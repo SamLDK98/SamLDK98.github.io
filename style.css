@@ -1,0 +1,222 @@
+/* ─── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --ink:        #1a1a18;
+  --ink-light:  #4a4a45;
+  --rule:       #1a1a18;
+  --bg:         #f9f6f0;
+  --accent:     #c8102e;
+  --col-width:  680px;
+  --font-body:  'EB Garamond', Georgia, serif;
+  --font-head:  'Libre Baskerville', Georgia, serif;
+}
+
+html {
+  font-size: 20px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.75;
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+header {
+  max-width: var(--col-width);
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.header-rule {
+  height: 3px;
+  background: var(--rule);
+  margin-bottom: 0;
+}
+
+.top-rule {
+  margin-bottom: 1.5rem;
+}
+
+.bottom-rule {
+  margin-top: 1.5rem;
+}
+
+.header-inner {
+  padding: 0 0.5rem;
+}
+
+.publication-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 1.2rem;
+}
+
+.essay-title {
+  font-family: var(--font-head);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.essay-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+  margin-bottom: 1.4rem;
+}
+
+.byline-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.byline-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-light);
+  opacity: 0.4;
+  max-width: 80px;
+}
+
+.byline {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  white-space: nowrap;
+}
+
+/* ─── Main / Article ────────────────────────────────────────── */
+main {
+  max-width: var(--col-width);
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+article {
+  padding-top: 2.5rem;
+}
+
+/* ─── Part Label ────────────────────────────────────────────── */
+.essay-part {
+  margin-bottom: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+.part-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+/* ─── Sections ──────────────────────────────────────────────── */
+.essay-section {
+  margin-bottom: 2.8rem;
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(26,26,24,0.15);
+}
+
+/* ─── Body Text ─────────────────────────────────────────────── */
+p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--ink);
+  margin-bottom: 1.2em;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* Drop cap on first paragraph of first section */
+.essay-section:first-of-type p:first-child::first-letter {
+  font-family: var(--font-head);
+  font-size: 4.2rem;
+  font-weight: 700;
+  float: left;
+  line-height: 0.82;
+  margin-right: 0.08em;
+  margin-top: 0.06em;
+  color: var(--ink);
+}
+
+/* ─── Footer ────────────────────────────────────────────────── */
+footer {
+  max-width: var(--col-width);
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.footer-rule {
+  height: 3px;
+  background: var(--rule);
+  margin-bottom: 1rem;
+}
+
+.footer-text {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  text-align: center;
+}
+
+/* ─── Fade-in on load ───────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+header {
+  animation: fadeUp 0.7s ease both;
+}
+
+.essay-section {
+  opacity: 0;
+  animation: fadeUp 0.6s ease forwards;
+}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  html { font-size: 18px; }
+
+  .essay-title { font-size: 1.85rem; }
+
+  p { text-align: left; hyphens: none; }
+}
