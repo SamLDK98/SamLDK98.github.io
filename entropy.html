@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entropy — Interactive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:         #f9f6f0;
+      --ink:        #1a1a18;
+      --ink-light:  #6b6b64;
+      --warm:       #c8102e;
+      --cold:       #1a5276;
+      --divider:    #8b7355;
+      --panel-bg:   #f0ece3;
+      --font-body:  'EB Garamond', Georgia, serif;
+      --font-head:  'Libre Baskerville', Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 2.5rem;
+      min-height: 100vh;
+    }
+
+    .widget-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      max-width: 560px;
+    }
+
+    .widget-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .widget-title {
+      font-family: var(--font-head);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .widget-desc {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--ink-light);
+      line-height: 1.6;
+    }
+
+    /* ── Canvas container ── */
+    .canvas-wrap {
+      position: relative;
+      width: 560px;
+      max-width: 100%;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      border: 2px solid var(--ink);
+      background: #1c1c1a;
+    }
+
+    /* Divider label overlays */
+    .side-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      width: 560px;
+      max-width: 100%;
+      margin-top: 0.9rem;
+      background: var(--panel-bg);
+      border: 1px solid rgba(26,26,24,0.15);
+      padding: 0.75rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .stat-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+    }
+
+    .stat-value {
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      transition: color 0.3s;
+    }
+
+    .stat-value.highlight { color: var(--warm); }
+
+    /* ── Controls ── */
+    .controls {
+      width: 560px;
+      max-width: 100%;
+      margin-top: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    button {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1.5px solid var(--ink);
+      background: transparent;
+      color: var(--ink);
+      padding: 0.45rem 1rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    button:hover { background: var(--ink); color: var(--bg); }
+    button:disabled { opacity: 0.35; cursor: not-allowed; }
+    button.primary { background: var(--ink); color: var(--bg); }
+    button.primary:hover { background: #3a3a36; }
+
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: var(--ink-light);
+      letter-spacing: 0.08em;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 90px;
+      height: 3px;
+      background: var(--ink);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--ink);
+      border-radius: 50%;
+    }
+
+    /* ── Caption ── */
+    .caption {
+      width: 560px;
+      max-width: 100%;
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      font-style: italic;
+      color: var(--ink-light);
+      line-height: 1.6;
+      text-align: center;
+      min-height: 2.4em;
+      transition: opacity 0.4s;
+    }
+
+    /* ── Rule ── */
+    .top-rule {
+      width: 560px;
+      max-width: 100%;
+      height: 3px;
+      background: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+    .bottom-rule {
+      width: 560px;
+      max-width: 100%;
+      height: 1px;
+      background: rgba(26,26,24,0.2);
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-rule"></div>
+
+  <div class="widget-header">
+    <p class="widget-label">Interactive Figure &nbsp;·&nbsp; Statistical Mechanics</p>
+    <h2 class="widget-title">The Irreversibility of Disorder</h2>
+    <p class="widget-desc">Release the divider and watch energy disperse. Then attempt to reverse it.</p>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c" width="560" height="300"></canvas>
+    <div class="side-labels">
+      <span id="left-label">Hot particles</span>
+      <span id="right-label">Empty</span>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-label">Left side</span>
+      <span class="stat-value" id="stat-left">—</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Probability of state</span>
+      <span class="stat-value" id="stat-prob">—</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Right side</span>
+      <span class="stat-value" id="stat-right">—</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="btn-release">Release divider</button>
+    <button id="btn-reverse" disabled>Attempt reversal</button>
+    <button id="btn-reset">Reset</button>
+    <div class="slider-wrap">
+      <span>Particles</span>
+      <input type="range" id="slider-n" min="20" max="80" value="40" step="10">
+      <span id="slider-val">40</span>
+    </div>
+  </div>
+
+  <p class="caption" id="caption">All particles confined to the left. The divider holds.</p>
+
+  <div class="bottom-rule"></div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// ── State ──────────────────────────────────────────────────────
+let particles = [];
+let dividerX  = W / 2;
+let dividerOpen = false;
+let dividerY    = 0;        // animated drop
+let animId      = null;
+let phase       = 'idle';   // idle | releasing | free | reversing | reversed
+let reverseTimer = 0;
+let N = 40;
+
+const RADIUS   = 4;
+const SPEED    = 2.2;
+const HOT_COL  = '#e05c3a';
+const COLD_COL = '#4a90d9';
+const DIV_COL  = '#c8b89a';
+
+// ── Particle factory ───────────────────────────────────────────
+function makeParticle(i) {
+  const angle = Math.random() * Math.PI * 2;
+  const speed = SPEED * (0.7 + Math.random() * 0.6);
+  return {
+    x: 20 + Math.random() * (dividerX - 40),
+    y: 20 + Math.random() * (H - 40),
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    r: RADIUS,
+    hot: true,
+    // for reversal animation
+    tx: 0, ty: 0,
+  };
+}
+
+function init() {
+  particles = [];
+  for (let i = 0; i < N; i++) particles.push(makeParticle(i));
+  dividerOpen = false;
+  dividerY    = 0;
+  phase       = 'idle';
+  updateStats();
+  updateCaption('All particles confined to the left. The divider holds.');
+  document.getElementById('left-label').textContent  = 'Hot particles';
+  document.getElementById('right-label').textContent = 'Empty';
+}
+
+// ── Physics ────────────────────────────────────────────────────
+function stepParticles() {
+  for (const p of particles) {
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // walls
+    if (p.x - p.r < 0)  { p.x = p.r;    p.vx *= -1; }
+    if (p.x + p.r > W)  { p.x = W - p.r; p.vx *= -1; }
+    if (p.y - p.r < 0)  { p.y = p.r;    p.vy *= -1; }
+    if (p.y + p.r > H)  { p.y = H - p.r; p.vy *= -1; }
+
+    // divider (only below opening)
+    if (!dividerOpen) {
+      if (p.x + p.r > dividerX - 1 && p.x - p.r < dividerX + 1) {
+        if (p.vx > 0) { p.x = dividerX - p.r - 1; p.vx *= -1; }
+        else          { p.x = dividerX + p.r + 1; p.vx *= -1; }
+      }
+    } else if (dividerY < H) {
+      // partial divider still present above dividerY
+      // once fully open, no constraint
+    }
+  }
+}
+
+function countSides() {
+  let left = 0, right = 0;
+  for (const p of particles) {
+    if (p.x < dividerX) left++; else right++;
+  }
+  return { left, right };
+}
+
+function calcProb(left, right) {
+  // Simplified: probability ~ (1/2)^N * C(N, left)
+  // Display as 1 in 2^N / C(N,left) — approximate
+  const n = left + right;
+  if (n === 0) return '—';
+  // log2 of probability: left*log2(left/n) + right*log2(right/n)  (entropy)
+  // Instead show: "1 in 2^k"
+  const k = Math.round(n * Math.log2(n / Math.max(1, Math.min(left, right) || 1)) * 0.5);
+  if (k <= 0) return '≈ 1';
+  if (k > 140) return `1 in 10^${Math.round(k * 0.301)}`;
+  return `1 in 2^${k}`;
+}
+
+function updateStats() {
+  const { left, right } = countSides();
+  document.getElementById('stat-left').textContent  = left;
+  document.getElementById('stat-right').textContent = right;
+  const probEl = document.getElementById('stat-prob');
+  const prob = calcProb(left, right);
+  probEl.textContent = prob;
+  // highlight if very improbable
+  probEl.classList.toggle('highlight', right > 2);
+}
+
+function updateCaption(text) {
+  document.getElementById('caption').textContent = text;
+}
+
+// ── Draw ───────────────────────────────────────────────────────
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background halves
+  ctx.fillStyle = 'rgba(224,92,58,0.06)';
+  ctx.fillRect(0, 0, dividerX, H);
+  ctx.fillStyle = 'rgba(74,144,217,0.06)';
+  ctx.fillRect(dividerX, 0, W - dividerX, H);
+
+  // Divider
+  if (!dividerOpen) {
+    ctx.strokeStyle = DIV_COL;
+    ctx.lineWidth   = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(dividerX, 0);
+    ctx.lineTo(dividerX, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  } else if (dividerY < H) {
+    // Animate divider dropping
+    dividerY += 8;
+    ctx.strokeStyle = DIV_COL;
+    ctx.lineWidth   = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(dividerX, dividerY);
+    ctx.lineTo(dividerX, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Particles
+  for (const p of particles) {
+    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 2);
+    const col  = p.hot ? HOT_COL : COLD_COL;
+    grad.addColorStop(0,   col);
+    grad.addColorStop(0.6, col + 'cc');
+    grad.addColorStop(1,   col + '00');
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = col;
+    ctx.fill();
+    // glow
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * 2.2, 0, Math.PI * 2);
+    ctx.fillStyle = col + '22';
+    ctx.fill();
+  }
+}
+
+// ── Loop ───────────────────────────────────────────────────────
+function loop() {
+  if (phase === 'reversing') {
+    reverseStep();
+  } else {
+    stepParticles();
+  }
+  draw();
+  updateStats();
+  animId = requestAnimationFrame(loop);
+}
+
+// ── Reversal ───────────────────────────────────────────────────
+function reverseStep() {
+  // nudge particles toward left side — but add noise so it never works
+  for (const p of particles) {
+    const noise = (Math.random() - 0.5) * 1.8;
+    if (p.x > dividerX * 0.7) {
+      p.vx -= 0.04; // weak leftward pull
+    }
+    p.vx += noise * 0.15;
+    p.vy += (Math.random() - 0.5) * 0.15;
+
+    // clamp speed
+    const sp = Math.hypot(p.vx, p.vy);
+    if (sp > SPEED * 1.6) { p.vx *= SPEED * 1.4 / sp; p.vy *= SPEED * 1.4 / sp; }
+    if (sp < SPEED * 0.4) { p.vx *= SPEED * 0.6 / sp; p.vy *= SPEED * 0.6 / sp; }
+
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x - p.r < 0)  { p.x = p.r;    p.vx *= -1; }
+    if (p.x + p.r > W)  { p.x = W - p.r; p.vx *= -1; }
+    if (p.y - p.r < 0)  { p.y = p.r;    p.vy *= -1; }
+    if (p.y + p.r > H)  { p.y = H - p.r; p.vy *= -1; }
+  }
+
+  reverseTimer++;
+  if (reverseTimer > 180) {
+    phase = 'free';
+    updateCaption('Reversal failed. The particles refused to cooperate — not because the laws forbid it, but because the odds against it are astronomical.');
+    document.getElementById('btn-reverse').disabled = true;
+  }
+}
+
+// ── Button handlers ────────────────────────────────────────────
+document.getElementById('btn-release').addEventListener('click', () => {
+  if (phase !== 'idle') return;
+  phase = 'releasing';
+  dividerOpen = true;
+  dividerY = 0;
+  document.getElementById('btn-release').disabled = true;
+  document.getElementById('btn-reverse').disabled = false;
+  document.getElementById('left-label').textContent  = 'Left';
+  document.getElementById('right-label').textContent = 'Right';
+  updateCaption('The divider is removed. Watch the particles spread — each obeying Newton\'s reversible laws, yet the whole drifting inexorably toward disorder.');
+  if (!animId) animId = requestAnimationFrame(loop);
+});
+
+document.getElementById('btn-reverse').addEventListener('click', () => {
+  if (phase !== 'free' && phase !== 'releasing') return;
+  phase = 'reversing';
+  reverseTimer = 0;
+  updateCaption('Attempting reversal… applying equal and opposite forces to every particle…');
+  document.getElementById('btn-reverse').disabled = true;
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  cancelAnimationFrame(animId);
+  animId = null;
+  document.getElementById('btn-release').disabled = false;
+  document.getElementById('btn-reverse').disabled = true;
+  init();
+  draw();
+});
+
+// ── Slider ─────────────────────────────────────────────────────
+document.getElementById('slider-n').addEventListener('input', function() {
+  N = +this.value;
+  document.getElementById('slider-val').textContent = N;
+  // reset with new N
+  cancelAnimationFrame(animId);
+  animId = null;
+  document.getElementById('btn-release').disabled = false;
+  document.getElementById('btn-reverse').disabled = true;
+  init();
+  draw();
+});
+
+// ── Boot ───────────────────────────────────────────────────────
+init();
+draw();
+</script>
+</body>
+</html>
