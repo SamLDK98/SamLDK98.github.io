@@ -1,0 +1,135 @@
+<style>
+.tr-widget { max-width: 600px; margin: 0 auto; padding: 1rem 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+.tr-direction { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 500; margin-bottom: 12px; padding: 10px 16px; border-radius: 6px; background: var(--color-background-secondary, rgba(0,0,0,0.04)); color: var(--color-text-secondary, #5f5e5a); transition: background 300ms ease, color 300ms ease; }
+.tr-direction.forward { background: rgba(129, 178, 154, 0.22); color: #2d5a44; }
+.tr-direction.backward { background: rgba(224, 122, 95, 0.22); color: #8b3a18; }
+.tr-direction-arrow { font-size: 16px; min-width: 18px; text-align: center; }
+.tr-box-wrap { display: flex; justify-content: center; }
+.tr-box { width: 100%; max-width: 520px; aspect-ratio: 380/240; border: 1px solid var(--color-border-tertiary, rgba(0,0,0,0.18)); border-radius: 4px; background: rgba(0,0,0,0.015); }
+.tr-trail { fill: none; stroke-width: 1.5; stroke-opacity: 0.4; stroke-linecap: round; stroke-linejoin: round; }
+.tr-info { text-align: center; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); margin: 12px 0; }
+.tr-controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.tr-btn { font: inherit; font-size: 13px; padding: 7px 14px; border: 0.5px solid var(--color-border-secondary, rgba(0,0,0,0.25)); background: transparent; color: inherit; border-radius: 6px; cursor: pointer; transition: background 150ms; min-width: 130px; }
+.tr-btn:hover { background: var(--color-background-secondary, rgba(0,0,0,0.04)); }
+.tr-btn:active { transform: scale(0.98); }
+.tr-btn.active-fwd { background: #3a6e54; color: white; border-color: #3a6e54; }
+.tr-btn.active-back { background: #c46838; color: white; border-color: #c46838; }
+.tr-caption { text-align: center; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); font-style: italic; line-height: 1.55; }
+@media (prefers-color-scheme: dark) { .tr-box { background: rgba(255,255,255,0.02); } }
+</style>
+<div class="tr-widget">
+  <div class="tr-direction" id="tr-direction">
+    <span>Time:</span>
+    <span class="tr-direction-arrow" id="tr-direction-arrow">⏸</span>
+    <span id="tr-direction-text">paused</span>
+  </div>
+  <div class="tr-box-wrap">
+    <svg class="tr-box" viewBox="0 0 380 240" id="tr-box" role="img" aria-label="A box containing 6 colored balls bouncing elastically. Each ball leaves a trail showing its recent path."></svg>
+  </div>
+  <div class="tr-info">Step <span id="tr-step">0</span></div>
+  <div class="tr-controls">
+    <button class="tr-btn" id="tr-back">◀ Reverse time</button>
+    <button class="tr-btn" id="tr-forward">Forward time ▶</button>
+    <button class="tr-btn" id="tr-reset">Reset</button>
+  </div>
+  <p class="tr-caption">Run the simulation forward, then click "Reverse time". The balls retrace their path exactly back to the starting positions.<br>The same Newtonian equations describe motion in either direction.</p>
+</div>
+<script>
+(function() {
+  const W = 380, H = 240, R = 13, TRAIL = 200, MAX_HIST = 3000, FPS = 50;
+  const COLORS = ['#e07a5f','#3d5a80','#81b29a','#5a4b8e','#d9a83e','#5fa8a8'];
+  const initial = [
+    {x: 60, y: 80, vx: 1.5, vy: 1.0},
+    {x: 200, y: 60, vx: -1.2, vy: 1.6},
+    {x: 280, y: 180, vx: 1.1, vy: -1.4},
+    {x: 100, y: 200, vx: -1.7, vy: -1.0},
+    {x: 250, y: 100, vx: 0.8, vy: 1.8},
+    {x: 160, y: 150, vx: -0.9, vy: -1.3}
+  ];
+  let balls = [], history = [], frameIdx = 0, mode = 'paused', timer = null;
+  function snap() { return balls.map(b => [b.x, b.y, b.vx, b.vy]); }
+  function restore(s) { for (let i = 0; i < balls.length; i++) { balls[i].x = s[i][0]; balls[i].y = s[i][1]; balls[i].vx = s[i][2]; balls[i].vy = s[i][3]; } }
+  function reset() {
+    pause();
+    balls = initial.map((s, i) => ({...s, color: COLORS[i]}));
+    history = [snap()]; frameIdx = 0;
+    render(); updateUI();
+  }
+  function simulate() {
+    for (const b of balls) { b.x += b.vx; b.y += b.vy; }
+    for (const b of balls) {
+      if (b.x < R) { b.x = R; b.vx = -b.vx; }
+      if (b.x > W - R) { b.x = W - R; b.vx = -b.vx; }
+      if (b.y < R) { b.y = R; b.vy = -b.vy; }
+      if (b.y > H - R) { b.y = H - R; b.vy = -b.vy; }
+    }
+    for (let i = 0; i < balls.length; i++) for (let j = i+1; j < balls.length; j++) collide(balls[i], balls[j]);
+  }
+  function collide(a, b) {
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const d2 = dx*dx + dy*dy, md = 2*R;
+    if (d2 >= md*md) return;
+    const d = Math.sqrt(d2);
+    if (d === 0) return;
+    const nx = dx/d, ny = dy/d;
+    const overlap = md - d;
+    a.x -= nx * overlap/2; a.y -= ny * overlap/2;
+    b.x += nx * overlap/2; b.y += ny * overlap/2;
+    const rvx = b.vx - a.vx, rvy = b.vy - a.vy;
+    const vRel = rvx*nx + rvy*ny;
+    if (vRel > 0) return;
+    const j = -vRel;
+    a.vx -= j*nx; a.vy -= j*ny;
+    b.vx += j*nx; b.vy += j*ny;
+  }
+  function tick() {
+    if (mode === 'forward') {
+      if (frameIdx < history.length - 1) { frameIdx++; restore(history[frameIdx]); }
+      else { simulate(); history.push(snap()); if (history.length > MAX_HIST) history.shift(); frameIdx = history.length - 1; }
+    } else if (mode === 'backward') {
+      if (frameIdx > 0) { frameIdx--; restore(history[frameIdx]); }
+      else { pause(); }
+    }
+    render(); updateUI();
+  }
+  function play(dir) { if (timer) clearInterval(timer); mode = dir; timer = setInterval(tick, 1000/FPS); updateUI(); }
+  function pause() { if (timer) clearInterval(timer); timer = null; mode = 'paused'; updateUI(); }
+  function setupSVG() {
+    const svg = document.getElementById('tr-box');
+    let html = '';
+    for (let i = 0; i < initial.length; i++) html += `<polyline class="tr-trail" id="tr-trail-${i}" stroke="${COLORS[i]}" points=""/>`;
+    for (let i = 0; i < initial.length; i++) html += `<circle class="tr-ball" id="tr-ball-${i}" r="${R}" fill="${COLORS[i]}"/>`;
+    svg.innerHTML = html;
+  }
+  function render() {
+    for (let i = 0; i < balls.length; i++) {
+      document.getElementById(`tr-ball-${i}`).setAttribute('cx', balls[i].x);
+      document.getElementById(`tr-ball-${i}`).setAttribute('cy', balls[i].y);
+      const start = Math.max(0, frameIdx - TRAIL);
+      const pts = [];
+      for (let f = start; f <= frameIdx; f++) if (history[f]) pts.push(history[f][i][0].toFixed(1) + ',' + history[f][i][1].toFixed(1));
+      document.getElementById(`tr-trail-${i}`).setAttribute('points', pts.join(' '));
+    }
+  }
+  function updateUI() {
+    document.getElementById('tr-step').textContent = frameIdx;
+    const dir = document.getElementById('tr-direction');
+    const arr = document.getElementById('tr-direction-arrow');
+    const txt = document.getElementById('tr-direction-text');
+    dir.classList.remove('forward', 'backward');
+    if (mode === 'forward') { dir.classList.add('forward'); arr.textContent = '→'; txt.textContent = 'forward'; }
+    else if (mode === 'backward') { dir.classList.add('backward'); arr.textContent = '←'; txt.textContent = 'reversed'; }
+    else { arr.textContent = '⏸'; txt.textContent = 'paused'; }
+    const fb = document.getElementById('tr-forward');
+    const bb = document.getElementById('tr-back');
+    fb.classList.toggle('active-fwd', mode === 'forward');
+    bb.classList.toggle('active-back', mode === 'backward');
+    fb.textContent = mode === 'forward' ? 'Pause' : 'Forward time ▶';
+    bb.textContent = mode === 'backward' ? 'Pause' : '◀ Reverse time';
+  }
+  setupSVG(); reset();
+  document.getElementById('tr-forward').onclick = () => mode === 'forward' ? pause() : play('forward');
+  document.getElementById('tr-back').onclick = () => mode === 'backward' ? pause() : play('backward');
+  document.getElementById('tr-reset').onclick = reset;
+})();
+</script>
