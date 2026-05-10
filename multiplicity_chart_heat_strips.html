@@ -1,48 +1,83 @@
 <style>
 .mc-widget { max-width: 700px; margin: 0 auto; padding: 1rem 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 .mc-axis-label { text-align: center; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); margin-bottom: 8px; }
-.mc-bars { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; align-items: end; height: 320px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.15)); }
+.mc-chart { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: stretch; }
+.mc-y-axis { position: relative; height: 320px; border-right: 0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.18)); }
+.mc-y-tick { position: absolute; right: 8px; transform: translateY(50%); font-size: 10px; color: var(--color-text-secondary, #5f5e5a); white-space: nowrap; }
+.mc-plot { position: relative; }
+.mc-gridline { position: absolute; left: 0; right: 0; border-top: 0.5px solid rgba(0,0,0,0.08); }
+.mc-bars { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; align-items: end; height: 320px; padding: 8px 0 0; border-bottom: 0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.18)); }
 .mc-col { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
-.mc-heat { display: flex; width: 100%; height: 18px; border-radius: 3px; overflow: hidden; margin-bottom: 4px; border: 0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.18)); }
+.mc-heat { display: flex; width: 100%; height: 18px; border-radius: 3px; overflow: hidden; margin-bottom: 5px; border: 0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.18)); }
 .mc-heat-half { flex: 1; }
 .mc-bar-wrap { width: 100%; flex: 1; display: flex; align-items: flex-end; }
-.mc-bar { width: 100%; background: var(--color-text-secondary, #6b6862); border-radius: 3px 3px 0 0; min-height: 2px; }
-.mc-labels { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; margin-top: 6px; }
+.mc-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; border: 0.5px solid rgba(0,0,0,0.14); border-bottom: 0; }
+.mc-labels { display: grid; grid-template-columns: 54px 1fr; gap: 10px; margin-top: 6px; }
+.mc-x-labels { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; }
 .mc-label { font-size: 11px; text-align: center; color: var(--color-text-secondary, #5f5e5a); line-height: 1.3; }
-.mc-count { font-size: 12px; font-weight: 500; text-align: center; color: var(--color-text-primary, #2c2c2a); margin-top: 2px; }
+.mc-x-axis-title { grid-column: 2; text-align: center; font-size: 11px; color: var(--color-text-secondary, #5f5e5a); margin-top: 6px; }
 .mc-legend { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 18px; font-size: 11px; color: var(--color-text-secondary, #5f5e5a); flex-wrap: wrap; }
 .mc-legend-item { display: flex; align-items: center; gap: 6px; }
 .mc-legend-swatch { width: 14px; height: 14px; border-radius: 2px; border: 0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.15)); }
 .mc-caption { text-align: center; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); margin-top: 12px; font-style: italic; }
+@media (max-width: 520px) {
+  .mc-chart, .mc-labels { grid-template-columns: 46px 1fr; gap: 8px; }
+  .mc-y-tick { font-size: 9px; right: 6px; }
+  .mc-bars, .mc-x-labels { gap: 4px; }
+  .mc-label { font-size: 10px; }
+}
 </style>
 <div class="mc-widget">
-  <div class="mc-axis-label">Number of microstates compatible with each macrostate</div>
-  <div class="mc-bars" id="mc-bars" role="img" aria-label="Bar chart of microstate counts per macrostate. The 4-and-4 macrostate has 4,900 microstates, far more than the 1 microstate of the all-on-one-side macrostates. Above each bar, a two-cell strip shows the heat distribution of that macrostate."></div>
-  <div class="mc-labels" id="mc-labels"></div>
-  <div class="mc-legend">
-    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#1e3a5f"></div>cold</div>
-    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#82a8c8"></div>cool</div>
-    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#b8a088"></div>warm</div>
-    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#d99868"></div>hot</div>
-    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#702018"></div>scorching</div>
+  <div class="mc-axis-label">Number of compatible microstates</div>
+  <div class="mc-chart">
+    <div class="mc-y-axis" id="mc-y-axis" aria-hidden="true"></div>
+    <div class="mc-plot">
+      <div id="mc-gridlines" aria-hidden="true"></div>
+      <div class="mc-bars" id="mc-bars" role="img" aria-label="Bar chart of microstate counts per macrostate, ordered from 8 dots on the left and 0 on the right to 0 dots on the left and 8 on the right. The 4-and-4 macrostate has 4,900 compatible microstates."></div>
+    </div>
   </div>
-  <p class="mc-caption">Heat strip above each bar shows the temperature of the left and right halves for that macrostate.</p>
+  <div class="mc-labels">
+    <div></div>
+    <div class="mc-x-labels" id="mc-labels"></div>
+    <div class="mc-x-axis-title">Dots on left / dots on right</div>
+  </div>
+  <div class="mc-legend">
+    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#8ecae6"></div>cold</div>
+    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#f4a261"></div>equal / warm</div>
+    <div class="mc-legend-item"><div class="mc-legend-swatch" style="background:#e76f51"></div>hot</div>
+  </div>
+  <p class="mc-caption">Each bar is split into left-half and right-half temperature. Taller bars represent macrostates with more compatible microstates.</p>
 </div>
 <script>
 (function() {
-  const counts = [1, 64, 784, 3136, 4900, 3136, 784, 64, 1];
-  const heat = ['#1e3a5f','#2d5a8a','#4a7eb6','#82a8c8','#b8a088','#d99868','#c46838','#a04028','#702018'];
+  const countsByLeft = [1, 64, 784, 3136, 4900, 3136, 784, 64, 1];
+  const heat = ['#8ecae6', '#9bd3e6', '#b7d9d8', '#f2c38b', '#f4a261', '#ef8d5a', '#e76f51', '#dc5f45', '#cf4d3f'];
   const max = 4900;
+  const ticks = [4900, 3136, 784, 64, 1];
   const bars = document.getElementById('mc-bars');
   const labels = document.getElementById('mc-labels');
-  let barsHtml = '', labelsHtml = '';
-  for (let leftDots = 0; leftDots <= 8; leftDots++) {
-    const rightDots = 8 - leftDots;
-    const ct = counts[leftDots];
-    const heightPct = Math.max((ct / max) * 100, 0.5);
-    barsHtml += `<div class="mc-col" title="${leftDots} left / ${rightDots} right · ${ct.toLocaleString()} microstates"><div class="mc-heat"><div class="mc-heat-half" style="background: ${heat[leftDots]}"></div><div class="mc-heat-half" style="background: ${heat[rightDots]}"></div></div><div class="mc-bar-wrap"><div class="mc-bar" style="height: ${heightPct}%"></div></div></div>`;
-    labelsHtml += `<div><div class="mc-label">${leftDots} / ${rightDots}</div><div class="mc-count">${ct.toLocaleString()}</div></div>`;
+  const yAxis = document.getElementById('mc-y-axis');
+  const gridlines = document.getElementById('mc-gridlines');
+  let barsHtml = '', labelsHtml = '', ticksHtml = '', gridHtml = '';
+
+  for (const tick of ticks) {
+    const bottomPct = (tick / max) * 100;
+    ticksHtml += `<div class="mc-y-tick" style="bottom:${bottomPct}%">${tick.toLocaleString()}</div>`;
+    gridHtml += `<div class="mc-gridline" style="bottom:${bottomPct}%"></div>`;
   }
+
+  for (let leftDots = 8; leftDots >= 0; leftDots--) {
+    const rightDots = 8 - leftDots;
+    const count = countsByLeft[leftDots];
+    const heightPct = Math.max((count / max) * 100, 0.5);
+    const fill = `linear-gradient(90deg, ${heat[leftDots]} 0 50%, ${heat[rightDots]} 50% 100%)`;
+    const title = `${leftDots} left / ${rightDots} right - ${count.toLocaleString()} compatible microstates`;
+    barsHtml += `<div class="mc-col" title="${title}"><div class="mc-heat"><div class="mc-heat-half" style="background:${heat[leftDots]}"></div><div class="mc-heat-half" style="background:${heat[rightDots]}"></div></div><div class="mc-bar-wrap"><div class="mc-bar" style="height:${heightPct}%; background:${fill}"></div></div></div>`;
+    labelsHtml += `<div class="mc-label">${leftDots}/${rightDots}</div>`;
+  }
+
+  yAxis.innerHTML = ticksHtml;
+  gridlines.innerHTML = gridHtml;
   bars.innerHTML = barsHtml;
   labels.innerHTML = labelsHtml;
 })();
