@@ -149,6 +149,14 @@ article {
   border-bottom: 1px solid rgba(26,26,24,0.15);
 }
 
+.subsection-title {
+  font-family: var(--font-head);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 2.2rem 0 0.75rem;
+}
+
 /* ─── Body Text ─────────────────────────────────────────────── */
 p {
   font-size: 1rem;
@@ -173,6 +181,42 @@ li {
   line-height: 1.8;
   color: var(--ink);
   padding-left: 0.25rem;
+}
+
+.table-wrap {
+  margin: 1.4rem 0 1.8rem;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+th,
+td {
+  border-bottom: 1px solid rgba(26,26,24,0.16);
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  color: var(--ink);
+  background: rgba(26,26,24,0.035);
+}
+
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.math {
+  white-space: nowrap;
 }
 
 /* Drop cap on first paragraph of first section */
@@ -214,6 +258,14 @@ li {
   height: 520px;
   margin: 2.4rem 0;
   border: 0;
+}
+
+.essay-widget-chart {
+  height: 500px;
+}
+
+.essay-widget-tall {
+  height: 560px;
 }
 
 footer {
@@ -267,4 +319,13 @@ header {
   .essay-title { font-size: 1.85rem; }
 
   p { text-align: left; hyphens: none; }
+
+  table { font-size: 0.78rem; }
+
+  th,
+  td { padding: 0.4rem 0.45rem; }
+
+  .essay-widget,
+  .essay-widget-chart,
+  .essay-widget-tall { height: 620px; }
 }

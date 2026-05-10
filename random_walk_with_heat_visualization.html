@@ -1,0 +1,133 @@
+<style>
+.rw-widget { max-width: 680px; margin: 0 auto; padding: 1rem 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+.rw-stats { display: flex; justify-content: space-around; gap: 12px; margin-bottom: 14px; text-align: center; }
+.rw-stat-label { font-size: 12px; color: var(--color-text-secondary, #5f5e5a); margin-bottom: 2px; }
+.rw-stat-value { font-size: 18px; font-weight: 500; }
+.rw-band-wrap { display: flex; height: 22px; border-radius: 4px; overflow: hidden; margin-bottom: 16px; border: 0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.15)); }
+.rw-band-half { flex: 1; transition: background-color 500ms ease; background: #b8a088; }
+.rw-main { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: center; margin-bottom: 18px; }
+@media (max-width: 540px) { .rw-main { grid-template-columns: 1fr; } }
+.rw-grid-wrap { display: flex; justify-content: center; }
+.rw-grid { width: 100%; max-width: 240px; aspect-ratio: 1; }
+.rw-heat-half { transition: fill 400ms ease; }
+.rw-cell { fill: rgba(0,0,0,0.04); stroke: rgba(0,0,0,0.12); stroke-width: 0.5; }
+.rw-midline { stroke: rgba(0,0,0,0.3); stroke-width: 1; stroke-dasharray: 3 3; }
+.rw-dot { fill: var(--color-text-primary, #2c2c2a); transition: cx 240ms ease, cy 240ms ease; }
+.rw-chart-wrap { position: relative; height: 200px; width: 100%; }
+.rw-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+.rw-btn { font: inherit; font-size: 13px; padding: 7px 14px; border: 0.5px solid var(--color-border-secondary, rgba(0,0,0,0.25)); background: transparent; color: inherit; border-radius: 6px; cursor: pointer; transition: background 150ms; min-width: 90px; }
+.rw-btn:hover { background: var(--color-background-secondary, rgba(0,0,0,0.04)); }
+.rw-btn:active { transform: scale(0.98); }
+.rw-speed { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); margin-left: 8px; }
+.rw-speed input[type="range"] { width: 80px; }
+.rw-caption { text-align: center; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); margin-top: 12px; font-style: italic; }
+@media (prefers-color-scheme: dark) { .rw-cell { fill: rgba(255,255,255,0.06); stroke: rgba(255,255,255,0.15); } .rw-midline { stroke: rgba(255,255,255,0.3); } }
+</style>
+<div class="rw-widget">
+  <div class="rw-stats">
+    <div><div class="rw-stat-label">Dots on left</div><div class="rw-stat-value" id="rw-left">4</div></div>
+    <div><div class="rw-stat-label">Dots on right</div><div class="rw-stat-value" id="rw-right">4</div></div>
+    <div><div class="rw-stat-label">Steps</div><div class="rw-stat-value" id="rw-steps">0</div></div>
+  </div>
+  <div class="rw-band-wrap" aria-label="Heat distribution: left half tinted by left temperature, right half by right temperature.">
+    <div class="rw-band-half" id="rw-band-left"></div>
+    <div class="rw-band-half" id="rw-band-right"></div>
+  </div>
+  <div class="rw-main">
+    <div class="rw-grid-wrap">
+      <svg class="rw-grid" viewBox="0 0 200 200" id="rw-grid" role="img" aria-label="Live 4 by 4 grid showing 8 dots that move randomly between adjacent cells. Halves tint by current heat."></svg>
+    </div>
+    <div class="rw-chart-wrap">
+      <canvas id="rw-chart" role="img" aria-label="Time series showing the number of dots on the left side over recent steps."></canvas>
+    </div>
+  </div>
+  <div class="rw-controls">
+    <button class="rw-btn" id="rw-play">▶ Play</button>
+    <button class="rw-btn" id="rw-random">Random start</button>
+    <button class="rw-btn" id="rw-allleft">All left</button>
+    <div class="rw-speed">
+      <span>Speed</span>
+      <input type="range" id="rw-speed" min="1" max="40" value="12" step="1">
+    </div>
+  </div>
+  <p class="rw-caption">Each step, a random dot tries to move to a random adjacent cell. Try starting with "All left".</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function() {
+  const GRID = 4, cellSize = 50, dotR = 16, HISTORY_MAX = 200;
+  const heat = ['#1e3a5f','#2d5a8a','#4a7eb6','#82a8c8','#b8a088','#d99868','#c46838','#a04028','#702018'];
+  let dots = [], running = false, stepCount = 0, history = [], chart = null, timer = null, speed = 12;
+  const svg = document.getElementById('rw-grid');
+  function buildGrid() {
+    let html = '';
+    html += `<rect class="rw-heat-half" id="rw-grid-left" x="0" y="0" width="100" height="200" fill="${heat[4]}" fill-opacity="0.32"/>`;
+    html += `<rect class="rw-heat-half" id="rw-grid-right" x="100" y="0" width="100" height="200" fill="${heat[4]}" fill-opacity="0.32"/>`;
+    for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) html += `<rect class="rw-cell" x="${c*cellSize}" y="${r*cellSize}" width="${cellSize}" height="${cellSize}"/>`;
+    html += `<line class="rw-midline" x1="100" y1="0" x2="100" y2="200"/>`;
+    for (let i = 0; i < 8; i++) html += `<circle class="rw-dot" id="rw-dot-${i}" r="${dotR}" cx="${cellSize/2}" cy="${cellSize/2}"/>`;
+    svg.innerHTML = html;
+  }
+  function renderDots() { for (let i = 0; i < dots.length; i++) { const el = document.getElementById('rw-dot-' + i); el.setAttribute('cx', dots[i].col * cellSize + cellSize / 2); el.setAttribute('cy', dots[i].row * cellSize + cellSize / 2); } }
+  function getLeftCount() { return dots.filter(d => d.col < 2).length; }
+  function updateStats() {
+    const left = getLeftCount();
+    const right = 8 - left;
+    document.getElementById('rw-left').textContent = left;
+    document.getElementById('rw-right').textContent = right;
+    document.getElementById('rw-steps').textContent = stepCount.toLocaleString();
+    document.getElementById('rw-band-left').style.backgroundColor = heat[left];
+    document.getElementById('rw-band-right').style.backgroundColor = heat[right];
+    document.getElementById('rw-grid-left').setAttribute('fill', heat[left]);
+    document.getElementById('rw-grid-right').setAttribute('fill', heat[right]);
+  }
+  function attemptStep() {
+    const idx = Math.floor(Math.random() * dots.length);
+    const dot = dots[idx];
+    const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    const [dr, dc] = dirs[Math.floor(Math.random() * 4)];
+    const nr = dot.row + dr, nc = dot.col + dc;
+    if (nr < 0 || nr >= GRID || nc < 0 || nc >= GRID) return false;
+    if (dots.some((d, i) => i !== idx && d.row === nr && d.col === nc)) return false;
+    dots[idx] = { row: nr, col: nc };
+    return true;
+  }
+  function tick() {
+    for (let i = 0; i < 6; i++) if (attemptStep()) break;
+    stepCount++;
+    history.push(getLeftCount());
+    if (history.length > HISTORY_MAX) history.shift();
+    renderDots(); updateStats(); updateChart();
+  }
+  function initChart() {
+    const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+    chart = new Chart(document.getElementById('rw-chart'), {
+      type: 'line',
+      data: { labels: history.map((_, i) => i), datasets: [{ data: [...history], borderColor: '#c46838', backgroundColor: 'rgba(196, 104, 56, 0.12)', fill: true, tension: 0.3, borderWidth: 1.5, pointRadius: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { min: 0, max: 8, ticks: { color: isDark ? '#a8a8a4' : '#5f5e5a', stepSize: 2, font: { size: 11 } }, grid: { color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)' }, title: { display: true, text: 'Dots on left over time', color: isDark ? '#a8a8a4' : '#5f5e5a', font: { size: 11 } } } } }
+    });
+  }
+  function updateChart() { if (!chart) return; chart.data.labels = history.map((_, i) => i); chart.data.datasets[0].data = [...history]; chart.update('none'); }
+  function play() { if (running) return; running = true; document.getElementById('rw-play').textContent = '⏸ Pause'; timer = setInterval(tick, 1000 / speed); }
+  function pause() { running = false; document.getElementById('rw-play').textContent = '▶ Play'; clearInterval(timer); }
+  function reset(mode) {
+    pause();
+    if (mode === 'random') {
+      const cells = [];
+      for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) cells.push({row: r, col: c});
+      for (let i = cells.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cells[i], cells[j]] = [cells[j], cells[i]]; }
+      dots = cells.slice(0, 8);
+    } else {
+      dots = [];
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 2; c++) dots.push({row: r, col: c});
+    }
+    stepCount = 0; history = [getLeftCount()];
+    renderDots(); updateStats(); updateChart();
+  }
+  buildGrid(); reset('random'); initChart();
+  document.getElementById('rw-play').onclick = () => running ? pause() : play();
+  document.getElementById('rw-random').onclick = () => reset('random');
+  document.getElementById('rw-allleft').onclick = () => reset('allleft');
+  document.getElementById('rw-speed').oninput = (e) => { speed = parseInt(e.target.value); if (running) { clearInterval(timer); timer = setInterval(tick, 1000 / speed); } };
+})();
+</script>

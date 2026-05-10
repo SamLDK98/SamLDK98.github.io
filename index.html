@@ -71,6 +71,219 @@
         <p>So: if Newton's laws governed the microscopic motion of particles, and those laws made no distinction between past and future, why did macroscopic, observable systems appear to evolve irreversibly?</p>
       </section>
 
+      <section class="essay-section">
+        <h3 class="section-title">b) Statistical Mechanics</h3>
+
+        <p>To understand why heat disperses from hotter regions to colder ones, we first need to understand entropy and why it tends to increase over time.</p>
+
+        <p>We will first consider a very abstract example.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Analogy</th>
+                <th>Physical meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Grid</td>
+                <td>Space available for the system to move within</td>
+              </tr>
+              <tr>
+                <td>Cells</td>
+                <td>Possible locations within that space</td>
+              </tr>
+              <tr>
+                <td>Individual dots</td>
+                <td>Parts/components/particles of the system</td>
+              </tr>
+              <tr>
+                <td>Dots collectively</td>
+                <td>The system</td>
+              </tr>
+              <tr>
+                <td>Dots configuration at one point in time</td>
+                <td>Microstate</td>
+              </tr>
+              <tr>
+                <td>The set of all microstates compatible with some macroscopic description.</td>
+                <td>Macrostate</td>
+              </tr>
+              <tr>
+                <td>Colour</td>
+                <td>Observable macroscopic property</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Imagine a 4&times;4 grid with 8 dots that randomly move around it.</p>
+
+        <p>Any specific configuration of these dots across the cells is a microstate of the system. With 8 dots in 16 cells, there are 12,870 unique microstates.</p>
+
+        <p>Now imagine the dots carry heat with them. Regions containing more dots are therefore warmer than regions containing fewer.</p>
+
+        <p>The resulting distribution of heat is a large-scale property emerging from the microscopic arrangement of the dots. We call such large-scale properties macroscopic observables.</p>
+
+        <p>Rather than tracking the exact position of every dot, we may instead describe the system in broader terms such as:</p>
+
+        <ul>
+          <li>&ldquo;hotter on the left,&rdquo;</li>
+          <li>&ldquo;hotter on the right,&rdquo;</li>
+          <li>or &ldquo;roughly equal temperature throughout.&rdquo;</li>
+        </ul>
+
+        <p>Each such macroscopic description defines a macrostate.</p>
+
+        <p>A macrostate is therefore the set of all microstates compatible with some observable large-scale description of the system.</p>
+
+        <p>A macrostate may therefore be understood in two equivalent ways:</p>
+
+        <ul>
+          <li>as a large-scale observable description of the system,</li>
+          <li>or as the set of all microstates compatible with that description.</li>
+        </ul>
+
+        <p>Different macrostates contain different numbers of compatible microstates.</p>
+
+        <p>If a macrostate is defined as all the dots being on the left-hand side, then there is only one compatible microstate.</p>
+
+        <p>If instead there must be four dots on the left and four on the right, there are 4,900 possible microstates compatible with that macrostate.</p>
+
+        <p>Here's the full count for each possible macrostate:</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="num">Dots on left</th>
+                <th class="num">Dots on right</th>
+                <th>Macroscopic description</th>
+                <th class="num">Number of microstates</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="num">0</td><td class="num">8</td><td>Extremely hot on the right</td><td class="num">1</td></tr>
+              <tr><td class="num">1</td><td class="num">7</td><td>Very hot on the right</td><td class="num">64</td></tr>
+              <tr><td class="num">2</td><td class="num">6</td><td>Hotter on the right</td><td class="num">784</td></tr>
+              <tr><td class="num">3</td><td class="num">5</td><td>Slightly hotter on the right</td><td class="num">3,136</td></tr>
+              <tr><td class="num">4</td><td class="num">4</td><td>Roughly uniform temperature</td><td class="num">4,900</td></tr>
+              <tr><td class="num">5</td><td class="num">3</td><td>Slightly hotter on the left</td><td class="num">3,136</td></tr>
+              <tr><td class="num">6</td><td class="num">2</td><td>Hotter on the left</td><td class="num">784</td></tr>
+              <tr><td class="num">7</td><td class="num">1</td><td>Very hot on the left</td><td class="num">64</td></tr>
+              <tr><td class="num">8</td><td class="num">0</td><td>Extremely hot on the left</td><td class="num">1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>And here is the distribution plotted:</p>
+
+        <iframe
+          class="essay-widget essay-widget-chart"
+          src="multiplicity_chart_heat_strips.html"
+          title="Bar chart showing the number of microstates compatible with each heat macrostate"
+          loading="lazy"
+        ></iframe>
+
+        <p>The 4-and-4 macrostate has the most compatible microstates.</p>
+
+        <p>If the dots wander randomly, we'd expect to see an even temperature distribution most of the time, with occasional fluctuations into warmer/colder regions left or right.</p>
+
+        <p>At this small scale those fluctuations happen often enough to be noticeable.</p>
+
+        <iframe
+          class="essay-widget essay-widget-tall"
+          src="random_walk_with_heat_visualization.html"
+          title="Random walking dots showing heat fluctuations on a small grid"
+          loading="lazy"
+        ></iframe>
+
+        <p>But let's scale everything up: consider a grid of 1 million cells with half a million dots:</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="num">Dots on left</th>
+                <th class="num">Dots on right</th>
+                <th>Macroscopic state</th>
+                <th class="num">Compatible microstates</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="num">0</td><td class="num">500,000</td><td>Extreme right-side heating</td><td class="num">1</td></tr>
+              <tr><td class="num">100,000</td><td class="num">400,000</td><td>Strong right-side heating</td><td class="num">~10<sup>217316</sup></td></tr>
+              <tr><td class="num">200,000</td><td class="num">300,000</td><td>Moderate right-side heating</td><td class="num">~10<sup>292279</sup></td></tr>
+              <tr><td class="num">250,000</td><td class="num">250,000</td><td>Thermal equilibrium</td><td class="num">~10<sup>301024</sup></td></tr>
+              <tr><td class="num">300,000</td><td class="num">200,000</td><td>Moderate left-side heating</td><td class="num">~10<sup>292279</sup></td></tr>
+              <tr><td class="num">400,000</td><td class="num">100,000</td><td>Strong left-side heating</td><td class="num">~10<sup>217316</sup></td></tr>
+              <tr><td class="num">500,000</td><td class="num">0</td><td>Extreme left-side heating</td><td class="num">1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>If our system begins near equilibrium, large deviations away from that equilibrium become astronomically unlikely.</p>
+
+        <p>Even a 1% imbalance (245,000 dots on one side and 255,000 on the other) lies about twenty standard deviations from equilibrium.</p>
+
+        <p>The probability of such a fluctuation, or anything more extreme, is around 10<sup>-89</sup>.</p>
+
+        <iframe
+          class="essay-widget essay-widget-chart"
+          src="scale_comparison_distribution_narrowing.html"
+          title="Scaled-up comparison showing the narrowing probability distribution near equilibrium"
+          loading="lazy"
+        ></iframe>
+
+        <h4 class="subsection-title">Perturbation</h4>
+
+        <p>Let's imagine we introduce 150K new dots to the left side. The macrostate would likely change; there would be a hotter left and colder right.</p>
+
+        <p>But over time the system would appear to drift toward equilibrium, and then stay there.</p>
+
+        <p>But why?</p>
+
+        <p>Return to the 4&times;4 grid. If all 8 dots start on the left side (filling columns 1 and 2), the 4 dots in column 1 are completely boxed in: surrounded by other dots and the edge.</p>
+
+        <p>The 4 dots in column 2 can only move in one direction: right, into the empty half.</p>
+
+        <p>There is literally no way for the next move to make the grid <em>more</em> concentrated on the left; every available move spreads things out.</p>
+
+        <p>When a system is in a low-multiplicity macrostate, the overwhelming majority of available moves take it toward higher-multiplicity macrostates, simply because there are more of those to move into.</p>
+
+        <p>There are simply far more ways for the system to become balanced than remain uneven.</p>
+
+        <p>Entropy is a measure of how many microstates are compatible with a macrostate. More precisely, it is proportional to the logarithm of that count: <span class="math">S = k&middot;ln(&Omega;)</span>. The log doesn't change the qualitative picture; it just keeps the numbers manageable when &Omega; is astronomical.</p>
+
+        <p>For example, our system has low entropy when all the dots are confined to one side, because even the movement of one dot will change the macrostate.</p>
+
+        <p>Other real-world examples:</p>
+
+        <p><strong>High entropy -- a cloud of gas:</strong> There are trillions of ways the molecules can fly around and still look like a &ldquo;cloud.&rdquo;</p>
+
+        <p><strong>Low entropy -- diamond crystal:</strong> The atoms must be in very specific spots. If you move one, the structure changes.</p>
+
+        <p>You'll often hear that systems &ldquo;try&rdquo; to maximize entropy. This is misleading. The system isn't trying to do anything. It wanders randomly through microstates, and overwhelmingly many of those microstates belong to high-entropy macrostates.</p>
+
+        <p>Macroscopic irreversibility emerges statistically rather than being explicitly built into the microscopic laws themselves.</p>
+
+        <p>A final note:</p>
+
+        <p>This analogy uses spatial position, but entropy isn't specifically about geometry. The same logic applies to any system with a meaningful distinction between microscopic configurations and macroscopic observables: the velocities of gas molecules, the alignments of magnetic spins, the energy levels of an ensemble. What matters is the multiplicity, not what the dots represent.</p>
+
+        <p>Statistical mechanics therefore appeared to explain why physical systems drift toward equilibrium. Heat disperses not because microscopic laws contain a preferred direction in time, but because overwhelmingly more microscopic arrangements correspond to dispersed states than concentrated ones.</p>
+
+        <p>But this immediately raised a deeper problem.</p>
+
+        <p>Living systems do not appear to drift passively toward equilibrium.</p>
+
+        <p>Cells maintain boundaries. Organisms preserve highly specific internal structure. Brains sustain coordinated electrical activity. Ecosystems maintain dynamic organization over enormous spans of time.</p>
+
+        <p>If entropy tends to increase, why do living systems not simply decay into equilibrium like everything else?</p>
+      </section>
+
     </article>
   </main>
 
