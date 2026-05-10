@@ -164,6 +164,17 @@ p:last-child {
   margin-bottom: 0;
 }
 
+ul {
+  margin: 0 0 1.2em 1.2rem;
+}
+
+li {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--ink);
+  padding-left: 0.25rem;
+}
+
 /* Drop cap on first paragraph of first section */
 .essay-section:first-of-type p:first-child::first-letter {
   font-family: var(--font-head);
@@ -177,6 +188,20 @@ p:last-child {
 }
 
 /* ─── Footer ────────────────────────────────────────────────── */
+.essay-figure {
+  margin: 2.4rem 0;
+}
+
+.essay-figure:first-child {
+  margin-top: 0;
+}
+
+.essay-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 footer {
   max-width: var(--col-width);
   margin: 0 auto;
