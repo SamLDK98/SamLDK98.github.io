@@ -1,6 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.documentElement.classList.add('js');
 
+  const autoHeightFrames = document.querySelectorAll('.essay-widget-microstates');
+
+  const resizeFrame = (frame) => {
+    try {
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      const height = Math.max(
+        doc.body.scrollHeight,
+        doc.body.offsetHeight,
+        doc.documentElement.scrollHeight,
+        doc.documentElement.offsetHeight
+      );
+      frame.style.height = `${height + 4}px`;
+    } catch {
+      // Keep the CSS fallback height if the frame cannot be measured.
+    }
+  };
+
+  autoHeightFrames.forEach((frame) => {
+    frame.addEventListener('load', () => resizeFrame(frame));
+    if (frame.contentDocument?.readyState === 'complete') {
+      resizeFrame(frame);
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    autoHeightFrames.forEach(resizeFrame);
+  });
+
   const sections = document.querySelectorAll('.essay-section');
 
   if (!('IntersectionObserver' in window)) {
