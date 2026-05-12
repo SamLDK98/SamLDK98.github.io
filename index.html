@@ -116,6 +116,56 @@
         <p>The partitioning of microstate space into fewer macrostates is called <strong>coarse-graining</strong>.</p>
 
         <p>Notice how different macrostates contain different numbers of compatible microstates.</p>
+
+        <p>The number of microstates that produce each macroscopic observable varies:</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="num">Dots on Left</th>
+                <th class="num">Dots on Right</th>
+                <th>Macrostate Color</th>
+                <th class="num">Number of corresponding microstates</th>
+                <th>Entropy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="num">8</td><td class="num">0</td><td>Red</td><td class="num">1</td><td>Zero</td></tr>
+              <tr><td class="num">7</td><td class="num">1</td><td>Orange</td><td class="num">64</td><td>Low</td></tr>
+              <tr><td class="num">6</td><td class="num">2</td><td>Yellow</td><td class="num">784</td><td>Medium</td></tr>
+              <tr><td class="num">5</td><td class="num">3</td><td>Green</td><td class="num">3,136</td><td>High</td></tr>
+              <tr><td class="num">4</td><td class="num">4</td><td>Blue</td><td class="num">4,900</td><td>Maximal</td></tr>
+              <tr><td class="num">3</td><td class="num">5</td><td>Violet (Purple)</td><td class="num">3,136</td><td>High</td></tr>
+              <tr><td class="num">2</td><td class="num">6</td><td>Pink</td><td class="num">784</td><td>Medium</td></tr>
+              <tr><td class="num">1</td><td class="num">7</td><td>Brown</td><td class="num">64</td><td>Low</td></tr>
+              <tr><td class="num">0</td><td class="num">8</td><td>Black</td><td class="num">1</td><td>Zero</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>If the dots move randomly around the grid, you can see that the higher-entropy macrostates occur more frequently because they correspond to more compatible microstates.</p>
+
+        <p>Blue has the highest entropy and is most often displayed.</p>
+
+        <p>At this small scale, fluctuations between macrostates occur frequently.</p>
+
+        <p>But let's scale everything up. Consider a grid of 80 million cells with 40 million dots. Our measuring device still detects the same balance ratios across the left and right sides.</p>
+
+        <p>As the size of the system increases, even tiny deviations from equilibrium become astronomically unlikely.</p>
+
+        <p>A 1% imbalance (51:49) lies about 126 standard deviations from equilibrium.</p>
+
+        <p>The probability of observing such a fluctuation, or anything more extreme, is roughly 10<sup>-3477</sup>.</p>
+
+        <p>The probability is so small that, even if every atom in the observable universe represented a new randomly sampled microstate every second since the beginning of time, the fluctuation would still almost certainly never occur.</p>
+
+        <iframe
+          class="essay-widget essay-widget-chart"
+          src="scale_comparison_distribution_narrowing.html"
+          title="Scaled-up comparison showing the narrowing probability distribution near equilibrium"
+          loading="lazy"
+        ></iframe>
       </section>
 
     </article>
