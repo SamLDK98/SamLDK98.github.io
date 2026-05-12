@@ -52,14 +52,6 @@
     font-style: italic;
     line-height: 1.5;
   }
-  @media (prefers-color-scheme: dark) {
-    body { color: #e8e8e6; }
-    .sc-stat { background: rgba(255,255,255,0.05); }
-    .sc-stat-label, .sc-caption { color: #a8a8a4; }
-    .sc-stat-value { color: #e8e8e6; }
-    .sc-btn { border-color: rgba(255,255,255,0.25); }
-    .sc-btn:hover { background: rgba(255,255,255,0.06); }
-  }
 </style>
 </head>
 <body>
@@ -153,7 +145,7 @@
   }
 
   function init() {
-    const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = false;
     const ctx = document.getElementById('sc-chart');
     chart = new Chart(ctx, {
       type: 'line',

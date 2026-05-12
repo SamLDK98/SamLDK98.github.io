@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.documentElement.classList.add('js');
 
-  const autoHeightFrames = document.querySelectorAll('.essay-widget-microstates');
+  const autoHeightFrames = document.querySelectorAll('.essay-widget-microstates, .essay-widget-autosize');
 
   const resizeFrame = (frame) => {
     try {
