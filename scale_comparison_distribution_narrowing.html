@@ -5,7 +5,7 @@
 .sc-btn:hover { background: var(--color-background-secondary, rgba(0,0,0,0.04)); }
 .sc-btn.active { background: #c46838; color: white; border-color: #c46838; }
 .sc-chart-wrap { position: relative; height: 260px; width: 100%; margin-bottom: 18px; }
-.sc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px; }
+.sc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 14px; }
 .sc-stat { text-align: center; padding: 12px; background: var(--color-background-secondary, rgba(0,0,0,0.03)); border-radius: 8px; }
 .sc-stat-label { font-size: 11px; color: var(--color-text-secondary, #5f5e5a); margin-bottom: 4px; }
 .sc-stat-value { font-size: 18px; font-weight: 500; color: var(--color-text-primary, #2c2c2a); }
@@ -14,17 +14,19 @@
 </style>
 <div class="sc-widget">
   <div class="sc-buttons" id="sc-buttons">
-    <button class="sc-btn" data-n="8">8 dots</button>
-    <button class="sc-btn" data-n="100">100</button>
-    <button class="sc-btn" data-n="10000">10,000</button>
-    <button class="sc-btn" data-n="1000000">1,000,000</button>
-    <button class="sc-btn active" data-n="40000000">40,000,000</button>
+    <button class="sc-btn" data-n="8">16 cells / 8 dots</button>
+    <button class="sc-btn" data-n="100">200 / 100</button>
+    <button class="sc-btn" data-n="10000">20,000 / 10,000</button>
+    <button class="sc-btn" data-n="1000000">2M / 1M</button>
+    <button class="sc-btn active" data-n="40000000">80M / 40M</button>
   </div>
   <div class="sc-chart-wrap">
     <canvas id="sc-chart" role="img" aria-label="Distribution curve showing how the spread of microstate probability narrows as system size grows."></canvas>
   </div>
   <div class="sc-stats">
+    <div class="sc-stat"><div class="sc-stat-label">System size</div><div class="sc-stat-value" id="sc-size">80M cells / 40M dots</div></div>
     <div class="sc-stat"><div class="sc-stat-label">Std deviation in left-side fraction</div><div class="sc-stat-value" id="sc-sigma">0.0079%</div></div>
+    <div class="sc-stat"><div class="sc-stat-label">Distance of 51:49 split</div><div class="sc-stat-value" id="sc-z">126σ</div></div>
     <div class="sc-stat"><div class="sc-stat-label">Probability of at least 1% imbalance</div><div class="sc-stat-value" id="sc-prob">-</div></div>
   </div>
   <p class="sc-caption">Vertical dashed lines mark equilibrium (centre) and a 1% imbalance at 49:51.<br>As the system grows, the distribution narrows toward a single point, and even tiny imbalances become astronomically unlikely.</p>
@@ -53,6 +55,10 @@
     const exp = Math.floor(log10p);
     const mantissa = Math.pow(10, log10p - exp);
     return `${mantissa.toFixed(1)} × 10<sup>${exp}</sup>`;
+  }
+  function formatCount(n) {
+    if (n >= 1000000) return `${(n / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`;
+    return n.toLocaleString();
   }
   function sigma(N) { return 1 / (2 * Math.sqrt(N)); }
   let chart = null;
@@ -110,8 +116,10 @@
     chart.data.datasets[0].data = buildCurve(N);
     chart.update();
     const s = sigma(N);
-    document.getElementById('sc-sigma').textContent = formatPct(s);
     const z = 0.01 / s;
+    document.getElementById('sc-size').textContent = `${formatCount(2 * N)} cells / ${formatCount(N)} dots`;
+    document.getElementById('sc-sigma').textContent = formatPct(s);
+    document.getElementById('sc-z').textContent = `${z.toFixed(N >= 10000 ? 0 : 1)}σ`;
     const log10p = log10erfc(z / Math.sqrt(2));
     document.getElementById('sc-prob').innerHTML = formatLogProb(log10p);
     document.querySelectorAll('.sc-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === N));
