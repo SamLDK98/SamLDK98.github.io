@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microstates, Macrostates, and Coarse-Graining</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FBF9F3;
+    --panel: #FFFFFF;
+    --ink: #1C1A17;
+    --ink-soft: #6B6357;
+    --rule: #E8E1D2;
+    --rule-strong: #B5AB97;
+    --board-bg: #FAF6EB;
+    --track-bg: #F2EDE0;
+
+    --c-red:    #C13B2E;
+    --c-orange: #DB6A1E;
+    --c-yellow: #C9A21A;
+    --c-green:  #2E8B47;
+    --c-blue:   #2B5DA8;
+    --c-violet: #6B3FA0;
+    --c-pink:   #C6447B;
+    --c-brown:  #7A4A21;
+    --c-black:  #1C1A17;
+
+    --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--serif);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 36px 20px 60px;
+  }
+
+  .widget {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ─────────────────────────────────────── */
+  .widget-header {
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .widget-header h1 {
+    font-size: 26px;
+    font-weight: 500;
+    margin: 0 0 6px 0;
+    font-style: italic;
+    letter-spacing: -0.01em;
+  }
+
+  .widget-header .subtitle {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin: 0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── MAIN ROW: GRID + DEVICE ────────────────────── */
+  .main-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 560px) {
+    .main-row { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    padding: 18px 18px 16px;
+  }
+
+  .panel-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+
+  /* ── GRID ───────────────────────────────────────── */
+  .grid-board {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--board-bg);
+    border: 1px solid var(--rule);
+  }
+
+  /* faint cell guides */
+  .grid-board::before, .grid-board::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .grid-board::before {
+    background-image:
+      linear-gradient(to right, var(--rule) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
+    background-size: 25% 25%;
+    opacity: 0.55;
+  }
+
+  .divider {
+    position: absolute;
+    left: calc(50% - 1px);
+    top: -6px;
+    bottom: -6px;
+    width: 2px;
+    background: var(--ink);
+    opacity: 0.85;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .divider-cap {
+    position: absolute;
+    left: calc(50% - 4px);
+    width: 8px;
+    height: 8px;
+    background: var(--ink);
+    transform: rotate(45deg);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .divider-cap.top { top: -10px; }
+  .divider-cap.bot { bottom: -10px; }
+
+  .dot {
+    position: absolute;
+    width: 15%;
+    height: 15%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #4A453D, #1C1A17 70%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    transition: left 320ms cubic-bezier(.45,.02,.3,1),
+                top 320ms cubic-bezier(.45,.02,.3,1);
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  /* ── CELL CLICK TARGETS (for placing dots) ─────── */
+  .cell-target {
+    position: absolute;
+    width: 25%;
+    height: 25%;
+    z-index: 1;
+    cursor: default;
+    transition: background 0.12s, outline-color 0.12s;
+    outline: 1px solid transparent;
+    outline-offset: -2px;
+  }
+
+  .grid-board.editable .cell-target {
+    cursor: pointer;
+  }
+
+  .grid-board.editable .cell-target:hover {
+    background: rgba(28, 26, 23, 0.06);
+    outline-color: var(--rule-strong);
+  }
+
+  .balance-readout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .balance-readout > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .balance-readout > div + div {
+    border-left: 1px solid var(--rule);
+  }
+
+  .balance-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .balance-tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+  }
+
+  /* ── DEVICE ─────────────────────────────────────── */
+  .device-panel { display: flex; flex-direction: column; }
+
+  .device-frame {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px 28px;
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(180deg, #FCF9F1 0%, #F7F2E4 100%);
+    position: relative;
+    text-align: center;
+    min-height: 240px;
+  }
+
+  /* small corner notches to suggest an instrument */
+  .device-frame::before,
+  .device-frame::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 8px;
+    border: 1px solid var(--rule-strong);
+  }
+  .device-frame::before { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+  .device-frame::after  { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+
+  .device-swatch {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--c-blue);
+    margin-bottom: 18px;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.18),
+      0 1px 0 rgba(0,0,0,0.04),
+      0 6px 16px -6px rgba(0,0,0,0.25);
+    transition: background 320ms ease;
+  }
+
+  .device-name {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 500;
+    font-style: italic;
+    margin: 0 0 6px 0;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .device-detail {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  /* ── CONTROLS ───────────────────────────────────── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 9px 14px;
+    background: var(--ink);
+    color: var(--bg);
+    border: 0;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.05s;
+  }
+
+  .btn:hover { opacity: 0.86; }
+  .btn:active { transform: translateY(1px); }
+
+  .btn:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+  }
+  .btn:disabled:hover { opacity: 0.32; }
+
+  .btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule-strong);
+  }
+  .btn.ghost:hover { background: var(--bg); opacity: 1; }
+
+  /* ── EDIT TOOLBAR (in grid panel) ───────────────── */
+  .edit-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+
+  .dot-counter {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot-counter strong {
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    transition: color 0.2s;
+  }
+
+  .dot-counter.invalid strong { color: var(--c-red); }
+
+  .preset-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .btn-mini {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 6px 9px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule-strong);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+  }
+
+  .btn-mini:hover { background: var(--bg); }
+  .btn-mini:active { transform: translateY(1px); }
+
+  /* Device frame: hollow look when not yet 8 dots */
+  .device-frame.empty .device-swatch {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 1px var(--rule-strong);
+  }
+  .device-frame.empty .device-name { opacity: 0.35; }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  input[type="range"] {
+    width: 120px;
+    accent-color: var(--ink);
+  }
+
+  .observed-count {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .observed-count strong {
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── HISTOGRAM ──────────────────────────────────── */
+  .histogram {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    padding: 18px 20px 20px;
+  }
+
+  .histogram-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+
+  .histogram-title em {
+    font-family: var(--serif);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .hist-rows {
+    display: grid;
+    gap: 5px;
+  }
+
+  .hist-row {
+    display: grid;
+    grid-template-columns: 54px minmax(80px, 110px) 1fr 58px;
+    align-items: center;
+    gap: 12px;
+    transition: opacity 0.2s;
+    padding: 2px 0;
+  }
+
+  .hist-row.current { opacity: 1; }
+  .hist-row:not(.current) { opacity: 0.78; }
+
+  .hist-split {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+    text-align: right;
+    letter-spacing: 0.04em;
+  }
+
+  .hist-row.current .hist-split { color: var(--ink); font-weight: 500; }
+
+  .hist-name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--ink);
+  }
+
+  .hist-color-mark {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .hist-bar-track {
+    height: 12px;
+    background: var(--track-bg);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+  }
+
+  .hist-row.current .hist-bar-track {
+    border-color: var(--rule-strong);
+  }
+
+  .hist-bar-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0%;
+    transition: width 0.35s ease-out;
+  }
+
+  .hist-pct {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+
+  .hist-row.current .hist-pct { color: var(--ink); font-weight: 500; }
+
+  /* ── FOOTER ─────────────────────────────────────── */
+  .footnote {
+    font-family: var(--serif);
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    text-align: center;
+    margin: 24px auto 0;
+    line-height: 1.65;
+    max-width: 640px;
+  }
+
+  .footnote strong {
+    color: var(--ink);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  @media (max-width: 520px) {
+    body { padding: 24px 14px 48px; }
+    .widget-header h1 { font-size: 22px; }
+    .hist-row {
+      grid-template-columns: 44px 80px 1fr 48px;
+      gap: 8px;
+    }
+    .hist-name { font-size: 13px; }
+    .hist-split, .hist-pct { font-size: 10.5px; }
+    .device-swatch { width: 88px; height: 88px; }
+    .device-name { font-size: 26px; }
+    .controls { gap: 10px; padding: 10px 12px; }
+    .speed-control input[type="range"] { width: 90px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .dot, .hist-bar-fill, .device-swatch { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+
+  <header class="widget-header">
+    <h1>Microstates, macrostates &amp; coarse-graining</h1>
+    <p class="subtitle">4 × 4 grid · 8 dots · a device reads the left–right balance and shows a colour</p>
+  </header>
+
+  <div class="main-row">
+
+    <div class="panel grid-panel">
+      <div class="panel-label">
+        <span>Left half</span>
+        <span>Microstate</span>
+        <span>Right half</span>
+      </div>
+      <div class="grid-board" id="grid-board">
+        <div class="divider"></div>
+        <div class="divider-cap top"></div>
+        <div class="divider-cap bot"></div>
+        <!-- dots injected by JS -->
+      </div>
+      <div class="balance-readout">
+        <div><span class="balance-num" id="count-left">4</span><span class="balance-tag">Dots left</span></div>
+        <div><span class="balance-num" id="count-right">4</span><span class="balance-tag">Dots right</span></div>
+      </div>
+      <div class="edit-toolbar">
+        <div class="dot-counter">Dots placed&nbsp;<strong id="dot-count">8 / 8</strong></div>
+        <div class="preset-group">
+          <button class="btn-mini" id="btn-clear" title="Remove all dots">Clear</button>
+          <button class="btn-mini" id="btn-all-left" title="Place 8 dots on the left half">All left</button>
+          <button class="btn-mini" id="btn-all-right" title="Place 8 dots on the right half">All right</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel device-panel">
+      <div class="panel-label">
+        <span>Device output</span>
+        <span>Macrostate</span>
+      </div>
+      <div class="device-frame">
+        <div class="device-swatch" id="device-swatch"></div>
+        <div class="device-name" id="device-name">Blue</div>
+        <div class="device-detail" id="device-detail">4 &mdash; 4</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="btn-play">Pause</button>
+    <button class="btn ghost" id="btn-reset">Reset</button>
+    <div class="speed-control">
+      <span>Speed</span>
+      <input type="range" id="speed" min="1" max="10" value="6" step="1">
+    </div>
+    <div class="observed-count">Microstates observed: <strong id="observed">0</strong></div>
+  </div>
+
+  <div class="histogram">
+    <div class="histogram-title">
+      <span>Macrostate frequency</span>
+      <em>nine colours partition 12,870 microstates</em>
+    </div>
+    <div class="hist-rows" id="hist-rows"></div>
+  </div>
+
+  <p class="footnote">
+    Every frame is a distinct microstate. The device reads one number from it &mdash; the count of dots on the left &mdash; and maps that to one of nine colours. Different microstates produce the same colour: that mapping <strong>is</strong> the coarse-graining. Let it run, and the middle colours fill faster than the extremes &mdash; not because the dots prefer them, but because far more microstates land there.
+  </p>
+
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const COLS = 4, ROWS = 4;
+  const TOTAL_CELLS = ROWS * COLS;
+  const TARGET_DOTS = 8;
+
+  // Macrostate map, indexed by dots-on-left (0..8)
+  // User's spec: 8L=Red, 7L=Orange, 6L=Yellow, 5L=Green, 4L=Blue,
+  //              3L=Violet, 2L=Pink, 1L=Brown, 0L=Black
+  const MACROS = {
+    8: { name: 'Red',    cssVar: '--c-red'    },
+    7: { name: 'Orange', cssVar: '--c-orange' },
+    6: { name: 'Yellow', cssVar: '--c-yellow' },
+    5: { name: 'Green',  cssVar: '--c-green'  },
+    4: { name: 'Blue',   cssVar: '--c-blue'   },
+    3: { name: 'Violet', cssVar: '--c-violet' },
+    2: { name: 'Pink',   cssVar: '--c-pink'   },
+    1: { name: 'Brown',  cssVar: '--c-brown'  },
+    0: { name: 'Black',  cssVar: '--c-black'  },
+  };
+
+  // DOM refs
+  const board       = document.getElementById('grid-board');
+  const swatch      = document.getElementById('device-swatch');
+  const deviceFrame = document.querySelector('.device-frame');
+  const deviceName  = document.getElementById('device-name');
+  const deviceDet   = document.getElementById('device-detail');
+  const countLEl    = document.getElementById('count-left');
+  const countREl    = document.getElementById('count-right');
+  const histRowsEl  = document.getElementById('hist-rows');
+  const observedEl  = document.getElementById('observed');
+  const btnPlay     = document.getElementById('btn-play');
+  const btnReset    = document.getElementById('btn-reset');
+  const btnClear    = document.getElementById('btn-clear');
+  const btnAllLeft  = document.getElementById('btn-all-left');
+  const btnAllRight = document.getElementById('btn-all-right');
+  const speedInput  = document.getElementById('speed');
+  const dotCountEl  = document.getElementById('dot-count');
+  const dotCounter  = dotCountEl.parentElement;
+
+  // State
+  let dots = [];                            // [{cell, el}]
+  let occupied = new Array(TOTAL_CELLS).fill(false);
+  let observations = new Array(9).fill(0);
+  let totalObs = 0;
+  let isPlaying = false;
+  let tickInterval = sliderToInterval(parseInt(speedInput.value, 10));
+  let timer = null;
+
+  // Slider 1..10 -> ms (right = faster)
+  function sliderToInterval(v) {
+    return Math.round(1300 * Math.pow(0.75, v - 1));
+  }
+
+  function cellCoords(cell) {
+    return { col: cell % COLS, row: Math.floor(cell / COLS) };
+  }
+
+  function positionDot(el, cell) {
+    const { col, row } = cellCoords(cell);
+    el.style.left = `${col * 25 + 5}%`;
+    el.style.top  = `${row * 25 + 5}%`;
+  }
+
+  // ── Cell click targets ──────────────────────────
+  for (let c = 0; c < TOTAL_CELLS; c++) {
+    const { col, row } = cellCoords(c);
+    const t = document.createElement('div');
+    t.className = 'cell-target';
+    t.style.left = `${col * 25}%`;
+    t.style.top  = `${row * 25}%`;
+    t.dataset.cell = c;
+    t.addEventListener('click', () => onCellClick(c));
+    board.appendChild(t);
+  }
+
+  function onCellClick(cell) {
+    if (isPlaying) pause();
+    toggleDot(cell);
+    afterEdit();
+  }
+
+  function afterEdit() {
+    updateReadouts();
+    updateEditUI();
+  }
+
+  // ── Dot management ──────────────────────────────
+  function placeDot(cell) {
+    if (occupied[cell]) return false;
+    if (dots.length >= TARGET_DOTS) return false;
+    const el = document.createElement('div');
+    el.className = 'dot';
+    positionDot(el, cell);
+    board.appendChild(el);
+    dots.push({ cell, el });
+    occupied[cell] = true;
+    return true;
+  }
+
+  function removeDotAt(cell) {
+    const idx = dots.findIndex(d => d.cell === cell);
+    if (idx === -1) return false;
+    dots[idx].el.remove();
+    dots.splice(idx, 1);
+    occupied[cell] = false;
+    return true;
+  }
+
+  function toggleDot(cell) {
+    if (occupied[cell]) removeDotAt(cell);
+    else placeDot(cell);
+  }
+
+  function clearDots() {
+    for (const d of dots) d.el.remove();
+    dots = [];
+    occupied.fill(false);
+  }
+
+  // ── Presets (each clears stats) ─────────────────
+  function presetRandom() {
+    clearDots();
+    const cells = [];
+    for (let i = 0; i < TOTAL_CELLS; i++) cells.push(i);
+    for (let i = 0; i < TARGET_DOTS; i++) {
+      const j = i + Math.floor(Math.random() * (TOTAL_CELLS - i));
+      [cells[i], cells[j]] = [cells[j], cells[i]];
+    }
+    for (let i = 0; i < TARGET_DOTS; i++) placeDot(cells[i]);
+    clearStats();
+    afterEdit();
+  }
+
+  function presetAllLeft() {
+    clearDots();
+    for (let row = 0; row < ROWS; row++) {
+      placeDot(row * COLS + 0);
+      placeDot(row * COLS + 1);
+    }
+    clearStats();
+    afterEdit();
+  }
+
+  function presetAllRight() {
+    clearDots();
+    for (let row = 0; row < ROWS; row++) {
+      placeDot(row * COLS + 2);
+      placeDot(row * COLS + 3);
+    }
+    clearStats();
+    afterEdit();
+  }
+
+  function presetClear() {
+    clearDots();
+    clearStats();
+    afterEdit();
+  }
+
+  // ── Stats / histogram ───────────────────────────
+  function clearStats() {
+    observations = new Array(9).fill(0);
+    totalObs = 0;
+    observedEl.textContent = '0';
+    renderHistogram(-1);
+  }
+
+  function renderHistogram(currentLeft) {
+    const maxObs = Math.max(1, ...observations);
+    for (const r of histRowData) {
+      const n = observations[r.L];
+      const pct  = totalObs > 0 ? (n / totalObs) * 100 : 0;
+      const barW = totalObs > 0 ? (n / maxObs) * 100 : 0;
+      r.fill.style.width = `${barW}%`;
+      r.pct.textContent = `${pct.toFixed(1)}%`;
+      r.el.classList.toggle('current', r.L === currentLeft);
+    }
+  }
+
+  function recordObservation(leftCount) {
+    observations[leftCount]++;
+    totalObs++;
+    observedEl.textContent = totalObs.toLocaleString();
+    renderHistogram(leftCount);
+  }
+
+  // ── Step (during run) ───────────────────────────
+  function step() {
+    if (dots.length === 0 || dots.length === TOTAL_CELLS) return;
+    const dotIdx = Math.floor(Math.random() * dots.length);
+    const empties = [];
+    for (let c = 0; c < TOTAL_CELLS; c++) if (!occupied[c]) empties.push(c);
+    if (empties.length === 0) return;
+    const newCell = empties[Math.floor(Math.random() * empties.length)];
+    const oldCell = dots[dotIdx].cell;
+    occupied[oldCell] = false;
+    occupied[newCell] = true;
+    dots[dotIdx].cell = newCell;
+    positionDot(dots[dotIdx].el, newCell);
+  }
+
+  // ── Readouts ────────────────────────────────────
+  function countLeft() {
+    let n = 0;
+    for (const d of dots) if ((d.cell % COLS) < 2) n++;
+    return n;
+  }
+
+  function updateReadouts() {
+    const total  = dots.length;
+    const leftN  = countLeft();
+    const rightN = total - leftN;
+
+    countLEl.textContent = leftN;
+    countREl.textContent = rightN;
+
+    if (total === TARGET_DOTS) {
+      const m = MACROS[leftN];
+      swatch.style.background = `var(${m.cssVar})`;
+      deviceName.textContent = m.name;
+      deviceDet.textContent = `${leftN} \u2014 ${rightN}`;
+      deviceFrame.classList.remove('empty');
+    } else {
+      swatch.style.background = '';
+      deviceName.textContent = '—';
+      const missing = TARGET_DOTS - total;
+      deviceDet.textContent = missing > 0
+        ? `place ${missing} more dot${missing === 1 ? '' : 's'}`
+        : `${total} dots placed (max ${TARGET_DOTS})`;
+      deviceFrame.classList.add('empty');
+    }
+    return leftN;
+  }
+
+  function updateEditUI() {
+    dotCountEl.textContent = `${dots.length} / ${TARGET_DOTS}`;
+    const valid = dots.length === TARGET_DOTS;
+    btnPlay.disabled = !valid;
+    dotCounter.classList.toggle('invalid', !valid);
+  }
+
+  // ── Tick / timer ────────────────────────────────
+  function tick() {
+    step();
+    const leftCount = updateReadouts();
+    recordObservation(leftCount);
+  }
+
+  function syncTransition() {
+    const trans = Math.max(90, Math.min(tickInterval * 0.65, 380));
+    for (const d of dots) d.el.style.transitionDuration = `${trans}ms`;
+  }
+
+  function play() {
+    if (dots.length !== TARGET_DOTS) return;
+    isPlaying = true;
+    btnPlay.textContent = 'Pause';
+    board.classList.remove('editable');
+    if (timer) clearInterval(timer);
+    syncTransition();
+    timer = setInterval(tick, tickInterval);
+  }
+
+  function pause() {
+    isPlaying = false;
+    btnPlay.textContent = 'Play';
+    board.classList.add('editable');
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  // ── Build histogram rows ────────────────────────
+  const histRowData = [];
+  for (let L = 8; L >= 0; L--) {
+    const row = document.createElement('div');
+    row.className = 'hist-row';
+    row.dataset.left = L;
+    row.innerHTML = `
+      <div class="hist-split">${L} | ${8 - L}</div>
+      <div class="hist-name">
+        <span class="hist-color-mark" style="background: var(${MACROS[L].cssVar})"></span>
+        ${MACROS[L].name}
+      </div>
+      <div class="hist-bar-track">
+        <div class="hist-bar-fill" style="background: var(${MACROS[L].cssVar})"></div>
+      </div>
+      <div class="hist-pct">0.0%</div>
+    `;
+    histRowsEl.appendChild(row);
+    histRowData.push({
+      L,
+      el:   row,
+      fill: row.querySelector('.hist-bar-fill'),
+      pct:  row.querySelector('.hist-pct'),
+    });
+  }
+
+  // ── Wire controls ───────────────────────────────
+  btnPlay.addEventListener('click', () => {
+    if (isPlaying) pause(); else play();
+  });
+  btnReset.addEventListener('click',    presetRandom);
+  btnClear.addEventListener('click',    presetClear);
+  btnAllLeft.addEventListener('click',  presetAllLeft);
+  btnAllRight.addEventListener('click', presetAllRight);
+
+  speedInput.addEventListener('input', (e) => {
+    tickInterval = sliderToInterval(parseInt(e.target.value, 10));
+    if (isPlaying) {
+      if (timer) clearInterval(timer);
+      timer = setInterval(tick, tickInterval);
+    }
+    syncTransition();
+  });
+
+  // ── Init: random placement, start running ───────
+  presetRandom();
+  play();
+})();
+</script>
+</body>
+</html>

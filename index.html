@@ -71,6 +71,17 @@
       <section class="essay-section">
         <h3 class="section-title">b) Statistical Mechanics</h3>
 
+        <p>As you read through this section, you can return to this widget to help build intuition of the key concepts.</p>
+
+        <iframe
+          class="essay-widget essay-widget-microstates"
+          src="widget2_microstates_macrostates_interactive_grid.html"
+          title="Interactive grid showing microstates, macrostates, and coarse-graining"
+          loading="lazy"
+        ></iframe>
+
+        <p>Continuing the story...</p>
+
         <p>Classical mechanics works for systems with a few objects and trajectories: a planet orbiting the sun or the flight of an arrow.</p>
 
         <p>But for systems containing billions of interacting particles, tracking every trajectory is impossible.</p>
@@ -79,131 +90,29 @@
 
         <p>Before we continue, it is worth briefly explaining what we mean by systems and states.</p>
 
-        <p>A system is simply a set of things that may vary in some way.</p>
+        <p>A <strong>system</strong> is simply a set of things that may vary in some way.</p>
 
-        <p>At any one moment in time, those variables will have specific values. We call this a state of the system.</p>
-
-        <p>As time passes, the system evolves, moving between different states.</p>
-
-        <p>Looking at the distribution of possible states provides the key insight.</p>
-
-        <p><em>Some states occur more frequently than others.</em></p>
-
-        <p>Let's take a simple, abstract example to illustrate.</p>
+        <p>At any one moment in time, these variables will have specific values. We call the set of these values a <strong>state</strong> of the system.</p>
 
         <p>Imagine a 4x4 grid with 8 dots that randomly move around it.</p>
 
-        <p>Imagine the dots carry heat.</p>
+        <p>The system is the collection of dots, and the way they vary is by their spatial location on a grid.</p>
 
-        <figure class="essay-figure state-diagram" aria-labelledby="state-diagram-title">
-          <div class="state-diagram-main">
-            <section class="microstate-panel" aria-labelledby="microstate-title">
-              <h4 id="microstate-title" class="diagram-title">Microstates</h4>
-              <div class="microstate-stack">
-                <div class="microstate-group">
-                  <div class="mini-grid" aria-label="Microstate with seven dots on the left and one dot on the right">
-                    <span class="dot" style="--row:1; --col:1;"></span>
-                    <span class="dot" style="--row:1; --col:2;"></span>
-                    <span class="dot" style="--row:2; --col:1;"></span>
-                    <span class="dot" style="--row:3; --col:1;"></span>
-                    <span class="dot" style="--row:3; --col:2;"></span>
-                    <span class="dot" style="--row:4; --col:1;"></span>
-                    <span class="dot" style="--row:4; --col:2;"></span>
-                    <span class="dot" style="--row:4; --col:4;"></span>
-                  </div>
-                  <div class="mini-grid" aria-label="Another microstate with seven dots on the left and one dot on the right">
-                    <span class="dot" style="--row:1; --col:1;"></span>
-                    <span class="dot" style="--row:1; --col:2;"></span>
-                    <span class="dot" style="--row:2; --col:1;"></span>
-                    <span class="dot" style="--row:2; --col:2;"></span>
-                    <span class="dot" style="--row:3; --col:1;"></span>
-                    <span class="dot" style="--row:3; --col:2;"></span>
-                    <span class="dot" style="--row:3; --col:3;"></span>
-                    <span class="dot" style="--row:4; --col:4;"></span>
-                  </div>
-                </div>
+        <p><strong>Microstates</strong> are specific configurations of these dots.</p>
 
-                <div class="microstate-group">
-                  <div class="mini-grid" aria-label="Microstate with four dots on the left and four dots on the right">
-                    <span class="dot" style="--row:1; --col:1;"></span>
-                    <span class="dot" style="--row:1; --col:4;"></span>
-                    <span class="dot" style="--row:2; --col:2;"></span>
-                    <span class="dot" style="--row:2; --col:4;"></span>
-                    <span class="dot" style="--row:3; --col:1;"></span>
-                    <span class="dot" style="--row:3; --col:3;"></span>
-                    <span class="dot" style="--row:4; --col:2;"></span>
-                    <span class="dot" style="--row:4; --col:4;"></span>
-                  </div>
-                  <div class="mini-grid" aria-label="Another microstate with four dots on the left and four dots on the right">
-                    <span class="dot" style="--row:1; --col:1;"></span>
-                    <span class="dot" style="--row:1; --col:3;"></span>
-                    <span class="dot" style="--row:2; --col:4;"></span>
-                    <span class="dot" style="--row:3; --col:1;"></span>
-                    <span class="dot" style="--row:3; --col:3;"></span>
-                    <span class="dot" style="--row:4; --col:1;"></span>
-                    <span class="dot" style="--row:4; --col:2;"></span>
-                    <span class="dot" style="--row:4; --col:4;"></span>
-                  </div>
-                </div>
-              </div>
-            </section>
+        <p>With 16 cells and 8 dots, there are 12,870 possible unique microstates.</p>
 
-            <section class="macrostate-panel" aria-labelledby="macrostate-title">
-              <h4 id="macrostate-title" class="diagram-title diagram-title-blue">Macrostates</h4>
+        <p>Now, imagine a device that measures how many dots are on either the left or right of the grid in each microstate.</p>
 
-              <div class="macro-card macro-card-blue">
-                <div class="heat-bar heat-bar-split" aria-hidden="true">
-                  <span></span>
-                  <span></span>
-                </div>
-                <div class="macro-copy">
-                  <p>Macrostate: <q>Very hot on the left</q></p>
-                  <p>Constraint: 7 dots left, 1 right</p>
-                  <p>Number of compatible microstates: 64</p>
-                </div>
-              </div>
+        <p>Depending on this balance, the device displays a colour. We call the colours <strong>macroscopic observables</strong>.</p>
 
-              <div class="macro-card macro-card-gold">
-                <div class="heat-bar heat-bar-uniform" aria-hidden="true"></div>
-                <div class="macro-copy">
-                  <p>Macrostate: <q>Uniform temperature</q></p>
-                  <p>Constraint: 4 dots left, 4 right</p>
-                  <p>Number of compatible microstates: 4,900</p>
-                </div>
-              </div>
-            </section>
-          </div>
+        <p>The <strong>macrostate</strong> is the set of all configurations that produce the same macroscopic observable/measurement (in this case colour).</p>
 
-          <hr class="diagram-rule" aria-hidden="true">
+        <p><strong>Entropy</strong> measures how many different microscopic ways a macroscopic state can exist.</p>
 
-          <div class="diagram-definitions" id="state-diagram-title">
-            <p><strong>Microstate</strong> = A specific configuration of dots.</p>
-            <p><strong>Macrostate</strong> = An observable description that can correspond to a range of microstates.</p>
-            <p>In our example, with 16 cells and 8 dots, there are 12,870 unique possible microstates.</p>
-          </div>
+        <p>The macroscopic observables define the range of microscopic configurations within each set.</p>
 
-          <div class="diagram-legend" aria-label="Diagram key">
-            <div class="legend-item">
-              <div class="legend-grid legend-grid-large" aria-hidden="true"></div>
-              <p><strong>Grid:</strong> Space available for the system to move in</p>
-            </div>
-            <div class="legend-item">
-              <div class="legend-grid" aria-hidden="true"></div>
-              <p><strong>Cells:</strong> Possible locations within that space</p>
-            </div>
-            <div class="legend-item">
-              <div class="legend-dots" aria-hidden="true">
-                <span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span>
-              </div>
-              <p><strong>Dots collectively:</strong> the system</p>
-            </div>
-            <div class="legend-item">
-              <span class="dot legend-single-dot" aria-hidden="true"></span>
-              <p><strong>Dot:</strong> part of the system</p>
-            </div>
-          </div>
-        </figure>
+        <p>The partitioning of microstate space into fewer macrostates is called <strong>coarse-graining</strong>.</p>
 
         <p>Notice how different macrostates contain different numbers of compatible microstates.</p>
 

@@ -505,6 +505,10 @@ th {
   height: 500px;
 }
 
+.essay-widget-microstates {
+  height: 1040px;
+}
+
 .essay-widget-tall {
   height: 560px;
 }
@@ -606,4 +610,6 @@ header {
   .essay-widget-tall { height: 620px; }
 
   .essay-widget-balls { height: 500px; }
+
+  .essay-widget-microstates { height: 1420px; }
 }
