@@ -509,6 +509,10 @@ th {
   height: 1040px;
 }
 
+.essay-widget-available-moves {
+  height: 640px;
+}
+
 .essay-widget-tall {
   height: 560px;
 }
@@ -612,4 +616,6 @@ header {
   .essay-widget-balls { height: 500px; }
 
   .essay-widget-microstates { height: 1420px; }
+
+  .essay-widget-available-moves { height: 720px; }
 }
