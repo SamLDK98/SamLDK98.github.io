@@ -81,6 +81,7 @@ header {
   color: var(--ink-light);
   line-height: 1.5;
   margin-bottom: 1.4rem;
+  text-align: center;
 }
 
 .byline-row {
@@ -252,6 +253,236 @@ th {
   margin-left: auto;
 }
 
+.state-diagram {
+  font-family: var(--font-body);
+  padding: 1.25rem;
+  border: 1px solid rgba(26,26,24,0.22);
+  background:
+    linear-gradient(rgba(255,255,255,0.54), rgba(255,255,255,0.54)),
+    var(--bg);
+}
+
+.state-diagram-main {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.78fr) minmax(0, 1.42fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.diagram-title {
+  width: fit-content;
+  margin: 0 auto 0.9rem;
+  padding: 0.22rem 1rem 0.28rem;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: rgba(249,246,240,0.9);
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.diagram-title-blue {
+  border-color: rgba(31,68,115,0.7);
+  background: rgba(218,231,245,0.82);
+}
+
+.microstate-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.microstate-group {
+  position: relative;
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+}
+
+.microstate-group::after {
+  content: "}";
+  position: absolute;
+  top: 50%;
+  right: -0.68rem;
+  transform: translateY(-50%);
+  font-size: 5.4rem;
+  line-height: 1;
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+
+.mini-grid,
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  background:
+    linear-gradient(to right, rgba(26,26,24,0.72) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(26,26,24,0.72) 1px, transparent 1px);
+  background-size: 25% 25%;
+  border-right: 1px solid rgba(26,26,24,0.72);
+  border-bottom: 1px solid rgba(26,26,24,0.72);
+}
+
+.mini-grid {
+  width: min(100%, 8.9rem);
+  aspect-ratio: 1;
+  padding: 0.22rem;
+}
+
+.dot {
+  grid-row: var(--row);
+  grid-column: var(--col);
+  align-self: center;
+  justify-self: center;
+  width: 0.64rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: #ff3b12;
+  box-shadow: 0 0.03rem 0.05rem rgba(26,26,24,0.25);
+}
+
+.macrostate-panel {
+  min-width: 0;
+}
+
+.macro-card {
+  display: grid;
+  grid-template-columns: minmax(4.4rem, 0.36fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(26,26,24,0.16);
+  border-radius: 6px;
+}
+
+.macro-card-blue {
+  background: rgba(232,240,246,0.78);
+}
+
+.macro-card-gold {
+  background: rgba(255,245,224,0.82);
+}
+
+.heat-bar {
+  width: 100%;
+  max-width: 5.1rem;
+  min-height: 5.6rem;
+  justify-self: center;
+  border: 2px solid var(--ink);
+}
+
+.heat-bar-split {
+  display: grid;
+  grid-template-columns: 7fr 1fr;
+}
+
+.heat-bar-split span:first-child {
+  background: #f24a24;
+}
+
+.heat-bar-split span:last-child {
+  background: #226cab;
+  border-left: 1px solid var(--ink);
+}
+
+.heat-bar-uniform {
+  background: #f79a23;
+}
+
+.macro-copy p,
+.diagram-definitions p,
+.diagram-legend p {
+  margin-bottom: 0;
+  text-align: left;
+  hyphens: none;
+}
+
+.macro-copy {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.macro-copy p {
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.diagram-rule {
+  margin: 1.1rem 0 0.85rem;
+  border: 0;
+  border-top: 2px solid rgba(26,26,24,0.82);
+}
+
+.diagram-definitions {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.diagram-definitions p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.diagram-legend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid var(--ink);
+  border-radius: 5px;
+  background: rgba(255,255,255,0.38);
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: center;
+  min-width: 0;
+  padding: 0.65rem;
+}
+
+.legend-item + .legend-item {
+  border-left: 1px solid rgba(26,26,24,0.55);
+}
+
+.legend-grid {
+  width: 2.2rem;
+  aspect-ratio: 1;
+}
+
+.legend-grid-large {
+  width: 2.9rem;
+}
+
+.legend-dots {
+  display: grid;
+  grid-template-columns: repeat(4, 0.52rem);
+  gap: 0.32rem;
+}
+
+.legend-dots span,
+.legend-single-dot {
+  display: block;
+  width: 0.52rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: #ff3b12;
+}
+
+.legend-single-dot {
+  width: 0.66rem;
+}
+
+.diagram-legend p {
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
 .essay-widget {
   display: block;
   width: 100%;
@@ -324,6 +555,41 @@ header {
 
   th,
   td { padding: 0.4rem 0.45rem; }
+
+  .state-diagram {
+    padding: 0.8rem;
+  }
+
+  .state-diagram-main {
+    grid-template-columns: 1fr;
+  }
+
+  .microstate-stack {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+
+  .microstate-group::after {
+    display: none;
+  }
+
+  .mini-grid {
+    max-width: 7.2rem;
+  }
+
+  .macro-card {
+    grid-template-columns: minmax(3.7rem, 0.3fr) minmax(0, 1fr);
+    padding: 0.75rem;
+  }
+
+  .diagram-legend {
+    grid-template-columns: 1fr;
+  }
+
+  .legend-item + .legend-item {
+    border-left: 0;
+    border-top: 1px solid rgba(26,26,24,0.55);
+  }
 
   .essay-widget,
   .essay-widget-chart,

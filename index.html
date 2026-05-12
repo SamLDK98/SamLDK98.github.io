@@ -37,7 +37,7 @@
 
         <p>Newton's laws of motion make no distinction between past and future. Anything that can happen in one direction may happen just the same in the reverse.</p>
 
-        <p>That does not mean Newton's equations <strong>predict</strong> apples should spontaneously rise from the ground. It means that if every particle involved in the process had its motion reversed perfectly, the equations would describe the reversed trajectory just as consistently as the forward one.</p>
+        <p><strong>That does not mean Newton's equations predict apples should spontaneously rise from the ground.</strong> It means that if every particle involved in the process had its motion reversed perfectly, the equations would describe the reversed trajectory just as consistently as the forward one.</p>
 
         <iframe
           class="essay-widget"
@@ -74,32 +74,138 @@
       <section class="essay-section">
         <h3 class="section-title">b) Statistical Mechanics</h3>
 
-        <p>Classical mechanics focused on exact trajectories: the precise motion of particular bodies through space.</p>
+        <p>Classical mechanics works for systems with a few objects and trajectories: a planet orbiting the sun or the flight of an arrow.</p>
 
-        <p>This works fine for systems with a few objects and trajectories: a planet orbiting the sun or the flight of an arrow.</p>
+        <p>But for systems containing billions of interacting particles, tracking every trajectory is impossible.</p>
 
-        <p>However, for systems containing billions of interacting particles, tracking every trajectory is impossible.</p>
+        <p>Fortunately, statistical mechanics introduced a new approach.</p>
 
-        <p>Fortunately, statistical mechanics introduced a new perspective.</p>
+        <p>Before we continue, it is worth briefly explaining what we mean by systems and states.</p>
 
-        <p>If objects are moving in some space continuously, at every point in time they will be in a specific configuration -- a state of the system.</p>
+        <p>A system is simply a set of things that may vary in some way.</p>
+
+        <p>At any one moment in time, those variables will have specific values. We call this a state of the system.</p>
 
         <p>As time passes, the system evolves, moving between different states.</p>
 
-        <p>Some states occur more frequently than others.</p>
+        <p>Looking at the distribution of possible states provides the key insight.</p>
 
-        <p>Looking at this distribution of possible states provides the key insight.</p>
+        <p><em>Some states occur more frequently than others.</em></p>
 
         <p>Let's take a simple, abstract example to illustrate.</p>
 
-        <p>Here, a <em>system</em> simply means a collection of interacting components capable of occupying different configurations, or states.</p>
+        <p>Imagine a 4x4 grid with 8 dots that randomly move around it.</p>
 
-        <p>This definition is deliberately broad because the same logic applies across many very different physical systems.</p>
+        <p>Imagine the dots carry heat.</p>
 
-        <p>Imagine a 4x4 grid with 8 dots that carry heat.</p>
+        <figure class="essay-figure state-diagram" aria-labelledby="state-diagram-title">
+          <div class="state-diagram-main">
+            <section class="microstate-panel" aria-labelledby="microstate-title">
+              <h4 id="microstate-title" class="diagram-title">Microstates</h4>
+              <div class="microstate-stack">
+                <div class="microstate-group">
+                  <div class="mini-grid" aria-label="Microstate with seven dots on the left and one dot on the right">
+                    <span class="dot" style="--row:1; --col:1;"></span>
+                    <span class="dot" style="--row:1; --col:2;"></span>
+                    <span class="dot" style="--row:2; --col:1;"></span>
+                    <span class="dot" style="--row:3; --col:1;"></span>
+                    <span class="dot" style="--row:3; --col:2;"></span>
+                    <span class="dot" style="--row:4; --col:1;"></span>
+                    <span class="dot" style="--row:4; --col:2;"></span>
+                    <span class="dot" style="--row:4; --col:4;"></span>
+                  </div>
+                  <div class="mini-grid" aria-label="Another microstate with seven dots on the left and one dot on the right">
+                    <span class="dot" style="--row:1; --col:1;"></span>
+                    <span class="dot" style="--row:1; --col:2;"></span>
+                    <span class="dot" style="--row:2; --col:1;"></span>
+                    <span class="dot" style="--row:2; --col:2;"></span>
+                    <span class="dot" style="--row:3; --col:1;"></span>
+                    <span class="dot" style="--row:3; --col:2;"></span>
+                    <span class="dot" style="--row:3; --col:3;"></span>
+                    <span class="dot" style="--row:4; --col:4;"></span>
+                  </div>
+                </div>
 
-        <figure class="essay-figure">
-          <img src="images/grid microstates macrostates.png" alt="Diagram explaining microstates and macrostates using a 4 by 4 grid with dots that carry heat.">
+                <div class="microstate-group">
+                  <div class="mini-grid" aria-label="Microstate with four dots on the left and four dots on the right">
+                    <span class="dot" style="--row:1; --col:1;"></span>
+                    <span class="dot" style="--row:1; --col:4;"></span>
+                    <span class="dot" style="--row:2; --col:2;"></span>
+                    <span class="dot" style="--row:2; --col:4;"></span>
+                    <span class="dot" style="--row:3; --col:1;"></span>
+                    <span class="dot" style="--row:3; --col:3;"></span>
+                    <span class="dot" style="--row:4; --col:2;"></span>
+                    <span class="dot" style="--row:4; --col:4;"></span>
+                  </div>
+                  <div class="mini-grid" aria-label="Another microstate with four dots on the left and four dots on the right">
+                    <span class="dot" style="--row:1; --col:1;"></span>
+                    <span class="dot" style="--row:1; --col:3;"></span>
+                    <span class="dot" style="--row:2; --col:4;"></span>
+                    <span class="dot" style="--row:3; --col:1;"></span>
+                    <span class="dot" style="--row:3; --col:3;"></span>
+                    <span class="dot" style="--row:4; --col:1;"></span>
+                    <span class="dot" style="--row:4; --col:2;"></span>
+                    <span class="dot" style="--row:4; --col:4;"></span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="macrostate-panel" aria-labelledby="macrostate-title">
+              <h4 id="macrostate-title" class="diagram-title diagram-title-blue">Macrostates</h4>
+
+              <div class="macro-card macro-card-blue">
+                <div class="heat-bar heat-bar-split" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                </div>
+                <div class="macro-copy">
+                  <p>Macrostate: <q>Very hot on the left</q></p>
+                  <p>Constraint: 7 dots left, 1 right</p>
+                  <p>Number of compatible microstates: 64</p>
+                </div>
+              </div>
+
+              <div class="macro-card macro-card-gold">
+                <div class="heat-bar heat-bar-uniform" aria-hidden="true"></div>
+                <div class="macro-copy">
+                  <p>Macrostate: <q>Uniform temperature</q></p>
+                  <p>Constraint: 4 dots left, 4 right</p>
+                  <p>Number of compatible microstates: 4,900</p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <hr class="diagram-rule" aria-hidden="true">
+
+          <div class="diagram-definitions" id="state-diagram-title">
+            <p><strong>Microstate</strong> = A specific configuration of dots.</p>
+            <p><strong>Macrostate</strong> = An observable description that can correspond to a range of microstates.</p>
+            <p>In our example, with 16 cells and 8 dots, there are 12,870 unique possible microstates.</p>
+          </div>
+
+          <div class="diagram-legend" aria-label="Diagram key">
+            <div class="legend-item">
+              <div class="legend-grid legend-grid-large" aria-hidden="true"></div>
+              <p><strong>Grid:</strong> Space available for the system to move in</p>
+            </div>
+            <div class="legend-item">
+              <div class="legend-grid" aria-hidden="true"></div>
+              <p><strong>Cells:</strong> Possible locations within that space</p>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dots" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <p><strong>Dots collectively:</strong> the system</p>
+            </div>
+            <div class="legend-item">
+              <span class="dot legend-single-dot" aria-hidden="true"></span>
+              <p><strong>Dot:</strong> part of the system</p>
+            </div>
+          </div>
         </figure>
 
         <p>Notice how different macrostates contain different numbers of compatible microstates.</p>
