@@ -165,8 +165,10 @@ p {
   color: var(--ink);
   margin-bottom: 1.2em;
   text-align: justify;
-  hyphens: auto;
-  -webkit-hyphens: auto;
+  hyphens: none;
+  -webkit-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 p:last-child {
@@ -182,6 +184,10 @@ li {
   line-height: 1.8;
   color: var(--ink);
   padding-left: 0.25rem;
+  hyphens: none;
+  -webkit-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .table-wrap {
@@ -491,6 +497,10 @@ th {
   border: 0;
 }
 
+.essay-widget-balls {
+  height: 430px;
+}
+
 .essay-widget-chart {
   height: 500px;
 }
@@ -594,4 +604,6 @@ header {
   .essay-widget,
   .essay-widget-chart,
   .essay-widget-tall { height: 620px; }
+
+  .essay-widget-balls { height: 500px; }
 }

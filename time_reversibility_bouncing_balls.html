@@ -1,38 +1,25 @@
 <style>
 .tr-widget { max-width: 600px; margin: 0 auto; padding: 1rem 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-.tr-direction { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 500; margin-bottom: 12px; padding: 10px 16px; border-radius: 6px; background: var(--color-background-secondary, rgba(0,0,0,0.04)); color: var(--color-text-secondary, #5f5e5a); transition: background 300ms ease, color 300ms ease; }
-.tr-direction.forward { background: rgba(129, 178, 154, 0.22); color: #2d5a44; }
-.tr-direction.backward { background: rgba(224, 122, 95, 0.22); color: #8b3a18; }
-.tr-direction-arrow { font-size: 16px; min-width: 18px; text-align: center; }
 .tr-box-wrap { display: flex; justify-content: center; }
 .tr-box { width: 100%; max-width: 520px; aspect-ratio: 380/240; border: 1px solid var(--color-border-tertiary, rgba(0,0,0,0.18)); border-radius: 4px; background: rgba(0,0,0,0.015); }
 .tr-trail { fill: none; stroke-width: 1.5; stroke-opacity: 0.4; stroke-linecap: round; stroke-linejoin: round; }
-.tr-info { text-align: center; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); margin: 12px 0; }
-.tr-controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.tr-controls { display: flex; justify-content: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .tr-btn { font: inherit; font-size: 13px; padding: 7px 14px; border: 0.5px solid var(--color-border-secondary, rgba(0,0,0,0.25)); background: transparent; color: inherit; border-radius: 6px; cursor: pointer; transition: background 150ms; min-width: 130px; }
 .tr-btn:hover { background: var(--color-background-secondary, rgba(0,0,0,0.04)); }
 .tr-btn:active { transform: scale(0.98); }
 .tr-btn.active-fwd { background: #3a6e54; color: white; border-color: #3a6e54; }
 .tr-btn.active-back { background: #c46838; color: white; border-color: #c46838; }
-.tr-caption { text-align: center; font-size: 12px; color: var(--color-text-secondary, #5f5e5a); font-style: italic; line-height: 1.55; }
 @media (prefers-color-scheme: dark) { .tr-box { background: rgba(255,255,255,0.02); } }
 </style>
 <div class="tr-widget">
-  <div class="tr-direction" id="tr-direction">
-    <span>Time:</span>
-    <span class="tr-direction-arrow" id="tr-direction-arrow">⏸</span>
-    <span id="tr-direction-text">paused</span>
-  </div>
   <div class="tr-box-wrap">
     <svg class="tr-box" viewBox="0 0 380 240" id="tr-box" role="img" aria-label="A box containing 6 colored balls bouncing elastically. Each ball leaves a trail showing its recent path."></svg>
   </div>
-  <div class="tr-info">Step <span id="tr-step">0</span></div>
   <div class="tr-controls">
     <button class="tr-btn" id="tr-back">◀ Reverse time</button>
     <button class="tr-btn" id="tr-forward">Forward time ▶</button>
     <button class="tr-btn" id="tr-reset">Reset</button>
   </div>
-  <p class="tr-caption">Run the simulation forward, then click "Reverse time". The balls retrace their path exactly back to the starting positions.<br>The same Newtonian equations describe motion in either direction.</p>
 </div>
 <script>
 (function() {
@@ -112,14 +99,6 @@
     }
   }
   function updateUI() {
-    document.getElementById('tr-step').textContent = frameIdx;
-    const dir = document.getElementById('tr-direction');
-    const arr = document.getElementById('tr-direction-arrow');
-    const txt = document.getElementById('tr-direction-text');
-    dir.classList.remove('forward', 'backward');
-    if (mode === 'forward') { dir.classList.add('forward'); arr.textContent = '→'; txt.textContent = 'forward'; }
-    else if (mode === 'backward') { dir.classList.add('backward'); arr.textContent = '←'; txt.textContent = 'reversed'; }
-    else { arr.textContent = '⏸'; txt.textContent = 'paused'; }
     const fb = document.getElementById('tr-forward');
     const bb = document.getElementById('tr-back');
     fb.classList.toggle('active-fwd', mode === 'forward');
