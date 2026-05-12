@@ -526,24 +526,6 @@
 
   .hist-row.current .hist-pct { color: var(--ink); font-weight: 500; }
 
-  /* ── FOOTER ─────────────────────────────────────── */
-  .footnote {
-    font-family: var(--serif);
-    font-size: 14.5px;
-    color: var(--ink-soft);
-    font-style: italic;
-    text-align: center;
-    margin: 24px auto 0;
-    line-height: 1.65;
-    max-width: 640px;
-  }
-
-  .footnote strong {
-    color: var(--ink);
-    font-style: normal;
-    font-weight: 500;
-  }
-
   @media (max-width: 520px) {
     body { padding: 24px 14px 48px; }
     .widget-header h1 { font-size: 22px; }
@@ -631,10 +613,6 @@
     </div>
     <div class="hist-rows" id="hist-rows"></div>
   </div>
-
-  <p class="footnote">
-    Every frame is a distinct microstate. The device reads one number from it &mdash; the count of dots on the left &mdash; and maps that to one of nine colours. Different microstates produce the same colour: that mapping <strong>is</strong> the coarse-graining. Let it run, and the middle colours fill faster than the extremes &mdash; not because the dots prefer them, but because far more microstates land there.
-  </p>
 
 </div>
 
