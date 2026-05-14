@@ -1,6 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.documentElement.classList.add('js');
 
+  const shelfArt = document.querySelector('.shelf-art');
+
+  if (shelfArt) {
+    const updateShelfZoom = () => {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      shelfArt.style.setProperty('--shelf-zoom', (1 + eased * 0.78).toFixed(3));
+      shelfArt.style.setProperty('--shelf-x', `${(-18 * eased).toFixed(2)}vw`);
+      shelfArt.style.setProperty('--shelf-y', `${(3.5 * eased).toFixed(2)}vh`);
+    };
+
+    const books = document.querySelectorAll('.shelf-book');
+
+    books.forEach((book) => {
+      book.addEventListener('click', (event) => {
+        if (!book.classList.contains('is-open')) {
+          event.preventDefault();
+          books.forEach((otherBook) => otherBook.classList.remove('is-open', 'is-selected'));
+          book.classList.add('is-open', 'is-selected');
+        }
+      });
+    });
+
+    updateShelfZoom();
+    window.addEventListener('scroll', updateShelfZoom, { passive: true });
+    window.addEventListener('resize', updateShelfZoom);
+  }
+
   const autoHeightFrames = document.querySelectorAll('.essay-widget-microstates, .essay-widget-autosize');
 
   const resizeFrame = (frame) => {
