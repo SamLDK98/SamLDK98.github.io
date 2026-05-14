@@ -29,6 +29,63 @@ body {
   line-height: 1.75;
 }
 
+.landing-page,
+.linear-algebra-page {
+  min-height: 100vh;
+  background: #7b4f34;
+}
+
+.landing-main {
+  min-height: 100vh;
+  max-width: none;
+  margin: 0;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 340px));
+  gap: 1.5rem;
+  place-content: center;
+}
+
+.landing-box,
+.corner-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 9rem;
+  padding: 1.25rem;
+  border: 2px solid #2a1710;
+  background: #a97854;
+  color: #1f120c;
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+}
+
+.landing-box {
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.landing-box:hover,
+.landing-box:focus-visible {
+  background: #bd8961;
+  transform: translateY(-2px);
+}
+
+.linear-algebra-main {
+  min-height: 100vh;
+  max-width: none;
+  margin: 0;
+  padding: 1rem;
+}
+
+.corner-box {
+  width: 9rem;
+  min-height: 5rem;
+}
+
 /* ─── Header ────────────────────────────────────────────────── */
 header {
   max-width: var(--col-width);
@@ -564,6 +621,11 @@ header {
 /* ─── Responsive ────────────────────────────────────────────── */
 @media (max-width: 720px) {
   html { font-size: 18px; }
+
+  .landing-main {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+  }
 
   .essay-title { font-size: 1.85rem; }
 
