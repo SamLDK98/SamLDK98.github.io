@@ -67,7 +67,7 @@
 
   .main {
     display: grid;
-    grid-template-columns: minmax(280px, 390px) minmax(240px, 1fr);
+    grid-template-columns: minmax(240px, 1fr) minmax(280px, 390px);
     background: var(--paper);
     border-top: 1px solid var(--rule);
     border-bottom: 1px solid var(--rule);
@@ -76,7 +76,7 @@
   .plot-wrap {
     position: relative;
     aspect-ratio: 1;
-    border-right: 1px solid var(--rule-soft);
+    border-left: 1px solid var(--rule-soft);
   }
 
   #plane {
@@ -115,31 +115,42 @@
     font-style: italic;
   }
 
-  .coefficient-grid {
+  .equation-block {
     display: grid;
-    gap: 9px;
+    gap: 10px;
   }
 
-  .coefficient-row {
-    display: grid;
-    grid-template-columns: 1.5rem 2.4rem 1fr 2.4rem;
+  .equation-row {
+    display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 18px;
   }
 
-  .coefficient-name {
-    color: var(--muted);
-    font-size: 18px;
+  .equation-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .control-pair {
+    display: grid;
+    grid-template-columns: auto 2.15rem;
+    gap: 0.45rem;
+    align-items: center;
+  }
+
+  .control-stack {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  .control-label {
+    color: var(--ink);
+    font-size: 1.35rem;
     font-style: italic;
-  }
-
-  .coefficient-value {
-    padding: 5px 8px;
-    border: 1px solid var(--rule-soft);
-    background: rgba(255,255,255,0.42);
-    font-size: 18px;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
+    line-height: 1;
   }
 
   button {
@@ -157,8 +168,11 @@
   button:hover { opacity: 0.82; }
 
   .step-btn {
+    width: 2.15rem;
+    min-height: 1.75rem;
     padding: 0;
-    font-size: 18px;
+    font-size: 15px;
+    letter-spacing: 0;
   }
 
   .secondary {
@@ -182,65 +196,71 @@
     }
 
     .plot-wrap {
-      border-right: 0;
-      border-bottom: 1px solid var(--rule-soft);
+      border-left: 0;
+      border-top: 1px solid var(--rule-soft);
     }
 
     .panel {
       padding: 18px;
+    }
+
+    .equation-controls {
+      gap: 10px;
+    }
+
+    .equation-row {
+      align-items: flex-start;
+      flex-direction: column;
     }
   }
 </style>
 </head>
 <body>
 <div class="widget">
-  <p class="subtitle">
-    The plane holds every possible pair (<em>x</em>, <em>y</em>). The equation rules out
-    almost all of them. Change the coefficients, drag the line, or drag either handle
-    to change the constraint itself.
-  </p>
-
   <div class="main">
-    <div class="plot-wrap">
-      <canvas id="plane" aria-label="Interactive coordinate plane"></canvas>
-    </div>
-
     <div class="panel">
-      <div>
+      <div class="equation-block">
         <div class="panel-label">Current equation</div>
-        <div class="equation" id="equation"></div>
-      </div>
-
-      <div>
-        <div class="panel-label">Change the constraint</div>
-        <div class="coefficient-grid">
-          <div class="coefficient-row">
-            <span class="coefficient-name">a</span>
-            <button class="step-btn" data-param="a" data-delta="-1" aria-label="Decrease a">-</button>
-            <span class="coefficient-value" id="a-value"></span>
-            <button class="step-btn" data-param="a" data-delta="1" aria-label="Increase a">+</button>
-          </div>
-          <div class="coefficient-row">
-            <span class="coefficient-name">b</span>
-            <button class="step-btn" data-param="b" data-delta="-1" aria-label="Decrease b">-</button>
-            <span class="coefficient-value" id="b-value"></span>
-            <button class="step-btn" data-param="b" data-delta="1" aria-label="Increase b">+</button>
-          </div>
-          <div class="coefficient-row">
-            <span class="coefficient-name">c</span>
-            <button class="step-btn" data-param="c" data-delta="-1" aria-label="Decrease c">-</button>
-            <span class="coefficient-value" id="c-value"></span>
-            <button class="step-btn" data-param="c" data-delta="1" aria-label="Increase c">+</button>
+        <div class="equation-row">
+          <div class="equation" id="equation"></div>
+          <div class="equation-controls" aria-label="Equation controls">
+            <div class="control-pair">
+              <span class="control-label">x</span>
+              <div class="control-stack">
+                <button class="step-btn" data-param="a" data-delta="1" aria-label="Increase x coefficient">+</button>
+                <button class="step-btn" data-param="a" data-delta="-1" aria-label="Decrease x coefficient">-</button>
+              </div>
+            </div>
+            <div class="control-pair">
+              <span class="control-label">y</span>
+              <div class="control-stack">
+                <button class="step-btn" data-param="b" data-delta="1" aria-label="Increase y coefficient">+</button>
+                <button class="step-btn" data-param="b" data-delta="-1" aria-label="Decrease y coefficient">-</button>
+              </div>
+            </div>
+            <div class="control-pair">
+              <span class="control-label">c</span>
+              <div class="control-stack">
+                <button class="step-btn" data-param="c" data-delta="1" aria-label="Increase constant">+</button>
+                <button class="step-btn" data-param="c" data-delta="-1" aria-label="Decrease constant">-</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <button class="secondary" id="reset-btn">Reset</button>
     </div>
+
+    <div class="plot-wrap">
+      <canvas id="plane" aria-label="Interactive coordinate plane"></canvas>
+    </div>
   </div>
+
   <p class="note">
-    Drag the line to shift the equality value. Drag a round handle to rotate the line:
-    the equation updates because the set of possible solutions has changed.
+    The plane holds every possible pair (<em>x</em>, <em>y</em>). The equation rules out
+    almost all of them. Change the coefficients, drag the line, or drag either handle
+    to change the constraint itself.
   </p>
 </div>
 
@@ -251,11 +271,6 @@
   const canvas = document.getElementById('plane');
   const ctx = canvas.getContext('2d');
   const equationEl = document.getElementById('equation');
-  const valueEls = {
-    a: document.getElementById('a-value'),
-    b: document.getElementById('b-value'),
-    c: document.getElementById('c-value')
-  };
   const resetBtn = document.getElementById('reset-btn');
 
   const X_MIN = -5;
@@ -315,9 +330,6 @@
   function updatePanel() {
     sanitizeState();
     equationEl.innerHTML = equationHTML();
-    valueEls.a.textContent = formatNumber(state.a);
-    valueEls.b.textContent = formatNumber(state.b);
-    valueEls.c.textContent = formatNumber(state.c);
   }
 
   function worldToScreen(x, y) {
