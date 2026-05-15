@@ -3,35 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sam Kirwan</title>
+  <title>Interactive Expositions | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="landing-page">
-  <main class="bookshelf-scroll" aria-label="Site sections">
-    <section class="bookshelf-stage" aria-label="Interactive bookshelf">
-      <div class="shelf-art">
-        <img src="images/bookshelf(2).png" alt="" />
-        <div class="book-row">
-          <a class="shelf-book shelf-book-active" href="active-inference.html" aria-label="Open Brief History of the Ideas Behind Active Inference">
-            <span class="book-spine">Active Inference</span>
-            <span class="book-cover">
-              <span>A Brief History of the Ideas Behind Active Inference</span>
-            </span>
-          </a>
-          <a class="shelf-book shelf-book-linear" href="linear-algebra.html" aria-label="Open Linear Algebra">
-            <span class="book-spine">Linear Algebra</span>
-            <span class="book-cover">
-              <span>Linear Algebra</span>
-            </span>
-          </a>
-        </div>
-      </div>
-      <p class="landing-hint">Scroll to move closer</p>
+<body class="landing-page article-index-page">
+  <header class="article-index-hero">
+    <div class="article-index-rule" aria-hidden="true"></div>
+    <h1>Interactive Expositions</h1>
+  </header>
+
+  <main class="article-index-main" aria-label="Interactive Expositions">
+    <section class="article-card-grid">
+      <a class="article-card article-card-featured" href="active-inference.html">
+        <span class="article-tags">Physics | Statistical Mechanics | Active Inference</span>
+        <span class="article-card-title">A Brief History of the Ideas Behind Active Inference</span>
+        <span class="article-card-footer">
+          <strong>Read More -></strong>
+        </span>
+      </a>
+
+      <a class="article-card" href="linear-algebra.html">
+        <span class="article-tags">Mathematics | Linear Algebra</span>
+        <span class="article-card-title">Linear Algebra</span>
+        <span class="article-card-footer">
+          <strong>Read More -></strong>
+        </span>
+      </a>
     </section>
   </main>
-  <script src="script.js"></script>
 </body>
 </html>

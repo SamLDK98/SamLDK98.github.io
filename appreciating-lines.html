@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appreciating lines | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Appreciating lines</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Straight lines are very interesting and I am not being remotely sarcastic. Unfortunately, we only have time to discuss one reason why.</p>
+
+        <p class="display-equation">$4x-2y=2$</p>
+
+        <p>A straight line perfectly captures this equation, and this equation is more complex than it seems.</p>
+
+        <p>Equations are statements: these two things are equal.</p>
+
+        <p>This equation contains the idea of variables: we do not yet know what is being declared to be equal.</p>
+
+        <p>We often talk about variables as <q>unknowns</q>. But perhaps they are better thought of as possibilities.</p>
+
+        <p>We define a category of <em>thing</em>, let's say, all the real numbers ($\mathbb{R}$), and we say $x$ and $y$ could be any one of these <em>things</em>.</p>
+
+        <p>We imagine all the possibilities of $x$ running along a horizontal axis, and all the possibilities of $y$ running along a vertical axis.</p>
+
+        <p>Now, without any constraints, we could have any point $(x,y)$, and we can imagine all of these points, the set of all possibilities, as a space. Being of two dimensions, that space is a 2D plane.</p>
+
+        <p>However, our equation limits this range of possibilities. It says, sure, $x$ can be anything, but whatever that thing is, $y$ must be the exact thing that makes our statement true.</p>
+
+        <p>This is a constraint on the possible ordered pairs of $(x,y)$.</p>
+
+        <p>The pairs of values that solve the constraint $4x-2y=2$ are the set of all possibilities for this specific constraint.</p>
+
+        <p>We can isolate our variables to more explicitly express this relationship, i.e. when $x$ is some value what must $y$ be.</p>
+
+        <div class="equation-stack">
+          <p>$x=\frac{2 +2y}{4}$</p>
+          <p>$y=\frac{2-4x}{-2}$</p>
+        </div>
+
+        <p>When $x$ is 1, $y$ must be $\frac{2 -4(1)}{-2}=1$.</p>
+        <p>When $x$ is 2, $y$ must be $\frac{2 -4(2)}{-2}=3$.</p>
+        <p>When $x$ is 3, $y$ must be $\frac{2 -4(3)}{-2}=5$.</p>
+
+        <p>The limited coordinates of our equation include: $(1,1)$, $(2,3)$, $(3,5)$, and so on.</p>
+
+        <p>We notice that as $x$ changes, $y$ changes at a constant rate: always by +2.</p>
+
+        <p>We could draw and connect these points, with respect to our 2D space. These points are the set of all possible solutions to our equation, and they would form a straight line.</p>
+
+        <p>These lines can model much real-life activity. Think of anything where as one thing increases or decreases, so does another thing, proportionally.</p>
+
+        <p>The line is not merely a shape. It is the geometric manifestation of a constraint relating variables.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize line-constraint-widget"
+          src="linear-algebra/appreciating-lines/line_as_constraint.html"
+          title="Interactive widget showing a line as a constraint"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

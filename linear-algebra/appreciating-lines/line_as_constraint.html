@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Line as constraint</title>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --paper: #fbf8f0;
+    --ink: #1a1a1a;
+    --soft-ink: #3a3a3a;
+    --muted: #7a7468;
+    --rule: #d6cdb7;
+    --rule-soft: #e6dfcd;
+    --line: #b85a3a;
+    --point: #2a5e58;
+    --success: #4a7d4a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+  }
+
+  body {
+    padding: 18px 18px 22px;
+    color: var(--ink);
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .widget {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .panel-label,
+  button {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    max-width: 620px;
+    margin: 0 auto 18px;
+    color: var(--soft-ink);
+    font-size: 15px;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  .note {
+    max-width: 620px;
+    margin: 16px auto 0;
+    color: var(--soft-ink);
+    font-size: 15px;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(280px, 390px) minmax(240px, 1fr);
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .plot-wrap {
+    position: relative;
+    aspect-ratio: 1;
+    border-right: 1px solid var(--rule-soft);
+  }
+
+  #plane {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  #plane.dragging { cursor: grabbing; }
+
+  .panel {
+    min-width: 0;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .panel-label {
+    margin-bottom: 7px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+  }
+
+  .equation {
+    font-size: 25px;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .equation em {
+    font-style: italic;
+  }
+
+  .coefficient-grid {
+    display: grid;
+    gap: 9px;
+  }
+
+  .coefficient-row {
+    display: grid;
+    grid-template-columns: 1.5rem 2.4rem 1fr 2.4rem;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .coefficient-name {
+    color: var(--muted);
+    font-size: 18px;
+    font-style: italic;
+  }
+
+  .coefficient-value {
+    padding: 5px 8px;
+    border: 1px solid var(--rule-soft);
+    background: rgba(255,255,255,0.42);
+    font-size: 18px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  button {
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    min-height: 34px;
+  }
+
+  button:hover { opacity: 0.82; }
+
+  .step-btn {
+    padding: 0;
+    font-size: 18px;
+  }
+
+  .secondary {
+    width: fit-content;
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .secondary:hover {
+    background: var(--ink);
+    color: var(--paper);
+    opacity: 1;
+  }
+
+  @media (max-width: 720px) {
+    body { padding: 16px 14px 20px; }
+
+    .main {
+      grid-template-columns: 1fr;
+    }
+
+    .plot-wrap {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <p class="subtitle">
+    The plane holds every possible pair (<em>x</em>, <em>y</em>). The equation rules out
+    almost all of them. Change the coefficients, drag the line, or drag either handle
+    to change the constraint itself.
+  </p>
+
+  <div class="main">
+    <div class="plot-wrap">
+      <canvas id="plane" aria-label="Interactive coordinate plane"></canvas>
+    </div>
+
+    <div class="panel">
+      <div>
+        <div class="panel-label">Current equation</div>
+        <div class="equation" id="equation"></div>
+      </div>
+
+      <div>
+        <div class="panel-label">Change the constraint</div>
+        <div class="coefficient-grid">
+          <div class="coefficient-row">
+            <span class="coefficient-name">a</span>
+            <button class="step-btn" data-param="a" data-delta="-1" aria-label="Decrease a">-</button>
+            <span class="coefficient-value" id="a-value"></span>
+            <button class="step-btn" data-param="a" data-delta="1" aria-label="Increase a">+</button>
+          </div>
+          <div class="coefficient-row">
+            <span class="coefficient-name">b</span>
+            <button class="step-btn" data-param="b" data-delta="-1" aria-label="Decrease b">-</button>
+            <span class="coefficient-value" id="b-value"></span>
+            <button class="step-btn" data-param="b" data-delta="1" aria-label="Increase b">+</button>
+          </div>
+          <div class="coefficient-row">
+            <span class="coefficient-name">c</span>
+            <button class="step-btn" data-param="c" data-delta="-1" aria-label="Decrease c">-</button>
+            <span class="coefficient-value" id="c-value"></span>
+            <button class="step-btn" data-param="c" data-delta="1" aria-label="Increase c">+</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="secondary" id="reset-btn">Reset</button>
+    </div>
+  </div>
+  <p class="note">
+    Drag the line to shift the equality value. Drag a round handle to rotate the line:
+    the equation updates because the set of possible solutions has changed.
+  </p>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const canvas = document.getElementById('plane');
+  const ctx = canvas.getContext('2d');
+  const equationEl = document.getElementById('equation');
+  const valueEls = {
+    a: document.getElementById('a-value'),
+    b: document.getElementById('b-value'),
+    c: document.getElementById('c-value')
+  };
+  const resetBtn = document.getElementById('reset-btn');
+
+  const X_MIN = -5;
+  const X_MAX = 5;
+  const Y_MIN = -5;
+  const Y_MAX = 5;
+  const INITIAL = { a: 4, b: -2, c: 2 };
+  const HANDLE_RADIUS = 11;
+  const LINE_HIT = 11;
+
+  let state = { ...INITIAL };
+  let dpr = 1;
+  let w = 0;
+  let h = 0;
+  let dragMode = null;
+  let dragStart = null;
+
+  function round2(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  function nearlyZero(n) {
+    return Math.abs(n) < 0.0001;
+  }
+
+  function formatNumber(n) {
+    const rounded = round2(n);
+    if (Object.is(rounded, -0)) return '0';
+    return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2);
+  }
+
+  function formatTerm(coef, variable, first) {
+    const sign = coef < 0 ? '-' : '+';
+    const abs = Math.abs(coef);
+    const body = `${formatNumber(abs)}<em>${variable}</em>`;
+    if (first) return coef < 0 ? `-${body}` : body;
+    return ` ${sign} ${body}`;
+  }
+
+  function equationHTML() {
+    const terms = [];
+    if (!nearlyZero(state.a)) terms.push(formatTerm(state.a, 'x', terms.length === 0));
+    if (!nearlyZero(state.b)) terms.push(formatTerm(state.b, 'y', terms.length === 0));
+    if (terms.length === 0) terms.push('0');
+    return `${terms.join('')} = ${formatNumber(state.c)}`;
+  }
+
+  function sanitizeState() {
+    if (nearlyZero(state.a) && nearlyZero(state.b)) {
+      state.a = 1;
+    }
+    state.a = round2(state.a);
+    state.b = round2(state.b);
+    state.c = round2(state.c);
+  }
+
+  function updatePanel() {
+    sanitizeState();
+    equationEl.innerHTML = equationHTML();
+    valueEls.a.textContent = formatNumber(state.a);
+    valueEls.b.textContent = formatNumber(state.b);
+    valueEls.c.textContent = formatNumber(state.c);
+  }
+
+  function worldToScreen(x, y) {
+    return [
+      ((x - X_MIN) / (X_MAX - X_MIN)) * w,
+      h - ((y - Y_MIN) / (Y_MAX - Y_MIN)) * h
+    ];
+  }
+
+  function screenToWorld(sx, sy) {
+    return {
+      x: X_MIN + (sx / w) * (X_MAX - X_MIN),
+      y: Y_MIN + ((h - sy) / h) * (Y_MAX - Y_MIN)
+    };
+  }
+
+  function getLineIntersections(a = state.a, b = state.b, c = state.c) {
+    const points = [];
+
+    if (!nearlyZero(b)) {
+      points.push({ x: X_MIN, y: (c - a * X_MIN) / b });
+      points.push({ x: X_MAX, y: (c - a * X_MAX) / b });
+    }
+
+    if (!nearlyZero(a)) {
+      points.push({ x: (c - b * Y_MIN) / a, y: Y_MIN });
+      points.push({ x: (c - b * Y_MAX) / a, y: Y_MAX });
+    }
+
+    const visible = points.filter((p) =>
+      p.x >= X_MIN - 0.0001 &&
+      p.x <= X_MAX + 0.0001 &&
+      p.y >= Y_MIN - 0.0001 &&
+      p.y <= Y_MAX + 0.0001
+    );
+
+    const unique = [];
+    visible.forEach((p) => {
+      if (!unique.some((q) => Math.abs(q.x - p.x) < 0.001 && Math.abs(q.y - p.y) < 0.001)) {
+        unique.push(p);
+      }
+    });
+
+    return unique.slice(0, 2);
+  }
+
+  function distancePointToSegment(px, py, ax, ay, bx, by) {
+    const dx = bx - ax;
+    const dy = by - ay;
+    const lengthSq = dx * dx + dy * dy;
+    if (lengthSq === 0) return Math.hypot(px - ax, py - ay);
+    const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSq));
+    return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+  }
+
+  function coefficientsFromPoints(p1, p2) {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    if (Math.hypot(dx, dy) < 0.15) return;
+
+    let a = dy;
+    let b = -dx;
+    let c = a * p1.x + b * p1.y;
+    const scale = Math.max(Math.abs(a), Math.abs(b), 0.0001);
+    const targetScale = 2;
+
+    a = (a / scale) * targetScale;
+    b = (b / scale) * targetScale;
+    c = (c / scale) * targetScale;
+
+    state = { a: round2(a), b: round2(b), c: round2(c) };
+    sanitizeState();
+  }
+
+  function drawGrid() {
+    ctx.strokeStyle = '#e6dfcd';
+    ctx.lineWidth = 1;
+
+    for (let x = Math.ceil(X_MIN); x <= X_MAX; x++) {
+      const [sx] = worldToScreen(x, 0);
+      ctx.beginPath();
+      ctx.moveTo(sx, 0);
+      ctx.lineTo(sx, h);
+      ctx.stroke();
+    }
+
+    for (let y = Math.ceil(Y_MIN); y <= Y_MAX; y++) {
+      const [, sy] = worldToScreen(0, y);
+      ctx.beginPath();
+      ctx.moveTo(0, sy);
+      ctx.lineTo(w, sy);
+      ctx.stroke();
+    }
+  }
+
+  function drawAxes() {
+    const [sx0] = worldToScreen(0, 0);
+    const [, sy0] = worldToScreen(0, 0);
+
+    ctx.strokeStyle = '#7a7468';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(0, sy0);
+    ctx.lineTo(w, sy0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(sx0, 0);
+    ctx.lineTo(sx0, h);
+    ctx.stroke();
+
+    ctx.fillStyle = '#7a7468';
+    ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+
+    for (let x = Math.ceil(X_MIN); x <= X_MAX; x++) {
+      if (x === 0) continue;
+      const [sx] = worldToScreen(x, 0);
+      ctx.fillText(x, sx, sy0 + 4);
+    }
+
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let y = Math.ceil(Y_MIN); y <= Y_MAX; y++) {
+      if (y === 0) continue;
+      const [, sy] = worldToScreen(0, y);
+      ctx.fillText(y, sx0 - 5, sy);
+    }
+  }
+
+  function drawLineAndHandles() {
+    const ends = getLineIntersections();
+    if (ends.length < 2) return;
+
+    const [p1, p2] = ends;
+    const [x1, y1] = worldToScreen(p1.x, p1.y);
+    const [x2, y2] = worldToScreen(p2.x, p2.y);
+
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(184, 90, 58, 0.16)';
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#b85a3a';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    const examplePoints = [0.25, 0.5, 0.75].map((t) => ({
+      x: p1.x + (p2.x - p1.x) * t,
+      y: p1.y + (p2.y - p1.y) * t
+    }));
+
+    examplePoints.forEach((p) => {
+      const [sx, sy] = worldToScreen(p.x, p.y);
+      ctx.fillStyle = '#fbf8f0';
+      ctx.strokeStyle = '#2a5e58';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    [p1, p2].forEach((p) => {
+      const [sx, sy] = worldToScreen(p.x, p.y);
+      ctx.fillStyle = '#fbf8f0';
+      ctx.strokeStyle = '#b85a3a';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+  }
+
+  function draw() {
+    ctx.fillStyle = '#fbf8f0';
+    ctx.fillRect(0, 0, w, h);
+    drawGrid();
+    drawAxes();
+    drawLineAndHandles();
+  }
+
+  function render() {
+    updatePanel();
+    draw();
+  }
+
+  function resize() {
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    const rect = canvas.getBoundingClientRect();
+    w = rect.width;
+    h = rect.height;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    render();
+  }
+
+  function pointerInfo(e) {
+    const rect = canvas.getBoundingClientRect();
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const world = screenToWorld(sx, sy);
+    return { sx, sy, world };
+  }
+
+  function chooseDragMode(info) {
+    const ends = getLineIntersections();
+    if (ends.length < 2) return null;
+
+    const screenEnds = ends.map((p) => {
+      const [sx, sy] = worldToScreen(p.x, p.y);
+      return { sx, sy, world: p };
+    });
+
+    const d0 = Math.hypot(info.sx - screenEnds[0].sx, info.sy - screenEnds[0].sy);
+    const d1 = Math.hypot(info.sx - screenEnds[1].sx, info.sy - screenEnds[1].sy);
+
+    if (d0 <= HANDLE_RADIUS + 4) return { type: 'handle', moving: 0, fixed: screenEnds[1].world };
+    if (d1 <= HANDLE_RADIUS + 4) return { type: 'handle', moving: 1, fixed: screenEnds[0].world };
+
+    const lineDistance = distancePointToSegment(
+      info.sx,
+      info.sy,
+      screenEnds[0].sx,
+      screenEnds[0].sy,
+      screenEnds[1].sx,
+      screenEnds[1].sy
+    );
+
+    if (lineDistance <= LINE_HIT) return { type: 'shift' };
+    return null;
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    const info = pointerInfo(e);
+    const mode = chooseDragMode(info);
+    if (!mode) return;
+
+    dragMode = mode;
+    dragStart = {
+      world: info.world,
+      state: { ...state }
+    };
+    canvas.classList.add('dragging');
+    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (!dragMode || !dragStart) return;
+    const info = pointerInfo(e);
+
+    if (dragMode.type === 'shift') {
+      const dx = info.world.x - dragStart.world.x;
+      const dy = info.world.y - dragStart.world.y;
+      state.c = round2(dragStart.state.c + dragStart.state.a * dx + dragStart.state.b * dy);
+    }
+
+    if (dragMode.type === 'handle') {
+      coefficientsFromPoints(dragMode.fixed, info.world);
+    }
+
+    render();
+  });
+
+  function endDrag(e) {
+    dragMode = null;
+    dragStart = null;
+    canvas.classList.remove('dragging');
+    if (e && e.pointerId !== undefined) {
+      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+  }
+
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+
+  document.querySelectorAll('.step-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      const param = button.dataset.param;
+      const delta = Number(button.dataset.delta);
+      state[param] = round2(state[param] + delta);
+      sanitizeState();
+      render();
+    });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    state = { ...INITIAL };
+    render();
+  });
+
+  window.addEventListener('resize', resize);
+  resize();
+})();
+</script>
+</body>
+</html>
