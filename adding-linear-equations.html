@@ -51,6 +51,74 @@
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <p><q>Pointwise</q> means: for each input point, evaluate both functions there, then add the resulting numbers.</p>
+
+        <p>The word is needed because functions are not numbers themselves.</p>
+
+        <p>They are rules that assign numbers to points.</p>
+
+        <p>So function addition cannot mean: <q>add the whole functions all at once</q> in the same way you add $2+3$.</p>
+
+        <p>Instead, the addition happens at every point individually.</p>
+
+        <p>Hence: pointwise.</p>
+
+        <p>Suppose:</p>
+
+        <div class="equation-stack">
+          <p>$f(x,y)=x+y$</p>
+          <p>$g(x,y)=x-y$</p>
+        </div>
+
+        <p>Now pick a point, say: $(3,1)$.</p>
+
+        <p>Evaluate each function there:</p>
+
+        <div class="equation-stack">
+          <p>$f(3,1)=3+1=4$</p>
+          <p>$g(3,1)=3-1=2$</p>
+        </div>
+
+        <p>Now add the outputs: $4+2=6$.</p>
+
+        <p>So the new function should output $6$ at the point $(3,1)$.</p>
+
+        <p>Now do this for every point in the plane.</p>
+
+        <p>That entire collection of summed outputs defines a new function.</p>
+
+        <p>That is what $(f+g)(x,y)$ means.</p>
+
+        <p>So:</p>
+
+        <p class="display-equation">$(f+g)(x,y)=f(x,y)+g(x,y)$</p>
+
+        <p>is really saying: <q>At each point $(x,y)$, evaluate both functions and add the results.</q></p>
+
+        <p>The important thing is:</p>
+
+        <p>the inputs are not added; the functions themselves are not <q>merged</q> mysteriously; their outputs are added at corresponding points.</p>
+
+        <p>Hence: pointwise addition.</p>
+
+        <p>You can think of functions as landscapes over space.</p>
+
+        <p>At every coordinate: one landscape has some height, and another landscape has some height.</p>
+
+        <p>Pointwise addition means: add the heights at matching coordinates.</p>
+
+        <p>This creates a new landscape.</p>
+
+        <p>Then: the zero-height contour of that new landscape becomes the new line/equation.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize pointwise-landscape-widget"
+          src="linear-algebra/adding-linear-equations/pointwise_landscapes.html"
+          title="Interactive widget showing pointwise function addition as landscapes"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
       </section>
     </article>
   </main>
