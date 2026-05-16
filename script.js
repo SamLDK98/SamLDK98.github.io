@@ -49,9 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   autoHeightFrames.forEach((frame) => {
-    frame.addEventListener('load', () => resizeFrame(frame));
+    frame.addEventListener('load', () => {
+      resizeFrame(frame);
+      setTimeout(() => resizeFrame(frame), 120);
+      setTimeout(() => resizeFrame(frame), 400);
+    });
     if (frame.contentDocument?.readyState === 'complete') {
       resizeFrame(frame);
+      setTimeout(() => resizeFrame(frame), 120);
     }
   });
 

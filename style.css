@@ -716,6 +716,14 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 900px;
 }
 
+.equation-multiplier-widget {
+  height: 560px;
+}
+
+.equation-adder-widget {
+  height: 760px;
+}
+
 footer {
   max-width: var(--col-width);
   margin: 0 auto;
@@ -853,6 +861,10 @@ header {
   .essay-widget-tall { height: 620px; }
 
   .line-constraint-widget { height: 1120px; }
+
+  .equation-multiplier-widget { height: 1180px; }
+
+  .equation-adder-widget { height: 1380px; }
 
   .essay-widget-balls { height: 500px; }
 
