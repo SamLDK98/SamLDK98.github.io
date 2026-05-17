@@ -128,27 +128,30 @@
   }
 
   .equation-controls {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(110px, 1fr));
+    gap: 14px;
+    align-items: start;
   }
 
   .control-pair {
     display: grid;
-    grid-template-columns: auto 2.15rem;
-    gap: 0.45rem;
-    align-items: center;
+    gap: 0.7rem;
+    padding: 12px 12px 10px;
+    border: 1px solid var(--rule-soft);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.78);
   }
 
   .control-stack {
     display: grid;
-    gap: 0.28rem;
+    grid-template-columns: repeat(3, minmax(2rem, 1fr));
+    gap: 0.45rem;
   }
 
   .control-label {
     color: var(--ink);
-    font-size: 1.35rem;
+    font-size: 1.15rem;
     font-style: italic;
     line-height: 1;
   }
@@ -163,6 +166,20 @@
     line-height: 1;
     letter-spacing: 0.08em;
     min-height: 34px;
+    border-radius: 8px;
+  }
+  .step-btn {
+    width: 100%;
+  }
+  .flip-btn {
+    background: transparent;
+    border-color: var(--muted);
+    color: var(--ink);
+    font-size: 15px;
+  }
+  .flip-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
   }
 
   button:hover { opacity: 0.82; }
@@ -229,6 +246,7 @@
               <div class="control-stack">
                 <button class="step-btn" data-param="a" data-delta="1" aria-label="Increase x coefficient">+</button>
                 <button class="step-btn" data-param="a" data-delta="-1" aria-label="Decrease x coefficient">-</button>
+                <button class="flip-btn" data-action="flip" data-param="a" aria-label="Flip sign of x coefficient">±</button>
               </div>
             </div>
             <div class="control-pair">
@@ -236,6 +254,7 @@
               <div class="control-stack">
                 <button class="step-btn" data-param="b" data-delta="1" aria-label="Increase y coefficient">+</button>
                 <button class="step-btn" data-param="b" data-delta="-1" aria-label="Decrease y coefficient">-</button>
+                <button class="flip-btn" data-action="flip" data-param="b" aria-label="Flip sign of y coefficient">±</button>
               </div>
             </div>
             <div class="control-pair">
@@ -243,6 +262,7 @@
               <div class="control-stack">
                 <button class="step-btn" data-param="c" data-delta="1" aria-label="Increase constant">+</button>
                 <button class="step-btn" data-param="c" data-delta="-1" aria-label="Decrease constant">-</button>
+                <button class="flip-btn" data-action="flip" data-param="c" aria-label="Flip sign of constant">±</button>
               </div>
             </div>
           </div>
@@ -615,15 +635,59 @@
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
 
+  let repeatTimer = null;
+  let repeatDelay = null;
+  const REPEAT_DELAY = 350;
+  const REPEAT_INTERVAL = 100;
+
+  function updateValue(param, delta) {
+    state[param] = round2(state[param] + delta);
+    sanitizeState();
+    render();
+  }
+
+  function startRepeat(button) {
+    const param = button.dataset.param;
+    const delta = Number(button.dataset.delta);
+    updateValue(param, delta);
+    repeatDelay = window.setTimeout(() => {
+      repeatTimer = window.setInterval(() => updateValue(param, delta), REPEAT_INTERVAL);
+    }, REPEAT_DELAY);
+  }
+
+  function stopRepeat() {
+    if (repeatDelay) {
+      window.clearTimeout(repeatDelay);
+      repeatDelay = null;
+    }
+    if (repeatTimer) {
+      window.clearInterval(repeatTimer);
+      repeatTimer = null;
+    }
+  }
+
   document.querySelectorAll('.step-btn').forEach((button) => {
+    button.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      event.preventDefault();
+      startRepeat(button);
+    });
+    button.addEventListener('pointerup', stopRepeat);
+    button.addEventListener('pointercancel', stopRepeat);
+    button.addEventListener('pointerleave', stopRepeat);
+  });
+
+  document.querySelectorAll('.flip-btn').forEach((button) => {
     button.addEventListener('click', () => {
       const param = button.dataset.param;
-      const delta = Number(button.dataset.delta);
-      state[param] = round2(state[param] + delta);
+      state[param] = round2(-state[param]);
       sanitizeState();
       render();
     });
   });
+
+  window.addEventListener('pointerup', stopRepeat);
+  window.addEventListener('pointercancel', stopRepeat);
 
   resetBtn.addEventListener('click', () => {
     state = { ...INITIAL };
