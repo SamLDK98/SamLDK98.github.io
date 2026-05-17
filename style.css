@@ -299,6 +299,14 @@ article {
   padding-top: 2.5rem;
 }
 
+body.chapter-page header {
+  padding-bottom: 1.4rem;
+}
+
+body.chapter-page article {
+  padding-top: 1.35rem;
+}
+
 /* ─── Part Label ────────────────────────────────────────────── */
 .essay-part {
   margin-bottom: 2rem;
