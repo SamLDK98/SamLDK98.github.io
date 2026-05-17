@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Adding multiples of an equation</title>
+<title>Scaled equation mixer</title>
 <style>
   :root {
     --bg: #f5f1e8;
@@ -13,8 +13,8 @@
     --muted: #7a7468;
     --rule: #d6cdb7;
     --rule-soft: #e6dfcd;
-    --fixed: #b85a3a;
-    --multiple: #2a5e58;
+    --eq-a: #b85a3a;
+    --eq-b: #2a5e58;
     --sum: #57478c;
   }
 
@@ -89,38 +89,33 @@
     transform: translateY(-0.08rem);
   }
 
-  .swatch-fixed { background: var(--fixed); }
-  .swatch-multiple { background: var(--multiple); }
+  .swatch-a { background: var(--eq-a); }
+  .swatch-b { background: var(--eq-b); }
   .swatch-sum { background: var(--sum); }
 
   .equation {
     font-size: 22px;
-    line-height: 1.28;
+    line-height: 1.25;
     font-variant-numeric: tabular-nums;
   }
 
   .equation em { font-style: italic; }
-
-  .equation.muted {
-    color: var(--soft-ink);
-    font-size: 19px;
-  }
 
   .control-set {
     border-top: 1px solid var(--rule-soft);
     padding-top: 13px;
   }
 
-  .multiplier-readout {
+  .control-title {
     margin-bottom: 10px;
-    font-size: 25px;
-    line-height: 1.1;
-    font-variant-numeric: tabular-nums;
+    color: var(--soft-ink);
+    font-size: 15px;
+    line-height: 1.3;
   }
 
-  .button-row {
+  .option-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
   }
 
@@ -138,23 +133,15 @@
 
   button:hover { opacity: 0.82; }
 
-  .step-btn {
-    min-width: 0;
-    padding: 0 6px;
-    font-size: 13px;
-    letter-spacing: 0;
-  }
-
-  .reset-btn {
-    width: fit-content;
-    min-width: 88px;
-    padding: 10px 16px;
+  .option-btn {
+    padding: 0 8px;
     background: transparent;
     color: var(--ink);
-    font-size: 12px;
+    font-size: 11px;
   }
 
-  .reset-btn:hover {
+  .option-btn.is-active,
+  .option-btn:hover {
     background: var(--ink);
     color: var(--paper);
     opacity: 1;
@@ -196,8 +183,6 @@
 
   @media (max-width: 480px) {
     .equation { font-size: 19px; }
-    .equation.muted { font-size: 17px; }
-    .button-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>
 </head>
@@ -207,48 +192,42 @@
     <div class="panel">
       <div class="equation-list">
         <div>
-          <div class="panel-label">Fixed equation</div>
+          <div class="panel-label">Selected equations</div>
           <div class="equation-row">
-            <span class="swatch swatch-fixed" aria-hidden="true"></span>
-            <div class="equation" id="fixed-equation"></div>
+            <span class="swatch swatch-a" aria-hidden="true"></span>
+            <div class="equation" id="equation-a"></div>
+          </div>
+          <div class="equation-row">
+            <span class="swatch swatch-b" aria-hidden="true"></span>
+            <div class="equation" id="equation-b"></div>
           </div>
         </div>
         <div>
-          <div class="panel-label">Equation multiplied by k</div>
-          <div class="equation-row">
-            <span class="swatch swatch-multiple" aria-hidden="true"></span>
-            <div class="equation muted" id="multiple-equation"></div>
-          </div>
-        </div>
-        <div>
-          <div class="panel-label">Fixed + multiplied equation</div>
+          <div class="panel-label">Like-terms added</div>
           <div class="equation-row">
             <span class="swatch swatch-sum" aria-hidden="true"></span>
-            <div class="equation" id="sum-equation"></div>
+            <div class="equation" id="equation-sum"></div>
           </div>
         </div>
       </div>
 
-      <div class="control-set" aria-label="Multiplier controls">
-        <div class="panel-label">Multiplier</div>
-        <div class="multiplier-readout" id="multiplier-readout"></div>
-        <div class="button-row">
-          <button class="step-btn" data-delta="-5" aria-label="Decrease multiplier by 5">-5</button>
-          <button class="step-btn" data-delta="-1" aria-label="Decrease multiplier by 1">-1</button>
-          <button class="step-btn" data-delta="1" aria-label="Increase multiplier by 1">+1</button>
-          <button class="step-btn" data-delta="5" aria-label="Increase multiplier by 5">+5</button>
-        </div>
+      <div class="control-set">
+        <div class="control-title">2 : 1 ratio versions</div>
+        <div class="option-grid" id="options-a"></div>
       </div>
 
-      <button class="reset-btn" id="reset-btn">Reset</button>
+      <div class="control-set">
+        <div class="control-title">1 : 2 ratio versions</div>
+        <div class="option-grid" id="options-b"></div>
+      </div>
     </div>
 
     <div class="plot-wrap">
-      <canvas id="plane" aria-label="Coordinate plane showing a fixed equation, a multiplied equation, and their sum"></canvas>
+      <canvas id="plane" aria-label="Coordinate plane comparing two selected equations and their sum"></canvas>
     </div>
   </div>
 
-  <p class="note" id="note"></p>
+  <p class="note">The red and green choices each keep the same line within their own family. The purple line changes because the like-terms are being added with different absolute magnitudes.</p>
 </div>
 
 <script>
@@ -257,29 +236,32 @@
 
   const canvas = document.getElementById('plane');
   const ctx = canvas.getContext('2d');
-  const fixedEl = document.getElementById('fixed-equation');
-  const multipleEl = document.getElementById('multiple-equation');
-  const sumEl = document.getElementById('sum-equation');
-  const multiplierEl = document.getElementById('multiplier-readout');
-  const noteEl = document.getElementById('note');
-  const resetBtn = document.getElementById('reset-btn');
+  const equationAEl = document.getElementById('equation-a');
+  const equationBEl = document.getElementById('equation-b');
+  const equationSumEl = document.getElementById('equation-sum');
+  const optionsAEl = document.getElementById('options-a');
+  const optionsBEl = document.getElementById('options-b');
 
-  const X_MIN = -6;
-  const X_MAX = 6;
-  const Y_MIN = -6;
-  const Y_MAX = 6;
-  const FIXED = { a: 2, b: -1, c: 0 };
-  const MOVING = { a: 1, b: -2, c: 0 };
-  const INITIAL_K = 1;
+  const X_MIN = -5;
+  const X_MAX = 5;
+  const Y_MIN = -5;
+  const Y_MAX = 5;
+  const equationsA = [
+    { a: 2, b: -1, c: 0, label: '2x - y' },
+    { a: 20, b: -10, c: 0, label: '20x - 10y' },
+    { a: 200, b: -100, c: 0, label: '200x - 100y' }
+  ];
+  const equationsB = [
+    { a: 1, b: -2, c: 0, label: 'x - 2y' },
+    { a: 10, b: -20, c: 0, label: '10x - 20y' },
+    { a: 100, b: -200, c: 0, label: '100x - 200y' }
+  ];
 
-  let k = INITIAL_K;
+  let selectedA = 0;
+  let selectedB = 0;
   let dpr = 1;
   let w = 0;
   let h = 0;
-
-  function nearlyZero(n) {
-    return Math.abs(n) < 0.0001;
-  }
 
   function formatNumber(n) {
     if (Object.is(n, -0)) return '0';
@@ -289,28 +271,30 @@
   function formatTerm(coef, variable, first) {
     const sign = coef < 0 ? '-' : '+';
     const abs = Math.abs(coef);
-    const body = `${formatNumber(abs)}<em>${variable}</em>`;
+    const body = abs === 1 ? `<em>${variable}</em>` : `${formatNumber(abs)}<em>${variable}</em>`;
     if (first) return coef < 0 ? `-${body}` : body;
     return ` ${sign} ${body}`;
   }
 
   function equationHTML(eq) {
     const terms = [];
-    if (!nearlyZero(eq.a)) terms.push(formatTerm(eq.a, 'x', terms.length === 0));
-    if (!nearlyZero(eq.b)) terms.push(formatTerm(eq.b, 'y', terms.length === 0));
+    if (eq.a !== 0) terms.push(formatTerm(eq.a, 'x', terms.length === 0));
+    if (eq.b !== 0) terms.push(formatTerm(eq.b, 'y', terms.length === 0));
     if (terms.length === 0) terms.push('0');
     return `${terms.join('')} = ${formatNumber(eq.c)}`;
   }
 
-  function scaleEquation(eq, scalar) {
-    return {
-      a: eq.a * scalar,
-      b: eq.b * scalar,
-      c: eq.c * scalar
-    };
+  function selectedEquationA() {
+    return equationsA[selectedA];
   }
 
-  function addEquations(one, two) {
+  function selectedEquationB() {
+    return equationsB[selectedB];
+  }
+
+  function sumEquation() {
+    const one = selectedEquationA();
+    const two = selectedEquationB();
     return {
       a: one.a + two.a,
       b: one.b + two.b,
@@ -318,27 +302,40 @@
     };
   }
 
-  function scaledEquation() {
-    return scaleEquation(MOVING, k);
-  }
+  function updateOptions() {
+    optionsAEl.innerHTML = '';
+    optionsBEl.innerHTML = '';
 
-  function sumEquation() {
-    return addEquations(FIXED, scaledEquation());
+    equationsA.forEach((eq, index) => {
+      const button = document.createElement('button');
+      button.className = `option-btn${index === selectedA ? ' is-active' : ''}`;
+      button.type = 'button';
+      button.textContent = eq.label;
+      button.addEventListener('click', () => {
+        selectedA = index;
+        render();
+      });
+      optionsAEl.appendChild(button);
+    });
+
+    equationsB.forEach((eq, index) => {
+      const button = document.createElement('button');
+      button.className = `option-btn${index === selectedB ? ' is-active' : ''}`;
+      button.type = 'button';
+      button.textContent = eq.label;
+      button.addEventListener('click', () => {
+        selectedB = index;
+        render();
+      });
+      optionsBEl.appendChild(button);
+    });
   }
 
   function updatePanel() {
-    const scaled = scaledEquation();
-    const sum = sumEquation();
-    fixedEl.innerHTML = equationHTML(FIXED);
-    multipleEl.innerHTML = `${formatNumber(k)} * (${equationHTML(MOVING)}) gives ${equationHTML(scaled)}`;
-    sumEl.innerHTML = equationHTML(sum);
-    multiplierEl.innerHTML = `k = ${formatNumber(k)}`;
-
-    if (k === 0) {
-      noteEl.innerHTML = 'At k = 0, the multiplied equation contributes 0 = 0. The added equation is just 2x - y = 0.';
-    } else {
-      noteEl.innerHTML = 'Changing k adds a larger or smaller multiple of x - 2y = 0 to the fixed equation. The purple result changes even though the green equation describes the same line whenever k is non-zero.';
-    }
+    equationAEl.innerHTML = equationHTML(selectedEquationA());
+    equationBEl.innerHTML = equationHTML(selectedEquationB());
+    equationSumEl.innerHTML = equationHTML(sumEquation());
+    updateOptions();
   }
 
   function worldToScreen(x, y) {
@@ -350,13 +347,11 @@
 
   function getLineIntersections(eq) {
     const points = [];
-
-    if (!nearlyZero(eq.b)) {
+    if (eq.b !== 0) {
       points.push({ x: X_MIN, y: (eq.c - eq.a * X_MIN) / eq.b });
       points.push({ x: X_MAX, y: (eq.c - eq.a * X_MAX) / eq.b });
     }
-
-    if (!nearlyZero(eq.a)) {
+    if (eq.a !== 0) {
       points.push({ x: (eq.c - eq.b * Y_MIN) / eq.a, y: Y_MIN });
       points.push({ x: (eq.c - eq.b * Y_MAX) / eq.a, y: Y_MAX });
     }
@@ -367,24 +362,13 @@
       p.y >= Y_MIN - 0.0001 &&
       p.y <= Y_MAX + 0.0001
     );
-
     const unique = [];
     visible.forEach((p) => {
       if (!unique.some((q) => Math.abs(q.x - p.x) < 0.001 && Math.abs(q.y - p.y) < 0.001)) {
         unique.push(p);
       }
     });
-
     return unique.slice(0, 2);
-  }
-
-  function intersection(one, two) {
-    const determinant = one.a * two.b - two.a * one.b;
-    if (nearlyZero(determinant)) return null;
-    return {
-      x: (one.c * two.b - two.c * one.b) / determinant,
-      y: (one.a * two.c - two.a * one.c) / determinant
-    };
   }
 
   function drawGrid() {
@@ -443,7 +427,7 @@
     }
   }
 
-  function drawLine(eq, color, width, dash, alpha) {
+  function drawLine(eq, color, width, dash) {
     const ends = getLineIntersections(eq);
     if (ends.length < 2) return;
 
@@ -452,7 +436,6 @@
     const [x2, y2] = worldToScreen(p2.x, p2.y);
 
     ctx.save();
-    ctx.globalAlpha = alpha === undefined ? 1 : alpha;
     ctx.lineCap = 'round';
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
@@ -464,29 +447,10 @@
     ctx.restore();
   }
 
-  function drawTrail() {
-    for (let trial = -8; trial <= 8; trial += 2) {
-      if (trial === k) continue;
-      drawLine(addEquations(FIXED, scaleEquation(MOVING, trial)), '#57478c', 1.1, [2, 7], 0.22);
-    }
-  }
-
-  function drawPoint(p) {
-    if (!p) return;
-    const [sx, sy] = worldToScreen(p.x, p.y);
-    ctx.fillStyle = '#fbf8f0';
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(sx, sy, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-  }
-
   function drawLegend() {
     const items = [
-      ['#b85a3a', [], 'fixed'],
-      ['#2a5e58', [7, 6], 'k times equation'],
+      ['#b85a3a', [], '2 : 1 family'],
+      ['#2a5e58', [7, 6], '1 : 2 family'],
       ['#57478c', [2, 5], 'sum']
     ];
 
@@ -514,17 +478,10 @@
     ctx.fillRect(0, 0, w, h);
     drawGrid();
     drawAxes();
-    drawTrail();
-
-    drawLine(FIXED, 'rgba(184, 90, 58, 0.18)', 11);
-    drawLine(FIXED, '#b85a3a', 3);
-
-    if (k !== 0) {
-      drawLine(scaledEquation(), '#2a5e58', 2.8, [7, 6]);
-    }
-
+    drawLine(selectedEquationA(), 'rgba(184, 90, 58, 0.2)', 10);
+    drawLine(selectedEquationA(), '#b85a3a', 2.8);
+    drawLine(selectedEquationB(), '#2a5e58', 2.8, [7, 6]);
     drawLine(sumEquation(), '#57478c', 3.2, [2, 5]);
-    drawPoint(intersection(FIXED, MOVING));
     drawLegend();
   }
 
@@ -543,18 +500,6 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     render();
   }
-
-  document.querySelectorAll('.step-btn').forEach((button) => {
-    button.addEventListener('click', () => {
-      k += Number(button.dataset.delta);
-      render();
-    });
-  });
-
-  resetBtn.addEventListener('click', () => {
-    k = INITIAL_K;
-    render();
-  });
 
   window.addEventListener('resize', resize);
   resize();

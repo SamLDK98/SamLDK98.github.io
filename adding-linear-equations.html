@@ -34,88 +34,90 @@
   <main>
     <article>
       <section class="essay-section">
-        <p>Create different linear equations, add them together, and see what kind of lines they produce.</p>
+        <p>What exactly does it mean to <q>add</q> equations?</p>
+
+        <p>Equations are not values, so it doesn't seem coherent to say we can add them.</p>
+
+        <p>Likewise, if we think of them as lines or solution sets, it makes no sense to add or subtract. We are not going to get <q>more line</q> or <q>less line</q> or <q>more solutions</q> or <q>less solutions</q>.</p>
+
+        <p>What we are actually adding are the like-terms.</p>
+
+        <p>Some people might say, <q>Sam. That is painfully pedantic. You're getting hung up on semantics.</q></p>
+
+        <p>To those people I say, <q>It builds up! These little semantical inconsistencies -- they build up!</q></p>
+
+        <p>So, that's the first thing: we aren't adding equations, we are adding the like-terms of equations.</p>
+
+        <div class="equation-stack">
+          <p>$$E_{1}:2x-3y=4$$</p>
+          <p>$$E_{2}:4x-y=3$$</p>
+          <p>$$E_{3}:(2x+4x)+(-3y-y)=4+3$$</p>
+          <p>$$E_{3}:6x-4y=7$$</p>
+        </div>
+
+        <p>Okay. But what does that even mean?</p>
+
+        <p>Let's take an example:</p>
+
+        <p>Coefficients determine how much relative value a variable has.</p>
+
+        <p>If our equations were:</p>
+
+        <div class="equation-stack">
+          <p>$$E_{1}:x-y=0$$</p>
+          <p>$$E_{2}:50x-10y=0$$</p>
+        </div>
+
+        <p>We see a 1 to 1 ratio between x and y being <q>added</q> to a 1 to five ratio, and we might think that the <q>sum</q> must be an equation that defines a ratio somewhere in the middle of these two.</p>
+
+        <p>However, this is not true.</p>
+
+        <p>Look at this example.</p>
+
+        <p>These all describe the same line and the same 2 : 1 ratio between $x$ and $y$ values.</p>
+
+        <div class="equation-stack">
+          <p>$$2x-y=0$$</p>
+          <p>$$20x-10y=0$$</p>
+          <p>$$200x-100y=0$$</p>
+        </div>
+
+        <p>These all describe the same line and the same 1 : 2 ratio between $x$ and $y$ values.</p>
+
+        <div class="equation-stack">
+          <p>$$x-2y=0$$</p>
+          <p>$$10x-20y=0$$</p>
+          <p>$$100x-200y=0$$</p>
+        </div>
+
+        <p>Logically, if we have a ratio that says, <q>for every x take 2 y</q>, and another that says, <q>for every y take 2 x</q>, we can see that combining them should result in <q>for every 1 x take 1 y</q>.</p>
+
+        <p>And this is true if we add the like-terms of our equations in this example:</p>
+
+        <div class="equation-stack">
+          <p>$$E_{1}:2x-y=0$$</p>
+          <p>$$E_{2}:x-2y=0$$</p>
+          <p>$$E_{1}+E_{2}:x-y=0$$</p>
+        </div>
+
+        <p>However, play around with the widget to see what happens when we add the scaled up or down versions of these equations.</p>
 
         <iframe
-          class="essay-widget essay-widget-autosize equation-adder-widget"
-          src="linear-algebra/adding-linear-equations/equation_adder.html"
-          title="Interactive widget for adding linear equations"
+          class="essay-widget essay-widget-autosize scaled-equation-mixer-widget"
+          src="linear-algebra/adding-linear-equations/scaled_equation_mixer.html"
+          title="Interactive widget for adding scaled versions of two equations"
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <p>Evidently, the absolute magnitudes of the coefficients influence the resulting ratio of the new equation.</p>
+
+        <hr>
 
         <iframe
           class="essay-widget essay-widget-autosize equation-multiple-sum-widget"
           src="linear-algebra/adding-linear-equations/equation_multiple_sum.html"
           title="Interactive widget for adding multiples of a linear equation"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p><q>Pointwise</q> means: for each input point, evaluate both functions there, then add the resulting numbers.</p>
-
-        <p>The word is needed because functions are not numbers themselves.</p>
-
-        <p>They are rules that assign numbers to points.</p>
-
-        <p>So function addition cannot mean: <q>add the whole functions all at once</q> in the same way you add $2+3$.</p>
-
-        <p>Instead, the addition happens at every point individually.</p>
-
-        <p>Hence: pointwise.</p>
-
-        <p>Suppose:</p>
-
-        <div class="equation-stack">
-          <p>$f(x,y)=x+y$</p>
-          <p>$g(x,y)=x-y$</p>
-        </div>
-
-        <p>Now pick a point, say: $(3,1)$.</p>
-
-        <p>Evaluate each function there:</p>
-
-        <div class="equation-stack">
-          <p>$f(3,1)=3+1=4$</p>
-          <p>$g(3,1)=3-1=2$</p>
-        </div>
-
-        <p>Now add the outputs: $4+2=6$.</p>
-
-        <p>So the new function should output $6$ at the point $(3,1)$.</p>
-
-        <p>Now do this for every point in the plane.</p>
-
-        <p>That entire collection of summed outputs defines a new function.</p>
-
-        <p>That is what $(f+g)(x,y)$ means.</p>
-
-        <p>So:</p>
-
-        <p class="display-equation">$(f+g)(x,y)=f(x,y)+g(x,y)$</p>
-
-        <p>is really saying: <q>At each point $(x,y)$, evaluate both functions and add the results.</q></p>
-
-        <p>The important thing is:</p>
-
-        <p>the inputs are not added; the functions themselves are not <q>merged</q> mysteriously; their outputs are added at corresponding points.</p>
-
-        <p>Hence: pointwise addition.</p>
-
-        <p>You can think of functions as landscapes over space.</p>
-
-        <p>At every coordinate: one landscape has some height, and another landscape has some height.</p>
-
-        <p>Pointwise addition means: add the heights at matching coordinates.</p>
-
-        <p>This creates a new landscape.</p>
-
-        <p>Then: the zero-height contour of that new landscape becomes the new line/equation.</p>
-
-        <iframe
-          class="essay-widget essay-widget-autosize pointwise-landscape-widget"
-          src="linear-algebra/adding-linear-equations/pointwise_landscapes.html"
-          title="Interactive widget showing pointwise function addition as landscapes"
           scrolling="no"
           loading="lazy"
         ></iframe>

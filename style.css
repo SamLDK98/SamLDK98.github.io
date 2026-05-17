@@ -724,12 +724,12 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
-.equation-multiple-sum-widget {
-  height: 660px;
+.scaled-equation-mixer-widget {
+  height: 650px;
 }
 
-.pointwise-landscape-widget {
-  height: 760px;
+.equation-multiple-sum-widget {
+  height: 660px;
 }
 
 footer {
@@ -874,9 +874,9 @@ header {
 
   .equation-adder-widget { height: 1380px; }
 
-  .equation-multiple-sum-widget { height: 1260px; }
+  .scaled-equation-mixer-widget { height: 1240px; }
 
-  .pointwise-landscape-widget { height: 1560px; }
+  .equation-multiple-sum-widget { height: 1260px; }
 
   .essay-widget-balls { height: 500px; }
 
