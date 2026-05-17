@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cancelling variables to reveal coordinates | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Cancelling variables to reveal coordinates</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Here are two facts that enable something cool.</p>
+
+        <p>Firstly, as you may have noticed, when we add two linear equations, the point of intersection between them is also the point of intersection with the new line.</p>
+
+        <p>This makes sense because, if a point satisfies $E_{1}$ and $E_{2}$, then it must also satisfy $E_{1}+E_{2}$.</p>
+
+        <p>The shared solution survives all linear combinations.</p>
+
+        <p>Nice.</p>
+
+        <p>Secondly, if we add like-terms such that we cancel a variable, the new line is parallel to the corresponding axis, and perpendicular to the other.</p>
+
+        <p>That means something significant.</p>
+
+        <p>Lines parallel to an axis reveal the coordinate of the the axis they are perpendicular to.</p>
+
+        <p>That means we could:</p>
+
+        <ul>
+          <li>Create a line parallel to the $x$-axis.</li>
+          <li>Create a line parallel to the $y$-axis.</li>
+          <li>And know that the point at which they intersect is the same as our original two lines.</li>
+          <li>This point of intersection would be the solution to both original equations.</li>
+        </ul>
+
+        <p>Very nice!</p>
+
+        <p>For example, consider:</p>
+
+        <div class="equation-stack">
+          <p>$$E_{1}:2x+3y=13$$</p>
+          <p>$$E_{2}:4x-y=5$$</p>
+        </div>
+
+        <p>We want to eliminate $y$.</p>
+
+        <p>Multiply $E_{2}$ by $3$:</p>
+
+        <p class="display-equation">$$3E_{2}:12x-3y=15$$</p>
+
+        <p>Now add:</p>
+
+        <div class="equation-stack">
+          <p>$$E_{1}+3E_{2}$$</p>
+          <p>$$(2x+3y)+(12x-3y)=13+15$$</p>
+        </div>
+
+        <p>giving:</p>
+
+        <div class="equation-stack">
+          <p>$$14x=28$$</p>
+          <p>$$x=2$$</p>
+        </div>
+
+        <p>(This constructed the vertical line.)</p>
+
+        <p>Next we construct the horizontal line by eliminating $x$.</p>
+
+        <p>Multiply $E_{1}$ by $-2$:</p>
+
+        <p class="display-equation">$$-2E_{1}:-4x-6y=-26$$</p>
+
+        <p>Now add:</p>
+
+        <div class="equation-stack">
+          <p>$$-2E_{1}+E_{2}$$</p>
+          <p>$$(-4x-6y)+(4x-y)=-26+5$$</p>
+        </div>
+
+        <p>giving:</p>
+
+        <div class="equation-stack">
+          <p>$$-7y=-21$$</p>
+          <p>$$y=3$$</p>
+        </div>
+
+        <p>This constructs a horizontal line.</p>
+
+        <p>The two new axis-parallel lines:</p>
+
+        <div class="equation-stack">
+          <p>$$x=2$$</p>
+          <p>$$y=3$$</p>
+        </div>
+
+        <p>still intersect at exactly the same point as the original equations.</p>
+
+        <p>So by strategically scaling and combining equations, we transform complicated slanted lines into lines that directly reveal the coordinates of the shared solution.</p>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
