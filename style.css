@@ -728,6 +728,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 660px;
 }
 
+.systems-dimension-widget {
+  height: 610px;
+}
+
 footer {
   max-width: var(--col-width);
   margin: 0 auto;
@@ -871,6 +875,8 @@ header {
   .scaled-equation-mixer-widget { height: 1240px; }
 
   .equation-multiple-sum-widget { height: 1260px; }
+
+  .systems-dimension-widget { height: 1180px; }
 
   .essay-widget-balls { height: 500px; }
 

@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Systems of equations dimension widget</title>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --paper: #fbf8f0;
+    --ink: #1a1a1a;
+    --soft-ink: #3a3a3a;
+    --muted: #7a7468;
+    --rule: #d6cdb7;
+    --rule-soft: #e6dfcd;
+    --e1: #b85a3a;
+    --e2: #2a5e58;
+    --e3: #57478c;
+    --solution: #1a1a1a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+  }
+
+  body {
+    padding: 18px 18px 22px;
+    color: var(--ink);
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .widget {
+    max-width: 840px;
+    margin: 0 auto;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.9fr) minmax(300px, 1fr);
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .panel {
+    min-width: 0;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .panel-label,
+  button {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    text-transform: uppercase;
+  }
+
+  .panel-label {
+    margin-bottom: 7px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+  }
+
+  .readout {
+    display: grid;
+    gap: 12px;
+  }
+
+  .system-lines {
+    display: grid;
+    gap: 8px;
+  }
+
+  .equation-row {
+    display: grid;
+    grid-template-columns: 0.85rem minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: baseline;
+  }
+
+  .swatch {
+    width: 0.72rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    transform: translateY(-0.08rem);
+  }
+
+  .swatch-e1 { background: var(--e1); }
+  .swatch-e2 { background: var(--e2); }
+  .swatch-e3 { background: var(--e3); }
+
+  .equation {
+    font-size: 20px;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .equation em { font-style: italic; }
+
+  .solution-card {
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 13px;
+  }
+
+  .solution-kind {
+    font-size: 25px;
+    line-height: 1.15;
+  }
+
+  .solution-note {
+    margin: 8px 0 0;
+    color: var(--soft-ink);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .controls {
+    display: grid;
+    gap: 10px;
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 13px;
+  }
+
+  .button-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  button {
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    min-height: 36px;
+    padding: 0 10px;
+  }
+
+  button:hover { opacity: 0.82; }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.36;
+  }
+
+  .secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .secondary:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--paper);
+    opacity: 1;
+  }
+
+  .canvas-wrap {
+    position: relative;
+    min-height: 430px;
+    border-left: 1px solid var(--rule-soft);
+  }
+
+  #space {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 430px;
+  }
+
+  .note {
+    max-width: 690px;
+    margin: 16px auto 0;
+    color: var(--soft-ink);
+    font-size: 15px;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  @media (max-width: 780px) {
+    body { padding: 16px 14px 20px; }
+
+    .main { grid-template-columns: 1fr; }
+
+    .panel { padding: 18px; }
+
+    .canvas-wrap {
+      border-left: 0;
+      border-top: 1px solid var(--rule-soft);
+      min-height: 390px;
+    }
+
+    #space { min-height: 390px; }
+  }
+
+  @media (max-width: 480px) {
+    .button-row { grid-template-columns: 1fr; }
+    .equation { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="main">
+    <div class="panel">
+      <div class="readout">
+        <div>
+          <div class="panel-label">Current system</div>
+          <div class="system-lines" id="system-lines"></div>
+        </div>
+
+        <div class="solution-card">
+          <div class="panel-label">Solution object</div>
+          <div class="solution-kind" id="solution-kind"></div>
+          <p class="solution-note" id="solution-note"></p>
+        </div>
+      </div>
+
+      <div class="controls" aria-label="System controls">
+        <div class="panel-label">Change the system</div>
+        <div class="button-row">
+          <button id="toggle-variable" type="button">Add z variable</button>
+          <button id="add-equation" type="button">Add equation</button>
+          <button id="remove-equation" class="secondary" type="button">Remove equation</button>
+          <button id="reset" class="secondary" type="button">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="space" aria-label="Graph of equations and solution object"></canvas>
+    </div>
+  </div>
+
+  <p class="note">Add variables to increase the dimension of the space. Add equations to add constraints. Each independent constraint reduces the remaining freedom.</p>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const canvas = document.getElementById('space');
+  const ctx = canvas.getContext('2d');
+  const systemLinesEl = document.getElementById('system-lines');
+  const solutionKindEl = document.getElementById('solution-kind');
+  const solutionNoteEl = document.getElementById('solution-note');
+  const toggleVariableBtn = document.getElementById('toggle-variable');
+  const addEquationBtn = document.getElementById('add-equation');
+  const removeEquationBtn = document.getElementById('remove-equation');
+  const resetBtn = document.getElementById('reset');
+
+  const colors = ['#b85a3a', '#2a5e58', '#57478c'];
+  const twoDEquations = [
+    { a: 2, b: -1, c: 1, label: '2x - y = 1' },
+    { a: 3, b: 3, c: 15, label: '3x + 3y = 15' }
+  ];
+  const threeDEquations = [
+    { a: 1, b: 1, c: 1, d: 6, label: 'x + y + z = 6' },
+    { a: 2, b: 1, c: -1, d: 3, label: '2x + y - z = 3' },
+    { a: 1, b: -1, c: 2, d: 5, label: 'x - y + 2z = 5' }
+  ];
+
+  let dimension = 2;
+  let equationCount = 2;
+  let dpr = 1;
+  let w = 0;
+  let h = 0;
+
+  function activeEquations() {
+    return (dimension === 2 ? twoDEquations : threeDEquations).slice(0, equationCount);
+  }
+
+  function rank(matrix) {
+    const a = matrix.map((row) => row.slice());
+    let r = 0;
+    const eps = 1e-9;
+
+    for (let c = 0; c < a[0].length && r < a.length; c++) {
+      let pivot = r;
+      for (let i = r + 1; i < a.length; i++) {
+        if (Math.abs(a[i][c]) > Math.abs(a[pivot][c])) pivot = i;
+      }
+      if (Math.abs(a[pivot][c]) < eps) continue;
+      [a[r], a[pivot]] = [a[pivot], a[r]];
+      const div = a[r][c];
+      for (let j = c; j < a[r].length; j++) a[r][j] /= div;
+      for (let i = 0; i < a.length; i++) {
+        if (i === r) continue;
+        const factor = a[i][c];
+        for (let j = c; j < a[i].length; j++) a[i][j] -= factor * a[r][j];
+      }
+      r++;
+    }
+    return r;
+  }
+
+  function solutionInfo() {
+    const equations = activeEquations();
+    const coefficientRows = equations.map((eq) =>
+      dimension === 2 ? [eq.a, eq.b] : [eq.a, eq.b, eq.c]
+    );
+    const augmentedRows = equations.map((eq) =>
+      dimension === 2 ? [eq.a, eq.b, eq.c] : [eq.a, eq.b, eq.c, eq.d]
+    );
+    const coefficientRank = rank(coefficientRows);
+    const augmentedRank = rank(augmentedRows);
+
+    if (coefficientRank !== augmentedRank) {
+      return {
+        kind: 'no shared solution',
+        note: 'The constraints are inconsistent: their geometric objects do not all meet.',
+        degrees: null
+      };
+    }
+
+    const degrees = dimension - coefficientRank;
+    if (degrees === 0) {
+      return {
+        kind: 'a point',
+        note: dimension === 2
+          ? 'Two independent lines in 2D usually leave one point.'
+          : 'Three independent planes in 3D usually leave one point.',
+        degrees
+      };
+    }
+    if (degrees === 1) {
+      return {
+        kind: dimension === 2 ? 'a line' : 'a line',
+        note: dimension === 2
+          ? 'One line in 2D leaves one degree of freedom.'
+          : 'Two independent planes in 3D usually meet along a line.',
+        degrees
+      };
+    }
+    if (degrees === 2) {
+      return {
+        kind: 'a plane',
+        note: 'One plane in 3D leaves two degrees of freedom.',
+        degrees
+      };
+    }
+    return {
+      kind: 'the whole space',
+      note: 'With no independent constraints, every point is possible.',
+      degrees
+    };
+  }
+
+  function formatEquation(eq, index) {
+    const label = eq.label
+      .replaceAll('x', '<em>x</em>')
+      .replaceAll('y', '<em>y</em>')
+      .replaceAll('z', '<em>z</em>');
+    return `
+      <div class="equation-row">
+        <span class="swatch swatch-e${index + 1}" aria-hidden="true"></span>
+        <div class="equation">E<sub>${index + 1}</sub>: ${label}</div>
+      </div>
+    `;
+  }
+
+  function updatePanel() {
+    systemLinesEl.innerHTML = activeEquations().map(formatEquation).join('');
+    const info = solutionInfo();
+    solutionKindEl.textContent = info.kind;
+    solutionNoteEl.textContent = info.note;
+
+    toggleVariableBtn.textContent = dimension === 2 ? 'Add z variable' : 'Remove z variable';
+    addEquationBtn.disabled = equationCount >= dimension;
+    removeEquationBtn.disabled = equationCount <= 1;
+  }
+
+  function worldToScreen2D(x, y) {
+    const min = -1;
+    const max = 6;
+    return [
+      ((x - min) / (max - min)) * w,
+      h - ((y - min) / (max - min)) * h
+    ];
+  }
+
+  function draw2DGrid() {
+    ctx.fillStyle = '#fbf8f0';
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#e6dfcd';
+    ctx.lineWidth = 1;
+
+    for (let n = -1; n <= 6; n++) {
+      const [x0, y0] = worldToScreen2D(n, -1);
+      const [x1, y1] = worldToScreen2D(n, 6);
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+
+      const [x2, y2] = worldToScreen2D(-1, n);
+      const [x3, y3] = worldToScreen2D(6, n);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x3, y3);
+      ctx.stroke();
+    }
+
+    const [xAxis0, yAxis] = worldToScreen2D(-1, 0);
+    const [xAxis1] = worldToScreen2D(6, 0);
+    const [xAxis, yAxis0] = worldToScreen2D(0, -1);
+    const [, yAxis1] = worldToScreen2D(0, 6);
+
+    ctx.strokeStyle = '#7a7468';
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(xAxis0, yAxis);
+    ctx.lineTo(xAxis1, yAxis);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(xAxis, yAxis0);
+    ctx.lineTo(xAxis, yAxis1);
+    ctx.stroke();
+  }
+
+  function lineIntersections2D(eq) {
+    const min = -1;
+    const max = 6;
+    const points = [];
+
+    if (eq.b !== 0) {
+      points.push({ x: min, y: (eq.c - eq.a * min) / eq.b });
+      points.push({ x: max, y: (eq.c - eq.a * max) / eq.b });
+    }
+    if (eq.a !== 0) {
+      points.push({ x: (eq.c - eq.b * min) / eq.a, y: min });
+      points.push({ x: (eq.c - eq.b * max) / eq.a, y: max });
+    }
+
+    const visible = points.filter((p) => p.x >= min - 1e-6 && p.x <= max + 1e-6 && p.y >= min - 1e-6 && p.y <= max + 1e-6);
+    const unique = [];
+    visible.forEach((p) => {
+      if (!unique.some((q) => Math.abs(q.x - p.x) < 0.001 && Math.abs(q.y - p.y) < 0.001)) unique.push(p);
+    });
+    return unique.slice(0, 2);
+  }
+
+  function draw2DLine(eq, color, dash) {
+    const points = lineIntersections2D(eq);
+    if (points.length < 2) return;
+    const [x1, y1] = worldToScreen2D(points[0].x, points[0].y);
+    const [x2, y2] = worldToScreen2D(points[1].x, points[1].y);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function intersection2D(e1, e2) {
+    const det = e1.a * e2.b - e2.a * e1.b;
+    if (Math.abs(det) < 1e-9) return null;
+    return {
+      x: (e1.c * e2.b - e2.c * e1.b) / det,
+      y: (e1.a * e2.c - e2.a * e1.c) / det
+    };
+  }
+
+  function draw2D() {
+    draw2DGrid();
+    activeEquations().forEach((eq, index) => draw2DLine(eq, colors[index], index === 1 ? [7, 6] : []));
+
+    if (equationCount === 2) {
+      const p = intersection2D(twoDEquations[0], twoDEquations[1]);
+      if (p) {
+        const [sx, sy] = worldToScreen2D(p.x, p.y);
+        ctx.fillStyle = '#fbf8f0';
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#1a1a1a';
+        ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText('solution point', sx + 9, sy - 9);
+      }
+    }
+  }
+
+  function project3D(x, y, z) {
+    const scale = Math.min(w, h) / 11;
+    return {
+      x: w / 2 + (x - y) * scale * 0.72,
+      y: h * 0.58 + (x + y) * scale * 0.34 - z * scale * 0.66
+    };
+  }
+
+  function drawPolygon(points, color, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    points.slice(1).forEach((p) => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 0.95;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function planePatch(eq, span) {
+    const pts = [];
+    const pairs = [[-span, -span], [span, -span], [span, span], [-span, span]];
+    pairs.forEach(([x, y]) => {
+      const z = (eq.d - eq.a * x - eq.b * y) / eq.c;
+      pts.push(project3D(x, y, z));
+    });
+    return pts;
+  }
+
+  function draw3DGrid() {
+    ctx.fillStyle = '#fbf8f0';
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#e6dfcd';
+    ctx.lineWidth = 1;
+
+    for (let n = -3; n <= 6; n++) {
+      let a = project3D(n, -3, 0);
+      let b = project3D(n, 6, 0);
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+
+      a = project3D(-3, n, 0);
+      b = project3D(6, n, 0);
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+
+    const axes = [
+      [project3D(-3, 0, 0), project3D(6, 0, 0), 'x'],
+      [project3D(0, -3, 0), project3D(0, 6, 0), 'y'],
+      [project3D(0, 0, -1), project3D(0, 0, 7), 'z']
+    ];
+
+    ctx.strokeStyle = '#7a7468';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '13px -apple-system, BlinkMacSystemFont, sans-serif';
+    axes.forEach(([a, b, label]) => {
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      ctx.fillText(label, b.x + 4, b.y - 4);
+    });
+  }
+
+  function intersectionLine3D(e1, e2) {
+    const n1 = [e1.a, e1.b, e1.c];
+    const n2 = [e2.a, e2.b, e2.c];
+    const dir = [
+      n1[1] * n2[2] - n1[2] * n2[1],
+      n1[2] * n2[0] - n1[0] * n2[2],
+      n1[0] * n2[1] - n1[1] * n2[0]
+    ];
+    const abs = dir.map(Math.abs);
+    const drop = abs.indexOf(Math.max(...abs));
+    let point;
+    if (drop === 0) {
+      const det = e1.b * e2.c - e2.b * e1.c;
+      point = [0, (e1.d * e2.c - e2.d * e1.c) / det, (e1.b * e2.d - e2.b * e1.d) / det];
+    } else if (drop === 1) {
+      const det = e1.a * e2.c - e2.a * e1.c;
+      point = [(e1.d * e2.c - e2.d * e1.c) / det, 0, (e1.a * e2.d - e2.a * e1.d) / det];
+    } else {
+      const det = e1.a * e2.b - e2.a * e1.b;
+      point = [(e1.d * e2.b - e2.d * e1.b) / det, (e1.a * e2.d - e2.a * e1.d) / det, 0];
+    }
+    return { point, dir };
+  }
+
+  function solutionPoint3D() {
+    return [13 / 7, 12 / 7, 17 / 7];
+  }
+
+  function draw3D() {
+    draw3DGrid();
+    const equations = activeEquations();
+    equations.forEach((eq, index) => drawPolygon(planePatch(eq, 3.3), colors[index], 0.26));
+
+    if (equationCount === 2) {
+      const line = intersectionLine3D(equations[0], equations[1]);
+      const p1 = project3D(
+        line.point[0] - line.dir[0] * 1.4,
+        line.point[1] - line.dir[1] * 1.4,
+        line.point[2] - line.dir[2] * 1.4
+      );
+      const p2 = project3D(
+        line.point[0] + line.dir[0] * 1.4,
+        line.point[1] + line.dir[1] * 1.4,
+        line.point[2] + line.dir[2] * 1.4
+      );
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+      ctx.fillText('solution line', p2.x + 5, p2.y - 5);
+    }
+
+    if (equationCount === 3) {
+      const [x, y, z] = solutionPoint3D();
+      const p = project3D(x, y, z);
+      ctx.fillStyle = '#fbf8f0';
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#1a1a1a';
+      ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('solution point', p.x + 9, p.y - 9);
+    }
+  }
+
+  function render() {
+    updatePanel();
+    if (dimension === 2) draw2D();
+    else draw3D();
+  }
+
+  function resize() {
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    const rect = canvas.getBoundingClientRect();
+    w = rect.width;
+    h = rect.height;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    render();
+  }
+
+  toggleVariableBtn.addEventListener('click', () => {
+    dimension = dimension === 2 ? 3 : 2;
+    equationCount = Math.min(equationCount, dimension);
+    render();
+  });
+
+  addEquationBtn.addEventListener('click', () => {
+    equationCount = Math.min(dimension, equationCount + 1);
+    render();
+  });
+
+  removeEquationBtn.addEventListener('click', () => {
+    equationCount = Math.max(1, equationCount - 1);
+    render();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    dimension = 2;
+    equationCount = 2;
+    render();
+  });
+
+  window.addEventListener('resize', resize);
+  resize();
+})();
+</script>
+</body>
+</html>

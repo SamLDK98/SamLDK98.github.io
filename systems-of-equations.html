@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Systems of equations | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Systems of equations</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>If we have two different lines, unless they are parallel, they must intersect at some point.</p>
+
+        <p class="display-equation">$\large \begin{cases} 2x - y = 1\\3x + 3y = 15 \end{cases}$</p>
+
+        <p>The intersection is the only $(x,y)$ pair that will satisfy <strong>BOTH</strong> equations.</p>
+
+        <p>There's two things worth noticing here.</p>
+
+        <p>Firstly...</p>
+
+        <p><strong>The number of variables in the equations determines the dimensionality of the space we are in.</strong> Here we have two variables, $x$ and $y$, so we are working in a two-dimensional coordinate system.</p>
+
+        <p>Secondly...</p>
+
+        <p><strong>Each equation acts as a constraint on that space.</strong> Geometrically, linear equations carve lower-dimensional surfaces out of higher-dimensional spaces.</p>
+
+        <ul>
+          <li>
+            One equation in two variables:
+            <ul>
+              <li>defines a line in 2D space.</li>
+            </ul>
+          </li>
+          <li>
+            Two equations in two variables:
+            <ul>
+              <li>two lines in 2D space.</li>
+              <li>solution: typically a point.</li>
+            </ul>
+          </li>
+          <li>
+            One equation in three variables:
+            <ul>
+              <li>defines a plane in 3D space.</li>
+            </ul>
+          </li>
+          <li>
+            Two equations in three variables:
+            <ul>
+              <li>two planes in 3D space.</li>
+              <li>solution: typically a line.</li>
+            </ul>
+          </li>
+          <li>
+            Three equations in three variables:
+            <ul>
+              <li>three planes in 3D space.</li>
+              <li>solution: typically a point.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <p>Each additional independent equation reduces the remaining degrees of freedom.</p>
+
+        <p>In this sense, solving simultaneous equations is the process of progressively shrinking the space of possible solutions.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize systems-dimension-widget"
+          src="linear-algebra/systems-of-equations/systems_dimension_widget.html"
+          title="Interactive widget showing how variables and equations change solution geometry"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
