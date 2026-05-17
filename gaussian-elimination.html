@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaussian elimination | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Gaussian elimination</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>We have already seen the geometric intuition for this process; now, we will work through an abstract example. Essentially, we are recursively simplifying a constrained system by removing shared structure.</p>
+
+        <ul>
+          <li>Choose a variable to eliminate.</li>
+          <li>Use one equation as the pivot row.</li>
+          <li>Remove that variable from the rows below.</li>
+          <li>Move to the next variable.</li>
+          <li>Repeat.</li>
+        </ul>
+
+        <p>Then solve upward via back-substitution.</p>
+
+        <div class="system-card">
+          <p class="system-card-label">Initial system</p>
+          <p class="display-equation system-equations">$$
+            \begin{aligned}
+              E_{1}:&\ 2a-3b+5c+d=-41\\
+              E_{2}:&\ 7a+2b-c=-28\\
+              E_{3}:&\ -a+2b-7c-2d=46\\
+              E_{4}:&\ 3a+7b-6c+d=31
+            \end{aligned}
+          $$</p>
+        </div>
+
+        <p>Let $E_{1}$ be the pivot.</p>
+
+        <p>Let $a$ be the target variable.</p>
+
+        <p>Find $\operatorname{LCM}$ of coefficients of $a$ between $E_{1}$ and $E_{2}$: $14a$.</p>
+
+        <p>Scale both rows to the common coefficient, subtract, and replace $E_{2}$ with the result.</p>
+
+        <p class="display-equation">$$7E_{1}-2E_{2}:\ -25b+37c+7d=-231$$</p>
+
+        <div class="system-card">
+          <p class="system-card-label">Updated system</p>
+          <p class="display-equation system-equations">$$
+            \begin{aligned}
+              E_{1}:&\ 2a-3b+5c+d=-41\\
+              E_{2}:&\ -25b+37c+7d=-231\\
+              E_{3}:&\ -a+2b-7c-2d=46\\
+              E_{4}:&\ 3a+7b-6c+d=31
+            \end{aligned}
+          $$</p>
+        </div>
+
+        <p>Again, but with...</p>
+
+        <p>$E_{1}$ and $E_{3}$:</p>
+
+        <div class="equation-stack">
+          <p>$$E_{1}:2a-3b+5c+d=-41$$</p>
+          <p>$$2E_{3}:-2a+4b-14c-4d=92$$</p>
+          <p>$$E_{1}+2E_{3}:b-9c-3d=51$$</p>
+        </div>
+
+        <p>$E_{1}$ and $E_{4}$:</p>
+
+        <div class="equation-stack">
+          <p>$$E_{1}:2a-3b+5c+d=-41$$</p>
+          <p>$$E_{4}:3a+7b-6c+d=31$$</p>
+          <p>$$(3E_{1})-(2E_{4}):-23b+27c+d=-185$$</p>
+        </div>
+
+        <div class="system-card">
+          <p class="system-card-label">Updated system</p>
+          <p class="display-equation system-equations">$$
+            \begin{aligned}
+              E_{1}:&\ 2a-3b+5c+d=-41\\
+              E_{2}:&\ -25b+37c+7d=-231\\
+              E_{3}:&\ b-9c-3d=51\\
+              E_{4}:&\ -23b+27c+d=-185
+            \end{aligned}
+          $$</p>
+        </div>
+
+        <p>Now, let $E_{2}$ be the pivot and reduce $E_{3}$ and $E_{4}$ to two variables.</p>
+
+        <div class="equation-stack">
+          <p>$$(E_{2}+25E_{3}):-188c-68d=1044$$</p>
+          <p>$$\phantom{(E_{2}+25E_{3}):}-47c-17d=261$$</p>
+          <p>$$(23E_{2}-25E_{4}):176c+136d=-688$$</p>
+          <p>$$\phantom{(23E_{2}-25E_{4}):}22c+17d=-86$$</p>
+        </div>
+
+        <div class="system-card">
+          <p class="system-card-label">Updated system</p>
+          <p class="display-equation system-equations">$$
+            \begin{aligned}
+              E_{1}:&\ 2a-3b+5c+d=-41\\
+              E_{2}:&\ -25b+37c+7d=-231\\
+              E_{3}:&\ -47c-17d=261\\
+              E_{4}:&\ 22c+17d=-86
+            \end{aligned}
+          $$</p>
+        </div>
+
+        <p>Only one more variable to eliminate. In this case, it's already set up nicely to remove $d$. We will use $E_{3}$ as the pivot.</p>
+
+        <p class="display-equation">$$E_{3}+E_{4}:-25c=175\rightarrow c=-7$$</p>
+
+        <div class="system-card">
+          <p class="system-card-label">Updated system</p>
+          <p class="display-equation system-equations">$$
+            \begin{aligned}
+              E_{1}:&\ 2a-3b+5c+d=-41\\
+              E_{2}:&\ -25b+37c+7d=-231\\
+              E_{3}:&\ -47c-17d=261\\
+              E_{4}:&\ c=-7
+            \end{aligned}
+          $$</p>
+        </div>
+
+        <p>Now begins the phase of back-substitution. Just plug in $c=-7$ to $E_{3}$, and so on...</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Equation</th>
+                <th>With known values plugged in</th>
+                <th>Unknown value revealed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$E_{1}$</td>
+                <td>$2a-3b+5c+d=-41$</td>
+                <td>$2a-3(0)+5(-7)+4=-41$</td>
+                <td>$a=-5$</td>
+              </tr>
+              <tr>
+                <td>$E_{2}$</td>
+                <td>$-25b+37c+7d=-231$</td>
+                <td>$-25b+37(-7)+7(4)=-231$</td>
+                <td>$b=0$</td>
+              </tr>
+              <tr>
+                <td>$E_{3}$</td>
+                <td>$-47c-17d=261$</td>
+                <td>$-47(-7)-17d=261$</td>
+                <td>$d=4$</td>
+              </tr>
+              <tr>
+                <td>$E_{4}$</td>
+                <td>$c=-7$</td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Final solution: $a=-5$, $b=0$, $c=-7$, $d=4$.</p>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

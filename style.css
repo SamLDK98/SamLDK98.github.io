@@ -421,6 +421,45 @@ th {
   margin-bottom: 0.65rem;
 }
 
+.system-card {
+  margin: 1.6rem 0 2rem;
+  padding: 1rem 1.1rem 1.05rem;
+  border: 1px solid rgba(26,26,24,0.18);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.34);
+}
+
+.system-card-label {
+  margin-bottom: 0.75rem;
+  color: var(--ink-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.system-card .equation-stack {
+  margin: 0;
+}
+
+.system-card .system-equations {
+  margin: 0;
+  overflow-x: auto;
+  font-size: 1.18rem;
+}
+
+.system-card .equation-stack p {
+  margin-bottom: 0.35rem;
+  font-size: 1.22rem;
+}
+
+.system-card .equation-stack p:last-child {
+  margin-bottom: 0;
+}
+
 /* Drop cap on first paragraph of first section */
 body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter {
   font-family: var(--font-head);
