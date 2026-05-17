@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solving Systems by Elimination</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #faf7f0;
+    --paper-deep: #f3eee2;
+    --ink: #2b2722;
+    --ink-soft: #6b655b;
+    --rule: #d6cfbe;
+    --rule-soft: #e8e2d2;
+
+    --c-e1: #4a6fa5;
+    --c-e2: #5d8a66;
+    --c-e3: #c44e2a;
+
+    --serif: 'EB Garamond', 'Iowan Old Style', Georgia, serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--serif);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+  }
+
+  .widget {
+    max-width: 780px;
+    margin: 0 auto;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1.75rem 1.5rem 1.5rem;
+    position: relative;
+    box-shadow: 0 1px 0 var(--rule-soft);
+  }
+  .widget::before {
+    content: 'WIDGET';
+    position: absolute;
+    top: -0.55rem;
+    left: 1.25rem;
+    background: var(--paper);
+    padding: 0 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-soft);
+  }
+
+  h2 { margin: 0 0 0.4rem; font-weight: 500; font-size: 1.5rem; letter-spacing: -0.01em; }
+  .lede {
+    color: var(--ink-soft); font-style: italic; font-size: 1.02rem;
+    margin: 0 0 1.4rem; max-width: 38rem;
+  }
+
+  /* ---------- size selector ---------- */
+  .size-panel {
+    border: 1px solid var(--rule);
+    background: var(--paper-deep);
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  .size-row {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.45rem 1.1rem;
+  }
+  .size-row .op-word {
+    font-style: italic; color: var(--ink-soft); font-size: 1rem;
+  }
+  .seg {
+    display: inline-flex; gap: 0;
+    border: 1px solid var(--rule); border-radius: 1px;
+    overflow: hidden; background: var(--paper);
+  }
+  .seg-btn {
+    font-family: var(--mono); font-size: 0.85rem;
+    background: var(--paper); color: var(--ink-soft);
+    border: 0; padding: 0.45rem 0.95rem; cursor: pointer;
+    border-right: 1px solid var(--rule);
+    transition: background 100ms;
+  }
+  .seg-btn:last-child { border-right: 0; }
+  .seg-btn:hover { background: var(--paper-deep); }
+  .seg-btn.active { background: var(--ink); color: var(--paper); }
+  .system-type {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--ink-soft);
+    margin: 0.8rem 0 0; padding-top: 0.7rem;
+    border-top: 1px dashed var(--rule);
+  }
+  .system-type .label {
+    display: inline-block;
+    margin-right: 0.6rem;
+    padding: 0.15em 0.6em;
+    background: var(--paper); color: var(--ink);
+    border-radius: 1px;
+  }
+  .system-type .desc {
+    font-family: var(--serif); font-style: italic; text-transform: none;
+    letter-spacing: 0; font-size: 0.95rem; color: var(--ink-soft);
+  }
+
+  /* ---------- graph ---------- */
+  .graph-container {
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    max-height: 480px;
+    border: 1px solid var(--rule);
+    background: var(--paper-deep);
+    position: relative;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    user-select: none;
+    touch-action: none;
+  }
+  .graph-2d, .graph-3d {
+    position: absolute; inset: 0;
+  }
+  .graph-2d svg {
+    width: 100%; height: 100%;
+    display: block;
+  }
+  .graph-3d canvas { display: block; }
+  .viewer-hint {
+    position: absolute; bottom: 8px; right: 10px;
+    font-family: var(--mono); font-size: 0.62rem;
+    letter-spacing: 0.12em; color: var(--ink-soft);
+    pointer-events: none; text-transform: uppercase;
+    background: rgba(250, 247, 240, 0.78);
+    padding: 3px 7px; border-radius: 2px;
+  }
+
+  /* ---------- legend ---------- */
+  .legend {
+    display: flex; justify-content: center;
+    gap: 1.4rem; flex-wrap: wrap;
+    margin-bottom: 1.1rem; font-size: 0.92rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-swatch { width: 18px; height: 12px; border-radius: 1px; opacity: 0.7; border: 1px solid; }
+  .legend-swatch.solid { opacity: 1; }
+  .legend-label .eq-name { font-style: italic; }
+  .legend-dot { display: inline-block; width: 8px; height: 8px; background: var(--ink); border-radius: 50%; margin-right: 0.3rem; vertical-align: middle; }
+  .legend-bar { display: inline-block; width: 18px; height: 3px; background: var(--ink); margin-right: 0.3rem; vertical-align: middle; }
+
+  /* ---------- equations ---------- */
+  .eq-stack {
+    display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem;
+  }
+  .eq-row {
+    display: grid; grid-template-columns: 56px 1fr auto; align-items: baseline;
+    gap: 0.8rem; padding: 0.65rem 0.95rem;
+    background: var(--paper);
+    border: 1px solid var(--rule); border-left-width: 3px;
+  }
+  .eq-row.e1 { border-left-color: var(--c-e1); }
+  .eq-row.e2 { border-left-color: var(--c-e2); }
+  .eq-row.e3 { border-left-color: var(--c-e3); }
+  .eq-row .label {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .eq-row .body {
+    font-family: var(--mono); font-size: 1rem; font-weight: 500;
+  }
+  .eq-row .body em { font-style: italic; font-family: var(--serif); font-size: 1.08rem; }
+  .eq-row .body sup, .eq-row .body sub { font-size: 0.7em; }
+  .eq-row .tag {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-soft);
+    background: var(--paper-deep); padding: 0.18em 0.55em;
+    border-radius: 1px; white-space: nowrap;
+  }
+  .eq-row .tag.reduced { color: var(--ink); background: #efe7d2; }
+  .eq-row .tag.solved { color: var(--ink); background: #e8dec3; }
+
+  .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: -0.45em; line-height: 1; font-size: 0.78em; margin: 0 0.08em; }
+  .frac .num { border-bottom: 1px solid currentColor; padding: 0 0.2em 0.05em; }
+  .frac .den { padding: 0.05em 0.2em 0; }
+
+  /* ---------- operation panel ---------- */
+  .op-panel {
+    background: var(--paper-deep);
+    border: 1px solid var(--rule);
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+  }
+  .op-row {
+    display: flex; align-items: center; gap: 0.4rem;
+    flex-wrap: wrap; margin-bottom: 0.75rem;
+    font-family: var(--serif); font-size: 1.02rem;
+  }
+  .op-word { font-style: italic; color: var(--ink-soft); }
+  .op-row select, .op-row input {
+    font-family: var(--mono); font-size: 0.95rem;
+    border: 1px solid var(--rule); background: var(--paper);
+    padding: 0.4rem 0.55rem; border-radius: 1px;
+    color: var(--ink);
+  }
+  .op-row select { min-width: 3.6rem; cursor: pointer; }
+  .op-row input { width: 4rem; text-align: center; }
+  .op-row select:focus, .op-row input:focus { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .op-row select.target { border-left-width: 3px; border-left-style: solid; padding-left: 0.45rem; }
+  .op-row select.target.e1 { border-left-color: var(--c-e1); }
+  .op-row select.target.e2 { border-left-color: var(--c-e2); }
+  .op-row select.target.e3 { border-left-color: var(--c-e3); }
+  .op-row .self-tag {
+    font-family: var(--mono); font-size: 0.95rem;
+    padding: 0.4rem 0.55rem;
+    background: var(--paper); border: 1px dashed var(--rule);
+    color: var(--ink-soft); font-style: italic;
+  }
+  .op-row .dot { font-family: var(--mono); font-size: 1rem; color: var(--ink-soft); }
+
+  .op-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .btn {
+    font-family: var(--mono); font-size: 0.72rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.55rem 1.1rem; cursor: pointer;
+    border: 1px solid var(--rule); border-radius: 1px;
+    transition: background 100ms;
+  }
+  .btn-apply { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .btn-apply:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
+  .btn-reset { background: var(--paper); color: var(--ink); }
+  .btn-reset:hover { background: var(--paper-deep); }
+
+  .history {
+    margin-top: 0.75rem; padding-top: 0.6rem;
+    border-top: 1px dashed var(--rule);
+    font-family: var(--mono); font-size: 0.82rem;
+    color: var(--ink-soft); max-height: 6em; overflow-y: auto;
+  }
+  .history .empty-hint { font-style: italic; opacity: 0.8; }
+  .history .empty-hint code { font-style: normal; background: var(--paper); padding: 0 0.3em; border-radius: 1px; }
+  .history ol { margin: 0; padding-left: 1.6rem; }
+  .history li { margin-bottom: 0.18rem; }
+
+  /* ---------- solution ---------- */
+  .solution-display {
+    border: 1px solid var(--rule); border-left: 3px solid var(--ink);
+    background: var(--paper); padding: 0.85rem 1rem;
+    display: grid; grid-template-columns: auto 1fr; gap: 0.8rem;
+    align-items: baseline; margin-top: 0.6rem;
+  }
+  .solution-display .label {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .solution-display .point {
+    font-family: var(--mono); font-size: 1rem;
+  }
+
+  .footnote {
+    margin-top: 0.7rem;
+    font-style: italic; font-size: 0.88rem; color: var(--ink-soft);
+  }
+  .footnote strong { font-style: normal; color: var(--ink); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <h2>Solving Systems by Elimination</h2>
+  <p class="lede">Each equation is a geometric object — a line in 2D, a plane in 3D. Their intersection is the system's solution. Pick a system size, then use row operations to peel back variables. The solution doesn't budge.</p>
+
+  <div class="size-panel">
+    <div class="size-row">
+      <span class="op-word">Number of equations:</span>
+      <div class="seg" id="seg-eqs">
+        <button class="seg-btn" data-eqs="2">2</button>
+        <button class="seg-btn" data-eqs="3">3</button>
+      </div>
+      <span class="op-word">Number of variables:</span>
+      <div class="seg" id="seg-vars">
+        <button class="seg-btn" data-vars="2">2</button>
+        <button class="seg-btn" data-vars="3">3</button>
+      </div>
+    </div>
+    <p class="system-type" id="system-type">
+      <span class="label" id="system-label">— × —</span>
+      <span class="desc" id="system-desc"></span>
+    </p>
+  </div>
+
+  <div class="graph-container" id="graph-container">
+    <div class="graph-2d" id="graph-2d" style="display:none">
+      <svg id="svg-2d" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="graph-3d" id="graph-3d" style="display:none"></div>
+    <div class="viewer-hint" id="viewer-hint"></div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="eq-stack" id="eq-stack"></div>
+
+  <div class="op-panel">
+    <div class="op-row">
+      <span class="op-word">Replace</span>
+      <select id="op-target" class="target e2" aria-label="Equation to replace"></select>
+      <span class="op-word">with</span>
+      <input type="text" id="op-a" value="1" aria-label="Coefficient for itself" inputmode="text">
+      <span class="dot">·</span>
+      <span class="self-tag" id="self-tag">itself</span>
+      <span class="op-word">+</span>
+      <input type="text" id="op-b" value="1" aria-label="Coefficient for other equation" inputmode="text">
+      <span class="dot">·</span>
+      <select id="op-source" aria-label="Other equation"></select>
+    </div>
+    <div class="op-buttons">
+      <button class="btn btn-apply" id="btn-apply">Apply</button>
+      <button class="btn btn-reset" id="btn-reset">Reset</button>
+    </div>
+    <div class="history">
+      <div class="empty-hint" id="empty-hint">no operations yet · accepts integers, decimals, or fractions (e.g. <code>3/2</code>, <code>-2</code>)</div>
+      <ol id="history-list"></ol>
+    </div>
+  </div>
+
+  <div class="solution-display">
+    <span class="label">solution</span>
+    <span class="point" id="sol-text"></span>
+  </div>
+
+  <div class="footnote">
+    Row operations preserve the <strong>solution set</strong> — the only point (or line) common to every equation. The equations rearrange themselves, but the intersection stays put.
+  </div>
+</div>
+
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ============== Fraction class ==============
+function gcd(a, b) {
+  a = Math.abs(a); b = Math.abs(b);
+  while (b) { [a, b] = [b, a % b]; }
+  return a || 1;
+}
+class F {
+  constructor(num, den = 1) {
+    if (den === 0) throw new Error('zero denominator');
+    if (den < 0) { num = -num; den = -den; }
+    const g = gcd(num, den);
+    this.n = num / g;
+    this.d = den / g;
+  }
+  static parse(s) {
+    s = String(s).trim();
+    if (!s) return null;
+    const m = s.match(/^(-?)\s*(\d+)\s*\/\s*(\d+)$/);
+    if (m) {
+      const sign = m[1] === '-' ? -1 : 1;
+      const n = parseInt(m[2], 10) * sign;
+      const d = parseInt(m[3], 10);
+      if (d === 0) return null;
+      return new F(n, d);
+    }
+    const decMatch = s.match(/^(-?)(\d*)\.(\d+)$/);
+    if (decMatch) {
+      const sign = decMatch[1] === '-' ? -1 : 1;
+      const intPart = decMatch[2] || '0';
+      const decPart = decMatch[3];
+      const den = 10 ** decPart.length;
+      const num = sign * (parseInt(intPart, 10) * den + parseInt(decPart, 10));
+      return new F(num, den);
+    }
+    const v = parseFloat(s);
+    if (Number.isFinite(v) && /^-?\d+$/.test(s)) return new F(v, 1);
+    return null;
+  }
+  add(o) { return new F(this.n * o.d + o.n * this.d, this.d * o.d); }
+  mul(o) { return new F(this.n * o.n, this.d * o.d); }
+  neg() { return new F(-this.n, this.d); }
+  isZero() { return this.n === 0; }
+  isNeg() { return this.n < 0; }
+  isOne() { return this.n === 1 && this.d === 1; }
+  isNegOne() { return this.n === -1 && this.d === 1; }
+  toNumber() { return this.n / this.d; }
+  toHtml() {
+    if (this.d === 1) return String(this.n);
+    const neg = this.n < 0;
+    const num = Math.abs(this.n);
+    return `${neg ? '−' : ''}<span class="frac"><span class="num">${num}</span><span class="den">${this.d}</span></span>`;
+  }
+}
+
+// ============== System data ==============
+// Each equation: array of F coefficients [a1, a2, ..., an, d] meaning a1·x1 + a2·x2 + ... = d
+function f(n, d = 1) { return new F(n, d); }
+
+const SYSTEMS = {
+  '2x2': {
+    nVars: 2, nEqs: 2, mode: '2D',
+    label: 'Square 2 × 2',
+    desc: 'two lines in 2D — a unique point of intersection.',
+    original: [
+      [f(2), f(-1), f(1)],
+      [f(3), f(3),  f(15)]
+    ],
+    solution: { type: 'point', coords: [f(2), f(3)] }
+  },
+  '3x2': {
+    nVars: 2, nEqs: 3, mode: '2D',
+    label: 'Overdetermined 3 × 2',
+    desc: 'three lines in 2D — solutions exist only when the lines all pass through the same point.',
+    original: [
+      [f(2), f(-1), f(1)],
+      [f(3), f(3),  f(15)],
+      [f(1), f(2),  f(8)]
+    ],
+    solution: { type: 'point', coords: [f(2), f(3)] }
+  },
+  '2x3': {
+    nVars: 3, nEqs: 2, mode: '3D',
+    label: 'Underdetermined 2 × 3',
+    desc: 'two planes in 3D — solutions form an entire line.',
+    original: [
+      [f(1), f(1),  f(1), f(4)],
+      [f(1), f(-1), f(1), f(2)]
+    ],
+    // Line: (3 - t, 1, t) for t ∈ ℝ
+    solution: { type: 'line', point: [3, 1, 0], direction: [-1, 0, 1],
+                pointF: [f(3), f(1), f(0)], directionF: [f(-1), f(0), f(1)] }
+  },
+  '3x3': {
+    nVars: 3, nEqs: 3, mode: '3D',
+    label: 'Square 3 × 3',
+    desc: 'three planes in 3D — a unique point of intersection.',
+    original: [
+      [f(1), f(1),  f(1),  f(6)],
+      [f(2), f(1),  f(-1), f(3)],
+      [f(1), f(-1), f(2),  f(5)]
+    ],
+    solution: { type: 'point', coords: [f(13, 7), f(12, 7), f(17, 7)] }
+  }
+};
+
+const COLORS = ['#4a6fa5', '#5d8a66', '#c44e2a'];
+const VARS_2D = ['x', 'y'];
+const VARS_3D = ['x', 'y', 'z'];
+
+// ============== State ==============
+let currentKey = '2x2';
+let currentSystem = SYSTEMS[currentKey];
+let equations = cloneEquations(currentSystem.original);
+let history = [];
+
+function cloneEquations(eqs) {
+  return eqs.map(eq => eq.map(c => new F(c.n, c.d)));
+}
+
+// ============== Equation rendering ==============
+function varsForSystem() {
+  return currentSystem.nVars === 2 ? VARS_2D : VARS_3D;
+}
+
+function formatTermHtml(coef, varName, isFirst) {
+  if (coef.isZero()) return '';
+  let sign, mag;
+  if (coef.isNeg()) {
+    sign = isFirst ? '−' : ' − ';
+    mag = coef.neg();
+  } else {
+    sign = isFirst ? '' : ' + ';
+    mag = coef;
+  }
+  const magStr = mag.isOne() ? '' : mag.toHtml();
+  return `${sign}${magStr}<em>${varName}</em>`;
+}
+
+function formatEqHtml(eq) {
+  const nv = currentSystem.nVars;
+  const vars = varsForSystem();
+  const parts = [];
+  let isFirst = true;
+  for (let i = 0; i < nv; i++) {
+    const piece = formatTermHtml(eq[i], vars[i], isFirst);
+    if (piece) { parts.push(piece); isFirst = false; }
+  }
+  if (parts.length === 0) parts.push('0');
+  const d = eq[nv];
+  let rhs;
+  if (d.isNeg()) rhs = '−' + d.neg().toHtml();
+  else rhs = d.toHtml();
+  return parts.join('') + ' = ' + rhs;
+}
+
+function countNonzeroCoefs(eq) {
+  const nv = currentSystem.nVars;
+  let c = 0;
+  for (let i = 0; i < nv; i++) if (!eq[i].isZero()) c++;
+  return c;
+}
+
+function buildEquationRows() {
+  const stack = document.getElementById('eq-stack');
+  stack.innerHTML = '';
+  for (let i = 0; i < currentSystem.nEqs; i++) {
+    const row = document.createElement('div');
+    row.className = `eq-row e${i+1}`;
+    row.innerHTML = `
+      <div class="label">E${'₁₂₃'[i]}</div>
+      <div class="body" id="eq${i}-text"></div>
+      <div class="tag" id="eq${i}-tag"></div>
+    `;
+    stack.appendChild(row);
+  }
+}
+
+function updateEquationDisplay() {
+  const nv = currentSystem.nVars;
+  for (let i = 0; i < currentSystem.nEqs; i++) {
+    const eq = equations[i];
+    document.getElementById(`eq${i}-text`).innerHTML = formatEqHtml(eq);
+    const tagEl = document.getElementById(`eq${i}-tag`);
+    tagEl.classList.remove('reduced', 'solved');
+    const nonzero = countNonzeroCoefs(eq);
+    if (nv === 2) {
+      if (nonzero === 2) tagEl.textContent = 'line';
+      else if (nonzero === 1) { tagEl.textContent = 'axis-aligned'; tagEl.classList.add('reduced'); }
+      else tagEl.textContent = eq[nv].isZero() ? '— (identity)' : '— (no solution)';
+    } else { // 3D
+      if (nonzero === 3) tagEl.textContent = 'plane';
+      else if (nonzero === 2) { tagEl.textContent = 'wall'; tagEl.classList.add('reduced'); }
+      else if (nonzero === 1) { tagEl.textContent = 'wall ⊥ axis'; tagEl.classList.add('solved'); }
+      else tagEl.textContent = eq[nv].isZero() ? '— (identity)' : '— (no solution)';
+    }
+  }
+}
+
+// ============== History ==============
+function opToHistoryHtml(targetIdx, sourceIdx, a, b) {
+  const t = `E<sub>${targetIdx+1}</sub>`;
+  const s = `E<sub>${sourceIdx+1}</sub>`;
+  let first;
+  if (a.isOne()) first = t;
+  else if (a.isNegOne()) first = `−${t}`;
+  else if (a.isZero()) first = '';
+  else first = `${a.toHtml()}·${t}`;
+  let second;
+  if (b.isZero()) second = '';
+  else if (b.isOne()) second = (first ? ' + ' : '') + s;
+  else if (b.isNegOne()) second = (first ? ' − ' : '−') + s;
+  else if (b.isNeg()) second = (first ? ' − ' : '−') + `${b.neg().toHtml()}·${s}`;
+  else second = (first ? ' + ' : '') + `${b.toHtml()}·${s}`;
+  return `${t} ← ${(first + second) || '0'}`;
+}
+
+function updateHistoryDisplay() {
+  const ol = document.getElementById('history-list');
+  const hint = document.getElementById('empty-hint');
+  if (history.length === 0) {
+    ol.innerHTML = ''; ol.style.display = 'none'; hint.style.display = '';
+    return;
+  }
+  hint.style.display = 'none'; ol.style.display = '';
+  ol.innerHTML = history.map(h => `<li>${h}</li>`).join('');
+}
+
+// ============== Selectors (target/source) ==============
+function buildOperationSelectors() {
+  const targetSel = document.getElementById('op-target');
+  const sourceSel = document.getElementById('op-source');
+  targetSel.innerHTML = '';
+  sourceSel.innerHTML = '';
+  for (let i = 0; i < currentSystem.nEqs; i++) {
+    const symbol = `E${'₁₂₃'[i]}`;
+    const tOpt = document.createElement('option');
+    tOpt.value = String(i); tOpt.textContent = symbol;
+    targetSel.appendChild(tOpt);
+    const sOpt = document.createElement('option');
+    sOpt.value = String(i); sOpt.textContent = symbol;
+    sourceSel.appendChild(sOpt);
+  }
+  // Sensible defaults: target = E2, source = E1
+  targetSel.value = '1';
+  sourceSel.value = '0';
+  syncTargetVisuals();
+}
+
+function syncTargetVisuals() {
+  const target = document.getElementById('op-target');
+  const idx = parseInt(target.value, 10);
+  target.classList.remove('e1', 'e2', 'e3');
+  target.classList.add(`e${idx + 1}`);
+  document.getElementById('self-tag').textContent = `E${'₁₂₃'[idx]}`;
+}
+
+// ============== Solution display ==============
+function updateSolutionDisplay() {
+  const sol = currentSystem.solution;
+  const out = document.getElementById('sol-text');
+  if (sol.type === 'point') {
+    const vars = varsForSystem();
+    const varList = vars.map(v => `<em>${v}</em>`).join(', ');
+    const coordList = sol.coords.map(c => c.isNeg() ? '−' + c.neg().toHtml() : c.toHtml()).join(', ');
+    out.innerHTML = `(${varList}) = (${coordList})`;
+  } else if (sol.type === 'line') {
+    // (3 - t, 1, t) form
+    const p = sol.pointF;
+    const dir = sol.directionF;
+    const parts = ['x', 'y', 'z'].map((v, i) => {
+      const a = p[i];
+      const k = dir[i];
+      let s = '';
+      const aStr = a.isNeg() ? '−' + a.neg().toHtml() : a.toHtml();
+      if (k.isZero()) {
+        s = aStr;
+      } else if (k.isOne()) {
+        s = a.isZero() ? '<em>t</em>' : `${aStr} + <em>t</em>`;
+      } else if (k.isNegOne()) {
+        s = a.isZero() ? '−<em>t</em>' : `${aStr} − <em>t</em>`;
+      } else if (k.isNeg()) {
+        s = a.isZero() ? `−${k.neg().toHtml()}<em>t</em>` : `${aStr} − ${k.neg().toHtml()}<em>t</em>`;
+      } else {
+        s = a.isZero() ? `${k.toHtml()}<em>t</em>` : `${aStr} + ${k.toHtml()}<em>t</em>`;
+      }
+      return `<em>${v}</em> = ${s}`;
+    });
+    out.innerHTML = `${parts.join(', ')} &nbsp; <span style="color:var(--ink-soft); font-style:italic;">(<em>t</em> ∈ ℝ)</span>`;
+  }
+}
+
+// ============== 2D RENDERING (SVG) ==============
+const VIEW = { xMin: -3, xMax: 7, yMin: -3, yMax: 7 };
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function render2D() {
+  const svg = document.getElementById('svg-2d');
+  svg.innerHTML = '';
+  const vbX = VIEW.xMin, vbW = VIEW.xMax - VIEW.xMin;
+  const vbY = -VIEW.yMax, vbH = VIEW.yMax - VIEW.yMin;
+  svg.setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
+  // We use SVG y = -math y throughout.
+
+  // Defs for clipping (so lines don't paint outside view)
+  const defs = svgEl('defs', {});
+  const clip = svgEl('clipPath', { id: 'plot-clip' });
+  clip.appendChild(svgEl('rect', {
+    x: VIEW.xMin, y: -VIEW.yMax,
+    width: VIEW.xMax - VIEW.xMin, height: VIEW.yMax - VIEW.yMin
+  }));
+  defs.appendChild(clip);
+  svg.appendChild(defs);
+
+  // Grid
+  const grid = svgEl('g', { class: 'grid' });
+  for (let i = Math.ceil(VIEW.xMin); i <= Math.floor(VIEW.xMax); i++) {
+    grid.appendChild(svgEl('line', {
+      x1: i, y1: -VIEW.yMin, x2: i, y2: -VIEW.yMax,
+      stroke: i === 0 ? '#9a907c' : '#e2dcc9', 'stroke-width': i === 0 ? 0.025 : 0.015
+    }));
+  }
+  for (let j = Math.ceil(VIEW.yMin); j <= Math.floor(VIEW.yMax); j++) {
+    grid.appendChild(svgEl('line', {
+      x1: VIEW.xMin, y1: -j, x2: VIEW.xMax, y2: -j,
+      stroke: j === 0 ? '#9a907c' : '#e2dcc9', 'stroke-width': j === 0 ? 0.025 : 0.015
+    }));
+  }
+  svg.appendChild(grid);
+
+  // Axis labels (math notation) — placed in +x/+y quadrant so they don't collide with ticks
+  const labelGroup = svgEl('g', {});
+  labelGroup.appendChild(svgText('x', VIEW.xMax - 0.25, -0.45, { 'font-style': 'italic', 'font-size': 0.55, fill: '#6b655b' }));
+  labelGroup.appendChild(svgText('y', 0.45, -(VIEW.yMax - 0.25), { 'font-style': 'italic', 'font-size': 0.55, fill: '#6b655b' }));
+  // Tick labels at integers (skip 0)
+  for (let i = Math.ceil(VIEW.xMin); i <= Math.floor(VIEW.xMax); i++) {
+    if (i === 0) continue;
+    labelGroup.appendChild(svgText(String(i), i, 0.45, {
+      'font-size': 0.35, 'text-anchor': 'middle', fill: '#9a907c'
+    }));
+  }
+  for (let j = Math.ceil(VIEW.yMin); j <= Math.floor(VIEW.yMax); j++) {
+    if (j === 0) continue;
+    labelGroup.appendChild(svgText(String(j), -0.2, -j + 0.12, {
+      'font-size': 0.35, 'text-anchor': 'end', fill: '#9a907c'
+    }));
+  }
+  svg.appendChild(labelGroup);
+
+  // Plot lines, clipped
+  const plotG = svgEl('g', { 'clip-path': 'url(#plot-clip)' });
+  for (let i = 0; i < currentSystem.nEqs; i++) {
+    const eq = equations[i];
+    const a = eq[0].toNumber();
+    const b = eq[1].toNumber();
+    const c = eq[2].toNumber();
+    const lineEl = makeLineElement(a, b, c, COLORS[i]);
+    if (lineEl) plotG.appendChild(lineEl);
+  }
+  svg.appendChild(plotG);
+
+  // Solution overlay
+  const sol = currentSystem.solution;
+  if (sol.type === 'point') {
+    const sx = sol.coords[0].toNumber();
+    const sy = sol.coords[1].toNumber();
+    // Halo ring + filled dot
+    svg.appendChild(svgEl('circle', {
+      cx: sx, cy: -sy, r: 0.22,
+      fill: 'none', stroke: '#2b2722', 'stroke-width': 0.04, opacity: 0.45
+    }));
+    svg.appendChild(svgEl('circle', {
+      cx: sx, cy: -sy, r: 0.12,
+      fill: '#2b2722'
+    }));
+  }
+}
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+function svgText(text, x, y, attrs = {}) {
+  const el = svgEl('text', { x, y, 'font-family': 'EB Garamond, serif', ...attrs });
+  el.textContent = text;
+  return el;
+}
+
+function makeLineElement(a, b, c, color) {
+  // ax + by = c
+  if (Math.abs(a) < 1e-12 && Math.abs(b) < 1e-12) return null;
+  // Extend far beyond view; clipPath will trim.
+  const FAR = 100;
+  let x1, y1, x2, y2;
+  if (Math.abs(b) > 1e-12) {
+    x1 = -FAR; y1 = (c - a * x1) / b;
+    x2 = FAR;  y2 = (c - a * x2) / b;
+  } else {
+    // a ≠ 0: vertical line x = c/a
+    x1 = c / a; y1 = -FAR;
+    x2 = c / a; y2 = FAR;
+  }
+  return svgEl('line', {
+    x1, y1: -y1, x2, y2: -y2,
+    stroke: color, 'stroke-width': 0.07,
+    'stroke-linecap': 'round'
+  });
+}
+
+// ============== 3D RENDERING (Three.js) ==============
+let scene, camera, renderer, controls;
+let threeContent = []; // disposable scene content (planes + line markers)
+let threeAxes = []; // permanent (axes, grid, labels)
+
+function init3D() {
+  if (renderer) return;
+  const viewer = document.getElementById('graph-3d');
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf3eee2);
+
+  camera = new THREE.PerspectiveCamera(40, 1, 0.1, 200);
+  camera.up.set(0, 0, 1);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  viewer.appendChild(renderer.domElement);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 3;
+  controls.maxDistance = 30;
+
+  // Axes (cylinders for visibility)
+  const axisMat = new THREE.MeshBasicMaterial({ color: 0x6b655b });
+  const axisLen = 4;
+  const r = 0.022;
+  ['x', 'y', 'z'].forEach(ax => {
+    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 2 * axisLen, 12), axisMat);
+    if (ax === 'x') cyl.rotation.z = Math.PI / 2;
+    else if (ax === 'z') cyl.rotation.x = Math.PI / 2;
+    scene.add(cyl);
+    threeAxes.push(cyl);
+  });
+
+  // Labels
+  function makeLabel(text) {
+    const c = document.createElement('canvas');
+    c.width = 128; c.height = 128;
+    const ctx = c.getContext('2d');
+    ctx.font = 'italic 80px "EB Garamond", serif';
+    ctx.fillStyle = '#2b2722';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(text, 64, 70);
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
+    const m = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+    const s = new THREE.Sprite(m);
+    s.scale.set(0.75, 0.75, 0.75);
+    return s;
+  }
+  const lx = makeLabel('x'); lx.position.set(4.45, 0, 0); scene.add(lx); threeAxes.push(lx);
+  const ly = makeLabel('y'); ly.position.set(0, 4.45, 0); scene.add(ly); threeAxes.push(ly);
+  const lz = makeLabel('z'); lz.position.set(0, 0, 4.45); scene.add(lz); threeAxes.push(lz);
+
+  // Floor grid (z = 0)
+  const grid = new THREE.GridHelper(8, 16, 0xc9c1ac, 0xe2dcc9);
+  grid.rotateX(Math.PI / 2);
+  scene.add(grid); threeAxes.push(grid);
+
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Resize handling
+  const container = document.getElementById('graph-container');
+  function resize3D() {
+    const r = container.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return;
+    renderer.setSize(r.width, r.height);
+    camera.aspect = r.width / r.height;
+    camera.updateProjectionMatrix();
+  }
+  resize3D();
+  window.addEventListener('resize', resize3D);
+  new ResizeObserver(resize3D).observe(container);
+}
+
+const PLANE_SIZE = 5;
+
+function createPlaneGroup(a, b, c, d, color, idx, anchor) {
+  const normal = new THREE.Vector3(a, b, c);
+  const len = normal.length();
+  if (len < 1e-9) return null;
+  const n = normal.clone().normalize();
+  let temp;
+  if (Math.abs(n.x) < 0.85) temp = new THREE.Vector3(1, 0, 0);
+  else temp = new THREE.Vector3(0, 1, 0);
+  const u = new THREE.Vector3().crossVectors(n, temp).normalize();
+  const v = new THREE.Vector3().crossVectors(n, u).normalize();
+
+  // Anchor must be a point on the plane. Project from anchor to plane (if needed).
+  // Distance from anchor to plane along n: (n·anchor - d/|orig_n|)
+  const center = anchor.clone();
+  const dist = center.dot(n) - d / len;
+  center.addScaledVector(n, -dist);
+
+  const h = PLANE_SIZE / 2;
+  const corners = [
+    center.clone().addScaledVector(u, -h).addScaledVector(v, -h),
+    center.clone().addScaledVector(u,  h).addScaledVector(v, -h),
+    center.clone().addScaledVector(u,  h).addScaledVector(v,  h),
+    center.clone().addScaledVector(u, -h).addScaledVector(v,  h)
+  ];
+
+  const faceGeom = new THREE.BufferGeometry();
+  const verts = new Float32Array([
+    corners[0].x, corners[0].y, corners[0].z,
+    corners[1].x, corners[1].y, corners[1].z,
+    corners[2].x, corners[2].y, corners[2].z,
+    corners[0].x, corners[0].y, corners[0].z,
+    corners[2].x, corners[2].y, corners[2].z,
+    corners[3].x, corners[3].y, corners[3].z,
+  ]);
+  faceGeom.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+  faceGeom.computeVertexNormals();
+  const faceMat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.36, side: THREE.DoubleSide, depthWrite: true
+  });
+  const faceMesh = new THREE.Mesh(faceGeom, faceMat);
+  faceMesh.renderOrder = idx;
+
+  const edgePts = [corners[0], corners[1], corners[1], corners[2], corners[2], corners[3], corners[3], corners[0]];
+  const edgeGeom = new THREE.BufferGeometry().setFromPoints(edgePts);
+  const edgeMat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.95 });
+  const edges = new THREE.LineSegments(edgeGeom, edgeMat);
+  edges.renderOrder = idx + 10;
+
+  const group = new THREE.Group();
+  group.add(faceMesh);
+  group.add(edges);
+  return group;
+}
+
+function rebuild3D() {
+  // Dispose previous content
+  threeContent.forEach(g => {
+    scene.remove(g);
+    g.traverse(o => {
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) o.material.dispose();
+    });
+  });
+  threeContent = [];
+
+  // Anchor where to center planes: solution point if 'point', else a point on the line
+  const sol = currentSystem.solution;
+  let anchor;
+  if (sol.type === 'point') {
+    anchor = new THREE.Vector3(
+      sol.coords[0].toNumber(),
+      sol.coords[1].toNumber(),
+      sol.coords[2].toNumber()
+    );
+  } else {
+    anchor = new THREE.Vector3(sol.point[0], sol.point[1], sol.point[2]);
+  }
+
+  // Place planes
+  for (let i = 0; i < currentSystem.nEqs; i++) {
+    const eq = equations[i];
+    const a = eq[0].toNumber();
+    const b = eq[1].toNumber();
+    const c = eq[2].toNumber();
+    const d = eq[3].toNumber();
+    const g = createPlaneGroup(a, b, c, d, new THREE.Color(COLORS[i]), i, anchor);
+    if (g) {
+      scene.add(g);
+      threeContent.push(g);
+    }
+  }
+
+  // Solution marker(s)
+  if (sol.type === 'point') {
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.12, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0x2b2722 })
+    );
+    sphere.position.copy(anchor);
+    sphere.renderOrder = 100;
+    scene.add(sphere); threeContent.push(sphere);
+  } else if (sol.type === 'line') {
+    // Line through anchor with direction
+    const dir = new THREE.Vector3(...sol.direction);
+    const L = 8;
+    const p1 = anchor.clone().addScaledVector(dir, -L);
+    const p2 = anchor.clone().addScaledVector(dir, L);
+    const lineGeom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x2b2722, transparent: true, opacity: 0.95 });
+    const line = new THREE.Line(lineGeom, lineMat);
+    line.renderOrder = 100;
+    // Use a slightly thicker visual via tube
+    const path = new THREE.LineCurve3(p1, p2);
+    const tube = new THREE.Mesh(
+      new THREE.TubeGeometry(path, 1, 0.035, 8, false),
+      new THREE.MeshBasicMaterial({ color: 0x2b2722 })
+    );
+    tube.renderOrder = 101;
+    scene.add(line); threeContent.push(line);
+    scene.add(tube); threeContent.push(tube);
+  }
+
+  // Position camera looking at anchor
+  controls.target.copy(anchor);
+  camera.position.set(anchor.x + 8, anchor.y + 6.5, anchor.z + 9);
+  controls.update();
+}
+
+// ============== Mode switching ==============
+function applyMode() {
+  const is2D = currentSystem.mode === '2D';
+  document.getElementById('graph-2d').style.display = is2D ? '' : 'none';
+  document.getElementById('graph-3d').style.display = is2D ? 'none' : '';
+  document.getElementById('viewer-hint').textContent = is2D ? '' : 'drag to rotate · scroll to zoom';
+  if (!is2D) init3D();
+}
+
+// ============== Legend ==============
+function updateLegend() {
+  const lg = document.getElementById('legend');
+  lg.innerHTML = '';
+  for (let i = 0; i < currentSystem.nEqs; i++) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `
+      <div class="legend-swatch ${currentSystem.mode === '2D' ? 'solid' : ''}" style="background:${COLORS[i]}; border-color:${COLORS[i]}"></div>
+      <span class="legend-label"><span class="eq-name">E${'₁₂₃'[i]}</span></span>
+    `;
+    lg.appendChild(item);
+  }
+  const solItem = document.createElement('div');
+  solItem.className = 'legend-item';
+  if (currentSystem.solution.type === 'line') {
+    solItem.innerHTML = `<span class="legend-bar"></span><span class="legend-label"><em>solution line</em></span>`;
+  } else {
+    solItem.innerHTML = `<span class="legend-dot"></span><span class="legend-label"><em>solution point</em></span>`;
+  }
+  lg.appendChild(solItem);
+}
+
+// ============== System type description ==============
+function updateSystemType() {
+  document.getElementById('system-label').textContent = `${currentSystem.nEqs} × ${currentSystem.nVars}`;
+  document.getElementById('system-desc').textContent = currentSystem.desc;
+}
+
+// ============== Operations ==============
+function applyOperation(aStr, bStr, targetIdx, sourceIdx) {
+  const a = F.parse(aStr);
+  const b = F.parse(bStr);
+  if (a === null) { flashInput('op-a'); return false; }
+  if (b === null) { flashInput('op-b'); return false; }
+  if (a.isZero() && b.isZero()) { flashInput('op-a'); return false; }
+  const tgt = equations[targetIdx];
+  const src = equations[sourceIdx];
+  const newEq = tgt.map((cf, i) => cf.mul(a).add(b.mul(src[i])));
+  equations[targetIdx] = newEq;
+  history.push(opToHistoryHtml(targetIdx, sourceIdx, a, b));
+  updateEquationDisplay();
+  updateHistoryDisplay();
+  rebuildGraph();
+  return true;
+}
+
+function flashInput(id) {
+  const el = document.getElementById(id);
+  el.style.transition = 'background 100ms';
+  el.style.background = '#f8d4c5';
+  setTimeout(() => { el.style.background = ''; }, 350);
+}
+
+function resetEquations() {
+  equations = cloneEquations(currentSystem.original);
+  history = [];
+  updateEquationDisplay();
+  updateHistoryDisplay();
+  rebuildGraph();
+}
+
+function rebuildGraph() {
+  if (currentSystem.mode === '2D') render2D();
+  else rebuild3D();
+}
+
+// ============== System size selection ==============
+function loadSystem(key) {
+  currentKey = key;
+  currentSystem = SYSTEMS[key];
+  equations = cloneEquations(currentSystem.original);
+  history = [];
+
+  // Update segmented buttons visually
+  document.querySelectorAll('#seg-eqs .seg-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.eqs, 10) === currentSystem.nEqs);
+  });
+  document.querySelectorAll('#seg-vars .seg-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.vars, 10) === currentSystem.nVars);
+  });
+
+  updateSystemType();
+  buildEquationRows();
+  updateEquationDisplay();
+  buildOperationSelectors();
+  updateHistoryDisplay();
+  updateSolutionDisplay();
+  updateLegend();
+  applyMode();
+  rebuildGraph();
+}
+
+// ============== UI wiring ==============
+function chooseEqs(n) {
+  loadSystem(`${n}x${currentSystem.nVars}`);
+}
+function chooseVars(n) {
+  loadSystem(`${currentSystem.nEqs}x${n}`);
+}
+
+document.querySelectorAll('#seg-eqs .seg-btn').forEach(b => {
+  b.addEventListener('click', () => chooseEqs(parseInt(b.dataset.eqs, 10)));
+});
+document.querySelectorAll('#seg-vars .seg-btn').forEach(b => {
+  b.addEventListener('click', () => chooseVars(parseInt(b.dataset.vars, 10)));
+});
+
+document.getElementById('btn-apply').addEventListener('click', () => {
+  const a = document.getElementById('op-a').value;
+  const b = document.getElementById('op-b').value;
+  const t = parseInt(document.getElementById('op-target').value, 10);
+  const s = parseInt(document.getElementById('op-source').value, 10);
+  applyOperation(a, b, t, s);
+});
+document.getElementById('btn-reset').addEventListener('click', resetEquations);
+['op-a', 'op-b'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btn-apply').click();
+  });
+});
+document.getElementById('op-target').addEventListener('change', syncTargetVisuals);
+
+// ============== Init ==============
+loadSystem('2x2');
+</script>
+</body>
+</html>
