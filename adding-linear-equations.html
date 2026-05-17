@@ -46,7 +46,7 @@
 
         <p>To those people I say, <q>It builds up! These little semantical inconsistencies -- they build up!</q></p>
 
-        <p>So, that's the first thing: we aren't adding equations, we are adding the like-terms of equations.</p>
+        <p>So, that's the first thing: <strong>we aren't adding equations, we are adding the like-terms of equations</strong>.</p>
 
         <div class="equation-stack">
           <p>$$E_{1}:2x-3y=4$$</p>
@@ -55,11 +55,47 @@
           <p>$$E_{3}:6x-4y=7$$</p>
         </div>
 
-        <p>Okay. But what does that even mean?</p>
+        <p>Okay. But what does it even mean to add the like-terms of equations?</p>
 
-        <p>Let's take an example:</p>
+        <p>Consider the following:</p>
 
-        <p>Coefficients determine how much relative value a variable has.</p>
+        <div class="equation-stack">
+          <p>$$2x-3y$$</p>
+          <p>$$4x-y$$</p>
+        </div>
+
+        <p>The coefficients determine how strongly each variable affects the total value of the expression.</p>
+
+        <p>Take the $x$-terms. One increases the value of $x$ by times 2, the other by times 4.</p>
+
+        <div class="equation-stack">
+          <p>$$2\cdot x$$</p>
+          <p>$$4\cdot x$$</p>
+        </div>
+
+        <p>If we add the $x$ terms, we increase the value of $x$ to times 6.</p>
+
+        <p>However, because we also do the same with the $y$-terms, we are not increasing anything absolutely -- only the <q>weight</q> of one term relative to another may increase or decrease.</p>
+
+        <div class="equation-stack">
+          <p>$$(2\cdot x)+(-3\cdot y)$$</p>
+          <p>$$(4\cdot x)+(-1\cdot y)$$</p>
+          <p>$$(2+4)x+(-3-1)y$$</p>
+          <p>$$6x-4y$$</p>
+        </div>
+
+        <p>So, although our addition of like-terms increased the value of $x$ to 6 times itself, we also increased the value of $y$ to negative four times itself.</p>
+
+        <p>After adding the like-terms of equations, we create an expression that either:</p>
+
+        <ul>
+          <li>Gives more weight to $x$.</li>
+          <li>Gives more weight $y$.</li>
+        </ul>
+
+        <p>So, we don't get <q>more line</q> we get <q>more $x$ for $y$</q> or <q>more $y$ for $x$</q>.</p>
+
+        <p>Let's make that super clear with another example.</p>
 
         <p>If our equations were:</p>
 
@@ -73,6 +109,8 @@
         <p>However, this is not true.</p>
 
         <p>Look at this example.</p>
+
+        <p>Sidenote: If we multiply a linear equation by any number we do not change the line it represents, because the set of solutions remains identical.</p>
 
         <p>These all describe the same line and the same 2 : 1 ratio between $x$ and $y$ values.</p>
 
@@ -121,6 +159,33 @@
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <p>From messing around with these coefficients, increasing or decreasing them, we see that we always have two lines. If our equations are on the same scale, then adding their coefficients will result in a line somewhere between the two.</p>
+
+        <p>The greater the coefficients are though, the more the new line gets closer to it.</p>
+
+        <p>However, something interesting happens when we begin to multiply an equation by negative numbers.</p>
+
+        <p>When the coefficients are both positive, the new line is trapped in a tug-of-war between the original two lines.</p>
+
+        <p>The moment you introduce a negative coefficient, you are no longer averaging the two lines; you are subtracting one from the other. Instead of the new line living between the two original lines, it gets kicked out into the space outside of them. It pivots away from the line with the negative coefficient and swings past the positive one.</p>
+
+        <p>So, when add the like-terms of two linear equations, there are a couple of things to watch out for happening:</p>
+
+        <ol>
+          <li>
+            <p>Positive combinations interpolate between the original orientations.</p>
+            <p>If both equations are combined with positive weights, the resulting line tends to lie between the original lines in orientation.</p>
+          </li>
+          <li>
+            <p>Negative combinations extrapolate beyond the original orientations.</p>
+            <p>Multiplying one equation by a negative causes cancellation rather than reinforcement, allowing the resulting line to rotate outside the range spanned by the originals.</p>
+          </li>
+          <li>
+            <p>Exact cancellation removes a variable entirely.</p>
+            <p>If the coefficients of one variable cancel exactly, the resulting equation becomes independent of that variable, producing a line parallel to one of the axes.</p>
+          </li>
+        </ol>
       </section>
     </article>
   </main>
