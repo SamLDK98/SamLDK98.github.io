@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coefficients as space transformations</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #fdfcf8; }
+  body { font-family: Georgia, 'Cambria', 'Times New Roman', serif; color: #1a1a1a; line-height: 1.5; padding: 1.5rem 1rem; }
+  .ewb3 { max-width: 720px; margin: 0 auto; }
+  .ewb3-card {
+    background: #ffffff;
+    border: 1px solid #e5e3dc;
+    border-radius: 8px;
+    padding: 0.95rem 1.15rem;
+    margin-bottom: 0.55rem;
+  }
+  .ewb3-label {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8a8678;
+    margin-bottom: 0.45rem;
+  }
+  .ewb3-eq {
+    font-size: 26px;
+    line-height: 1.4;
+    font-style: italic;
+    font-family: Georgia, serif;
+    margin-bottom: 0.7rem;
+    min-height: 1.4em;
+  }
+  .ewb3-eq .x { color: #2563eb; font-weight: 500; font-style: normal; }
+  .ewb3-eq .y { color: #ea580c; font-weight: 500; font-style: normal; }
+  .ewb3-eq .op { color: #8a8678; margin: 0 0.12em; font-style: normal; }
+  .ewb3-eq .var { font-style: italic; }
+  .ewb3-eq .zero { opacity: 0.45; }
+  .ewb3-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 22px;
+  }
+  @media (max-width: 480px) { .ewb3-controls { grid-template-columns: 1fr; } }
+  .ewb3-ctrl { display: flex; align-items: center; gap: 8px; }
+  .ewb3-ctrl .name {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    min-width: 16px;
+  }
+  .ewb3-ctrl .name.x { color: #2563eb; }
+  .ewb3-ctrl .name.y { color: #ea580c; }
+  .ewb3-ctrl input[type=range] {
+    flex: 1;
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    height: 18px;
+    margin: 0;
+  }
+  .ewb3-ctrl input[type=range]::-webkit-slider-runnable-track {
+    height: 4px; background: #e5e3dc; border-radius: 2px;
+  }
+  .ewb3-ctrl input[type=range]::-moz-range-track {
+    height: 4px; background: #e5e3dc; border-radius: 2px; border: none;
+  }
+  .ewb3-ctrl input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    margin-top: -6px;
+    cursor: pointer;
+    border: none;
+  }
+  .ewb3-ctrl input[type=range]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    cursor: pointer;
+    border: none;
+  }
+  .ewb3-ctrl input[type=range]:focus { outline: none; }
+  .ewb3-ctrl input[type=range]:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(26,26,26,0.15);
+  }
+  .ewb3-ctrl input[type=number] {
+    width: 62px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    padding: 4px 6px;
+    border: 1px solid #c8c4b5;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+  .ewb3-ctrl input[type=number]:focus {
+    outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 2px rgba(26,26,26,0.12);
+  }
+  .ewb3-plane-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 0;
+    background: #ffffff;
+    border: 1px solid #e5e3dc;
+    border-radius: 8px;
+    margin-bottom: 0.55rem;
+  }
+  .ewb3-plane { width: 100%; max-width: 420px; height: auto; display: block; color: #1a1a1a; }
+  .ewb3-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 0.7rem;
+  }
+  .ewb3-buttons button {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 7px 13px;
+    background: #ffffff;
+    border: 1px solid #c8c4b5;
+    border-radius: 6px;
+    color: #1a1a1a;
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .ewb3-buttons button:hover { background: #f5f3eb; border-color: #a8a496; }
+  .ewb3-buttons button:active { background: #ece9df; transform: scale(0.98); }
+  .ewb3-status {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #4a4a4a;
+    padding: 0.7rem 0.95rem;
+    background: #faf8f1;
+    border-radius: 6px;
+    margin-top: 0.55rem;
+  }
+  .ewb3-status em { font-style: italic; color: #1a1a1a; }
+  .ewb3-status .flip { color: #c2410c; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="ewb3" role="region" aria-label="Coefficient space transformation widget">
+  <div class="ewb3-card">
+    <div class="ewb3-label">Equation coefficients</div>
+    <div class="ewb3-eq" id="ewb3-eq"></div>
+    <div class="ewb3-controls">
+      <div class="ewb3-ctrl">
+        <span class="name x">a</span>
+        <input type="range" id="ewb3-a" min="-4" max="4" step="0.5" value="2">
+        <input type="number" id="ewb3-aNum" min="-4" max="4" step="0.5" value="2">
+      </div>
+      <div class="ewb3-ctrl">
+        <span class="name y">b</span>
+        <input type="range" id="ewb3-b" min="-4" max="4" step="0.5" value="-1">
+        <input type="number" id="ewb3-bNum" min="-4" max="4" step="0.5" value="-1">
+      </div>
+    </div>
+    <div class="ewb3-buttons">
+      <button id="ewb3-btnArt">4x &minus; 2y (the article)</button>
+      <button id="ewb3-btnId">Identity (1, 1)</button>
+      <button id="ewb3-btnRst">Reset</button>
+    </div>
+  </div>
+
+  <div class="ewb3-plane-wrap">
+    <svg class="ewb3-plane" viewBox="0 0 400 400" aria-label="Coordinate plane">
+      <defs>
+        <clipPath id="ewb3-clip"><rect x="30" y="30" width="340" height="340"/></clipPath>
+      </defs>
+      <g id="ewb3-origGrid" stroke="currentColor" stroke-opacity="0.07" stroke-width="1"></g>
+      <g clip-path="url(#ewb3-clip)" id="ewb3-transGrid"></g>
+      <line id="ewb3-axisX" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.2"/>
+      <line id="ewb3-axisY" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.2"/>
+      <g id="ewb3-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.55"></g>
+      <rect id="ewb3-origSquare" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="3,2.5"/>
+      <g clip-path="url(#ewb3-clip)">
+        <polygon id="ewb3-transSquare" fill="#16a34a" fill-opacity="0.18" stroke="#16a34a" stroke-width="1.8"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="ewb3-status" id="ewb3-status"></div>
+</div>
+
+<script>
+(function(){
+  var X_MIN = -6, X_MAX = 6, Y_MIN = -6, Y_MAX = 6;
+  var PA = { x: 30, y: 30, w: 340, h: 340 };
+
+  function sx(mx){ return PA.x + (mx - X_MIN)/(X_MAX - X_MIN) * PA.w; }
+  function sy(my){ return PA.y + (Y_MAX - my)/(Y_MAX - Y_MIN) * PA.h; }
+  function $(id){ return document.getElementById(id); }
+  function setAttrs(el, o){ for (var k in o) el.setAttribute(k, o[k]); }
+
+  var og = '';
+  for (var i = X_MIN; i <= X_MAX; i++) {
+    if (i !== 0) og += '<line x1="'+sx(i)+'" y1="'+sy(Y_MIN)+'" x2="'+sx(i)+'" y2="'+sy(Y_MAX)+'"/>';
+  }
+  for (var j = Y_MIN; j <= Y_MAX; j++) {
+    if (j !== 0) og += '<line x1="'+sx(X_MIN)+'" y1="'+sy(j)+'" x2="'+sx(X_MAX)+'" y2="'+sy(j)+'"/>';
+  }
+  $('ewb3-origGrid').innerHTML = og;
+
+  setAttrs($('ewb3-axisX'), { x1: sx(X_MIN), y1: sy(0), x2: sx(X_MAX), y2: sy(0) });
+  setAttrs($('ewb3-axisY'), { x1: sx(0), y1: sy(Y_MIN), x2: sx(0), y2: sy(Y_MAX) });
+
+  var th = '';
+  for (var i2 = X_MIN; i2 <= X_MAX; i2++) {
+    if (i2 !== 0) th += '<text x="'+sx(i2)+'" y="'+(sy(0)+13)+'" text-anchor="middle">'+i2+'</text>';
+  }
+  for (var j2 = Y_MIN; j2 <= Y_MAX; j2++) {
+    if (j2 !== 0) th += '<text x="'+(sx(0)-6)+'" y="'+(sy(j2)+3.5)+'" text-anchor="end">'+j2+'</text>';
+  }
+  $('ewb3-ticks').innerHTML = th;
+
+  setAttrs($('ewb3-origSquare'), { x: sx(0), y: sy(1), width: sx(1)-sx(0), height: sy(0)-sy(1) });
+
+  function fmt(n){
+    if (Number.isInteger(n)) return String(n);
+    return (Math.round(n*100)/100).toString();
+  }
+
+  function term(coef, varName, first){
+    var cls = varName === 'x' ? 'x' : 'y';
+    if (coef === 0){
+      return first
+        ? '<span class="'+cls+' zero">0<span class="var">'+varName+'</span></span>'
+        : '<span class="op">+</span><span class="'+cls+' zero">0<span class="var">'+varName+'</span></span>';
+    }
+    var sign = coef < 0 ? '\u2212' : (first ? '' : '+');
+    var mag = Math.abs(coef);
+    var num = mag === 1 ? '' : fmt(mag);
+    if (first) return '<span class="'+cls+'">'+sign+num+'<span class="var">'+varName+'</span></span>';
+    return '<span class="op">'+sign+'</span><span class="'+cls+'">'+num+'<span class="var">'+varName+'</span></span>';
+  }
+
+  function update(){
+    var a = +$('ewb3-a').value, b = +$('ewb3-b').value;
+    $('ewb3-aNum').value = a;
+    $('ewb3-bNum').value = b;
+    $('ewb3-eq').innerHTML = term(a, 'x', true) + ' ' + term(b, 'y', false);
+
+    var html = '';
+    if (Math.abs(a) > 1e-9){
+      var maxKa = Math.max(2, Math.ceil(X_MAX / Math.abs(a)) + 2);
+      for (var k = -maxKa; k <= maxKa; k++){
+        if (k === 0) continue;
+        var x = a*k;
+        html += '<line x1="'+sx(x)+'" y1="'+sy(Y_MIN)+'" x2="'+sx(x)+'" y2="'+sy(Y_MAX)+'" stroke="#2563eb" stroke-opacity="0.3" stroke-width="1.2"/>';
+      }
+    }
+    if (Math.abs(b) > 1e-9){
+      var maxKb = Math.max(2, Math.ceil(Y_MAX / Math.abs(b)) + 2);
+      for (var k2 = -maxKb; k2 <= maxKb; k2++){
+        if (k2 === 0) continue;
+        var y = b*k2;
+        html += '<line x1="'+sx(X_MIN)+'" y1="'+sy(y)+'" x2="'+sx(X_MAX)+'" y2="'+sy(y)+'" stroke="#ea580c" stroke-opacity="0.3" stroke-width="1.2"/>';
+      }
+    }
+    $('ewb3-transGrid').innerHTML = html;
+
+    var pts = [[sx(0),sy(0)], [sx(a),sy(0)], [sx(a),sy(b)], [sx(0),sy(b)]];
+    $('ewb3-transSquare').setAttribute('points', pts.map(function(p){ return p.join(','); }).join(' '));
+
+    var msg = '';
+    if (a === 0 && b === 0){
+      msg = 'Both coefficients are zero \u2014 every point in the plane collapses to the origin.';
+    } else if (a === 0){
+      msg = 'The x-coefficient is zero. The whole plane collapses onto the y-axis.';
+    } else if (b === 0){
+      msg = 'The y-coefficient is zero. The whole plane collapses onto the x-axis.';
+    } else {
+      var area = Math.abs(a*b);
+      var ex = '(3, 4) lands at ('+fmt(3*a)+', '+fmt(4*b)+')';
+      msg = 'Every <em>(x, y)</em> is dragged to <em>('+fmt(a)+'x, '+fmt(b)+'y)</em>. The unit square (dashed) becomes a '+fmt(Math.abs(a))+' \u00d7 '+fmt(Math.abs(b))+' rectangle, scaling area by <em>'+fmt(area)+'</em>. For example, '+ex+'.';
+      var flips = [];
+      if (a < 0) flips.push('the x-axis');
+      if (b < 0) flips.push('the y-axis');
+      if (flips.length) msg += ' <span class="flip">Flips: '+flips.join(' and ')+'.</span>';
+    }
+    $('ewb3-status').innerHTML = msg;
+  }
+
+  function setVals(a, b){
+    $('ewb3-a').value = a;
+    $('ewb3-b').value = b;
+    update();
+  }
+
+  $('ewb3-a').addEventListener('input', update);
+  $('ewb3-b').addEventListener('input', update);
+  $('ewb3-aNum').addEventListener('input', function(){
+    $('ewb3-a').value = $('ewb3-aNum').value;
+    update();
+  });
+  $('ewb3-bNum').addEventListener('input', function(){
+    $('ewb3-b').value = $('ewb3-bNum').value;
+    update();
+  });
+  $('ewb3-btnArt').addEventListener('click', function(){ setVals(4, -2); });
+  $('ewb3-btnId').addEventListener('click', function(){ setVals(1, 1); });
+  $('ewb3-btnRst').addEventListener('click', function(){ setVals(2, -1); });
+  update();
+})();
+</script>
+</body>
+</html>

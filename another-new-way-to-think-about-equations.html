@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Another new way to think about equations | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Another new way to think about equations</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p class="display-equation">$4x-2y=2$</p>
+
+        <p>We are inclined to think of the $x$ and $y$ as being only those values that make the equation true.</p>
+
+        <p>They <strong>are</strong> the pairs that make the equation true and <strong>are not</strong> the pairs that don't.</p>
+
+        <p>However, a better framing to approach Linear Algebra (LA) with is that all pairs of $(x,y)$ do exist.</p>
+
+        <p>Collectively, all these pairs describe a space.</p>
+
+        <p>So, that's the first thing: when we see an equation we check how many variables there are and imagine a space with that many dimensions/axes.</p>
+
+        <p>However, how should we conceptualize the coefficients?</p>
+
+        <p>$4x$ and $-2y$.</p>
+
+        <p>How do you multiple an axis?</p>
+
+        <p>You multiply every point on it.</p>
+
+        <p>Imagine a point $(3,4)$.</p>
+
+        <p>We move across the $x$-axis to (4 x 3) 12, and down the $y$-axis to (-2 x 4) -8.</p>
+
+        <p>Our new location is $(12, -8)$.</p>
+
+        <p>We can imagine this, not just as hopping over to this new point, but as dragging that old (3, 4) over to this new location, i.e. the space is changed.</p>
+
+        <p>We imagine that happens for every possible $(x,y)$ coordinate.</p>
+
+        <p>So, now when we see the equation $4x-2y=2$, we imagine:</p>
+
+        <ol>
+          <li>A space with two axes.</li>
+          <li>Every coordinate being moved as specified by the coefficients.</li>
+        </ol>
+
+        <iframe
+          class="essay-widget essay-widget-autosize"
+          src="linear-algebra/another-new-way-to-think-about-equations/space_transformation_by_coefficients.html"
+          title="Interactive widget showing coefficients as space transformations"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
