@@ -291,7 +291,7 @@ button:focus-visible {
   </div>
 
   <div class="constant-plane-wrap">
-    <svg class="constant-plane" viewBox="0 0 420 520" aria-label="A constant point on a number line lifting into a two dimensional solution line">
+    <svg class="constant-plane" viewBox="0 0 420 520" aria-label="A constant point on a number line lifting into the two dimensional solution line x minus y equals c">
       <defs>
         <clipPath id="constant-plane-clip">
           <rect x="48" y="28" width="324" height="324"></rect>
@@ -441,12 +441,8 @@ button:focus-visible {
 
   function resizeFrame() {
     if (!window.frameElement) return;
-    const height = Math.max(
-      document.body.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.scrollHeight,
-      document.documentElement.offsetHeight
-    );
+    const root = document.querySelector(".constant-widget");
+    const height = Math.ceil(root.getBoundingClientRect().bottom + 16);
     window.frameElement.style.height = `${height + 12}px`;
   }
 
@@ -482,6 +478,7 @@ button:focus-visible {
 
     const samples = samplePointsForConstant(c);
     const center = { x: c / 2, y: -c / 2 };
+    const example = samples[1] || center;
     const rays = samples.map(point => {
       return `<path class="lift-ray" d="M ${numberX} ${NL_Y} L ${sx(point.x)} ${sy(point.y)}"></path>`;
     }).join("");
@@ -492,7 +489,7 @@ button:focus-visible {
 
     $("constant-rays").innerHTML = rays;
     $("constant-samples").innerHTML = dots;
-    $("constant-status").innerHTML = `The point <strong>${fmt(c)}</strong> on the number line lifts into the full 2D line <em>x - y = ${fmt(c)}</em>. Every coordinate on that line collapses back to <em>${fmt(c)}</em>. The earlier point lands at <em>4</em>, so its distance from this constant is <em>${distance >= 0 ? "+" : ""}${fmt(distance)}</em>.`;
+    $("constant-status").innerHTML = `The point <strong>${fmt(c)}</strong> on the number line lifts into the full 2D line <em>x - y = ${fmt(c)}</em>. Every coordinate on that line evaluates back to <em>${fmt(c)}</em> under <em>x - y</em>. For example, <em>(${fmt(example.x)}, ${fmt(example.y)})</em> gives <em>${fmt(example.x)} - (${fmt(example.y)}) = ${fmt(c)}</em>. The earlier point lands at <em>4</em>, so its distance from this constant is <em>${distance >= 0 ? "+" : ""}${fmt(distance)}</em>.`;
 
     if (replay) {
       animatePath(line);

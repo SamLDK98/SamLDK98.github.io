@@ -74,7 +74,7 @@ button:focus-visible {
 .ewb4.collapsed .ewb4-nl { opacity: 1; }
 @media (max-width: 480px) { .ewb4-controls { grid-template-columns: 1fr; } }
 </style>
-<h2 class="sr-only">Interactive widget showing how a 2D plane of (x, y) coordinates, once scaled by coefficients, collapses to a 1D number line where each point lands at its summed value ax + by.</h2>
+<h2 class="sr-only">Interactive widget showing how a 2D plane of (x, y) coordinates, once scaled by coefficients, collapses to a 1D number line where each point lands at its signed value ax + by.</h2>
 <div class="ewb4" id="ewb4-root">
   <div class="ewb4-card">
     <div class="ewb4-label">Equation coefficients</div>
@@ -195,22 +195,18 @@ button:focus-visible {
       const values = new Set();
       SAMPLES.forEach(s => values.add(a*s.ox + b*s.oy));
       const ex = `(3, 4) lands at <em>${fmt(3*a + 4*b)}</em>`;
-      msg = `The 2D plane has collapsed onto a 1D line. Each <em>(x, y)</em> projects to <em>${fmt(a)}x + ${fmt(b)}y</em>. The ${SAMPLES.length} sample points landed on <em>${values.size}</em> distinct values \u2014 dots that stack are points lying on the same line <em>ax + by = c</em>. For example, ${ex}.`;
+      msg = `The 2D plane has collapsed onto a 1D line. Each <em>(x, y)</em> projects to the signed value <em>${fmt(a)}x + ${fmt(b)}y</em>. The ${SAMPLES.length} sample points landed on <em>${values.size}</em> distinct values \u2014 dots that stack are points lying on the same line <em>ax + by = c</em>. For example, ${ex}.`;
     } else {
       const ex = `(3, 4) goes to (${fmt(3*a)}, ${fmt(4*b)})`;
-      msg = `Every <em>(x, y)</em> is dragged to <em>(${fmt(a)}x, ${fmt(b)}y)</em>. The 25 purple dots are integer sample points being transformed \u2014 e.g. ${ex}. <span class="reveal">Press \u201cCollapse to 1D line\u201d to sum each pair into a single value.</span>`;
+      msg = `Every <em>(x, y)</em> is dragged to <em>(${fmt(a)}x, ${fmt(b)}y)</em>. The 25 purple dots are integer sample points being transformed \u2014 e.g. ${ex}. <span class="reveal">Press \u201cCollapse to 1D line\u201d to evaluate each pair as one signed value.</span>`;
     }
     $('ewb4-status').innerHTML = msg;
   }
   function setVals(a, b){ $('ewb4-a').value = a; $('ewb4-b').value = b; update(); resizeFrame(); }
   function resizeFrame(){
     if (!window.frameElement) return;
-    const height = Math.max(
-      document.body.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.scrollHeight,
-      document.documentElement.offsetHeight
-    );
+    const root = $('ewb4-root');
+    const height = Math.ceil(root.getBoundingClientRect().bottom + 16);
     window.frameElement.style.height = `${height + 12}px`;
   }
   function toggleCollapse(){
