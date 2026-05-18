@@ -1,0 +1,239 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collapse 2D space to a 1D number line</title>
+<style>
+:root {
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #6f6b60;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f7f5ef;
+  --color-border-tertiary: #e5e3dc;
+  --border-radius-lg: 8px;
+  --border-radius-md: 6px;
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body { padding: 0 1rem 1rem; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: #f7f5ef;
+  color: #1a1a1a;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible {
+  border-color: #1a1a1a;
+  background: #ffffff;
+}
+.ewb4 { font-family: Georgia, 'Cambria', 'Times New Roman', serif; max-width: 720px; margin: 0 auto; padding: 1rem 0; color: var(--color-text-primary); }
+.ewb4-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.95rem 1.15rem; margin-bottom: 0.55rem; }
+.ewb4-label { font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-secondary); margin-bottom: 0.45rem; }
+.ewb4-eq { font-size: 24px; line-height: 1.4; font-style: italic; font-family: Georgia, serif; margin-bottom: 0.7rem; min-height: 1.4em; }
+.ewb4-eq .x { color: #2563eb; font-weight: 500; font-style: normal; }
+.ewb4-eq .y { color: #ea580c; font-weight: 500; font-style: normal; }
+.ewb4-eq .op { color: var(--color-text-secondary); margin: 0 0.12em; font-style: normal; }
+.ewb4-eq .var { font-style: italic; }
+.ewb4-eq .zero { opacity: 0.45; }
+.ewb4-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; }
+.ewb4-ctrl { display: flex; align-items: center; gap: 8px; }
+.ewb4-ctrl .name { font-family: Georgia, serif; font-style: italic; font-size: 16px; min-width: 16px; }
+.ewb4-ctrl .name.x { color: #2563eb; }
+.ewb4-ctrl .name.y { color: #ea580c; }
+.ewb4-ctrl input[type=range] { flex: 1; min-width: 0; }
+.ewb4-ctrl input[type=number] { width: 60px; font-family: var(--font-mono); font-size: 13px; }
+.ewb4-plane-wrap { display: flex; justify-content: center; padding: 0.5rem 0; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 0.55rem; }
+.ewb4-plane { width: 100%; max-width: 440px; height: auto; display: block; color: var(--color-text-primary); }
+.ewb4-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.7rem; }
+.ewb4-status { font-family: var(--font-sans); font-size: 13px; line-height: 1.65; color: var(--color-text-secondary); padding: 0.7rem 0.95rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); margin-top: 0.55rem; }
+.ewb4-status em { font-style: italic; color: var(--color-text-primary); }
+.ewb4-status .reveal { color: #7c3aed; font-weight: 500; }
+.ewb4-dot { transition: cx 0.18s ease, cy 0.18s ease; }
+.ewb4-dot.t-slow { transition: cx 0.6s cubic-bezier(0.4, 0, 0.2, 1), cy 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.ewb4-fadeable { transition: opacity 0.45s ease; }
+.ewb4.collapsed .ewb4-fadeable { opacity: 0.12; }
+.ewb4-nl { transition: opacity 0.45s ease; opacity: 0.4; }
+.ewb4.collapsed .ewb4-nl { opacity: 1; }
+@media (max-width: 480px) { .ewb4-controls { grid-template-columns: 1fr; } }
+</style>
+<h2 class="sr-only">Interactive widget showing how a 2D plane of (x, y) coordinates, once scaled by coefficients, collapses to a 1D number line where each point lands at its summed value ax + by.</h2>
+<div class="ewb4" id="ewb4-root">
+  <div class="ewb4-card">
+    <div class="ewb4-label">Equation coefficients</div>
+    <div class="ewb4-eq" id="ewb4-eq"></div>
+    <div class="ewb4-controls">
+      <div class="ewb4-ctrl"><span class="name x">x</span><input type="range" id="ewb4-a" min="-4" max="4" step="0.5" value="1"><input type="number" id="ewb4-aNum" min="-4" max="4" step="0.5" value="1"></div>
+      <div class="ewb4-ctrl"><span class="name y">y</span><input type="range" id="ewb4-b" min="-4" max="4" step="0.5" value="-1"><input type="number" id="ewb4-bNum" min="-4" max="4" step="0.5" value="-1"></div>
+    </div>
+    <div class="ewb4-buttons">
+      <button id="ewb4-toggle">Collapse to 1D line</button>
+      <button id="ewb4-btnRst">Reset</button>
+    </div>
+  </div>
+  <div class="ewb4-plane-wrap">
+    <svg class="ewb4-plane" viewBox="0 0 400 460" aria-label="Coordinate plane with 1D number line below">
+      <defs><clipPath id="ewb4-clip"><rect x="30" y="20" width="340" height="340"/></clipPath></defs>
+      <g class="ewb4-fadeable">
+        <g id="ewb4-origGrid" stroke="currentColor" stroke-opacity="0.07" stroke-width="1"></g>
+        <g clip-path="url(#ewb4-clip)" id="ewb4-transGrid"></g>
+      </g>
+      <line id="ewb4-axisX" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.2"/>
+      <line id="ewb4-axisY" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.2"/>
+      <g id="ewb4-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.5"></g>
+      <g class="ewb4-fadeable">
+        <rect id="ewb4-origSquare" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1" stroke-dasharray="3,2.5"/>
+        <g clip-path="url(#ewb4-clip)">
+          <polygon id="ewb4-transSquare" fill="#16a34a" fill-opacity="0.12" stroke="#16a34a" stroke-width="1.5" stroke-opacity="0.55"/>
+        </g>
+      </g>
+      <g class="ewb4-nl">
+        <line id="ewb4-nlLine" stroke="currentColor" stroke-width="1.5"/>
+        <g id="ewb4-nlTicks" stroke="currentColor" stroke-width="1"></g>
+        <g id="ewb4-nlLabels" font-family="system-ui, sans-serif" font-size="10" fill="currentColor"></g>
+      </g>
+      <g id="ewb4-dots"></g>
+    </svg>
+  </div>
+  <div class="ewb4-status" id="ewb4-status"></div>
+</div>
+<script>
+(function(){
+  const X_MIN = -8, X_MAX = 8, Y_MIN = -8, Y_MAX = 8;
+  const NL_MIN = -16, NL_MAX = 16;
+  const PA = { x: 30, y: 20, w: 340, h: 340 };
+  const NL_Y = 410;
+  const sx2D = mx => PA.x + (mx - X_MIN)/(X_MAX - X_MIN) * PA.w;
+  const sy2D = my => PA.y + (Y_MAX - my)/(Y_MAX - Y_MIN) * PA.h;
+  const sxNL = v => PA.x + (v - NL_MIN)/(NL_MAX - NL_MIN) * PA.w;
+  const $ = id => document.getElementById(id);
+  function setAttrs(el, o){ for (const k in o) el.setAttribute(k, o[k]); }
+  const SAMPLES = [];
+  for (let x = -2; x <= 2; x++) for (let y = -2; y <= 2; y++) SAMPLES.push({ ox: x, oy: y });
+  let og = '';
+  for (let i = X_MIN; i <= X_MAX; i++) if (i !== 0) og += `<line x1="${sx2D(i)}" y1="${sy2D(Y_MIN)}" x2="${sx2D(i)}" y2="${sy2D(Y_MAX)}"/>`;
+  for (let i = Y_MIN; i <= Y_MAX; i++) if (i !== 0) og += `<line x1="${sx2D(X_MIN)}" y1="${sy2D(i)}" x2="${sx2D(X_MAX)}" y2="${sy2D(i)}"/>`;
+  $('ewb4-origGrid').innerHTML = og;
+  setAttrs($('ewb4-axisX'), { x1: sx2D(X_MIN), y1: sy2D(0), x2: sx2D(X_MAX), y2: sy2D(0) });
+  setAttrs($('ewb4-axisY'), { x1: sx2D(0), y1: sy2D(Y_MIN), x2: sx2D(0), y2: sy2D(Y_MAX) });
+  let th = '';
+  for (let i = X_MIN; i <= X_MAX; i += 2) if (i !== 0) th += `<text x="${sx2D(i)}" y="${sy2D(0)+13}" text-anchor="middle">${i}</text>`;
+  for (let i = Y_MIN; i <= Y_MAX; i += 2) if (i !== 0) th += `<text x="${sx2D(0)-6}" y="${sy2D(i)+3.5}" text-anchor="end">${i}</text>`;
+  $('ewb4-ticks').innerHTML = th;
+  setAttrs($('ewb4-origSquare'), { x: sx2D(0), y: sy2D(1), width: sx2D(1)-sx2D(0), height: sy2D(0)-sy2D(1) });
+  setAttrs($('ewb4-nlLine'), { x1: sxNL(NL_MIN), y1: NL_Y, x2: sxNL(NL_MAX), y2: NL_Y });
+  let nlt = '', nll = '';
+  for (let v = NL_MIN; v <= NL_MAX; v += 2) {
+    const xv = sxNL(v);
+    nlt += `<line x1="${xv}" y1="${NL_Y - 4}" x2="${xv}" y2="${NL_Y + 4}"/>`;
+    if (v % 4 === 0) nll += `<text x="${xv}" y="${NL_Y + 18}" text-anchor="middle">${v}</text>`;
+  }
+  $('ewb4-nlTicks').innerHTML = nlt;
+  $('ewb4-nlLabels').innerHTML = nll;
+  let dh = '';
+  SAMPLES.forEach((s, i) => {
+    dh += `<circle id="ewb4-dot-${i}" class="ewb4-dot" cx="${sx2D(2*s.ox)}" cy="${sy2D(-1*s.oy)}" r="4.5" fill="#7c3aed" fill-opacity="0.6" stroke="#fff" stroke-width="0.7"/>`;
+  });
+  $('ewb4-dots').innerHTML = dh;
+  let collapsed = false;
+  function fmt(n){ return Number.isInteger(n) ? String(n) : (Math.round(n*100)/100).toString(); }
+  function term(coef, varName, first){
+    const cls = varName === 'x' ? 'x' : 'y';
+    if (coef === 0){
+      return first ? `<span class="${cls} zero">0<span class="var">${varName}</span></span>` : `<span class="op">+</span><span class="${cls} zero">0<span class="var">${varName}</span></span>`;
+    }
+    const sign = coef < 0 ? '\u2212' : (first ? '' : '+');
+    const mag = Math.abs(coef);
+    const num = mag === 1 ? '' : fmt(mag);
+    if (first) return `<span class="${cls}">${sign}${num}<span class="var">${varName}</span></span>`;
+    return `<span class="op">${sign}</span><span class="${cls}">${num}<span class="var">${varName}</span></span>`;
+  }
+  function update(){
+    const a = +$('ewb4-a').value, b = +$('ewb4-b').value;
+    $('ewb4-aNum').value = a; $('ewb4-bNum').value = b;
+    $('ewb4-eq').innerHTML = term(a,'x',true) + ' ' + term(b,'y',false);
+    let html = '';
+    if (Math.abs(a) > 1e-9){
+      const maxK = Math.max(2, Math.ceil(X_MAX / Math.abs(a)) + 2);
+      for (let k = -maxK; k <= maxK; k++){ if (k === 0) continue; const x = a*k; html += `<line x1="${sx2D(x)}" y1="${sy2D(Y_MIN)}" x2="${sx2D(x)}" y2="${sy2D(Y_MAX)}" stroke="#2563eb" stroke-opacity="0.3" stroke-width="1.2"/>`; }
+    }
+    if (Math.abs(b) > 1e-9){
+      const maxK = Math.max(2, Math.ceil(Y_MAX / Math.abs(b)) + 2);
+      for (let k = -maxK; k <= maxK; k++){ if (k === 0) continue; const y = b*k; html += `<line x1="${sx2D(X_MIN)}" y1="${sy2D(y)}" x2="${sx2D(X_MAX)}" y2="${sy2D(y)}" stroke="#ea580c" stroke-opacity="0.3" stroke-width="1.2"/>`; }
+    }
+    $('ewb4-transGrid').innerHTML = html;
+    const pts = [[sx2D(0),sy2D(0)], [sx2D(a),sy2D(0)], [sx2D(a),sy2D(b)], [sx2D(0),sy2D(b)]];
+    $('ewb4-transSquare').setAttribute('points', pts.map(p => p.join(',')).join(' '));
+    SAMPLES.forEach((s, i) => {
+      const dot = $(`ewb4-dot-${i}`);
+      if (collapsed){ const v = a*s.ox + b*s.oy; setAttrs(dot, { cx: sxNL(v), cy: NL_Y }); }
+      else { setAttrs(dot, { cx: sx2D(a*s.ox), cy: sy2D(b*s.oy) }); }
+    });
+    updateStatus(a, b);
+    resizeFrame();
+  }
+  function updateStatus(a, b){
+    let msg = '';
+    if (collapsed){
+      const values = new Set();
+      SAMPLES.forEach(s => values.add(a*s.ox + b*s.oy));
+      const ex = `(3, 4) lands at <em>${fmt(3*a + 4*b)}</em>`;
+      msg = `The 2D plane has collapsed onto a 1D line. Each <em>(x, y)</em> projects to <em>${fmt(a)}x + ${fmt(b)}y</em>. The ${SAMPLES.length} sample points landed on <em>${values.size}</em> distinct values \u2014 dots that stack are points lying on the same line <em>ax + by = c</em>. For example, ${ex}.`;
+    } else {
+      const ex = `(3, 4) goes to (${fmt(3*a)}, ${fmt(4*b)})`;
+      msg = `Every <em>(x, y)</em> is dragged to <em>(${fmt(a)}x, ${fmt(b)}y)</em>. The 25 purple dots are integer sample points being transformed \u2014 e.g. ${ex}. <span class="reveal">Press \u201cCollapse to 1D line\u201d to sum each pair into a single value.</span>`;
+    }
+    $('ewb4-status').innerHTML = msg;
+  }
+  function setVals(a, b){ $('ewb4-a').value = a; $('ewb4-b').value = b; update(); resizeFrame(); }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.max(
+      document.body.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.scrollHeight,
+      document.documentElement.offsetHeight
+    );
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+  function toggleCollapse(){
+    collapsed = !collapsed;
+    const dots = document.querySelectorAll('.ewb4-dot');
+    dots.forEach(d => d.classList.add('t-slow'));
+    $('ewb4-root').classList.toggle('collapsed', collapsed);
+    $('ewb4-toggle').textContent = collapsed ? 'Expand back to 2D' : 'Collapse to 1D line';
+    update();
+    resizeFrame();
+    setTimeout(() => dots.forEach(d => d.classList.remove('t-slow')), 750);
+  }
+  $('ewb4-a').addEventListener('input', update);
+  $('ewb4-b').addEventListener('input', update);
+  $('ewb4-aNum').addEventListener('input', () => { $('ewb4-a').value = $('ewb4-aNum').value; update(); });
+  $('ewb4-bNum').addEventListener('input', () => { $('ewb4-b').value = $('ewb4-bNum').value; update(); });
+  $('ewb4-toggle').addEventListener('click', toggleCollapse);
+  $('ewb4-btnRst').addEventListener('click', () => setVals(1, -1));
+  update();
+  resizeFrame();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>

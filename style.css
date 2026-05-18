@@ -759,6 +759,14 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 560px;
 }
 
+.essay-widget-collapse-line {
+  height: 760px;
+}
+
+.essay-widget-constant-line {
+  height: 760px;
+}
+
 .line-constraint-widget {
   height: 900px;
 }
@@ -918,6 +926,10 @@ header {
   .essay-widget,
   .essay-widget-chart,
   .essay-widget-tall { height: 620px; }
+
+  .essay-widget-collapse-line { height: 820px; }
+
+  .essay-widget-constant-line { height: 820px; }
 
   .line-constraint-widget { height: 1120px; }
 

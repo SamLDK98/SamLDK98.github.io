@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Constant value lifting into a solution line</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --paper: #fdfcf8;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --border: #e5e3dc;
+  --accent: #c8102e;
+  --purple: #7c3aed;
+  --blue: #2563eb;
+  --orange: #ea580c;
+  --green: #16a34a;
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  padding: 0 1rem 1rem;
+}
+
+.constant-widget {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem 0;
+  font-family: Georgia, "Cambria", "Times New Roman", serif;
+}
+
+.constant-card {
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.constant-label {
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.constant-equation {
+  min-height: 1.35em;
+  margin-bottom: 0.7rem;
+  font-family: Georgia, serif;
+  font-size: 25px;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.constant-equation .x {
+  color: var(--blue);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.constant-equation .y {
+  color: var(--orange);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.constant-equation .c {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.constant-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.constant-range {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.constant-range span {
+  min-width: 16px;
+  color: var(--accent);
+  font-family: Georgia, serif;
+  font-size: 17px;
+  font-style: italic;
+}
+
+input[type=range] {
+  flex: 1;
+  min-width: 0;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+input[type=range]::-moz-range-track {
+  height: 4px;
+  border: none;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+input[type=range]::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border: none;
+  border-radius: 50%;
+  background: var(--ink);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type=range]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: var(--ink);
+  cursor: pointer;
+}
+
+input[type=number] {
+  width: 62px;
+  padding: 0.36rem 0.42rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+button {
+  padding: 0.42rem 0.62rem;
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+button:hover,
+button:focus-visible {
+  border-color: var(--ink);
+  background: var(--card);
+}
+
+.constant-plane-wrap {
+  margin-bottom: 0.55rem;
+  padding: 0.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.constant-plane {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.grid-line {
+  stroke: currentColor;
+  stroke-opacity: 0.075;
+  stroke-width: 1;
+}
+
+.axis-line {
+  stroke: currentColor;
+  stroke-opacity: 0.48;
+  stroke-width: 1.2;
+}
+
+.constant-point,
+.sample-dot,
+.reference-dot {
+  transition: cx 180ms ease, cy 180ms ease;
+}
+
+.solution-line,
+.lift-ray,
+.distance-line {
+  transition: opacity 180ms ease;
+}
+
+.lift-ray {
+  stroke: var(--accent);
+  stroke-width: 1.1;
+  stroke-opacity: 0.25;
+  fill: none;
+}
+
+.solution-line {
+  stroke: var(--green);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.distance-line {
+  stroke: var(--purple);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.constant-status {
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.constant-status em {
+  color: var(--ink);
+  font-style: italic;
+}
+
+.constant-status strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .constant-controls {
+    grid-template-columns: 1fr auto;
+  }
+
+  .constant-range {
+    grid-column: 1 / -1;
+  }
+}
+</style>
+</head>
+<body>
+<div class="constant-widget">
+  <div class="constant-card">
+    <div class="constant-label">Constant value</div>
+    <div class="constant-equation" id="constant-equation"></div>
+    <div class="constant-controls">
+      <label class="constant-range">
+        <span>c</span>
+        <input id="constant-slider" type="range" min="-6" max="6" step="0.5" value="2">
+      </label>
+      <input id="constant-number" type="number" min="-6" max="6" step="0.5" value="2" aria-label="Constant value">
+      <button id="constant-replay" type="button">Replay lift</button>
+    </div>
+  </div>
+
+  <div class="constant-plane-wrap">
+    <svg class="constant-plane" viewBox="0 0 420 520" aria-label="A constant point on a number line lifting into a two dimensional solution line">
+      <defs>
+        <clipPath id="constant-plane-clip">
+          <rect x="48" y="28" width="324" height="324"></rect>
+        </clipPath>
+      </defs>
+
+      <g id="constant-grid"></g>
+      <line id="constant-axis-x" class="axis-line"></line>
+      <line id="constant-axis-y" class="axis-line"></line>
+      <g id="constant-axis-labels" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.55"></g>
+
+      <g id="constant-rays"></g>
+      <path id="constant-solution-line" class="solution-line" clip-path="url(#constant-plane-clip)"></path>
+      <g id="constant-samples"></g>
+
+      <line id="constant-number-line" class="axis-line"></line>
+      <g id="constant-number-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.58"></g>
+      <line id="constant-distance-line" class="distance-line"></line>
+      <text id="constant-distance-label" font-family="system-ui, sans-serif" font-size="11" fill="#7c3aed" text-anchor="middle"></text>
+      <circle id="constant-c-point" class="constant-point" r="6.5" fill="#c8102e"></circle>
+      <text id="constant-c-label" font-family="system-ui, sans-serif" font-size="11" fill="#c8102e" text-anchor="middle"></text>
+      <circle id="constant-reference-point" class="reference-dot" r="5" fill="#7c3aed" fill-opacity="0.74"></circle>
+      <text id="constant-reference-label" font-family="system-ui, sans-serif" font-size="11" fill="#7c3aed" text-anchor="middle"></text>
+    </svg>
+  </div>
+
+  <div class="constant-status" id="constant-status"></div>
+</div>
+
+<script>
+(function(){
+  const X_MIN = -6;
+  const X_MAX = 6;
+  const Y_MIN = -6;
+  const Y_MAX = 6;
+  const C_MIN = -6;
+  const C_MAX = 6;
+  const LINE_MIN = -8;
+  const LINE_MAX = 8;
+  const OUTPUT_VALUE = 4;
+  const PA = { x: 48, y: 28, w: 324, h: 324 };
+  const NL_Y = 438;
+  const EPS = 1e-7;
+
+  const $ = id => document.getElementById(id);
+  const sx = x => PA.x + ((x - X_MIN) / (X_MAX - X_MIN)) * PA.w;
+  const sy = y => PA.y + ((Y_MAX - y) / (Y_MAX - Y_MIN)) * PA.h;
+  const sxLine = value => PA.x + ((value - LINE_MIN) / (LINE_MAX - LINE_MIN)) * PA.w;
+  const fmt = value => Number.isInteger(value) ? String(value) : String(Math.round(value * 100) / 100);
+
+  function setAttrs(el, attrs) {
+    Object.keys(attrs).forEach(key => el.setAttribute(key, attrs[key]));
+  }
+
+  function buildStaticPlane() {
+    let grid = "";
+    let labels = "";
+
+    for (let x = X_MIN; x <= X_MAX; x++) {
+      if (x !== 0) {
+        grid += `<line class="grid-line" x1="${sx(x)}" y1="${sy(Y_MIN)}" x2="${sx(x)}" y2="${sy(Y_MAX)}"></line>`;
+      }
+    }
+
+    for (let y = Y_MIN; y <= Y_MAX; y++) {
+      if (y !== 0) {
+        grid += `<line class="grid-line" x1="${sx(X_MIN)}" y1="${sy(y)}" x2="${sx(X_MAX)}" y2="${sy(y)}"></line>`;
+      }
+    }
+
+    for (let x = X_MIN; x <= X_MAX; x += 2) {
+      if (x !== 0) {
+        labels += `<text x="${sx(x)}" y="${sy(0) + 14}" text-anchor="middle">${x}</text>`;
+      }
+    }
+
+    for (let y = Y_MIN; y <= Y_MAX; y += 2) {
+      if (y !== 0) {
+        labels += `<text x="${sx(0) - 7}" y="${sy(y) + 3.5}" text-anchor="end">${y}</text>`;
+      }
+    }
+
+    $("constant-grid").innerHTML = grid;
+    $("constant-axis-labels").innerHTML = labels;
+    setAttrs($("constant-axis-x"), { x1: sx(X_MIN), y1: sy(0), x2: sx(X_MAX), y2: sy(0) });
+    setAttrs($("constant-axis-y"), { x1: sx(0), y1: sy(Y_MIN), x2: sx(0), y2: sy(Y_MAX) });
+    setAttrs($("constant-number-line"), { x1: sxLine(LINE_MIN), y1: NL_Y, x2: sxLine(LINE_MAX), y2: NL_Y });
+
+    let ticks = "";
+    for (let value = LINE_MIN; value <= LINE_MAX; value += 2) {
+      const x = sxLine(value);
+      ticks += `<line x1="${x}" y1="${NL_Y - 5}" x2="${x}" y2="${NL_Y + 5}" stroke="currentColor" stroke-opacity="0.55"></line>`;
+      ticks += `<text x="${x}" y="${NL_Y + 22}" text-anchor="middle">${value}</text>`;
+    }
+    $("constant-number-ticks").innerHTML = ticks;
+  }
+
+  function lineSegmentForConstant(c) {
+    const candidates = [];
+    const add = (x, y) => {
+      if (x >= X_MIN - EPS && x <= X_MAX + EPS && y >= Y_MIN - EPS && y <= Y_MAX + EPS) {
+        candidates.push({ x, y });
+      }
+    };
+
+    add(X_MIN, X_MIN - c);
+    add(X_MAX, X_MAX - c);
+    add(Y_MIN + c, Y_MIN);
+    add(Y_MAX + c, Y_MAX);
+
+    const unique = [];
+    candidates.forEach(point => {
+      const exists = unique.some(other => Math.abs(other.x - point.x) < EPS && Math.abs(other.y - point.y) < EPS);
+      if (!exists) unique.push(point);
+    });
+
+    if (unique.length < 2) {
+      return [{ x: c, y: 0 }, { x: c, y: 0 }];
+    }
+
+    return [unique[0], unique[1]];
+  }
+
+  function samplePointsForConstant(c) {
+    const points = [];
+    const start = Math.max(X_MIN, Y_MIN + c);
+    const end = Math.min(X_MAX, Y_MAX + c);
+
+    for (let i = 0; i < 5; i++) {
+      const t = i / 4;
+      const x = start + (end - start) * t;
+      points.push({ x, y: x - c });
+    }
+
+    return points;
+  }
+
+  function animatePath(path) {
+    const length = path.getTotalLength();
+    path.style.transition = "none";
+    path.style.strokeDasharray = length;
+    path.style.strokeDashoffset = length;
+    path.getBoundingClientRect();
+    path.style.transition = "stroke-dashoffset 680ms cubic-bezier(0.4, 0, 0.2, 1)";
+    path.style.strokeDashoffset = "0";
+  }
+
+  function resizeFrame() {
+    if (!window.frameElement) return;
+    const height = Math.max(
+      document.body.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.scrollHeight,
+      document.documentElement.offsetHeight
+    );
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+
+  function update(replay) {
+    const c = Number($("constant-slider").value);
+    $("constant-number").value = c;
+    $("constant-equation").innerHTML = `<span class="x">x</span> - <span class="y">y</span> = <span class="c">${fmt(c)}</span>`;
+
+    const [start, end] = lineSegmentForConstant(c);
+    const line = $("constant-solution-line");
+    line.setAttribute("d", `M ${sx(start.x)} ${sy(start.y)} L ${sx(end.x)} ${sy(end.y)}`);
+
+    const numberX = sxLine(c);
+    setAttrs($("constant-c-point"), { cx: numberX, cy: NL_Y });
+    setAttrs($("constant-reference-point"), { cx: sxLine(OUTPUT_VALUE), cy: NL_Y });
+    setAttrs($("constant-distance-line"), {
+      x1: Math.min(numberX, sxLine(OUTPUT_VALUE)),
+      y1: NL_Y - 18,
+      x2: Math.max(numberX, sxLine(OUTPUT_VALUE)),
+      y2: NL_Y - 18
+    });
+    $("constant-c-label").setAttribute("x", numberX);
+    $("constant-c-label").setAttribute("y", NL_Y - 14);
+    $("constant-c-label").textContent = `c = ${fmt(c)}`;
+    $("constant-reference-label").setAttribute("x", sxLine(OUTPUT_VALUE));
+    $("constant-reference-label").setAttribute("y", NL_Y + 42);
+    $("constant-reference-label").textContent = "(12, -8) -> 4";
+
+    const distance = OUTPUT_VALUE - c;
+    $("constant-distance-label").setAttribute("x", (numberX + sxLine(OUTPUT_VALUE)) / 2);
+    $("constant-distance-label").setAttribute("y", NL_Y - 28);
+    $("constant-distance-label").textContent = `distance ${distance >= 0 ? "+" : ""}${fmt(distance)}`;
+
+    const samples = samplePointsForConstant(c);
+    const center = { x: c / 2, y: -c / 2 };
+    const rays = samples.map(point => {
+      return `<path class="lift-ray" d="M ${numberX} ${NL_Y} L ${sx(point.x)} ${sy(point.y)}"></path>`;
+    }).join("");
+
+    const dots = samples.map(point => {
+      return `<circle class="sample-dot" cx="${sx(point.x)}" cy="${sy(point.y)}" r="4.5" fill="#16a34a" fill-opacity="0.8" stroke="#fff" stroke-width="0.8"></circle>`;
+    }).join("") + `<circle class="sample-dot" cx="${sx(center.x)}" cy="${sy(center.y)}" r="6" fill="#c8102e" fill-opacity="0.86" stroke="#fff" stroke-width="1"></circle>`;
+
+    $("constant-rays").innerHTML = rays;
+    $("constant-samples").innerHTML = dots;
+    $("constant-status").innerHTML = `The point <strong>${fmt(c)}</strong> on the number line lifts into the full 2D line <em>x - y = ${fmt(c)}</em>. Every coordinate on that line collapses back to <em>${fmt(c)}</em>. The earlier point lands at <em>4</em>, so its distance from this constant is <em>${distance >= 0 ? "+" : ""}${fmt(distance)}</em>.`;
+
+    if (replay) {
+      animatePath(line);
+      document.querySelectorAll(".lift-ray").forEach(animatePath);
+    }
+
+    resizeFrame();
+  }
+
+  buildStaticPlane();
+  $("constant-slider").addEventListener("input", () => update(true));
+  $("constant-number").addEventListener("input", () => {
+    const value = Math.max(C_MIN, Math.min(C_MAX, Number($("constant-number").value)));
+    $("constant-slider").value = value;
+    update(true);
+  });
+  $("constant-replay").addEventListener("click", () => update(true));
+  update(true);
+  window.addEventListener("load", resizeFrame);
+  window.addEventListener("resize", resizeFrame);
+})();
+</script>
+</body>
+</html>
