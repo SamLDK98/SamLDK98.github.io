@@ -767,6 +767,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
+.essay-widget-input-output {
+  height: 900px;
+}
+
 .line-constraint-widget {
   height: 900px;
 }
@@ -930,6 +934,8 @@ header {
   .essay-widget-collapse-line { height: 820px; }
 
   .essay-widget-constant-line { height: 820px; }
+
+  .essay-widget-input-output { height: 1120px; }
 
   .line-constraint-widget { height: 1120px; }
 

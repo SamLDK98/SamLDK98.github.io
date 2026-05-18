@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Systems of equations as collapses into a new space</title>
+<style>
+  :root{
+    --bg:#fdfcf8; --card:#fff; --ink:#1a1a1a; --muted:#787264; --line:#e5e1d7;
+    --soft:#faf8f1; --blue:#2563eb; --orange:#ea580c; --purple:#7c3aed; --green:#16a34a; --red:#dc2626;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Georgia,'Cambria','Times New Roman',serif;line-height:1.45}
+  body{padding:1.25rem}
+  .sysw{max-width:1060px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1rem 1.15rem;margin-bottom:.75rem}
+  .label{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+  h1{font-size:1.45rem;margin:.15rem 0 .45rem;font-weight:500}
+  .intro{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#4a4a4a;font-size:.92rem;margin:.2rem 0 0;max-width:850px}
+  .equations{display:flex;gap:1.2rem;align-items:flex-start;flex-wrap:wrap;margin:.5rem 0 .25rem}
+  .eqBox{font-size:1.45rem;line-height:1.55;min-width:260px;font-style:italic}
+  .eqBox .blue{color:var(--blue);font-style:normal;font-weight:600}.eqBox .orange{color:var(--orange);font-style:normal;font-weight:600}.eqBox .const{color:var(--purple);font-style:normal;font-weight:600}
+  .controls{display:grid;grid-template-columns:repeat(6,minmax(74px,1fr));gap:.55rem;flex:1;min-width:460px}
+  .ctrl{display:flex;flex-direction:column;gap:.2rem;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:12px;color:var(--muted)}
+  .ctrl input{width:100%;padding:.35rem .4rem;border:1px solid #c8c4b5;border-radius:6px;background:#fff;color:var(--ink);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px}
+  .ctrl input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 2px rgba(26,26,26,.12)}
+  .buttons{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.75rem}
+  button{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px;cursor:pointer;padding:.45rem .75rem;background:#fff;border:1px solid #c8c4b5;border-radius:7px;color:var(--ink);transition:background .12s ease,border-color .12s ease,transform .08s ease}
+  button:hover{background:#f5f3eb;border-color:#a8a496}button:active{transform:scale(.985)}button.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+  .stageBtns{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin-top:.7rem}
+  .stageBtns button{text-align:left;padding:.55rem .65rem}.stageBtns span{display:block;font-size:11px;color:inherit;opacity:.68;margin-top:.12rem}
+  .vizWrap{background:#fff;border:1px solid var(--line);border-radius:10px;padding:.55rem;overflow:hidden}
+  svg{display:block;width:100%;height:auto;color:var(--ink)}
+  .status{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px;line-height:1.65;color:#4a4a4a;padding:.75rem .95rem;background:var(--soft);border-radius:8px;margin-top:.75rem}.status em{color:var(--ink)}.status strong{color:var(--ink)}
+  .small{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:11px;fill:#6d675a}.axisLbl{font-family:Georgia,serif;font-style:italic;font-size:16px;fill:#1a1a1a}.mathLbl{font-family:Georgia,serif;font-style:italic;font-size:14px;fill:#1a1a1a}.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;fill:#4a4a4a}
+  .fade{transition:opacity .45s ease}.dot{transition:cx .75s cubic-bezier(.4,0,.2,1),cy .75s cubic-bezier(.4,0,.2,1),opacity .45s ease,r .25s ease}.target,.solution{transition:cx .75s cubic-bezier(.4,0,.2,1),cy .75s cubic-bezier(.4,0,.2,1),opacity .45s ease}.line{transition:opacity .45s ease,stroke-width .25s ease}
+  .hidden{opacity:0;pointer-events:none}.muted{opacity:.16}.visible{opacity:1}
+  @media(max-width:760px){.controls{grid-template-columns:repeat(3,1fr);min-width:100%}.stageBtns{grid-template-columns:1fr}.eqBox{font-size:1.25rem}}
+</style>
+</head>
+<body>
+<div class="sysw" id="sysw-root">
+  <div class="card">
+    <div class="label">System of equations</div>
+    <h1>Two collapses becoming a new output space</h1>
+    <p class="intro">Edit the coefficients and constants. The widget treats each equation as a separate scalar collapse. The two scalar outputs are then used as coordinates in a new 2D space.</p>
+    <div class="equations">
+      <div class="eqBox" id="eqDisplay"></div>
+      <div class="controls">
+        <label class="ctrl">a₁ <input type="number" step="0.5" id="a1" value="4"></label>
+        <label class="ctrl">b₁ <input type="number" step="0.5" id="b1" value="-2"></label>
+        <label class="ctrl">c₁ <input type="number" step="0.5" id="c1" value="2"></label>
+        <label class="ctrl">a₂ <input type="number" step="0.5" id="a2" value="2"></label>
+        <label class="ctrl">b₂ <input type="number" step="0.5" id="b2" value="4"></label>
+        <label class="ctrl">c₂ <input type="number" step="0.5" id="c2" value="16"></label>
+      </div>
+    </div>
+    <div class="buttons">
+      <button id="presetArticle">Article example</button>
+      <button id="presetIdentity">Identity</button>
+      <button id="presetSingular">Dependent equations</button>
+      <button id="presetInconsistent">No solution</button>
+      <button id="playBtn">Run sequence</button>
+    </div>
+    <div class="stageBtns">
+      <button data-stage="0" class="active">1. Original space<span>all possible (x,y)</span></button>
+      <button data-stage="1">2. Two collapses<span>E₁ and E₂ become separate lines</span></button>
+      <button data-stage="2">3. Lines become axes<span>outputs form a new coordinate space</span></button>
+      <button data-stage="3">4. Constants go backward<span>target output reveals solution set</span></button>
+    </div>
+  </div>
+
+  <div class="vizWrap">
+    <svg viewBox="0 0 1000 620" aria-label="Interactive system of equations transformation widget">
+      <defs>
+        <clipPath id="clipIn"><rect x="40" y="70" width="390" height="390"/></clipPath>
+        <clipPath id="clipOut"><rect x="570" y="70" width="390" height="390"/></clipPath>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8678"/></marker>
+      </defs>
+
+      <text x="235" y="35" text-anchor="middle" class="axisLbl">input space</text>
+      <text x="765" y="35" text-anchor="middle" class="axisLbl" id="rightTitle">output view</text>
+      <text x="235" y="55" text-anchor="middle" class="small">all possible (x, y) coordinates</text>
+      <text x="765" y="55" text-anchor="middle" class="small" id="rightSubtitle">collapses and output coordinates appear here</text>
+
+      <rect x="40" y="70" width="390" height="390" fill="#fff" stroke="#e5e1d7"/>
+      <rect x="570" y="70" width="390" height="390" fill="#fff" stroke="#e5e1d7"/>
+      <g id="gridIn"></g>
+      <g id="gridOut"></g>
+      <g id="inputEqLines" clip-path="url(#clipIn)"></g>
+      <g id="outputGrid" clip-path="url(#clipOut)"></g>
+      <g id="sampleDots"></g>
+      <g id="collapseLines"></g>
+      <g id="outputDots"></g>
+      <g id="basisVectors"></g>
+      <g id="targetGroup"></g>
+      <g id="solutionGroup"></g>
+      <g id="axisLabels"></g>
+      <g id="callouts"></g>
+    </svg>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const inputs = ['a1','b1','c1','a2','b2','c2'].map($);
+  const LIM = 6;
+  const IN = {x:40,y:70,w:390,h:390};
+  const OUT = {x:570,y:70,w:390,h:390};
+  const sample = [];
+  for(let x=-3;x<=3;x++) for(let y=-3;y<=3;y++) sample.push({x,y});
+  let stage = 0, timer = null;
+
+  function val(id){ return +$(id).value || 0; }
+  function coeffs(){ return {a1:val('a1'),b1:val('b1'),c1:val('c1'),a2:val('a2'),b2:val('b2'),c2:val('c2')}; }
+  function fmt(n){ if(!Number.isFinite(n)) return '—'; if(Math.abs(n)<1e-10) n=0; return Number.isInteger(n)?String(n):(Math.round(n*100)/100).toString(); }
+  function term(a,v,first){
+    if(Math.abs(a)<1e-10) return first?`<span style="opacity:.38">0${v}</span>`:` <span style="opacity:.38">+ 0${v}</span>`;
+    const sign = a<0 ? '−' : (first?'':'+');
+    const mag = Math.abs(a); const num = mag===1?'':fmt(mag);
+    return `${first?'':' '}<span>${sign}${first&&sign==='−'?'':''}</span>${!first&&sign? ' ':''}<span class="${v==='x'?'blue':'orange'}">${first&&sign==='−'?'': ''}${num}${v}</span>`;
+  }
+  function eqHTML(m){
+    return `<div>${term(m.a1,'x',true)} ${term(m.b1,'y',false)} <span>=</span> <span class="const">${fmt(m.c1)}</span></div>
+            <div>${term(m.a2,'x',true)} ${term(m.b2,'y',false)} <span>=</span> <span class="const">${fmt(m.c2)}</span></div>`;
+  }
+  function sx(box,x,min=-LIM,max=LIM){ return box.x + (x-min)/(max-min)*box.w; }
+  function sy(box,y,min=-LIM,max=LIM){ return box.y + (max-y)/(max-min)*box.h; }
+  function setAttrs(el,o){ for(const k in o) el.setAttribute(k,o[k]); }
+  function lineHTML(x1,y1,x2,y2,attrs=''){ return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${attrs}/>`; }
+  function textHTML(x,y,t,attrs=''){ return `<text x="${x}" y="${y}" ${attrs}>${t}</text>`; }
+  function clear(id){ $(id).innerHTML=''; }
+
+  function drawStaticGrid(){
+    let g='';
+    for(let i=-LIM;i<=LIM;i++){
+      const strong = i===0;
+      g += lineHTML(sx(IN,i), sy(IN,-LIM), sx(IN,i), sy(IN,LIM), `stroke="#1a1a1a" stroke-opacity="${strong?.42:.08}" stroke-width="${strong?1.25:1}"`);
+      g += lineHTML(sx(IN,-LIM), sy(IN,i), sx(IN,LIM), sy(IN,i), `stroke="#1a1a1a" stroke-opacity="${strong?.42:.08}" stroke-width="${strong?1.25:1}"`);
+      if(i!==0 && i%2===0){
+        g += textHTML(sx(IN,i), sy(IN,0)+14, i, 'text-anchor="middle" class="small"');
+        g += textHTML(sx(IN,0)-7, sy(IN,i)+4, i, 'text-anchor="end" class="small"');
+      }
+    }
+    $('gridIn').innerHTML = g;
+  }
+  function drawOutputAxes(min,max){
+    let g='';
+    for(let i=Math.ceil(min);i<=Math.floor(max);i++){
+      if(i%5!==0 && i!==0) continue;
+      const strong = i===0;
+      g += lineHTML(sx(OUT,i,min,max), sy(OUT,min,min,max), sx(OUT,i,min,max), sy(OUT,max,min,max), `stroke="#1a1a1a" stroke-opacity="${strong?.42:.06}" stroke-width="${strong?1.25:1}"`);
+      g += lineHTML(sx(OUT,min,min,max), sy(OUT,i,min,max), sx(OUT,max,min,max), sy(OUT,i,min,max), `stroke="#1a1a1a" stroke-opacity="${strong?.42:.06}" stroke-width="${strong?1.25:1}"`);
+      if(i!==0){
+        g += textHTML(sx(OUT,i,min,max), sy(OUT,0,min,max)+14, i, 'text-anchor="middle" class="small"');
+        g += textHTML(sx(OUT,0,min,max)-7, sy(OUT,i,min,max)+4, i, 'text-anchor="end" class="small"');
+      }
+    }
+    g += textHTML(sx(OUT,max,min,max)-12, sy(OUT,0,min,max)-8, 'E₁', 'class="mathLbl" fill="#2563eb"');
+    g += textHTML(sx(OUT,0,min,max)+8, sy(OUT,max,min,max)+17, 'E₂', 'class="mathLbl" fill="#ea580c"');
+    $('gridOut').innerHTML = g;
+  }
+  function lineFromEq(a,b,c,box){
+    const pts=[];
+    if(Math.abs(b)>1e-10){ pts.push({x:-LIM,y:(c-a*(-LIM))/b}); pts.push({x:LIM,y:(c-a*LIM)/b}); }
+    if(Math.abs(a)>1e-10){ pts.push({x:(c-b*(-LIM))/a,y:-LIM}); pts.push({x:(c-b*LIM)/a,y:LIM}); }
+    const inside=pts.filter(p=>p.x>=-LIM-1e-8&&p.x<=LIM+1e-8&&p.y>=-LIM-1e-8&&p.y<=LIM+1e-8);
+    if(inside.length<2) return '';
+    return lineHTML(sx(box,inside[0].x), sy(box,inside[0].y), sx(box,inside[1].x), sy(box,inside[1].y), 'stroke-width="2.5" stroke-linecap="round"');
+  }
+  function solve(m){
+    const det = m.a1*m.b2 - m.b1*m.a2;
+    if(Math.abs(det)>1e-10){
+      return {type:'unique', det, x:(m.c1*m.b2-m.b1*m.c2)/det, y:(m.a1*m.c2-m.c1*m.a2)/det};
+    }
+    const dep1 = Math.abs(m.a1*m.c2 - m.c1*m.a2)<1e-10;
+    const dep2 = Math.abs(m.b1*m.c2 - m.c1*m.b2)<1e-10;
+    return {type:(dep1&&dep2)?'infinite':'none', det};
+  }
+  function outputBounds(m){
+    const vals=[];
+    sample.forEach(p=>{ vals.push(m.a1*p.x+m.b1*p.y, m.a2*p.x+m.b2*p.y); });
+    vals.push(m.c1,m.c2,0);
+    const maxAbs = Math.max(6, ...vals.map(v=>Math.abs(v)));
+    const nice = Math.ceil(maxAbs/5)*5;
+    return {min:-nice,max:nice};
+  }
+  function dot(id,cx,cy,r,fill,extra=''){
+    return `<circle id="${id}" class="dot" cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" ${extra}/>`;
+  }
+  function render(){
+    const m=coeffs(); $('eqDisplay').innerHTML=eqHTML(m);
+    const b=outputBounds(m); drawStaticGrid();
+    ['inputEqLines','outputGrid','sampleDots','collapseLines','outputDots','basisVectors','targetGroup','solutionGroup','axisLabels','callouts'].forEach(clear);
+    $('rightTitle').textContent = stage<2 ? 'two output lines' : 'output space';
+    $('rightSubtitle').textContent = stage===0 ? 'nothing has collapsed yet' : stage===1 ? 'each equation assigns a scalar' : stage===2 ? 'the two scalars become coordinates' : 'the target coordinate is mapped back';
+    document.querySelectorAll('.stageBtns button').forEach(btn=>btn.classList.toggle('active', +btn.dataset.stage===stage));
+
+    // input sample dots always visible unless final overlays dominate
+    let sd='';
+    sample.forEach((p,i)=>{ sd += dot('inDot'+i, sx(IN,p.x), sy(IN,p.y), 3.4, '#7c3aed', `fill-opacity="${stage===3?.28:.55}" stroke="#fff" stroke-width=".6"`); });
+    $('sampleDots').innerHTML=sd;
+
+    if(stage===0){
+      $('gridOut').innerHTML='';
+      $('status').innerHTML = `Start with the original plane. Every dot is one possible input <em>(x,y)</em>. The equations have not yet been used; all possible coordinate pairs are still present.`;
+      $('callouts').innerHTML = textHTML(235,500,'All possible inputs live here first.', 'text-anchor="middle" class="small"');
+      return;
+    }
+
+    if(stage===1){
+      // two separate horizontal number lines
+      const y1=195,y2=335,x0=610,x1=920;
+      const sc=v=> x0+(v-b.min)/(b.max-b.min)*(x1-x0);
+      let cl='';
+      cl += lineHTML(x0,y1,x1,y1,'stroke="#2563eb" stroke-width="2" stroke-opacity=".75"');
+      cl += lineHTML(x0,y2,x1,y2,'stroke="#ea580c" stroke-width="2" stroke-opacity=".75"');
+      for(let v=Math.ceil(b.min); v<=Math.floor(b.max); v++) if(v%5===0){
+        cl += lineHTML(sc(v),y1-5,sc(v),y1+5,'stroke="#2563eb" stroke-opacity=".45"');
+        cl += lineHTML(sc(v),y2-5,sc(v),y2+5,'stroke="#ea580c" stroke-opacity=".45"');
+        cl += textHTML(sc(v),y1+20,v,'text-anchor="middle" class="small"');
+        cl += textHTML(sc(v),y2+20,v,'text-anchor="middle" class="small"');
+      }
+      cl += textHTML(x0,y1-18,'E₁ = a₁x + b₁y','class="mathLbl" fill="#2563eb"');
+      cl += textHTML(x0,y2-18,'E₂ = a₂x + b₂y','class="mathLbl" fill="#ea580c"');
+      cl += `<circle class="target" cx="${sc(m.c1)}" cy="${y1}" r="6" fill="#7c3aed" stroke="#fff" stroke-width="1.5"/><text x="${sc(m.c1)}" y="${y1-12}" text-anchor="middle" class="mono">c₁=${fmt(m.c1)}</text>`;
+      cl += `<circle class="target" cx="${sc(m.c2)}" cy="${y2}" r="6" fill="#7c3aed" stroke="#fff" stroke-width="1.5"/><text x="${sc(m.c2)}" y="${y2-12}" text-anchor="middle" class="mono">c₂=${fmt(m.c2)}</text>`;
+      sample.forEach((p,i)=>{
+        const e1=m.a1*p.x+m.b1*p.y, e2=m.a2*p.x+m.b2*p.y;
+        cl += dot('c1dot'+i, sc(e1), y1, 2.6, '#2563eb', 'fill-opacity=".38"');
+        cl += dot('c2dot'+i, sc(e2), y2, 2.6, '#ea580c', 'fill-opacity=".38"');
+      });
+      $('collapseLines').innerHTML=cl;
+      $('status').innerHTML = `Each equation collapses the same input point onto its own number line. For example, <em>(3,4)</em> becomes <em>E₁=${fmt(m.a1*3+m.b1*4)}</em> on the first line and <em>E₂=${fmt(m.a2*3+m.b2*4)}</em> on the second line. The constants appear as target values <em>c₁=${fmt(m.c1)}</em> and <em>c₂=${fmt(m.c2)}</em>.`;
+      return;
+    }
+
+    // output space stages 2 and 3
+    drawOutputAxes(b.min,b.max);
+    let od='';
+    sample.forEach((p,i)=>{
+      const e1=m.a1*p.x+m.b1*p.y, e2=m.a2*p.x+m.b2*p.y;
+      od += dot('outDot'+i, sx(OUT,e1,b.min,b.max), sy(OUT,e2,b.min,b.max), 3.4, '#7c3aed', 'fill-opacity=".52" stroke="#fff" stroke-width=".6"');
+    });
+    $('outputDots').innerHTML=od;
+    const bx1x=sx(OUT,m.a1,b.min,b.max), bx1y=sy(OUT,m.a2,b.min,b.max);
+    const by1x=sx(OUT,m.b1,b.min,b.max), by1y=sy(OUT,m.b2,b.min,b.max);
+    const ox=sx(OUT,0,b.min,b.max), oy=sy(OUT,0,b.min,b.max);
+    $('basisVectors').innerHTML = lineHTML(ox,oy,bx1x,bx1y,'stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"')+
+      lineHTML(ox,oy,by1x,by1y,'stroke="#ea580c" stroke-width="3" marker-end="url(#arrow)"')+
+      textHTML(bx1x+6,bx1y-6,'x contribution','class="small" fill="#2563eb"')+
+      textHTML(by1x+6,by1y-6,'y contribution','class="small" fill="#ea580c"');
+    $('targetGroup').innerHTML = `<circle class="target" cx="${sx(OUT,m.c1,b.min,b.max)}" cy="${sy(OUT,m.c2,b.min,b.max)}" r="7" fill="#16a34a" stroke="#fff" stroke-width="2"/>`+
+      textHTML(sx(OUT,m.c1,b.min,b.max)+9, sy(OUT,m.c2,b.min,b.max)-9, `target (${fmt(m.c1)}, ${fmt(m.c2)})`, 'class="mono"');
+
+    if(stage===2){
+      $('status').innerHTML = `Now the two collapsed values are treated as coordinates. A point <em>(x,y)</em> maps to <em>(E₁,E₂)</em> = <em>(${fmt(m.a1)}x ${m.b1<0?'−':'+'} ${fmt(Math.abs(m.b1))}y, ${fmt(m.a2)}x ${m.b2<0?'−':'+'} ${fmt(Math.abs(m.b2))}y)</em>. The constants combine into the target coordinate <em>(${fmt(m.c1)}, ${fmt(m.c2)})</em>.`;
+      return;
+    }
+
+    // stage 3 inverse / solution set
+    let il='';
+    il += lineFromEq(m.a1,m.b1,m.c1,IN).replace('stroke-width="2.5"','stroke="#2563eb" stroke-opacity=".75" stroke-width="2.5"');
+    il += lineFromEq(m.a2,m.b2,m.c2,IN).replace('stroke-width="2.5"','stroke="#ea580c" stroke-opacity=".75" stroke-width="2.5"');
+    $('inputEqLines').innerHTML=il;
+    const sol=solve(m);
+    if(sol.type==='unique'){
+      const inRange = sol.x>=-LIM&&sol.x<=LIM&&sol.y>=-LIM&&sol.y<=LIM;
+      $('solutionGroup').innerHTML = (inRange?`<circle class="solution" cx="${sx(IN,sol.x)}" cy="${sy(IN,sol.y)}" r="7" fill="#16a34a" stroke="#fff" stroke-width="2"/>`:'')+
+        textHTML(235,490,`inverse target → solution (${fmt(sol.x)}, ${fmt(sol.y)})`, 'text-anchor="middle" class="mono"')+
+        lineHTML(sx(OUT,m.c1,b.min,b.max), sy(OUT,m.c2,b.min,b.max), sx(IN,Math.max(-LIM,Math.min(LIM,sol.x))), sy(IN,Math.max(-LIM,Math.min(LIM,sol.y))), 'stroke="#16a34a" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)" opacity=".55"');
+      $('status').innerHTML = `The constants form the target coordinate <em>(${fmt(m.c1)}, ${fmt(m.c2)})</em>. Running the transformation backward asks: which input point maps to that target? Here the determinant is <em>${fmt(sol.det)}</em>, so there is one solution: <strong>(${fmt(sol.x)}, ${fmt(sol.y)})</strong>.`;
+    } else if(sol.type==='infinite'){
+      $('solutionGroup').innerHTML = textHTML(235,490,'target maps back to a whole line of solutions', 'text-anchor="middle" class="mono" fill="#16a34a"');
+      $('status').innerHTML = `The two equations are dependent: the second collapse does not add a genuinely independent constraint. The target is consistent with the first line, so reversing the target gives a whole <strong>line of solutions</strong>, not one point.`;
+    } else {
+      $('solutionGroup').innerHTML = textHTML(235,490,'target has no preimage in the input space', 'text-anchor="middle" class="mono" fill="#dc2626"');
+      $('status').innerHTML = `The two equations are parallel/inconsistent. The target coordinate <em>(${fmt(m.c1)}, ${fmt(m.c2)})</em> does not correspond to any input point under this transformation. So the system has <strong>no solution</strong>.`;
+    }
+  }
+
+  function setStage(s){ stage=s; render(); }
+  function setVals(a1,b1,c1,a2,b2,c2){ Object.entries({a1,b1,c1,a2,b2,c2}).forEach(([k,v])=>$(k).value=v); render(); }
+  inputs.forEach(i=>i.addEventListener('input',render));
+  document.querySelectorAll('.stageBtns button').forEach(btn=>btn.addEventListener('click',()=>{ if(timer){clearInterval(timer);timer=null;$('playBtn').textContent='Run sequence';} setStage(+btn.dataset.stage); }));
+  $('presetArticle').addEventListener('click',()=>setVals(4,-2,2,2,4,16));
+  $('presetIdentity').addEventListener('click',()=>setVals(1,0,3,0,1,4));
+  $('presetSingular').addEventListener('click',()=>setVals(2,1,5,4,2,10));
+  $('presetInconsistent').addEventListener('click',()=>setVals(2,1,5,4,2,12));
+  $('playBtn').addEventListener('click',()=>{
+    if(timer){clearInterval(timer);timer=null;$('playBtn').textContent='Run sequence';return;}
+    stage=0; render(); $('playBtn').textContent='Stop sequence';
+    timer=setInterval(()=>{ stage++; if(stage>3){clearInterval(timer); timer=null; $('playBtn').textContent='Run sequence'; stage=3;} render(); }, 1600);
+  });
+  render();
+})();
+</script>
+</body>
+</html>

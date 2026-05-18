@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Linear Algebra approach | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">The Linear Algebra approach</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h2 class="section-title">Another way to think about systems of equations</h2>
+
+        <p>Previously, we look at an equation and imagined:</p>
+
+        <ol>
+          <li>A space with the number of axes as variables.</li>
+          <li>Every coordinate in that space being moved, as specified by the coefficients of the variables.</li>
+          <li>Every coordinate being summed and represented on a one-dimensional space, i.e. a line.</li>
+          <li>The constant as a point on that line.</li>
+        </ol>
+
+        <p>Now, we can do something similar when we see a system of equations.</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = 2\\2x + 4y = 16 \end{cases}$$</p>
+
+        <p>Imagine:</p>
+
+        <ol>
+          <li>A space with the number of axes as variables.</li>
+          <li>?</li>
+        </ol>
+
+        <p>Wait. We have two different sets of coefficients. So, do we move every coordinate in the space by one after the other?</p>
+
+        <p>No. We do two separate collapses onto lines (temporarily ignoring the constants).</p>
+
+        <p>Imagine we want to see where the point (3, 4) moves to.</p>
+
+        <p>So:</p>
+
+        <ul>
+          <li>$E_{1}$ becomes 4 on the line.</li>
+          <li>$E_{2}$ becomes 22 on another line.</li>
+        </ul>
+
+        <p>Hm. Two lines. That's two axes.</p>
+
+        <p>Just imagine one line rotating until perpendicular. Our points drift out to meet each other, revealing a coordinate in new 2D plane.</p>
+
+        <p>So we can think of our system of equations as a new space.</p>
+
+        <p>But again, what about the constants?</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize essay-widget-input-output"
+          src="linear-algebra/the-linear-algebra-approach/input_output_space.html"
+          title="Interactive widget showing a system of equations as input and output spaces"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
