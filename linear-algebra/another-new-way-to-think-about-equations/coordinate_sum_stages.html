@@ -182,7 +182,7 @@ button:focus-visible {
 
 <script>
 (function(){
-  const X_MIN = -10, X_MAX = 10, Y_MIN = -6, Y_MAX = 6;
+  const X_MIN = -12, X_MAX = 12, Y_MIN = -6, Y_MAX = 6;
   const PA = { x: 42, y: 32, w: 476, h: 396 };
   const SAMPLES = [];
   for (let x = -2; x <= 2; x++) {
@@ -282,10 +282,9 @@ button:focus-visible {
       const ty = b * sample.y;
       const cx = sx(tx);
       const cy = sy(ty);
-      const labelX = sample.x < 1 ? cx + 8 : cx - 8;
-      const labelY = sample.y < 1 ? cy - 9 : cy + 17;
-      const anchor = sample.x < 1 ? 'start' : 'end';
-      labels += `<text class="ewb6-label-text" x="${labelX}" y="${labelY}" text-anchor="${anchor}" fill="#312e81">${labelFor(tx, ty)}</text>`;
+      const labelX = cx + 8;
+      const labelY = cy - 9;
+      labels += `<text class="ewb6-label-text" x="${labelX}" y="${labelY}" text-anchor="start" fill="#312e81">${labelFor(tx, ty)}</text>`;
     });
     $('ewb6-labels').innerHTML = labels;
   }
