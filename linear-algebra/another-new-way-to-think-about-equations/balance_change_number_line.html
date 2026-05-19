@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balance change on collapsed number line</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --blue: #2563eb;
+  --orange: #ea580c;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body { padding: 0 1rem 1rem; color: var(--ink); font-family: Georgia, "Cambria", "Times New Roman", serif; }
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+.bcn { max-width: 720px; margin: 0 auto; padding: 1rem 0; }
+.bcn-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.bcn-label {
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.bcn-eq {
+  min-height: 1.4em;
+  margin-bottom: 0.7rem;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-style: italic;
+  line-height: 1.4;
+}
+.bcn-eq .x { color: var(--blue); font-style: normal; font-weight: 500; }
+.bcn-eq .y { color: var(--orange); font-style: normal; font-weight: 500; }
+.bcn-eq .op { color: var(--muted); margin: 0 0.12em; font-style: normal; }
+.bcn-eq .var { font-style: italic; }
+.bcn-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 22px;
+}
+.bcn-ctrl { display: flex; align-items: center; gap: 8px; }
+.bcn-ctrl .name {
+  min-width: 16px;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+}
+.bcn-ctrl .name.x { color: var(--blue); }
+.bcn-ctrl .name.y { color: var(--orange); }
+.bcn-ctrl input[type=range] { flex: 1; min-width: 0; }
+.bcn-ctrl input[type=number] {
+  width: 60px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.bcn-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0.7rem;
+}
+.bcn-figure {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem 0;
+}
+.bcn-svg { width: 100%; height: auto; display: block; }
+.bcn-axis { stroke: var(--ink); stroke-width: 1.2; stroke-opacity: 0.72; }
+.bcn-tick { stroke: var(--ink); stroke-width: 1; stroke-opacity: 0.45; }
+.bcn-tick-label {
+  fill: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.bcn-row-label {
+  fill: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+}
+.bcn-row-note {
+  fill: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+}
+.bcn-connector {
+  stroke: #b8b2a4;
+  stroke-width: 1;
+  stroke-opacity: 0.55;
+}
+.bcn-dot {
+  stroke: #ffffff;
+  stroke-width: 1.1;
+}
+.bcn-dot-label {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.bcn-stack-label {
+  fill: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.bcn-status {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.bcn-status em { color: var(--ink); font-style: italic; }
+@media (max-width: 560px) {
+  .bcn-controls { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="bcn" id="bcn-root" role="region" aria-label="Coefficient balance number line comparison widget">
+  <div class="bcn-card">
+    <div class="bcn-label">Changed collapse on the number line</div>
+    <div class="bcn-eq" id="bcn-eq"></div>
+    <div class="bcn-controls">
+      <div class="bcn-ctrl">
+        <span class="name x">x</span>
+        <input id="bcn-a" type="range" min="-5" max="5" step="0.5" value="4">
+        <input id="bcn-a-num" type="number" min="-5" max="5" step="0.5" value="4">
+      </div>
+      <div class="bcn-ctrl">
+        <span class="name y">y</span>
+        <input id="bcn-b" type="range" min="-5" max="5" step="0.5" value="-2">
+        <input id="bcn-b-num" type="number" min="-5" max="5" step="0.5" value="-2">
+      </div>
+    </div>
+    <div class="bcn-buttons">
+      <button data-preset="4,-4">Same balance: 4x - 4y</button>
+      <button data-preset="4,-2">Changed balance: 4x - 2y</button>
+      <button data-preset="1,-3">Y-heavy: x - 3y</button>
+      <button data-preset="1,-1">Base: x - y</button>
+    </div>
+  </div>
+
+  <div class="bcn-figure">
+    <svg class="bcn-svg" viewBox="0 0 680 380" aria-label="Two collapsed number lines comparing output locations">
+      <g id="bcn-connectors"></g>
+      <g id="bcn-base-axis"></g>
+      <g id="bcn-change-axis"></g>
+      <g id="bcn-dots"></g>
+      <text class="bcn-row-label" x="36" y="82">x - y</text>
+      <text class="bcn-row-note" x="36" y="100">A, B, C collapse together at 0</text>
+      <text class="bcn-row-label" id="bcn-change-label" x="36" y="248">4x - 2y</text>
+      <text class="bcn-row-note" id="bcn-change-note" x="36" y="266">same points now separate</text>
+    </svg>
+  </div>
+
+  <div class="bcn-status" id="bcn-status"></div>
+</div>
+
+<script>
+(function(){
+  const POINTS = [
+    { x: -1, y: -1, label: 'A', color: '#2563eb' },
+    { x: 0, y: 0, label: 'B', color: '#16a34a' },
+    { x: 1, y: 1, label: 'C', color: '#dc2626' },
+    { x: 2, y: 0, label: 'D', color: '#f59e0b' },
+    { x: 0, y: 2, label: 'E', color: '#7c3aed' }
+  ];
+  const BASE_Y = 132;
+  const CHANGE_Y = 298;
+  const LINE_LEFT = 132;
+  const LINE_RIGHT = 618;
+  const CENTER_X = (LINE_LEFT + LINE_RIGHT) / 2;
+  const VALUE_MIN = -12;
+  const VALUE_MAX = 12;
+  const $ = id => document.getElementById(id);
+
+  function fmt(n){
+    if (Number.isInteger(n)) return String(n);
+    return (Math.round(n * 100) / 100).toString();
+  }
+  function xFor(v){
+    return LINE_LEFT + (v - VALUE_MIN) / (VALUE_MAX - VALUE_MIN) * (LINE_RIGHT - LINE_LEFT);
+  }
+  function clampX(x){
+    return Math.max(LINE_LEFT + 10, Math.min(LINE_RIGHT - 10, x));
+  }
+  function coefTerm(coef, varName, first){
+    const cls = varName === 'x' ? 'x' : 'y';
+    if (coef === 0) return first ? `<span class="${cls}">0<span class="var">${varName}</span></span>` : `<span class="op">+</span><span class="${cls}">0<span class="var">${varName}</span></span>`;
+    const sign = coef < 0 ? '-' : (first ? '' : '+');
+    const mag = Math.abs(coef);
+    const num = mag === 1 ? '' : fmt(mag);
+    if (first) return `<span class="${cls}">${sign}${num}<span class="var">${varName}</span></span>`;
+    return `<span class="op">${sign}</span><span class="${cls}">${num}<span class="var">${varName}</span></span>`;
+  }
+  function htmlEquation(a, b){
+    return coefTerm(a, 'x', true) + ' ' + coefTerm(b, 'y', false);
+  }
+  function plainTerm(coef, varName, first){
+    if (coef === 0) return first ? `0${varName}` : `+ 0${varName}`;
+    const sign = coef < 0 ? '-' : (first ? '' : '+');
+    const mag = Math.abs(coef);
+    const num = mag === 1 ? '' : fmt(mag);
+    return first ? `${sign}${num}${varName}` : `${sign} ${num}${varName}`;
+  }
+  function plainEquation(a, b){
+    return `${plainTerm(a, 'x', true)} ${plainTerm(b, 'y', false)}`;
+  }
+  function baseValue(point){
+    return point.x - point.y;
+  }
+  function changedValue(point, a, b){
+    return a * point.x + b * point.y;
+  }
+  function axis(y, values){
+    const tickValues = Array.from(new Set([-12, -8, -4, 0, 4, 8, 12, ...values.map(v => Math.max(-12, Math.min(12, v)))]))
+      .sort((a, b) => a - b);
+    let html = `<line class="bcn-axis" x1="${LINE_LEFT}" y1="${y}" x2="${LINE_RIGHT}" y2="${y}"/>`;
+    tickValues.forEach(v => {
+      const x = xFor(v);
+      html += `<line class="bcn-tick" x1="${x}" y1="${y - 5}" x2="${x}" y2="${y + 5}"/>`;
+      html += `<text class="bcn-tick-label" x="${x}" y="${y + 23}" text-anchor="middle">${fmt(v)}</text>`;
+    });
+    return html;
+  }
+  function stackOffsets(values){
+    const counts = {};
+    return values.map(v => {
+      const key = fmt(v);
+      counts[key] = (counts[key] || 0) + 1;
+      return (counts[key] - 1) * -16;
+    });
+  }
+  function setVals(a, b){
+    $('bcn-a').value = a;
+    $('bcn-b').value = b;
+    update();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('bcn-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+  function update(){
+    const a = +$('bcn-a').value;
+    const b = +$('bcn-b').value;
+    $('bcn-a-num').value = a;
+    $('bcn-b-num').value = b;
+    $('bcn-eq').innerHTML = htmlEquation(a, b);
+    $('bcn-change-label').textContent = plainEquation(a, b);
+
+    const baseValues = POINTS.map(baseValue);
+    const changedValues = POINTS.map(point => changedValue(point, a, b));
+    const baseOffsets = stackOffsets(baseValues);
+    const changedOffsets = stackOffsets(changedValues);
+    $('bcn-base-axis').innerHTML = axis(BASE_Y, baseValues);
+    $('bcn-change-axis').innerHTML = axis(CHANGE_Y, changedValues);
+
+    let connectors = '';
+    let dots = '';
+    POINTS.forEach((point, index) => {
+      const bv = baseValues[index];
+      const cv = changedValues[index];
+      const bx = clampX(xFor(bv));
+      const cx = clampX(xFor(cv));
+      const by = BASE_Y + baseOffsets[index];
+      const cy = CHANGE_Y + changedOffsets[index];
+      connectors += `<line class="bcn-connector" x1="${bx}" y1="${by + 7}" x2="${cx}" y2="${cy - 7}"/>`;
+      dots += `<circle class="bcn-dot" cx="${bx}" cy="${by}" r="6" fill="${point.color}"/>`;
+      dots += `<text class="bcn-dot-label" x="${bx + 9}" y="${by - 9}">${point.label}: ${fmt(bv)}</text>`;
+      dots += `<circle class="bcn-dot" cx="${cx}" cy="${cy}" r="6" fill="${point.color}"/>`;
+      dots += `<text class="bcn-dot-label" x="${cx + 9}" y="${cy - 9}">${point.label}: ${fmt(cv)}</text>`;
+    });
+    $('bcn-connectors').innerHTML = connectors;
+    $('bcn-dots').innerHTML = dots;
+
+    const abcChanged = changedValues.slice(0, 3);
+    const abcSame = new Set(abcChanged.map(fmt)).size === 1;
+    $('bcn-change-note').textContent = abcSame ? 'A, B, C still collapse together' : 'A, B, C split across the line';
+    $('bcn-status').innerHTML = abcSame
+      ? `A, B, and C share the same output under <em>x - y</em>, and still share one output under <em>${plainEquation(a, b)}</em>. This is the same collapse grouping measured with different spacing.`
+      : `A, B, and C share output <em>0</em> under <em>x - y</em>, but land at <em>${abcChanged.map(fmt).join(', ')}</em> under <em>${plainEquation(a, b)}</em>. The changed collapse therefore changes the resulting number line, not just its scale.`;
+    resizeFrame();
+  }
+
+  $('bcn-a').addEventListener('input', update);
+  $('bcn-b').addEventListener('input', update);
+  $('bcn-a-num').addEventListener('input', () => { $('bcn-a').value = $('bcn-a-num').value; update(); });
+  $('bcn-b-num').addEventListener('input', () => { $('bcn-b').value = $('bcn-b-num').value; update(); });
+  document.querySelectorAll('[data-preset]').forEach(button => {
+    button.addEventListener('click', () => {
+      const values = button.dataset.preset.split(',').map(Number);
+      setVals(values[0], values[1]);
+    });
+  });
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>
