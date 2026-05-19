@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction changes the sum</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --purple: #7c3aed;
+  --green: #16a34a;
+  --red: #dc2626;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body { padding: 0 1rem 1rem; color: var(--ink); font-family: Georgia, "Cambria", "Times New Roman", serif; }
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible,
+button.is-active {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+button.is-active {
+  box-shadow: inset 0 0 0 1px rgba(26,26,26,0.16);
+}
+.dcs { max-width: 720px; margin: 0 auto; padding: 1rem 0; }
+.dcs-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.dcs-label {
+  margin-bottom: 0.55rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.dcs-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0.85rem;
+}
+.dcs-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: center;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+}
+.dcs-control strong { color: var(--ink); }
+.dcs-control input[type=range] { min-width: 0; }
+.dcs-value {
+  min-width: 4.5rem;
+  text-align: right;
+  color: var(--ink);
+  font-family: var(--mono);
+}
+.dcs-plane-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+}
+.dcs-plane { width: 100%; max-width: 560px; height: auto; display: block; color: var(--ink); }
+.dcs-axis { stroke: var(--ink); stroke-width: 1.2; stroke-opacity: 0.58; }
+.dcs-sum-line {
+  stroke: var(--green);
+  stroke-width: 1.8;
+  stroke-opacity: 0.76;
+  stroke-dasharray: 5 4;
+}
+.dcs-change-line {
+  stroke: var(--red);
+  stroke-width: 1.5;
+  stroke-opacity: 0.4;
+  stroke-dasharray: 4 5;
+}
+.dcs-arrow {
+  stroke-width: 3;
+  fill: none;
+  marker-end: url(#dcs-arrow-head);
+}
+.dcs-arrow.preserve { stroke: var(--green); }
+.dcs-arrow.change { stroke: var(--red); }
+.dcs-dot {
+  stroke: #ffffff;
+  stroke-width: 1.2;
+}
+.dcs-label-text {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.dcs-status {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.dcs-status em { color: var(--ink); font-style: italic; }
+@media (max-width: 520px) {
+  .dcs-control { grid-template-columns: 1fr; }
+  .dcs-value { text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="dcs" id="dcs-root" role="region" aria-label="Direction changes summed value widget">
+  <div class="dcs-card">
+    <div class="dcs-label">Directions that preserve or change the sum</div>
+    <div class="dcs-buttons">
+      <button class="dcs-direction-btn" data-mode="preserve">(1, -1) preserves the sum</button>
+      <button class="dcs-direction-btn" data-mode="change">(1, 1) changes the sum</button>
+    </div>
+    <label class="dcs-control">
+      <strong>Steps in selected direction</strong>
+      <input id="dcs-slider" type="range" min="0" max="3" step="1" value="1">
+      <span class="dcs-value" id="dcs-step-value">1 step</span>
+    </label>
+  </div>
+
+  <div class="dcs-plane-wrap">
+    <svg class="dcs-plane" viewBox="0 0 560 500" aria-label="Coordinate plane comparing movement directions">
+      <defs>
+        <marker id="dcs-arrow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+        </marker>
+      </defs>
+      <line id="dcs-axis-x" class="dcs-axis"/>
+      <line id="dcs-axis-y" class="dcs-axis"/>
+      <g id="dcs-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.52"></g>
+      <line id="dcs-sum-line" class="dcs-sum-line"/>
+      <line id="dcs-change-line" class="dcs-change-line"/>
+      <line id="dcs-arrow" class="dcs-arrow"/>
+      <circle id="dcs-start" class="dcs-dot" r="6" fill="#7c3aed"/>
+      <circle id="dcs-end" class="dcs-dot" r="6" fill="#1a1a1a"/>
+      <text id="dcs-start-label" class="dcs-label-text"></text>
+      <text id="dcs-end-label" class="dcs-label-text"></text>
+      <text id="dcs-direction-label" class="dcs-label-text"></text>
+    </svg>
+  </div>
+
+  <div class="dcs-status" id="dcs-status"></div>
+</div>
+
+<script>
+(function(){
+  const X_MIN = -2, X_MAX = 7, Y_MIN = -3, Y_MAX = 7;
+  const PA = { x: 42, y: 32, w: 476, h: 396 };
+  const START = { x: 2, y: 1 };
+  let mode = 'preserve';
+  let steps = 1;
+  const $ = id => document.getElementById(id);
+  const sx = x => PA.x + (x - X_MIN) / (X_MAX - X_MIN) * PA.w;
+  const sy = y => PA.y + (Y_MAX - y) / (Y_MAX - Y_MIN) * PA.h;
+  function fmt(n){ return Number.isInteger(n) ? String(n) : (Math.round(n * 100) / 100).toString(); }
+  function signedPart(n){ return n < 0 ? `- ${fmt(Math.abs(n))}` : `+ ${fmt(n)}`; }
+  function sum(point){ return point.x + point.y; }
+  function direction(){
+    return mode === 'preserve' ? { x: 1, y: -1 } : { x: 1, y: 1 };
+  }
+  function endPoint(){
+    const d = direction();
+    return { x: START.x + d.x * steps, y: START.y + d.y * steps };
+  }
+  function lineSegmentForSum(total){
+    const candidates = [
+      { x: X_MIN, y: total - X_MIN },
+      { x: X_MAX, y: total - X_MAX },
+      { x: total - Y_MIN, y: Y_MIN },
+      { x: total - Y_MAX, y: Y_MAX }
+    ].filter(point => point.x >= X_MIN - 1e-9 && point.x <= X_MAX + 1e-9 && point.y >= Y_MIN - 1e-9 && point.y <= Y_MAX + 1e-9);
+    const unique = [];
+    candidates.forEach(point => {
+      if (!unique.some(other => Math.abs(other.x - point.x) < 1e-9 && Math.abs(other.y - point.y) < 1e-9)) unique.push(point);
+    });
+    return unique.slice(0, 2);
+  }
+  function drawBase(){
+    $('dcs-axis-x').setAttribute('x1', sx(X_MIN));
+    $('dcs-axis-x').setAttribute('y1', sy(0));
+    $('dcs-axis-x').setAttribute('x2', sx(X_MAX));
+    $('dcs-axis-x').setAttribute('y2', sy(0));
+    $('dcs-axis-y').setAttribute('x1', sx(0));
+    $('dcs-axis-y').setAttribute('y1', sy(Y_MIN));
+    $('dcs-axis-y').setAttribute('x2', sx(0));
+    $('dcs-axis-y').setAttribute('y2', sy(Y_MAX));
+    let ticks = '';
+    for (let x = -2; x <= 6; x += 2) if (x !== 0) ticks += `<text x="${sx(x)}" y="${sy(0)+14}" text-anchor="middle">${x}</text>`;
+    for (let y = -2; y <= 6; y += 2) if (y !== 0) ticks += `<text x="${sx(0)-7}" y="${sy(y)+3.5}" text-anchor="end">${y}</text>`;
+    $('dcs-ticks').innerHTML = ticks;
+  }
+  function setLine(el, segment){
+    el.setAttribute('x1', sx(segment[0].x));
+    el.setAttribute('y1', sy(segment[0].y));
+    el.setAttribute('x2', sx(segment[1].x));
+    el.setAttribute('y2', sy(segment[1].y));
+  }
+  function update(){
+    const end = endPoint();
+    const startSum = sum(START);
+    const endSum = sum(end);
+    const activeLine = lineSegmentForSum(startSum);
+    const changedLine = lineSegmentForSum(endSum);
+    setLine($('dcs-sum-line'), activeLine);
+    setLine($('dcs-change-line'), mode === 'change' ? changedLine : activeLine);
+    $('dcs-change-line').style.opacity = mode === 'change' ? '1' : '0';
+
+    $('dcs-start').setAttribute('cx', sx(START.x));
+    $('dcs-start').setAttribute('cy', sy(START.y));
+    $('dcs-end').setAttribute('cx', sx(end.x));
+    $('dcs-end').setAttribute('cy', sy(end.y));
+    $('dcs-arrow').setAttribute('x1', sx(START.x));
+    $('dcs-arrow').setAttribute('y1', sy(START.y));
+    $('dcs-arrow').setAttribute('x2', sx(end.x));
+    $('dcs-arrow').setAttribute('y2', sy(end.y));
+    $('dcs-arrow').setAttribute('class', `dcs-arrow ${mode}`);
+    $('dcs-arrow').style.color = mode === 'preserve' ? '#16a34a' : '#dc2626';
+    $('dcs-start-label').setAttribute('x', sx(START.x) + 9);
+    $('dcs-start-label').setAttribute('y', sy(START.y) - 11);
+    $('dcs-start-label').textContent = `(${fmt(START.x)}, ${fmt(START.y)}) = ${fmt(startSum)}`;
+    $('dcs-end-label').setAttribute('x', sx(end.x) + 9);
+    $('dcs-end-label').setAttribute('y', sy(end.y) - 11);
+    $('dcs-end-label').textContent = `(${fmt(end.x)}, ${fmt(end.y)}) = ${fmt(endSum)}`;
+    $('dcs-direction-label').setAttribute('x', (sx(START.x) + sx(end.x)) / 2 + 10);
+    $('dcs-direction-label').setAttribute('y', (sy(START.y) + sy(end.y)) / 2 - 10);
+    const d = direction();
+    $('dcs-direction-label').textContent = `${steps} x (${fmt(d.x)}, ${fmt(d.y)})`;
+    $('dcs-step-value').textContent = `${steps} ${steps === 1 ? 'step' : 'steps'}`;
+    $('dcs-slider').value = steps;
+    document.querySelectorAll('.dcs-direction-btn').forEach(button => {
+      button.classList.toggle('is-active', button.dataset.mode === mode);
+    });
+    $('dcs-status').innerHTML = mode === 'preserve'
+      ? `Moving in direction <em>(1, -1)</em> changes the coordinate by <em>x +${fmt(steps)}</em> and <em>y -${fmt(steps)}</em>. The changes cancel, so the sum remains <em>${fmt(startSum)}</em>.`
+      : `Moving in direction <em>(1, 1)</em> changes the coordinate by <em>x +${fmt(steps)}</em> and <em>y +${fmt(steps)}</em>. The changes reinforce each other, so the sum moves from <em>${fmt(startSum)}</em> to <em>${fmt(endSum)}</em>.`;
+    resizeFrame();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('dcs-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+
+  drawBase();
+  document.querySelectorAll('.dcs-direction-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      mode = button.dataset.mode;
+      update();
+    });
+  });
+  $('dcs-slider').addEventListener('input', () => {
+    steps = Number($('dcs-slider').value);
+    update();
+  });
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>

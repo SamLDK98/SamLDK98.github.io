@@ -100,6 +100,64 @@
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <p>So, let's say we have the summed value 3.</p>
+
+        <p>We no longer know exactly where the original coordinate was.</p>
+
+        <p>Many different points can produce the same sum.</p>
+
+        <p>However, we do learn something about how all points with this summed value are related.</p>
+
+        <p>For example:</p>
+
+        <ul>
+          <li>if we move one unit right,</li>
+          <li>we must move one unit down to maintain the same sum.</li>
+        </ul>
+
+        <p>This movement can be represented by the direction:</p>
+
+        <p class="display-equation">$$(1, -1)$$</p>
+
+        <p>meaning:</p>
+
+        <ul>
+          <li>$x$ increases by 1,</li>
+          <li>while $y$ decreases by 1.</li>
+        </ul>
+
+        <p>These changes cancel each other out, so the total remains unchanged.</p>
+
+        <p>However, movement in a different direction changes the sum.</p>
+
+        <p>For example, if we move:</p>
+
+        <ul>
+          <li>one unit right,</li>
+          <li>and one unit up,</li>
+        </ul>
+
+        <p>then both coordinates increase together:</p>
+
+        <p class="display-equation">$$(1,1)$$</p>
+
+        <p>and the summed value increases.</p>
+
+        <p>So:</p>
+
+        <ul>
+          <li>movement along one direction preserves the sum,</li>
+          <li>while movement along another direction changes it.</li>
+        </ul>
+
+        <iframe
+          class="essay-widget essay-widget-autosize essay-widget-direction-sum"
+          src="linear-algebra/collapsing-a-coordinate-system-onto-a-line/direction_changes_sum.html"
+          title="Interactive widget comparing directions that preserve or change a sum"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
       </section>
     </article>
   </main>

@@ -795,6 +795,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 680px;
 }
 
+.essay-widget-direction-sum {
+  height: 660px;
+}
+
 .question-carousel {
   margin: -0.7rem 0 2.4rem;
 }
@@ -1107,6 +1111,8 @@ header {
   .essay-widget-coordinate-collapse { height: 820px; }
 
   .essay-widget-constant-sum-line { height: 840px; }
+
+  .essay-widget-direction-sum { height: 820px; }
 
   .question-carousel-track { min-height: 26rem; }
 
