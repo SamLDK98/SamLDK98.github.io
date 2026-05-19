@@ -175,18 +175,14 @@ button:focus-visible {
 
 <script>
 (function(){
-  const X_MIN = -14, X_MAX = 14, Y_MIN = -12, Y_MAX = 12;
+  const X_MIN = -6, X_MAX = 6, Y_MIN = -6, Y_MAX = 6;
   const PA = { x: 42, y: 32, w: 476, h: 396 };
-  const SAMPLES = [
-    { x: -2, y: -2, dx: 8, dy: 15 },
-    { x: -1, y: 1, dx: 8, dy: -10 },
-    { x: 0, y: 0, dx: 8, dy: -10 },
-    { x: 1, y: -1, dx: 8, dy: 15 },
-    { x: 2, y: 1, dx: 8, dy: -10 },
-    { x: 3, y: 4, dx: 8, dy: -10, focus: true },
-    { x: -3, y: 2, dx: 8, dy: 15 },
-    { x: 1, y: 3, dx: 8, dy: -10 }
-  ];
+  const SAMPLES = [];
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
+      SAMPLES.push({ x, y });
+    }
+  }
   const STAGES = [
     'Scaled coordinates',
     'Replace the comma with the signed operation',
@@ -222,8 +218,8 @@ button:focus-visible {
     setAttrs($('ewb6-axisX'), { x1: sx(X_MIN), y1: sy(0), x2: sx(X_MAX), y2: sy(0) });
     setAttrs($('ewb6-axisY'), { x1: sx(0), y1: sy(Y_MIN), x2: sx(0), y2: sy(Y_MAX) });
     let ticks = '';
-    for (let x = X_MIN; x <= X_MAX; x += 4) if (x !== 0) ticks += `<text x="${sx(x)}" y="${sy(0)+14}" text-anchor="middle">${x}</text>`;
-    for (let y = Y_MIN; y <= Y_MAX; y += 4) if (y !== 0) ticks += `<text x="${sx(0)-7}" y="${sy(y)+3.5}" text-anchor="end">${y}</text>`;
+    for (let x = X_MIN; x <= X_MAX; x += 2) if (x !== 0) ticks += `<text x="${sx(x)}" y="${sy(0)+14}" text-anchor="middle">${x}</text>`;
+    for (let y = Y_MIN; y <= Y_MAX; y += 2) if (y !== 0) ticks += `<text x="${sx(0)-7}" y="${sy(y)+3.5}" text-anchor="end">${y}</text>`;
     $('ewb6-ticks').innerHTML = ticks;
   }
   function update(){
@@ -251,16 +247,18 @@ button:focus-visible {
       const ty = b * sample.y;
       const cx = sx(tx);
       const cy = sy(ty);
-      const color = sample.focus ? '#dc2626' : '#7c3aed';
-      points += `<circle class="ewb6-point" cx="${cx}" cy="${cy}" r="${sample.focus ? 5.5 : 4.4}" fill="${color}" fill-opacity="0.74" stroke="#fff" stroke-width="0.8"/>`;
-      points += `<text class="ewb6-label-text" x="${cx + sample.dx}" y="${cy + sample.dy}" fill="${sample.focus ? '#991b1b' : '#312e81'}">${labelFor(tx, ty)}</text>`;
+      const labelX = sample.x < 1 ? cx + 8 : cx - 8;
+      const labelY = sample.y < 1 ? cy - 9 : cy + 17;
+      const anchor = sample.x < 1 ? 'start' : 'end';
+      points += `<circle class="ewb6-point" cx="${cx}" cy="${cy}" r="4.4" fill="#7c3aed" fill-opacity="0.74" stroke="#fff" stroke-width="0.8"/>`;
+      points += `<text class="ewb6-label-text" x="${labelX}" y="${labelY}" text-anchor="${anchor}" fill="#312e81">${labelFor(tx, ty)}</text>`;
     });
     $('ewb6-points').innerHTML = points;
 
     const exX = 3 * a;
     const exY = 4 * b;
     const message = stage === 0
-      ? `Each original point has been dragged to its scaled coordinate. The highlighted point <em>(3, 4)</em> is now <em>(${fmt(exX)}, ${fmt(exY)})</em>.`
+      ? `This shows every coordinate in a small 3-by-3 patch of the original space after scaling. Separately, the article example <em>(3, 4)</em> would become <em>(${fmt(exX)}, ${fmt(exY)})</em>.`
       : stage === 1
         ? `The comma is no longer doing coordinate-pair work. It becomes the signed operation: <em>(${fmt(exX)}, ${fmt(exY)})</em> becomes <em>(${fmt(exX)} ${signedPart(exY)})</em>.`
         : `Now each displayed coordinate has been evaluated as one number. For <em>(3, 4)</em>, <em>${fmt(exX)} ${signedPart(exY)} = ${fmt(exX + exY)}</em>.`;
