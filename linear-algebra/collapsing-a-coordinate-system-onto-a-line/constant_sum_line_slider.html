@@ -76,6 +76,20 @@ button.is-active {
   color: var(--ink);
   font-family: var(--mono);
 }
+.csl-delta {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.csl-delta strong {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-weight: 650;
+}
 .csl-plane-wrap {
   display: flex;
   justify-content: center;
@@ -162,6 +176,7 @@ button.is-active {
       <input id="csl-slider" type="range" min="-4" max="4" step="1" value="0">
       <span class="csl-value" id="csl-slider-value">x = 0</span>
     </label>
+    <div class="csl-delta" id="csl-delta">Move the point to compare coordinate changes.</div>
   </div>
 
   <div class="csl-plane-wrap">
@@ -187,6 +202,7 @@ button.is-active {
   const SUMS = [-4, -2, 0, 2, 4];
   let selectedSum = 0;
   let xValue = 0;
+  let previousX = 0;
   let dragging = false;
   const $ = id => document.getElementById(id);
   const sx = x => PA.x + (x - X_MIN) / (X_MAX - X_MIN) * PA.w;
@@ -254,6 +270,9 @@ button.is-active {
   function update(){
     setSliderBounds();
     const yValue = yFor(xValue);
+    const previousY = yFor(previousX);
+    const dx = xValue - previousX;
+    const dy = yValue - previousY;
     const px = sx(xValue);
     const py = sy(yValue);
     $('csl-dot').setAttribute('cx', px);
@@ -270,11 +289,15 @@ button.is-active {
     $('csl-readout').setAttribute('y', py - 13);
     $('csl-readout').textContent = `(${fmt(xValue)}, ${fmt(yValue)})  ${fmt(xValue)} ${signedPart(yValue)} = ${fmt(selectedSum)}`;
     $('csl-slider-value').textContent = `x = ${fmt(xValue)}`;
+    $('csl-delta').innerHTML = dx === 0 && dy === 0
+      ? 'Move the point to compare coordinate changes.'
+      : `Change from previous position: <strong>x ${dx > 0 ? '+' : ''}${fmt(dx)}</strong>, <strong>y ${dy > 0 ? '+' : ''}${fmt(dy)}</strong>.`;
     $('csl-status').innerHTML = `Along <em>x + y = ${fmt(selectedSum)}</em>, the sum is fixed. Moving right increases <em>x</em>, so <em>y</em> decreases by the same amount. The coordinate changes, but <em>x + y</em> remains <em>${fmt(selectedSum)}</em>.`;
     document.querySelectorAll('.csl-sum-btn').forEach(button => {
       button.classList.toggle('is-active', Number(button.dataset.sum) === selectedSum);
     });
     drawLines();
+    previousX = xValue;
     resizeFrame();
   }
   function pointerToSvgX(event){
@@ -298,6 +321,7 @@ button.is-active {
     button.addEventListener('click', () => {
       selectedSum = Number(button.dataset.sum);
       xValue = Math.round(selectedSum / 2);
+      previousX = xValue;
       update();
     });
   });
