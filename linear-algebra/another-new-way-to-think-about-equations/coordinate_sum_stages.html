@@ -116,7 +116,6 @@ button:focus-visible {
   line-height: 1.65;
 }
 .ewb6-status em { color: var(--ink); font-style: italic; }
-.ewb6-point { transition: cx 0.18s ease, cy 0.18s ease; }
 .ewb6-label-text {
   font-family: var(--mono);
   font-size: 11px;
@@ -167,6 +166,7 @@ button:focus-visible {
       <line id="ewb6-axisY" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.2"/>
       <g id="ewb6-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.52"></g>
       <g id="ewb6-points" clip-path="url(#ewb6-clip)"></g>
+      <g id="ewb6-labels"></g>
     </svg>
   </div>
 
@@ -189,6 +189,8 @@ button:focus-visible {
     'Evaluate the sum'
   ];
   let stage = 0;
+  let lastA = null;
+  let lastB = null;
 
   const $ = id => document.getElementById(id);
   const sx = mx => PA.x + (mx - X_MIN)/(X_MAX - X_MIN) * PA.w;
@@ -222,14 +224,7 @@ button:focus-visible {
     for (let y = Y_MIN; y <= Y_MAX; y += 2) if (y !== 0) ticks += `<text x="${sx(0)-7}" y="${sy(y)+3.5}" text-anchor="end">${y}</text>`;
     $('ewb6-ticks').innerHTML = ticks;
   }
-  function update(){
-    const a = +$('ewb6-a').value;
-    const b = +$('ewb6-b').value;
-    $('ewb6-aNum').value = a;
-    $('ewb6-bNum').value = b;
-    $('ewb6-eq').innerHTML = term(a, 'x', true) + ' ' + term(b, 'y', false);
-    $('ewb6-stage').innerHTML = `<strong>${stage + 1}/3</strong> ${STAGES[stage]}`;
-
+  function renderSpace(a, b){
     let transGrid = '';
     if (Math.abs(a) > 1e-9) {
       const maxK = Math.max(2, Math.ceil(X_MAX / Math.abs(a)) + 2);
@@ -247,21 +242,49 @@ button:focus-visible {
       const ty = b * sample.y;
       const cx = sx(tx);
       const cy = sy(ty);
+      points += `<circle class="ewb6-point" cx="${cx}" cy="${cy}" r="4.4" fill="#7c3aed" fill-opacity="0.74" stroke="#fff" stroke-width="0.8"/>`;
+    });
+    $('ewb6-points').innerHTML = points;
+  }
+
+  function renderLabels(a, b){
+    let labels = '';
+    SAMPLES.forEach(sample => {
+      const tx = a * sample.x;
+      const ty = b * sample.y;
+      const cx = sx(tx);
+      const cy = sy(ty);
       const labelX = sample.x < 1 ? cx + 8 : cx - 8;
       const labelY = sample.y < 1 ? cy - 9 : cy + 17;
       const anchor = sample.x < 1 ? 'start' : 'end';
-      points += `<circle class="ewb6-point" cx="${cx}" cy="${cy}" r="4.4" fill="#7c3aed" fill-opacity="0.74" stroke="#fff" stroke-width="0.8"/>`;
-      points += `<text class="ewb6-label-text" x="${labelX}" y="${labelY}" text-anchor="${anchor}" fill="#312e81">${labelFor(tx, ty)}</text>`;
+      labels += `<text class="ewb6-label-text" x="${labelX}" y="${labelY}" text-anchor="${anchor}" fill="#312e81">${labelFor(tx, ty)}</text>`;
     });
-    $('ewb6-points').innerHTML = points;
+    $('ewb6-labels').innerHTML = labels;
+  }
+
+  function update(options = {}){
+    const a = +$('ewb6-a').value;
+    const b = +$('ewb6-b').value;
+    const geometryChanged = options.forceGeometry || a !== lastA || b !== lastB;
+    $('ewb6-aNum').value = a;
+    $('ewb6-bNum').value = b;
+    $('ewb6-eq').innerHTML = term(a, 'x', true) + ' ' + term(b, 'y', false);
+    $('ewb6-stage').innerHTML = `<strong>${stage + 1}/3</strong> ${STAGES[stage]}`;
+
+    if (geometryChanged) {
+      renderSpace(a, b);
+      lastA = a;
+      lastB = b;
+    }
+    renderLabels(a, b);
 
     const exX = 3 * a;
     const exY = 4 * b;
     const message = stage === 0
       ? `This shows every coordinate in a small 3-by-3 patch of the original space after scaling. Separately, the article example <em>(3, 4)</em> would become <em>(${fmt(exX)}, ${fmt(exY)})</em>.`
       : stage === 1
-        ? `The comma is no longer doing coordinate-pair work. It becomes the signed operation: <em>(${fmt(exX)}, ${fmt(exY)})</em> becomes <em>(${fmt(exX)} ${signedPart(exY)})</em>.`
-        : `Now each displayed coordinate has been evaluated as one number. For <em>(3, 4)</em>, <em>${fmt(exX)} ${signedPart(exY)} = ${fmt(exX + exY)}</em>.`;
+        ? `The transformed space has not changed. Only the notation changes: the comma is replaced by the signed operation, so <em>(${fmt(exX)}, ${fmt(exY)})</em> becomes <em>(${fmt(exX)} ${signedPart(exY)})</em>.`
+        : `The transformed space still has not changed. Now each displayed expression is evaluated as one number. For <em>(3, 4)</em>, <em>${fmt(exX)} ${signedPart(exY)} = ${fmt(exX + exY)}</em>.`;
     $('ewb6-status').innerHTML = message;
     resizeFrame();
   }
@@ -269,7 +292,7 @@ button:focus-visible {
     $('ewb6-a').value = a;
     $('ewb6-b').value = b;
     stage = 0;
-    update();
+    update({ forceGeometry: true });
   }
   function resizeFrame(){
     if (!window.frameElement) return;
@@ -278,14 +301,14 @@ button:focus-visible {
   }
 
   buildBase();
-  $('ewb6-a').addEventListener('input', update);
-  $('ewb6-b').addEventListener('input', update);
+  $('ewb6-a').addEventListener('input', () => update());
+  $('ewb6-b').addEventListener('input', () => update());
   $('ewb6-aNum').addEventListener('input', () => { $('ewb6-a').value = $('ewb6-aNum').value; update(); });
   $('ewb6-bNum').addEventListener('input', () => { $('ewb6-b').value = $('ewb6-bNum').value; update(); });
   $('ewb6-next').addEventListener('click', () => { stage = (stage + 1) % STAGES.length; update(); });
   $('ewb6-prev').addEventListener('click', () => { stage = (stage + STAGES.length - 1) % STAGES.length; update(); });
   $('ewb6-reset').addEventListener('click', () => setVals(4, -2));
-  update();
+  update({ forceGeometry: true });
   window.addEventListener('load', resizeFrame);
   window.addEventListener('resize', resizeFrame);
 })();
