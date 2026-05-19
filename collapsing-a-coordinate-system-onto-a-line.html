@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collapsing a coordinate system onto a line | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Collapsing a coordinate system onto a line</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Imagine a 2D coordinate plane.</p>
+
+        <p>Each coordinate encodes information about two independent directions.</p>
+
+        <p class="display-equation">$(3,-4)$</p>
+
+        <p>This denotes a location three positive units in one direction and four negative units in another.</p>
+
+        <p>There is no operation implied.</p>
+
+        <p>However, what would it mean if we summed every coordinate?</p>
+
+        <p>Say we added these two values together.</p>
+
+        <p>For example:</p>
+
+        <ul>
+          <li>$(3, -4) \to -1$</li>
+          <li>$(1, 1) \to 2$</li>
+          <li>$(5, 9) \to 14$</li>
+        </ul>
+
+        <p>How could we interpret these summed values?</p>
+
+        <p>We have lost any information about how far our point is from the center of the axis.</p>
+
+        <p>For example,</p>
+
+        <ul>
+          <li>$(2, 3) \to 5$</li>
+          <li>$(100, -95) \to 5$</li>
+        </ul>
+
+        <p>The first is very close to the center, the other is not.</p>
+
+        <p>We have also lost information about whether we are on the right or left side of the vertical axis, or above or below the horizontal axis.</p>
+
+        <p>So what information is maintained within these summed values?</p>
+
+        <p>Firstly, notice that points producing the same sum are not random.</p>
+
+        <p>For example:</p>
+
+        <ul>
+          <li>$(2, 3) \to 5$</li>
+          <li>$(4, 1) \to 5$</li>
+          <li>$(10, -5) \to 5$</li>
+        </ul>
+
+        <p>These points all lie on the same diagonal line.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize essay-widget-coordinate-collapse"
+          src="linear-algebra/collapsing-a-coordinate-system-onto-a-line/standard_coordinate_collapse.html"
+          title="Interactive widget showing coordinates collapsing onto summed-value lines"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

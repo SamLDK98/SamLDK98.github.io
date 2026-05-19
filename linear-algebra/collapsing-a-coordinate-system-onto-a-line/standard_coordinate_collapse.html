@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standard coordinate collapse</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --purple: #7c3aed;
+  --green: #16a34a;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body { padding: 0 1rem 1rem; color: var(--ink); font-family: Georgia, "Cambria", "Times New Roman", serif; }
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible,
+button.is-active {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+button.is-active {
+  box-shadow: inset 0 0 0 1px rgba(26,26,26,0.16);
+}
+.scc { max-width: 720px; margin: 0 auto; padding: 1rem 0; }
+.scc-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.scc-label {
+  margin-bottom: 0.55rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.scc-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.scc-stage {
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.scc-stage strong { color: var(--ink); font-weight: 650; }
+.scc-plane-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+}
+.scc-plane { width: 100%; max-width: 560px; height: auto; display: block; color: var(--ink); }
+.scc-axis { stroke: var(--ink); stroke-width: 1.2; stroke-opacity: 0.58; }
+.scc-grid-line { stroke: var(--purple); stroke-width: 1.1; stroke-opacity: 0.18; }
+.scc-value-line {
+  stroke: var(--green);
+  stroke-width: 1.6;
+  stroke-opacity: 0.62;
+  stroke-dasharray: 5 4;
+}
+.scc-dot {
+  fill: var(--purple);
+  fill-opacity: 0.76;
+  stroke: #ffffff;
+  stroke-width: 0.8;
+}
+.scc-label-text {
+  fill: #312e81;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.scc-status {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.scc-status em { color: var(--ink); font-style: italic; }
+@media (max-width: 520px) {
+  .scc-label-text { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div class="scc" id="scc-root" role="region" aria-label="Coordinate collapse stages widget">
+  <div class="scc-card">
+    <div class="scc-label">Summing coordinates</div>
+    <div class="scc-buttons">
+      <button class="scc-stage-btn" data-stage="0">Coordinates</button>
+      <button class="scc-stage-btn" data-stage="1">Signed operations</button>
+      <button class="scc-stage-btn" data-stage="2">Sums</button>
+      <button class="scc-stage-btn" data-stage="3">Equal-value lines</button>
+      <span class="scc-stage" id="scc-stage"></span>
+    </div>
+  </div>
+
+  <div class="scc-plane-wrap">
+    <svg class="scc-plane" viewBox="0 0 560 500" aria-label="Coordinate plane showing summed coordinate stages">
+      <defs>
+        <clipPath id="scc-clip"><rect x="42" y="32" width="476" height="396"/></clipPath>
+      </defs>
+      <g id="scc-grid" clip-path="url(#scc-clip)"></g>
+      <line id="scc-axis-x" class="scc-axis"/>
+      <line id="scc-axis-y" class="scc-axis"/>
+      <g id="scc-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.52"></g>
+      <g id="scc-value-lines" clip-path="url(#scc-clip)"></g>
+      <g id="scc-points" clip-path="url(#scc-clip)"></g>
+      <g id="scc-labels"></g>
+    </svg>
+  </div>
+
+  <div class="scc-status" id="scc-status"></div>
+</div>
+
+<script>
+(function(){
+  const X_MIN = -4, X_MAX = 4, Y_MIN = -4, Y_MAX = 4;
+  const PA = { x: 42, y: 32, w: 476, h: 396 };
+  const POINTS = [];
+  for (let x = -2; x <= 2; x++) {
+    for (let y = -2; y <= 2; y++) POINTS.push({ x, y });
+  }
+  const STAGES = [
+    'Coordinate locations',
+    'Comma becomes signed operation',
+    'Each coordinate becomes one value',
+    'Same values form diagonal lines'
+  ];
+  let stage = 0;
+  const $ = id => document.getElementById(id);
+  const sx = x => PA.x + (x - X_MIN) / (X_MAX - X_MIN) * PA.w;
+  const sy = y => PA.y + (Y_MAX - y) / (Y_MAX - Y_MIN) * PA.h;
+
+  function fmt(n){ return Number.isInteger(n) ? String(n) : (Math.round(n * 100) / 100).toString(); }
+  function signedPart(n){ return n < 0 ? `- ${fmt(Math.abs(n))}` : `+ ${fmt(n)}`; }
+  function labelFor(point){
+    const sum = point.x + point.y;
+    if (stage === 0) return `(${fmt(point.x)}, ${fmt(point.y)})`;
+    if (stage === 1) return `(${fmt(point.x)} ${signedPart(point.y)})`;
+    return `(${fmt(sum)})`;
+  }
+  function lineSegmentForSum(sum){
+    const candidates = [
+      { x: X_MIN, y: sum - X_MIN },
+      { x: X_MAX, y: sum - X_MAX },
+      { x: sum - Y_MIN, y: Y_MIN },
+      { x: sum - Y_MAX, y: Y_MAX }
+    ].filter(point =>
+      point.x >= X_MIN - 1e-9 &&
+      point.x <= X_MAX + 1e-9 &&
+      point.y >= Y_MIN - 1e-9 &&
+      point.y <= Y_MAX + 1e-9
+    );
+    const unique = [];
+    candidates.forEach(point => {
+      if (!unique.some(other => Math.abs(other.x - point.x) < 1e-9 && Math.abs(other.y - point.y) < 1e-9)) unique.push(point);
+    });
+    return unique.length >= 2 ? unique.slice(0, 2) : null;
+  }
+  function drawBase(){
+    let grid = '';
+    for (let y = -2; y <= 2; y++) {
+      grid += `<line class="scc-grid-line" x1="${sx(-2)}" y1="${sy(y)}" x2="${sx(2)}" y2="${sy(y)}"/>`;
+    }
+    for (let x = -2; x <= 2; x++) {
+      grid += `<line class="scc-grid-line" x1="${sx(x)}" y1="${sy(-2)}" x2="${sx(x)}" y2="${sy(2)}"/>`;
+    }
+    $('scc-grid').innerHTML = grid;
+    $('scc-axis-x').setAttribute('x1', sx(X_MIN));
+    $('scc-axis-x').setAttribute('y1', sy(0));
+    $('scc-axis-x').setAttribute('x2', sx(X_MAX));
+    $('scc-axis-x').setAttribute('y2', sy(0));
+    $('scc-axis-y').setAttribute('x1', sx(0));
+    $('scc-axis-y').setAttribute('y1', sy(Y_MIN));
+    $('scc-axis-y').setAttribute('x2', sx(0));
+    $('scc-axis-y').setAttribute('y2', sy(Y_MAX));
+    let ticks = '';
+    for (let x = -4; x <= 4; x += 2) if (x !== 0) ticks += `<text x="${sx(x)}" y="${sy(0)+14}" text-anchor="middle">${x}</text>`;
+    for (let y = -4; y <= 4; y += 2) if (y !== 0) ticks += `<text x="${sx(0)-7}" y="${sy(y)+3.5}" text-anchor="end">${y}</text>`;
+    $('scc-ticks').innerHTML = ticks;
+  }
+  function renderPoints(){
+    $('scc-points').innerHTML = POINTS.map(point =>
+      `<circle class="scc-dot" cx="${sx(point.x)}" cy="${sy(point.y)}" r="4.5"/>`
+    ).join('');
+  }
+  function renderLabels(){
+    const labels = POINTS.map(point => {
+      const x = sx(point.x) + 8;
+      const y = sy(point.y) - 9;
+      return `<text class="scc-label-text" x="${x}" y="${y}" text-anchor="start">${labelFor(point)}</text>`;
+    }).join('');
+    $('scc-labels').innerHTML = labels;
+  }
+  function renderValueLines(){
+    if (stage !== 3) {
+      $('scc-value-lines').innerHTML = '';
+      return;
+    }
+    const sums = Array.from(new Set(POINTS.map(point => point.x + point.y))).sort((a, b) => a - b);
+    $('scc-value-lines').innerHTML = sums.map(sum => {
+      const segment = lineSegmentForSum(sum);
+      if (!segment) return '';
+      return `<line class="scc-value-line" x1="${sx(segment[0].x)}" y1="${sy(segment[0].y)}" x2="${sx(segment[1].x)}" y2="${sy(segment[1].y)}"/>`;
+    }).join('');
+  }
+  function update(){
+    document.querySelectorAll('.scc-stage-btn').forEach(button => {
+      button.classList.toggle('is-active', Number(button.dataset.stage) === stage);
+    });
+    $('scc-stage').innerHTML = `<strong>${stage + 1}/${STAGES.length}</strong> ${STAGES[stage]}`;
+    renderLabels();
+    renderValueLines();
+    const status = stage === 0
+      ? `The labels are ordinary coordinates. A point like <em>(2, 3)</em> names a location; no operation has happened yet.`
+      : stage === 1
+        ? `Now the comma is replaced by the signed operation: <em>(2, 3)</em> is read as <em>(2 + 3)</em>, and <em>(3, -4)</em> is read as <em>(3 - 4)</em>.`
+        : stage === 2
+          ? `Each coordinate has collapsed to a single number. This loses some location information, but preserves the sum.`
+          : `Points with the same sum line up diagonally. The summed value identifies which diagonal line the point belongs to.`;
+    $('scc-status').innerHTML = status;
+    resizeFrame();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('scc-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+
+  drawBase();
+  renderPoints();
+  document.querySelectorAll('.scc-stage-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      stage = Number(button.dataset.stage);
+      update();
+    });
+  });
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>
