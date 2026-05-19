@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equivalent lines to number line</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --green: #16a34a;
+  --purple: #7c3aed;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body { padding: 0 1rem 1rem; color: var(--ink); font-family: Georgia, "Cambria", "Times New Roman", serif; }
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible,
+button.is-active {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+button.is-active { box-shadow: inset 0 0 0 1px rgba(26,26,26,0.16); }
+.eln { max-width: 720px; margin: 0 auto; padding: 1rem 0; }
+.eln-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.eln-label {
+  margin-bottom: 0.55rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.eln-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.eln-stage {
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.eln-stage strong { color: var(--ink); font-weight: 650; }
+.eln-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+}
+.eln-svg { width: 100%; max-width: 600px; height: auto; display: block; color: var(--ink); }
+.eln-axis { stroke: var(--ink); stroke-width: 1.1; stroke-opacity: 0.55; }
+.eln-eq-line {
+  stroke: var(--green);
+  stroke-width: 1.8;
+  stroke-opacity: 0.72;
+  stroke-dasharray: 5 4;
+}
+.eln-stack-line {
+  stroke: var(--green);
+  stroke-width: 2;
+  stroke-opacity: 0.76;
+}
+.eln-number-line {
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-opacity: 0.72;
+}
+.eln-drop {
+  stroke: #9ca3af;
+  stroke-width: 1;
+  stroke-opacity: 0.46;
+  stroke-dasharray: 3 4;
+}
+.eln-dot {
+  fill: var(--purple);
+  fill-opacity: 0.78;
+  stroke: #fff;
+  stroke-width: 0.8;
+}
+.eln-label-text {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.eln-muted-text {
+  fill: var(--muted);
+  font-family: var(--sans);
+  font-size: 12px;
+}
+.eln-status {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.eln-status em { color: var(--ink); font-style: italic; }
+@media (max-width: 520px) {
+  .eln-label-text { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div class="eln" id="eln-root" role="region" aria-label="Equal-sum lines represented on a number line">
+  <div class="eln-card">
+    <div class="eln-label">Lump equal coordinates into values</div>
+    <div class="eln-buttons">
+      <button class="eln-stage-btn" data-stage="0">Diagonal lines</button>
+      <button class="eln-stage-btn" data-stage="1">Vertical stacks</button>
+      <button class="eln-stage-btn" data-stage="2">Number line</button>
+      <span class="eln-stage" id="eln-stage"></span>
+    </div>
+  </div>
+
+  <div class="eln-wrap">
+    <svg class="eln-svg" viewBox="0 0 640 470" aria-label="Stages showing diagonal equal-sum lines becoming a number line">
+      <g id="eln-scene"></g>
+    </svg>
+  </div>
+
+  <div class="eln-status" id="eln-status"></div>
+</div>
+
+<script>
+(function(){
+  const SUMS = [-4, -2, 0, 2, 4];
+  const X_MIN = -4, X_MAX = 4, Y_MIN = -4, Y_MAX = 4;
+  const PA = { x: 80, y: 34, w: 420, h: 330 };
+  const BASE_Y = 340;
+  const STACK_TOP = 84;
+  const STACK_BOTTOM = 270;
+  const LINE_Y = 360;
+  let stage = 0;
+  const $ = id => document.getElementById(id);
+  const sx = x => PA.x + (x - X_MIN) / (X_MAX - X_MIN) * PA.w;
+  const sy = y => PA.y + (Y_MAX - y) / (Y_MAX - Y_MIN) * PA.h;
+  const stackX = sum => 110 + (sum + 4) / 8 * 420;
+
+  function lineSegmentForSum(sum){
+    const candidates = [
+      { x: X_MIN, y: sum - X_MIN },
+      { x: X_MAX, y: sum - X_MAX },
+      { x: sum - Y_MIN, y: Y_MIN },
+      { x: sum - Y_MAX, y: Y_MAX }
+    ].filter(point =>
+      point.x >= X_MIN - 1e-9 &&
+      point.x <= X_MAX + 1e-9 &&
+      point.y >= Y_MIN - 1e-9 &&
+      point.y <= Y_MAX + 1e-9
+    );
+    const unique = [];
+    candidates.forEach(point => {
+      if (!unique.some(other => Math.abs(other.x - point.x) < 1e-9 && Math.abs(other.y - point.y) < 1e-9)) unique.push(point);
+    });
+    return unique.slice(0, 2);
+  }
+  function samplePoints(sum){
+    const pts = [];
+    for (let x = -3; x <= 3; x++) {
+      const y = sum - x;
+      if (y >= -3 && y <= 3) pts.push({ x, y });
+    }
+    return pts.slice(0, 5);
+  }
+  function axes(){
+    return `
+      <line class="eln-axis" x1="${sx(X_MIN)}" y1="${sy(0)}" x2="${sx(X_MAX)}" y2="${sy(0)}"/>
+      <line class="eln-axis" x1="${sx(0)}" y1="${sy(Y_MIN)}" x2="${sx(0)}" y2="${sy(Y_MAX)}"/>
+    `;
+  }
+  function diagonalScene(){
+    let html = axes();
+    SUMS.forEach(sum => {
+      const segment = lineSegmentForSum(sum);
+      html += `<line class="eln-eq-line" x1="${sx(segment[0].x)}" y1="${sy(segment[0].y)}" x2="${sx(segment[1].x)}" y2="${sy(segment[1].y)}"/>`;
+      const labelPoint = segment[0].y < segment[1].y ? segment[0] : segment[1];
+      html += `<text class="eln-label-text" x="${sx(labelPoint.x)}" y="${sy(labelPoint.y)+16}" text-anchor="middle">${sum}</text>`;
+      samplePoints(sum).forEach(point => {
+        html += `<circle class="eln-dot" cx="${sx(point.x)}" cy="${sy(point.y)}" r="4.4"/>`;
+      });
+    });
+    html += `<text class="eln-muted-text" x="80" y="410">Each diagonal line is one equivalence group under x + y.</text>`;
+    return html;
+  }
+  function stackScene(withNumberLine){
+    let html = '';
+    SUMS.forEach(sum => {
+      const x = stackX(sum);
+      html += `<line class="eln-stack-line" x1="${x}" y1="${STACK_TOP}" x2="${x}" y2="${STACK_BOTTOM}"/>`;
+      samplePoints(sum).forEach((point, i) => {
+        const y = STACK_TOP + 28 + i * 28;
+        html += `<circle class="eln-dot" cx="${x}" cy="${y}" r="4.4"/>`;
+      });
+      html += `<text class="eln-label-text" x="${x}" y="${STACK_BOTTOM + 28}" text-anchor="middle">${sum}</text>`;
+      if (withNumberLine) {
+        html += `<line class="eln-drop" x1="${x}" y1="${STACK_BOTTOM + 34}" x2="${x}" y2="${LINE_Y - 6}"/>`;
+      }
+    });
+    if (withNumberLine) {
+      const left = stackX(SUMS[0]);
+      const right = stackX(SUMS[SUMS.length - 1]);
+      html += `<line class="eln-number-line" x1="${left - 38}" y1="${LINE_Y}" x2="${right + 38}" y2="${LINE_Y}"/>`;
+      SUMS.forEach(sum => {
+        const x = stackX(sum);
+        html += `<line class="eln-axis" x1="${x}" y1="${LINE_Y - 6}" x2="${x}" y2="${LINE_Y + 6}"/>`;
+        html += `<text class="eln-label-text" x="${x}" y="${LINE_Y + 28}" text-anchor="middle">${sum}</text>`;
+      });
+      html += `<text class="eln-muted-text" x="80" y="430">The horizontal line records the output values: one value for each vertical stack.</text>`;
+    } else {
+      html += `<text class="eln-muted-text" x="80" y="390">Rotate each equivalence group into a vertical stack and label it by its sum.</text>`;
+    }
+    return html;
+  }
+  function update(){
+    document.querySelectorAll('.eln-stage-btn').forEach(button => {
+      button.classList.toggle('is-active', Number(button.dataset.stage) === stage);
+    });
+    const labels = ['Diagonal equal-sum lines', 'Rotate groups into stacks', 'Represent stacks on a line'];
+    $('eln-stage').innerHTML = `<strong>${stage + 1}/3</strong> ${labels[stage]}`;
+    $('eln-scene').innerHTML = stage === 0 ? diagonalScene() : stage === 1 ? stackScene(false) : stackScene(true);
+    $('eln-status').innerHTML = stage === 0
+      ? `All points on the same diagonal have the same summed value. They are equivalent under the operation <em>x + y</em>.`
+      : stage === 1
+        ? `Each diagonal group is treated as one bundle. The label below the stack is the value shared by every coordinate in that bundle.`
+        : `Those bundles can now be represented on a one-dimensional number line: each stack becomes one position on the line.`;
+    resizeFrame();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('eln-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+
+  document.querySelectorAll('.eln-stage-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      stage = Number(button.dataset.stage);
+      update();
+    });
+  });
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>
