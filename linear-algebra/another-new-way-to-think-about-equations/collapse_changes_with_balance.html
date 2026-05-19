@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collapse changes with coefficient balance</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --blue: #2563eb;
+  --orange: #ea580c;
+  --green: #16a34a;
+  --purple: #7c3aed;
+  --red: #dc2626;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body { padding: 0 1rem 1rem; color: var(--ink); font-family: Georgia, "Cambria", "Times New Roman", serif; }
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+.ccb { max-width: 720px; margin: 0 auto; padding: 1rem 0; }
+.ccb-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.ccb-label {
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ccb-eq {
+  min-height: 1.4em;
+  margin-bottom: 0.7rem;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-style: italic;
+  line-height: 1.4;
+}
+.ccb-eq .x { color: var(--blue); font-style: normal; font-weight: 500; }
+.ccb-eq .y { color: var(--orange); font-style: normal; font-weight: 500; }
+.ccb-eq .op { color: var(--muted); margin: 0 0.12em; font-style: normal; }
+.ccb-eq .var { font-style: italic; }
+.ccb-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 22px;
+}
+.ccb-ctrl { display: flex; align-items: center; gap: 8px; }
+.ccb-ctrl .name {
+  min-width: 16px;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+}
+.ccb-ctrl .name.x { color: var(--blue); }
+.ccb-ctrl .name.y { color: var(--orange); }
+.ccb-ctrl input[type=range] { flex: 1; min-width: 0; }
+.ccb-ctrl input[type=number] {
+  width: 60px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.ccb-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0.7rem;
+}
+.ccb-figure {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem 0;
+}
+.ccb-svg { width: 100%; height: auto; display: block; }
+.ccb-axis { stroke: var(--ink); stroke-width: 1.1; stroke-opacity: 0.55; }
+.ccb-line {
+  stroke: var(--green);
+  stroke-width: 1.35;
+  stroke-opacity: 0.5;
+  stroke-dasharray: 5 4;
+}
+.ccb-base-line { stroke: #64748b; stroke-opacity: 0.42; }
+.ccb-pane-title {
+  fill: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ccb-pane-note {
+  fill: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+}
+.ccb-dot {
+  stroke: #fff;
+  stroke-width: 1;
+}
+.ccb-dot-label {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.ccb-status {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.ccb-status em { color: var(--ink); font-style: italic; }
+@media (max-width: 620px) {
+  .ccb-controls { grid-template-columns: 1fr; }
+  .ccb-svg { min-height: 620px; }
+}
+</style>
+</head>
+<body>
+<div class="ccb" id="ccb-root" role="region" aria-label="Collapse changes with coefficient balance widget">
+  <div class="ccb-card">
+    <div class="ccb-label">Changed coefficient balance</div>
+    <div class="ccb-eq" id="ccb-eq"></div>
+    <div class="ccb-controls">
+      <div class="ccb-ctrl">
+        <span class="name x">x</span>
+        <input id="ccb-a" type="range" min="-5" max="5" step="0.5" value="4">
+        <input id="ccb-a-num" type="number" min="-5" max="5" step="0.5" value="4">
+      </div>
+      <div class="ccb-ctrl">
+        <span class="name y">y</span>
+        <input id="ccb-b" type="range" min="-5" max="5" step="0.5" value="-2">
+        <input id="ccb-b-num" type="number" min="-5" max="5" step="0.5" value="-2">
+      </div>
+    </div>
+    <div class="ccb-buttons">
+      <button data-preset="4,-4">Same balance: 4x - 4y</button>
+      <button data-preset="4,-2">Changed balance: 4x - 2y</button>
+      <button data-preset="1,-3">Y-heavy: x - 3y</button>
+      <button data-preset="1,-1">Base: x - y</button>
+    </div>
+  </div>
+
+  <div class="ccb-figure">
+    <svg class="ccb-svg" viewBox="0 0 680 500" aria-label="Side by side equal-output line comparison">
+      <defs>
+        <clipPath id="ccb-left-clip"><rect x="38" y="58" width="280" height="280"/></clipPath>
+        <clipPath id="ccb-right-clip"><rect x="362" y="58" width="280" height="280"/></clipPath>
+      </defs>
+      <text class="ccb-pane-title" x="38" y="34">Base collapse: x - y</text>
+      <text class="ccb-pane-note" x="38" y="50">Points on each dashed line share one output.</text>
+      <text class="ccb-pane-title" id="ccb-right-title" x="362" y="34">Changed collapse: 4x - 2y</text>
+      <text class="ccb-pane-note" id="ccb-right-note" x="362" y="50">Changing the balance changes the line family.</text>
+      <g id="ccb-left"></g>
+      <g id="ccb-right"></g>
+      <g id="ccb-focus"></g>
+      <g id="ccb-legend"></g>
+    </svg>
+  </div>
+
+  <div class="ccb-status" id="ccb-status"></div>
+</div>
+
+<script>
+(function(){
+  const BOUNDS = { min: -3, max: 3 };
+  const LEFT = { x: 38, y: 58, w: 280, h: 280 };
+  const RIGHT = { x: 362, y: 58, w: 280, h: 280 };
+  const FOCUS = [
+    { x: -1, y: -1, label: 'A', color: '#2563eb' },
+    { x: 0, y: 0, label: 'B', color: '#16a34a' },
+    { x: 1, y: 1, label: 'C', color: '#dc2626' }
+  ];
+  const PATCH = [];
+  for (let x = -2; x <= 2; x++) {
+    for (let y = -2; y <= 2; y++) PATCH.push({ x, y });
+  }
+  const $ = id => document.getElementById(id);
+
+  function fmt(n){
+    if (Number.isInteger(n)) return String(n);
+    return (Math.round(n * 100) / 100).toString();
+  }
+  function sx(pane, x){
+    return pane.x + (x - BOUNDS.min) / (BOUNDS.max - BOUNDS.min) * pane.w;
+  }
+  function sy(pane, y){
+    return pane.y + (BOUNDS.max - y) / (BOUNDS.max - BOUNDS.min) * pane.h;
+  }
+  function term(a, b){
+    const first = coefTerm(a, 'x', true);
+    const second = coefTerm(b, 'y', false);
+    return first + ' ' + second;
+  }
+  function coefTerm(coef, varName, first){
+    const cls = varName === 'x' ? 'x' : 'y';
+    if (coef === 0) return first ? `<span class="${cls}">0<span class="var">${varName}</span></span>` : `<span class="op">+</span><span class="${cls}">0<span class="var">${varName}</span></span>`;
+    const sign = coef < 0 ? '-' : (first ? '' : '+');
+    const mag = Math.abs(coef);
+    const num = mag === 1 ? '' : fmt(mag);
+    if (first) return `<span class="${cls}">${sign}${num}<span class="var">${varName}</span></span>`;
+    return `<span class="op">${sign}</span><span class="${cls}">${num}<span class="var">${varName}</span></span>`;
+  }
+  function plainEquation(a, b){
+    const first = plainTerm(a, 'x', true);
+    const second = plainTerm(b, 'y', false);
+    return `${first} ${second}`;
+  }
+  function plainTerm(coef, varName, first){
+    if (coef === 0) return first ? `0${varName}` : `+ 0${varName}`;
+    const sign = coef < 0 ? '-' : (first ? '' : '+');
+    const mag = Math.abs(coef);
+    const num = mag === 1 ? '' : fmt(mag);
+    return first ? `${sign}${num}${varName}` : `${sign} ${num}${varName}`;
+  }
+  function lineSegment(a, b, c){
+    const min = BOUNDS.min;
+    const max = BOUNDS.max;
+    const candidates = [];
+    if (Math.abs(b) > 1e-9) {
+      candidates.push({ x: min, y: (c - a * min) / b });
+      candidates.push({ x: max, y: (c - a * max) / b });
+    }
+    if (Math.abs(a) > 1e-9) {
+      candidates.push({ x: (c - b * min) / a, y: min });
+      candidates.push({ x: (c - b * max) / a, y: max });
+    }
+    const inside = candidates.filter(point =>
+      point.x >= min - 1e-9 &&
+      point.x <= max + 1e-9 &&
+      point.y >= min - 1e-9 &&
+      point.y <= max + 1e-9
+    );
+    const unique = [];
+    inside.forEach(point => {
+      if (!unique.some(other => Math.abs(other.x - point.x) < 1e-8 && Math.abs(other.y - point.y) < 1e-8)) {
+        unique.push(point);
+      }
+    });
+    return unique.length >= 2 ? unique.slice(0, 2) : null;
+  }
+  function uniqueOutputs(a, b){
+    return Array.from(new Set(PATCH.map(point => fmt(a * point.x + b * point.y))))
+      .map(Number)
+      .sort((u, v) => u - v);
+  }
+  function axes(pane){
+    return `
+      <line class="ccb-axis" x1="${sx(pane, BOUNDS.min)}" y1="${sy(pane, 0)}" x2="${sx(pane, BOUNDS.max)}" y2="${sy(pane, 0)}"/>
+      <line class="ccb-axis" x1="${sx(pane, 0)}" y1="${sy(pane, BOUNDS.min)}" x2="${sx(pane, 0)}" y2="${sy(pane, BOUNDS.max)}"/>
+    `;
+  }
+  function linesFor(pane, clipId, a, b, className){
+    return `<g clip-path="url(#${clipId})">` + uniqueOutputs(a, b).map(c => {
+      const segment = lineSegment(a, b, c);
+      if (!segment) return '';
+      return `<line class="ccb-line ${className}" x1="${sx(pane, segment[0].x)}" y1="${sy(pane, segment[0].y)}" x2="${sx(pane, segment[1].x)}" y2="${sy(pane, segment[1].y)}"/>`;
+    }).join('') + '</g>';
+  }
+  function focusDots(pane, a, b, prefix){
+    return FOCUS.map(point => {
+      const output = a * point.x + b * point.y;
+      return `
+        <circle class="ccb-dot" cx="${sx(pane, point.x)}" cy="${sy(pane, point.y)}" r="6" fill="${point.color}"/>
+        <text class="ccb-dot-label" x="${sx(pane, point.x) + 8}" y="${sy(pane, point.y) - 9}">${point.label}: ${fmt(output)}</text>
+      `;
+    }).join('');
+  }
+  function patchDots(pane){
+    return PATCH.map(point => `<circle cx="${sx(pane, point.x)}" cy="${sy(pane, point.y)}" r="2.2" fill="#111827" fill-opacity="0.22"/>`).join('');
+  }
+  function setVals(a, b){
+    $('ccb-a').value = a;
+    $('ccb-b').value = b;
+    update();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('ccb-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+  function update(){
+    const a = +$('ccb-a').value;
+    const b = +$('ccb-b').value;
+    $('ccb-a-num').value = a;
+    $('ccb-b-num').value = b;
+    $('ccb-eq').innerHTML = term(a, b);
+    $('ccb-right-title').textContent = `Comparison collapse: ${plainEquation(a, b)}`;
+
+    $('ccb-left').innerHTML = axes(LEFT) + linesFor(LEFT, 'ccb-left-clip', 1, -1, 'ccb-base-line') + patchDots(LEFT);
+    $('ccb-right').innerHTML = axes(RIGHT) + linesFor(RIGHT, 'ccb-right-clip', a, b, '') + patchDots(RIGHT);
+    $('ccb-focus').innerHTML = focusDots(LEFT, 1, -1, 'base') + focusDots(RIGHT, a, b, 'comparison');
+
+    const baseOutputs = FOCUS.map(point => point.x - point.y);
+    const comparisonOutputs = FOCUS.map(point => a * point.x + b * point.y);
+    const sameBalance = Math.abs(a + b) < 1e-9;
+    $('ccb-right-note').textContent = sameBalance
+      ? 'Same balance: the highlighted points stay grouped.'
+      : 'Changed balance: the highlighted points split apart.';
+    $('ccb-status').innerHTML = sameBalance
+      ? `Because <em>${plainEquation(a, b)}</em> is a uniform scaling of <em>x - y</em>, points A, B, and C still share output <em>${fmt(comparisonOutputs[1])}</em>. The collapse grouping is preserved.`
+      : `In <em>x - y</em>, A, B, and C all share output <em>${fmt(baseOutputs[0])}</em>. Under <em>${plainEquation(a, b)}</em>, they become <em>${comparisonOutputs.map(fmt).join(', ')}</em>, so the collapse itself has changed.`;
+    resizeFrame();
+  }
+
+  $('ccb-a').addEventListener('input', update);
+  $('ccb-b').addEventListener('input', update);
+  $('ccb-a-num').addEventListener('input', () => { $('ccb-a').value = $('ccb-a-num').value; update(); });
+  $('ccb-b-num').addEventListener('input', () => { $('ccb-b').value = $('ccb-b-num').value; update(); });
+  document.querySelectorAll('[data-preset]').forEach(button => {
+    button.addEventListener('click', () => {
+      const parts = button.dataset.preset.split(',').map(Number);
+      setVals(parts[0], parts[1]);
+    });
+  });
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>
