@@ -118,15 +118,21 @@ button:focus-visible {
 .ewb6-status em { color: var(--ink); font-style: italic; }
 .ewb6-label-text {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 9px;
   paint-order: stroke;
   stroke: #ffffff;
   stroke-width: 4px;
   stroke-linejoin: round;
 }
+.ewb6-value-line {
+  stroke: #16a34a;
+  stroke-width: 1.6;
+  stroke-opacity: 0.58;
+  stroke-dasharray: 5 4;
+}
 @media (max-width: 520px) {
   .ewb6-controls { grid-template-columns: 1fr; }
-  .ewb6-label-text { font-size: 10px; }
+  .ewb6-label-text { font-size: 8px; }
 }
 </style>
 </head>
@@ -165,6 +171,7 @@ button:focus-visible {
       <line id="ewb6-axisX" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.2"/>
       <line id="ewb6-axisY" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.2"/>
       <g id="ewb6-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.52"></g>
+      <g id="ewb6-valueLines" clip-path="url(#ewb6-clip)"></g>
       <g id="ewb6-points" clip-path="url(#ewb6-clip)"></g>
       <g id="ewb6-labels"></g>
     </svg>
@@ -175,18 +182,19 @@ button:focus-visible {
 
 <script>
 (function(){
-  const X_MIN = -6, X_MAX = 6, Y_MIN = -6, Y_MAX = 6;
+  const X_MIN = -10, X_MAX = 10, Y_MIN = -6, Y_MAX = 6;
   const PA = { x: 42, y: 32, w: 476, h: 396 };
   const SAMPLES = [];
-  for (let x = -1; x <= 1; x++) {
-    for (let y = -1; y <= 1; y++) {
+  for (let x = -2; x <= 2; x++) {
+    for (let y = -2; y <= 2; y++) {
       SAMPLES.push({ x, y });
     }
   }
   const STAGES = [
     'Scaled coordinates',
     'Replace the comma with the signed operation',
-    'Evaluate the sum'
+    'Evaluate the sum',
+    'Draw equal-value lines'
   ];
   let stage = 0;
   let lastA = null;
@@ -202,6 +210,26 @@ button:focus-visible {
     if (stage === 0) return `(${fmt(tx)}, ${fmt(ty)})`;
     if (stage === 1) return `(${fmt(tx)} ${signedPart(ty)})`;
     return `(${fmt(tx + ty)})`;
+  }
+  function lineSegmentForSum(sum){
+    const candidates = [
+      { x: X_MIN, y: sum - X_MIN },
+      { x: X_MAX, y: sum - X_MAX },
+      { x: sum - Y_MIN, y: Y_MIN },
+      { x: sum - Y_MAX, y: Y_MAX }
+    ].filter(point =>
+      point.x >= X_MIN - 1e-9 &&
+      point.x <= X_MAX + 1e-9 &&
+      point.y >= Y_MIN - 1e-9 &&
+      point.y <= Y_MAX + 1e-9
+    );
+    const unique = [];
+    candidates.forEach(point => {
+      if (!unique.some(other => Math.abs(other.x - point.x) < 1e-9 && Math.abs(other.y - point.y) < 1e-9)) {
+        unique.push(point);
+      }
+    });
+    return unique.length >= 2 ? unique.slice(0, 2) : null;
   }
   function term(coef, varName, first){
     const cls = varName === 'x' ? 'x' : 'y';
@@ -262,6 +290,20 @@ button:focus-visible {
     $('ewb6-labels').innerHTML = labels;
   }
 
+  function renderValueLines(a, b){
+    if (stage !== 3) {
+      $('ewb6-valueLines').innerHTML = '';
+      return;
+    }
+    const sums = Array.from(new Set(SAMPLES.map(sample => fmt(a * sample.x + b * sample.y))));
+    const lines = sums.map(sumText => {
+      const segment = lineSegmentForSum(Number(sumText));
+      if (!segment) return '';
+      return `<line class="ewb6-value-line" x1="${sx(segment[0].x)}" y1="${sy(segment[0].y)}" x2="${sx(segment[1].x)}" y2="${sy(segment[1].y)}"/>`;
+    }).join('');
+    $('ewb6-valueLines').innerHTML = lines;
+  }
+
   function update(options = {}){
     const a = +$('ewb6-a').value;
     const b = +$('ewb6-b').value;
@@ -277,14 +319,17 @@ button:focus-visible {
       lastB = b;
     }
     renderLabels(a, b);
+    renderValueLines(a, b);
 
     const exX = 3 * a;
     const exY = 4 * b;
     const message = stage === 0
-      ? `This shows every coordinate in a small 3-by-3 patch of the original space after scaling. Separately, the article example <em>(3, 4)</em> would become <em>(${fmt(exX)}, ${fmt(exY)})</em>.`
+      ? `This shows every coordinate in a small 5-by-5 patch of the original space after scaling. Separately, the article example <em>(3, 4)</em> would become <em>(${fmt(exX)}, ${fmt(exY)})</em>.`
       : stage === 1
         ? `The transformed space has not changed. Only the notation changes: the comma is replaced by the signed operation, so <em>(${fmt(exX)}, ${fmt(exY)})</em> becomes <em>(${fmt(exX)} ${signedPart(exY)})</em>.`
-        : `The transformed space still has not changed. Now each displayed expression is evaluated as one number. For <em>(3, 4)</em>, <em>${fmt(exX)} ${signedPart(exY)} = ${fmt(exX + exY)}</em>.`;
+        : stage === 2
+          ? `The transformed space still has not changed. Now each displayed expression is evaluated as one number. For <em>(3, 4)</em>, <em>${fmt(exX)} ${signedPart(exY)} = ${fmt(exX + exY)}</em>.`
+          : `The green dashed lines connect coordinates with the same output value. Points on the same line have the same signed sum <em>x + y</em> in this transformed space.`;
     $('ewb6-status').innerHTML = message;
     resizeFrame();
   }
