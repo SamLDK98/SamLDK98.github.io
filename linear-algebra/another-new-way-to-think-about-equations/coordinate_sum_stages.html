@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinate sums by coefficient scaling</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --blue: #2563eb;
+  --orange: #ea580c;
+  --green: #16a34a;
+  --purple: #7c3aed;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body { padding: 0 1rem 1rem; color: var(--ink); font-family: Georgia, "Cambria", "Times New Roman", serif; }
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+.ewb6 { max-width: 720px; margin: 0 auto; padding: 1rem 0; }
+.ewb6-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.ewb6-label {
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ewb6-eq {
+  min-height: 1.4em;
+  margin-bottom: 0.7rem;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-style: italic;
+  line-height: 1.4;
+}
+.ewb6-eq .x { color: var(--blue); font-style: normal; font-weight: 500; }
+.ewb6-eq .y { color: var(--orange); font-style: normal; font-weight: 500; }
+.ewb6-eq .op { color: var(--muted); margin: 0 0.12em; font-style: normal; }
+.ewb6-eq .var { font-style: italic; }
+.ewb6-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 22px;
+}
+.ewb6-ctrl { display: flex; align-items: center; gap: 8px; }
+.ewb6-ctrl .name {
+  min-width: 16px;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+}
+.ewb6-ctrl .name.x { color: var(--blue); }
+.ewb6-ctrl .name.y { color: var(--orange); }
+.ewb6-ctrl input[type=range] { flex: 1; min-width: 0; }
+.ewb6-ctrl input[type=number] {
+  width: 60px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.ewb6-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0.7rem;
+}
+.ewb6-stage {
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.ewb6-stage strong { color: var(--ink); font-weight: 600; }
+.ewb6-plane-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+}
+.ewb6-plane { width: 100%; max-width: 560px; height: auto; display: block; color: var(--ink); }
+.ewb6-status {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.ewb6-status em { color: var(--ink); font-style: italic; }
+.ewb6-point { transition: cx 0.18s ease, cy 0.18s ease; }
+.ewb6-label-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+@media (max-width: 520px) {
+  .ewb6-controls { grid-template-columns: 1fr; }
+  .ewb6-label-text { font-size: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="ewb6" id="ewb6-root" role="region" aria-label="Coordinate sum stages widget">
+  <div class="ewb6-card">
+    <div class="ewb6-label">Equation coefficients</div>
+    <div class="ewb6-eq" id="ewb6-eq"></div>
+    <div class="ewb6-controls">
+      <div class="ewb6-ctrl">
+        <span class="name x">x</span>
+        <input type="range" id="ewb6-a" min="-4" max="4" step="0.5" value="4">
+        <input type="number" id="ewb6-aNum" min="-4" max="4" step="0.5" value="4">
+      </div>
+      <div class="ewb6-ctrl">
+        <span class="name y">y</span>
+        <input type="range" id="ewb6-b" min="-4" max="4" step="0.5" value="-2">
+        <input type="number" id="ewb6-bNum" min="-4" max="4" step="0.5" value="-2">
+      </div>
+    </div>
+    <div class="ewb6-buttons">
+      <button id="ewb6-next">Next stage</button>
+      <button id="ewb6-prev">Previous stage</button>
+      <button id="ewb6-reset">Reset</button>
+      <span class="ewb6-stage" id="ewb6-stage"></span>
+    </div>
+  </div>
+
+  <div class="ewb6-plane-wrap">
+    <svg class="ewb6-plane" viewBox="0 0 560 500" aria-label="Transformed coordinate plane with coordinate labels">
+      <defs>
+        <clipPath id="ewb6-clip"><rect x="42" y="32" width="476" height="396"/></clipPath>
+      </defs>
+      <g id="ewb6-grid" stroke="currentColor" stroke-opacity="0.07" stroke-width="1"></g>
+      <g clip-path="url(#ewb6-clip)" id="ewb6-transGrid"></g>
+      <line id="ewb6-axisX" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.2"/>
+      <line id="ewb6-axisY" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.2"/>
+      <g id="ewb6-ticks" font-family="system-ui, sans-serif" font-size="10" fill="currentColor" fill-opacity="0.52"></g>
+      <g id="ewb6-points" clip-path="url(#ewb6-clip)"></g>
+    </svg>
+  </div>
+
+  <div class="ewb6-status" id="ewb6-status"></div>
+</div>
+
+<script>
+(function(){
+  const X_MIN = -14, X_MAX = 14, Y_MIN = -12, Y_MAX = 12;
+  const PA = { x: 42, y: 32, w: 476, h: 396 };
+  const SAMPLES = [
+    { x: -2, y: -2, dx: 8, dy: 15 },
+    { x: -1, y: 1, dx: 8, dy: -10 },
+    { x: 0, y: 0, dx: 8, dy: -10 },
+    { x: 1, y: -1, dx: 8, dy: 15 },
+    { x: 2, y: 1, dx: 8, dy: -10 },
+    { x: 3, y: 4, dx: 8, dy: -10, focus: true },
+    { x: -3, y: 2, dx: 8, dy: 15 },
+    { x: 1, y: 3, dx: 8, dy: -10 }
+  ];
+  const STAGES = [
+    'Scaled coordinates',
+    'Replace the comma with the signed operation',
+    'Evaluate the sum'
+  ];
+  let stage = 0;
+
+  const $ = id => document.getElementById(id);
+  const sx = mx => PA.x + (mx - X_MIN)/(X_MAX - X_MIN) * PA.w;
+  const sy = my => PA.y + (Y_MAX - my)/(Y_MAX - Y_MIN) * PA.h;
+  function setAttrs(el, attrs){ for (const key in attrs) el.setAttribute(key, attrs[key]); }
+  function fmt(n){ return Number.isInteger(n) ? String(n) : (Math.round(n * 100) / 100).toString(); }
+  function signedPart(n){ return n < 0 ? `- ${fmt(Math.abs(n))}` : `+ ${fmt(n)}`; }
+  function labelFor(tx, ty){
+    if (stage === 0) return `(${fmt(tx)}, ${fmt(ty)})`;
+    if (stage === 1) return `(${fmt(tx)} ${signedPart(ty)})`;
+    return `(${fmt(tx + ty)})`;
+  }
+  function term(coef, varName, first){
+    const cls = varName === 'x' ? 'x' : 'y';
+    if (coef === 0) return first ? `<span class="${cls}">0<span class="var">${varName}</span></span>` : `<span class="op">+</span><span class="${cls}">0<span class="var">${varName}</span></span>`;
+    const sign = coef < 0 ? '\u2212' : (first ? '' : '+');
+    const mag = Math.abs(coef);
+    const num = mag === 1 ? '' : fmt(mag);
+    if (first) return `<span class="${cls}">${sign}${num}<span class="var">${varName}</span></span>`;
+    return `<span class="op">${sign}</span><span class="${cls}">${num}<span class="var">${varName}</span></span>`;
+  }
+  function buildBase(){
+    let grid = '';
+    for (let x = X_MIN; x <= X_MAX; x++) if (x !== 0) grid += `<line x1="${sx(x)}" y1="${sy(Y_MIN)}" x2="${sx(x)}" y2="${sy(Y_MAX)}"/>`;
+    for (let y = Y_MIN; y <= Y_MAX; y++) if (y !== 0) grid += `<line x1="${sx(X_MIN)}" y1="${sy(y)}" x2="${sx(X_MAX)}" y2="${sy(y)}"/>`;
+    $('ewb6-grid').innerHTML = grid;
+    setAttrs($('ewb6-axisX'), { x1: sx(X_MIN), y1: sy(0), x2: sx(X_MAX), y2: sy(0) });
+    setAttrs($('ewb6-axisY'), { x1: sx(0), y1: sy(Y_MIN), x2: sx(0), y2: sy(Y_MAX) });
+    let ticks = '';
+    for (let x = X_MIN; x <= X_MAX; x += 4) if (x !== 0) ticks += `<text x="${sx(x)}" y="${sy(0)+14}" text-anchor="middle">${x}</text>`;
+    for (let y = Y_MIN; y <= Y_MAX; y += 4) if (y !== 0) ticks += `<text x="${sx(0)-7}" y="${sy(y)+3.5}" text-anchor="end">${y}</text>`;
+    $('ewb6-ticks').innerHTML = ticks;
+  }
+  function update(){
+    const a = +$('ewb6-a').value;
+    const b = +$('ewb6-b').value;
+    $('ewb6-aNum').value = a;
+    $('ewb6-bNum').value = b;
+    $('ewb6-eq').innerHTML = term(a, 'x', true) + ' ' + term(b, 'y', false);
+    $('ewb6-stage').innerHTML = `<strong>${stage + 1}/3</strong> ${STAGES[stage]}`;
+
+    let transGrid = '';
+    if (Math.abs(a) > 1e-9) {
+      const maxK = Math.max(2, Math.ceil(X_MAX / Math.abs(a)) + 2);
+      for (let k = -maxK; k <= maxK; k++) if (k !== 0) transGrid += `<line x1="${sx(a*k)}" y1="${sy(Y_MIN)}" x2="${sx(a*k)}" y2="${sy(Y_MAX)}" stroke="${a < 0 ? '#1d4ed8' : '#2563eb'}" stroke-opacity="0.28" stroke-width="1.2"/>`;
+    }
+    if (Math.abs(b) > 1e-9) {
+      const maxK = Math.max(2, Math.ceil(Y_MAX / Math.abs(b)) + 2);
+      for (let k = -maxK; k <= maxK; k++) if (k !== 0) transGrid += `<line x1="${sx(X_MIN)}" y1="${sy(b*k)}" x2="${sx(X_MAX)}" y2="${sy(b*k)}" stroke="${b < 0 ? '#c2410c' : '#ea580c'}" stroke-opacity="0.28" stroke-width="1.2"/>`;
+    }
+    $('ewb6-transGrid').innerHTML = transGrid;
+
+    let points = '';
+    SAMPLES.forEach(sample => {
+      const tx = a * sample.x;
+      const ty = b * sample.y;
+      const cx = sx(tx);
+      const cy = sy(ty);
+      const color = sample.focus ? '#dc2626' : '#7c3aed';
+      points += `<circle class="ewb6-point" cx="${cx}" cy="${cy}" r="${sample.focus ? 5.5 : 4.4}" fill="${color}" fill-opacity="0.74" stroke="#fff" stroke-width="0.8"/>`;
+      points += `<text class="ewb6-label-text" x="${cx + sample.dx}" y="${cy + sample.dy}" fill="${sample.focus ? '#991b1b' : '#312e81'}">${labelFor(tx, ty)}</text>`;
+    });
+    $('ewb6-points').innerHTML = points;
+
+    const exX = 3 * a;
+    const exY = 4 * b;
+    const message = stage === 0
+      ? `Each original point has been dragged to its scaled coordinate. The highlighted point <em>(3, 4)</em> is now <em>(${fmt(exX)}, ${fmt(exY)})</em>.`
+      : stage === 1
+        ? `The comma is no longer doing coordinate-pair work. It becomes the signed operation: <em>(${fmt(exX)}, ${fmt(exY)})</em> becomes <em>(${fmt(exX)} ${signedPart(exY)})</em>.`
+        : `Now each displayed coordinate has been evaluated as one number. For <em>(3, 4)</em>, <em>${fmt(exX)} ${signedPart(exY)} = ${fmt(exX + exY)}</em>.`;
+    $('ewb6-status').innerHTML = message;
+    resizeFrame();
+  }
+  function setVals(a, b){
+    $('ewb6-a').value = a;
+    $('ewb6-b').value = b;
+    stage = 0;
+    update();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('ewb6-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+
+  buildBase();
+  $('ewb6-a').addEventListener('input', update);
+  $('ewb6-b').addEventListener('input', update);
+  $('ewb6-aNum').addEventListener('input', () => { $('ewb6-a').value = $('ewb6-aNum').value; update(); });
+  $('ewb6-bNum').addEventListener('input', () => { $('ewb6-b').value = $('ewb6-bNum').value; update(); });
+  $('ewb6-next').addEventListener('click', () => { stage = (stage + 1) % STAGES.length; update(); });
+  $('ewb6-prev').addEventListener('click', () => { stage = (stage + STAGES.length - 1) % STAGES.length; update(); });
+  $('ewb6-reset').addEventListener('click', () => setVals(4, -2));
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>
