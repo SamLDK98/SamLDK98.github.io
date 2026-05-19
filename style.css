@@ -795,6 +795,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
+  z-index: 1;
 }
 
 .question-card.is-before {
@@ -828,6 +829,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   background: rgba(255,255,255,0.38);
   color: var(--ink);
   cursor: pointer;
+  user-select: none;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }

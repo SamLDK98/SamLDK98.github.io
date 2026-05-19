@@ -78,11 +78,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const render = () => {
       cards.forEach((card, index) => {
-        card.classList.toggle('is-active', index === activeIndex);
+        const isActive = index === activeIndex;
+        const isFlipped = card.classList.contains('is-flipped');
+
+        card.classList.toggle('is-active', isActive);
         card.classList.toggle('is-before', index < activeIndex);
 
         card.querySelectorAll('.question-card-face').forEach((face) => {
-          face.tabIndex = index === activeIndex ? 0 : -1;
+          const isVisibleFace = face.classList.contains(isFlipped ? 'question-card-back' : 'question-card-front');
+
+          face.tabIndex = isActive && isVisibleFace ? 0 : -1;
+          face.setAttribute('aria-pressed', isFlipped ? 'true' : 'false');
         });
       });
 
@@ -93,13 +99,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const goTo = (index) => {
       activeIndex = (index + cards.length) % cards.length;
+      cards[activeIndex].classList.remove('is-flipped');
       render();
     };
 
     cards.forEach((card) => {
+      const flipCard = () => {
+        card.classList.toggle('is-flipped');
+        render();
+      };
+
       card.querySelectorAll('.question-card-face').forEach((face) => {
-        face.addEventListener('click', () => {
-          card.classList.toggle('is-flipped');
+        face.addEventListener('click', flipCard);
+        face.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          flipCard();
         });
       });
     });
