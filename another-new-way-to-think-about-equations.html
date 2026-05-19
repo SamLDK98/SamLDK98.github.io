@@ -36,13 +36,9 @@
       <section class="essay-section">
         <p class="display-equation">$4x-2y=2$</p>
 
-        <p>We are inclined to think of the $x$ and $y$ as being only those values that make the equation true.</p>
+        <p>We are inclined to think of the $x$ and $y$ as being only those values that make the equation true. They <strong>are</strong> the pairs that make the equation true and <strong>are not</strong> the pairs that don't.</p>
 
-        <p>They <strong>are</strong> the pairs that make the equation true and <strong>are not</strong> the pairs that don't.</p>
-
-        <p>However, a better framing to approach Linear Algebra (LA) with is that all pairs of $(x,y)$ do exist.</p>
-
-        <p>Collectively, all these pairs describe a space.</p>
+        <p>However, a better framing to approach Linear Algebra (LA) with is that all pairs of $(x,y)$ do exist. Collectively, all these pairs describe a space.</p>
 
         <p>So, that's the first thing: when we see an equation we check how many variables there are and imagine a space with that many dimensions/axes.</p>
 
@@ -50,9 +46,7 @@
 
         <p>$4x$ and $-2y$.</p>
 
-        <p>How do you multiple an axis?</p>
-
-        <p>You multiply every point on it.</p>
+        <p>How do you multiply an axis? You multiply every point on it.</p>
 
         <p>Imagine a point $(3,4)$.</p>
 
@@ -78,6 +72,82 @@
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <div class="question-carousel" data-question-carousel>
+          <div class="question-carousel-track">
+            <article class="question-card is-active" data-question-card>
+              <div class="question-card-inner">
+                <button class="question-card-face question-card-front" type="button">
+                  What happens when the $x$-coefficient or $y$-coefficient increases or decreases?
+                </button>
+                <button class="question-card-face question-card-back" type="button">
+                  <span>Moving one unit along the horizontal or vertical direction corresponds to moving a greater or lesser distance relative to the original spacing.</span>
+                  <span>If $4x$ &rarr; moving 1 unit along the $x$-direction behaves like moving 4 units in terms of the original spacing.</span>
+                  <span>If $\frac{1}{2}y$ &rarr; moving 2 units along the $y$-direction behaves like moving 1 unit in terms of the original spacing.</span>
+                  <span>Larger coefficients stretch the space along that direction, while smaller coefficients compress it.</span>
+                </button>
+              </div>
+            </article>
+
+            <article class="question-card" data-question-card>
+              <div class="question-card-inner">
+                <button class="question-card-face question-card-front" type="button">
+                  What happens when a coefficient becomes negative?
+                </button>
+                <button class="question-card-face question-card-back" type="button">
+                  <span>The direction reverses.</span>
+                  <span>For example, while positive $y$ normally moves upward, a negative $y$-coefficient causes positive movement in $y$ to move downward instead.</span>
+                  <span>The same applies horizontally for $x$.</span>
+                  <span>You can drag the sliders quickly between positive and negative values to make reflections easier to notice visually.</span>
+                </button>
+              </div>
+            </article>
+
+            <article class="question-card" data-question-card>
+              <div class="question-card-inner">
+                <button class="question-card-face question-card-front" type="button">
+                  What happens if both coefficients scale by the same amount?
+                </button>
+                <button class="question-card-face question-card-back" type="button">
+                  <span>$x-y$ and $4x-4y$</span>
+                  <span>Both produce the same overall geometric structure.</span>
+                  <span>However, the second scales all outputs by 4.</span>
+                  <span>So moving one unit in the transformed space of the second equation corresponds to moving four units in the transformed space of the first.</span>
+                </button>
+              </div>
+            </article>
+
+            <article class="question-card" data-question-card>
+              <div class="question-card-inner">
+                <button class="question-card-face question-card-front" type="button">
+                  What happens when one coefficient becomes much larger than the other?
+                </button>
+                <button class="question-card-face question-card-back" type="button">
+                  <span>What matters most is not usually the absolute size of the coefficients, but their relationship to each other.</span>
+                  <span>Changing the balance between the coefficients changes which directions are stretched most, which directions dominate the transformation, and how the transformed space is oriented.</span>
+                </button>
+              </div>
+            </article>
+
+            <article class="question-card" data-question-card>
+              <div class="question-card-inner">
+                <button class="question-card-face question-card-front" type="button">
+                  What happens when a coefficient becomes 0?
+                </button>
+                <button class="question-card-face question-card-back" type="button">
+                  <span>A coefficient of zero removes sensitivity to that direction.</span>
+                  <span>If the y-coefficient becomes 0, then moving up and down no longer changes the transformation.</span>
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <div class="question-carousel-controls" aria-label="Question cards">
+            <button class="question-carousel-btn" type="button" data-question-prev>Previous</button>
+            <span class="question-carousel-status" data-question-status>1 / 5</span>
+            <button class="question-carousel-btn" type="button" data-question-next>Next</button>
+          </div>
+        </div>
 
         <p>However, notice that our equation involves the summing of $x$ and $y$ after they have been scaled by their coefficient.</p>
 

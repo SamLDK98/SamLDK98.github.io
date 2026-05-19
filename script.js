@@ -64,6 +64,52 @@ document.addEventListener('DOMContentLoaded', () => {
     autoHeightFrames.forEach(resizeFrame);
   });
 
+  const questionCarousels = document.querySelectorAll('[data-question-carousel]');
+
+  questionCarousels.forEach((carousel) => {
+    const cards = Array.from(carousel.querySelectorAll('[data-question-card]'));
+    const prevButton = carousel.querySelector('[data-question-prev]');
+    const nextButton = carousel.querySelector('[data-question-next]');
+    const status = carousel.querySelector('[data-question-status]');
+    let activeIndex = cards.findIndex((card) => card.classList.contains('is-active'));
+
+    if (!cards.length) return;
+    if (activeIndex < 0) activeIndex = 0;
+
+    const render = () => {
+      cards.forEach((card, index) => {
+        card.classList.toggle('is-active', index === activeIndex);
+        card.classList.toggle('is-before', index < activeIndex);
+
+        card.querySelectorAll('.question-card-face').forEach((face) => {
+          face.tabIndex = index === activeIndex ? 0 : -1;
+        });
+      });
+
+      if (status) {
+        status.textContent = `${activeIndex + 1} / ${cards.length}`;
+      }
+    };
+
+    const goTo = (index) => {
+      activeIndex = (index + cards.length) % cards.length;
+      render();
+    };
+
+    cards.forEach((card) => {
+      card.querySelectorAll('.question-card-face').forEach((face) => {
+        face.addEventListener('click', () => {
+          card.classList.toggle('is-flipped');
+        });
+      });
+    });
+
+    prevButton?.addEventListener('click', () => goTo(activeIndex - 1));
+    nextButton?.addEventListener('click', () => goTo(activeIndex + 1));
+
+    render();
+  });
+
   const sections = document.querySelectorAll('.essay-section');
 
   if (!('IntersectionObserver' in window)) {
