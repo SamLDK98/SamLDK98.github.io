@@ -843,6 +843,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   text-align: center;
 }
 
+.question-card.is-flipped .question-card-front {
+  visibility: hidden;
+}
+
 .question-card-back {
   overflow-y: auto;
   transform: rotateY(180deg);
@@ -850,6 +854,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-size: 0.9rem;
   line-height: 1.52;
   text-align: left;
+  visibility: hidden;
+}
+
+.question-card.is-flipped .question-card-back {
+  visibility: visible;
 }
 
 .question-card-back span {
