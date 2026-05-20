@@ -597,7 +597,7 @@
   </div>
 
   <div class="controls">
-    <button class="btn" id="btn-play">Pause</button>
+    <button class="btn" id="btn-play">Play</button>
     <button class="btn ghost" id="btn-reset">Reset</button>
     <div class="speed-control">
       <span>Speed</span>
@@ -933,9 +933,9 @@
     syncTransition();
   });
 
-  // ── Init: random placement, start running ───────
-  presetRandom();
-  play();
+  // ── Init: all dots left, paused ─────────────────
+  presetAllLeft();
+  pause();
 })();
 </script>
 </body>
