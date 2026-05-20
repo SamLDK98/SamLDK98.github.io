@@ -44,14 +44,6 @@
   .sc-stat-label { font-size: 11px; color: #5f5e5a; margin-bottom: 4px; }
   .sc-stat-value { font-size: 18px; font-weight: 500; color: #2c2c2a; }
   .sc-stat-value sup { font-size: 12px; }
-  .sc-caption {
-    text-align: center;
-    font-size: 12px;
-    color: #5f5e5a;
-    margin-top: 8px;
-    font-style: italic;
-    line-height: 1.5;
-  }
 </style>
 </head>
 <body>
@@ -84,8 +76,6 @@
       <div class="sc-stat-value" id="sc-prob">-</div>
     </div>
   </div>
-  <p class="sc-caption">Vertical dashed lines mark equilibrium (centre) and a 1% imbalance at 49:51.<br>
-  As the system grows, the distribution narrows toward a single point, and even tiny imbalances become astronomically unlikely.</p>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
@@ -179,29 +169,6 @@
             grid: { display: false },
             title: { display: true, text: 'Relative likelihood', color: isDark ? '#a8a8a4' : '#5f5e5a', font: { size: 11 } }
           }
-        }
-      },
-      plugins: [{
-        id: 'refLines',
-        afterDatasetsDraw(c) {
-          const { ctx, chartArea: a, scales: { x: xs } } = c;
-          const lines = [
-            { x: 0.5, label: 'equilibrium', color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)', dash: [4, 4] },
-            { x: 0.49, label: '-1%', color: '#702018', dash: [3, 3] },
-            { x: 0.51, label: '+1%', color: '#702018', dash: [3, 3] }
-          ];
-          lines.forEach(line => {
-            const px = xs.getPixelForValue(line.x);
-            ctx.save();
-            ctx.beginPath();
-            ctx.setLineDash(line.dash);
-            ctx.strokeStyle = line.color;
-            ctx.lineWidth = 1;
-            ctx.moveTo(px, a.top);
-            ctx.lineTo(px, a.bottom);
-            ctx.stroke();
-            ctx.restore();
-          });
         }
       }]
     });
