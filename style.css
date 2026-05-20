@@ -389,13 +389,23 @@ li {
   white-space: nowrap;
 }
 
+.macrostate-table {
+  table-layout: auto;
+}
+
+.macrostate-table th:nth-child(3),
+.macrostate-table td:nth-child(3) {
+  width: 11rem;
+}
+
+.macrostate-table th:nth-child(4),
+.macrostate-table td:nth-child(4) {
+  width: 7rem;
+}
+
 .macrostate-table .compact-col {
   width: 3.2rem;
   text-align: right;
-}
-
-.macrostate-table .group-heading {
-  text-align: center;
 }
 
 table {
@@ -785,6 +795,8 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .essay-widget-microstates {
   height: 1040px;
+  margin-top: 1.2rem;
+  margin-bottom: 1.1rem;
 }
 
 .essay-widget-available-moves {
