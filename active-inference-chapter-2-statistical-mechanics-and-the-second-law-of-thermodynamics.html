@@ -29,19 +29,17 @@
     <article>
 
       <section class="essay-section">
-        <p>As you read through this section, you can return to this widget to help build intuition of the key concepts.</p>
+        <p>As you read through this section, you can return to this interactive grid and play around with it to help build intuition of the key concepts.</p>
 
         <iframe
           class="essay-widget essay-widget-microstates"
           src="widget2_microstates_macrostates_interactive_grid.html"
           title="Interactive grid showing microstates, macrostates, and coarse-graining"
           scrolling="no"
-          loading="lazy"
+          loading="eager"
         ></iframe>
 
-        <p>Continuing the story...</p>
-
-        <p>Classical mechanics works for systems with a few objects and trajectories: a planet orbiting the sun or the flight of an arrow.</p>
+        <p>Classical mechanics works for systems with a few objects and trajectories: a planet orbiting the sun or the flight of an arrow</p>
 
         <p>But for systems containing billions of interacting particles, tracking every trajectory is impossible.</p>
 
@@ -51,7 +49,7 @@
 
         <p>A <strong>system</strong> is simply a set of things that may vary in some way.</p>
 
-        <p>At any one moment in time, these variables will have specific values. We call the set of these values a <strong>state</strong> of the system.</p>
+        <p>At any one moment in time, these <em>things that may vary</em> (variables) will not in fact be varying -- they will have specific values. We call this set of values a <strong>state</strong> of the system.</p>
 
         <p>Imagine a 4x4 grid with 8 dots that randomly move around it.</p>
 
@@ -61,9 +59,9 @@
 
         <p>With 16 cells and 8 dots, there are 12,870 possible unique microstates.</p>
 
-        <p>Now, imagine a device that measures how many dots are on either the left or right of the grid in each microstate.</p>
+        <p>Now, imagine a device that measures how many dots are on either the left or right side of the grid in each microstate.</p>
 
-        <p>Depending on this balance, the device displays a colour. We call the colours <strong>macroscopic observables</strong>.</p>
+        <p>Depending on this balance, the device displays a colour. We call the colors <strong>macroscopic observables</strong>.</p>
 
         <p>The <strong>macrostate</strong> is the set of all configurations that produce the same macroscopic observable/measurement (in this case colour).</p>
 
@@ -71,52 +69,58 @@
 
         <p>The macroscopic observables define the range of microscopic configurations within each set.</p>
 
-        <p>The partitioning of microstate space into fewer macrostates is called <strong>coarse-graining</strong>.</p>
-
-        <p>Notice how different macrostates contain different numbers of compatible microstates.</p>
+        <p>The partitioning of microstate space into a set of fewer macrostates is called <strong>coarse-graining</strong>. Here we have 9 macrostates.</p>
 
         <p>The number of microstates that produce each macroscopic observable varies:</p>
 
         <div class="table-wrap">
-          <table>
+          <table class="macrostate-table">
             <thead>
               <tr>
-                <th class="num">Dots on Left</th>
-                <th class="num">Dots on Right</th>
+                <th class="group-heading" colspan="2">Dots on the...</th>
                 <th>Macrostate Color</th>
-                <th class="num">Number of corresponding microstates</th>
+                <th class="num">Microstates</th>
                 <th>Entropy</th>
+              </tr>
+              <tr>
+                <th class="compact-col">Left</th>
+                <th class="compact-col">Right</th>
+                <th></th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr><td class="num">8</td><td class="num">0</td><td>Red</td><td class="num">1</td><td>Zero</td></tr>
-              <tr><td class="num">7</td><td class="num">1</td><td>Orange</td><td class="num">64</td><td>Low</td></tr>
-              <tr><td class="num">6</td><td class="num">2</td><td>Yellow</td><td class="num">784</td><td>Medium</td></tr>
-              <tr><td class="num">5</td><td class="num">3</td><td>Green</td><td class="num">3,136</td><td>High</td></tr>
-              <tr><td class="num">4</td><td class="num">4</td><td>Blue</td><td class="num">4,900</td><td>Maximal</td></tr>
-              <tr><td class="num">3</td><td class="num">5</td><td>Violet (Purple)</td><td class="num">3,136</td><td>High</td></tr>
-              <tr><td class="num">2</td><td class="num">6</td><td>Pink</td><td class="num">784</td><td>Medium</td></tr>
-              <tr><td class="num">1</td><td class="num">7</td><td>Brown</td><td class="num">64</td><td>Low</td></tr>
-              <tr><td class="num">0</td><td class="num">8</td><td>Black</td><td class="num">1</td><td>Zero</td></tr>
+              <tr><td class="num compact-col">8</td><td class="num compact-col">0</td><td>Red</td><td class="num">1</td><td>Zero</td></tr>
+              <tr><td class="num compact-col">7</td><td class="num compact-col">1</td><td>Orange</td><td class="num">64</td><td>Low</td></tr>
+              <tr><td class="num compact-col">6</td><td class="num compact-col">2</td><td>Yellow</td><td class="num">784</td><td>Medium</td></tr>
+              <tr><td class="num compact-col">5</td><td class="num compact-col">3</td><td>Green</td><td class="num">3,136</td><td>High</td></tr>
+              <tr><td class="num compact-col">4</td><td class="num compact-col">4</td><td>Blue</td><td class="num">4,900</td><td>Maximal</td></tr>
+              <tr><td class="num compact-col">3</td><td class="num compact-col">5</td><td>Violet (Purple)</td><td class="num">3,136</td><td>High</td></tr>
+              <tr><td class="num compact-col">2</td><td class="num compact-col">6</td><td>Pink</td><td class="num">784</td><td>Medium</td></tr>
+              <tr><td class="num compact-col">1</td><td class="num compact-col">7</td><td>Brown</td><td class="num">64</td><td>Low</td></tr>
+              <tr><td class="num compact-col">0</td><td class="num compact-col">8</td><td>Black</td><td class="num">1</td><td>Zero</td></tr>
             </tbody>
           </table>
         </div>
 
-        <p>If the dots move randomly around the grid, you can see that the higher-entropy macrostates occur more frequently because they correspond to more compatible microstates.</p>
+        <p>If the dots move randomly around the grid, the higher-entropy macrostates occur more frequently because they correspond to more compatible microstates.</p>
 
-        <p>Blue has the highest entropy and is most often displayed.</p>
+        <p>Blue has the largest multiplicity (and therefore highest entropy) and is most often displayed.</p>
 
-        <p>At this small scale, fluctuations between macrostates occur frequently.</p>
+        <p>At this small scale, fluctuations between macrostates occur frequently. If you let the simulation at the top of this page run and follow the distribution, you will likely see blue appear most often, but the colour still changes repeatedly.</p>
 
-        <p>But let's scale everything up. Consider a grid of 80 million cells with 40 million dots. Our measuring device still detects the same balance ratios across the left and right sides.</p>
+        <p>But let's scale everything up.</p>
+
+        <p>Consider a grid of 80 million cells with 40 million dots. Our measuring device still detects the same balance ratios across the left and right sides: 8 : 0, 7 : 1, 6 : 2, etc.</p>
 
         <p>As the size of the system increases, even tiny deviations from equilibrium become astronomically unlikely.</p>
 
-        <p>A 1% imbalance (51:49) lies about 126 standard deviations from equilibrium.</p>
+        <p>A 1% imbalance (51 : 49) lies about 126 standard deviations from equilibrium.</p>
 
         <p>The probability of observing such a fluctuation, or anything more extreme, is roughly 10<sup>-3477</sup>.</p>
 
-        <p>The probability is so small that, even if every atom in the observable universe represented a new randomly sampled microstate every second since the beginning of time, the fluctuation would still almost certainly never occur.</p>
+        <p>The probability is so small that, even if every atom in the observable universe represented a new randomly sampled microstate every second since the beginning of time, the fluctuation would still almost certainly never occur. Our device would only ever show blue.</p>
 
         <iframe
           class="essay-widget essay-widget-chart essay-widget-autosize"
@@ -131,7 +135,7 @@
         <p>Move all 8 dots to the left side of the grid. Notice that there is literally no way for the next move to make the distribution more concentrated on the left; every available move spreads things out.</p>
 
         <iframe
-          class="essay-widget essay-widget-available-moves essay-widget-autosize"
+          class="essay-widget essay-widget-available-moves essay-widget-autosize essay-widget-tight-after"
           src="next_move.html"
           title="Interactive grid showing available moves away from a low-entropy macrostate"
           scrolling="no"
@@ -144,6 +148,17 @@
 
         <p>The system is not <q>trying</q> to maximize entropy. It simply wanders randomly through microstates, and overwhelmingly many of those microstates belong to high-entropy macrostates.</p>
 
+        <aside class="side-note-box">
+          <h4>Side note</h4>
+          <ul>
+            <li>The macroscopic observable produced by a microstate depends on what the measuring device is designed to detect. In this case, the left-right ratios.</li>
+            <li>It's worth noting that, although we are using color in this example, any type of description, including numerical descriptions, can be used to describe whatever is being observed.</li>
+            <li>For example, if a room is at 37 degrees Celsius, this 37 is a macroscopic observable just like the colours in our example. Equally, the sensation of warmth could also be a macroscopic description here.</li>
+            <li>The point is that the detection of a difference by a measuring instrument determines the effective bounds of a macrostate, whether that instrument is a thermometer or a human's sensory system. This detection is limited by the instrument's sensitivity: what does it measure, and at what resolution?</li>
+            <li>There are unimaginably many ways the air molecules could be configured and still produce no detectable difference at the level of the thermometer or at the level of human sensation.</li>
+          </ul>
+        </aside>
+
         <p><strong>So why does heat drift from hot to cold?</strong></p>
 
         <p>The system is all the particles in the room.</p>
@@ -154,11 +169,15 @@
 
         <p>As the system moves between microstates, it therefore overwhelmingly tends toward equilibrium.</p>
 
+        <figure class="essay-figure">
+          <img src="images/ai_ch2_coffee_entropy_arrow.png" alt="A sequence of coffee cups cooling over time, with arrows showing time, temperature change from hot to cold, and entropy increasing from left to right.">
+        </figure>
+
         <p><strong>But this immediately raised a deeper problem.</strong></p>
 
         <p>Living systems do not appear to drift passively toward equilibrium.</p>
 
-        <p>Cells maintain boundaries. Organisms preserve highly specific internal structure. Brains sustain coordinated electrical activity. Ecosystems maintain dynamic organization over enormous spans of time.</p>
+        <p>Cells maintain boundaries. Organisms preserve highly specific internal structure. Brains sustain coordinated electrical activity.</p>
 
         <p>If entropy tends to increase, why do living systems not simply decay into equilibrium like everything else?</p>
       </section>

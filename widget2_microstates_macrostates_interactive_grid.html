@@ -108,6 +108,10 @@
     margin-bottom: 14px;
   }
 
+  .panel-label-centered {
+    justify-content: center;
+  }
+
   /* ── GRID ───────────────────────────────────────── */
   .grid-board {
     position: relative;
@@ -550,17 +554,11 @@
 <body>
 <div class="widget">
 
-  <header class="widget-header">
-    <p class="subtitle">4 × 4 grid · 8 dots · a device reads the left–right balance and shows a colour</p>
-  </header>
-
   <div class="main-row">
 
     <div class="panel grid-panel">
-      <div class="panel-label">
-        <span>Left half</span>
+      <div class="panel-label panel-label-centered">
         <span>Microstate</span>
-        <span>Right half</span>
       </div>
       <div class="grid-board" id="grid-board">
         <div class="divider"></div>

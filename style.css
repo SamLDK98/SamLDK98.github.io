@@ -384,6 +384,20 @@ li {
   overflow-x: auto;
 }
 
+.macrostate-table th,
+.macrostate-table td {
+  white-space: nowrap;
+}
+
+.macrostate-table .compact-col {
+  width: 3.2rem;
+  text-align: right;
+}
+
+.macrostate-table .group-heading {
+  text-align: center;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -457,6 +471,28 @@ th {
   margin: 0;
   overflow-x: auto;
   font-size: 1.18rem;
+}
+
+.side-note-box {
+  margin: 1.7rem 0 2rem;
+  padding: 1rem 1.1rem 1.05rem;
+  border: 1px solid rgba(26,26,24,0.2);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.38);
+}
+
+.side-note-box h4 {
+  margin: 0 0 0.65rem;
+  color: var(--ink);
+  font-family: var(--font-head);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.side-note-box ul {
+  margin-bottom: 0;
 }
 
 .system-card .equation-stack p {
@@ -752,7 +788,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .essay-widget-available-moves {
-  height: 640px;
+  height: 560px;
+}
+
+.essay-widget-tight-after {
+  margin-bottom: 1rem;
 }
 
 .essay-widget-tall {
@@ -801,6 +841,14 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .essay-widget-line-collapse {
   height: 660px;
+}
+
+.essay-widget-uniform-scaling-line {
+  height: 760px;
+}
+
+.essay-widget-coefficient-balance {
+  height: 820px;
 }
 
 .question-carousel {
@@ -1006,6 +1054,11 @@ header {
   animation-play-state: running;
 }
 
+.js body.chapter-page .essay-section {
+  opacity: 1;
+  animation-play-state: running;
+}
+
 /* ─── Responsive ────────────────────────────────────────────── */
 @media (max-width: 720px) {
   html { font-size: 18px; }
@@ -1120,6 +1173,10 @@ header {
 
   .essay-widget-line-collapse { height: 820px; }
 
+  .essay-widget-uniform-scaling-line { height: 900px; }
+
+  .essay-widget-coefficient-balance { height: 960px; }
+
   .question-carousel-track { min-height: 26rem; }
 
   .question-card-front {
@@ -1146,5 +1203,5 @@ header {
 
   .essay-widget-microstates { height: 1420px; }
 
-  .essay-widget-available-moves { height: 720px; }
+  .essay-widget-available-moves { height: 640px; }
 }
