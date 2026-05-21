@@ -390,21 +390,28 @@ li {
 }
 
 .macrostate-table {
+  width: auto;
+  min-width: min(100%, 31rem);
   table-layout: auto;
+}
+
+.macrostate-table th,
+.macrostate-table td {
+  text-align: right;
 }
 
 .macrostate-table th:nth-child(3),
 .macrostate-table td:nth-child(3) {
-  width: 11rem;
+  width: 9rem;
 }
 
 .macrostate-table th:nth-child(4),
 .macrostate-table td:nth-child(4) {
-  width: 7rem;
+  width: 6.5rem;
 }
 
 .macrostate-table .compact-col {
-  width: 3.2rem;
+  width: 5.4rem;
   text-align: right;
 }
 
