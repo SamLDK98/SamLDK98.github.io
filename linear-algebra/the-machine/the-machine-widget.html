@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Machine input and output space widget</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root {
+    --bg: #fdfcf8;
+    --panel: #fffefa;
+    --ink: #1a1a18;
+    --muted: #6f6a5e;
+    --line: #e1ddd2;
+    --soft: #f7f3ea;
+    --input: #2563eb;
+    --xvec: #1f8a70;
+    --yvec: #c2410c;
+    --target: #7c3aed;
+    --miss: #c92a2a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body {
+    padding: 1rem;
+  }
+
+  .machine-widget {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .machine-panel {
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+  }
+
+  .machine-heading {
+    display: grid;
+    grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.3fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .machine-system {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.45;
+  }
+
+  .machine-controls {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.24rem;
+    color: var(--muted);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  input[type="number"],
+  input[type="range"] {
+    width: 100%;
+  }
+
+  input[type="number"] {
+    padding: 0.38rem 0.42rem;
+    border: 1px solid #c9c2b3;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    font: 0.88rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+
+  input[type="number"]:focus {
+    outline: 2px solid rgba(37, 99, 235, 0.22);
+    border-color: var(--input);
+  }
+
+  .machine-readout {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-top: 0.8rem;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .readout-card {
+    min-height: 4.2rem;
+    padding: 0.7rem 0.78rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--soft);
+  }
+
+  .readout-label {
+    display: block;
+    margin-bottom: 0.32rem;
+    color: var(--muted);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    display: block;
+    color: var(--ink);
+    font: 0.95rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+
+  .readout-note {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .machine-stage {
+    margin-top: 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .axis-label {
+    fill: var(--ink);
+    font: italic 17px Georgia, "Times New Roman", serif;
+  }
+
+  .small-label {
+    fill: var(--muted);
+    font: 12px Arial, Helvetica, sans-serif;
+  }
+
+  .mono-label {
+    fill: #3d3932;
+    font: 12px ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+
+  .grid-line {
+    stroke: var(--ink);
+    stroke-opacity: 0.08;
+  }
+
+  .axis-line {
+    stroke: var(--ink);
+    stroke-opacity: 0.45;
+    stroke-width: 1.3;
+  }
+
+  .input-point,
+  .target-point,
+  .output-point,
+  .vector-line,
+  .guide-line {
+    transition: cx 180ms ease, cy 180ms ease, x1 180ms ease, y1 180ms ease, x2 180ms ease, y2 180ms ease;
+  }
+
+  @media (max-width: 760px) {
+    body {
+      padding: 0.7rem;
+    }
+
+    .machine-heading,
+    .machine-readout {
+      grid-template-columns: 1fr;
+    }
+
+    .machine-controls {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
+</head>
+<body>
+<div class="machine-widget" role="region" aria-label="Input and output space machine widget">
+  <div class="machine-panel">
+    <div class="machine-heading">
+      <p class="machine-system">$$\begin{cases}4x - 2y = c_{1}\\3x + 5y = c_{2}\end{cases}$$</p>
+
+      <div class="machine-controls">
+        <label>
+          x input
+          <input id="xValue" type="number" min="-10" max="10" step="1" value="3">
+          <input id="xRange" type="range" min="-10" max="10" step="1" value="3" aria-label="x input slider">
+        </label>
+
+        <label>
+          y input
+          <input id="yValue" type="number" min="-10" max="10" step="1" value="1">
+          <input id="yRange" type="range" min="-10" max="10" step="1" value="1" aria-label="y input slider">
+        </label>
+
+        <label>
+          c1 target
+          <input id="c1Value" type="number" min="-10" max="10" step="1" value="2">
+          <input id="c1Range" type="range" min="-10" max="10" step="1" value="2" aria-label="c1 target slider">
+        </label>
+
+        <label>
+          c2 target
+          <input id="c2Value" type="number" min="-10" max="10" step="1" value="7">
+          <input id="c2Range" type="range" min="-10" max="10" step="1" value="7" aria-label="c2 target slider">
+        </label>
+      </div>
+    </div>
+
+    <div class="machine-readout" aria-live="polite">
+      <div class="readout-card">
+        <span class="readout-label">Input vector</span>
+        <span class="readout-value" id="inputReadout">(3, 1)</span>
+      </div>
+      <div class="readout-card">
+        <span class="readout-label">Output vector</span>
+        <span class="readout-value" id="outputReadout">(10, 14)</span>
+        <span class="readout-note" id="calculationReadout">3(4, 3) + 1(-2, 5)</span>
+      </div>
+      <div class="readout-card">
+        <span class="readout-label">Target output</span>
+        <span class="readout-value" id="targetReadout">(2, 7)</span>
+        <span class="readout-note" id="statusReadout">not a solution</span>
+      </div>
+    </div>
+
+    <div class="machine-stage">
+      <svg viewBox="0 0 1100 560" aria-label="Input space and output space diagrams">
+        <defs>
+          <marker id="arrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#5f5a4f"></path>
+          </marker>
+        </defs>
+
+        <text x="275" y="38" text-anchor="middle" class="axis-label">input space</text>
+        <text x="825" y="38" text-anchor="middle" class="axis-label">output space</text>
+        <text x="275" y="58" text-anchor="middle" class="small-label">axes are x and y</text>
+        <text x="825" y="58" text-anchor="middle" class="small-label">axes are c1 and c2</text>
+
+        <rect x="70" y="80" width="410" height="410" fill="#fff" stroke="#e1ddd2"></rect>
+        <rect x="620" y="80" width="410" height="410" fill="#fff" stroke="#e1ddd2"></rect>
+
+        <g id="inputGrid"></g>
+        <g id="outputGrid"></g>
+
+        <line id="xVector" class="vector-line" stroke="#1f8a70" stroke-width="4" stroke-linecap="round" marker-end="url(#arrowHead)"></line>
+        <line id="yVector" class="vector-line" stroke="#c2410c" stroke-width="4" stroke-linecap="round" marker-end="url(#arrowHead)"></line>
+        <line id="resultGuide" class="guide-line" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="6 5" opacity="0.62"></line>
+
+        <circle id="inputPoint" class="input-point" r="7" fill="#2563eb" stroke="#fff" stroke-width="2"></circle>
+        <circle id="outputPoint" class="output-point" r="7" fill="#2563eb" stroke="#fff" stroke-width="2"></circle>
+        <circle id="targetPoint" class="target-point" r="7" fill="#7c3aed" stroke="#fff" stroke-width="2"></circle>
+
+        <text id="inputLabel" class="mono-label"></text>
+        <text id="outputLabel" class="mono-label"></text>
+        <text id="targetLabel" class="mono-label"></text>
+        <text id="xVectorLabel" class="mono-label" fill="#1f8a70"></text>
+        <text id="yVectorLabel" class="mono-label" fill="#c2410c"></text>
+
+        <text x="465" y="278" text-anchor="middle" class="small-label">x contributes</text>
+        <text x="465" y="294" text-anchor="middle" class="mono-label">(4, 3)</text>
+        <text x="465" y="324" text-anchor="middle" class="small-label">y contributes</text>
+        <text x="465" y="340" text-anchor="middle" class="mono-label">(-2, 5)</text>
+
+        <text x="275" y="526" text-anchor="middle" class="small-label">The chosen input point is plotted here.</text>
+        <text x="825" y="526" text-anchor="middle" class="small-label">The same input is transformed into output coordinates.</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const inputBox = { x: 70, y: 80, w: 410, h: 410 };
+  const outputBox = { x: 620, y: 80, w: 410, h: 410 };
+  const inputLimit = 10;
+  const outputLimit = 90;
+  const fields = [
+    ["xValue", "xRange"],
+    ["yValue", "yRange"],
+    ["c1Value", "c1Range"],
+    ["c2Value", "c2Range"]
+  ];
+
+  const byId = (id) => document.getElementById(id);
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const fmt = (value) => String(Math.round(value * 100) / 100).replace("-0", "0");
+
+  function sx(box, value, limit) {
+    return box.x + ((value + limit) / (2 * limit)) * box.w;
+  }
+
+  function sy(box, value, limit) {
+    return box.y + ((limit - value) / (2 * limit)) * box.h;
+  }
+
+  function line(x1, y1, x2, y2, className) {
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${className}"></line>`;
+  }
+
+  function text(x, y, value, attrs) {
+    return `<text x="${x}" y="${y}" ${attrs}>${value}</text>`;
+  }
+
+  function drawGrid(target, box, limit, step, axisNames) {
+    let markup = "";
+
+    for (let value = -limit; value <= limit; value += step) {
+      const isAxis = value === 0;
+      const className = isAxis ? "axis-line" : "grid-line";
+      markup += line(sx(box, value, limit), box.y, sx(box, value, limit), box.y + box.h, className);
+      markup += line(box.x, sy(box, value, limit), box.x + box.w, sy(box, value, limit), className);
+
+      if (value !== 0 && value % (step * 2) === 0) {
+        markup += text(sx(box, value, limit), sy(box, 0, limit) + 17, value, 'text-anchor="middle" class="small-label"');
+        markup += text(sx(box, 0, limit) - 8, sy(box, value, limit) + 4, value, 'text-anchor="end" class="small-label"');
+      }
+    }
+
+    markup += text(box.x + box.w - 12, sy(box, 0, limit) - 9, axisNames[0], 'text-anchor="end" class="axis-label"');
+    markup += text(sx(box, 0, limit) + 10, box.y + 18, axisNames[1], 'class="axis-label"');
+    byId(target).innerHTML = markup;
+  }
+
+  function setLine(id, x1, y1, x2, y2) {
+    const el = byId(id);
+    el.setAttribute("x1", x1);
+    el.setAttribute("y1", y1);
+    el.setAttribute("x2", x2);
+    el.setAttribute("y2", y2);
+  }
+
+  function setCircle(id, cx, cy) {
+    const el = byId(id);
+    el.setAttribute("cx", cx);
+    el.setAttribute("cy", cy);
+  }
+
+  function setLabel(id, x, y, value) {
+    const el = byId(id);
+    el.setAttribute("x", x);
+    el.setAttribute("y", y);
+    el.textContent = value;
+  }
+
+  function readNumber(id) {
+    return clamp(Number(byId(id).value) || 0, -10, 10);
+  }
+
+  function syncPair(primaryId, secondaryId) {
+    const primary = byId(primaryId);
+    const secondary = byId(secondaryId);
+    const value = readNumber(primaryId);
+    primary.value = value;
+    secondary.value = value;
+  }
+
+  function render() {
+    fields.forEach(([numberId, rangeId]) => syncPair(numberId, rangeId));
+
+    const x = readNumber("xValue");
+    const y = readNumber("yValue");
+    const c1 = readNumber("c1Value");
+    const c2 = readNumber("c2Value");
+    const out1 = 4 * x - 2 * y;
+    const out2 = 3 * x + 5 * y;
+    const inputX = sx(inputBox, x, inputLimit);
+    const inputY = sy(inputBox, y, inputLimit);
+    const outputX = sx(outputBox, out1, outputLimit);
+    const outputY = sy(outputBox, out2, outputLimit);
+    const targetX = sx(outputBox, c1, outputLimit);
+    const targetY = sy(outputBox, c2, outputLimit);
+    const originX = sx(outputBox, 0, outputLimit);
+    const originY = sy(outputBox, 0, outputLimit);
+    const xContributionX = sx(outputBox, 4 * x, outputLimit);
+    const xContributionY = sy(outputBox, 3 * x, outputLimit);
+
+    setCircle("inputPoint", inputX, inputY);
+    setCircle("outputPoint", outputX, outputY);
+    setCircle("targetPoint", targetX, targetY);
+    setLine("xVector", originX, originY, xContributionX, xContributionY);
+    setLine("yVector", xContributionX, xContributionY, outputX, outputY);
+    setLine("resultGuide", inputX, inputY, outputX, outputY);
+
+    setLabel("inputLabel", inputX + 10, inputY - 10, `(${fmt(x)}, ${fmt(y)})`);
+    setLabel("outputLabel", outputX + 10, outputY - 10, `(${fmt(out1)}, ${fmt(out2)})`);
+    setLabel("targetLabel", targetX + 10, targetY + 20, `target (${fmt(c1)}, ${fmt(c2)})`);
+    setLabel("xVectorLabel", (originX + xContributionX) / 2 + 10, (originY + xContributionY) / 2 - 8, `${fmt(x)}(4, 3)`);
+    setLabel("yVectorLabel", (xContributionX + outputX) / 2 + 10, (xContributionY + outputY) / 2 + 18, `${fmt(y)}(-2, 5)`);
+
+    byId("inputReadout").textContent = `(${fmt(x)}, ${fmt(y)})`;
+    byId("outputReadout").textContent = `(${fmt(out1)}, ${fmt(out2)})`;
+    byId("targetReadout").textContent = `(${fmt(c1)}, ${fmt(c2)})`;
+    byId("calculationReadout").textContent = `${fmt(x)}(4, 3) + ${fmt(y)}(-2, 5)`;
+
+    const isSolution = Math.abs(out1 - c1) < 0.0001 && Math.abs(out2 - c2) < 0.0001;
+    const delta1 = out1 - c1;
+    const delta2 = out2 - c2;
+    byId("statusReadout").textContent = isSolution
+      ? "solution: output matches target"
+      : `not a solution: off by (${fmt(delta1)}, ${fmt(delta2)})`;
+    byId("statusReadout").style.color = isSolution ? "#1f8a70" : "#c92a2a";
+  }
+
+  fields.forEach(([numberId, rangeId]) => {
+    byId(numberId).addEventListener("input", () => {
+      syncPair(numberId, rangeId);
+      render();
+    });
+    byId(rangeId).addEventListener("input", () => {
+      byId(numberId).value = byId(rangeId).value;
+      render();
+    });
+  });
+
+  drawGrid("inputGrid", inputBox, inputLimit, 1, ["x", "y"]);
+  drawGrid("outputGrid", outputBox, outputLimit, 5, ["c1", "c2"]);
+  render();
+})();
+</script>
+</body>
+</html>

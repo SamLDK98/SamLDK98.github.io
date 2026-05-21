@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Machine | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">The Machine</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h2 class="section-title">The Machine</h2>
+
+        <p>Imagine:</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = 2\\3x + 5y = 7 \end{cases}$$</p>
+
+        <p>Let's temporarily forget the specific constants and replace them with variables.</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = c_{1}\\3x + 5y = c_{2} \end{cases}$$</p>
+
+        <p>Imagine all the possible values of $c_{1}$ as an axis.</p>
+
+        <p>Do the same for $c_{2}$.</p>
+
+        <p>Put them together and we have a space of all possible values for $(c_{1}, c_{2})$.</p>
+
+        <blockquote>
+          <p>This might seem a little odd. Typically we would be thinking about all the possible inputs in terms of a space, i.e. with $x$ and $y$ as our axes; whereas, now we are thinking about all the possible outputs.</p>
+        </blockquote>
+
+        <p>Next, let's plot our actual values, 2 and 7, in this space.</p>
+
+        <p>Let's call this "output space".</p>
+
+        <p>Now, let's imagine all our possible values for $x$ and $y$ to create a similar "input space".</p>
+
+        <p>Let's guess an input that might solve the system, e.g. $x = 3$, $y = 1$.</p>
+
+        <p>Plot it in input space.</p>
+
+        <p>However, we know that our inputs are weighted by coefficients.</p>
+
+        <p>Currently this coordinate represents the expression $x - y$, not $4x - 2y$.</p>
+
+        <p>Our coefficients tell us that...</p>
+
+        <ul>
+          <li>For a one unit increase in the $x$ direction, we move 4 units along the $c_{1}$ axis and 3 units along the $c_{2}$ axis.</li>
+          <li>For a one unit increase in the $y$ direction, we move -2 units along the $c_{1}$ axis and 5 units along the $c_{2}$ axis.</li>
+        </ul>
+
+        <p>So, our guess $(3, 1)$ would need to move:</p>
+
+        <ul>
+          <li>12 units along the $c_{1}$ axis and 9 units along the $c_{2}$ axis.</li>
+          <li>-2 units along the $c_{1}$ axis and 5 units along the $c_{2}$ axis.</li>
+        </ul>
+
+        <p>This would leave us at the coordinate $(10, 14)$.</p>
+
+        <p>$(10, 14)$ is not $(2, 7)$ -- not a solution!</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize essay-widget-input-output"
+          src="linear-algebra/the-machine/the-machine-widget.html"
+          title="Interactive widget comparing input space and output space for a system of equations"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
