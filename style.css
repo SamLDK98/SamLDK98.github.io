@@ -76,6 +76,10 @@ body {
   text-align: left;
 }
 
+.section-index-page .article-index-hero h1 {
+  font-size: clamp(1.75rem, 3.4vw, 3.1rem);
+}
+
 .article-index-main {
   max-width: none;
   margin: 0;
@@ -136,6 +140,11 @@ body {
   z-index: 0;
 }
 
+.active-inference-chapter-1-card .chapter-card-corner-image {
+  width: min(42%, 8.5rem);
+  max-height: 58%;
+}
+
 .active-inference-chapter-1-card .article-card-title,
 .active-inference-chapter-1-card .article-card-footer,
 .active-inference-chapter-2-card .article-card-title,
@@ -171,6 +180,16 @@ body {
   font-family: var(--font-body);
   font-size: clamp(1.6rem, 2.7vw, 2.35rem);
   line-height: 1.08;
+}
+
+.article-card-concepts {
+  display: block;
+  max-width: 42rem;
+  margin-top: 1rem;
+  color: #77746c;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.72rem;
+  line-height: 1.55;
 }
 
 .article-card-footer {
