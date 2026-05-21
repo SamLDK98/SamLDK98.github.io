@@ -136,12 +136,15 @@ body {
   z-index: 0;
 }
 
+.active-inference-chapter-1-card .article-card-title,
+.active-inference-chapter-1-card .article-card-footer,
 .active-inference-chapter-2-card .article-card-title,
 .active-inference-chapter-2-card .article-card-footer {
   position: relative;
   z-index: 1;
 }
 
+.active-inference-chapter-1-card .article-card-footer,
 .active-inference-chapter-2-card .article-card-footer {
   margin-left: auto;
 }
