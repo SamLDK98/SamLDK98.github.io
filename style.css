@@ -397,7 +397,7 @@ li {
 
 .macrostate-table th,
 .macrostate-table td {
-  text-align: right;
+  text-align: center;
 }
 
 .macrostate-table th:nth-child(3),
@@ -412,7 +412,7 @@ li {
 
 .macrostate-table .compact-col {
   width: 5.4rem;
-  text-align: right;
+  text-align: center;
 }
 
 table {
