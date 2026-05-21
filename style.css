@@ -89,10 +89,12 @@ body {
 }
 
 .article-card {
+  position: relative;
   min-height: clamp(15rem, 28vw, 20rem);
   padding: 1.55rem;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   border: 1px solid #e0e0dd;
   border-radius: 10px;
   background: #f7f7f6;
@@ -119,6 +121,29 @@ body {
 
 .chapter-card {
   min-height: clamp(13rem, 22vw, 17rem);
+}
+
+.chapter-card-corner-image {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  width: min(58%, 13rem);
+  max-height: 72%;
+  object-fit: contain;
+  object-position: left bottom;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.active-inference-chapter-2-card .article-card-title,
+.active-inference-chapter-2-card .article-card-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.active-inference-chapter-2-card .article-card-footer {
+  margin-left: auto;
 }
 
 .article-kicker,
