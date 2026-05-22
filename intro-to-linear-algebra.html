@@ -92,15 +92,27 @@
           loading="lazy"
         ></iframe>
 
-        <p>Any coordinate in input space can then be "mapped" to output space by taking these new steps:</p>
+        <p>All coordinates in input space can be 'mapped' to output space using these new steps: $x(4,3)$ and $y(-2,5)$.</p>
 
-        <p class="display-equation">$$x(4,3)\ \text{and}\ y(-2,5)$$</p>
+        <p>For example, the input vector $(7,6)$ maps to the output vector $(16,51)$:</p>
 
-        <p>For example, to see where a point in input space ends up after performing this transformation:</p>
+        <p class="display-equation">$$
+\begin{gathered}
+(7,6)\mapsto 7(4,3) + 6(-2,5) \\
+= (28,21) + (-12,30) \\
+= (16,51)
+\end{gathered}
+$$</p>
 
-        <p class="display-equation">$$\begin{gathered}(7,6)\mapsto 7(4,3) + 6(-2,5) \\ = (28,21) + (-12,30) \\ = (16, 51)\end{gathered}$$</p>
+        <p>In fact, 'can be mapped' is not strong enough...</p>
 
-        <p>So we can imagine our input space "transforming", by imagining the coordinates $(0,1)$ and $(1,0)$ moving to $(4, 3)$ and $(-2, 5)$, respectively, and every other following suit.</p>
+        <p>As we are assuming all coordinate in input space are actually constructed by these basis vector thing, if we change the basis vectors, then all the coordinates they are the parts of must change accordingly.</p>
+
+        <p>Take notice of the fact that we are saying all coordinates in input space are actually composed of these basis vector things. So if we change the basis vectors, then all the coordinates must change accordingly.</p>
+
+        <p>This is mathematically equivalent to imagining every coordinate in the input space being passed through a function to produce a corresponding output coordinate, but the conceptual distinction is important.</p>
+
+        <p>Rather than thinking of isolated points moving independently, we can instead think of the basis vectors being transformed, and the new space being constructed from them.</p>
 
         <iframe
           class="essay-widget intro-transform-widget"

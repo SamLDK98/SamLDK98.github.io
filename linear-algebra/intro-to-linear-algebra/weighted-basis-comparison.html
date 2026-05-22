@@ -53,9 +53,8 @@
   }
 
   .system-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem;
+    display: grid;
+    gap: 0.2rem;
     align-items: center;
     justify-content: center;
     margin-bottom: 0.85rem;
@@ -69,8 +68,25 @@
   }
 
   .system-term {
+    display: block;
     font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
     white-space: nowrap;
+  }
+
+  .system-brace {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.45rem;
+    align-items: center;
+  }
+
+  .system-brace::before {
+    content: "{";
+    color: var(--muted);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 2.55rem;
+    line-height: 0.9;
   }
 
   .control-card {
@@ -214,8 +230,12 @@
 <body>
 <div class="comparison" role="region" aria-label="Input and output weighted basis comparison">
   <div class="system-strip" aria-label="System terms">
-    <span class="system-term">4<span class="blue">x</span> - 2<span class="orange">y</span></span>
-    <span class="system-term">3<span class="blue">x</span> + 5<span class="orange">y</span></span>
+    <div class="system-brace">
+      <div>
+        <span class="system-term">4x - 2y</span>
+        <span class="system-term">3x + 5y</span>
+      </div>
+    </div>
   </div>
 
   <div class="controls">
