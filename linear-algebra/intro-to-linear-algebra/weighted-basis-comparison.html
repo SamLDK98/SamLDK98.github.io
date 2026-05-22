@@ -52,6 +52,27 @@
     margin-bottom: 0.85rem;
   }
 
+  .system-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.85rem;
+    padding: 0.72rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.16);
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .system-term {
+    font-family: Georgia, "Times New Roman", serif;
+    white-space: nowrap;
+  }
+
   .control-card {
     padding: 0.8rem 0.85rem;
     border: 1px solid var(--line);
@@ -61,7 +82,7 @@
 
   label {
     display: grid;
-    grid-template-columns: auto 5rem 1fr;
+    grid-template-columns: auto 3rem 1fr;
     gap: 0.65rem;
     align-items: center;
     color: var(--muted);
@@ -72,9 +93,11 @@
     text-transform: uppercase;
   }
 
-  input[type="number"] {
-    width: 5rem;
-    padding: 0.36rem 0.42rem;
+  .slider-value {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.5rem;
+    padding: 0.3rem 0.42rem;
     border: 1px solid var(--line);
     border-radius: 2px;
     background: rgba(0, 0, 0, 0.22);
@@ -85,6 +108,7 @@
 
   input[type="range"] {
     width: 100%;
+    accent-color: #d4b888;
   }
 
   input:focus {
@@ -182,29 +206,30 @@
     }
 
     label {
-      grid-template-columns: auto 4.6rem;
-    }
-
-    input[type="range"] {
-      grid-column: 1 / -1;
+      grid-template-columns: auto 3rem 1fr;
     }
   }
 </style>
 </head>
 <body>
 <div class="comparison" role="region" aria-label="Input and output weighted basis comparison">
+  <div class="system-strip" aria-label="System terms">
+    <span class="system-term">4<span class="blue">x</span> - 2<span class="orange">y</span></span>
+    <span class="system-term">3<span class="blue">x</span> + 5<span class="orange">y</span></span>
+  </div>
+
   <div class="controls">
     <div class="control-card">
       <label>
         x steps
-        <input id="xNumber" type="number" min="-6" max="6" step="1" value="3">
+        <span class="slider-value" id="xValue">3</span>
         <input id="xRange" type="range" min="-6" max="6" step="1" value="3" aria-label="x step slider">
       </label>
     </div>
     <div class="control-card">
       <label>
         y steps
-        <input id="yNumber" type="number" min="-6" max="6" step="1" value="3">
+        <span class="slider-value" id="yValue">3</span>
         <input id="yRange" type="range" min="-6" max="6" step="1" value="3" aria-label="y step slider">
       </label>
     </div>
@@ -228,8 +253,6 @@
 
       <text x="255" y="32" text-anchor="middle" class="axis-label">input space</text>
       <text x="785" y="32" text-anchor="middle" class="axis-label">output space</text>
-      <text x="255" y="54" text-anchor="middle" class="small-label">As x or y increases...</text>
-      <text x="785" y="54" text-anchor="middle" class="small-label">As x or y increases...</text>
 
       <rect x="50" y="80" width="410" height="410" fill="rgba(0,0,0,0.12)" stroke="rgba(214,196,168,0.14)"></rect>
       <rect x="580" y="80" width="410" height="410" fill="rgba(0,0,0,0.12)" stroke="rgba(214,196,168,0.14)"></rect>
@@ -246,10 +269,10 @@
   const outputBox = { x: 580, y: 80, w: 410, h: 410 };
   const inputLimit = 6;
   const outputLimit = 36;
-  const xNumber = document.getElementById("xNumber");
   const xRange = document.getElementById("xRange");
-  const yNumber = document.getElementById("yNumber");
   const yRange = document.getElementById("yRange");
+  const xValue = document.getElementById("xValue");
+  const yValue = document.getElementById("yValue");
   const xReadout = document.getElementById("xReadout");
   const yReadout = document.getElementById("yReadout");
   const inputGrid = document.getElementById("inputGrid");
@@ -315,21 +338,21 @@
       text(tipX + offsetX, tipY + offsetY, label, `class="mono-label vector-label" fill="${color}" font-weight="700"`);
   }
 
-  function syncPair(numberInput, rangeInput) {
-    const value = read(numberInput);
-    numberInput.value = fmt(value);
+  function syncRange(rangeInput, valueEl) {
+    const value = read(rangeInput);
     rangeInput.value = fmt(value);
+    valueEl.textContent = fmt(value);
     return value;
   }
 
   function render() {
-    const x = syncPair(xNumber, xRange);
-    const y = syncPair(yNumber, yRange);
+    const x = syncRange(xRange, xValue);
+    const y = syncRange(yRange, yValue);
     const xOut = { x: 4 * x, y: 3 * x };
     const yOut = { x: -2 * y, y: 5 * y };
 
-    xReadout.innerHTML = `<strong>As x increases</strong><br><span class="blue">input:</span> (${fmt(x)}, 0) &nbsp; <span class="green">output:</span> (${fmt(xOut.x)}, ${fmt(xOut.y)})`;
-    yReadout.innerHTML = `<strong>As y increases</strong><br><span class="orange">input:</span> (0, ${fmt(y)}) &nbsp; <span class="green">output:</span> (${fmt(yOut.x)}, ${fmt(yOut.y)})`;
+    xReadout.innerHTML = `<strong>x basis vector</strong><br><span class="blue">input:</span> (${fmt(x)}, 0) &nbsp; <span class="green">output:</span> (${fmt(xOut.x)}, ${fmt(xOut.y)})`;
+    yReadout.innerHTML = `<strong>y basis vector</strong><br><span class="orange">input:</span> (0, ${fmt(y)}) &nbsp; <span class="green">output:</span> (${fmt(yOut.x)}, ${fmt(yOut.y)})`;
 
     let html = "";
     html += vector(inputBox, inputLimit, x, 0, "#e8a13b", "arrowBlue", `(${fmt(x)},0)`, x >= 0 ? 10 : -54, 18);
@@ -339,16 +362,8 @@
     vectors.innerHTML = html;
   }
 
-  xNumber.addEventListener("input", render);
-  xRange.addEventListener("input", () => {
-    xNumber.value = xRange.value;
-    render();
-  });
-  yNumber.addEventListener("input", render);
-  yRange.addEventListener("input", () => {
-    yNumber.value = yRange.value;
-    render();
-  });
+  xRange.addEventListener("input", render);
+  yRange.addEventListener("input", render);
 
   drawGrid(inputGrid, inputBox, inputLimit, 1, ["x", "y"]);
   drawGrid(outputGrid, outputBox, outputLimit, 6, ["c1", "c2"]);
