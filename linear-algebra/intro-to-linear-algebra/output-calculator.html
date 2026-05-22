@@ -51,10 +51,7 @@
   }
 
   .calculator-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: end;
+    display: block;
     padding: 1.1rem 1.25rem 0.9rem;
     border-bottom: 1px solid var(--rule);
   }
@@ -75,14 +72,6 @@
     font-size: 1.35rem;
     font-weight: 400;
     letter-spacing: -0.01em;
-  }
-
-  .meta {
-    color: var(--faint);
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.68rem;
-    line-height: 1.4;
-    text-align: right;
   }
 
   .calculator-body {
@@ -172,7 +161,8 @@
 
   input {
     width: 100%;
-    padding: 0.58rem 0.62rem;
+    height: 2.7rem;
+    padding: 0.58rem 2.35rem 0.58rem 0.62rem;
     border: 1px solid var(--rule);
     border-radius: 2px;
     background: rgba(0, 0, 0, 0.2);
@@ -180,10 +170,56 @@
     font: 0.95rem/1.2 "JetBrains Mono", monospace;
   }
 
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
   input:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(212, 184, 136, 0.08);
+  }
+
+  .number-control {
+    position: relative;
+  }
+
+  .stepper {
+    position: absolute;
+    right: 0.35rem;
+    top: 50%;
+    width: 1.45rem;
+    display: grid;
+    gap: 0.14rem;
+    transform: translateY(-50%);
+  }
+
+  .stepper button {
+    width: 1.45rem;
+    height: 1rem;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(214, 196, 168, 0.18);
+    border-radius: 2px;
+    background: rgba(212, 184, 136, 0.06);
+    color: var(--accent);
+    font: 0.72rem/1 "JetBrains Mono", monospace;
+    text-align: center;
+  }
+
+  .stepper button:hover {
+    background: rgba(212, 184, 136, 0.14);
+    border-color: rgba(212, 184, 136, 0.36);
   }
 
   button {
@@ -208,22 +244,9 @@
     transform: scale(0.985);
   }
 
-  .hint {
-    margin-top: auto;
-    color: var(--faint);
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.66rem;
-    line-height: 1.45;
-  }
-
   @media (max-width: 660px) {
     .calculator-header {
-      align-items: start;
-      flex-direction: column;
-    }
-
-    .meta {
-      text-align: left;
+      display: block;
     }
 
     .calculator-body {
@@ -246,10 +269,8 @@
 <div class="calculator" role="region" aria-label="Linear system output calculator">
   <div class="calculator-header">
     <div>
-      <p class="eyebrow">Output Space</p>
-      <h1>Evaluate the system</h1>
+      <h1>Row by row calculation of outputs</h1>
     </div>
-    <div class="meta">x, y input<br>c1, c2 output</div>
   </div>
 
   <div class="calculator-body">
@@ -267,17 +288,28 @@
     </div>
 
     <div class="controls">
-      <div class="section-label">Input Coordinate</div>
+      <div class="section-label">Coordinate</div>
       <label>
         x value
-        <input id="xInput" type="number" step="1" placeholder="x">
+        <span class="number-control">
+          <input id="xInput" type="number" step="1" placeholder="x">
+          <span class="stepper">
+            <button type="button" data-target="xInput" data-step="1" aria-label="Increase x value">+</button>
+            <button type="button" data-target="xInput" data-step="-1" aria-label="Decrease x value">-</button>
+          </span>
+        </span>
       </label>
       <label>
         y value
-        <input id="yInput" type="number" step="1" placeholder="y">
+        <span class="number-control">
+          <input id="yInput" type="number" step="1" placeholder="y">
+          <span class="stepper">
+            <button type="button" data-target="yInput" data-step="1" aria-label="Increase y value">+</button>
+            <button type="button" data-target="yInput" data-step="-1" aria-label="Decrease y value">-</button>
+          </span>
+        </span>
       </label>
-      <button id="enterButton" type="button">Enter</button>
-      <div class="hint">The system updates only when Enter is pressed.</div>
+      <button id="enterButton" type="button">Set</button>
     </div>
   </div>
 </div>
@@ -330,6 +362,14 @@
   });
   yInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") submit();
+  });
+  document.querySelectorAll(".stepper button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.getElementById(button.dataset.target);
+      const current = read(input) ?? 0;
+      input.value = fmt(current + Number(button.dataset.step));
+      input.focus();
+    });
   });
 
   resetGeneric();
