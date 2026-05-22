@@ -48,18 +48,24 @@
 
   .top-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-columns: minmax(0, 1fr) 350px;
     gap: 1rem;
     align-items: stretch;
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--rule);
   }
 
+  .coordinate-panel {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.78fr) minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
   .coordinate-card {
     display: flex;
     align-items: center;
-    min-height: 7.4rem;
-    padding: 1.05rem 1.15rem;
+    min-height: 6rem;
+    padding: 0.9rem 1rem;
     border: 1px solid var(--rule);
     border-radius: 3px;
     background: rgba(0, 0, 0, 0.16);
@@ -67,7 +73,7 @@
 
   .coordinate {
     font-family: "Fraunces", Georgia, serif;
-    font-size: clamp(2.2rem, 7vw, 4.7rem);
+    font-size: clamp(1.8rem, 4vw, 3.2rem);
     line-height: 1;
     letter-spacing: 0;
   }
@@ -164,16 +170,13 @@
 
   .calculation-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--rule);
-    background: rgba(0, 0, 0, 0.08);
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
   }
 
   .calc-card {
-    min-height: 4.3rem;
-    padding: 0.78rem 0.85rem;
+    min-height: 0;
+    padding: 0.72rem 0.78rem;
     border: 1px solid var(--rule);
     border-radius: 3px;
     background: var(--card);
@@ -271,7 +274,7 @@
 
   @media (max-width: 720px) {
     .top-row,
-    .calculation-row {
+    .coordinate-panel {
       grid-template-columns: 1fr;
     }
   }
@@ -280,8 +283,21 @@
 <body>
 <div class="builder" role="region" aria-label="Input space basis vector builder">
   <div class="top-row">
-    <div class="coordinate-card" aria-live="polite">
-      <div class="coordinate" id="coordinateText"></div>
+    <div class="coordinate-panel">
+      <div class="coordinate-card" aria-live="polite">
+        <div class="coordinate" id="coordinateText"></div>
+      </div>
+
+      <div class="calculation-row">
+        <div class="calc-card">
+          <span class="calc-label">x basis direction</span>
+          <span class="calc-value" id="xText"></span>
+        </div>
+        <div class="calc-card">
+          <span class="calc-label">y basis direction</span>
+          <span class="calc-value" id="yText"></span>
+        </div>
+      </div>
     </div>
 
     <div class="controls">
@@ -305,17 +321,6 @@
           </span>
         </span>
       </label>
-    </div>
-  </div>
-
-  <div class="calculation-row">
-    <div class="calc-card">
-      <span class="calc-label">x basis direction</span>
-      <span class="calc-value" id="xText"></span>
-    </div>
-    <div class="calc-card">
-      <span class="calc-label">y basis direction</span>
-      <span class="calc-value" id="yText"></span>
     </div>
   </div>
 

@@ -1080,7 +1080,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .intro-linear-algebra-page .intro-basis-widget {
-  height: 940px;
+  height: 850px;
 }
 
 .intro-linear-algebra-page .intro-weighted-widget {
