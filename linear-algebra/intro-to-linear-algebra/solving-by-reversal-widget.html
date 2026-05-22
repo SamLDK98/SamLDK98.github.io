@@ -216,31 +216,6 @@
     color: var(--text-dim);
   }
 
-  .description {
-    font-family: 'EB Garamond', serif;
-    font-size: 1rem;
-    line-height: 1.55;
-    color: var(--text);
-    min-height: 5.5rem;
-    transition: opacity 0.25s;
-    font-style: italic;
-  }
-
-  .description em {
-    color: var(--accent);
-    font-style: normal;
-  }
-
-  .description code {
-    font-family: 'JetBrains Mono', monospace;
-    font-style: normal;
-    font-size: 0.88rem;
-    background: rgba(212, 184, 136, 0.08);
-    padding: 1px 5px;
-    border-radius: 2px;
-    color: var(--text);
-  }
-
   .matrix-display {
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.05rem;
@@ -355,36 +330,6 @@
     margin-left: 0.5rem;
   }
 
-  .nav {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: auto;
-  }
-
-  .nav button {
-    flex: 1;
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--rule);
-    border-radius: 2px;
-    padding: 0.7rem 0.85rem;
-    font-family: 'EB Garamond', serif;
-    font-size: 0.95rem;
-    font-style: italic;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .nav button:hover:not(:disabled) {
-    border-color: var(--accent);
-    background: rgba(212, 184, 136, 0.08);
-  }
-
-  .nav button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-
   .footer {
     padding: 0.85rem 2rem;
     border-top: 1px solid var(--rule);
@@ -447,8 +392,6 @@
         </div>
       </div>
 
-      <div class="description" id="description"></div>
-
       <div>
         <div class="section-label">Basis Matrix</div>
         <div class="matrix-display">
@@ -476,10 +419,6 @@
         </div>
       </div>
 
-      <div class="nav">
-        <button id="prev">&lt;- Back</button>
-        <button id="next">Next -&gt;</button>
-      </div>
     </aside>
   </div>
 
@@ -514,7 +453,6 @@
   const PHASES = [
     {
       label: "Input Space",
-      desc: `Begin with the standard input space. The basis vectors are <em>i</em> and <em>j</em>; no output target has been plotted yet.`,
       basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
       target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
       extent: 9,
@@ -523,7 +461,6 @@
     },
     {
       label: "Transform Space",
-      desc: `Apply the transformation. The basis i and j stretch to <em>(4, 3)</em> and <em>(-2, 5)</em>.`,
       basis: { ix: TRANSFORM.ix, iy: TRANSFORM.iy, jx: TRANSFORM.jx, jy: TRANSFORM.jy },
       target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
       extent: 9,
@@ -532,7 +469,6 @@
     },
     {
       label: "Plot Target Vector",
-      desc: `Now plot the target output vector <em>(2, 7)</em> in output space.`,
       basis: { ix: TRANSFORM.ix, iy: TRANSFORM.iy, jx: TRANSFORM.jx, jy: TRANSFORM.jy },
       target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
       extent: 9,
@@ -541,7 +477,6 @@
     },
     {
       label: "Reverse the Map",
-      desc: `Now reverse the transformation. The basis returns to standard, and the target rides along with the un-deforming space, landing at the input vector.`,
       basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
       target: { x: SOLUTION.x, y: SOLUTION.y },
       extent: 1.6,
@@ -550,7 +485,6 @@
     },
     {
       label: "Decompose",
-      desc: `Decompose the input as <em>x*i + y*j</em>. The scalars are the solution to the system.`,
       basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
       target: { x: SOLUTION.x, y: SOLUTION.y },
       extent: 1.6,
@@ -689,7 +623,7 @@
     ctx.save();
     ctx.globalAlpha = 1 - 0.75 * current.decomp;
     drawArrow([0,0], iHead, '#e8a13b', 'rgba(232,161,59,0.5)', 3, 'i', [8, -4]);
-    drawArrow([0,0], jHead, '#6dd3c4', 'rgba(109,211,196,0.5)', 3, 'j', [8, -4]);
+    drawArrow([0,0], jHead, '#6dd3c4', 'rgba(109,211,196,0.5)', 3, 'j', [-24, -4]);
     ctx.restore();
 
     // Decomposition (phase 4) - drawn underneath the target arrow
@@ -808,9 +742,6 @@
       el.classList.toggle('active', i === idx);
       el.classList.toggle('done', i < idx);
     });
-    document.getElementById('description').innerHTML = target.desc;
-    document.getElementById('prev').disabled = idx === 0;
-    document.getElementById('next').disabled = idx === PHASES.length - 1;
     document.getElementById('target-info').classList.toggle('visible', idx >= 2);
     document.getElementById('solution').classList.toggle('visible', idx === 4);
   }
@@ -819,9 +750,6 @@
   document.querySelectorAll('.phase-item').forEach(el => {
     el.addEventListener('click', () => goToPhase(parseInt(el.dataset.phase)));
   });
-  document.getElementById('prev').addEventListener('click', () => goToPhase(phaseIndex - 1));
-  document.getElementById('next').addEventListener('click', () => goToPhase(phaseIndex + 1));
-
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') { goToPhase(phaseIndex + 1); e.preventDefault(); }
     if (e.key === 'ArrowLeft')  { goToPhase(phaseIndex - 1); e.preventDefault(); }
