@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intro to Linear Algebra | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Intro to Linear Algebra</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Imagine:</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = 2\\3x + 5y = 7 \end{cases}$$</p>
+
+        <p>Let's temporarily forget the specific constants and replace them with variables.</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = c_{1}\\3x + 5y = c_{2} \end{cases}$$</p>
+
+        <p>Imagine all the possible values of $c_{1}$ and $c_{2}$ as two axes -- call it "output space".</p>
+
+        <p>We take some input $(x,y) = (7,6)$ and want to see what values it produces for $c_{1}$ and $c_{2}$.</p>
+
+        <p>We could just calculate row by row, plugging our input into our variables.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize"
+          src="linear-algebra/intro-to-linear-algebra/output-calculator.html"
+          title="Interactive calculator for the outputs of a two-equation linear system"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
