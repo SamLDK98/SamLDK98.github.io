@@ -3,454 +3,575 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Machine input and output space widget</title>
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']]
-    },
-    svg: { fontCache: 'global' }
-  };
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<title>Linear Algebra: input → output mapping</title>
 <style>
-  :root {
-    --bg: #fdfcf8;
-    --panel: #fffefa;
-    --ink: #1a1a18;
-    --muted: #6f6a5e;
-    --line: #e1ddd2;
-    --soft: #f7f3ea;
-    --input: #2563eb;
-    --xvec: #1f8a70;
-    --yvec: #c2410c;
-    --target: #7c3aed;
-    --miss: #c92a2a;
-  }
+:root{
+  --bg:#fdfcf8; --card:#fff; --ink:#1a1a1a; --muted:#787264; --line:#e5e1d7;
+  --soft:#faf8f1;
+  --blue:#2563eb; --blueSoft:#eff6ff; --blueBorder:#bfdbfe; --blueDk:#1e3a8a;
+  --orange:#ea580c;
+  --indigo:#4338ca;
+  --emerald:#059669; --emeraldDk:#047857; --emeraldSoft:#ecfdf5; --emeraldBorder:#a7f3d0;
+  --pink:#db2777; --pinkDk:#9d174d;
+  --red:#dc2626;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Georgia,'Cambria','Times New Roman',serif;line-height:1.45}
+body{padding:1.25rem}
+.wrap{max-width:1060px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;margin-bottom:.55rem}
 
-  * {
-    box-sizing: border-box;
-  }
+.equations{font-size:1.4rem;line-height:1.45;font-style:italic;margin:.1rem 0 .7rem 0;display:grid;gap:.15rem}
+.equations .blue{color:var(--blue);font-style:normal;font-weight:600}
+.equations .orange{color:var(--orange);font-style:normal;font-weight:600}
+.equations .c1clr{color:var(--indigo);font-style:normal;font-weight:700}
+.equations .c2clr{color:var(--emeraldDk);font-style:normal;font-weight:700}
 
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: Georgia, "Times New Roman", serif;
-  }
+.ioRow{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.inputCard,.targetCard{padding:.55rem .7rem;border-radius:7px;font-family:system-ui,sans-serif;font-size:12.5px;display:flex;align-items:center;flex-wrap:wrap;gap:.45rem}
+.inputCard{background:var(--blueSoft);border:1px solid var(--blueBorder);color:var(--blueDk)}
+.targetCard{background:var(--emeraldSoft);border:1px solid var(--emeraldBorder);color:var(--emeraldDk)}
+.inputCard b,.targetCard b{font-weight:700}
+.inputCard input,.targetCard input{width:56px;padding:.25rem .3rem;border-radius:5px;font-family:ui-monospace,monospace;font-size:13px;font-weight:600;text-align:center}
+.inputCard input{border:1px solid #93c5fd;background:#fff;color:var(--blue)}
+.targetCard input{border:1px solid #6ee7b7;background:#fff;color:var(--emeraldDk)}
+.inputCard input:focus{outline:none;box-shadow:0 0 0 2px rgba(37,99,235,.18);border-color:var(--blue)}
+.targetCard input:focus{outline:none;box-shadow:0 0 0 2px rgba(5,150,105,.18);border-color:var(--emerald)}
 
-  body {
-    padding: 1rem;
-  }
+.buttons{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.55rem}
+button{font-family:system-ui,sans-serif;font-size:13px;cursor:pointer;padding:.42rem .7rem;background:#fff;border:1px solid #c8c4b5;border-radius:7px;color:var(--ink);transition:background .12s,border-color .12s,transform .08s}
+button:hover{background:#f5f3eb;border-color:#a8a496}
+button:active{transform:scale(.985)}
+button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.primary{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+button.primary:hover{background:#3730a3;border-color:#3730a3}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
-  .machine-widget {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
+.stageBtns{display:grid;grid-template-columns:repeat(5,1fr);gap:.35rem;margin-top:.55rem}
+.stageBtns button{text-align:left;padding:.5rem .55rem;line-height:1.2}
+.stageBtns button .num{display:block;font-weight:700;font-size:12.5px}
+.stageBtns button .desc{display:block;font-size:10.5px;opacity:.7;margin-top:.15rem}
 
-  .machine-panel {
-    padding: 1rem;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--panel);
-  }
+.vizWrap{background:#fff;border:1px solid var(--line);border-radius:10px;padding:.55rem;overflow:hidden}
+svg{display:block;width:100%;height:auto;user-select:none}
 
-  .machine-heading {
-    display: grid;
-    grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.3fr);
-    gap: 1rem;
-    align-items: start;
-  }
+.status{font-family:system-ui,sans-serif;font-size:13px;line-height:1.65;color:#4a4a4a;padding:.8rem 1rem;background:var(--soft);border-radius:8px;margin-top:.75rem}
+.status em{color:var(--ink);font-style:italic}
+.status strong{color:var(--ink)}
+.status .vx{color:var(--blue);font-weight:600}
+.status .vy{color:var(--orange);font-weight:600}
+.status .c1c{color:var(--indigo);font-weight:600}
+.status .c2c{color:var(--emeraldDk);font-weight:600}
+.status .vmap{color:var(--pink);font-weight:600}
+.status .vtgt{color:var(--emeraldDk);font-weight:600}
+.status .ok{color:var(--emeraldDk);font-weight:700}
+.status .miss{color:var(--red);font-weight:700}
 
-  .machine-system {
-    margin: 0;
-    font-size: 1.25rem;
-    line-height: 1.45;
-  }
+.small{font-family:system-ui,sans-serif;font-size:11px;fill:#6d675a}
+.axisLbl{font-family:Georgia,serif;font-style:italic;font-size:16px}
+.mathLbl{font-family:Georgia,serif;font-style:italic;font-size:14px}
+.mono{font-family:ui-monospace,monospace;font-size:11px}
 
-  .machine-controls {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.65rem;
-  }
+.arithBox{
+  margin-top:.65rem;
+  padding:.55rem .7rem;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#fff;
+  font-family:Georgia,'Cambria','Times New Roman',serif;
+}
+.arithTitle{
+  font-family:system-ui,sans-serif;
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+  margin-bottom:.35rem;
+}
+.arithChain{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:.28rem;
+  font-size:1.05rem;
+}
+.arithStep{
+  padding:.18rem .32rem;
+  border-radius:6px;
+  border:1px solid transparent;
+  color:#444;
+}
+.arithStep.active{
+  background:#fff7ed;
+  border-color:#fed7aa;
+  color:#9a3412;
+  font-weight:700;
+  box-shadow:0 0 0 3px rgba(234,88,12,.10);
+}
+.arithArrow{
+  color:#9a8f7b;
+}
+.coef{
+  display:inline-block;
+  padding:.02rem .12rem;
+  border-radius:5px;
+  transition:box-shadow .15s, background .15s, transform .15s;
+}
+.coef.activeCoef{
+  background:#fff7ed;
+  box-shadow:0 0 0 3px rgba(234,88,12,.18), 0 0 14px rgba(234,88,12,.35);
+  transform:scale(1.06);
+  font-weight:800;
+}
+.coef.doneCoef{
+  background:rgba(22,163,74,.10);
+}
 
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.24rem;
-    color: var(--muted);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  input[type="number"],
-  input[type="range"] {
-    width: 100%;
-  }
-
-  input[type="number"] {
-    padding: 0.38rem 0.42rem;
-    border: 1px solid #c9c2b3;
-    border-radius: 6px;
-    background: #fff;
-    color: var(--ink);
-    font: 0.88rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
-  }
-
-  input[type="number"]:focus {
-    outline: 2px solid rgba(37, 99, 235, 0.22);
-    border-color: var(--input);
-  }
-
-  .machine-readout {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.65rem;
-    margin-top: 0.8rem;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-
-  .readout-card {
-    min-height: 4.2rem;
-    padding: 0.7rem 0.78rem;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--soft);
-  }
-
-  .readout-label {
-    display: block;
-    margin-bottom: 0.32rem;
-    color: var(--muted);
-    font-size: 0.66rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .readout-value {
-    display: block;
-    color: var(--ink);
-    font: 0.95rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
-  }
-
-  .readout-note {
-    display: block;
-    margin-top: 0.25rem;
-    color: var(--muted);
-    font-size: 0.78rem;
-    line-height: 1.35;
-  }
-
-  .machine-stage {
-    margin-top: 0.85rem;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
-    overflow: hidden;
-  }
-
-  svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .axis-label {
-    fill: var(--ink);
-    font: italic 17px Georgia, "Times New Roman", serif;
-  }
-
-  .small-label {
-    fill: var(--muted);
-    font: 12px Arial, Helvetica, sans-serif;
-  }
-
-  .mono-label {
-    fill: #3d3932;
-    font: 12px ui-monospace, SFMono-Regular, Consolas, monospace;
-  }
-
-  .grid-line {
-    stroke: var(--ink);
-    stroke-opacity: 0.08;
-  }
-
-  .axis-line {
-    stroke: var(--ink);
-    stroke-opacity: 0.45;
-    stroke-width: 1.3;
-  }
-
-  .input-point,
-  .target-point,
-  .output-point,
-  .vector-line,
-  .guide-line {
-    transition: cx 180ms ease, cy 180ms ease, x1 180ms ease, y1 180ms ease, x2 180ms ease, y2 180ms ease;
-  }
-
-  @media (max-width: 760px) {
-    body {
-      padding: 0.7rem;
-    }
-
-    .machine-heading,
-    .machine-readout {
-      grid-template-columns: 1fr;
-    }
-
-    .machine-controls {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
+@media(max-width:860px){
+  .ioRow{grid-template-columns:1fr}
+  .stageBtns button .desc{display:none}
+  .equations{font-size:1.15rem}
+}
 </style>
 </head>
 <body>
-<div class="machine-widget" role="region" aria-label="Input and output space machine widget">
-  <div class="machine-panel">
-    <div class="machine-heading">
-      <p class="machine-system">$$\begin{cases}4x - 2y = c_{1}\\3x + 5y = c_{2}\end{cases}$$</p>
-
-      <div class="machine-controls">
-        <label>
-          x input
-          <input id="xValue" type="number" min="-10" max="10" step="1" value="3">
-          <input id="xRange" type="range" min="-10" max="10" step="1" value="3" aria-label="x input slider">
-        </label>
-
-        <label>
-          y input
-          <input id="yValue" type="number" min="-10" max="10" step="1" value="1">
-          <input id="yRange" type="range" min="-10" max="10" step="1" value="1" aria-label="y input slider">
-        </label>
-
-        <label>
-          c1 target
-          <input id="c1Value" type="number" min="-10" max="10" step="1" value="2">
-          <input id="c1Range" type="range" min="-10" max="10" step="1" value="2" aria-label="c1 target slider">
-        </label>
-
-        <label>
-          c2 target
-          <input id="c2Value" type="number" min="-10" max="10" step="1" value="7">
-          <input id="c2Range" type="range" min="-10" max="10" step="1" value="7" aria-label="c2 target slider">
-        </label>
+<div class="wrap">
+  <div class="card">
+    <div class="equations" id="eqDisplay"></div>
+    <div class="ioRow">
+      <div class="inputCard">
+        <b>Input</b>:
+        <span>x = <input type="number" step="0.5" min="-10" max="10" id="x" value="3"></span>
+        <span>y = <input type="number" step="0.5" min="-10" max="10" id="y" value="1"></span>
+      </div>
+      <div class="targetCard">
+        <b>Target</b>:
+        <span>c₁ = <input type="number" step="0.5" min="-10" max="10" id="c1" value="2"></span>
+        <span>c₂ = <input type="number" step="0.5" min="-10" max="10" id="c2" value="7"></span>
       </div>
     </div>
-
-    <div class="machine-readout" aria-live="polite">
-      <div class="readout-card">
-        <span class="readout-label">Input vector</span>
-        <span class="readout-value" id="inputReadout">(3, 1)</span>
-      </div>
-      <div class="readout-card">
-        <span class="readout-label">Output vector</span>
-        <span class="readout-value" id="outputReadout">(10, 14)</span>
-        <span class="readout-note" id="calculationReadout">3(4, 3) + 1(-2, 5)</span>
-      </div>
-      <div class="readout-card">
-        <span class="readout-label">Target output</span>
-        <span class="readout-value" id="targetReadout">(2, 7)</span>
-        <span class="readout-note" id="statusReadout">not a solution</span>
-      </div>
+    <div class="buttons">
+      <button id="mapBtn" class="primary">Map input → output</button>
+      <button id="resetBtn">Reset</button>
+      <button id="playBtn">Auto-play stages</button>
+      <button id="snapBtn" title="Set (x, y) to the input that actually solves the system for the chosen target">Snap (x, y) to solution</button>
     </div>
-
-    <div class="machine-stage">
-      <svg viewBox="0 0 1100 560" aria-label="Input space and output space diagrams">
-        <defs>
-          <marker id="arrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#5f5a4f"></path>
-          </marker>
-        </defs>
-
-        <text x="275" y="38" text-anchor="middle" class="axis-label">input space</text>
-        <text x="825" y="38" text-anchor="middle" class="axis-label">output space</text>
-        <text x="275" y="58" text-anchor="middle" class="small-label">axes are x and y</text>
-        <text x="825" y="58" text-anchor="middle" class="small-label">axes are c1 and c2</text>
-
-        <rect x="70" y="80" width="410" height="410" fill="#fff" stroke="#e1ddd2"></rect>
-        <rect x="620" y="80" width="410" height="410" fill="#fff" stroke="#e1ddd2"></rect>
-
-        <g id="inputGrid"></g>
-        <g id="outputGrid"></g>
-
-        <line id="xVector" class="vector-line" stroke="#1f8a70" stroke-width="4" stroke-linecap="round" marker-end="url(#arrowHead)"></line>
-        <line id="yVector" class="vector-line" stroke="#c2410c" stroke-width="4" stroke-linecap="round" marker-end="url(#arrowHead)"></line>
-        <line id="resultGuide" class="guide-line" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="6 5" opacity="0.62"></line>
-
-        <circle id="inputPoint" class="input-point" r="7" fill="#2563eb" stroke="#fff" stroke-width="2"></circle>
-        <circle id="outputPoint" class="output-point" r="7" fill="#2563eb" stroke="#fff" stroke-width="2"></circle>
-        <circle id="targetPoint" class="target-point" r="7" fill="#7c3aed" stroke="#fff" stroke-width="2"></circle>
-
-        <text id="inputLabel" class="mono-label"></text>
-        <text id="outputLabel" class="mono-label"></text>
-        <text id="targetLabel" class="mono-label"></text>
-        <text id="xVectorLabel" class="mono-label" fill="#1f8a70"></text>
-        <text id="yVectorLabel" class="mono-label" fill="#c2410c"></text>
-
-        <text x="465" y="278" text-anchor="middle" class="small-label">x contributes</text>
-        <text x="465" y="294" text-anchor="middle" class="mono-label">(4, 3)</text>
-        <text x="465" y="324" text-anchor="middle" class="small-label">y contributes</text>
-        <text x="465" y="340" text-anchor="middle" class="mono-label">(-2, 5)</text>
-
-        <text x="275" y="526" text-anchor="middle" class="small-label">The chosen input point is plotted here.</text>
-        <text x="825" y="526" text-anchor="middle" class="small-label">The same input is transformed into output coordinates.</text>
-      </svg>
+    <div class="stageBtns" id="stageButtons">
+      <button data-stage="0" class="active">
+        <span class="num">0. Naive copy</span>
+        <span class="desc">vector at (x, y)</span>
+      </button>
+      <button data-stage="1">
+        <span class="num">1. Apply a₁</span>
+        <span class="desc">x-coeff in E₁</span>
+      </button>
+      <button data-stage="2">
+        <span class="num">2. Apply a₂</span>
+        <span class="desc">x-coeff in E₂</span>
+      </button>
+      <button data-stage="3">
+        <span class="num">3. Apply b₁</span>
+        <span class="desc">y-coeff in E₁</span>
+      </button>
+      <button data-stage="4">
+        <span class="num">4. Apply b₂</span>
+        <span class="desc">y-coeff in E₂</span>
+      </button>
+    </div>
+    <div class="arithBox">
+      <div class="arithTitle">Arithmetic morphing path</div>
+      <div class="arithChain" id="arithChain"></div>
     </div>
   </div>
+
+  <div class="vizWrap">
+    <svg viewBox="0 0 1000 500" aria-label="Linear algebra mapping widget">
+      <defs>
+        <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+        </marker>
+        <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#ea580c"/>
+        </marker>
+        <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+        </marker>
+        <marker id="arrowPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#db2777"/>
+        </marker>
+      </defs>
+
+      <text x="235" y="35" class="axisLbl" text-anchor="middle" fill="#1a1a1a">Input space</text>
+      <text x="235" y="55" class="small" text-anchor="middle">all possible (x, y) coordinates</text>
+      <text x="765" y="35" class="axisLbl" text-anchor="middle" fill="#1a1a1a">Output space</text>
+      <text x="765" y="55" class="small" text-anchor="middle">all possible (c₁, c₂) coordinates</text>
+
+      <rect x="30" y="70" width="410" height="400" fill="#fff" stroke="#e5e1d7"/>
+      <rect x="560" y="70" width="410" height="400" fill="#fff" stroke="#e5e1d7"/>
+
+      <g id="gridIn"></g>
+      <g id="gridOut"></g>
+      <g id="inputVec"></g>
+      <g id="targetVec"></g>
+      <g id="trail"></g>
+      <g id="mappedTip"></g>
+    </svg>
+  </div>
+
+  <div class="status" id="status"></div>
 </div>
 
 <script>
-(function () {
-  const inputBox = { x: 70, y: 80, w: 410, h: 410 };
-  const outputBox = { x: 620, y: 80, w: 410, h: 410 };
-  const inputLimit = 10;
-  const outputLimit = 90;
-  const fields = [
-    ["xValue", "xRange"],
-    ["yValue", "yRange"],
-    ["c1Value", "c1Range"],
-    ["c2Value", "c2Range"]
-  ];
+(function(){
+  const $ = id => document.getElementById(id);
+  // Fixed system from the article
+  const a1 = 4, b1 = -2, a2 = 3, b2 = 5;
+  const LIM_IN = 10;
+  const IN = {x:30, y:70, w:410, h:400};
+  const OUT = {x:560, y:70, w:410, h:400};
+  let stage = 0;
+  let mapped = false;
+  let timer = null;
 
-  const byId = (id) => document.getElementById(id);
-  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-  const fmt = (value) => String(Math.round(value * 100) / 100).replace("-0", "0");
-
-  function sx(box, value, limit) {
-    return box.x + ((value + limit) / (2 * limit)) * box.w;
+  function val(id){ return +$(id).value || 0; }
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+  function fmt(n){
+    if(Math.abs(n) < 1e-10) n = 0;
+    return Number.isInteger(n) ? String(n) : (Math.round(n*100)/100).toString();
+  }
+  function inputs(){
+    return {
+      x:  clamp(val('x'),  -LIM_IN, LIM_IN),
+      y:  clamp(val('y'),  -LIM_IN, LIM_IN),
+      c1: clamp(val('c1'), -LIM_IN, LIM_IN),
+      c2: clamp(val('c2'), -LIM_IN, LIM_IN)
+    };
   }
 
-  function sy(box, value, limit) {
-    return box.y + ((limit - value) / (2 * limit)) * box.h;
+  // Coefficient-swap model:
+  // Identity initial: a1_eff=1, b1_eff=0, a2_eff=0, b2_eff=1
+  // Stage k swaps in one real coefficient.
+  function vectorAt(s, m){
+    let A1=1, B1=0, A2=0, B2=1;
+    if(s >= 1) A1 = a1;
+    if(s >= 2) A2 = a2;
+    if(s >= 3) B1 = b1;
+    if(s >= 4) B2 = b2;
+    return { x: A1*m.x + B1*m.y, y: A2*m.x + B2*m.y };
   }
 
-  function line(x1, y1, x2, y2, className) {
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${className}"></line>`;
+  function getPathPoints(x, y){
+    const points = [];
+    for(let s=0; s<=4; s++){
+      const p = vectorAt(s, {x, y});
+      points.push([p.x, p.y]);
+    }
+    return points;
   }
 
-  function text(x, y, value, attrs) {
-    return `<text x="${x}" y="${y}" ${attrs}>${value}</text>`;
+  function outputBounds(m){
+    const positions = [];
+    for(let s=0; s<=4; s++) positions.push(vectorAt(s, m));
+    positions.push({x:m.c1, y:m.c2});
+    const maxAbs = Math.max(...positions.map(p => Math.max(Math.abs(p.x), Math.abs(p.y))), 8);
+    const nice = Math.max(15, Math.ceil(maxAbs * 1.18 / 5) * 5);
+    return {min:-nice, max:nice};
   }
 
-  function drawGrid(target, box, limit, step, axisNames) {
-    let markup = "";
+  function sxIn(x){ return IN.x + (x + LIM_IN)/(2*LIM_IN) * IN.w; }
+  function syIn(y){ return IN.y + (LIM_IN - y)/(2*LIM_IN) * IN.h; }
+  function sxOut(x, b){ return OUT.x + (x - b.min)/(b.max - b.min) * OUT.w; }
+  function syOut(y, b){ return OUT.y + (b.max - y)/(b.max - b.min) * OUT.h; }
 
-    for (let value = -limit; value <= limit; value += step) {
-      const isAxis = value === 0;
-      const className = isAxis ? "axis-line" : "grid-line";
-      markup += line(sx(box, value, limit), box.y, sx(box, value, limit), box.y + box.h, className);
-      markup += line(box.x, sy(box, value, limit), box.x + box.w, sy(box, value, limit), className);
+  function line(x1,y1,x2,y2,attrs=''){ return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${attrs}/>`; }
+  function text(x,y,t,attrs=''){ return `<text x="${x}" y="${y}" ${attrs}>${t}</text>`; }
 
-      if (value !== 0 && value % (step * 2) === 0) {
-        markup += text(sx(box, value, limit), sy(box, 0, limit) + 17, value, 'text-anchor="middle" class="small-label"');
-        markup += text(sx(box, 0, limit) - 8, sy(box, value, limit) + 4, value, 'text-anchor="end" class="small-label"');
+  function drawInputGrid(){
+    let g = '';
+    for(let i=-LIM_IN; i<=LIM_IN; i++){
+      const strong = i === 0;
+      g += line(sxIn(i), syIn(-LIM_IN), sxIn(i), syIn(LIM_IN),
+                `stroke="#1a1a1a" stroke-opacity="${strong?.42:.08}" stroke-width="${strong?1.25:1}"`);
+      g += line(sxIn(-LIM_IN), syIn(i), sxIn(LIM_IN), syIn(i),
+                `stroke="#1a1a1a" stroke-opacity="${strong?.42:.08}" stroke-width="${strong?1.25:1}"`);
+      if(i !== 0 && i%2 === 0){
+        g += text(sxIn(i), syIn(0)+14, i, 'text-anchor="middle" class="small"');
+        g += text(sxIn(0)-7, syIn(i)+4, i, 'text-anchor="end" class="small"');
       }
     }
-
-    markup += text(box.x + box.w - 12, sy(box, 0, limit) - 9, axisNames[0], 'text-anchor="end" class="axis-label"');
-    markup += text(sx(box, 0, limit) + 10, box.y + 18, axisNames[1], 'class="axis-label"');
-    byId(target).innerHTML = markup;
+    g += text(sxIn(LIM_IN)-14, syIn(0)-8, 'x', 'class="axisLbl" fill="#2563eb" font-weight="700"');
+    g += text(sxIn(0)+8, syIn(LIM_IN)+17, 'y', 'class="axisLbl" fill="#ea580c" font-weight="700"');
+    $('gridIn').innerHTML = g;
   }
 
-  function setLine(id, x1, y1, x2, y2) {
-    const el = byId(id);
-    el.setAttribute("x1", x1);
-    el.setAttribute("y1", y1);
-    el.setAttribute("x2", x2);
-    el.setAttribute("y2", y2);
+  function drawOutputGrid(b){
+    const range = b.max - b.min;
+    const step = range > 80 ? 20 : range > 30 ? 10 : range > 15 ? 5 : 2;
+    let g = '';
+    for(let i = Math.ceil(b.min/step)*step; i <= b.max; i += step){
+      const strong = i === 0;
+      g += line(sxOut(i,b), syOut(b.min,b), sxOut(i,b), syOut(b.max,b),
+                `stroke="#1a1a1a" stroke-opacity="${strong?.42:.08}" stroke-width="${strong?1.25:1}"`);
+      g += line(sxOut(b.min,b), syOut(i,b), sxOut(b.max,b), syOut(i,b),
+                `stroke="#1a1a1a" stroke-opacity="${strong?.42:.08}" stroke-width="${strong?1.25:1}"`);
+      if(i !== 0){
+        g += text(sxOut(i,b), syOut(0,b)+14, i, 'text-anchor="middle" class="small"');
+        g += text(sxOut(0,b)-7, syOut(i,b)+4, i, 'text-anchor="end" class="small"');
+      }
+    }
+    g += text(sxOut(b.max,b)-20, syOut(0,b)-8, 'c₁', 'class="axisLbl" fill="#4338ca" font-weight="700"');
+    g += text(sxOut(0,b)+8, syOut(b.max,b)+17, 'c₂', 'class="axisLbl" fill="#047857" font-weight="700"');
+    $('gridOut').innerHTML = g;
   }
 
-  function setCircle(id, cx, cy) {
-    const el = byId(id);
-    el.setAttribute("cx", cx);
-    el.setAttribute("cy", cy);
+  function drawInputVector(m){
+    const tipX = sxIn(m.x), tipY = syIn(m.y);
+    const ox = sxIn(0), oy = syIn(0);
+    let g = '';
+    if(Math.abs(m.x) > 1e-9 || Math.abs(m.y) > 1e-9){
+      g += line(ox, oy, tipX, tipY,
+                `stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrowBlue)" stroke-linecap="round"`);
+    }
+    g += `<circle cx="${tipX}" cy="${tipY}" r="5.5" fill="#2563eb" stroke="#fff" stroke-width="1.5"/>`;
+    const lblOffX = m.x >= 0 ? 10 : -10;
+    const lblOffY = m.y >= 0 ? -10 : 18;
+    const anchor = m.x >= 0 ? 'start' : 'end';
+    g += text(tipX + lblOffX, tipY + lblOffY, `(${fmt(m.x)}, ${fmt(m.y)})`,
+              `class="mono" fill="#1e3a8a" font-weight="700" text-anchor="${anchor}"`);
+    $('inputVec').innerHTML = g;
   }
 
-  function setLabel(id, x, y, value) {
-    const el = byId(id);
-    el.setAttribute("x", x);
-    el.setAttribute("y", y);
-    el.textContent = value;
+  function drawTargetVector(m, b){
+    const tipX = sxOut(m.c1, b), tipY = syOut(m.c2, b);
+    const ox = sxOut(0, b), oy = syOut(0, b);
+    let g = '';
+    if(Math.abs(m.c1) > 1e-9 || Math.abs(m.c2) > 1e-9){
+      g += line(ox, oy, tipX, tipY,
+                `stroke="#16a34a" stroke-width="2.5" marker-end="url(#arrowGreen)" stroke-linecap="round"`);
+    }
+    g += `<circle cx="${tipX}" cy="${tipY}" r="8" fill="none" stroke="#16a34a" stroke-width="2.2"/>`;
+    g += `<circle cx="${tipX}" cy="${tipY}" r="3" fill="#16a34a"/>`;
+    const lblOffX = m.c1 >= 0 ? 13 : -13;
+    const lblOffY = m.c2 >= 0 ? -12 : 20;
+    const anchor = m.c1 >= 0 ? 'start' : 'end';
+    g += text(tipX + lblOffX, tipY + lblOffY, `target (${fmt(m.c1)}, ${fmt(m.c2)})`,
+              `class="mono" fill="#047857" font-weight="700" text-anchor="${anchor}"`);
+    $('targetVec').innerHTML = g;
   }
 
-  function readNumber(id) {
-    return clamp(Number(byId(id).value) || 0, -10, 10);
+  function drawTrailAndMapped(m, b){
+    if(!mapped){
+      $('trail').innerHTML = '';
+      $('mappedTip').innerHTML = '';
+      return;
+    }
+    let trailG = '';
+    const positions = [];
+    for(let s=0; s<=stage; s++) positions.push(vectorAt(s, m));
+
+    // Starting point (x, y) marker — show only when we've moved past it
+    if(stage > 0){
+      const sX = sxOut(positions[0].x, b);
+      const sY = syOut(positions[0].y, b);
+      trailG += `<circle cx="${sX}" cy="${sY}" r="3.8" fill="#db2777" opacity=".35" stroke="#fff" stroke-width="1"/>`;
+      trailG += text(sX + 7, sY + 15, `start (${fmt(positions[0].x)}, ${fmt(positions[0].y)})`,
+                     'class="mono" fill="#9d174d" opacity=".55"');
+    }
+
+    // Trail segments
+    for(let i=1; i < positions.length; i++){
+      const p0 = positions[i-1];
+      const p1 = positions[i];
+      const isLast = i === positions.length - 1;
+      // Stages 1, 2 are x-contributions (blue); stages 3, 4 are y-contributions (orange)
+      const isXContrib = i <= 2;
+      const color = isXContrib ? '#2563eb' : '#ea580c';
+      const arrowId = isXContrib ? 'arrowBlue' : 'arrowOrange';
+      const opacity = isLast ? 0.88 : 0.4;
+      const width  = isLast ? 2.5 : 1.5;
+      const dash   = isLast ? '' : 'stroke-dasharray="4,3"';
+      const marker = isLast ? `marker-end="url(#${arrowId})"` : '';
+      trailG += line(sxOut(p0.x,b), syOut(p0.y,b), sxOut(p1.x,b), syOut(p1.y,b),
+                     `stroke="${color}" stroke-width="${width}" opacity="${opacity}" ${dash} ${marker} stroke-linecap="round"`);
+      if(!isLast){
+        // Intermediate corner marker
+        trailG += `<circle cx="${sxOut(p1.x,b)}" cy="${syOut(p1.y,b)}" r="3.2" fill="${color}" opacity=".5"/>`;
+      }
+    }
+    $('trail').innerHTML = trailG;
+
+    // Current mapped tip
+    const cur = positions[positions.length - 1];
+    const tipX = sxOut(cur.x, b), tipY = syOut(cur.y, b);
+    const finalC1 = a1*m.x + b1*m.y;
+    const finalC2 = a2*m.x + b2*m.y;
+    const onTarget = stage === 4 && Math.abs(finalC1 - m.c1) < 1e-9 && Math.abs(finalC2 - m.c2) < 1e-9;
+
+    let tipHtml = '';
+    if(onTarget){
+      // Pulsing halo when mapped lands on target
+      tipHtml += `<circle cx="${tipX}" cy="${tipY}" r="12" fill="none" stroke="#16a34a" stroke-width="2" opacity=".55"/>`;
+    }
+    tipHtml += `<circle cx="${tipX}" cy="${tipY}" r="7" fill="#db2777" stroke="#fff" stroke-width="2"/>`;
+    const lblOffX = cur.x >= 0 ? 12 : -12;
+    const lblOffY = cur.y >= 0 ? 20 : -12;
+    const anchor = cur.x >= 0 ? 'start' : 'end';
+    tipHtml += text(tipX + lblOffX, tipY + lblOffY, `mapped (${fmt(cur.x)}, ${fmt(cur.y)})`,
+                    `class="mono" fill="#9d174d" font-weight="700" text-anchor="${anchor}"`);
+    $('mappedTip').innerHTML = tipHtml;
   }
 
-  function syncPair(primaryId, secondaryId) {
-    const primary = byId(primaryId);
-    const secondary = byId(secondaryId);
-    const value = readNumber(primaryId);
-    primary.value = value;
-    secondary.value = value;
+  function updateEqDisplay(){
+    function tail(coef, vbl, cls, id){
+      const abs = Math.abs(coef);
+      const sign = coef < 0 ? '−' : '+';
+      return ` <span>${sign}</span> <span id="${id}" class="${cls} coef">${abs}${vbl}</span>`;
+    }
+    const eq1 = `<span id="coef-a1" class="blue coef">${a1}x</span>${tail(b1, 'y', 'orange', 'coef-b1')} <span>=</span> <span class="c1clr">c₁</span>`;
+    const eq2 = `<span id="coef-a2" class="blue coef">${a2}x</span>${tail(b2, 'y', 'orange', 'coef-b2')} <span>=</span> <span class="c2clr">c₂</span>`;
+    $('eqDisplay').innerHTML = `<div>${eq1}</div><div>${eq2}</div>`;
   }
 
-  function render() {
-    fields.forEach(([numberId, rangeId]) => syncPair(numberId, rangeId));
-
-    const x = readNumber("xValue");
-    const y = readNumber("yValue");
-    const c1 = readNumber("c1Value");
-    const c2 = readNumber("c2Value");
-    const out1 = 4 * x - 2 * y;
-    const out2 = 3 * x + 5 * y;
-    const inputX = sx(inputBox, x, inputLimit);
-    const inputY = sy(inputBox, y, inputLimit);
-    const outputX = sx(outputBox, out1, outputLimit);
-    const outputY = sy(outputBox, out2, outputLimit);
-    const targetX = sx(outputBox, c1, outputLimit);
-    const targetY = sy(outputBox, c2, outputLimit);
-    const originX = sx(outputBox, 0, outputLimit);
-    const originY = sy(outputBox, 0, outputLimit);
-    const xContributionX = sx(outputBox, 4 * x, outputLimit);
-    const xContributionY = sy(outputBox, 3 * x, outputLimit);
-
-    setCircle("inputPoint", inputX, inputY);
-    setCircle("outputPoint", outputX, outputY);
-    setCircle("targetPoint", targetX, targetY);
-    setLine("xVector", originX, originY, xContributionX, xContributionY);
-    setLine("yVector", xContributionX, xContributionY, outputX, outputY);
-    setLine("resultGuide", inputX, inputY, outputX, outputY);
-
-    setLabel("inputLabel", inputX + 10, inputY - 10, `(${fmt(x)}, ${fmt(y)})`);
-    setLabel("outputLabel", outputX + 10, outputY - 10, `(${fmt(out1)}, ${fmt(out2)})`);
-    setLabel("targetLabel", targetX + 10, targetY + 20, `target (${fmt(c1)}, ${fmt(c2)})`);
-    setLabel("xVectorLabel", (originX + xContributionX) / 2 + 10, (originY + xContributionY) / 2 - 8, `${fmt(x)}(4, 3)`);
-    setLabel("yVectorLabel", (xContributionX + outputX) / 2 + 10, (xContributionY + outputY) / 2 + 18, `${fmt(y)}(-2, 5)`);
-
-    byId("inputReadout").textContent = `(${fmt(x)}, ${fmt(y)})`;
-    byId("outputReadout").textContent = `(${fmt(out1)}, ${fmt(out2)})`;
-    byId("targetReadout").textContent = `(${fmt(c1)}, ${fmt(c2)})`;
-    byId("calculationReadout").textContent = `${fmt(x)}(4, 3) + ${fmt(y)}(-2, 5)`;
-
-    const isSolution = Math.abs(out1 - c1) < 0.0001 && Math.abs(out2 - c2) < 0.0001;
-    const delta1 = out1 - c1;
-    const delta2 = out2 - c2;
-    byId("statusReadout").textContent = isSolution
-      ? "solution: output matches target"
-      : `not a solution: off by (${fmt(delta1)}, ${fmt(delta2)})`;
-    byId("statusReadout").style.color = isSolution ? "#1f8a70" : "#c92a2a";
-  }
-
-  fields.forEach(([numberId, rangeId]) => {
-    byId(numberId).addEventListener("input", () => {
-      syncPair(numberId, rangeId);
-      render();
+  function updateCoefficientHighlight(){
+    const ids = ['coef-a1','coef-a2','coef-b1','coef-b2'];
+    const activeByStage = {1:'coef-a1', 2:'coef-a2', 3:'coef-b1', 4:'coef-b2'};
+    ids.forEach((id, idx) => {
+      const el = $(id);
+      if(!el) return;
+      const s = idx + 1;
+      el.classList.toggle('activeCoef', mapped && stage === s);
+      el.classList.toggle('doneCoef', mapped && stage > s);
     });
-    byId(rangeId).addEventListener("input", () => {
-      byId(numberId).value = byId(rangeId).value;
+  }
+
+  function updateArithmeticChain(m){
+    const points = getPathPoints(m.x, m.y);
+    const forms = [
+      `(x, y)`,
+      `(4x, y)`,
+      `(4x, 3x)`,
+      `(4x − 2y, 3x)`,
+      `(4x − 2y, 3x + 5y)`
+    ];
+    const nums = points.map(p => `(${fmt(p[0])}, ${fmt(p[1])})`);
+    let html = '';
+    for(let i=0; i<forms.length; i++){
+      const active = mapped && stage === i ? ' active' : '';
+      html += `<span class="arithStep${active}"><em>${forms[i]}</em><br><span class="mono">${nums[i]}</span></span>`;
+      if(i < forms.length - 1) html += `<span class="arithArrow">→</span>`;
+    }
+    $('arithChain').innerHTML = html;
+  }
+
+  function updateStatus(m){
+    const finalC1 = a1*m.x + b1*m.y;
+    const finalC2 = a2*m.x + b2*m.y;
+    const isSolution = Math.abs(finalC1 - m.c1) < 1e-9 && Math.abs(finalC2 - m.c2) < 1e-9;
+    const pos = vectorAt(stage, m);
+
+    let html = '';
+    if(!mapped){
+      html = `Pick an input <span class="vx">(${fmt(m.x)}, ${fmt(m.y)})</span> and a target <span class="vtgt">(${fmt(m.c1)}, ${fmt(m.c2)})</span>. Then click <em>Map input → output</em> to send the input vector into the output space and watch each coefficient act on it.`;
+    } else if(stage === 0){
+      html = `The input vector <span class="vx">(${fmt(m.x)}, ${fmt(m.y)})</span> is copied straight into output space at <span class="vmap">(${fmt(m.x)}, ${fmt(m.y)})</span>. This is what its position would be if every coefficient were the identity (1 on the diagonal, 0 off it). The next four stages swap in the real coefficients one by one.`;
+    } else if(stage === 1){
+      const d = (a1 - 1)*m.x;
+      const dir = d >= 0 ? 'right' : 'left';
+      html = `<strong>Stage 1 — apply a₁ = ${a1}.</strong> Before, c₁'s x-term used the identity coefficient 1, so c₁ = x = ${fmt(m.x)}. Now we replace 1 with the real a₁ = ${a1}, so c₁ becomes ${a1}·x = ${fmt(a1*m.x)}. The mapped vector slides <strong>${dir}</strong> by ${fmt(Math.abs(d))} along c₁ and lands at <span class="vmap">(${fmt(pos.x)}, ${fmt(pos.y)})</span>.`;
+    } else if(stage === 2){
+      const d = a2*m.x;
+      const dir = d >= 0 ? 'up' : 'down';
+      html = `<strong>Stage 2 — apply a₂ = ${a2}.</strong> c₂ had no x-term yet (identity coefficient 0 for x in E₂). Replacing that 0 with the real a₂ = ${a2} adds a₂·x = ${fmt(a2*m.x)} to c₂. The mapped vector slides <strong>${dir}</strong> by ${fmt(Math.abs(d))} along c₂ and lands at <span class="vmap">(${fmt(pos.x)}, ${fmt(pos.y)})</span>.`;
+    } else if(stage === 3){
+      const d = b1*m.y;
+      const dir = d >= 0 ? 'right' : 'left';
+      html = `<strong>Stage 3 — apply b₁ = ${b1}.</strong> c₁ had no y-term yet (identity coefficient 0 for y in E₁). Replacing 0 with b₁ = ${b1} adds b₁·y = ${fmt(b1*m.y)} to c₁. The mapped vector slides <strong>${dir}</strong> by ${fmt(Math.abs(d))} along c₁ and lands at <span class="vmap">(${fmt(pos.x)}, ${fmt(pos.y)})</span>.`;
+    } else if(stage === 4){
+      const d = (b2 - 1)*m.y;
+      const dir = d >= 0 ? 'up' : 'down';
+      html = `<strong>Stage 4 — apply b₂ = ${b2}.</strong> c₂'s y-term used the identity coefficient 1, so the y-part of c₂ was just y. Replacing 1 with b₂ = ${b2} makes it ${b2}·y = ${fmt(b2*m.y)}. The mapped vector slides <strong>${dir}</strong> by ${fmt(Math.abs(d))} along c₂ and finishes at <span class="vmap">(${fmt(pos.x)}, ${fmt(pos.y)})</span>. `;
+      if(isSolution){
+        html += `<span class="ok">The mapped vector lands exactly on the target — (${fmt(m.x)}, ${fmt(m.y)}) is a solution of the system!</span>`;
+      } else {
+        html += `<span class="miss">It misses the target <span class="vtgt">(${fmt(m.c1)}, ${fmt(m.c2)})</span> — so (${fmt(m.x)}, ${fmt(m.y)}) is <em>not</em> a solution.</span> Try <em>Snap (x, y) to solution</em> to see which input does land on the target.`;
+      }
+    }
+    $('status').innerHTML = html;
+  }
+
+  function render(){
+    const m = inputs();
+    updateEqDisplay();
+    updateCoefficientHighlight();
+    updateArithmeticChain(m);
+    document.querySelectorAll('.stageBtns button').forEach(btn => {
+      const s = +btn.dataset.stage;
+      btn.classList.toggle('active', mapped && s === stage);
+      btn.disabled = !mapped;
+    });
+    drawInputGrid();
+    const b = outputBounds(m);
+    drawOutputGrid(b);
+    drawInputVector(m);
+    drawTargetVector(m, b);
+    drawTrailAndMapped(m, b);
+    updateStatus(m);
+  }
+
+  // Event handlers
+  ['x','y','c1','c2'].forEach(id => $(id).addEventListener('input', render));
+
+  $('mapBtn').addEventListener('click', () => {
+    mapped = true; stage = 0;
+    if(timer){ clearInterval(timer); timer = null; $('playBtn').textContent = 'Auto-play stages'; }
+    render();
+  });
+
+  $('resetBtn').addEventListener('click', () => {
+    mapped = false; stage = 0;
+    if(timer){ clearInterval(timer); timer = null; $('playBtn').textContent = 'Auto-play stages'; }
+    render();
+  });
+
+  $('snapBtn').addEventListener('click', () => {
+    const m = inputs();
+    const det = a1*b2 - b1*a2;
+    if(Math.abs(det) < 1e-10) return;
+    const sX = (m.c1*b2 - b1*m.c2) / det;
+    const sY = (a1*m.c2 - m.c1*a2) / det;
+    $('x').value = fmt(sX);
+    $('y').value = fmt(sY);
+    render();
+  });
+
+  $('playBtn').addEventListener('click', () => {
+    if(timer){
+      clearInterval(timer); timer = null;
+      $('playBtn').textContent = 'Auto-play stages';
+      return;
+    }
+    mapped = true; stage = 0;
+    render();
+    $('playBtn').textContent = 'Stop';
+    timer = setInterval(() => {
+      stage++;
+      if(stage > 4){
+        clearInterval(timer); timer = null;
+        $('playBtn').textContent = 'Auto-play stages';
+        stage = 4;
+      }
+      render();
+    }, 1600);
+  });
+
+  document.querySelectorAll('.stageBtns button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.disabled) return;
+      if(timer){ clearInterval(timer); timer = null; $('playBtn').textContent = 'Auto-play stages'; }
+      stage = +btn.dataset.stage;
       render();
     });
   });
 
-  drawGrid("inputGrid", inputBox, inputLimit, 1, ["x", "y"]);
-  drawGrid("outputGrid", outputBox, outputLimit, 5, ["c1", "c2"]);
   render();
 })();
 </script>
