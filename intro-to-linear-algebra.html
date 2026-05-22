@@ -55,6 +55,40 @@
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <p>But let's try it a different way.</p>
+
+        <p>Let's imagine a space of all the possible values for $x$ and $y$ -- call it "input space".</p>
+
+        <p>The distance from $(0,0)$ to $(1,0)$ is a unit step along the $x$-axis, and $(0,0)$ to $(0,1)$ is a unit step along the $y$-axis.</p>
+
+        <p>Any coordinate in input space can be thought of as a combination of these steps.</p>
+
+        <p>For example, $(2, 3)$:</p>
+
+        <p class="display-equation">$$2(1,0)\ \text{and}\ 3(0,1)\to (2,0)\ \text{and}\ (0,3)\to (2,3)$$</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize"
+          src="linear-algebra/intro-to-linear-algebra/basis-vector-builder.html"
+          title="Interactive widget showing coordinates built from basis vectors"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>However, we know that our $x$ and $y$ values are weighted by certain coefficients.</p>
+
+        <p>A unit step along the $x$-axis is actually from $(0,0)$ to $(4,3)$.</p>
+
+        <p>A unit step along the $y$-axis is from $(0,0)$ to $(-2, 5)$.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize"
+          src="linear-algebra/intro-to-linear-algebra/weighted-basis-comparison.html"
+          title="Interactive widget comparing input basis vectors with weighted output vectors"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
       </section>
     </article>
   </main>

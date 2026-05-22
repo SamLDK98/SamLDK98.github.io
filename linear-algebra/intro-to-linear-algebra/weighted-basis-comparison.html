@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weighted basis comparison</title>
+<style>
+  :root {
+    --bg: #fdfcf8;
+    --card: #fffefa;
+    --ink: #1a1a18;
+    --muted: #706a5f;
+    --line: #e3ded2;
+    --soft: #f8f4ec;
+    --blue: #2563eb;
+    --orange: #c2410c;
+    --green: #047857;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body {
+    padding: 1rem;
+  }
+
+  .comparison {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .control-card {
+    padding: 0.8rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--soft);
+  }
+
+  label {
+    display: grid;
+    grid-template-columns: auto 5rem 1fr;
+    gap: 0.65rem;
+    align-items: center;
+    color: var(--muted);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  input[type="number"] {
+    width: 5rem;
+    padding: 0.36rem 0.42rem;
+    border: 1px solid #c9c2b3;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    font: 0.94rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+    text-align: center;
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
+
+  input:focus {
+    outline: 2px solid rgba(37, 99, 235, 0.18);
+    border-color: var(--blue);
+  }
+
+  .readout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .readout-card {
+    padding: 0.72rem 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .readout-card strong {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .blue {
+    color: var(--blue);
+    font-weight: 700;
+  }
+
+  .orange {
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  .green {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .stage {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .axis-label {
+    fill: var(--ink);
+    font: italic 17px Georgia, "Times New Roman", serif;
+  }
+
+  .small-label {
+    fill: var(--muted);
+    font: 12px Arial, Helvetica, sans-serif;
+  }
+
+  .mono-label {
+    fill: #3d3932;
+    font: 12px ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+
+  .grid-line {
+    stroke: var(--ink);
+    stroke-opacity: 0.08;
+  }
+
+  .axis-line {
+    stroke: var(--ink);
+    stroke-opacity: 0.45;
+    stroke-width: 1.25;
+  }
+
+  .vector-line,
+  .vector-dot,
+  .vector-label {
+    transition: x2 180ms ease, y2 180ms ease, cx 180ms ease, cy 180ms ease;
+  }
+
+  @media (max-width: 760px) {
+    body {
+      padding: 0.7rem;
+    }
+
+    .controls,
+    .readout {
+      grid-template-columns: 1fr;
+    }
+
+    label {
+      grid-template-columns: auto 4.6rem;
+    }
+
+    input[type="range"] {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="comparison" role="region" aria-label="Input and output weighted basis comparison">
+  <div class="controls">
+    <div class="control-card">
+      <label>
+        x steps
+        <input id="xNumber" type="number" min="-6" max="6" step="1" value="3">
+        <input id="xRange" type="range" min="-6" max="6" step="1" value="3" aria-label="x step slider">
+      </label>
+    </div>
+    <div class="control-card">
+      <label>
+        y steps
+        <input id="yNumber" type="number" min="-6" max="6" step="1" value="3">
+        <input id="yRange" type="range" min="-6" max="6" step="1" value="3" aria-label="y step slider">
+      </label>
+    </div>
+  </div>
+
+  <div class="readout" aria-live="polite">
+    <div class="readout-card" id="xReadout"></div>
+    <div class="readout-card" id="yReadout"></div>
+  </div>
+
+  <div class="stage">
+    <svg viewBox="0 0 1040 560" aria-label="Input space and output space weighted basis vectors">
+      <defs>
+        <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"></path>
+        </marker>
+        <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c2410c"></path>
+        </marker>
+      </defs>
+
+      <text x="255" y="32" text-anchor="middle" class="axis-label">input space</text>
+      <text x="785" y="32" text-anchor="middle" class="axis-label">output space</text>
+      <text x="255" y="54" text-anchor="middle" class="small-label">As x or y increases...</text>
+      <text x="785" y="54" text-anchor="middle" class="small-label">As x or y increases...</text>
+
+      <rect x="50" y="80" width="410" height="410" fill="#fff" stroke="#e3ded2"></rect>
+      <rect x="580" y="80" width="410" height="410" fill="#fff" stroke="#e3ded2"></rect>
+      <g id="inputGrid"></g>
+      <g id="outputGrid"></g>
+      <g id="vectors"></g>
+    </svg>
+  </div>
+</div>
+
+<script>
+(function () {
+  const inputBox = { x: 50, y: 80, w: 410, h: 410 };
+  const outputBox = { x: 580, y: 80, w: 410, h: 410 };
+  const inputLimit = 6;
+  const outputLimit = 36;
+  const xNumber = document.getElementById("xNumber");
+  const xRange = document.getElementById("xRange");
+  const yNumber = document.getElementById("yNumber");
+  const yRange = document.getElementById("yRange");
+  const xReadout = document.getElementById("xReadout");
+  const yReadout = document.getElementById("yReadout");
+  const inputGrid = document.getElementById("inputGrid");
+  const outputGrid = document.getElementById("outputGrid");
+  const vectors = document.getElementById("vectors");
+
+  function clamp(value, limit) {
+    return Math.max(-limit, Math.min(limit, value));
+  }
+
+  function read(input) {
+    const value = Number(input.value);
+    return Number.isFinite(value) ? clamp(value, inputLimit) : 0;
+  }
+
+  function fmt(value) {
+    if (Math.abs(value) < 1e-10) value = 0;
+    return Number.isInteger(value) ? String(value) : String(Math.round(value * 100) / 100);
+  }
+
+  function sx(box, value, limit) {
+    return box.x + ((value + limit) / (2 * limit)) * box.w;
+  }
+
+  function sy(box, value, limit) {
+    return box.y + ((limit - value) / (2 * limit)) * box.h;
+  }
+
+  function line(x1, y1, x2, y2, attrs) {
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${attrs}></line>`;
+  }
+
+  function text(x, y, value, attrs) {
+    return `<text x="${x}" y="${y}" ${attrs}>${value}</text>`;
+  }
+
+  function drawGrid(target, box, limit, step, labels) {
+    let html = "";
+    for (let i = -limit; i <= limit; i += step) {
+      const strong = i === 0;
+      const cls = strong ? "axis-line" : "grid-line";
+      html += line(sx(box, i, limit), box.y, sx(box, i, limit), box.y + box.h, `class="${cls}"`);
+      html += line(box.x, sy(box, i, limit), box.x + box.w, sy(box, i, limit), `class="${cls}"`);
+
+      if (i !== 0 && i % (step * 2) === 0) {
+        html += text(sx(box, i, limit), sy(box, 0, limit) + 16, i, 'text-anchor="middle" class="small-label"');
+        html += text(sx(box, 0, limit) - 8, sy(box, i, limit) + 4, i, 'text-anchor="end" class="small-label"');
+      }
+    }
+
+    html += text(box.x + box.w - 14, sy(box, 0, limit) - 9, labels[0], 'text-anchor="end" class="axis-label" fill="#2563eb"');
+    html += text(sx(box, 0, limit) + 10, box.y + 20, labels[1], 'class="axis-label" fill="#c2410c"');
+    target.innerHTML = html;
+  }
+
+  function vector(box, limit, x, y, color, arrowId, label, offsetX, offsetY) {
+    const originX = sx(box, 0, limit);
+    const originY = sy(box, 0, limit);
+    const tipX = sx(box, x, limit);
+    const tipY = sy(box, y, limit);
+    return line(originX, originY, tipX, tipY, `class="vector-line" stroke="${color}" stroke-width="3" stroke-linecap="round" marker-end="url(#${arrowId})"`) +
+      `<circle class="vector-dot" cx="${tipX}" cy="${tipY}" r="5.5" fill="${color}" stroke="#fff" stroke-width="1.5"></circle>` +
+      text(tipX + offsetX, tipY + offsetY, label, `class="mono-label vector-label" fill="${color}" font-weight="700"`);
+  }
+
+  function syncPair(numberInput, rangeInput) {
+    const value = read(numberInput);
+    numberInput.value = fmt(value);
+    rangeInput.value = fmt(value);
+    return value;
+  }
+
+  function render() {
+    const x = syncPair(xNumber, xRange);
+    const y = syncPair(yNumber, yRange);
+    const xOut = { x: 4 * x, y: 3 * x };
+    const yOut = { x: -2 * y, y: 5 * y };
+
+    xReadout.innerHTML = `<strong>As x increases</strong><br><span class="blue">input:</span> (${fmt(x)}, 0) &nbsp; <span class="green">output:</span> (${fmt(xOut.x)}, ${fmt(xOut.y)})`;
+    yReadout.innerHTML = `<strong>As y increases</strong><br><span class="orange">input:</span> (0, ${fmt(y)}) &nbsp; <span class="green">output:</span> (${fmt(yOut.x)}, ${fmt(yOut.y)})`;
+
+    let html = "";
+    html += vector(inputBox, inputLimit, x, 0, "#2563eb", "arrowBlue", `(${fmt(x)},0)`, x >= 0 ? 10 : -54, 18);
+    html += vector(inputBox, inputLimit, 0, y, "#c2410c", "arrowOrange", `(0,${fmt(y)})`, 10, y >= 0 ? -10 : 22);
+    html += vector(outputBox, outputLimit, xOut.x, xOut.y, "#2563eb", "arrowBlue", `(${fmt(xOut.x)},${fmt(xOut.y)})`, xOut.x >= 0 ? 10 : -74, xOut.y >= 0 ? -10 : 22);
+    html += vector(outputBox, outputLimit, yOut.x, yOut.y, "#c2410c", "arrowOrange", `(${fmt(yOut.x)},${fmt(yOut.y)})`, yOut.x >= 0 ? 10 : -74, yOut.y >= 0 ? -10 : 22);
+    vectors.innerHTML = html;
+  }
+
+  xNumber.addEventListener("input", render);
+  xRange.addEventListener("input", () => {
+    xNumber.value = xRange.value;
+    render();
+  });
+  yNumber.addEventListener("input", render);
+  yRange.addEventListener("input", () => {
+    yNumber.value = yRange.value;
+    render();
+  });
+
+  drawGrid(inputGrid, inputBox, inputLimit, 1, ["x", "y"]);
+  drawGrid(outputGrid, outputBox, outputLimit, 6, ["c1", "c2"]);
+  render();
+})();
+</script>
+</body>
+</html>
