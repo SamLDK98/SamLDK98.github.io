@@ -4,27 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Linear system output calculator</title>
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']]
-    },
-    svg: { fontCache: 'global' }
-  };
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #fdfcf8;
-    --card: #fffefa;
-    --ink: #1a1a18;
-    --muted: #706a5f;
-    --line: #e3ded2;
-    --soft: #f8f4ec;
-    --blue: #2563eb;
-    --orange: #c2410c;
-    --green: #047857;
+    --bg: #161311;
+    --panel: #1e1a17;
+    --card: #221d1a;
+    --rule: rgba(214, 196, 168, 0.14);
+    --text: #ece2d1;
+    --dim: #a89c87;
+    --faint: #6f6557;
+    --accent: #d4b888;
+    --x: #e8a13b;
+    --y: #6dd3c4;
+    --out: #ece2d1;
   }
 
   * {
@@ -35,106 +30,254 @@
   body {
     margin: 0;
     padding: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: Georgia, "Times New Roman", serif;
+    background: transparent;
+    color: var(--text);
+    font-family: "EB Garamond", Georgia, serif;
   }
 
   body {
-    padding: 1rem;
+    padding: 0;
   }
 
   .calculator {
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 1rem;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background:
+      radial-gradient(ellipse at top left, rgba(212, 184, 136, 0.05), transparent 55%),
+      var(--panel);
+    overflow: hidden;
   }
 
-  .calculator-layout {
-    display: grid;
-    grid-template-columns: minmax(18rem, 1fr) minmax(18rem, 0.9fr);
+  .calculator-header {
+    display: flex;
+    justify-content: space-between;
     gap: 1rem;
-    align-items: center;
+    align-items: end;
+    padding: 1.1rem 1.25rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
   }
 
-  .system {
+  .eyebrow {
+    margin: 0 0 0.2rem;
+    color: var(--faint);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  h1 {
     margin: 0;
-    font-size: 1.34rem;
-    line-height: 1.45;
-    text-align: center;
+    color: var(--text);
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .meta {
+    color: var(--faint);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    line-height: 1.4;
+    text-align: right;
+  }
+
+  .calculator-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    min-height: 225px;
+  }
+
+  .system-panel {
+    display: grid;
+    place-items: center;
+    padding: 1.4rem 1.25rem;
+  }
+
+  .system-card {
+    width: min(100%, 440px);
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.16);
+  }
+
+  .equation {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.9rem;
+    align-items: baseline;
+    padding: 0.48rem 0;
+    border-bottom: 1px solid rgba(214, 196, 168, 0.08);
+    color: var(--text);
+    font-size: 1.18rem;
+    line-height: 1.3;
+  }
+
+  .equation:last-child {
+    border-bottom: 0;
+  }
+
+  .expr {
+    white-space: nowrap;
+  }
+
+  .result {
+    color: var(--out);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .x {
+    color: var(--x);
+  }
+
+  .y {
+    color: var(--y);
   }
 
   .controls {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.25rem;
+    border-left: 1px solid var(--rule);
+    background: var(--card);
+  }
+
+  .section-label {
+    margin-bottom: -0.2rem;
+    padding-bottom: 0.42rem;
+    border-bottom: 1px solid var(--rule);
+    color: var(--faint);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
   label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.45rem;
-    padding: 0.72rem;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--soft);
-    color: var(--muted);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.84rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    display: grid;
+    gap: 0.35rem;
+    color: var(--dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   input {
-    width: 5.5rem;
-    padding: 0.38rem 0.45rem;
-    border: 1px solid #c9c2b3;
-    border-radius: 6px;
-    background: #fff;
-    color: var(--ink);
-    font: 0.95rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
-    text-align: center;
+    width: 100%;
+    padding: 0.58rem 0.62rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text);
+    font: 0.95rem/1.2 "JetBrains Mono", monospace;
   }
 
   input:focus {
-    outline: 2px solid rgba(37, 99, 235, 0.18);
-    border-color: var(--blue);
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(212, 184, 136, 0.08);
   }
 
-  @media (max-width: 700px) {
-    body {
-      padding: 0.7rem;
+  button {
+    cursor: pointer;
+    margin-top: 0.15rem;
+    padding: 0.68rem 0.78rem;
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    background: rgba(212, 184, 136, 0.1);
+    color: var(--text);
+    font-family: "EB Garamond", Georgia, serif;
+    font-size: 1rem;
+    text-align: left;
+    transition: background 0.15s ease, transform 0.08s ease;
+  }
+
+  button:hover {
+    background: rgba(212, 184, 136, 0.16);
+  }
+
+  button:active {
+    transform: scale(0.985);
+  }
+
+  .hint {
+    margin-top: auto;
+    color: var(--faint);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.66rem;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 660px) {
+    .calculator-header {
+      align-items: start;
+      flex-direction: column;
     }
 
-    .calculator-layout {
+    .meta {
+      text-align: left;
+    }
+
+    .calculator-body {
       grid-template-columns: 1fr;
     }
 
     .controls {
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .equation {
       grid-template-columns: 1fr;
+      gap: 0.2rem;
     }
   }
 </style>
 </head>
 <body>
 <div class="calculator" role="region" aria-label="Linear system output calculator">
-  <div class="calculator-layout">
-    <p class="system" id="systemDisplay">$$\begin{cases}4x - 2y = \ ?\\3x + 5y = \ ?\end{cases}$$</p>
+  <div class="calculator-header">
+    <div>
+      <p class="eyebrow">Output Space</p>
+      <h1>Evaluate the system</h1>
+    </div>
+    <div class="meta">x, y input<br>c1, c2 output</div>
+  </div>
+
+  <div class="calculator-body">
+    <div class="system-panel">
+      <div class="system-card" aria-live="polite">
+        <div class="equation">
+          <span class="expr" id="eqOneExpr">4<span class="x">x</span> - 2<span class="y">y</span></span>
+          <span class="result" id="eqOneResult">= ?</span>
+        </div>
+        <div class="equation">
+          <span class="expr" id="eqTwoExpr">3<span class="x">x</span> + 5<span class="y">y</span></span>
+          <span class="result" id="eqTwoResult">= ?</span>
+        </div>
+      </div>
+    </div>
 
     <div class="controls">
+      <div class="section-label">Input Coordinate</div>
       <label>
-        x
+        x value
         <input id="xInput" type="number" step="1" placeholder="x">
       </label>
       <label>
-        y
+        y value
         <input id="yInput" type="number" step="1" placeholder="y">
       </label>
+      <button id="enterButton" type="button">Enter</button>
+      <div class="hint">The system updates only when Enter is pressed.</div>
     </div>
   </div>
 </div>
@@ -143,7 +286,11 @@
 (function () {
   const xInput = document.getElementById("xInput");
   const yInput = document.getElementById("yInput");
-  const systemDisplay = document.getElementById("systemDisplay");
+  const enterButton = document.getElementById("enterButton");
+  const eqOneExpr = document.getElementById("eqOneExpr");
+  const eqTwoExpr = document.getElementById("eqTwoExpr");
+  const eqOneResult = document.getElementById("eqOneResult");
+  const eqTwoResult = document.getElementById("eqTwoResult");
 
   function read(input) {
     const value = Number(input.value);
@@ -155,26 +302,37 @@
     return Number.isInteger(value) ? String(value) : String(Math.round(value * 100) / 100);
   }
 
-  function render() {
+  function resetGeneric() {
+    eqOneExpr.innerHTML = '4<span class="x">x</span> - 2<span class="y">y</span>';
+    eqTwoExpr.innerHTML = '3<span class="x">x</span> + 5<span class="y">y</span>';
+    eqOneResult.textContent = "= ?";
+    eqTwoResult.textContent = "= ?";
+  }
+
+  function submit() {
     const x = read(xInput);
     const y = read(yInput);
 
     if (x === null || y === null) {
-      systemDisplay.innerHTML = "$$\\begin{cases}4x - 2y = \\ ?\\\\3x + 5y = \\ ?\\end{cases}$$";
-    } else {
-      const c1 = 4 * x - 2 * y;
-      const c2 = 3 * x + 5 * y;
-      systemDisplay.innerHTML = `$$\\begin{cases}4(${fmt(x)}) - 2(${fmt(y)}) = ${fmt(c1)}\\\\3(${fmt(x)}) + 5(${fmt(y)}) = ${fmt(c2)}\\end{cases}$$`;
+      resetGeneric();
+      return;
     }
 
-    if (window.MathJax?.typesetPromise) {
-      window.MathJax.typesetPromise([systemDisplay]);
-    }
+    eqOneExpr.innerHTML = `4(<span class="x">${fmt(x)}</span>) - 2(<span class="y">${fmt(y)}</span>)`;
+    eqTwoExpr.innerHTML = `3(<span class="x">${fmt(x)}</span>) + 5(<span class="y">${fmt(y)}</span>)`;
+    eqOneResult.textContent = `= ${fmt(4 * x - 2 * y)}`;
+    eqTwoResult.textContent = `= ${fmt(3 * x + 5 * y)}`;
   }
 
-  xInput.addEventListener("input", render);
-  yInput.addEventListener("input", render);
-  render();
+  enterButton.addEventListener("click", submit);
+  xInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") submit();
+  });
+  yInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") submit();
+  });
+
+  resetGeneric();
 })();
 </script>
 </body>

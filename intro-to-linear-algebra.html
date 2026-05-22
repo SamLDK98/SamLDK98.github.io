@@ -6,7 +6,7 @@
   <title>Intro to Linear Algebra | Linear Algebra</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <script>
     window.MathJax = {
@@ -21,7 +21,7 @@
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body class="chapter-page">
+<body class="chapter-page intro-linear-algebra-page">
   <header>
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
@@ -49,7 +49,7 @@
         <p>We could just calculate row by row, plugging our input into our variables.</p>
 
         <iframe
-          class="essay-widget essay-widget-autosize"
+          class="essay-widget intro-output-widget"
           src="linear-algebra/intro-to-linear-algebra/output-calculator.html"
           title="Interactive calculator for the outputs of a two-equation linear system"
           scrolling="no"
@@ -69,7 +69,7 @@
         <p class="display-equation">$$2(1,0)\ \text{and}\ 3(0,1)\to (2,0)\ \text{and}\ (0,3)\to (2,3)$$</p>
 
         <iframe
-          class="essay-widget essay-widget-autosize"
+          class="essay-widget intro-basis-widget"
           src="linear-algebra/intro-to-linear-algebra/basis-vector-builder.html"
           title="Interactive widget showing coordinates built from basis vectors"
           scrolling="no"
@@ -83,7 +83,7 @@
         <p>A unit step along the $y$-axis is from $(0,0)$ to $(-2, 5)$.</p>
 
         <iframe
-          class="essay-widget essay-widget-autosize"
+          class="essay-widget intro-weighted-widget"
           src="linear-algebra/intro-to-linear-algebra/weighted-basis-comparison.html"
           title="Interactive widget comparing input basis vectors with weighted output vectors"
           scrolling="no"
@@ -101,9 +101,31 @@
         <p>So we can imagine our input space "transforming", by imagining the coordinates $(0,1)$ and $(1,0)$ moving to $(4, 3)$ and $(-2, 5)$, respectively, and every other following suit.</p>
 
         <iframe
-          class="essay-widget essay-widget-autosize"
+          class="essay-widget intro-transform-widget"
           src="linear-algebra/intro-to-linear-algebra/linear-transformation-widget.html"
           title="Interactive widget showing a linear transformation deforming the grid"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Now, remember that our equations did actually specify a particular output:</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = 2\\3x + 5y = 7 \end{cases}$$</p>
+
+        <p>We can perform a linear transformation to see where this $(2, 7)$ target vector ends up.</p>
+
+        <p>The question is then, "What input vector moves to this location following a transformation?"</p>
+
+        <p>To answer this, we reverse the transformation by moving the transformed basis directions back to their original positions.</p>
+
+        <p>As the space transforms back into the original coordinate system, the target vector moves with it, eventually revealing the input vector that generated it.</p>
+
+        <p>This recovered input vector can then be decomposed into scaled combinations of the original basis vectors to show the actual $x$ and $y$ values that solve the system.</p>
+
+        <iframe
+          class="essay-widget intro-reversal-widget"
+          src="linear-algebra/intro-to-linear-algebra/solving-by-reversal-widget.html"
+          title="Interactive widget showing a system solved by reversing a linear transformation"
           scrolling="no"
           loading="lazy"
         ></iframe>

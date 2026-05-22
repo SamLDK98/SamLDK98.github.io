@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to think about Linear Algebra | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">How to think about Linear Algebra</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h2 class="section-title">The Conceptual Shift</h2>
+
+        <p>Linear Algebra (LA) is <strong>not</strong> a new way to solve linear systems of equations. We still use Gaussian elimination for that.</p>
+
+        <p>In these early sections, you can almost pretend we have lost interest in "solving" per se.</p>
+
+        <p>Given a system like this:</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = 2\\2x + 4y = 16 \end{cases}$$</p>
+
+        <p>We start thinking about this:</p>
+
+        <p class="display-equation">$$\begin{cases} 4x - 2y = \underline{\hspace{1.4em}}\\2x + 4y = \underline{\hspace{1.4em}} \end{cases}$$</p>
+
+        <p>We wonder about all the possible values our system could produce given inputs of $(x, y)$.</p>
+
+        <p>We are therefore considering the system as a function, and so, rather than static constants, we think of the RHS as <strong>outputs</strong> of the function.</p>
+
+        <p class="display-equation">$$\text{Inputs } \begin{pmatrix} x \\ y \end{pmatrix} \longrightarrow \begin{bmatrix} \text{The Machine} \\ \begin{cases} 4x - 2y \\ 2x + 4y \end{cases} \end{bmatrix} \longrightarrow \text{Outputs } \begin{pmatrix} a \\ b \end{pmatrix}$$</p>
+
+        <p>Naturally, because the function can take any input, we can imagine feeding all possible inputs through the machine and observing the entire set of outputs it can produce.</p>
+
+        <p>This set of possible outputs forms a space of its own -- the output space of the transformation.</p>
+
+        <p>So, Linear Algebra focuses on the structure of the transformation itself: which outputs can and cannot be produced by the system.</p>
+
+        <h3 class="subsection-title">But Why?</h3>
+
+        <p>You might be wondering:</p>
+
+        <blockquote>
+          <p>"So what? Why would we care about anything other than just solving the equations?"</p>
+        </blockquote>
+
+        <p>For small systems, solving directly is often enough.</p>
+
+        <p>However, real-world systems are rarely small. Physics, engineering, statistics, computer graphics, machine learning, and many other fields involve huge numbers of interacting variables and equations.</p>
+
+        <p>At that scale, solving specific equations one at a time becomes less important than understanding the structure of the system itself.</p>
+
+        <p>I am sure this will not truly clarify the value of LA to a new learner, but some vague sense of understanding general structure from specific states should suffice, and is probably all you can hope for without an understanding of its mechanics and further immersion in its application across a range of contexts.</p>
+
+        <p>We will return to this "But Why?" question in a later section.</p>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

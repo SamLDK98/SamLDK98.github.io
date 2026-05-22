@@ -6,15 +6,17 @@
 <title>Weighted basis comparison</title>
 <style>
   :root {
-    --bg: #fdfcf8;
-    --card: #fffefa;
-    --ink: #1a1a18;
-    --muted: #706a5f;
-    --line: #e3ded2;
-    --soft: #f8f4ec;
-    --blue: #2563eb;
-    --orange: #c2410c;
-    --green: #047857;
+    --bg: #161311;
+    --card: #1e1a17;
+    --panel: #221d1a;
+    --ink: #ece2d1;
+    --muted: #a89c87;
+    --faint: #6f6557;
+    --line: rgba(214, 196, 168, 0.14);
+    --soft: rgba(0, 0, 0, 0.18);
+    --blue: #e8a13b;
+    --orange: #6dd3c4;
+    --green: #d4b888;
   }
 
   * {
@@ -25,13 +27,13 @@
   body {
     margin: 0;
     padding: 0;
-    background: var(--bg);
+    background: transparent;
     color: var(--ink);
     font-family: Georgia, "Times New Roman", serif;
   }
 
   body {
-    padding: 1rem;
+    padding: 0;
   }
 
   .comparison {
@@ -39,7 +41,7 @@
     margin: 0 auto;
     padding: 1rem;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 4px;
     background: var(--card);
   }
 
@@ -53,7 +55,7 @@
   .control-card {
     padding: 0.8rem 0.85rem;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 2px;
     background: var(--soft);
   }
 
@@ -73,9 +75,9 @@
   input[type="number"] {
     width: 5rem;
     padding: 0.36rem 0.42rem;
-    border: 1px solid #c9c2b3;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.22);
     color: var(--ink);
     font: 0.94rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
     text-align: center;
@@ -86,8 +88,9 @@
   }
 
   input:focus {
-    outline: 2px solid rgba(37, 99, 235, 0.18);
-    border-color: var(--blue);
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(212, 184, 136, 0.08);
   }
 
   .readout {
@@ -100,8 +103,8 @@
   .readout-card {
     padding: 0.72rem 0.8rem;
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
+    border-radius: 2px;
+    background: var(--panel);
     font-size: 1rem;
     line-height: 1.45;
   }
@@ -131,8 +134,8 @@
 
   .stage {
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.14);
     overflow: hidden;
   }
 
@@ -153,18 +156,16 @@
   }
 
   .mono-label {
-    fill: #3d3932;
+    fill: var(--ink);
     font: 12px ui-monospace, SFMono-Regular, Consolas, monospace;
   }
 
   .grid-line {
-    stroke: var(--ink);
-    stroke-opacity: 0.08;
+    stroke: rgba(214, 196, 168, 0.16);
   }
 
   .axis-line {
-    stroke: var(--ink);
-    stroke-opacity: 0.45;
+    stroke: rgba(238, 224, 200, 0.48);
     stroke-width: 1.25;
   }
 
@@ -175,10 +176,6 @@
   }
 
   @media (max-width: 760px) {
-    body {
-      padding: 0.7rem;
-    }
-
     .controls,
     .readout {
       grid-template-columns: 1fr;
@@ -222,10 +219,10 @@
     <svg viewBox="0 0 1040 560" aria-label="Input space and output space weighted basis vectors">
       <defs>
         <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"></path>
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#e8a13b"></path>
         </marker>
         <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c2410c"></path>
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#6dd3c4"></path>
         </marker>
       </defs>
 
@@ -234,8 +231,8 @@
       <text x="255" y="54" text-anchor="middle" class="small-label">As x or y increases...</text>
       <text x="785" y="54" text-anchor="middle" class="small-label">As x or y increases...</text>
 
-      <rect x="50" y="80" width="410" height="410" fill="#fff" stroke="#e3ded2"></rect>
-      <rect x="580" y="80" width="410" height="410" fill="#fff" stroke="#e3ded2"></rect>
+      <rect x="50" y="80" width="410" height="410" fill="rgba(0,0,0,0.12)" stroke="rgba(214,196,168,0.14)"></rect>
+      <rect x="580" y="80" width="410" height="410" fill="rgba(0,0,0,0.12)" stroke="rgba(214,196,168,0.14)"></rect>
       <g id="inputGrid"></g>
       <g id="outputGrid"></g>
       <g id="vectors"></g>
@@ -303,8 +300,8 @@
       }
     }
 
-    html += text(box.x + box.w - 14, sy(box, 0, limit) - 9, labels[0], 'text-anchor="end" class="axis-label" fill="#2563eb"');
-    html += text(sx(box, 0, limit) + 10, box.y + 20, labels[1], 'class="axis-label" fill="#c2410c"');
+    html += text(box.x + box.w - 14, sy(box, 0, limit) - 9, labels[0], 'text-anchor="end" class="axis-label" fill="#e8a13b"');
+    html += text(sx(box, 0, limit) + 10, box.y + 20, labels[1], 'class="axis-label" fill="#6dd3c4"');
     target.innerHTML = html;
   }
 
@@ -314,7 +311,7 @@
     const tipX = sx(box, x, limit);
     const tipY = sy(box, y, limit);
     return line(originX, originY, tipX, tipY, `class="vector-line" stroke="${color}" stroke-width="3" stroke-linecap="round" marker-end="url(#${arrowId})"`) +
-      `<circle class="vector-dot" cx="${tipX}" cy="${tipY}" r="5.5" fill="${color}" stroke="#fff" stroke-width="1.5"></circle>` +
+      `<circle class="vector-dot" cx="${tipX}" cy="${tipY}" r="5.5" fill="${color}" stroke="#161311" stroke-width="1.5"></circle>` +
       text(tipX + offsetX, tipY + offsetY, label, `class="mono-label vector-label" fill="${color}" font-weight="700"`);
   }
 
@@ -335,10 +332,10 @@
     yReadout.innerHTML = `<strong>As y increases</strong><br><span class="orange">input:</span> (0, ${fmt(y)}) &nbsp; <span class="green">output:</span> (${fmt(yOut.x)}, ${fmt(yOut.y)})`;
 
     let html = "";
-    html += vector(inputBox, inputLimit, x, 0, "#2563eb", "arrowBlue", `(${fmt(x)},0)`, x >= 0 ? 10 : -54, 18);
-    html += vector(inputBox, inputLimit, 0, y, "#c2410c", "arrowOrange", `(0,${fmt(y)})`, 10, y >= 0 ? -10 : 22);
-    html += vector(outputBox, outputLimit, xOut.x, xOut.y, "#2563eb", "arrowBlue", `(${fmt(xOut.x)},${fmt(xOut.y)})`, xOut.x >= 0 ? 10 : -74, xOut.y >= 0 ? -10 : 22);
-    html += vector(outputBox, outputLimit, yOut.x, yOut.y, "#c2410c", "arrowOrange", `(${fmt(yOut.x)},${fmt(yOut.y)})`, yOut.x >= 0 ? 10 : -74, yOut.y >= 0 ? -10 : 22);
+    html += vector(inputBox, inputLimit, x, 0, "#e8a13b", "arrowBlue", `(${fmt(x)},0)`, x >= 0 ? 10 : -54, 18);
+    html += vector(inputBox, inputLimit, 0, y, "#6dd3c4", "arrowOrange", `(0,${fmt(y)})`, 10, y >= 0 ? -10 : 22);
+    html += vector(outputBox, outputLimit, xOut.x, xOut.y, "#e8a13b", "arrowBlue", `(${fmt(xOut.x)},${fmt(xOut.y)})`, xOut.x >= 0 ? 10 : -74, xOut.y >= 0 ? -10 : 22);
+    html += vector(outputBox, outputLimit, yOut.x, yOut.y, "#6dd3c4", "arrowOrange", `(${fmt(yOut.x)},${fmt(yOut.y)})`, yOut.x >= 0 ? 10 : -74, yOut.y >= 0 ? -10 : 22);
     vectors.innerHTML = html;
   }
 

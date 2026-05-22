@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solving by Reversing the Transformation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --line-faint: rgba(214, 196, 168, 0.07);
+    --line-grid: rgba(214, 196, 168, 0.13);
+    --line-axis-original: rgba(214, 196, 168, 0.22);
+    --line-axis-transformed: rgba(238, 224, 200, 0.55);
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --ihat: #e8a13b;
+    --ihat-glow: rgba(232, 161, 59, 0.25);
+    --jhat: #6dd3c4;
+    --jhat-glow: rgba(109, 211, 196, 0.25);
+    --accent: #d4b888;
+    --target: #e57994;
+    --target-glow: rgba(229, 121, 148, 0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: transparent;
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 0;
+    background-image:
+      radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(229, 121, 148, 0.04), transparent 50%);
+  }
+
+  .widget {
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .widget::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+
+  .header {
+    padding: 1.75rem 2rem 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .header-left .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.35rem;
+  }
+
+  .header-left h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.85rem;
+    letter-spacing: -0.01em;
+    font-variation-settings: "opsz" 144;
+    color: var(--text);
+  }
+
+  .header-left h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .system {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    border-left: 1px solid var(--rule);
+    padding-left: 1rem;
+  }
+
+  .system span {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 0;
+  }
+
+  @media (max-width: 760px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { border-left: none !important; border-top: 1px solid var(--rule); }
+  }
+
+  .canvas-wrap {
+    padding: 1.5rem;
+    position: relative;
+    aspect-ratio: 1;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 2px;
+  }
+
+  .sidebar {
+    border-left: 1px solid var(--rule);
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    background: var(--bg-card);
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 0.85rem;
+  }
+
+  .phase-stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .phase-item {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid transparent;
+    border-left: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 0.45rem 0.85rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    gap: 0.7rem;
+    align-items: center;
+    position: relative;
+  }
+
+  .phase-item .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    width: 1.2rem;
+    transition: color 0.25s;
+  }
+
+  .phase-item .name {
+    font-style: italic;
+  }
+
+  .phase-item:hover {
+    color: var(--text);
+    border-left-color: var(--accent);
+  }
+
+  .phase-item.active {
+    color: var(--text);
+    border-left-color: var(--accent);
+    background: rgba(212, 184, 136, 0.06);
+  }
+
+  .phase-item.active .num {
+    color: var(--accent);
+  }
+
+  .phase-item.done .num {
+    color: var(--text-dim);
+  }
+
+  .description {
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--text);
+    min-height: 5.5rem;
+    transition: opacity 0.25s;
+    font-style: italic;
+  }
+
+  .description em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .description code {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.88rem;
+    background: rgba(212, 184, 136, 0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+    color: var(--text);
+  }
+
+  .matrix-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    justify-content: center;
+    padding: 0.4rem 0;
+  }
+
+  .bracket {
+    font-size: 3rem;
+    color: var(--text-dim);
+    font-weight: 200;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 0.9;
+  }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 0.9rem;
+    text-align: right;
+    min-width: 100px;
+  }
+
+  .matrix-grid span {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .matrix-grid .col-1 { color: var(--ihat); }
+  .matrix-grid .col-2 { color: var(--jhat); }
+
+  .info-block {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    padding: 0.6rem 0.75rem;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-row .label { color: var(--text-faint); }
+  .info-row .val { color: var(--text); font-variant-numeric: tabular-nums; }
+  .info-row .val.target { color: var(--target); }
+
+  .solution-block {
+    padding: 0.85rem;
+    background: rgba(212, 184, 136, 0.06);
+    border: 1px solid rgba(212, 184, 136, 0.25);
+    border-radius: 2px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+
+  .solution-block.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .solution-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+
+  .solution-eq {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .solution-eq .frac {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.9rem;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .solution-eq .approx {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    margin-left: 0.5rem;
+  }
+
+  .nav {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+
+  .nav button {
+    flex: 1;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.7rem 0.85rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    font-style: italic;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav button:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.08);
+  }
+
+  .nav button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .footer {
+    padding: 0.85rem 2rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .footer kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.7rem;
+    background: rgba(212, 184, 136, 0.08);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1px 5px;
+    color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="header">
+    <div class="header-left">
+      <div class="eyebrow">Figure - Solving by Reversal</div>
+      <h1>Working <em>backwards</em> from the output</h1>
+    </div>
+    <div class="system">
+      <span>4x - 2y = 2</span>
+      <span>3x + 5y = 7</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="900" height="900"></canvas>
+    </div>
+
+    <aside class="sidebar">
+      <div>
+        <div class="section-label">Steps</div>
+        <div class="phase-stepper" id="stepper">
+          <button class="phase-item" data-phase="0">
+            <span class="num">01</span><span class="name">The Target</span>
+          </button>
+          <button class="phase-item" data-phase="1">
+            <span class="num">02</span><span class="name">Transform Space</span>
+          </button>
+          <button class="phase-item" data-phase="2">
+            <span class="num">03</span><span class="name">Reverse the Map</span>
+          </button>
+          <button class="phase-item" data-phase="3">
+            <span class="num">04</span><span class="name">Decompose</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="description" id="description"></div>
+
+      <div>
+        <div class="section-label">Basis Matrix</div>
+        <div class="matrix-display">
+          <span class="bracket">[</span>
+          <div class="matrix-grid">
+            <span class="col-1" id="m00">1</span><span class="col-2" id="m01">0</span>
+            <span class="col-1" id="m10">0</span><span class="col-2" id="m11">1</span>
+          </div>
+          <span class="bracket">]</span>
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="info-row">
+          <span class="label">target</span>
+          <span class="val target" id="target-coord">(2, 7)</span>
+        </div>
+      </div>
+
+      <div class="solution-block" id="solution">
+        <div class="solution-title">Solution</div>
+        <div class="solution-eq">
+          <div>x &nbsp;=&nbsp; <span class="frac">12/13</span><span class="approx">~ 0.923</span></div>
+          <div>y &nbsp;=&nbsp; <span class="frac">11/13</span><span class="approx">~ 0.846</span></div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button id="prev">&lt;- Back</button>
+        <button id="next">Next -&gt;</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">
+    Step through with <kbd>&lt;-</kbd> and <kbd>-&gt;</kbd>, or click any step.
+  </div>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let cssW = 600, cssH = 600;
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cssW = rect.width;
+    cssH = rect.height;
+    draw();
+  }
+
+  // The four phases
+  const SOLUTION = { x: 12/13, y: 11/13 };
+  const TARGET_OUTPUT = { x: 2, y: 7 };
+  const TRANSFORM = { ix: 4, iy: 3, jx: -2, jy: 5 }; // columns: (4,3) and (-2,5)
+
+  const PHASES = [
+    {
+      label: "The Target",
+      desc: `Our system asks for <code>(x, y)</code> that the transformation sends to <em>(2, 7)</em>. We begin in the standard plane with this output target marked.`,
+      basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
+      target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
+      extent: 9,
+      decomp: 0
+    },
+    {
+      label: "Transform Space",
+      desc: `Apply the transformation. The basis i and j stretch to <em>(4, 3)</em> and <em>(-2, 5)</em>. The target stays put; its coordinates <em>in this new basis</em> are exactly the <code>(x, y)</code> we seek.`,
+      basis: { ix: TRANSFORM.ix, iy: TRANSFORM.iy, jx: TRANSFORM.jx, jy: TRANSFORM.jy },
+      target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
+      extent: 9,
+      decomp: 0
+    },
+    {
+      label: "Reverse the Map",
+      desc: `Now reverse the transformation. The basis returns to standard, and the target rides along with the un-deforming space, landing at the input vector.`,
+      basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
+      target: { x: SOLUTION.x, y: SOLUTION.y },
+      extent: 1.6,
+      decomp: 0
+    },
+    {
+      label: "Decompose",
+      desc: `Decompose the input as <em>x*i + y*j</em>. The scalars are the solution to the system.`,
+      basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
+      target: { x: SOLUTION.x, y: SOLUTION.y },
+      extent: 1.6,
+      decomp: 1
+    }
+  ];
+
+  // Animated state
+  let current = {
+    ix: PHASES[0].basis.ix, iy: PHASES[0].basis.iy,
+    jx: PHASES[0].basis.jx, jy: PHASES[0].basis.jy,
+    tx: PHASES[0].target.x, ty: PHASES[0].target.y,
+    extent: PHASES[0].extent,
+    decomp: PHASES[0].decomp
+  };
+
+  let phaseIndex = 0;
+  let animStart = null;
+  let animFromState = { ...current };
+  let animToState = { ...current };
+  const DURATION = 1100;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+  function mathToPx(x, y) {
+    const cx = cssW / 2, cy = cssH / 2;
+    const s = (Math.min(cssW, cssH) / 2) / current.extent;
+    return [cx + x * s, cy - y * s];
+  }
+
+  // Apply current basis to a point in "matrix coordinates"
+  function applyBasis(x, y) {
+    return [current.ix * x + current.jx * y, current.iy * x + current.jy * y];
+  }
+
+  function drawGrid() {
+    const range = 16;
+
+    // Original axes — faint reference
+    ctx.strokeStyle = 'rgba(214, 196, 168, 0.07)';
+    ctx.lineWidth = 1;
+    const cx = cssW / 2, cy = cssH / 2;
+    ctx.beginPath();
+    ctx.moveTo(0, cy); ctx.lineTo(cssW, cy);
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, cssH);
+    ctx.stroke();
+
+    // Deformed grid
+    ctx.strokeStyle = 'rgba(214, 196, 168, 0.13)';
+    ctx.lineWidth = 1;
+
+    for (let k = -range; k <= range; k++) {
+      if (k === 0) continue;
+      // Vertical line originally at x = k
+      const p1 = applyBasis(k, -range);
+      const p2 = applyBasis(k, range);
+      const [x1, y1] = mathToPx(p1[0], p1[1]);
+      const [x2, y2] = mathToPx(p2[0], p2[1]);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+    for (let k = -range; k <= range; k++) {
+      if (k === 0) continue;
+      const p1 = applyBasis(-range, k);
+      const p2 = applyBasis(range, k);
+      const [x1, y1] = mathToPx(p1[0], p1[1]);
+      const [x2, y2] = mathToPx(p2[0], p2[1]);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+
+    // Transformed axes (the deformed x- and y-axes)
+    ctx.strokeStyle = 'rgba(238, 224, 200, 0.45)';
+    ctx.lineWidth = 1.5;
+    const xa1 = applyBasis(-range, 0), xa2 = applyBasis(range, 0);
+    const [xx1, xy1] = mathToPx(xa1[0], xa1[1]);
+    const [xx2, xy2] = mathToPx(xa2[0], xa2[1]);
+    ctx.beginPath(); ctx.moveTo(xx1, xy1); ctx.lineTo(xx2, xy2); ctx.stroke();
+    const ya1 = applyBasis(0, -range), ya2 = applyBasis(0, range);
+    const [yx1, yy1] = mathToPx(ya1[0], ya1[1]);
+    const [yx2, yy2] = mathToPx(ya2[0], ya2[1]);
+    ctx.beginPath(); ctx.moveTo(yx1, yy1); ctx.lineTo(yx2, yy2); ctx.stroke();
+  }
+
+  function drawArrow(fromMath, toMath, color, glowColor, width, label, labelOffset) {
+    const [ox, oy] = mathToPx(fromMath[0], fromMath[1]);
+    const [px, py] = mathToPx(toMath[0], toMath[1]);
+
+    ctx.save();
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(px, py);
+    ctx.stroke();
+
+    // Arrowhead — only if vector has non-trivial length
+    const dx = px - ox, dy = py - oy;
+    const len = Math.hypot(dx, dy);
+    if (len > 4) {
+      const ang = Math.atan2(dy, dx);
+      const size = Math.min(12, len * 0.4);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px - size * Math.cos(ang - 0.45), py - size * Math.sin(ang - 0.45));
+      ctx.lineTo(px - size * Math.cos(ang + 0.45), py - size * Math.sin(ang + 0.45));
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Label
+    if (label) {
+      ctx.fillStyle = color;
+      ctx.font = 'italic 600 17px Fraunces, serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const offX = labelOffset ? labelOffset[0] : 8;
+      const offY = labelOffset ? labelOffset[1] : 0;
+      ctx.fillText(label, px + offX, py + offY);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, cssW, cssH);
+    drawGrid();
+
+    // Basis vectors — fade as decomposition appears
+    const iHead = [current.ix, current.iy];
+    const jHead = [current.jx, current.jy];
+    ctx.save();
+    ctx.globalAlpha = 1 - 0.75 * current.decomp;
+    drawArrow([0,0], iHead, '#e8a13b', 'rgba(232,161,59,0.5)', 3, 'i', [8, -4]);
+    drawArrow([0,0], jHead, '#6dd3c4', 'rgba(109,211,196,0.5)', 3, 'j', [8, -4]);
+    ctx.restore();
+
+    // Decomposition (phase 4) - drawn underneath the target arrow
+    if (current.decomp > 0.01) {
+      const alpha = current.decomp;
+      // Faint dashed projection lines from target down to axes
+      const [tx, ty] = mathToPx(current.tx, current.ty);
+      const [zx, zy] = mathToPx(current.tx, 0);
+      const [zx2, zy2] = mathToPx(0, current.ty);
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.5;
+      ctx.strokeStyle = '#a89c87';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(tx, ty); ctx.lineTo(zx, zy);
+      ctx.moveTo(tx, ty); ctx.lineTo(zx2, zy2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Scaled î from origin to (12/13, 0)
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      drawArrow([0, 0], [SOLUTION.x, 0], '#e8a13b', 'rgba(232,161,59,0.5)', 4,
+        null);
+      // Scaled ĵ from (12/13, 0) head-to-tail to (12/13, 11/13)
+      drawArrow([SOLUTION.x, 0], [SOLUTION.x, SOLUTION.y], '#6dd3c4', 'rgba(109,211,196,0.5)', 4,
+        null);
+
+      // Labels showing the scalar amounts
+      ctx.fillStyle = '#e8a13b';
+      ctx.font = 'italic 500 14px Fraunces, serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const [midIx, midIy] = mathToPx(SOLUTION.x / 2, 0);
+      ctx.fillText('12/13 i', midIx, midIy + 8);
+
+      ctx.fillStyle = '#6dd3c4';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const [midJx, midJy] = mathToPx(SOLUTION.x, SOLUTION.y / 2);
+      ctx.fillText('11/13 j', midJx + 10, midJy);
+
+      ctx.restore();
+    }
+
+    // Target vector — always drawn on top
+    drawArrow([0, 0], [current.tx, current.ty],
+      '#e57994', 'rgba(229,121,148,0.5)', 3.5,
+      null);
+
+    // Small filled circle at target tip
+    const [ttx, tty] = mathToPx(current.tx, current.ty);
+    ctx.fillStyle = '#e57994';
+    ctx.beginPath();
+    ctx.arc(ttx, tty, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function formatNum(n) {
+    const r = Math.round(n * 100) / 100;
+    if (Math.abs(r) < 0.005) return '0';
+    const s = (r === 0 ? 0 : r).toFixed(2).replace(/\.?0+$/, '');
+    return s.replace('-', '−');
+  }
+
+  function updateInfo() {
+    document.getElementById('m00').textContent = formatNum(current.ix);
+    document.getElementById('m01').textContent = formatNum(current.jx);
+    document.getElementById('m10').textContent = formatNum(current.iy);
+    document.getElementById('m11').textContent = formatNum(current.jy);
+
+    document.getElementById('target-coord').textContent =
+      `(${formatNum(current.tx)}, ${formatNum(current.ty)})`;
+  }
+
+  function animate(ts) {
+    if (animStart === null) animStart = ts;
+    const t = Math.min((ts - animStart) / DURATION, 1);
+    const e = ease(t);
+
+    for (const k of ['ix','iy','jx','jy','tx','ty','extent','decomp']) {
+      current[k] = lerp(animFromState[k], animToState[k], e);
+    }
+
+    draw();
+    updateInfo();
+
+    if (t < 1) requestAnimationFrame(animate);
+  }
+
+  function goToPhase(idx) {
+    if (idx < 0 || idx >= PHASES.length) return;
+    phaseIndex = idx;
+
+    const target = PHASES[idx];
+    animFromState = { ...current };
+    animToState = {
+      ix: target.basis.ix, iy: target.basis.iy,
+      jx: target.basis.jx, jy: target.basis.jy,
+      tx: target.target.x, ty: target.target.y,
+      extent: target.extent,
+      decomp: target.decomp
+    };
+    animStart = null;
+    requestAnimationFrame(animate);
+
+    // Update UI
+    document.querySelectorAll('.phase-item').forEach((el, i) => {
+      el.classList.toggle('active', i === idx);
+      el.classList.toggle('done', i < idx);
+    });
+    document.getElementById('description').innerHTML = target.desc;
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === PHASES.length - 1;
+    document.getElementById('solution').classList.toggle('visible', idx === 3);
+  }
+
+  // Wire up controls
+  document.querySelectorAll('.phase-item').forEach(el => {
+    el.addEventListener('click', () => goToPhase(parseInt(el.dataset.phase)));
+  });
+  document.getElementById('prev').addEventListener('click', () => goToPhase(phaseIndex - 1));
+  document.getElementById('next').addEventListener('click', () => goToPhase(phaseIndex + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { goToPhase(phaseIndex + 1); e.preventDefault(); }
+    if (e.key === 'ArrowLeft')  { goToPhase(phaseIndex - 1); e.preventDefault(); }
+  });
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Initial state
+  goToPhase(0);
+})();
+</script>
+
+</body>
+</html>

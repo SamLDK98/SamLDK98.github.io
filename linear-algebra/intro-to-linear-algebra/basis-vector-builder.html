@@ -6,16 +6,18 @@
 <title>Basis vector coordinate builder</title>
 <style>
   :root {
-    --bg: #fdfcf8;
-    --card: #fffefa;
-    --ink: #1a1a18;
-    --muted: #706a5f;
-    --line: #e3ded2;
-    --soft: #f8f4ec;
-    --blue: #2563eb;
-    --orange: #c2410c;
-    --green: #047857;
-    --purple: #7c3aed;
+    --bg: #161311;
+    --card: #1e1a17;
+    --panel: #221d1a;
+    --ink: #ece2d1;
+    --muted: #a89c87;
+    --faint: #6f6557;
+    --line: rgba(214, 196, 168, 0.14);
+    --soft: rgba(0, 0, 0, 0.18);
+    --blue: #e8a13b;
+    --orange: #6dd3c4;
+    --green: #d4b888;
+    --purple: #ece2d1;
   }
 
   * {
@@ -26,13 +28,13 @@
   body {
     margin: 0;
     padding: 0;
-    background: var(--bg);
+    background: transparent;
     color: var(--ink);
     font-family: Georgia, "Times New Roman", serif;
   }
 
   body {
-    padding: 1rem;
+    padding: 0;
   }
 
   .builder {
@@ -40,7 +42,7 @@
     margin: 0 auto;
     padding: 1rem;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 4px;
     background: var(--card);
   }
 
@@ -65,7 +67,7 @@
     gap: 0.45rem;
     padding: 0.7rem;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 2px;
     background: var(--soft);
     color: var(--muted);
     font-family: Arial, Helvetica, sans-serif;
@@ -78,25 +80,26 @@
   input {
     width: 5rem;
     padding: 0.38rem 0.45rem;
-    border: 1px solid #c9c2b3;
-    border-radius: 6px;
-    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.22);
     color: var(--ink);
     font: 0.95rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
     text-align: center;
   }
 
   input:focus {
-    outline: 2px solid rgba(37, 99, 235, 0.18);
-    border-color: var(--blue);
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(212, 184, 136, 0.08);
   }
 
   .formula {
     margin: 0;
     padding: 0.78rem 0.85rem;
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.16);
     font: 0.98rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
   }
 
@@ -111,8 +114,8 @@
     min-height: 4rem;
     padding: 0.72rem 0.78rem;
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
+    border-radius: 2px;
+    background: var(--panel);
   }
 
   .step-label {
@@ -146,9 +149,9 @@
   button {
     cursor: pointer;
     padding: 0.48rem 0.72rem;
-    border: 1px solid #c8c4b5;
-    border-radius: 7px;
-    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: transparent;
     color: var(--ink);
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.84rem;
@@ -156,8 +159,8 @@
   }
 
   button:hover {
-    background: #f5f3eb;
-    border-color: #a8a496;
+    background: rgba(212, 184, 136, 0.08);
+    border-color: var(--green);
   }
 
   button:active {
@@ -170,9 +173,9 @@
   }
 
   .primary {
-    border-color: var(--blue);
-    background: var(--blue);
-    color: #fff;
+    border-color: var(--green);
+    background: rgba(212, 184, 136, 0.12);
+    color: var(--ink);
   }
 
   .blue {
@@ -192,8 +195,8 @@
 
   .stage {
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.14);
     overflow: hidden;
   }
 
@@ -214,18 +217,16 @@
   }
 
   .mono-label {
-    fill: #3d3932;
+    fill: var(--ink);
     font: 12px ui-monospace, SFMono-Regular, Consolas, monospace;
   }
 
   .grid-line {
-    stroke: var(--ink);
-    stroke-opacity: 0.08;
+    stroke: rgba(214, 196, 168, 0.16);
   }
 
   .axis-line {
-    stroke: var(--ink);
-    stroke-opacity: 0.45;
+    stroke: rgba(238, 224, 200, 0.48);
     stroke-width: 1.35;
   }
 
@@ -236,10 +237,6 @@
   }
 
   @media (max-width: 720px) {
-    body {
-      padding: 0.7rem;
-    }
-
     .top-row,
     .steps {
       grid-template-columns: 1fr;
@@ -294,19 +291,19 @@
     <svg viewBox="0 0 860 560" aria-label="Input space grid showing basis vectors">
       <defs>
         <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"></path>
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#e8a13b"></path>
         </marker>
         <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c2410c"></path>
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#6dd3c4"></path>
         </marker>
         <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#047857"></path>
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4b888"></path>
         </marker>
       </defs>
 
       <text x="430" y="34" text-anchor="middle" class="axis-label">input space</text>
       <text x="430" y="54" text-anchor="middle" class="small-label">coordinates are built from x-steps and y-steps</text>
-      <rect x="90" y="80" width="680" height="420" fill="#fff" stroke="#e3ded2"></rect>
+      <rect x="90" y="80" width="680" height="420" fill="rgba(0,0,0,0.12)" stroke="rgba(214,196,168,0.14)"></rect>
       <g id="grid"></g>
       <g id="vectors"></g>
     </svg>
@@ -377,8 +374,8 @@
       }
     }
 
-    html += text(box.x + box.w - 14, sy(0) - 9, "x", 'text-anchor="end" class="axis-label" fill="#2563eb"');
-    html += text(sx(0) + 10, box.y + 20, "y", 'class="axis-label" fill="#c2410c"');
+    html += text(box.x + box.w - 14, sy(0) - 9, "x", 'text-anchor="end" class="axis-label" fill="#e8a13b"');
+    html += text(sx(0) + 10, box.y + 20, "y", 'class="axis-label" fill="#6dd3c4"');
     grid.innerHTML = html;
   }
 
@@ -388,7 +385,7 @@
     const endX = sx(x2);
     const endY = sy(y2);
     return line(startX, startY, endX, endY, `class="vector-line" stroke="${color}" stroke-width="3" stroke-linecap="round" marker-end="url(#${arrowId})"`) +
-      `<circle class="vector-dot" cx="${endX}" cy="${endY}" r="5" fill="${color}" stroke="#fff" stroke-width="1.5"></circle>` +
+      `<circle class="vector-dot" cx="${endX}" cy="${endY}" r="5" fill="${color}" stroke="#161311" stroke-width="1.5"></circle>` +
       text(endX + labelOffsetX, endY + labelOffsetY, label, `class="mono-label vector-label" fill="${color}" font-weight="700"`);
   }
 
@@ -414,20 +411,20 @@
 
     let html = "";
     if (stage >= 1) {
-      html += vector(0, 0, x, 0, "#2563eb", "arrowBlue", `(${fmt(x)},0)`, x >= 0 ? 10 : -58, 18);
+      html += vector(0, 0, x, 0, "#e8a13b", "arrowBlue", `(${fmt(x)},0)`, x >= 0 ? 10 : -58, 18);
     }
 
     if (stage >= 2) {
       const yStartX = stage >= 3 ? x : 0;
       const yEndX = stage >= 3 ? x : 0;
-      html += vector(yStartX, 0, yEndX, y, "#c2410c", "arrowOrange", `(0,${fmt(y)})`, 10, y >= 0 ? -10 : 20);
+      html += vector(yStartX, 0, yEndX, y, "#6dd3c4", "arrowOrange", `(0,${fmt(y)})`, 10, y >= 0 ? -10 : 20);
     }
 
     if (stage >= 4) {
-      html += vector(0, 0, x, y, "#047857", "arrowGreen", `(${fmt(x)},${fmt(y)})`, x >= 0 ? 10 : -66, y >= 0 ? -12 : 22);
+      html += vector(0, 0, x, y, "#d4b888", "arrowGreen", `(${fmt(x)},${fmt(y)})`, x >= 0 ? 10 : -66, y >= 0 ? -12 : 22);
     } else if (stage >= 3) {
-      html += `<circle class="vector-dot" cx="${sx(x)}" cy="${sy(y)}" r="6" fill="#7c3aed" stroke="#fff" stroke-width="1.5"></circle>`;
-      html += text(sx(x) + (x >= 0 ? 10 : -58), sy(y) + (y >= 0 ? -12 : 22), `(${fmt(x)},${fmt(y)})`, 'class="mono-label vector-label" fill="#7c3aed" font-weight="700"');
+      html += `<circle class="vector-dot" cx="${sx(x)}" cy="${sy(y)}" r="6" fill="#ece2d1" stroke="#161311" stroke-width="1.5"></circle>`;
+      html += text(sx(x) + (x >= 0 ? 10 : -58), sy(y) + (y >= 0 ? -12 : 22), `(${fmt(x)},${fmt(y)})`, 'class="mono-label vector-label" fill="#ece2d1" font-weight="700"');
     }
 
     vectors.innerHTML = html;
