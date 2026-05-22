@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Notation | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">New Notation</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Column vectors are written vertically using matrix notation rather than coordinate notation.</p>
+
+        <p>For example, instead of $(6,2)$, we write:</p>
+
+        <p class="display-equation">$$
+\begin{bmatrix}
+6\\
+2
+\end{bmatrix}
+$$</p>
+
+        <h3 class="subsection-title">Vector Addition</h3>
+
+        <p>Simply add corresponding components:</p>
+
+        <p class="display-equation">$$
+\begin{bmatrix}
+1\\
+2\\
+1
+\end{bmatrix}
++
+\begin{bmatrix}
+3\\
+-1\\
+4
+\end{bmatrix}
+=
+\begin{bmatrix}
+4\\
+1\\
+5
+\end{bmatrix}
+$$</p>
+
+        <h3 class="subsection-title">Scalar multiplication</h3>
+
+        <p>Multiply each component by the scalar:</p>
+
+        <p class="display-equation">$$
+2
+\begin{bmatrix}
+1\\
+2\\
+1
+\end{bmatrix}
+=
+\begin{bmatrix}
+2\\
+4\\
+2
+\end{bmatrix}
+$$</p>
+
+        <h3 class="subsection-title">Linear combinations</h3>
+
+        <p>Scale each vector and then add the corresponding components.:</p>
+
+        <p class="display-equation">$$
+2
+\begin{bmatrix}
+1\\
+2\\
+1
+\end{bmatrix}
++
+3
+\begin{bmatrix}
+1\\
+-1\\
+2
+\end{bmatrix}
+=
+\begin{bmatrix}
+5\\
+1\\
+8
+\end{bmatrix}
+$$</p>
+
+        <h3 class="subsection-title">Expressing a system of linear equations</h3>
+
+        <p>Imagine:</p>
+
+        <p class="display-equation">$$\begin{cases} x + y = 2\\2x - y = 1\\x+2y=5 \end{cases}$$</p>
+
+        <p>We express this as:</p>
+
+        <p class="display-equation">$$
+x\begin{bmatrix}
+1\\
+2\\
+1
+\end{bmatrix}
++
+y\begin{bmatrix}
+1\\
+-1\\
+2
+\end{bmatrix}
+=
+\begin{bmatrix}
+2\\
+1\\
+5
+\end{bmatrix}
+$$</p>
+
+        <p>Or alternatively:</p>
+
+        <p class="display-equation">$$
+\begin{bmatrix}
+1&1\\
+2&-1\\
+1&2
+\end{bmatrix}
+\begin{bmatrix}
+x\\
+y
+\end{bmatrix}
+=
+\begin{bmatrix}
+2\\
+1\\
+5
+\end{bmatrix}
+$$</p>
+
+        <h3 class="subsection-title">Shorthand</h3>
+
+        <p class="display-equation">$$
+A\mathbf{x}=\mathbf{b}
+$$</p>
+
+        <p>This equation describes a linear transformation taking an input vector $\mathbf{x}$ and mapping it to an output vector $\mathbf{b}$.</p>
+
+        <p>$A=$ matrix representing the transformation</p>
+
+        <p>$\mathbf{x}=$ input vector</p>
+
+        <p>$\mathbf{b}=$ output vector</p>
+
+        <p class="display-equation">$$A=\begin{bmatrix} 1&1\\2&-1\\1&2\end{bmatrix}$$</p>
+
+        <p class="display-equation">$$
+\mathbf{x}=
+\begin{bmatrix}
+x\\
+y
+\end{bmatrix}
+$$</p>
+
+        <p class="display-equation">$$\mathbf{b}=
+\begin{bmatrix}
+2\\
+1\\
+5
+\end{bmatrix}$$</p>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
