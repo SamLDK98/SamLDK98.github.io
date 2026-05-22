@@ -286,6 +286,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .info-block.visible {
+    opacity: 1;
   }
 
   .info-row {
@@ -406,8 +412,7 @@
 <div class="widget">
   <div class="header">
     <div class="header-left">
-      <div class="eyebrow">Figure - Solving by Reversal</div>
-      <h1>Working <em>backwards</em> from the output</h1>
+      <h1>Visualizing Linear and Inverse Transformations</h1>
     </div>
     <div class="system">
       <span>4x - 2y = 2</span>
@@ -425,16 +430,19 @@
         <div class="section-label">Steps</div>
         <div class="phase-stepper" id="stepper">
           <button class="phase-item" data-phase="0">
-            <span class="num">01</span><span class="name">The Target</span>
+            <span class="num">01</span><span class="name">Input Space</span>
           </button>
           <button class="phase-item" data-phase="1">
             <span class="num">02</span><span class="name">Transform Space</span>
           </button>
           <button class="phase-item" data-phase="2">
-            <span class="num">03</span><span class="name">Reverse the Map</span>
+            <span class="num">03</span><span class="name">Plot Target Vector</span>
           </button>
           <button class="phase-item" data-phase="3">
-            <span class="num">04</span><span class="name">Decompose</span>
+            <span class="num">04</span><span class="name">Reverse the Map</span>
+          </button>
+          <button class="phase-item" data-phase="4">
+            <span class="num">05</span><span class="name">Decompose</span>
           </button>
         </div>
       </div>
@@ -453,7 +461,7 @@
         </div>
       </div>
 
-      <div class="info-block">
+      <div class="info-block" id="target-info">
         <div class="info-row">
           <span class="label">target</span>
           <span class="val target" id="target-coord">(2, 7)</span>
@@ -498,27 +506,38 @@
     draw();
   }
 
-  // The four phases
+  // The phases
   const SOLUTION = { x: 12/13, y: 11/13 };
   const TARGET_OUTPUT = { x: 2, y: 7 };
   const TRANSFORM = { ix: 4, iy: 3, jx: -2, jy: 5 }; // columns: (4,3) and (-2,5)
 
   const PHASES = [
     {
-      label: "The Target",
-      desc: `Our system asks for <code>(x, y)</code> that the transformation sends to <em>(2, 7)</em>. We begin in the standard plane with this output target marked.`,
+      label: "Input Space",
+      desc: `Begin with the standard input space. The basis vectors are <em>i</em> and <em>j</em>; no output target has been plotted yet.`,
       basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
       target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
       extent: 9,
-      decomp: 0
+      decomp: 0,
+      targetAlpha: 0
     },
     {
       label: "Transform Space",
-      desc: `Apply the transformation. The basis i and j stretch to <em>(4, 3)</em> and <em>(-2, 5)</em>. The target stays put; its coordinates <em>in this new basis</em> are exactly the <code>(x, y)</code> we seek.`,
+      desc: `Apply the transformation. The basis i and j stretch to <em>(4, 3)</em> and <em>(-2, 5)</em>.`,
       basis: { ix: TRANSFORM.ix, iy: TRANSFORM.iy, jx: TRANSFORM.jx, jy: TRANSFORM.jy },
       target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
       extent: 9,
-      decomp: 0
+      decomp: 0,
+      targetAlpha: 0
+    },
+    {
+      label: "Plot Target Vector",
+      desc: `Now plot the target output vector <em>(2, 7)</em> in output space.`,
+      basis: { ix: TRANSFORM.ix, iy: TRANSFORM.iy, jx: TRANSFORM.jx, jy: TRANSFORM.jy },
+      target: { x: TARGET_OUTPUT.x, y: TARGET_OUTPUT.y },
+      extent: 9,
+      decomp: 0,
+      targetAlpha: 1
     },
     {
       label: "Reverse the Map",
@@ -526,7 +545,8 @@
       basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
       target: { x: SOLUTION.x, y: SOLUTION.y },
       extent: 1.6,
-      decomp: 0
+      decomp: 0,
+      targetAlpha: 1
     },
     {
       label: "Decompose",
@@ -534,7 +554,8 @@
       basis: { ix: 1, iy: 0, jx: 0, jy: 1 },
       target: { x: SOLUTION.x, y: SOLUTION.y },
       extent: 1.6,
-      decomp: 1
+      decomp: 1,
+      targetAlpha: 1
     }
   ];
 
@@ -544,7 +565,8 @@
     jx: PHASES[0].basis.jx, jy: PHASES[0].basis.jy,
     tx: PHASES[0].target.x, ty: PHASES[0].target.y,
     extent: PHASES[0].extent,
-    decomp: PHASES[0].decomp
+    decomp: PHASES[0].decomp,
+    targetAlpha: PHASES[0].targetAlpha
   };
 
   let phaseIndex = 0;
@@ -714,17 +736,22 @@
       ctx.restore();
     }
 
-    // Target vector — always drawn on top
-    drawArrow([0, 0], [current.tx, current.ty],
-      '#e57994', 'rgba(229,121,148,0.5)', 3.5,
-      null);
+    // Target vector
+    if (current.targetAlpha > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = current.targetAlpha;
+      drawArrow([0, 0], [current.tx, current.ty],
+        '#e57994', 'rgba(229,121,148,0.5)', 3.5,
+        null);
 
-    // Small filled circle at target tip
-    const [ttx, tty] = mathToPx(current.tx, current.ty);
-    ctx.fillStyle = '#e57994';
-    ctx.beginPath();
-    ctx.arc(ttx, tty, 4, 0, Math.PI * 2);
-    ctx.fill();
+      // Small filled circle at target tip
+      const [ttx, tty] = mathToPx(current.tx, current.ty);
+      ctx.fillStyle = '#e57994';
+      ctx.beginPath();
+      ctx.arc(ttx, tty, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   function formatNum(n) {
@@ -749,7 +776,7 @@
     const t = Math.min((ts - animStart) / DURATION, 1);
     const e = ease(t);
 
-    for (const k of ['ix','iy','jx','jy','tx','ty','extent','decomp']) {
+    for (const k of ['ix','iy','jx','jy','tx','ty','extent','decomp','targetAlpha']) {
       current[k] = lerp(animFromState[k], animToState[k], e);
     }
 
@@ -770,7 +797,8 @@
       jx: target.basis.jx, jy: target.basis.jy,
       tx: target.target.x, ty: target.target.y,
       extent: target.extent,
-      decomp: target.decomp
+      decomp: target.decomp,
+      targetAlpha: target.targetAlpha
     };
     animStart = null;
     requestAnimationFrame(animate);
@@ -783,7 +811,8 @@
     document.getElementById('description').innerHTML = target.desc;
     document.getElementById('prev').disabled = idx === 0;
     document.getElementById('next').disabled = idx === PHASES.length - 1;
-    document.getElementById('solution').classList.toggle('visible', idx === 3);
+    document.getElementById('target-info').classList.toggle('visible', idx >= 2);
+    document.getElementById('solution').classList.toggle('visible', idx === 4);
   }
 
   // Wire up controls
