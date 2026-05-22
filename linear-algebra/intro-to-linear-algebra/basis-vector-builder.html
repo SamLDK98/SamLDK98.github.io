@@ -4,16 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Basis vector coordinate builder</title>
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']]
-    },
-    svg: { fontCache: 'global' }
-  };
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 <style>
   :root {
     --bg: #fdfcf8;
@@ -107,19 +97,18 @@
     border: 1px solid var(--line);
     border-radius: 8px;
     background: #fff;
-    font-size: 1.12rem;
-    line-height: 1.45;
+    font: 0.98rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
   }
 
   .steps {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.65rem;
     margin-bottom: 0.85rem;
   }
 
   .step {
-    min-height: 4.4rem;
+    min-height: 4rem;
     padding: 0.72rem 0.78rem;
     border: 1px solid var(--line);
     border-radius: 8px;
@@ -140,8 +129,7 @@
   .step-value {
     display: block;
     color: var(--ink);
-    font-size: 1.08rem;
-    line-height: 1.4;
+    font: 0.92rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
   }
 
   .step.is-hidden {
@@ -185,6 +173,21 @@
     border-color: var(--blue);
     background: var(--blue);
     color: #fff;
+  }
+
+  .blue {
+    color: var(--blue);
+    font-weight: 700;
+  }
+
+  .orange {
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  .green {
+    color: var(--green);
+    font-weight: 700;
   }
 
   .stage {
@@ -262,21 +265,26 @@
 
   <div class="steps">
     <div class="step" id="basisStep">
-      <span class="step-label">Basis expression</span>
+      <span class="step-label">Start</span>
       <span class="step-value" id="basisText"></span>
     </div>
-    <div class="step is-hidden" id="componentStep">
-      <span class="step-label">Compute each scaled vector</span>
-      <span class="step-value" id="componentText"></span>
+    <div class="step is-hidden" id="xStep">
+      <span class="step-label">x part</span>
+      <span class="step-value" id="xText"></span>
+    </div>
+    <div class="step is-hidden" id="yStep">
+      <span class="step-label">y part</span>
+      <span class="step-value" id="yText"></span>
     </div>
     <div class="step is-hidden" id="sumStep">
-      <span class="step-label">Add the vectors</span>
+      <span class="step-label">Together</span>
       <span class="step-value" id="sumText"></span>
     </div>
   </div>
 
   <div class="buttons">
-    <button id="computeButton" class="primary" type="button">Compute next step</button>
+    <button id="xButton" class="primary" type="button">Show x vector</button>
+    <button id="yButton" type="button" disabled>Show y vector</button>
     <button id="addButton" type="button" disabled>Add x and y vectors</button>
     <button id="drawButton" type="button" disabled>Add new vector</button>
     <button id="resetButton" type="button">Reset</button>
@@ -315,11 +323,14 @@
   const yInput = document.getElementById("yInput");
   const formula = document.getElementById("formula");
   const basisText = document.getElementById("basisText");
-  const componentText = document.getElementById("componentText");
+  const xText = document.getElementById("xText");
+  const yText = document.getElementById("yText");
   const sumText = document.getElementById("sumText");
-  const componentStep = document.getElementById("componentStep");
+  const xStep = document.getElementById("xStep");
+  const yStep = document.getElementById("yStep");
   const sumStep = document.getElementById("sumStep");
-  const computeButton = document.getElementById("computeButton");
+  const xButton = document.getElementById("xButton");
+  const yButton = document.getElementById("yButton");
   const addButton = document.getElementById("addButton");
   const drawButton = document.getElementById("drawButton");
   const resetButton = document.getElementById("resetButton");
@@ -381,60 +392,64 @@
       text(endX + labelOffsetX, endY + labelOffsetY, label, `class="mono-label vector-label" fill="${color}" font-weight="700"`);
   }
 
-  function renderMath() {
-    if (window.MathJax?.typesetPromise) {
-      window.MathJax.typesetPromise([formula, basisText, componentText, sumText]);
-    }
-  }
-
   function render() {
     const x = read(xInput);
     const y = read(yInput);
     xInput.value = fmt(x);
     yInput.value = fmt(y);
 
-    formula.innerHTML = `$${fmt(x)}(1,0) + ${fmt(y)}(0,1)$`;
-    basisText.innerHTML = `$${fmt(x)}(1,0) + ${fmt(y)}(0,1)$`;
-    componentText.innerHTML = `$(${fmt(x)},0) + (0,${fmt(y)})$`;
-    sumText.innerHTML = `$(${fmt(x)},${fmt(y)})$`;
+    formula.innerHTML = `<span class="blue">${fmt(x)}(1,0)</span> + <span class="orange">${fmt(y)}(0,1)</span>`;
+    basisText.innerHTML = `<span class="blue">${fmt(x)} x-steps</span> + <span class="orange">${fmt(y)} y-steps</span>`;
+    xText.innerHTML = `<span class="blue">${fmt(x)}(1,0) = (${fmt(x)},0)</span>`;
+    yText.innerHTML = `<span class="orange">${fmt(y)}(0,1) = (0,${fmt(y)})</span>`;
+    sumText.innerHTML = `<span class="blue">(${fmt(x)},0)</span> + <span class="orange">(0,${fmt(y)})</span> = <span class="green">(${fmt(x)},${fmt(y)})</span>`;
 
-    componentStep.classList.toggle("is-hidden", stage < 1);
-    sumStep.classList.toggle("is-hidden", stage < 2);
-    computeButton.disabled = stage >= 1;
-    addButton.disabled = stage < 1 || stage >= 2;
-    drawButton.disabled = stage < 2 || stage >= 3;
+    xStep.classList.toggle("is-hidden", stage < 1);
+    yStep.classList.toggle("is-hidden", stage < 2);
+    sumStep.classList.toggle("is-hidden", stage < 3);
+    xButton.disabled = stage >= 1;
+    yButton.disabled = stage < 1 || stage >= 2;
+    addButton.disabled = stage < 2 || stage >= 3;
+    drawButton.disabled = stage < 3 || stage >= 4;
 
     let html = "";
     if (stage >= 1) {
       html += vector(0, 0, x, 0, "#2563eb", "arrowBlue", `(${fmt(x)},0)`, x >= 0 ? 10 : -58, 18);
-      const yStartX = stage >= 2 ? x : 0;
-      const yEndX = stage >= 2 ? x : 0;
+    }
+
+    if (stage >= 2) {
+      const yStartX = stage >= 3 ? x : 0;
+      const yEndX = stage >= 3 ? x : 0;
       html += vector(yStartX, 0, yEndX, y, "#c2410c", "arrowOrange", `(0,${fmt(y)})`, 10, y >= 0 ? -10 : 20);
     }
 
-    if (stage >= 3) {
+    if (stage >= 4) {
       html += vector(0, 0, x, y, "#047857", "arrowGreen", `(${fmt(x)},${fmt(y)})`, x >= 0 ? 10 : -66, y >= 0 ? -12 : 22);
-    } else if (stage >= 2) {
+    } else if (stage >= 3) {
       html += `<circle class="vector-dot" cx="${sx(x)}" cy="${sy(y)}" r="6" fill="#7c3aed" stroke="#fff" stroke-width="1.5"></circle>`;
       html += text(sx(x) + (x >= 0 ? 10 : -58), sy(y) + (y >= 0 ? -12 : 22), `(${fmt(x)},${fmt(y)})`, 'class="mono-label vector-label" fill="#7c3aed" font-weight="700"');
     }
 
     vectors.innerHTML = html;
-    renderMath();
   }
 
-  computeButton.addEventListener("click", () => {
+  xButton.addEventListener("click", () => {
     stage = 1;
     render();
   });
 
-  addButton.addEventListener("click", () => {
+  yButton.addEventListener("click", () => {
     stage = 2;
     render();
   });
 
-  drawButton.addEventListener("click", () => {
+  addButton.addEventListener("click", () => {
     stage = 3;
+    render();
+  });
+
+  drawButton.addEventListener("click", () => {
+    stage = 4;
     render();
   });
 

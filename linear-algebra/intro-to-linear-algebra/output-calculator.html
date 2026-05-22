@@ -45,7 +45,7 @@
   }
 
   .calculator {
-    max-width: 820px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 1rem;
     border: 1px solid var(--line);
@@ -53,9 +53,16 @@
     background: var(--card);
   }
 
+  .calculator-layout {
+    display: grid;
+    grid-template-columns: minmax(18rem, 1fr) minmax(18rem, 0.9fr);
+    gap: 1rem;
+    align-items: center;
+  }
+
   .system {
-    margin: 0 0 0.85rem;
-    font-size: 1.28rem;
+    margin: 0;
+    font-size: 1.34rem;
     line-height: 1.45;
     text-align: center;
   }
@@ -64,7 +71,6 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
-    margin-bottom: 0.9rem;
   }
 
   label {
@@ -100,114 +106,48 @@
     border-color: var(--blue);
   }
 
-  .rows {
-    display: grid;
-    gap: 0.65rem;
-  }
-
-  .row {
-    padding: 0.8rem 0.9rem;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
-  }
-
-  .row-title {
-    display: block;
-    margin-bottom: 0.35rem;
-    color: var(--muted);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .math-line {
-    color: var(--ink);
-    font-size: 1.12rem;
-    line-height: 1.5;
-  }
-
-  .blue {
-    color: var(--blue);
-    font-weight: 700;
-  }
-
-  .orange {
-    color: var(--orange);
-    font-weight: 700;
-  }
-
-  .result {
-    color: var(--green);
-    font-weight: 700;
-  }
-
-  .summary {
-    margin: 0.75rem 0 0;
-    padding: 0.72rem 0.85rem;
-    border-radius: 8px;
-    background: var(--soft);
-    font-size: 1.05rem;
-    text-align: center;
-  }
-
-  @media (max-width: 620px) {
+  @media (max-width: 700px) {
     body {
       padding: 0.7rem;
     }
 
-    .controls {
+    .calculator-layout {
       grid-template-columns: 1fr;
     }
 
-    .math-line {
-      font-size: 0.98rem;
+    .controls {
+      grid-template-columns: 1fr;
     }
   }
 </style>
 </head>
 <body>
 <div class="calculator" role="region" aria-label="Linear system output calculator">
-  <p class="system">$$\begin{cases}4x - 2y = \ ?\\3x + 5y = \ ?\end{cases}$$</p>
+  <div class="calculator-layout">
+    <p class="system" id="systemDisplay">$$\begin{cases}4x - 2y = \ ?\\3x + 5y = \ ?\end{cases}$$</p>
 
-  <div class="controls">
-    <label>
-      x
-      <input id="xInput" type="number" step="1" value="7">
-    </label>
-    <label>
-      y
-      <input id="yInput" type="number" step="1" value="6">
-    </label>
-  </div>
-
-  <div class="rows">
-    <div class="row">
-      <span class="row-title">First row</span>
-      <div class="math-line" id="rowOne"></div>
-    </div>
-    <div class="row">
-      <span class="row-title">Second row</span>
-      <div class="math-line" id="rowTwo"></div>
+    <div class="controls">
+      <label>
+        x
+        <input id="xInput" type="number" step="1" placeholder="x">
+      </label>
+      <label>
+        y
+        <input id="yInput" type="number" step="1" placeholder="y">
+      </label>
     </div>
   </div>
-
-  <p class="summary" id="summary"></p>
 </div>
 
 <script>
 (function () {
   const xInput = document.getElementById("xInput");
   const yInput = document.getElementById("yInput");
-  const rowOne = document.getElementById("rowOne");
-  const rowTwo = document.getElementById("rowTwo");
-  const summary = document.getElementById("summary");
+  const systemDisplay = document.getElementById("systemDisplay");
 
   function read(input) {
     const value = Number(input.value);
-    return Number.isFinite(value) ? value : 0;
+    return input.value.trim() !== "" && Number.isFinite(value) ? value : null;
   }
 
   function fmt(value) {
@@ -218,15 +158,17 @@
   function render() {
     const x = read(xInput);
     const y = read(yInput);
-    const c1 = 4 * x - 2 * y;
-    const c2 = 3 * x + 5 * y;
 
-    rowOne.innerHTML = `<span class="blue">4(${fmt(x)})</span> - <span class="orange">2(${fmt(y)})</span> = ${fmt(4 * x)} - ${fmt(2 * y)} = <span class="result">${fmt(c1)}</span>`;
-    rowTwo.innerHTML = `<span class="blue">3(${fmt(x)})</span> + <span class="orange">5(${fmt(y)})</span> = ${fmt(3 * x)} + ${fmt(5 * y)} = <span class="result">${fmt(c2)}</span>`;
-    summary.innerHTML = `So the input $(x,y) = (${fmt(x)}, ${fmt(y)})$ produces $(c_{1}, c_{2}) = <span class="result">(${fmt(c1)}, ${fmt(c2)})</span>.`;
+    if (x === null || y === null) {
+      systemDisplay.innerHTML = "$$\\begin{cases}4x - 2y = \\ ?\\\\3x + 5y = \\ ?\\end{cases}$$";
+    } else {
+      const c1 = 4 * x - 2 * y;
+      const c2 = 3 * x + 5 * y;
+      systemDisplay.innerHTML = `$$\\begin{cases}4(${fmt(x)}) - 2(${fmt(y)}) = ${fmt(c1)}\\\\3(${fmt(x)}) + 5(${fmt(y)}) = ${fmt(c2)}\\end{cases}$$`;
+    }
 
     if (window.MathJax?.typesetPromise) {
-      window.MathJax.typesetPromise([summary]);
+      window.MathJax.typesetPromise([systemDisplay]);
     }
   }
 

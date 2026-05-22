@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Transformations — A Visual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --line-faint: rgba(214, 196, 168, 0.07);
+    --line-grid: rgba(214, 196, 168, 0.13);
+    --line-axis-original: rgba(214, 196, 168, 0.22);
+    --line-axis-transformed: rgba(238, 224, 200, 0.55);
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --ihat: #e8a13b;
+    --ihat-glow: rgba(232, 161, 59, 0.25);
+    --jhat: #6dd3c4;
+    --jhat-glow: rgba(109, 211, 196, 0.25);
+    --accent: #d4b888;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+    background-image:
+      radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(109, 211, 196, 0.03), transparent 50%);
+  }
+
+  .widget {
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .widget::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+
+  .header {
+    padding: 1.75rem 2rem 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .header-left .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.35rem;
+  }
+
+  .header-left h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.85rem;
+    letter-spacing: -0.01em;
+    font-variation-settings: "opsz" 144;
+    color: var(--text);
+  }
+
+  .header-left h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    letter-spacing: 0.05em;
+    text-align: right;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 0;
+  }
+
+  @media (max-width: 760px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { border-left: none !important; border-top: 1px solid var(--rule); }
+  }
+
+  .canvas-wrap {
+    padding: 1.5rem;
+    position: relative;
+    aspect-ratio: 1;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 2px;
+  }
+
+  .sidebar {
+    border-left: 1px solid var(--rule);
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background: var(--bg-card);
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 0.85rem;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tbtn {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.7rem 0.85rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+  }
+
+  .tbtn:hover {
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.06);
+  }
+
+  .tbtn.active {
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.1);
+    color: var(--text);
+  }
+
+  .tbtn.active::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--accent);
+  }
+
+  .tbtn .name {
+    font-style: italic;
+    letter-spacing: 0.01em;
+  }
+
+  .tbtn .mini-matrix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    line-height: 1;
+    border-left: 1px solid var(--rule);
+    padding-left: 0.55rem;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 2px 6px;
+    text-align: right;
+  }
+
+  .tbtn.active .mini-matrix { color: var(--text); }
+
+  .matrix-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+
+  .bracket {
+    font-size: 3.2rem;
+    color: var(--text-dim);
+    font-weight: 200;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 0.9;
+  }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 0.9rem;
+    text-align: right;
+    min-width: 110px;
+  }
+
+  .matrix-grid span {
+    font-variant-numeric: tabular-nums;
+    transition: color 0.2s;
+  }
+
+  .matrix-grid .col-1 { color: var(--ihat); }
+  .matrix-grid .col-2 { color: var(--jhat); }
+
+  .basis-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+
+  .basis-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--text-dim);
+  }
+
+  .basis-row .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .basis-row .dot.i { background: var(--ihat); box-shadow: 0 0 8px var(--ihat-glow); }
+  .basis-row .dot.j { background: var(--jhat); box-shadow: 0 0 8px var(--jhat-glow); }
+
+  .basis-row .label { color: var(--text); }
+  .basis-row .arrow { color: var(--text-faint); }
+  .basis-row .coord { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .determinant {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    padding: 0.65rem 0.75rem;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .determinant .val { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .determinant.flipped .val { color: #e57373; }
+
+  .footer {
+    padding: 0.85rem 2rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .footer kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.7rem;
+    background: rgba(212, 184, 136, 0.08);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1px 5px;
+    color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="header">
+    <div class="header-left">
+      <div class="eyebrow">Figure · Linear Transformations</div>
+      <h1>Watching <em>space itself</em> deform</h1>
+    </div>
+    <div class="header-meta">
+      basis vectors<br>i-hat &amp; j-hat
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="900" height="900"></canvas>
+    </div>
+
+    <aside class="sidebar">
+      <div>
+        <div class="section-label">Transformation</div>
+        <div class="buttons" id="buttons">
+          <button class="tbtn" data-key="identity">
+            <span class="name">Identity</span>
+            <span class="mini-matrix"><span>1</span><span>0</span><span>0</span><span>1</span></span>
+          </button>
+          <button class="tbtn" data-key="scale">
+            <span class="name">Scaling</span>
+            <span class="mini-matrix"><span>2</span><span>0</span><span>0</span><span>1</span></span>
+          </button>
+          <button class="tbtn" data-key="shear">
+            <span class="name">Shear</span>
+            <span class="mini-matrix"><span>1</span><span>1</span><span>0</span><span>1</span></span>
+          </button>
+          <button class="tbtn" data-key="reflect">
+            <span class="name">Reflection</span>
+            <span class="mini-matrix"><span>1</span><span>0</span><span>0</span><span>−1</span></span>
+          </button>
+          <button class="tbtn" data-key="rotate">
+            <span class="name">Rotation</span>
+            <span class="mini-matrix"><span>0</span><span>−1</span><span>1</span><span>0</span></span>
+          </button>
+          <button class="tbtn" data-key="general">
+            <span class="name">General</span>
+            <span class="mini-matrix"><span>4</span><span>−2</span><span>3</span><span>5</span></span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Current Matrix</div>
+        <div class="matrix-display">
+          <span class="bracket">[</span>
+          <div class="matrix-grid" id="matrix-grid">
+            <span class="col-1" id="m00">1</span><span class="col-2" id="m01">0</span>
+            <span class="col-1" id="m10">0</span><span class="col-2" id="m11">1</span>
+          </div>
+          <span class="bracket">]</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Where the Basis Lands</div>
+        <div class="basis-info">
+          <div class="basis-row">
+            <span class="dot i"></span>
+            <span class="label">i-hat</span>
+            <span class="arrow">→</span>
+            <span class="coord" id="ihat-coord">(1, 0)</span>
+          </div>
+          <div class="basis-row">
+            <span class="dot j"></span>
+            <span class="label">j-hat</span>
+            <span class="arrow">→</span>
+            <span class="coord" id="jhat-coord">(0, 1)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="determinant" id="det-box">
+        <span>det</span>
+        <span class="val" id="det-val">1.00</span>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">
+    Each cell of the grid is sheared, scaled, and rotated by the matrix &mdash; press <kbd>R</kbd> to reset.
+  </div>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Handle high-DPI displays
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cssW = rect.width;
+    cssH = rect.height;
+    draw();
+  }
+
+  let cssW = 600, cssH = 600;
+
+  const transformations = {
+    identity: [[1, 0], [0, 1]],
+    scale:    [[2, 0], [0, 1]],
+    shear:    [[1, 1], [0, 1]],
+    reflect:  [[1, 0], [0, -1]],
+    rotate:   [[0, -1], [1, 0]],
+    general:  [[4, -2], [3, 5]]
+  };
+
+  // Per-transformation view scale (so general doesn't shoot off-screen)
+  const viewScales = {
+    identity: 1,
+    scale:    1,
+    shear:    1,
+    reflect:  1,
+    rotate:   1,
+    general:  0.5
+  };
+
+  let currentMatrix = [[1, 0], [0, 1]];
+  let startMatrix   = [[1, 0], [0, 1]];
+  let targetMatrix  = [[1, 0], [0, 1]];
+
+  let currentZoom = 1;
+  let startZoom   = 1;
+  let targetZoom  = 1;
+
+  let activeKey = 'identity';
+  let animStart = null;
+  const DURATION = 900;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+  function applyMat(m, v) {
+    return [m[0][0]*v[0] + m[0][1]*v[1], m[1][0]*v[0] + m[1][1]*v[1]];
+  }
+
+  function mathToPx(x, y) {
+    const cx = cssW / 2;
+    const cy = cssH / 2;
+    const baseScale = Math.min(cssW, cssH) / 14;  // base pixels per unit
+    const s = baseScale * currentZoom;
+    return [cx + x * s, cy - y * s];
+  }
+
+  function drawGrid() {
+    const range = 14;
+
+    // 1. Original faint axes (where the grid was)
+    ctx.strokeStyle = 'rgba(214, 196, 168, 0.08)';
+    ctx.lineWidth = 1;
+    const cx = cssW / 2, cy = cssH / 2;
+    ctx.beginPath();
+    ctx.moveTo(0, cy); ctx.lineTo(cssW, cy);
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, cssH);
+    ctx.stroke();
+
+    // 2. Transformed grid lines
+    ctx.strokeStyle = 'rgba(214, 196, 168, 0.13)';
+    ctx.lineWidth = 1;
+
+    // Vertical lines (originally x = k)
+    for (let k = -range; k <= range; k++) {
+      if (k === 0) continue;
+      const p1 = applyMat(currentMatrix, [k, -range]);
+      const p2 = applyMat(currentMatrix, [k,  range]);
+      const [x1, y1] = mathToPx(p1[0], p1[1]);
+      const [x2, y2] = mathToPx(p2[0], p2[1]);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+    // Horizontal lines (originally y = k)
+    for (let k = -range; k <= range; k++) {
+      if (k === 0) continue;
+      const p1 = applyMat(currentMatrix, [-range, k]);
+      const p2 = applyMat(currentMatrix, [ range, k]);
+      const [x1, y1] = mathToPx(p1[0], p1[1]);
+      const [x2, y2] = mathToPx(p2[0], p2[1]);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    // 3. Transformed axes (more visible: image of original axes)
+    ctx.strokeStyle = 'rgba(238, 224, 200, 0.45)';
+    ctx.lineWidth = 1.5;
+    // Image of x-axis: line through origin in direction i-hat (column 1)
+    const xa1 = applyMat(currentMatrix, [-range, 0]);
+    const xa2 = applyMat(currentMatrix, [ range, 0]);
+    const [xx1, xy1] = mathToPx(xa1[0], xa1[1]);
+    const [xx2, xy2] = mathToPx(xa2[0], xa2[1]);
+    ctx.beginPath();
+    ctx.moveTo(xx1, xy1); ctx.lineTo(xx2, xy2);
+    ctx.stroke();
+    // Image of y-axis: line through origin in direction j-hat (column 2)
+    const ya1 = applyMat(currentMatrix, [0, -range]);
+    const ya2 = applyMat(currentMatrix, [0,  range]);
+    const [yx1, yy1] = mathToPx(ya1[0], ya1[1]);
+    const [yx2, yy2] = mathToPx(ya2[0], ya2[1]);
+    ctx.beginPath();
+    ctx.moveTo(yx1, yy1); ctx.lineTo(yx2, yy2);
+    ctx.stroke();
+  }
+
+  function drawVector(end, color, glowColor, label) {
+    const [ox, oy] = mathToPx(0, 0);
+    const [px, py] = mathToPx(end[0], end[1]);
+
+    // Subtle glow
+    ctx.save();
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 12;
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(px, py);
+    ctx.stroke();
+
+    // Arrowhead
+    const dx = px - ox, dy = py - oy;
+    const ang = Math.atan2(dy, dx);
+    const size = 12;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px - size * Math.cos(ang - 0.45), py - size * Math.sin(ang - 0.45));
+    ctx.lineTo(px - size * Math.cos(ang + 0.45), py - size * Math.sin(ang + 0.45));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Label
+    ctx.fillStyle = color;
+    ctx.font = 'italic 600 18px Fraunces, serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    const labelOffX = 10 * Math.cos(ang);
+    const labelOffY = 10 * Math.sin(ang);
+    ctx.fillText(label, px + labelOffX + 4, py + labelOffY + 2);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, cssW, cssH);
+    drawGrid();
+    drawVector(applyMat(currentMatrix, [1, 0]), '#e8a13b', 'rgba(232,161,59,0.5)', 'i');
+    drawVector(applyMat(currentMatrix, [0, 1]), '#6dd3c4', 'rgba(109,211,196,0.5)', 'j');
+  }
+
+  function formatNum(n) {
+    const r = Math.round(n * 100) / 100;
+    if (Math.abs(r) < 0.005) return '0';
+    // Avoid -0
+    const s = (r === 0 ? 0 : r).toFixed(2).replace(/\.?0+$/, '');
+    return s.replace('-', '−');
+  }
+
+  function updateInfo() {
+    const m = currentMatrix;
+    document.getElementById('m00').textContent = formatNum(m[0][0]);
+    document.getElementById('m01').textContent = formatNum(m[0][1]);
+    document.getElementById('m10').textContent = formatNum(m[1][0]);
+    document.getElementById('m11').textContent = formatNum(m[1][1]);
+
+    document.getElementById('ihat-coord').textContent =
+      `(${formatNum(m[0][0])}, ${formatNum(m[1][0])})`;
+    document.getElementById('jhat-coord').textContent =
+      `(${formatNum(m[0][1])}, ${formatNum(m[1][1])})`;
+
+    const det = m[0][0] * m[1][1] - m[0][1] * m[1][0];
+    const detEl = document.getElementById('det-val');
+    detEl.textContent = formatNum(det);
+    const box = document.getElementById('det-box');
+    if (det < 0) box.classList.add('flipped'); else box.classList.remove('flipped');
+  }
+
+  function animate(ts) {
+    if (animStart === null) animStart = ts;
+    const t = Math.min((ts - animStart) / DURATION, 1);
+    const e = ease(t);
+
+    for (let i = 0; i < 2; i++)
+      for (let j = 0; j < 2; j++)
+        currentMatrix[i][j] = lerp(startMatrix[i][j], targetMatrix[i][j], e);
+
+    currentZoom = lerp(startZoom, targetZoom, e);
+
+    draw();
+    updateInfo();
+
+    if (t < 1) requestAnimationFrame(animate);
+  }
+
+  function transformTo(key) {
+    activeKey = key;
+    // Update button states
+    document.querySelectorAll('.tbtn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.key === key);
+    });
+
+    startMatrix = currentMatrix.map(r => r.slice());
+    targetMatrix = transformations[key].map(r => r.slice());
+    startZoom = currentZoom;
+    targetZoom = viewScales[key];
+    animStart = null;
+    requestAnimationFrame(animate);
+  }
+
+  // Wire up buttons
+  document.querySelectorAll('.tbtn').forEach(btn => {
+    btn.addEventListener('click', () => transformTo(btn.dataset.key));
+  });
+
+  // Keyboard shortcut: R to reset
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R') transformTo('identity');
+  });
+
+  // Initial setup
+  document.querySelector('[data-key="identity"]').classList.add('active');
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  updateInfo();
+})();
+</script>
+
+</body>
+</html>
