@@ -1095,6 +1095,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 980px;
 }
 
+.intro-linear-algebra-page .span-widget {
+  height: 940px;
+}
+
 .intro-linear-algebra-page a {
   color: var(--intro-accent);
 }

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Span Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --line: rgba(214, 196, 168, 0.14);
+    --grid: rgba(214, 196, 168, 0.13);
+    --text: #ece2d1;
+    --dim: #a89c87;
+    --faint: #6f6557;
+    --accent: #d4b888;
+    --v1: #e8a13b;
+    --v2: #6dd3c4;
+    --v3: #86d48f;
+    --span: rgba(201, 164, 94, 0.18);
+    --result: #e57994;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    background: transparent;
+    color: var(--text);
+    font-family: "EB Garamond", Georgia, serif;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .widget {
+    max-width: 1040px;
+    margin: 0 auto;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background:
+      radial-gradient(ellipse at top left, rgba(212, 184, 136, 0.05), transparent 55%),
+      var(--bg-elev);
+    overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-end;
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    color: var(--text);
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.55rem;
+    font-weight: 400;
+  }
+
+  .header-meta {
+    color: var(--faint);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-align: right;
+    text-transform: uppercase;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 285px;
+  }
+
+  .canvas-wrap {
+    padding: 1.2rem;
+    background: rgba(0, 0, 0, 0.12);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 10 / 8;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.16);
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem;
+    border-left: 1px solid var(--line);
+    background: var(--bg-card);
+  }
+
+  .section-label {
+    margin-bottom: 0.45rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--faint);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.35rem;
+  }
+
+  .vector-count {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  button {
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--dim);
+    font-family: "EB Garamond", Georgia, serif;
+    font-size: 0.95rem;
+    padding: 0.5rem 0.55rem;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  button:hover,
+  button.active {
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.1);
+    color: var(--text);
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.38;
+  }
+
+  .control {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .control-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.6rem;
+    color: var(--dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+  }
+
+  .control-head strong {
+    font-weight: 500;
+  }
+
+  .value {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .v1 {
+    color: var(--v1);
+  }
+
+  .v2 {
+    color: var(--v2);
+  }
+
+  .v3 {
+    color: var(--v3);
+  }
+
+  .info {
+    margin-top: auto;
+    padding: 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.18);
+  }
+
+  .statement {
+    color: var(--text);
+    font-size: 1.05rem;
+    font-style: italic;
+  }
+
+  .statement em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .combo {
+    margin-top: 0.55rem;
+    color: var(--dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 760px) {
+    .main {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="widget" role="region" aria-label="Interactive span widget">
+  <div class="header">
+    <h1>Span</h1>
+    <div class="header-meta" id="spaceLabel">2D output space</div>
+  </div>
+
+  <div class="main">
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="1000" height="800" aria-label="Span visualization"></canvas>
+    </div>
+
+    <aside class="sidebar">
+      <div>
+        <div class="section-label">Space</div>
+        <div class="segmented">
+          <button type="button" class="active" data-mode="2d">2D</button>
+          <button type="button" data-mode="3d">3D</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Vectors</div>
+        <div class="segmented vector-count">
+          <button type="button" class="active" data-count="1">1</button>
+          <button type="button" data-count="2">2</button>
+          <button type="button" data-count="3" id="count3" disabled>3</button>
+        </div>
+      </div>
+
+      <div class="control" id="c1Control">
+        <div class="control-head">
+          <strong class="v1">a · e1</strong>
+          <span class="value" id="c1Val">1</span>
+        </div>
+        <input id="c1" type="range" min="-5" max="5" step="0.1" value="1">
+      </div>
+
+      <div class="control" id="c2Control">
+        <div class="control-head">
+          <strong class="v2">b · e2</strong>
+          <span class="value" id="c2Val">1</span>
+        </div>
+        <input id="c2" type="range" min="-5" max="5" step="0.1" value="1">
+      </div>
+
+      <div class="control" id="c3Control">
+        <div class="control-head">
+          <strong class="v3">c · e3</strong>
+          <span class="value" id="c3Val">1</span>
+        </div>
+        <input id="c3" type="range" min="-5" max="5" step="0.1" value="1">
+      </div>
+
+      <div class="info" aria-live="polite">
+        <div class="section-label">Reachable region</div>
+        <div class="statement" id="statement"></div>
+        <div class="combo" id="combo"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  const state = { mode: "2d", count: 1, c1: 1, c2: 1, c3: 1 };
+  const colors = { v1: "#e8a13b", v2: "#6dd3c4", v3: "#86d48f", result: "#e57994" };
+
+  const els = {
+    spaceLabel: document.getElementById("spaceLabel"),
+    count3: document.getElementById("count3"),
+    c1: document.getElementById("c1"),
+    c2: document.getElementById("c2"),
+    c3: document.getElementById("c3"),
+    c1Val: document.getElementById("c1Val"),
+    c2Val: document.getElementById("c2Val"),
+    c3Val: document.getElementById("c3Val"),
+    c2Control: document.getElementById("c2Control"),
+    c3Control: document.getElementById("c3Control"),
+    statement: document.getElementById("statement"),
+    combo: document.getElementById("combo")
+  };
+
+  function fmt(value) {
+    if (Math.abs(value) < 1e-10) value = 0;
+    return Number.isInteger(value) ? String(value) : String(Math.round(value * 10) / 10);
+  }
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function point2(x, y) {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    const sx = w / 10;
+    const sy = h / 8;
+    return [w / 2 + x * sx, h / 2 - y * sy];
+  }
+
+  function iso(x, y, z) {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    const s = Math.min(w, h) / 12;
+    return [
+      w / 2 + (x - y) * s * 0.78,
+      h / 2 + (x + y) * s * 0.38 - z * s
+    ];
+  }
+
+  function line(a, b, color, width) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(a[0], a[1]);
+    ctx.lineTo(b[0], b[1]);
+    ctx.stroke();
+  }
+
+  function arrow(a, b, color, width, label) {
+    line(a, b, color, width);
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy);
+    if (len > 4) {
+      const angle = Math.atan2(dy, dx);
+      const size = 10;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(b[0], b[1]);
+      ctx.lineTo(b[0] - size * Math.cos(angle - 0.45), b[1] - size * Math.sin(angle - 0.45));
+      ctx.lineTo(b[0] - size * Math.cos(angle + 0.45), b[1] - size * Math.sin(angle + 0.45));
+      ctx.closePath();
+      ctx.fill();
+    }
+    if (label) {
+      ctx.fillStyle = color;
+      ctx.font = "600 14px JetBrains Mono, monospace";
+      ctx.fillText(label, b[0] + 9, b[1] - 8);
+    }
+  }
+
+  function drawGrid2D() {
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    ctx.strokeStyle = "rgba(214, 196, 168, 0.13)";
+    ctx.lineWidth = 1;
+    for (let x = -5; x <= 5; x++) line(point2(x, -4), point2(x, 4), "rgba(214, 196, 168, 0.12)", 1);
+    for (let y = -4; y <= 4; y++) line(point2(-5, y), point2(5, y), "rgba(214, 196, 168, 0.12)", 1);
+    line(point2(-5, 0), point2(5, 0), "rgba(238, 224, 200, 0.5)", 1.5);
+    line(point2(0, -4), point2(0, 4), "rgba(238, 224, 200, 0.5)", 1.5);
+  }
+
+  function draw2D() {
+    drawGrid2D();
+    const o = point2(0, 0);
+    const p1 = point2(state.c1, 0);
+    const p2 = point2(0, state.c2);
+    const sum = point2(state.c1, state.count >= 2 ? state.c2 : 0);
+
+    ctx.save();
+    if (state.count === 1) {
+      line(point2(-5, 0), point2(5, 0), "rgba(201, 164, 94, 0.35)", 10);
+    } else {
+      ctx.fillStyle = "rgba(201, 164, 94, 0.16)";
+      ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    }
+    ctx.restore();
+
+    arrow(o, p1, colors.v1, 3, "e1");
+    if (state.count >= 2) arrow(o, p2, colors.v2, 3, "e2");
+    arrow(o, sum, colors.result, 3.5, "sum");
+  }
+
+  function draw3DGrid() {
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    const o = iso(0, 0, 0);
+    for (let i = -3; i <= 3; i++) {
+      line(iso(i, -3, 0), iso(i, 3, 0), "rgba(214, 196, 168, 0.12)", 1);
+      line(iso(-3, i, 0), iso(3, i, 0), "rgba(214, 196, 168, 0.12)", 1);
+    }
+    arrow(o, iso(3.2, 0, 0), "rgba(238, 224, 200, 0.45)", 1.5, "x");
+    arrow(o, iso(0, 3.2, 0), "rgba(238, 224, 200, 0.45)", 1.5, "y");
+    arrow(o, iso(0, 0, 3.2), "rgba(238, 224, 200, 0.45)", 1.5, "z");
+  }
+
+  function draw3DSpan() {
+    if (state.count === 1) {
+      line(iso(-3, 0, 0), iso(3, 0, 0), "rgba(201, 164, 94, 0.38)", 10);
+      return;
+    }
+
+    if (state.count === 2) {
+      ctx.fillStyle = "rgba(201, 164, 94, 0.18)";
+      ctx.beginPath();
+      ctx.moveTo(...iso(-3, -3, 0));
+      ctx.lineTo(...iso(3, -3, 0));
+      ctx.lineTo(...iso(3, 3, 0));
+      ctx.lineTo(...iso(-3, 3, 0));
+      ctx.closePath();
+      ctx.fill();
+      return;
+    }
+
+    ctx.fillStyle = "rgba(201, 164, 94, 0.12)";
+    const faces = [
+      [iso(-2,-2,0), iso(2,-2,0), iso(2,2,0), iso(-2,2,0)],
+      [iso(-2,-2,0), iso(2,-2,0), iso(2,-2,3), iso(-2,-2,3)],
+      [iso(2,-2,0), iso(2,2,0), iso(2,2,3), iso(2,-2,3)]
+    ];
+    faces.forEach(face => {
+      ctx.beginPath();
+      ctx.moveTo(face[0][0], face[0][1]);
+      face.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+      ctx.closePath();
+      ctx.fill();
+    });
+  }
+
+  function draw3D() {
+    draw3DGrid();
+    draw3DSpan();
+    const o = iso(0, 0, 0);
+    const x = state.c1;
+    const y = state.count >= 2 ? state.c2 : 0;
+    const z = state.count >= 3 ? state.c3 : 0;
+    arrow(o, iso(x, 0, 0), colors.v1, 3, "e1");
+    if (state.count >= 2) arrow(o, iso(0, y, 0), colors.v2, 3, "e2");
+    if (state.count >= 3) arrow(o, iso(0, 0, z), colors.v3, 3, "e3");
+    arrow(o, iso(x, y, z), colors.result, 3.5, "sum");
+  }
+
+  function updateControls() {
+    els.spaceLabel.textContent = state.mode === "2d" ? "2D output space" : "3D output space";
+    els.count3.disabled = state.mode === "2d";
+    if (state.mode === "2d" && state.count > 2) state.count = 2;
+    els.c2Control.style.display = state.count >= 2 ? "grid" : "none";
+    els.c3Control.style.display = state.mode === "3d" && state.count >= 3 ? "grid" : "none";
+    els.c1Val.textContent = fmt(state.c1);
+    els.c2Val.textContent = fmt(state.c2);
+    els.c3Val.textContent = fmt(state.c3);
+    document.querySelectorAll("[data-mode]").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === state.mode));
+    document.querySelectorAll("[data-count]").forEach(btn => btn.classList.toggle("active", Number(btn.dataset.count) === state.count));
+
+    if (state.mode === "2d") {
+      els.statement.innerHTML = state.count === 1 ? "a <em>line</em> in the 2D plane" : "the entire <em>2D plane</em>";
+      els.combo.textContent = state.count === 1
+        ? `${fmt(state.c1)}e1 = (${fmt(state.c1)}, 0)`
+        : `${fmt(state.c1)}e1 + ${fmt(state.c2)}e2 = (${fmt(state.c1)}, ${fmt(state.c2)})`;
+    } else {
+      const statements = {
+        1: "a <em>line</em> in 3D space",
+        2: "a <em>plane</em> inside 3D space",
+        3: "the whole <em>3D space</em>"
+      };
+      els.statement.innerHTML = statements[state.count];
+      els.combo.textContent = `${fmt(state.c1)}e1 + ${state.count >= 2 ? fmt(state.c2) : 0}e2 + ${state.count >= 3 ? fmt(state.c3) : 0}e3 = (${fmt(state.c1)}, ${state.count >= 2 ? fmt(state.c2) : 0}, ${state.count >= 3 ? fmt(state.c3) : 0})`;
+    }
+  }
+
+  function draw() {
+    updateControls();
+    if (state.mode === "2d") draw2D();
+    else draw3D();
+  }
+
+  document.querySelectorAll("[data-mode]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.mode = btn.dataset.mode;
+      draw();
+    });
+  });
+
+  document.querySelectorAll("[data-count]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.disabled) return;
+      state.count = Number(btn.dataset.count);
+      draw();
+    });
+  });
+
+  ["c1", "c2", "c3"].forEach(id => {
+    els[id].addEventListener("input", () => {
+      state[id] = Number(els[id].value);
+      draw();
+    });
+  });
+
+  window.addEventListener("resize", resize);
+  resize();
+})();
+</script>
+</body>
+</html>

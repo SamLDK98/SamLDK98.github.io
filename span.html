@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Span | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Span</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Span refers to the regions of space reachable by linear combinations (scaled and added) of basis vectors.</p>
+
+        <p>In other words, what outputs can our system reach?</p>
+
+        <p>Span is determined by how many independent vectors we have (i.e. vectors pointing in different directions), and limited by the dimensions of the output space.</p>
+
+        <iframe
+          class="essay-widget span-widget"
+          src="linear-algebra/span/span-widget.html"
+          title="Interactive widget exploring span using linear combinations of vectors"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>We can get a sense of our potential span when looking at a matrix:</p>
+
+        <p class="display-equation">$$
+A=
+\begin{bmatrix}
+1 & 1\\
+2 & -1\\
+1 & 2
+\end{bmatrix}
+$$</p>
+
+        <ul>
+          <li>The number of columns tells us we have 2 input vectors.</li>
+          <li>The number of rows tells us we have three equations (3-dimensional output vectors).</li>
+        </ul>
+
+        <p>So the columns can at most span a 2-dimensional region inside a 3-dimensional output space, if they are independent. We call such a system 'overdetermined'.</p>
+
+        <h3 class="subsection-title">Overdetermined systems</h3>
+
+        <ul>
+          <li>More equations than independent input vectors, i.e. more rows than columns.</li>
+          <li>The output space is of a higher dimension than what we can span with our input vectors.</li>
+          <li>For example, we might span a plane inside a 3D space.</li>
+          <li>Many potential target vectors are unreachable.</li>
+        </ul>
+
+        <h3 class="subsection-title">Underdetermined systems</h3>
+
+        <ul>
+          <li>More independent input vectors than equations, i.e. more columns than rows.</li>
+          <li>Now, infinitely many input vectors can produce the same output.</li>
+          <li>Often there are infinitely many solutions.</li>
+        </ul>
+
+        <h3 class="subsection-title">Square systems</h3>
+
+        <p>A square system has the same number of inputs and outputs.</p>
+
+        <p>If the basis directions are independent, the transformation can reach every point in the output space and be reversed uniquely.</p>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
