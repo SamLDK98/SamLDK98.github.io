@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Determinants | Linear Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Linear Algebra</p>
+      <h1 class="essay-title">Determinants</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>The historical development of determinants is outlined in these sections on Leibniz and Cramer; however, they are not necessary to understand the contemporary geometric understanding of determinants, so feel free to skip ahead.</p>
+
+        <details class="notation-details">
+          <summary>Leibniz's and Cramer's observations</summary>
+
+          <p>To eliminate a variable in a system we need the coefficients to match across equations.</p>
+
+          <p>This can be ensured by multiplying the coefficients of the targeted variable by one another, e.g. $3 \cdot 5 = 5 \cdot 3$.</p>
+
+          <p class="display-equation">$$
+\begin{cases} 2x + 3y = 7 \\ 4x + 5y = 1 \end{cases}
+\ \ \ \ \ \rightarrow \ \ \ \ \
+\begin{cases} 5(2x + 3y = 7) \\ 3(4x + 5y = 1) \end{cases}
+\ \ \ \ \ \rightarrow \ \ \ \ \
+\begin{cases} 10x + \boxed{15y} = 35 \\ 12x + \boxed{15y} = 3 \end{cases}
+$$</p>
+
+          <p>Algebraically:</p>
+
+          <p class="display-equation">$$\begin{cases} ax+by=e\\ cx+dy=f \end{cases}  \ \ \ \ \to  \ \ \ \  \begin{cases} d(ax+by=e)\\ b(cx+dy=f) \end{cases}  \ \ \ \ \to  \ \ \ \   \begin{cases} adx+bdy=ed\\ bcx+bdy=bf \end{cases}$$</p>
+
+          <p>To eliminate the variable, subtract:</p>
+
+          <p class="display-equation">$$(adx+bdy)-(bcx+bdy)=ed-bf$$</p>
+
+          <p>We are left with:</p>
+
+          <p class="display-equation">$$(adx)-(bcx)=ed-bf$$</p>
+
+          <p>The $x$ can be factored out:</p>
+
+          <p class="display-equation">$$x(ad-bc)=ed-bf$$</p>
+
+          <p>And isolated:</p>
+
+          <p class="display-equation">$$x=\frac{ed-bf}{ad-bc}$$</p>
+
+          <p>We could do the same for $y$ and we would be left with:</p>
+
+          <p class="display-equation">$$y = \frac{af - ec}{ad - bc}$$</p>
+
+          <p><strong>Leibniz observation</strong></p>
+
+          <ul>
+            <li>Regardless of the particular outputs of an equation, the coefficients can tell you if the system is uniquely solvable. That is, if $ad-bc=0$, elimination removes not only the target variable, but also the remaining variable coefficient, preventing the unique isolation of a variable.</li>
+          </ul>
+
+          <p>This allowed mathematicians to quickly identify when a system could not be uniquely solved.</p>
+
+          <p><strong>Cramer's observation</strong></p>
+
+          <ul>
+            <li>The isolated-$x$ numerator replaces the $x$-coefficients ($a,c$) with the outputs $(e, f)$.</li>
+            <li>While the isolated-$y$ numerator replaces the $y$-coefficients $(b,d)$ with the outputs $(e,f)$.</li>
+          </ul>
+
+          <p>Again, this helped speed up the process of solving systems, and revealed a little more structure.</p>
+        </details>
+
+        <h3 class="subsection-title">Geometric interpretation of determinants</h3>
+
+        <p>Determinants were originally viewed as just clever algebraic tricks for quickly determining the solvability of a system.</p>
+
+        <p>But in the 19th century mathematicians realized they exactly measure how transformations reshape space itself.</p>
+
+        <p>The unit square is simply the square formed by the standard basis vectors:</p>
+
+        <p class="display-equation">$$\begin{bmatrix} 1 \\ 0 \end{bmatrix} \qquad \begin{bmatrix} 0 \\ 1 \end{bmatrix}$$</p>
+
+        <p>Now consider the transformation:</p>
+
+        <p class="display-equation">$$A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$$</p>
+
+        <p>The transformation moves the basis vectors to new coordinates:</p>
+
+        <p class="display-equation">$$\begin{bmatrix} 1 \\ 0 \end{bmatrix} \mapsto \begin{bmatrix} a \\ c \end{bmatrix} \qquad \begin{bmatrix} 0 \\ 1 \end{bmatrix} \mapsto \begin{bmatrix} b \\ d \end{bmatrix}$$</p>
+
+        <p>As these basis vectors move, the unit square itself transforms with them. The square becomes a parallelogram whose sides are formed by the transformed basis vectors.</p>
+
+        <p>A parallelogram has four sides whose opposite sides are parallel, i.e. a square, rectangle and more general slanted forms.</p>
+
+        <p>The determinant exactly measures the <strong>signed area scaling factor</strong> of this transformed unit square.</p>
+
+        <p>For example:</p>
+
+        <ul>
+          <li>If $ad - bc = 2$, the transformation doubles the area.</li>
+          <li>If $ad - bc = \frac{1}{2}$, the transformation halves the area.</li>
+          <li>If $ad - bc = 0$, the square collapses into a lower-dimensional shape (a line or a point) with zero area.</li>
+        </ul>
+
+        <p>In two dimensions, the determinant tells us how much a transformation scales area.</p>
+
+        <p>For example, imagine the matrix:</p>
+
+        <p class="display-equation">$$
+A=
+\begin{bmatrix}
+4 & -2\\
+3 & 5
+\end{bmatrix}
+$$</p>
+
+        <p>The columns of this matrix show where the basis vectors land after transformation:</p>
+
+        <p class="display-equation">$$
+\begin{bmatrix}
+1\\
+0
+\end{bmatrix}
+\mapsto
+\begin{bmatrix}
+4\\
+3
+\end{bmatrix}
+\qquad
+\begin{bmatrix}
+0\\
+1
+\end{bmatrix}
+\mapsto
+\begin{bmatrix}
+-2\\
+5
+\end{bmatrix}
+$$</p>
+
+        <p>For a $2\times2$ matrix:</p>
+
+        <p class="display-equation">$$
+\det
+\begin{bmatrix}
+a & b\\
+c & d
+\end{bmatrix}
+=
+ad-bc
+$$</p>
+
+        <p>So for our matrix:</p>
+
+        <p class="display-equation">$$
+\det(A)
+=
+(4)(5)-(-2)(3)
+=
+20+6
+=
+26
+$$</p>
+
+        <p>This means the transformation scales area by a factor of $26$.</p>
+
+        <p>Importantly, the determinant is not the area itself; it is the scaling factor relative to the original space.</p>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

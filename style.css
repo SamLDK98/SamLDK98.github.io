@@ -1023,6 +1023,26 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-weight: 400;
 }
 
+.intro-linear-algebra-page .notation-details {
+  margin: 1.4rem auto 2.2rem;
+  padding: 0.95rem 1.1rem 0.4rem;
+  border: 1px solid var(--intro-rule);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.intro-linear-algebra-page .notation-details summary {
+  cursor: pointer;
+  color: var(--intro-accent);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  list-style-position: outside;
+}
+
+.intro-linear-algebra-page .notation-details[open] summary {
+  margin-bottom: 1rem;
+}
+
 .intro-linear-algebra-page p,
 .intro-linear-algebra-page li {
   color: var(--intro-text);
