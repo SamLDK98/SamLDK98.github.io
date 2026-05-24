@@ -1024,6 +1024,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .intro-linear-algebra-page .notation-details {
+  max-width: 860px;
   margin: 1.4rem auto 2.2rem;
   padding: 0.95rem 1.1rem 0.4rem;
   border: 1px solid var(--intro-rule);
@@ -1041,6 +1042,35 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .intro-linear-algebra-page .notation-details[open] summary {
   margin-bottom: 1rem;
+}
+
+.intro-linear-algebra-page .inline-definition {
+  display: inline;
+  margin: 0;
+  padding: 0 0.12rem 0.08rem;
+  border: 0;
+  border-bottom: 1px solid var(--intro-accent);
+  background: transparent;
+  color: var(--intro-accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.intro-linear-algebra-page .inline-definition:hover,
+.intro-linear-algebra-page .inline-definition[aria-expanded="true"] {
+  color: var(--intro-text);
+  border-bottom-color: var(--intro-text);
+}
+
+.intro-linear-algebra-page .inline-definition-text {
+  max-width: 860px;
+  margin: -0.2rem auto 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--intro-rule);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--intro-dim);
+  font-style: italic;
 }
 
 .intro-linear-algebra-page p,
@@ -1117,6 +1147,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .intro-linear-algebra-page .span-widget {
   height: 940px;
+}
+
+.intro-linear-algebra-page .determinant-widget {
+  height: 720px;
 }
 
 .intro-linear-algebra-page a {

@@ -95,9 +95,9 @@ $$</p>
 
         <h3 class="subsection-title">Geometric interpretation of determinants</h3>
 
-        <p>Determinants were originally viewed as just clever algebraic tricks for quickly determining the solvability of a system.</p>
+        <p>Determinants were originally viewed as clever algebraic tools for quickly determining whether a system could be uniquely solved.</p>
 
-        <p>But in the 19th century mathematicians realized they exactly measure how transformations reshape space itself.</p>
+        <p>But in the 19th century, mathematicians realized that determinants also describe geometry: they equal the signed area scaling factor of a transformed unit square. That is, the factor by which the area increased or decreased, and whether the orientation was flipped, as indicated by the positive or negative sign.</p>
 
         <p>The unit square is simply the square formed by the standard basis vectors:</p>
 
@@ -111,25 +111,18 @@ $$</p>
 
         <p class="display-equation">$$\begin{bmatrix} 1 \\ 0 \end{bmatrix} \mapsto \begin{bmatrix} a \\ c \end{bmatrix} \qquad \begin{bmatrix} 0 \\ 1 \end{bmatrix} \mapsto \begin{bmatrix} b \\ d \end{bmatrix}$$</p>
 
-        <p>As these basis vectors move, the unit square itself transforms with them. The square becomes a parallelogram whose sides are formed by the transformed basis vectors.</p>
+        <p>The unit square becomes a <button class="inline-definition" type="button" aria-expanded="false" aria-controls="parallelogram-definition">parallelogram</button> with one pair of sides formed by $\begin{bmatrix} a \\ c \end{bmatrix}$ and the other pair by $\begin{bmatrix} b \\ d \end{bmatrix}$.</p>
 
-        <p>A parallelogram has four sides whose opposite sides are parallel, i.e. a square, rectangle and more general slanted forms.</p>
+        <p class="inline-definition-text" id="parallelogram-definition" hidden>A parallelogram has four sides whose opposite sides are parallel, i.e. a square, rectangle, or more general slanted forms.</p>
 
-        <p>The determinant exactly measures the <strong>signed area scaling factor</strong> of this transformed unit square.</p>
+        <p>By calculating $ad-bc$ we can find this 'signed area scaling factor'.</p>
 
-        <p>For example:</p>
+        <details class="notation-details">
+          <summary>Example</summary>
 
-        <ul>
-          <li>If $ad - bc = 2$, the transformation doubles the area.</li>
-          <li>If $ad - bc = \frac{1}{2}$, the transformation halves the area.</li>
-          <li>If $ad - bc = 0$, the square collapses into a lower-dimensional shape (a line or a point) with zero area.</li>
-        </ul>
+          <p>Imagine:</p>
 
-        <p>In two dimensions, the determinant tells us how much a transformation scales area.</p>
-
-        <p>For example, imagine the matrix:</p>
-
-        <p class="display-equation">$$
+          <p class="display-equation">$$
 A=
 \begin{bmatrix}
 4 & -2\\
@@ -137,45 +130,16 @@ A=
 \end{bmatrix}
 $$</p>
 
-        <p>The columns of this matrix show where the basis vectors land after transformation:</p>
-
-        <p class="display-equation">$$
-\begin{bmatrix}
-1\\
-0
-\end{bmatrix}
-\mapsto
-\begin{bmatrix}
-4\\
-3
-\end{bmatrix}
-\qquad
-\begin{bmatrix}
-0\\
-1
-\end{bmatrix}
-\mapsto
-\begin{bmatrix}
--2\\
-5
-\end{bmatrix}
-$$</p>
-
-        <p>For a $2\times2$ matrix:</p>
-
-        <p class="display-equation">$$
-\det
-\begin{bmatrix}
+          <p class="display-equation">$$
+\begin{vmatrix}
 a & b\\
 c & d
-\end{bmatrix}
+\end{vmatrix}
 =
 ad-bc
 $$</p>
 
-        <p>So for our matrix:</p>
-
-        <p class="display-equation">$$
+          <p class="display-equation">$$
 \det(A)
 =
 (4)(5)-(-2)(3)
@@ -185,12 +149,59 @@ $$</p>
 26
 $$</p>
 
-        <p>This means the transformation scales area by a factor of $26$.</p>
+          <p>This means the transformation scales area by a factor of $26$.</p>
 
-        <p>Importantly, the determinant is not the area itself; it is the scaling factor relative to the original space.</p>
+          <p>Note that the determinant is not the area itself; it is the factor by which area scales relative to the original unit square.</p>
+        </details>
+
+        <h3 class="subsection-title">Types of determinants</h3>
+
+        <p>Take:</p>
+
+        <p class="display-equation">$$
+\det(A)=
+\begin{vmatrix}
+a & b\\
+c & d
+\end{vmatrix}
+$$</p>
+
+        <p><em>* Vertical bars denote a determinant operation.</em></p>
+
+        <p>Positive determinants mean the area is scaled by that factor and orientation is preserved.</p>
+
+        <p>Negative determinants mean the area is scaled by that factor and the orientation is reversed.</p>
+
+        <p>Determinants with magnitude &lt; 1 (fractions or irrationals) mean the area is reduced by that factor.</p>
+
+        <p>Determinants that equal zero mean that the area is reduced to nothing, indicating the transformation has collapsed the plane to a lower-dimensional shape (a line or a point). The transformed basis vectors must be linearly dependent.</p>
+
+        <p>When $\det(A)=0$ -&gt; the transformation is not invertible. Different input vectors now map to the same output vector, meaning the transformation can no longer be uniquely reversed.</p>
+
+        <iframe
+          class="essay-widget determinant-widget"
+          src="linear-algebra/determinants/determinant-widget.html"
+          title="Interactive widget showing determinant effects on space transformations"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">Extra intuition</h3>
+
+        <p>The subtraction in $ad-bc$ measures the net independent area generated by the transformed basis vectors. When the vectors begin pointing in the same direction, the two terms cancel and the area collapses toward zero.</p>
       </section>
     </article>
   </main>
   <script src="script.js"></script>
+  <script>
+    document.querySelectorAll(".inline-definition").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.getAttribute("aria-controls"));
+        const expanded = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", String(!expanded));
+        target.hidden = expanded;
+      });
+    });
+  </script>
 </body>
 </html>
