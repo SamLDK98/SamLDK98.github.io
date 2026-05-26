@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Degrees and Pi Fractions</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --green: #7ea35f;
+      --yellow: #f1d84d;
+      --axis: rgba(236, 226, 209, 0.36);
+      --circle: rgba(236, 226, 209, 0.68);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 760px;
+      border: 1px solid var(--rule);
+      background:
+        radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%),
+        var(--bg);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.3rem 1.6rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 500;
+    }
+
+    .mode-toggle {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(90px, 1fr));
+      gap: 0.4rem;
+      width: min(100%, 420px);
+    }
+
+    button {
+      min-height: 38px;
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      color: var(--dim);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button.active {
+      border-color: var(--accent);
+      color: #ffe7b2;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 660px;
+      padding: 1rem;
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 820px);
+      height: auto;
+      user-select: none;
+    }
+
+    .circle {
+      fill: rgba(0, 0, 0, 0.08);
+      stroke: var(--circle);
+      stroke-width: 2.6;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 1.4;
+      stroke-dasharray: 4 5;
+      marker-start: url(#axisArrow);
+      marker-end: url(#axisArrow);
+    }
+
+    .axis-arrow {
+      fill: var(--axis);
+    }
+
+    .tick-point {
+      fill: var(--yellow);
+      stroke: rgba(0, 0, 0, 0.55);
+      stroke-width: 2;
+    }
+
+    .degree-label,
+    .pi-label {
+      fill: var(--green);
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+    }
+
+    .degree-label {
+      font-size: 20px;
+      opacity: 0.72;
+    }
+
+    .pi-label {
+      font-size: 24px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      .widget {
+        min-height: 690px;
+      }
+
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .mode-toggle {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        min-height: 520px;
+      }
+
+      .degree-label {
+        font-size: 16px;
+      }
+
+      .pi-label {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Degrees and Pi Fractions</h1>
+      <div class="mode-toggle" role="group" aria-label="Label display mode">
+        <button type="button" data-mode="degrees">Degrees</button>
+        <button type="button" data-mode="pi">Pi fractions</button>
+        <button type="button" data-mode="both" class="active">Both</button>
+      </div>
+    </header>
+
+    <div class="stage">
+      <svg viewBox="0 0 840 660" role="img" aria-label="Circle labelled with degrees and pi-fraction radian measures">
+        <defs>
+          <marker id="axisArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M 0 0 L 7 3.5 L 0 7 Z" class="axis-arrow"></path>
+          </marker>
+        </defs>
+
+        <line class="axis" x1="80" y1="330" x2="760" y2="330" />
+        <line class="axis" x1="420" y1="620" x2="420" y2="40" />
+        <circle class="circle" cx="420" cy="330" r="250" />
+        <g id="marks"></g>
+      </svg>
+    </div>
+  </section>
+
+  <script>
+    const marksRoot = document.getElementById("marks");
+    const buttons = [...document.querySelectorAll("button[data-mode]")];
+    const cx = 420;
+    const cy = 330;
+    const radius = 250;
+    let mode = "both";
+
+    const marks = [
+      { degrees: 0, pi: "0 or\n2π", degreeText: "0° or\n360°" },
+      { degrees: 30, pi: "π\n6" },
+      { degrees: 45, pi: "π\n4" },
+      { degrees: 60, pi: "π\n3" },
+      { degrees: 90, pi: "π\n2" },
+      { degrees: 120, pi: "2π\n3" },
+      { degrees: 135, pi: "3π\n4" },
+      { degrees: 150, pi: "5π\n6" },
+      { degrees: 180, pi: "π" },
+      { degrees: 210, pi: "7π\n6" },
+      { degrees: 225, pi: "5π\n4" },
+      { degrees: 240, pi: "4π\n3" },
+      { degrees: 270, pi: "3π\n2" },
+      { degrees: 300, pi: "5π\n3" },
+      { degrees: 315, pi: "7π\n4" },
+      { degrees: 330, pi: "11π\n6" }
+    ];
+
+    function pointAt(degrees, r = radius) {
+      const radians = degrees * Math.PI / 180;
+      return {
+        x: cx + Math.cos(radians) * r,
+        y: cy - Math.sin(radians) * r
+      };
+    }
+
+    function anchorFor(degrees) {
+      if (degrees === 90 || degrees === 270) return "middle";
+      return degrees > 90 && degrees < 270 ? "end" : "start";
+    }
+
+    function addMultilineText(root, className, text, x, y, anchor) {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      element.setAttribute("class", className);
+      element.setAttribute("x", x);
+      element.setAttribute("y", y);
+      element.setAttribute("text-anchor", anchor);
+      text.split("\n").forEach((line, index) => {
+        const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        tspan.setAttribute("x", x);
+        tspan.setAttribute("dy", index === 0 ? 0 : 24);
+        tspan.textContent = line;
+        element.appendChild(tspan);
+      });
+      root.appendChild(element);
+      return element;
+    }
+
+    function buildMarks() {
+      marks.forEach((mark) => {
+        const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        group.dataset.degrees = mark.degrees;
+
+        const point = pointAt(mark.degrees);
+        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("class", "tick-point");
+        dot.setAttribute("cx", point.x);
+        dot.setAttribute("cy", point.y);
+        dot.setAttribute("r", "7");
+        group.appendChild(dot);
+
+        const anchor = anchorFor(mark.degrees);
+        const piPoint = pointAt(mark.degrees, radius + 47);
+        const degreeRadius = mode === "both" ? radius - 34 : radius + 34;
+        const degreePoint = pointAt(mark.degrees, degreeRadius);
+        const degreeText = mark.degreeText || `${mark.degrees}°`;
+
+        const piLabel = addMultilineText(group, "pi-label", mark.pi, piPoint.x, piPoint.y - 4, anchor);
+        const degreeLabel = addMultilineText(group, "degree-label", degreeText, degreePoint.x, degreePoint.y + 7, anchor);
+        piLabel.dataset.labelType = "pi";
+        degreeLabel.dataset.labelType = "degrees";
+        marksRoot.appendChild(group);
+      });
+    }
+
+    function refreshMode() {
+      buttons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === mode);
+      });
+
+      document.querySelectorAll("[data-label-type='degrees']").forEach((label) => {
+        label.classList.toggle("hidden", mode === "pi");
+      });
+      document.querySelectorAll("[data-label-type='pi']").forEach((label) => {
+        label.classList.toggle("hidden", mode === "degrees");
+      });
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        mode = button.dataset.mode;
+        refreshMode();
+      });
+    });
+
+    buildMarks();
+    refreshMode();
+  </script>
+</body>
+</html>

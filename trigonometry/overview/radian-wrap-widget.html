@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Radian</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --pink: #ec57d9;
+      --green: #86a963;
+      --axis: rgba(236, 226, 209, 0.42);
+      --circle: rgba(236, 226, 209, 0.66);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 760px;
+      border: 1px solid var(--rule);
+      background:
+        radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%),
+        var(--bg);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.3rem 1.6rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 500;
+    }
+
+    .step-label {
+      min-width: 170px;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--accent);
+      font-family: "Courier New", monospace;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      min-height: 640px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 640px;
+      border-right: 1px solid var(--rule);
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 780px);
+      height: auto;
+    }
+
+    .controls {
+      padding: 1.2rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .controls p {
+      margin: 0 0 1rem;
+      color: var(--dim);
+      font-size: 1.02rem;
+      line-height: 1.45;
+    }
+
+    button {
+      width: 100%;
+      min-height: 44px;
+      margin-bottom: 0.65rem;
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button.active {
+      border-color: var(--accent);
+      color: #ffe7b2;
+    }
+
+    .circle {
+      fill: none;
+      stroke: var(--circle);
+      stroke-width: 2.4;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 1.5;
+      marker-end: url(#axisArrow);
+      marker-start: url(#axisArrow);
+    }
+
+    .ghost-ray {
+      stroke: rgba(236, 226, 209, 0.23);
+      stroke-width: 2;
+    }
+
+    .radius-line {
+      stroke: var(--pink);
+      stroke-linecap: round;
+      stroke-width: 5;
+      filter: drop-shadow(0 0 6px rgba(236, 87, 217, 0.4));
+    }
+
+    .arc {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 5;
+    }
+
+    .arc-pink { stroke: var(--pink); }
+    .arc-yellow { stroke: #f2d94e; }
+    .arc-orange { stroke: #f08a2f; }
+    .arc-green { stroke: #42c784; }
+    .arc-blue { stroke: #26aee8; }
+    .arc-red { stroke: #ef513d; }
+    .arc-tail { stroke: rgba(236, 226, 209, 0.74); }
+
+    .angle-arc {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 3;
+    }
+
+    .point {
+      fill: #f2d94e;
+      stroke: rgba(0, 0, 0, 0.55);
+      stroke-width: 2;
+    }
+
+    .center {
+      fill: var(--green);
+      opacity: 0.9;
+    }
+
+    .label {
+      fill: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 44px;
+      font-weight: 700;
+    }
+
+    .small-label {
+      fill: var(--green);
+      font-family: "Courier New", monospace;
+      font-size: 23px;
+      font-weight: 700;
+    }
+
+    .axis-arrow {
+      fill: var(--axis);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 850px) {
+      .widget {
+        min-height: 920px;
+      }
+
+      header,
+      .stage {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-wrap {
+        min-height: 560px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Building a Radian</h1>
+      <div class="step-label" id="stepLabel">Radius</div>
+    </header>
+
+    <div class="stage">
+      <div class="canvas-wrap">
+        <svg viewBox="0 0 820 620" role="img" aria-label="Interactive explanation of one radian as one radius length wrapped around the circumference">
+          <defs>
+            <marker id="axisArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M 0 0 L 7 3.5 L 0 7 Z" class="axis-arrow"></path>
+            </marker>
+          </defs>
+
+          <line class="axis" x1="90" y1="320" x2="730" y2="320" />
+          <circle class="circle" cx="410" cy="320" r="210" />
+          <circle class="center" cx="410" cy="320" r="4" />
+
+          <g id="ghostRays"></g>
+          <g id="arcGroup"></g>
+
+          <line class="radius-line" id="radiusLine" x1="410" y1="320" x2="620" y2="320" />
+          <circle class="point hidden" id="endPoint" cx="0" cy="0" r="5" />
+          <path class="angle-arc hidden" id="angleArc" d="" />
+          <text class="label" id="radiusLabel" x="500" y="300">r</text>
+          <text class="small-label hidden" id="radianLabel" x="455" y="300">1 rad</text>
+          <text class="small-label hidden" id="tailLabel" x="642" y="335">~0.28r</text>
+          <text class="label hidden" id="sixLabel" x="600" y="520">6r + a bit</text>
+        </svg>
+      </div>
+
+      <aside class="controls">
+        <p id="description">Start with a circle and highlight its radius.</p>
+        <button type="button" data-step="0">1. Highlight radius</button>
+        <button type="button" data-step="1">2. Move radius to edge</button>
+        <button type="button" data-step="2">3. Wrap the radius</button>
+        <button type="button" data-step="3">4. Show 1 radian</button>
+        <button type="button" data-step="4">5. Fill the circle</button>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const radiusLine = document.getElementById("radiusLine");
+    const radiusLabel = document.getElementById("radiusLabel");
+    const radianLabel = document.getElementById("radianLabel");
+    const tailLabel = document.getElementById("tailLabel");
+    const sixLabel = document.getElementById("sixLabel");
+    const angleArc = document.getElementById("angleArc");
+    const endPoint = document.getElementById("endPoint");
+    const arcGroup = document.getElementById("arcGroup");
+    const ghostRays = document.getElementById("ghostRays");
+    const stepLabel = document.getElementById("stepLabel");
+    const description = document.getElementById("description");
+    const buttons = [...document.querySelectorAll("button[data-step]")];
+
+    const cx = 410;
+    const cy = 320;
+    const r = 210;
+    const radianDegrees = 180 / Math.PI;
+
+    const descriptions = [
+      ["Radius", "Start with a circle and highlight its radius."],
+      ["Edge radius", "Move that same radius length to the edge of the circle."],
+      ["Wrap radius", "Wrap one radius length along the circumference."],
+      ["1 radian", "The angle that catches one radius length of arc is 1 radian."],
+      ["2 pi radians", "A full turn contains 6 whole radius lengths, plus about 0.28 of another."]
+    ];
+
+    function pointAt(degrees, radius = r) {
+      const radians = degrees * Math.PI / 180;
+      return {
+        x: cx + Math.cos(radians) * radius,
+        y: cy - Math.sin(radians) * radius
+      };
+    }
+
+    function arcPath(startDegrees, endDegrees, radius = r) {
+      const start = pointAt(startDegrees, radius);
+      const end = pointAt(endDegrees, radius);
+      const largeArc = Math.abs(endDegrees - startDegrees) > 180 ? 1 : 0;
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArc} 0 ${end.x} ${end.y}`;
+    }
+
+    function makeArc(start, end, className) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("class", `arc ${className}`);
+      path.setAttribute("d", arcPath(start, end));
+      arcGroup.appendChild(path);
+    }
+
+    function makeGhostRay(degrees) {
+      const p = pointAt(degrees, r + 35);
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("class", "ghost-ray");
+      line.setAttribute("x1", cx);
+      line.setAttribute("y1", cy);
+      line.setAttribute("x2", p.x);
+      line.setAttribute("y2", p.y);
+      ghostRays.appendChild(line);
+    }
+
+    function clearDynamic() {
+      arcGroup.innerHTML = "";
+      ghostRays.innerHTML = "";
+      angleArc.classList.add("hidden");
+      radianLabel.classList.add("hidden");
+      tailLabel.classList.add("hidden");
+      sixLabel.classList.add("hidden");
+      endPoint.classList.add("hidden");
+    }
+
+    function setRadiusLine(x1, y1, x2, y2, labelX, labelY) {
+      radiusLine.setAttribute("x1", x1);
+      radiusLine.setAttribute("y1", y1);
+      radiusLine.setAttribute("x2", x2);
+      radiusLine.setAttribute("y2", y2);
+      radiusLabel.setAttribute("x", labelX);
+      radiusLabel.setAttribute("y", labelY);
+    }
+
+    function showStep(step) {
+      clearDynamic();
+      stepLabel.textContent = descriptions[step][0];
+      description.textContent = descriptions[step][1];
+      buttons.forEach((button) => button.classList.toggle("active", Number(button.dataset.step) === step));
+
+      if (step === 0) {
+        setRadiusLine(cx, cy, cx + r, cy, cx + 94, cy - 20);
+        return;
+      }
+
+      if (step === 1) {
+        setRadiusLine(cx + r, cy, cx + r, cy - r, cx + r + 18, cy - 80);
+        endPoint.classList.remove("hidden");
+        endPoint.setAttribute("cx", cx + r);
+        endPoint.setAttribute("cy", cy - r);
+        return;
+      }
+
+      if (step === 2) {
+        setRadiusLine(cx + r, cy, cx + r, cy - r, cx + r + 18, cy - 80);
+        makeArc(0, radianDegrees, "arc-pink");
+        const p = pointAt(radianDegrees);
+        endPoint.classList.remove("hidden");
+        endPoint.setAttribute("cx", p.x);
+        endPoint.setAttribute("cy", p.y);
+        return;
+      }
+
+      if (step === 3) {
+        setRadiusLine(cx, cy, pointAt(radianDegrees, r + 44).x, pointAt(radianDegrees, r + 44).y, pointAt(radianDegrees / 2, r + 55).x + 6, pointAt(radianDegrees / 2, r + 55).y);
+        makeArc(0, radianDegrees, "arc-pink");
+        angleArc.classList.remove("hidden");
+        angleArc.setAttribute("d", arcPath(0, radianDegrees, 52));
+        radianLabel.classList.remove("hidden");
+        const p = pointAt(radianDegrees);
+        endPoint.classList.remove("hidden");
+        endPoint.setAttribute("cx", p.x);
+        endPoint.setAttribute("cy", p.y);
+        return;
+      }
+
+      const colors = ["arc-pink", "arc-green", "arc-red", "arc-blue", "arc-yellow", "arc-orange"];
+      for (let i = 0; i < 6; i += 1) {
+        const start = i * radianDegrees;
+        const end = (i + 1) * radianDegrees;
+        makeArc(start, end, colors[i]);
+        makeGhostRay(end);
+      }
+      makeArc(6 * radianDegrees, 360, "arc-tail");
+      angleArc.classList.remove("hidden");
+      angleArc.setAttribute("d", arcPath(0, radianDegrees, 52));
+      radianLabel.classList.remove("hidden");
+      tailLabel.classList.remove("hidden");
+      sixLabel.classList.remove("hidden");
+      setRadiusLine(cx, cy, pointAt(radianDegrees, r + 44).x, pointAt(radianDegrees, r + 44).y, pointAt(radianDegrees / 2, r + 55).x + 6, pointAt(radianDegrees / 2, r + 55).y);
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => showStep(Number(button.dataset.step)));
+    });
+
+    showStep(0);
+  </script>
+</body>
+</html>
