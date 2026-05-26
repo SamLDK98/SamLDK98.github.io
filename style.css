@@ -1153,6 +1153,109 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 720px;
 }
 
+.intro-linear-algebra-page .trig-ratios-widget {
+  height: 900px;
+}
+
+.trig-figure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 980px;
+  margin: 1.4rem auto 2rem;
+}
+
+.trig-figure {
+  margin: 1.4rem auto 2rem;
+  max-width: 980px;
+  border: 1px solid var(--intro-rule);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+
+.trig-figure-grid .trig-figure {
+  margin: 0;
+}
+
+.trig-figure svg {
+  display: block;
+  width: 100%;
+  min-height: 260px;
+}
+
+.trig-figure figcaption {
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid var(--intro-rule);
+  color: var(--intro-dim);
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.trig-triangle-figure {
+  max-width: 760px;
+}
+
+.trig-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 6;
+}
+
+.trig-line-accent {
+  stroke: var(--intro-text);
+}
+
+.trig-line-muted {
+  stroke: rgba(168, 154, 132, 0.58);
+  stroke-dasharray: 9 10;
+}
+
+.trig-line-cyan {
+  stroke: var(--intro-jhat);
+}
+
+.trig-line-gold {
+  stroke: var(--intro-accent);
+}
+
+.trig-circle {
+  fill: none;
+  stroke: rgba(242, 176, 68, 0.72);
+  stroke-width: 4;
+}
+
+.trig-sector {
+  fill: rgba(100, 216, 207, 0.22);
+}
+
+.trig-angle-arc,
+.trig-right-angle {
+  fill: none;
+  stroke: var(--intro-accent);
+  stroke-linecap: round;
+  stroke-width: 4;
+}
+
+.trig-triangle-fill {
+  fill: rgba(109, 211, 196, 0.08);
+  stroke: none;
+}
+
+.trig-label {
+  fill: var(--intro-accent);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 30px;
+}
+
+.trig-small-label {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+}
+
 .intro-linear-algebra-page a {
   color: var(--intro-accent);
 }
@@ -1407,6 +1510,10 @@ header {
 
   .article-card-title {
     font-size: clamp(1.75rem, 9vw, 2.45rem);
+  }
+
+  .trig-figure-grid {
+    grid-template-columns: 1fr;
   }
 
   .essay-title { font-size: 1.85rem; }

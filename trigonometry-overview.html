@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-overview-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Overview</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h3 class="subsection-title">Opening</h3>
+
+        <p>Trigonometry translates to triangle measurement.</p>
+
+        <p>In fact, we are most often more interested in angles.</p>
+
+        <p>It just happens that connecting the lines that possess an angle to create a triangle is the simplest method of measuring angles.</p>
+
+        <p>Additionally, trigonometry revolves more so around circles. Angles are most easily understood as fractions of a circle.</p>
+
+        <div class="trig-figure-grid">
+          <figure class="trig-figure">
+            <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-triangle-title">
+              <title id="angle-triangle-title">Two rays forming an angle with an extra triangle side greyed out</title>
+              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="338" y2="216" />
+              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="266" y2="64" />
+              <line class="trig-line trig-line-muted" x1="338" y1="216" x2="266" y2="64" />
+              <path class="trig-angle-arc" d="M 128 216 A 50 50 0 0 0 117 185" />
+              <text class="trig-label" x="139" y="199">&theta;</text>
+              <text class="trig-small-label" x="257" y="154">extra line</text>
+            </svg>
+            <figcaption>The third side lets the angle be measured through a triangle.</figcaption>
+          </figure>
+
+          <figure class="trig-figure">
+            <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-circle-title">
+              <title id="angle-circle-title">A circle around an angle showing the angle as part of a full turn</title>
+              <circle class="trig-circle" cx="210" cy="150" r="96" />
+              <line class="trig-line trig-line-accent" x1="210" y1="150" x2="330" y2="150" />
+              <line class="trig-line trig-line-accent" x1="210" y1="150" x2="282" y2="70" />
+              <path class="trig-sector" d="M 270 150 A 60 60 0 0 0 250 105 L 210 150 Z" />
+              <path class="trig-angle-arc" d="M 270 150 A 60 60 0 0 0 250 105" />
+              <text class="trig-label" x="271" y="125">&theta;</text>
+            </svg>
+            <figcaption>An angle can be understood as a fraction of a circle.</figcaption>
+          </figure>
+        </div>
+
+        <p>Typically, I like to move through these explanations conceptually, often with a focus on the historical development of ideas. However, in this case, I think it would be more productive to jump straight into learning a few things without much context. We will then go back and understand things more conceptually afterwards.</p>
+
+        <h3 class="subsection-title">Trigonometric Functions</h3>
+
+        <p>Initially, the sides of triangles were understood in terms of ratios, rather than functions.</p>
+
+        <figure class="trig-figure trig-triangle-figure">
+          <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-title">
+            <title id="right-triangle-title">Right triangle labelled hypotenuse, opposite, and adjacent</title>
+            <polygon class="trig-triangle-fill" points="88,250 416,250 416,70" />
+            <line class="trig-line trig-line-accent" x1="88" y1="250" x2="416" y2="250" />
+            <line class="trig-line trig-line-cyan" x1="416" y1="250" x2="416" y2="70" />
+            <line class="trig-line trig-line-gold" x1="88" y1="250" x2="416" y2="70" />
+            <path class="trig-angle-arc" d="M 148 250 A 60 60 0 0 0 141 219" />
+            <path class="trig-right-angle" d="M 386 250 L 386 220 L 416 220" />
+            <text class="trig-label" x="157" y="235">&theta;</text>
+            <text class="trig-small-label" x="227" y="275">adjacent</text>
+            <text class="trig-small-label" x="427" y="166">opposite</text>
+            <text class="trig-small-label" x="218" y="138">hypotenuse</text>
+          </svg>
+          <figcaption>The side names are always relative to the angle being considered.</figcaption>
+        </figure>
+
+        <p>Given 3 different sides, there are 6 possible ratios. We gave names to these ratios: sine, cosine, tangent, cotangent, secant, and cosecant.</p>
+
+        <p class="display-equation">$$\sin(\theta) = \frac{\text{opposite}}{\text{hypotenuse}} \qquad \cos(\theta) = \frac{\text{adjacent}}{\text{hypotenuse}} \qquad \tan(\theta) = \frac{\text{opposite}}{\text{adjacent}}$$</p>
+
+        <p class="display-equation">$$
+\csc(\theta) = \frac{\text{hypotenuse}}{\text{opposite}}
+\qquad
+\sec(\theta) = \frac{\text{hypotenuse}}{\text{adjacent}}
+\qquad
+\cot(\theta) = \frac{\text{adjacent}}{\text{opposite}}
+$$</p>
+
+        <p>Given a right-angled triangle and its side lengths, we can divide particular pairs of sides to produce ratios associated with the triangle's angles.</p>
+
+        <iframe
+          class="essay-widget trig-ratios-widget"
+          src="trigonometry/overview/trig-ratios-widget.html"
+          title="Interactive widget for building trigonometric ratios"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
