@@ -1169,6 +1169,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
+.intro-linear-algebra-page .angle-practice-widget {
+  height: 780px;
+}
+
 .trig-figure-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
