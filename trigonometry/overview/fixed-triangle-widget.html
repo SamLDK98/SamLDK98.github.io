@@ -51,8 +51,15 @@
     .side:active { cursor: grabbing; }
     .side-a { stroke: var(--orange); }
     .side-b { stroke: var(--cyan); }
-    .side-c { stroke: var(--pink); }
+    .side-c { stroke: var(--pink); cursor: default; }
     .is-snapped .side { filter: drop-shadow(0 0 9px rgba(120, 200, 132, 0.35)); }
+
+    .gap-line {
+      stroke: rgba(236, 226, 209, 0.28);
+      stroke-dasharray: 7 9;
+      stroke-linecap: round;
+      stroke-width: 2;
+    }
 
     .angle-arc {
       fill: none;
@@ -68,11 +75,13 @@
     }
 
     .handle {
-      fill: var(--pink);
       stroke: var(--bg);
       stroke-width: 2;
       cursor: grab;
     }
+
+    .handle-a { fill: var(--orange); }
+    .handle-b { fill: var(--cyan); }
 
     .target {
       fill: none;
@@ -110,12 +119,14 @@
         <path class="angle-arc" id="arcA" d="" />
         <path class="angle-arc" id="arcB" d="" />
         <path class="angle-arc" id="arcC" d="" />
+        <line class="gap-line" id="gapLine" x1="0" y1="0" x2="0" y2="0" />
         <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
         <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
         <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
         <circle class="vertex" id="va" cx="0" cy="0" r="5" />
         <circle class="vertex" id="vb" cx="0" cy="0" r="5" />
-        <circle class="handle" id="vc" cx="0" cy="0" r="10" />
+        <circle class="handle handle-a" id="handleA" cx="0" cy="0" r="10" />
+        <circle class="handle handle-b" id="handleB" cx="0" cy="0" r="10" />
         <text class="side-label" id="labelA" x="0" y="0">a = 4</text>
         <text class="side-label" id="labelB" x="0" y="0">b = 6</text>
         <text class="side-label" id="labelC" x="0" y="0">c = 9</text>
@@ -131,7 +142,7 @@
     const svg = document.getElementById("canvas");
     const group = document.getElementById("triangleGroup");
     const el = Object.fromEntries([
-      "snapTarget", "sideA", "sideB", "sideC", "va", "vb", "vc",
+      "snapTarget", "gapLine", "sideA", "sideB", "sideC", "va", "vb", "handleA", "handleB",
       "labelA", "labelB", "labelC", "angleA", "angleB", "angleC",
       "arcA", "arcB", "arcC", "status"
     ].map((id) => [id, document.getElementById(id)]));
@@ -140,15 +151,26 @@
     const lengths = { a: 4 * scale, b: 6 * scale, c: 9 * scale };
     const A = { x: 150, y: 350 };
     const B = { x: A.x + lengths.c, y: A.y };
-    const targetC = targetPoint();
-    let C = { x: targetC.x + 96, y: targetC.y - 82 };
-    let dragging = false;
+    const targets = targetPoints();
+    let angleA = Math.atan2(targets.upper.y - A.y, targets.upper.x - A.x) - 0.5;
+    let angleB = Math.atan2(targets.upper.y - B.y, targets.upper.x - B.x) + 0.58;
+    let dragging = null;
     let snapped = false;
 
-    function targetPoint() {
+    function targetPoints() {
       const x = (lengths.b ** 2 + lengths.c ** 2 - lengths.a ** 2) / (2 * lengths.c);
       const y = Math.sqrt(Math.max(0, lengths.b ** 2 - x ** 2));
-      return { x: A.x + x, y: A.y - y };
+      return {
+        upper: { x: A.x + x, y: A.y - y },
+        lower: { x: A.x + x, y: A.y + y }
+      };
+    }
+
+    function pointFrom(anchor, radians, length) {
+      return {
+        x: anchor.x + Math.cos(radians) * length,
+        y: anchor.y + Math.sin(radians) * length
+      };
     }
 
     function setLine(line, from, to) {
@@ -169,6 +191,12 @@
 
     function distance(p, q) {
       return Math.hypot(p.x - q.x, p.y - q.y);
+    }
+
+    function nearestTarget(point) {
+      return distance(point, targets.upper) <= distance(point, targets.lower)
+        ? targets.upper
+        : targets.lower;
     }
 
     function degreesAt(vertex, p1, p2) {
@@ -203,68 +231,100 @@
     }
 
     function render() {
-      const gap = distance(C, targetC);
-      if (gap < 24 && !dragging) {
-        C = { ...targetC };
+      let freeA = pointFrom(B, angleB, lengths.a);
+      let freeB = pointFrom(A, angleA, lengths.b);
+      const gap = distance(freeA, freeB);
+
+      if (gap < 26) {
+        const target = nearestTarget({
+          x: (freeA.x + freeB.x) / 2,
+          y: (freeA.y + freeB.y) / 2
+        });
+        freeA = { ...target };
+        freeB = { ...target };
+        angleA = Math.atan2(target.y - A.y, target.x - A.x);
+        angleB = Math.atan2(target.y - B.y, target.x - B.x);
         snapped = true;
+      } else if (dragging) {
+        snapped = false;
       }
 
+      const joined = distance(freeA, freeB) < 1;
       group.classList.toggle("is-snapped", snapped);
-      setCircle(el.snapTarget, targetC);
-      setLine(el.sideA, B, C);
-      setLine(el.sideB, A, C);
+      setCircle(el.snapTarget, nearestTarget(freeB));
+      setLine(el.sideA, B, freeA);
+      setLine(el.sideB, A, freeB);
       setLine(el.sideC, A, B);
+      setLine(el.gapLine, freeA, freeB);
+      el.gapLine.style.display = joined ? "none" : "block";
       setCircle(el.va, A);
       setCircle(el.vb, B);
-      setCircle(el.vc, C);
+      setCircle(el.handleA, freeA);
+      setCircle(el.handleB, freeB);
 
-      setText(el.labelA, midpoint(B, C, -12), "a = 4");
-      setText(el.labelB, midpoint(A, C, -12), "b = 6");
+      setText(el.labelA, midpoint(B, freeA, -12), "a = 4");
+      setText(el.labelB, midpoint(A, freeB, -12), "b = 6");
       setText(el.labelC, midpoint(A, B, 28), "c = 9");
 
-      const angles = [
-        degreesAt(A, B, C),
-        degreesAt(B, C, A),
-        degreesAt(C, A, B)
-      ];
-      el.arcA.setAttribute("d", arcPath(A, B, C, 34));
-      el.arcB.setAttribute("d", arcPath(B, C, A, 34));
-      el.arcC.setAttribute("d", arcPath(C, A, B, 34));
-      setText(el.angleA, { x: A.x + 42, y: A.y - 14 }, `${angles[0].toFixed(1)}°`);
-      setText(el.angleB, { x: B.x - 88, y: B.y - 14 }, `${angles[1].toFixed(1)}°`);
-      setText(el.angleC, { x: C.x - 24, y: C.y - 22 }, `${angles[2].toFixed(1)}°`);
+      const angleAtA = degreesAt(A, B, freeB);
+      const angleAtB = degreesAt(B, freeA, A);
+      el.arcA.setAttribute("d", arcPath(A, B, freeB, 34));
+      el.arcB.setAttribute("d", arcPath(B, freeA, A, 34));
+      setText(el.angleA, { x: A.x + 42, y: A.y - 14 }, `${angleAtA.toFixed(1)}°`);
+      setText(el.angleB, { x: B.x - 88, y: B.y - 14 }, `${angleAtB.toFixed(1)}°`);
+
+      if (joined) {
+        const angleAtC = degreesAt(freeB, A, B);
+        el.arcC.style.display = "block";
+        el.angleC.style.display = "block";
+        el.arcC.setAttribute("d", arcPath(freeB, A, B, 34));
+        setText(el.angleC, { x: freeB.x - 24, y: freeB.y - 22 }, `${angleAtC.toFixed(1)}°`);
+      } else {
+        el.arcC.style.display = "none";
+        el.angleC.style.display = "none";
+      }
+
       setText(
         el.status,
         { x: 150, y: 84 },
-        snapped ? "connected: angles fixed" : "move the broken point until it connects"
+        joined ? "connected: angles fixed" : "fixed lengths, broken apart"
       );
     }
 
-    el.vc.addEventListener("pointerdown", (event) => {
-      dragging = true;
+    function startDrag(which, event) {
+      dragging = which;
       snapped = false;
-      el.vc.setPointerCapture(event.pointerId);
-    });
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
 
-    el.vc.addEventListener("pointermove", (event) => {
+    function drag(event) {
       if (!dragging) return;
-      C = pointerPoint(event);
-      render();
-    });
-
-    el.vc.addEventListener("pointerup", (event) => {
-      dragging = false;
-      if (distance(C, targetC) < 34) {
-        C = { ...targetC };
-        snapped = true;
+      const point = pointerPoint(event);
+      if (dragging === "a") {
+        angleB = Math.atan2(point.y - B.y, point.x - B.x);
+      } else {
+        angleA = Math.atan2(point.y - A.y, point.x - A.x);
       }
-      el.vc.releasePointerCapture(event.pointerId);
       render();
-    });
+    }
 
-    el.vc.addEventListener("pointercancel", () => {
-      dragging = false;
+    function stopDrag(event) {
+      if (!dragging) return;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+      dragging = null;
       render();
+    }
+
+    [
+      [el.sideA, "a"],
+      [el.handleA, "a"],
+      [el.sideB, "b"],
+      [el.handleB, "b"]
+    ].forEach(([node, which]) => {
+      node.addEventListener("pointerdown", (event) => startDrag(which, event));
+      node.addEventListener("pointermove", drag);
+      node.addEventListener("pointerup", stopDrag);
+      node.addEventListener("pointercancel", stopDrag);
     });
 
     render();

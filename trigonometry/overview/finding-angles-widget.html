@@ -83,11 +83,6 @@
       font-weight: 700;
     }
 
-    .length-label {
-      fill: var(--dim);
-      font-size: 16px;
-    }
-
     .angle-label {
       fill: var(--accent);
       font-size: 22px;
@@ -106,9 +101,6 @@
       <circle class="vertex" id="origin" cx="0" cy="0" r="5" />
       <circle class="handle handle-a" id="handleA" cx="0" cy="0" r="10" />
       <circle class="handle handle-b" id="handleB" cx="0" cy="0" r="10" />
-      <text class="length-label" id="labelA" x="0" y="0">a = 1</text>
-      <text class="length-label" id="labelB" x="0" y="0">b = 2</text>
-      <text class="length-label" id="labelC" x="0" y="0">c</text>
       <text class="angle-label" id="angleLabel" x="0" y="0"></text>
     </svg>
   </section>
@@ -121,9 +113,6 @@
     const handleA = document.getElementById("handleA");
     const handleB = document.getElementById("handleB");
     const origin = document.getElementById("origin");
-    const labelA = document.getElementById("labelA");
-    const labelB = document.getElementById("labelB");
-    const labelC = document.getElementById("labelC");
     const angleArc = document.getElementById("angleArc");
     const angleLabel = document.getElementById("angleLabel");
 
@@ -178,10 +167,6 @@
       return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 ${sweep} ${end.x} ${end.y}`;
     }
 
-    function midpoint(p, q, offsetY = 0) {
-      return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 + offsetY };
-    }
-
     function render() {
       const aEnd = pointAt(angles.a, lengths.a);
       const bEnd = pointAt(angles.b, lengths.b);
@@ -194,13 +179,6 @@
       setCircle(origin, center);
       setCircle(handleA, aEnd);
       setCircle(handleB, bEnd);
-
-      const aLabel = pointAt(angles.a, lengths.a / 2 + 18);
-      const bLabel = pointAt(angles.b, lengths.b / 2 + 18);
-      const cLength = Math.hypot(aEnd.x - bEnd.x, aEnd.y - bEnd.y) / lengths.a;
-      setText(labelA, { x: aLabel.x - 24, y: aLabel.y - 8 }, "a = 1");
-      setText(labelB, { x: bLabel.x - 24, y: bLabel.y - 8 }, "b = 2");
-      setText(labelC, midpoint(aEnd, bEnd, -12), `c = ${cLength.toFixed(2)}`);
 
       if (included < 3 || included > 177) {
         angleArc.classList.add("hidden");
