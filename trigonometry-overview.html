@@ -101,13 +101,11 @@
           loading="lazy"
         ></iframe>
 
-        <p>So, if we fix the side lengths, we fix the angles.</p>
+        <h3 class="subsection-title">Right-angled Triangles</h3>
 
-        <p>However, fixing the angles doesn't fix the side lengths -- they can scale proportionally and preserve the angles.</p>
+        <p>We could determine the angles of any triangle from its side lengths alone. However, the relationships become much simpler for right-angled triangles, and right angles are extremely common in practical geometry. So let's begin by considering them specifically.</p>
 
-        <p>However, fixing one angle to $90^\circ$ can help.</p>
-
-        <p>Imagine a right-angled triangle. The only thing we fix is this angle. The other two are free to vary as the lines increase or decrease in length.</p>
+        <p>While we know that one angle is fixed to $90^\circ$, the other two are free to vary as the side lengths change, although they cannot vary independently.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize right-angle-widget"
@@ -117,13 +115,13 @@
           loading="lazy"
         ></iframe>
 
-        <p>If we fix another angle, something interesting happens. The triangles shape cannot be changed.</p>
+        <p>If we fix a second angle, the third is fixed as well, since the angles of a triangle must sum to $180^\circ$.</p>
 
-        <p>We can still vary the size of the triangle, proportionally, but not the sides independently.</p>
+        <p>We can still vary the side lengths proportionally and preserve the ratios.</p>
 
-        <p>In other words, the ratios between the side lengths remain the same.</p>
+        <p>You can experiment with changing this second angle and notice how the ratios change. Then fix the angle and scale the triangle; notice that the ratios remain unchanged.</p>
 
-        <p>This means that particular side ratios are uniquely associated with particular angles.</p>
+        <p>This means that particular ratios are uniquely associated with particular sets of angles.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize right-angle-ratios-widget"
@@ -133,26 +131,11 @@
           loading="lazy"
         ></iframe>
 
-        <p>Before continuing, make sure you understand the following. If it's not yet clear, go back and mess around with the widget, think about it and re-read.</p>
+        <p>As the ratios depend on the angle, we can think of them as functions; for example:</p>
 
-        <p>For right-angled triangles:</p>
+        <div class="display-equation">$$\sin(\theta) = \frac{o}{h}$$</div>
 
-        <ul>
-          <li>The $90^\circ$ angle is already fixed,</li>
-          <li>so only one additional angle remains free.</li>
-        </ul>
-
-        <p>That means:</p>
-
-        <ul>
-          <li>the triangle's shape is completely encoded by the side ratios.</li>
-        </ul>
-
-        <p>So:</p>
-
-        <div class="display-equation">$$\text{knowing side lengths} \implies \text{knowing ratios}$$</div>
-
-        <div class="display-equation">$$\text{knowing ratios} \implies \text{knowing the angle}$$</div>
+        <p>Such functions assume right-angled triangles. We give them an angle and receive a ratio between specific side lengths.</p>
 
         <h3 class="subsection-title">Trigonometric Functions</h3>
 

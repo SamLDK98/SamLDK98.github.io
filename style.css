@@ -1191,19 +1191,19 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .intro-linear-algebra-page .finding-angles-widget {
-  height: 360px;
+  height: 315px;
 }
 
 .intro-linear-algebra-page .fixed-triangle-widget {
-  height: 530px;
+  height: 395px;
 }
 
 .intro-linear-algebra-page .right-angle-widget {
-  height: 490px;
+  height: 330px;
 }
 
 .intro-linear-algebra-page .right-angle-ratios-widget {
-  height: 530px;
+  height: 540px;
 }
 
 .intro-linear-algebra-page .degree-circle-widget {

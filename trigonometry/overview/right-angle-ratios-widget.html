@@ -28,13 +28,13 @@
 
     .widget {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 270px;
+      grid-template-columns: minmax(0, 1fr) 340px;
       border: 1px solid var(--rule);
       background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
     }
 
     .stage {
-      min-height: 510px;
+      min-height: 520px;
       border-right: 1px solid var(--rule);
     }
 
@@ -68,28 +68,31 @@
 
     .ratio-box {
       display: grid;
-      gap: 0.5rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
       margin-top: 1rem;
     }
 
     .ratio-row {
       display: grid;
-      grid-template-columns: 4.5rem 1fr;
-      gap: 0.75rem;
+      grid-template-columns: 3.4rem 1fr;
+      gap: 0.65rem;
       align-items: center;
-      padding: 0.55rem 0.65rem;
+      padding: 0.7rem 0.75rem;
       border: 1px solid var(--rule);
       background: rgba(0, 0, 0, 0.14);
       font-family: "Courier New", monospace;
-      font-size: 0.9rem;
+      font-size: 1.12rem;
+      font-weight: 700;
     }
 
     .fraction {
       display: inline-grid;
       grid-template-rows: auto 1px auto;
       justify-items: center;
-      min-width: 1.4rem;
+      min-width: 1.7rem;
       line-height: 1;
+      font-size: 1.12rem;
     }
 
     .bar {

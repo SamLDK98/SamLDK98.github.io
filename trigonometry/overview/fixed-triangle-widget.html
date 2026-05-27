@@ -34,14 +34,15 @@
     }
 
     .stage {
-      min-height: 520px;
+      min-height: 390px;
       border-right: 1px solid var(--rule);
     }
 
     svg {
       display: block;
-      width: 100%;
+      width: min(100%, 540px);
       height: auto;
+      margin: 0 auto;
       user-select: none;
       touch-action: none;
     }
@@ -144,7 +145,7 @@
     @media (max-width: 760px) {
       .widget { grid-template-columns: 1fr; }
       .stage {
-        min-height: 420px;
+        min-height: 340px;
         border-right: 0;
         border-bottom: 1px solid var(--rule);
       }
