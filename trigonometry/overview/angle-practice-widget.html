@@ -20,9 +20,7 @@
       --circle: rgba(236, 226, 209, 0.68);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -35,16 +33,10 @@
     .widget {
       min-height: 780px;
       border: 1px solid var(--rule);
-      background:
-        radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%),
-        var(--bg);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%), var(--bg);
     }
 
     header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 1rem;
-      align-items: end;
       padding: 1.3rem 1.6rem;
       border-bottom: 1px solid var(--rule);
     }
@@ -56,13 +48,6 @@
       font-weight: 500;
     }
 
-    .mode-toggle {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(110px, 1fr));
-      gap: 0.4rem;
-      width: min(100%, 320px);
-    }
-
     button {
       min-height: 40px;
       border: 1px solid var(--rule);
@@ -72,8 +57,7 @@
       cursor: pointer;
     }
 
-    button:hover,
-    button.active {
+    button:hover {
       border-color: var(--accent);
       color: #ffe7b2;
     }
@@ -121,9 +105,11 @@
       fill: var(--yellow);
       stroke: rgba(0, 0, 0, 0.55);
       stroke-width: 2;
+      cursor: pointer;
       transition: fill 150ms ease, r 150ms ease, filter 150ms ease;
     }
 
+    .point:hover,
     .point.active {
       fill: var(--blue);
       filter: drop-shadow(0 0 8px rgba(110, 167, 255, 0.65));
@@ -131,6 +117,7 @@
 
     .point.correct {
       fill: var(--green);
+      filter: none;
     }
 
     .controls {
@@ -191,11 +178,12 @@
       background: rgba(239, 106, 91, 0.12);
     }
 
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.55rem;
+    .reset-row {
       margin-top: 0.85rem;
+    }
+
+    .reset-row button {
+      width: 100%;
     }
 
     .progress {
@@ -206,11 +194,8 @@
     }
 
     @media (max-width: 850px) {
-      .widget {
-        min-height: 980px;
-      }
+      .widget { min-height: 980px; }
 
-      header,
       .layout {
         grid-template-columns: 1fr;
       }
@@ -220,10 +205,6 @@
         border-right: 0;
         border-bottom: 1px solid var(--rule);
       }
-
-      .mode-toggle {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
@@ -231,10 +212,6 @@
   <section class="widget">
     <header>
       <h1>Angle Practice</h1>
-      <div class="mode-toggle" role="group" aria-label="Answer mode">
-        <button type="button" data-mode="degrees" class="active">Degrees</button>
-        <button type="button" data-mode="pi">Pi fractions</button>
-      </div>
     </header>
 
     <div class="layout">
@@ -248,8 +225,8 @@
       </div>
 
       <aside class="controls">
-        <p class="prompt" id="prompt">Press Start to light up a point.</p>
-        <p class="hint" id="hint">Degree mode accepts answers like 30, 30°, or 360.</p>
+        <p class="prompt" id="prompt">Select a point on the circle.</p>
+        <p class="hint">Enter degrees, such as 225, or radians, such as 5p/4. You can use p for pi.</p>
 
         <div class="answer-box" id="answerBox">
           <label for="answer">Your answer</label>
@@ -257,8 +234,7 @@
           <button type="button" id="submit" disabled>Check</button>
         </div>
 
-        <div class="button-row">
-          <button type="button" id="start">Start</button>
+        <div class="reset-row">
           <button type="button" id="reset">Reset</button>
         </div>
 
@@ -271,39 +247,35 @@
     const pointRoot = document.getElementById("points");
     const circle = document.getElementById("circle");
     const prompt = document.getElementById("prompt");
-    const hint = document.getElementById("hint");
     const answerBox = document.getElementById("answerBox");
     const answer = document.getElementById("answer");
     const submit = document.getElementById("submit");
-    const start = document.getElementById("start");
     const reset = document.getElementById("reset");
     const progress = document.getElementById("progress");
-    const modeButtons = [...document.querySelectorAll("button[data-mode]")];
 
     const cx = 380;
     const cy = 320;
     const radius = 250;
-    let mode = "degrees";
     let active = null;
     let completed = new Set();
 
     const angles = [
-      { degrees: 0, pi: ["0", "2pi", "2π"] },
-      { degrees: 30, pi: ["pi/6", "π/6"] },
-      { degrees: 45, pi: ["pi/4", "π/4"] },
-      { degrees: 60, pi: ["pi/3", "π/3"] },
-      { degrees: 90, pi: ["pi/2", "π/2"] },
-      { degrees: 120, pi: ["2pi/3", "2π/3"] },
-      { degrees: 135, pi: ["3pi/4", "3π/4"] },
-      { degrees: 150, pi: ["5pi/6", "5π/6"] },
-      { degrees: 180, pi: ["pi", "π"] },
-      { degrees: 210, pi: ["7pi/6", "7π/6"] },
-      { degrees: 225, pi: ["5pi/4", "5π/4"] },
-      { degrees: 240, pi: ["4pi/3", "4π/3"] },
-      { degrees: 270, pi: ["3pi/2", "3π/2"] },
-      { degrees: 300, pi: ["5pi/3", "5π/3"] },
-      { degrees: 315, pi: ["7pi/4", "7π/4"] },
-      { degrees: 330, pi: ["11pi/6", "11π/6"] }
+      { degrees: 0, pi: ["0", "2pi", "2p"] },
+      { degrees: 30, pi: ["pi/6", "p/6"] },
+      { degrees: 45, pi: ["pi/4", "p/4"] },
+      { degrees: 60, pi: ["pi/3", "p/3"] },
+      { degrees: 90, pi: ["pi/2", "p/2"] },
+      { degrees: 120, pi: ["2pi/3", "2p/3"] },
+      { degrees: 135, pi: ["3pi/4", "3p/4"] },
+      { degrees: 150, pi: ["5pi/6", "5p/6"] },
+      { degrees: 180, pi: ["pi", "p"] },
+      { degrees: 210, pi: ["7pi/6", "7p/6"] },
+      { degrees: 225, pi: ["5pi/4", "5p/4"] },
+      { degrees: 240, pi: ["4pi/3", "4p/3"] },
+      { degrees: 270, pi: ["3pi/2", "3p/2"] },
+      { degrees: 300, pi: ["5pi/3", "5p/3"] },
+      { degrees: 315, pi: ["7pi/4", "7p/4"] },
+      { degrees: 330, pi: ["11pi/6", "11p/6"] }
     ];
 
     function pointAt(degrees) {
@@ -319,6 +291,8 @@
         .toLowerCase()
         .replace(/\s+/g, "")
         .replace(/π/g, "pi")
+        .replace(/pie/g, "pi")
+        .replace(/p(?!i)/g, "pi")
         .replace(/^1pi/, "pi");
     }
 
@@ -338,6 +312,7 @@
         dot.setAttribute("cy", point.y);
         dot.setAttribute("r", "7");
         dot.dataset.degrees = angle.degrees;
+        dot.addEventListener("click", () => selectPoint(angle));
         pointRoot.appendChild(dot);
       });
     }
@@ -354,18 +329,10 @@
       circle.classList.toggle("complete", completed.size === angles.length);
     }
 
-    function choosePoint() {
-      const remaining = angles.filter((angle) => !completed.has(angle.degrees));
-      if (remaining.length === 0) {
-        active = null;
-        prompt.textContent = "Complete. Every point is correct.";
-        answer.disabled = true;
-        submit.disabled = true;
-        updatePoints();
-        return;
-      }
-      active = remaining[Math.floor(Math.random() * remaining.length)];
-      prompt.textContent = mode === "degrees" ? "Enter this point in degrees." : "Enter this point as a pi fraction.";
+    function selectPoint(angle) {
+      if (completed.has(angle.degrees)) return;
+      active = angle;
+      prompt.textContent = "Enter this point in degrees or radians.";
       answer.value = "";
       answer.disabled = false;
       submit.disabled = false;
@@ -374,11 +341,19 @@
       answer.focus();
     }
 
+    function completeIfFinished() {
+      if (completed.size === angles.length) {
+        active = null;
+        prompt.textContent = "Complete. Every point is correct.";
+        answer.disabled = true;
+        submit.disabled = true;
+        updatePoints();
+      }
+    }
+
     function isCorrect() {
       if (!active) return false;
-      if (mode === "degrees") {
-        return normalizeDegree(answer.value) === active.degrees;
-      }
+      if (normalizeDegree(answer.value) === active.degrees) return true;
       const candidate = normalizePi(answer.value);
       return active.pi.map(normalizePi).includes(candidate);
     }
@@ -389,8 +364,14 @@
         completed.add(active.degrees);
         answerBox.classList.add("correct");
         answerBox.classList.remove("incorrect");
-        setTimeout(choosePoint, 450);
+        prompt.textContent = "Correct. Select another point.";
+        active = null;
+        answer.value = "";
+        answer.disabled = true;
+        submit.disabled = true;
+        completeIfFinished();
       } else {
+        prompt.textContent = "Not quite. Try again.";
         answerBox.classList.add("incorrect");
         answerBox.classList.remove("correct");
       }
@@ -404,28 +385,14 @@
       answer.disabled = true;
       submit.disabled = true;
       answerBox.classList.remove("correct", "incorrect");
-      prompt.textContent = "Press Start to light up a point.";
+      prompt.textContent = "Select a point on the circle.";
       updatePoints();
     }
 
-    modeButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        mode = button.dataset.mode;
-        modeButtons.forEach((item) => item.classList.toggle("active", item === button));
-        hint.textContent = mode === "degrees"
-          ? "Degree mode accepts answers like 30, 30°, or 360."
-          : "Pi mode accepts answers like pi/6, π/6, pi, or 2pi.";
-        resetGame();
-      });
-    });
-
-    start.addEventListener("click", choosePoint);
     reset.addEventListener("click", resetGame);
     submit.addEventListener("click", checkAnswer);
     answer.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        checkAnswer();
-      }
+      if (event.key === "Enter") checkAnswer();
     });
 
     buildPoints();

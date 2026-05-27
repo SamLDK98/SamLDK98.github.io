@@ -91,7 +91,7 @@
             <text class="trig-small-label" x="427" y="166">opposite</text>
             <text class="trig-small-label" x="180" y="116">hypotenuse</text>
           </svg>
-          <figcaption>We label the sides of a right-angled triangle as follows; the 'opposite' is with respect to the angle of interest.</figcaption>
+          <figcaption>The 'opposite' is with respect to the angle of interest.</figcaption>
         </figure>
 
         <p>From the three sides of a right-angled triangle, we can construct six named ratios: sine, cosine, tangent, cosecant, secant, and cotangent.</p>
@@ -127,7 +127,7 @@ $$</p>
         <p>Imagine a point where the line crosses the circumference of the circle. As we rotate the line, the point moves around the circumference.</p>
 
         <blockquote>
-          <p>When I say 'about', I am thinking of pinching the line at one end and swivelling it such that, at the other end, the point moves 'around' the circumference of the circle. I hope that clarifies the distinction between 'about' and 'around'.</p>
+          <p>When I say 'about', I am thinking of pinching the line at one end and swivelling it such that, at the other end, the point moves 'around' the circumference of the circle.</p>
         </blockquote>
 
         <p>We have arbitrarily partitioned the circle into 360 parts, which we will call degrees. We will focus on multiples of $30^\circ$ and $45^\circ$, because they work cleanly with equilateral triangles and squares, respectively.</p>
@@ -198,6 +198,65 @@ $$</p>
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <p>It's worth getting familiar with these angles, in terms of both degrees and radians. I've created a game below for you to brute force this into memory.</p>
+
+        <p>Once you know $0^\circ, 90^\circ, 180^\circ, 270^\circ,$ and $360^\circ$, you can work out the other points based on adding or subtracting either $30^\circ$ or $45^\circ$.</p>
+
+        <p>The radians are trickier...</p>
+
+        <p>Multiples of <strong>$30^\circ$</strong> are typically expressed in sixths of $\pi$. Multiples of <strong>$45^\circ$</strong> are typically expressed in fourths of $\pi$.</p>
+
+        <p>Because:</p>
+
+        <p class="display-equation">$$30^\circ = \frac{\pi}{6} \qquad\text{and}\qquad 45^\circ = \frac{\pi}{4}$$</p>
+
+        <p>A full circle is $360^\circ = 2\pi$ radians. Therefore:</p>
+
+        <ul>
+          <li>Dividing the circle into $12$ equal parts gives $30^\circ$ steps:</li>
+        </ul>
+
+        <p class="display-equation">$$\frac{2\pi}{12} = \frac{\pi}{6} \text{ radians}$$</p>
+
+        <ul>
+          <li>Dividing the circle into $8$ equal parts gives $45^\circ$ steps:</li>
+        </ul>
+
+        <p class="display-equation">$$\frac{2\pi}{8} = \frac{\pi}{4} \text{ radians}$$</p>
+
+        <p>Here's the full table:</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th><strong>$30^\circ$</strong></th>
+              <th><strong>$45^\circ$</strong></th>
+              <th><strong>Radians ($30^\circ$)</strong></th>
+              <th><strong>Radians ($45^\circ$)</strong></th>
+              <th><strong>Reduced</strong></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>$0^\circ$</td><td>$0^\circ$</td><td>$0/6\,\pi$</td><td>$0/4\,\pi$</td><td>$0\,\pi$</td></tr>
+            <tr><td>$30^\circ$</td><td></td><td>$1/6\,\pi$</td><td></td><td>$\pi/6$</td></tr>
+            <tr><td></td><td>$45^\circ$</td><td></td><td>$1/4\,\pi$</td><td>$\pi/4$</td></tr>
+            <tr><td>$60^\circ$</td><td></td><td>$2/6\,\pi$</td><td></td><td>$\pi/3$</td></tr>
+            <tr><td>$90^\circ$</td><td>$90^\circ$</td><td>$3/6\,\pi$</td><td>$2/4\,\pi$</td><td>$\pi/2$</td></tr>
+            <tr><td>$120^\circ$</td><td></td><td>$4/6\,\pi$</td><td></td><td>$2\pi/3$</td></tr>
+            <tr><td></td><td>$135^\circ$</td><td></td><td>$3/4\,\pi$</td><td>$3\pi/4$</td></tr>
+            <tr><td>$150^\circ$</td><td></td><td>$5/6\,\pi$</td><td></td><td>$5\pi/6$</td></tr>
+            <tr><td>$180^\circ$</td><td>$180^\circ$</td><td>$6/6\,\pi$</td><td>$4/4\,\pi$</td><td>$\pi$</td></tr>
+            <tr><td>$210^\circ$</td><td></td><td>$7/6\,\pi$</td><td></td><td>$7\pi/6$</td></tr>
+            <tr><td></td><td>$225^\circ$</td><td></td><td>$5/4\,\pi$</td><td>$5\pi/4$</td></tr>
+            <tr><td>$240^\circ$</td><td></td><td>$8/6\,\pi$</td><td></td><td>$4\pi/3$</td></tr>
+            <tr><td>$270^\circ$</td><td>$270^\circ$</td><td>$9/6\,\pi$</td><td>$6/4\,\pi$</td><td>$3\pi/2$</td></tr>
+            <tr><td>$300^\circ$</td><td></td><td>$10/6\,\pi$</td><td></td><td>$5\pi/3$</td></tr>
+            <tr><td></td><td>$315^\circ$</td><td></td><td>$7/4\,\pi$</td><td>$7\pi/4$</td></tr>
+            <tr><td>$330^\circ$</td><td></td><td>$11/6\,\pi$</td><td></td><td>$11\pi/6$</td></tr>
+            <tr><td>$360^\circ$</td><td>$360^\circ$</td><td>$12/6\,\pi$</td><td>$8/4\,\pi$</td><td>$2\pi$</td></tr>
+          </tbody>
+        </table>
 
         <iframe
           class="essay-widget angle-practice-widget"
