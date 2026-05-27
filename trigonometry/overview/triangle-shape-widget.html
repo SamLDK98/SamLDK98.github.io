@@ -79,6 +79,7 @@
       width: min(100%, 760px);
       height: auto;
       user-select: none;
+      touch-action: none;
     }
 
     .triangle-fill {
@@ -90,16 +91,38 @@
       fill: none;
       stroke-linecap: round;
       stroke-width: 5;
+      cursor: pointer;
     }
 
     .side-a { stroke: var(--orange); }
     .side-b { stroke: var(--cyan); }
     .side-c { stroke: var(--pink); }
     .selected { filter: drop-shadow(0 0 8px rgba(212, 184, 136, 0.6)); }
+    .ghost-side {
+      stroke: rgba(236, 226, 209, 0.35);
+      stroke-dasharray: 9 9;
+      filter: none;
+    }
 
     .vertex {
       fill: var(--text);
       opacity: 0.85;
+    }
+
+    .angle-arc {
+      fill: none;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-width: 2.5;
+      opacity: 0.72;
+    }
+
+    .drag-handle {
+      fill: var(--accent);
+      stroke: var(--bg);
+      stroke-width: 2;
+      cursor: ew-resize;
+      filter: drop-shadow(0 0 8px rgba(212, 184, 136, 0.48));
     }
 
     .angle-label,
@@ -146,13 +169,6 @@
       color: #ffe7b2;
     }
 
-    .step-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
     .readout {
       padding: 0.85rem;
       border: 1px solid var(--rule);
@@ -161,6 +177,43 @@
       font-family: "Courier New", monospace;
       font-size: 0.88rem;
       line-height: 1.6;
+    }
+
+    .custom-panel {
+      display: none;
+      margin: 1rem 0;
+      padding: 0.85rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+    }
+
+    .custom-panel.is-active {
+      display: block;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 0.35rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      min-height: 38px;
+      margin-bottom: 0.65rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid var(--rule);
+      background: #161311;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .hidden {
+      display: none;
     }
 
     @media (max-width: 850px) {
@@ -187,9 +240,13 @@
       <div class="stage">
         <svg viewBox="0 0 760 620" role="img" aria-label="Interactive triangle showing shape and scale">
           <polygon class="triangle-fill" id="fill" points="" />
+          <path class="angle-arc" id="arcA" d="" />
+          <path class="angle-arc" id="arcB" d="" />
+          <path class="angle-arc" id="arcC" d="" />
           <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
           <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
           <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
+          <circle class="drag-handle" id="dragHandle" cx="0" cy="0" r="9" />
           <circle class="vertex" id="va" cx="0" cy="0" r="4" />
           <circle class="vertex" id="vb" cx="0" cy="0" r="4" />
           <circle class="vertex" id="vc" cx="0" cy="0" r="4" />
@@ -208,16 +265,22 @@
         <div class="button-grid">
           <button type="button" id="random">Random angles</button>
           <button type="button" id="selectAll" class="active">Select All</button>
-          <button type="button" data-side="a">Side a</button>
-          <button type="button" data-side="b">Side b</button>
-          <button type="button" data-side="c">Side c</button>
+          <button type="button" id="customStart">Create custom triangle</button>
           <button type="button" id="reset">Reset</button>
         </div>
 
-        <div class="step-row">
-          <button type="button" id="decrease">Decrease</button>
-          <button type="button" id="increase">Increase</button>
+        <div class="custom-panel" id="customPanel">
+          <label for="firstAngle">first angle</label>
+          <input id="firstAngle" type="number" min="1" max="178" value="45">
+          <button type="button" id="setFirstAngle">Set first angle</button>
+
+          <label for="secondAngle">second angle</label>
+          <input id="secondAngle" type="number" min="1" max="178" value="100">
+          <button type="button" id="setSecondAngle">Set second angle</button>
+          <button type="button" id="finishCustom">Finish triangle</button>
         </div>
+
+        <p>Click a side to select it. Drag the gold handle left or right to increase or decrease the selected side. Use Select All to scale the whole triangle.</p>
 
         <div class="readout" id="readout"></div>
       </aside>
@@ -225,17 +288,30 @@
   </section>
 
   <script>
-    const ids = ["sideA", "sideB", "sideC", "fill", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"];
+    const ids = ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "dragHandle", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"];
     const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
     const status = document.getElementById("status");
     const readout = document.getElementById("readout");
     const selectAll = document.getElementById("selectAll");
-    const sideButtons = [...document.querySelectorAll("[data-side]")];
+    const svg = document.querySelector("svg");
+    const customPanel = document.getElementById("customPanel");
+    const firstAngleInput = document.getElementById("firstAngle");
+    const secondAngleInput = document.getElementById("secondAngle");
 
     let selected = "all";
     let angles = [50, 60, 70];
     let baseSides = sidesFromAngles(angles);
     let sides = [...baseSides];
+    let dragStartX = 0;
+    let dragStartSides = null;
+    let custom = {
+      active: false,
+      step: 0,
+      firstAngle: 45,
+      secondAngle: null,
+      secondAt: null,
+      angles: null
+    };
 
     function deg(rad) {
       return rad * 180 / Math.PI;
@@ -291,20 +367,144 @@
     function setSelection(newSelection) {
       selected = newSelection;
       selectAll.classList.toggle("active", selected === "all");
-      sideButtons.forEach((button) => button.classList.toggle("active", button.dataset.side === selected));
       render();
     }
 
+    function setVisibility(visible) {
+      ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "dragHandle", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"].forEach((id) => {
+        el[id].classList.toggle("hidden", !visible);
+      });
+    }
+
+    function arcPath(vertex, p1, p2, radius) {
+      const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+      let a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+      while (a2 < a1) a2 += Math.PI * 2;
+      if (a2 - a1 > Math.PI) {
+        const temp = a1;
+        return arcPath(vertex, p2, p1, radius);
+      }
+      const start = { x: vertex.x + Math.cos(a1) * radius, y: vertex.y + Math.sin(a1) * radius };
+      const end = { x: vertex.x + Math.cos(a2) * radius, y: vertex.y + Math.sin(a2) * radius };
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
+    }
+
+    function clearLabels() {
+      ["angleA", "angleB", "angleC", "labelA", "labelB", "labelC"].forEach((id) => {
+        el[id].textContent = "";
+      });
+    }
+
+    function renderCustom() {
+      customPanel.classList.add("is-active");
+      setVisibility(true);
+      clearLabels();
+      el.dragHandle.classList.add("hidden");
+      el.fill.setAttribute("points", "");
+      el.arcB.setAttribute("d", "");
+      el.arcC.setAttribute("d", "");
+      el.sideA.classList.remove("ghost-side", "selected");
+      el.sideB.classList.remove("ghost-side", "selected");
+      el.sideC.classList.remove("ghost-side", "selected");
+
+      const A = { x: 190, y: 420 };
+      const rayLength = 310;
+      const B = { x: A.x + rayLength, y: A.y };
+      const C = {
+        x: A.x + Math.cos(rad(custom.firstAngle)) * rayLength,
+        y: A.y - Math.sin(rad(custom.firstAngle)) * rayLength
+      };
+
+      setLine(el.sideC, A, B);
+      setLine(el.sideB, A, C);
+      el.sideB.classList.toggle("selected", custom.secondAt === "C");
+      el.sideC.classList.toggle("selected", custom.secondAt === "B");
+      el.arcA.setAttribute("d", arcPath(A, B, C, 42));
+      el.angleA.setAttribute("x", A.x + 54);
+      el.angleA.setAttribute("y", A.y - 22);
+      el.angleA.textContent = `A ${fmt(custom.firstAngle)}°`;
+      [["va", A], ["vb", B], ["vc", C]].forEach(([id, p]) => {
+        el[id].setAttribute("cx", p.x);
+        el[id].setAttribute("cy", p.y);
+      });
+
+      if (!custom.secondAngle || !custom.secondAt) {
+        el.sideA.classList.add("hidden");
+        status.textContent = custom.step === 0 ? "Enter first angle" : "Select a ray";
+        readout.innerHTML = custom.step === 0
+          ? "Enter an angle and press Set first angle."
+          : "Click one of the two rays, enter the second angle, then press Set second angle.";
+        return;
+      }
+
+      const builtAngles = custom.secondAt === "B"
+        ? [custom.firstAngle, custom.secondAngle, 180 - custom.firstAngle - custom.secondAngle]
+        : [custom.firstAngle, 180 - custom.firstAngle - custom.secondAngle, custom.secondAngle];
+      custom.angles = builtAngles;
+
+      if (builtAngles.some((angle) => angle <= 0)) {
+        el.sideA.classList.add("hidden");
+        status.textContent = "Invalid angles";
+        readout.innerHTML = "Those angles leave no room for the third angle. Use smaller values.";
+        return;
+      }
+
+      const previewSides = sidesFromAngles(builtAngles);
+      const points = layoutPoints(previewSides);
+      el.fill.setAttribute("points", [points.A, points.B, points.C].map(pointString).join(" "));
+      setLine(el.sideA, points.B, points.C);
+      setLine(el.sideB, points.A, points.C);
+      setLine(el.sideC, points.A, points.B);
+      el.sideA.classList.remove("hidden");
+      el.sideA.classList.add("ghost-side");
+      el.arcA.setAttribute("d", arcPath(points.A, points.B, points.C, 38));
+      el.arcB.setAttribute("d", arcPath(points.B, points.C, points.A, 38));
+      el.arcC.setAttribute("d", arcPath(points.C, points.A, points.B, 38));
+      [["va", points.A], ["vb", points.B], ["vc", points.C]].forEach(([id, p]) => {
+        el[id].setAttribute("cx", p.x);
+        el[id].setAttribute("cy", p.y);
+      });
+      el.angleA.setAttribute("x", points.A.x - 48);
+      el.angleA.setAttribute("y", points.A.y + 28);
+      el.angleA.textContent = `A ${fmt(builtAngles[0])}°`;
+      el.angleB.setAttribute("x", points.B.x + 12);
+      el.angleB.setAttribute("y", points.B.y + 28);
+      el.angleB.textContent = `B ${fmt(builtAngles[1])}°`;
+      el.angleC.setAttribute("x", points.C.x - 18);
+      el.angleC.setAttribute("y", points.C.y - 18);
+      el.angleC.textContent = `C ${fmt(builtAngles[2])}°`;
+      status.textContent = "Closing side";
+      readout.innerHTML = `
+        third side is forced by the first two angles<br>
+        angles: ${builtAngles.map(fmt).join("°, ")}°
+      `;
+    }
+
     function render() {
+      if (custom.active) {
+        renderCustom();
+        return;
+      }
+      customPanel.classList.remove("is-active");
+      setVisibility(true);
+      el.sideA.classList.remove("ghost-side");
+      el.sideB.classList.remove("ghost-side");
+      el.sideC.classList.remove("ghost-side");
       const currentAngles = anglesFromSides(sides);
       const { A, B, C } = layoutPoints(sides);
       el.fill.setAttribute("points", [A, B, C].map(pointString).join(" "));
+      el.arcA.setAttribute("d", arcPath(A, B, C, 38));
+      el.arcB.setAttribute("d", arcPath(B, C, A, 38));
+      el.arcC.setAttribute("d", arcPath(C, A, B, 38));
       setLine(el.sideA, B, C);
       setLine(el.sideB, A, C);
       setLine(el.sideC, A, B);
       el.sideA.classList.toggle("selected", selected === "all" || selected === "a");
       el.sideB.classList.toggle("selected", selected === "all" || selected === "b");
       el.sideC.classList.toggle("selected", selected === "all" || selected === "c");
+      el.sideA.style.pointerEvents = "stroke";
+      el.sideB.style.pointerEvents = "stroke";
+      el.sideC.style.pointerEvents = "stroke";
 
       [["va", A], ["vb", B], ["vc", C]].forEach(([id, p]) => {
         el[id].setAttribute("cx", p.x);
@@ -334,12 +534,27 @@
       el.labelC.setAttribute("y", mc.y);
       el.labelC.textContent = `c ${sides[2].toFixed(2)}`;
 
+      const handleAnchor = selected === "a" ? ma : selected === "b" ? mb : selected === "c" ? mc : { x: 560, y: 105 };
+      el.dragHandle.setAttribute("cx", handleAnchor.x + 46);
+      el.dragHandle.setAttribute("cy", handleAnchor.y);
+
       status.textContent = selected === "all" ? "Select All" : `Side ${selected}`;
       readout.innerHTML = `
         angles: ${currentAngles.map(fmt).join("°, ")}°<br>
         sides: ${sides.map((value) => value.toFixed(2)).join(", ")}<br>
         sum: ${(currentAngles[0] + currentAngles[1] + currentAngles[2]).toFixed(1)}°
       `;
+    }
+
+    function scaledSidesFromDrag(delta) {
+      const factor = Math.max(0.35, 1 + delta / 180);
+      if (selected === "all") {
+        return dragStartSides.map((side) => side * factor);
+      }
+      const index = { a: 0, b: 1, c: 2 }[selected];
+      const next = [...dragStartSides];
+      next[index] = Math.max(0.1, dragStartSides[index] * factor);
+      return next;
     }
 
     function adjust(direction) {
@@ -355,6 +570,7 @@
     }
 
     function randomAngles() {
+      custom.active = false;
       const a = 35 + Math.random() * 70;
       const b = 35 + Math.random() * (145 - a - 35);
       const c = 180 - a - b;
@@ -364,15 +580,101 @@
       setSelection("all");
     }
 
-    document.getElementById("increase").addEventListener("click", () => adjust(1));
-    document.getElementById("decrease").addEventListener("click", () => adjust(-1));
     document.getElementById("random").addEventListener("click", randomAngles);
     document.getElementById("reset").addEventListener("click", () => {
+      custom.active = false;
       sides = [...baseSides];
       setSelection("all");
     });
-    selectAll.addEventListener("click", () => setSelection("all"));
-    sideButtons.forEach((button) => button.addEventListener("click", () => setSelection(button.dataset.side)));
+    selectAll.addEventListener("click", () => {
+      custom.active = false;
+      setSelection("all");
+    });
+    el.sideA.addEventListener("click", () => {
+      if (custom.active && custom.angles) {
+        finishCustomTriangle();
+      } else {
+        setSelection("a");
+      }
+    });
+    el.sideB.addEventListener("click", () => {
+      if (custom.active && custom.step >= 1 && !custom.secondAngle) {
+        custom.secondAt = "C";
+        render();
+      } else {
+        setSelection("b");
+      }
+    });
+    el.sideC.addEventListener("click", () => {
+      if (custom.active && custom.step >= 1 && !custom.secondAngle) {
+        custom.secondAt = "B";
+        render();
+      } else {
+        setSelection("c");
+      }
+    });
+
+    function startCustomTriangle() {
+      custom = {
+        active: true,
+        step: 0,
+        firstAngle: Number(firstAngleInput.value) || 45,
+        secondAngle: null,
+        secondAt: null,
+        angles: null
+      };
+      render();
+    }
+
+    function finishCustomTriangle() {
+      if (!custom.angles || custom.angles.some((angle) => angle <= 0)) return;
+      angles = [...custom.angles];
+      baseSides = sidesFromAngles(angles);
+      sides = [...baseSides];
+      custom.active = false;
+      setSelection("all");
+    }
+
+    document.getElementById("customStart").addEventListener("click", startCustomTriangle);
+    document.getElementById("setFirstAngle").addEventListener("click", () => {
+      const value = Number(firstAngleInput.value);
+      if (!Number.isFinite(value) || value <= 0 || value >= 178) return;
+      custom.active = true;
+      custom.step = 1;
+      custom.firstAngle = value;
+      custom.secondAngle = null;
+      custom.secondAt = null;
+      custom.angles = null;
+      render();
+    });
+    document.getElementById("setSecondAngle").addEventListener("click", () => {
+      const value = Number(secondAngleInput.value);
+      if (!custom.active || !custom.secondAt || !Number.isFinite(value) || value <= 0) return;
+      custom.secondAngle = value;
+      custom.step = 2;
+      render();
+    });
+    document.getElementById("finishCustom").addEventListener("click", finishCustomTriangle);
+
+    el.dragHandle.addEventListener("pointerdown", (event) => {
+      dragStartX = event.clientX;
+      dragStartSides = [...sides];
+      el.dragHandle.setPointerCapture(event.pointerId);
+    });
+
+    el.dragHandle.addEventListener("pointermove", (event) => {
+      if (!dragStartSides) return;
+      const next = scaledSidesFromDrag(event.clientX - dragStartX);
+      if (selected === "all" || isValidTriangle(next)) {
+        sides = next;
+        render();
+      }
+    });
+
+    el.dragHandle.addEventListener("pointerup", (event) => {
+      dragStartSides = null;
+      el.dragHandle.releasePointerCapture(event.pointerId);
+    });
 
     render();
   </script>
