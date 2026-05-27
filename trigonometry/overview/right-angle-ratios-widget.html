@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Right Angle Ratios</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.16);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --orange: #e8a13b;
+      --cyan: #6dd3c4;
+      --yellow: #e7c84f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
+    }
+
+    .stage {
+      min-height: 510px;
+      border-right: 1px solid var(--rule);
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+    }
+
+    .controls {
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin: 0 0 0.45rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      margin: 0 0 1rem;
+      accent-color: var(--accent);
+    }
+
+    .ratio-box {
+      display: grid;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .ratio-row {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    .fraction {
+      display: inline-grid;
+      grid-template-rows: auto 1px auto;
+      justify-items: center;
+      min-width: 1.4rem;
+      line-height: 1;
+    }
+
+    .bar {
+      width: 100%;
+      background: var(--dim);
+    }
+
+    .o { color: var(--orange); fill: var(--orange); }
+    .a { color: var(--cyan); fill: var(--cyan); }
+    .h { color: var(--yellow); fill: var(--yellow); }
+
+    .side {
+      stroke-linecap: round;
+      stroke-width: 6;
+    }
+
+    .adjacent { stroke: var(--cyan); }
+    .opposite { stroke: var(--orange); }
+    .hypotenuse { stroke: var(--yellow); }
+
+    .fill {
+      fill: rgba(214, 196, 168, 0.055);
+    }
+
+    .angle-arc {
+      fill: none;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-width: 3;
+    }
+
+    .right-mark {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 3;
+    }
+
+    .point {
+      fill: var(--text);
+      opacity: 0.9;
+    }
+
+    text {
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+    }
+
+    .angle-label {
+      fill: var(--accent);
+      font-size: 20px;
+    }
+
+    .side-label {
+      font-size: 18px;
+    }
+
+    @media (max-width: 760px) {
+      .widget { grid-template-columns: 1fr; }
+      .stage {
+        min-height: 410px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <div class="stage">
+      <svg viewBox="0 0 680 510" role="img" aria-label="Right triangle with fixed acute angle and side ratios">
+        <polygon class="fill" id="fill" points="" />
+        <path class="angle-arc" id="arcA" d="" />
+        <path class="right-mark" id="rightMark" d="" />
+        <line class="side adjacent" id="adjacent" x1="0" y1="0" x2="0" y2="0" />
+        <line class="side opposite" id="opposite" x1="0" y1="0" x2="0" y2="0" />
+        <line class="side hypotenuse" id="hypotenuse" x1="0" y1="0" x2="0" y2="0" />
+        <circle class="point" id="pA" cx="0" cy="0" r="5" />
+        <circle class="point" id="pB" cx="0" cy="0" r="5" />
+        <circle class="point" id="pC" cx="0" cy="0" r="5" />
+        <text class="angle-label" id="angleA" x="0" y="0"></text>
+        <text class="angle-label" id="angleB" x="0" y="0">90°</text>
+        <text class="side-label a" id="labelA" x="0" y="0">a</text>
+        <text class="side-label o" id="labelO" x="0" y="0">o</text>
+        <text class="side-label h" id="labelH" x="0" y="0">h</text>
+      </svg>
+    </div>
+    <aside class="controls">
+      <label for="angle">angle</label>
+      <input id="angle" type="range" min="15" max="75" value="38">
+
+      <label for="scale">size</label>
+      <input id="scale" type="range" min="0.7" max="1.45" step="0.01" value="1">
+
+      <div class="ratio-box">
+        <div class="ratio-row">
+          <span><span class="fraction"><span class="o">o</span><span class="bar"></span><span class="h">h</span></span></span>
+          <span id="ratioOH"></span>
+        </div>
+        <div class="ratio-row">
+          <span><span class="fraction"><span class="a">a</span><span class="bar"></span><span class="h">h</span></span></span>
+          <span id="ratioAH"></span>
+        </div>
+        <div class="ratio-row">
+          <span><span class="fraction"><span class="o">o</span><span class="bar"></span><span class="a">a</span></span></span>
+          <span id="ratioOA"></span>
+        </div>
+        <div class="ratio-row">
+          <span><span class="fraction"><span class="h">h</span><span class="bar"></span><span class="o">o</span></span></span>
+          <span id="ratioHO"></span>
+        </div>
+        <div class="ratio-row">
+          <span><span class="fraction"><span class="h">h</span><span class="bar"></span><span class="a">a</span></span></span>
+          <span id="ratioHA"></span>
+        </div>
+        <div class="ratio-row">
+          <span><span class="fraction"><span class="a">a</span><span class="bar"></span><span class="o">o</span></span></span>
+          <span id="ratioAO"></span>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <script>
+    const el = Object.fromEntries([
+      "fill", "arcA", "rightMark", "adjacent", "opposite", "hypotenuse",
+      "pA", "pB", "pC", "angleA", "angleB", "labelA", "labelO", "labelH",
+      "ratioOH", "ratioAH", "ratioOA", "ratioHO", "ratioHA", "ratioAO"
+    ].map((id) => [id, document.getElementById(id)]));
+    const angleInput = document.getElementById("angle");
+    const scaleInput = document.getElementById("scale");
+
+    function setLine(line, from, to) {
+      line.setAttribute("x1", from.x);
+      line.setAttribute("y1", from.y);
+      line.setAttribute("x2", to.x);
+      line.setAttribute("y2", to.y);
+    }
+
+    function setCircle(circle, point) {
+      circle.setAttribute("cx", point.x);
+      circle.setAttribute("cy", point.y);
+    }
+
+    function setText(text, point, value) {
+      text.setAttribute("x", point.x);
+      text.setAttribute("y", point.y);
+      text.textContent = value;
+    }
+
+    function arcPath(vertex, p1, p2, radius) {
+      const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+      let a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+      while (a2 < a1) a2 += Math.PI * 2;
+      if (a2 - a1 > Math.PI) return arcPath(vertex, p2, p1, radius);
+      const start = { x: vertex.x + Math.cos(a1) * radius, y: vertex.y + Math.sin(a1) * radius };
+      const end = { x: vertex.x + Math.cos(a2) * radius, y: vertex.y + Math.sin(a2) * radius };
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
+    }
+
+    function ratio(value) {
+      return value.toFixed(3).replace(/0+$/, "").replace(/\.$/, ".0");
+    }
+
+    function render() {
+      const theta = Number(angleInput.value) * Math.PI / 180;
+      const size = Number(scaleInput.value);
+      const adjacent = 260 * size;
+      const opposite = Math.tan(theta) * adjacent;
+      const hypotenuse = Math.hypot(adjacent, opposite);
+
+      const B = { x: 155, y: 390 };
+      const A = { x: B.x + adjacent, y: B.y };
+      const C = { x: B.x, y: B.y - opposite };
+
+      el.fill.setAttribute("points", `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`);
+      setLine(el.adjacent, B, A);
+      setLine(el.opposite, B, C);
+      setLine(el.hypotenuse, A, C);
+      [["pA", A], ["pB", B], ["pC", C]].forEach(([id, point]) => setCircle(el[id], point));
+
+      el.arcA.setAttribute("d", arcPath(A, B, C, 40));
+      el.rightMark.setAttribute("d", `M ${B.x + 34} ${B.y} L ${B.x + 34} ${B.y - 34} L ${B.x} ${B.y - 34}`);
+      setText(el.angleA, { x: A.x - 74, y: A.y - 18 }, `${Number(angleInput.value).toFixed(0)}°`);
+      el.angleB.setAttribute("x", B.x + 42);
+      el.angleB.setAttribute("y", B.y - 42);
+
+      setText(el.labelA, { x: B.x + adjacent / 2 - 6, y: B.y + 32 }, "a");
+      setText(el.labelO, { x: B.x - 32, y: B.y - opposite / 2 + 6 }, "o");
+      setText(el.labelH, { x: (A.x + C.x) / 2 + 14, y: (A.y + C.y) / 2 - 12 }, "h");
+
+      el.ratioOH.textContent = ratio(opposite / hypotenuse);
+      el.ratioAH.textContent = ratio(adjacent / hypotenuse);
+      el.ratioOA.textContent = ratio(opposite / adjacent);
+      el.ratioHO.textContent = ratio(hypotenuse / opposite);
+      el.ratioHA.textContent = ratio(hypotenuse / adjacent);
+      el.ratioAO.textContent = ratio(adjacent / opposite);
+    }
+
+    angleInput.addEventListener("input", render);
+    scaleInput.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>

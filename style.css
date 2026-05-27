@@ -1202,6 +1202,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 490px;
 }
 
+.intro-linear-algebra-page .right-angle-ratios-widget {
+  height: 530px;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }
