@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triangle Shape and Scale</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --orange: #e8a13b;
+      --cyan: #6dd3c4;
+      --pink: #ef7398;
+      --green: #78c884;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 760px;
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%), var(--bg);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.3rem 1.6rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 500;
+    }
+
+    .status {
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--accent);
+      font-family: "Courier New", monospace;
+      font-size: 0.88rem;
+      text-align: right;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      min-height: 660px;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 660px;
+      padding: 1rem;
+      border-right: 1px solid var(--rule);
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 760px);
+      height: auto;
+      user-select: none;
+    }
+
+    .triangle-fill {
+      fill: rgba(214, 196, 168, 0.055);
+      stroke: none;
+    }
+
+    .side {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 5;
+    }
+
+    .side-a { stroke: var(--orange); }
+    .side-b { stroke: var(--cyan); }
+    .side-c { stroke: var(--pink); }
+    .selected { filter: drop-shadow(0 0 8px rgba(212, 184, 136, 0.6)); }
+
+    .vertex {
+      fill: var(--text);
+      opacity: 0.85;
+    }
+
+    .angle-label,
+    .side-label {
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .angle-label { fill: var(--accent); }
+    .side-label { fill: var(--dim); font-size: 15px; }
+
+    .controls {
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .controls p {
+      margin: 0 0 1rem;
+      color: var(--dim);
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button.active {
+      border-color: var(--accent);
+      color: #ffe7b2;
+    }
+
+    .step-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .readout {
+      padding: 0.85rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--text);
+      font-family: "Courier New", monospace;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 850px) {
+      .widget { min-height: 980px; }
+      header,
+      .layout { grid-template-columns: 1fr; }
+      .stage {
+        min-height: 560px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .status { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Shape, Angles, and Scale</h1>
+      <div class="status" id="status">Select All</div>
+    </header>
+
+    <div class="layout">
+      <div class="stage">
+        <svg viewBox="0 0 760 620" role="img" aria-label="Interactive triangle showing shape and scale">
+          <polygon class="triangle-fill" id="fill" points="" />
+          <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
+          <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
+          <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
+          <circle class="vertex" id="va" cx="0" cy="0" r="4" />
+          <circle class="vertex" id="vb" cx="0" cy="0" r="4" />
+          <circle class="vertex" id="vc" cx="0" cy="0" r="4" />
+          <text class="angle-label" id="angleA" x="0" y="0"></text>
+          <text class="angle-label" id="angleB" x="0" y="0"></text>
+          <text class="angle-label" id="angleC" x="0" y="0"></text>
+          <text class="side-label" id="labelA" x="0" y="0"></text>
+          <text class="side-label" id="labelB" x="0" y="0"></text>
+          <text class="side-label" id="labelC" x="0" y="0"></text>
+        </svg>
+      </div>
+
+      <aside class="controls">
+        <p>Scale all sides together and the triangle keeps the same shape. Change one side by itself and the angles must change.</p>
+
+        <div class="button-grid">
+          <button type="button" id="random">Random angles</button>
+          <button type="button" id="selectAll" class="active">Select All</button>
+          <button type="button" data-side="a">Side a</button>
+          <button type="button" data-side="b">Side b</button>
+          <button type="button" data-side="c">Side c</button>
+          <button type="button" id="reset">Reset</button>
+        </div>
+
+        <div class="step-row">
+          <button type="button" id="decrease">Decrease</button>
+          <button type="button" id="increase">Increase</button>
+        </div>
+
+        <div class="readout" id="readout"></div>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const ids = ["sideA", "sideB", "sideC", "fill", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"];
+    const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+    const status = document.getElementById("status");
+    const readout = document.getElementById("readout");
+    const selectAll = document.getElementById("selectAll");
+    const sideButtons = [...document.querySelectorAll("[data-side]")];
+
+    let selected = "all";
+    let angles = [50, 60, 70];
+    let baseSides = sidesFromAngles(angles);
+    let sides = [...baseSides];
+
+    function deg(rad) {
+      return rad * 180 / Math.PI;
+    }
+
+    function rad(degrees) {
+      return degrees * Math.PI / 180;
+    }
+
+    function sidesFromAngles(values) {
+      return values.map((angle) => Math.sin(rad(angle)));
+    }
+
+    function anglesFromSides([a, b, c]) {
+      const A = deg(Math.acos((b * b + c * c - a * a) / (2 * b * c)));
+      const B = deg(Math.acos((a * a + c * c - b * b) / (2 * a * c)));
+      return [A, B, 180 - A - B];
+    }
+
+    function isValidTriangle([a, b, c]) {
+      return a + b > c && a + c > b && b + c > a;
+    }
+
+    function fmt(value) {
+      return value.toFixed(1);
+    }
+
+    function pointString(p) {
+      return `${p.x},${p.y}`;
+    }
+
+    function layoutPoints([a, b, c]) {
+      const scale = 330 / Math.max(a, b, c);
+      const A = { x: 190, y: 420 };
+      const B = { x: 190 + c * scale, y: 420 };
+      const xC = (b * b + c * c - a * a) / (2 * c);
+      const yC = Math.sqrt(Math.max(0, b * b - xC * xC));
+      const C = { x: 190 + xC * scale, y: 420 - yC * scale };
+      return { A, B, C };
+    }
+
+    function mid(a, b, offsetY = 0) {
+      return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 + offsetY };
+    }
+
+    function setLine(line, from, to) {
+      line.setAttribute("x1", from.x);
+      line.setAttribute("y1", from.y);
+      line.setAttribute("x2", to.x);
+      line.setAttribute("y2", to.y);
+    }
+
+    function setSelection(newSelection) {
+      selected = newSelection;
+      selectAll.classList.toggle("active", selected === "all");
+      sideButtons.forEach((button) => button.classList.toggle("active", button.dataset.side === selected));
+      render();
+    }
+
+    function render() {
+      const currentAngles = anglesFromSides(sides);
+      const { A, B, C } = layoutPoints(sides);
+      el.fill.setAttribute("points", [A, B, C].map(pointString).join(" "));
+      setLine(el.sideA, B, C);
+      setLine(el.sideB, A, C);
+      setLine(el.sideC, A, B);
+      el.sideA.classList.toggle("selected", selected === "all" || selected === "a");
+      el.sideB.classList.toggle("selected", selected === "all" || selected === "b");
+      el.sideC.classList.toggle("selected", selected === "all" || selected === "c");
+
+      [["va", A], ["vb", B], ["vc", C]].forEach(([id, p]) => {
+        el[id].setAttribute("cx", p.x);
+        el[id].setAttribute("cy", p.y);
+      });
+
+      el.angleA.setAttribute("x", A.x - 48);
+      el.angleA.setAttribute("y", A.y + 28);
+      el.angleA.textContent = `A ${fmt(currentAngles[0])}°`;
+      el.angleB.setAttribute("x", B.x + 12);
+      el.angleB.setAttribute("y", B.y + 28);
+      el.angleB.textContent = `B ${fmt(currentAngles[1])}°`;
+      el.angleC.setAttribute("x", C.x - 18);
+      el.angleC.setAttribute("y", C.y - 18);
+      el.angleC.textContent = `C ${fmt(currentAngles[2])}°`;
+
+      const ma = mid(B, C);
+      const mb = mid(A, C);
+      const mc = mid(A, B, 30);
+      el.labelA.setAttribute("x", ma.x + 18);
+      el.labelA.setAttribute("y", ma.y);
+      el.labelA.textContent = `a ${sides[0].toFixed(2)}`;
+      el.labelB.setAttribute("x", mb.x - 58);
+      el.labelB.setAttribute("y", mb.y);
+      el.labelB.textContent = `b ${sides[1].toFixed(2)}`;
+      el.labelC.setAttribute("x", mc.x - 18);
+      el.labelC.setAttribute("y", mc.y);
+      el.labelC.textContent = `c ${sides[2].toFixed(2)}`;
+
+      status.textContent = selected === "all" ? "Select All" : `Side ${selected}`;
+      readout.innerHTML = `
+        angles: ${currentAngles.map(fmt).join("°, ")}°<br>
+        sides: ${sides.map((value) => value.toFixed(2)).join(", ")}<br>
+        sum: ${(currentAngles[0] + currentAngles[1] + currentAngles[2]).toFixed(1)}°
+      `;
+    }
+
+    function adjust(direction) {
+      if (selected === "all") {
+        sides = sides.map((side) => side * (direction > 0 ? 1.12 : 0.88));
+      } else {
+        const index = { a: 0, b: 1, c: 2 }[selected];
+        const next = [...sides];
+        next[index] *= direction > 0 ? 1.12 : 0.88;
+        if (isValidTriangle(next)) sides = next;
+      }
+      render();
+    }
+
+    function randomAngles() {
+      const a = 35 + Math.random() * 70;
+      const b = 35 + Math.random() * (145 - a - 35);
+      const c = 180 - a - b;
+      angles = [a, b, c];
+      baseSides = sidesFromAngles(angles);
+      sides = [...baseSides];
+      setSelection("all");
+    }
+
+    document.getElementById("increase").addEventListener("click", () => adjust(1));
+    document.getElementById("decrease").addEventListener("click", () => adjust(-1));
+    document.getElementById("random").addEventListener("click", randomAngles);
+    document.getElementById("reset").addEventListener("click", () => {
+      sides = [...baseSides];
+      setSelection("all");
+    });
+    selectAll.addEventListener("click", () => setSelection("all"));
+    sideButtons.forEach((button) => button.addEventListener("click", () => setSelection(button.dataset.side)));
+
+    render();
+  </script>
+</body>
+</html>

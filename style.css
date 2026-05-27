@@ -1184,6 +1184,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 900px;
 }
 
+.intro-linear-algebra-page .triangle-shape-widget {
+  height: 760px;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }
@@ -1267,8 +1271,12 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   stroke: var(--intro-jhat);
 }
 
+.trig-line-adjacent {
+  stroke: #78c884;
+}
+
 .trig-line-gold {
-  stroke: var(--intro-accent);
+  stroke: #e7c84f;
 }
 
 .trig-circle {
@@ -1305,6 +1313,52 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-family: "JetBrains Mono", "Courier New", monospace;
   font-size: 16px;
   letter-spacing: 0.08em;
+}
+
+.trig-opposite-text {
+  color: var(--intro-jhat);
+  fill: var(--intro-jhat);
+}
+
+.trig-adjacent-text {
+  color: #78c884;
+  fill: #78c884;
+}
+
+.trig-hypotenuse-text {
+  color: #e7c84f;
+  fill: #e7c84f;
+}
+
+.trig-ratio-equations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem 1.4rem;
+}
+
+.trig-ratio-equations > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.trig-fraction {
+  display: inline-grid;
+  grid-template-rows: auto 1px auto;
+  min-width: 1.6rem;
+  align-items: center;
+  justify-items: center;
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.trig-bar {
+  width: 100%;
+  height: 1px;
+  background: currentColor;
 }
 
 .intro-linear-algebra-page a {

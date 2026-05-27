@@ -73,6 +73,22 @@
 
         <h3 class="subsection-title">Trigonometric Functions</h3>
 
+        <p>Angles and ratios measure shape independently of size.</p>
+
+        <p>Pick any three numbers that sum to 180 (or randomly have them generated) and notice that they determine the shape of the triangle.</p>
+
+        <p>Click 'Select All' to increase or decrease the triangles side lengths simultaneously. Notice the shape and angles do not change.</p>
+
+        <p>Select a particular side and increase or decrease it -- notice how the angles and shape changes.</p>
+
+        <iframe
+          class="essay-widget triangle-shape-widget"
+          src="trigonometry/overview/triangle-shape-widget.html"
+          title="Interactive widget showing triangle shape and scaling"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
         <p>If we know the side lengths of a triangle, we can derive its angles.</p>
 
         <p>For right-angled triangles, we need only know two side lengths.</p>
@@ -81,30 +97,29 @@
           <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-title">
             <title id="right-triangle-title">Right triangle labelled hypotenuse, opposite, and adjacent</title>
             <polygon class="trig-triangle-fill" points="88,250 416,250 416,70" />
-            <line class="trig-line trig-line-accent" x1="88" y1="250" x2="416" y2="250" />
+            <line class="trig-line trig-line-adjacent" x1="88" y1="250" x2="416" y2="250" />
             <line class="trig-line trig-line-cyan" x1="416" y1="250" x2="416" y2="70" />
             <line class="trig-line trig-line-gold" x1="88" y1="250" x2="416" y2="70" />
             <path class="trig-angle-arc" d="M 148 250 A 60 60 0 0 0 141 219" />
             <path class="trig-right-angle" d="M 386 250 L 386 220 L 416 220" />
             <text class="trig-label" x="157" y="235">&theta;</text>
-            <text class="trig-small-label" x="227" y="275">adjacent</text>
-            <text class="trig-small-label" x="427" y="166">opposite</text>
-            <text class="trig-small-label" x="180" y="116">hypotenuse</text>
+            <text class="trig-small-label trig-adjacent-text" x="227" y="275">adjacent</text>
+            <text class="trig-small-label trig-opposite-text" x="427" y="166">opposite</text>
+            <text class="trig-small-label trig-hypotenuse-text" x="180" y="116">hypotenuse</text>
           </svg>
           <figcaption>The 'opposite' is with respect to the angle of interest.</figcaption>
         </figure>
 
         <p>From the three sides of a right-angled triangle, we can construct six named ratios: sine, cosine, tangent, cosecant, secant, and cotangent.</p>
 
-        <p class="display-equation">$$\sin(\theta) = \frac{\text{opposite}}{\text{hypotenuse}} \qquad \cos(\theta) = \frac{\text{adjacent}}{\text{hypotenuse}} \qquad \tan(\theta) = \frac{\text{opposite}}{\text{adjacent}}$$</p>
-
-        <p class="display-equation">$$
-\csc(\theta) = \frac{\text{hypotenuse}}{\text{opposite}}
-\qquad
-\sec(\theta) = \frac{\text{hypotenuse}}{\text{adjacent}}
-\qquad
-\cot(\theta) = \frac{\text{adjacent}}{\text{opposite}}
-$$</p>
+        <div class="display-equation trig-ratio-equations">
+          <span>$\sin(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
+          <span>$\cos(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
+          <span>$\tan(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
+          <span>$\csc(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
+          <span>$\sec(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
+          <span>$\cot(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
+        </div>
 
         <p>We can find the mystery angle using whichever ratio is most convenient.</p>
 
