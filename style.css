@@ -1190,6 +1190,14 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
+.intro-linear-algebra-page .finding-angles-widget {
+  height: 510px;
+}
+
+.intro-linear-algebra-page .fixed-triangle-widget {
+  height: 530px;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }

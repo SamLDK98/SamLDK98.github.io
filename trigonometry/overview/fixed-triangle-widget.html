@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixed Triangle</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --rule: rgba(214, 196, 168, 0.16);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --orange: #e8a13b;
+      --cyan: #6dd3c4;
+      --pink: #ef7398;
+      --green: #78c884;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      max-width: 860px;
+      height: auto;
+      margin: 0 auto;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .side {
+      stroke-linecap: round;
+      stroke-width: 6;
+      cursor: grab;
+      filter: drop-shadow(0 0 7px rgba(212, 184, 136, 0.12));
+    }
+
+    .side:active { cursor: grabbing; }
+    .side-a { stroke: var(--orange); }
+    .side-b { stroke: var(--cyan); }
+    .side-c { stroke: var(--pink); }
+    .is-snapped .side { filter: drop-shadow(0 0 9px rgba(120, 200, 132, 0.35)); }
+
+    .angle-arc {
+      fill: none;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-width: 3;
+      opacity: 0.85;
+    }
+
+    .vertex {
+      fill: var(--text);
+      opacity: 0.9;
+    }
+
+    .handle {
+      fill: var(--pink);
+      stroke: var(--bg);
+      stroke-width: 2;
+      cursor: grab;
+    }
+
+    .target {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 2;
+      opacity: 0.35;
+    }
+
+    text {
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+    }
+
+    .side-label {
+      fill: var(--dim);
+      font-size: 16px;
+    }
+
+    .angle-label {
+      fill: var(--accent);
+      font-size: 18px;
+    }
+
+    .status {
+      fill: var(--text);
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <svg id="canvas" viewBox="0 0 860 520" role="img" aria-label="Fixed side lengths forming one possible triangle">
+      <g id="triangleGroup">
+        <circle class="target" id="snapTarget" cx="0" cy="0" r="18" />
+        <path class="angle-arc" id="arcA" d="" />
+        <path class="angle-arc" id="arcB" d="" />
+        <path class="angle-arc" id="arcC" d="" />
+        <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
+        <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
+        <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
+        <circle class="vertex" id="va" cx="0" cy="0" r="5" />
+        <circle class="vertex" id="vb" cx="0" cy="0" r="5" />
+        <circle class="handle" id="vc" cx="0" cy="0" r="10" />
+        <text class="side-label" id="labelA" x="0" y="0">a = 4</text>
+        <text class="side-label" id="labelB" x="0" y="0">b = 6</text>
+        <text class="side-label" id="labelC" x="0" y="0">c = 9</text>
+        <text class="angle-label" id="angleA" x="0" y="0"></text>
+        <text class="angle-label" id="angleB" x="0" y="0"></text>
+        <text class="angle-label" id="angleC" x="0" y="0"></text>
+        <text class="status" id="status" x="0" y="0"></text>
+      </g>
+    </svg>
+  </section>
+
+  <script>
+    const svg = document.getElementById("canvas");
+    const group = document.getElementById("triangleGroup");
+    const el = Object.fromEntries([
+      "snapTarget", "sideA", "sideB", "sideC", "va", "vb", "vc",
+      "labelA", "labelB", "labelC", "angleA", "angleB", "angleC",
+      "arcA", "arcB", "arcC", "status"
+    ].map((id) => [id, document.getElementById(id)]));
+
+    const scale = 42;
+    const lengths = { a: 4 * scale, b: 6 * scale, c: 9 * scale };
+    const A = { x: 150, y: 350 };
+    const B = { x: A.x + lengths.c, y: A.y };
+    const targetC = targetPoint();
+    let C = { x: targetC.x + 96, y: targetC.y - 82 };
+    let dragging = false;
+    let snapped = false;
+
+    function targetPoint() {
+      const x = (lengths.b ** 2 + lengths.c ** 2 - lengths.a ** 2) / (2 * lengths.c);
+      const y = Math.sqrt(Math.max(0, lengths.b ** 2 - x ** 2));
+      return { x: A.x + x, y: A.y - y };
+    }
+
+    function setLine(line, from, to) {
+      line.setAttribute("x1", from.x);
+      line.setAttribute("y1", from.y);
+      line.setAttribute("x2", to.x);
+      line.setAttribute("y2", to.y);
+    }
+
+    function setCircle(circle, point) {
+      circle.setAttribute("cx", point.x);
+      circle.setAttribute("cy", point.y);
+    }
+
+    function midpoint(p, q, offsetY = 0) {
+      return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 + offsetY };
+    }
+
+    function distance(p, q) {
+      return Math.hypot(p.x - q.x, p.y - q.y);
+    }
+
+    function degreesAt(vertex, p1, p2) {
+      const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+      const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+      let diff = Math.abs((a2 - a1) * 180 / Math.PI);
+      if (diff > 180) diff = 360 - diff;
+      return diff;
+    }
+
+    function arcPath(vertex, p1, p2, radius) {
+      const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+      let a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+      while (a2 < a1) a2 += Math.PI * 2;
+      if (a2 - a1 > Math.PI) return arcPath(vertex, p2, p1, radius);
+      const start = { x: vertex.x + Math.cos(a1) * radius, y: vertex.y + Math.sin(a1) * radius };
+      const end = { x: vertex.x + Math.cos(a2) * radius, y: vertex.y + Math.sin(a2) * radius };
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
+    }
+
+    function setText(text, point, value) {
+      text.setAttribute("x", point.x);
+      text.setAttribute("y", point.y);
+      text.textContent = value;
+    }
+
+    function pointerPoint(event) {
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      return point.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    function render() {
+      const gap = distance(C, targetC);
+      if (gap < 24 && !dragging) {
+        C = { ...targetC };
+        snapped = true;
+      }
+
+      group.classList.toggle("is-snapped", snapped);
+      setCircle(el.snapTarget, targetC);
+      setLine(el.sideA, B, C);
+      setLine(el.sideB, A, C);
+      setLine(el.sideC, A, B);
+      setCircle(el.va, A);
+      setCircle(el.vb, B);
+      setCircle(el.vc, C);
+
+      setText(el.labelA, midpoint(B, C, -12), "a = 4");
+      setText(el.labelB, midpoint(A, C, -12), "b = 6");
+      setText(el.labelC, midpoint(A, B, 28), "c = 9");
+
+      const angles = [
+        degreesAt(A, B, C),
+        degreesAt(B, C, A),
+        degreesAt(C, A, B)
+      ];
+      el.arcA.setAttribute("d", arcPath(A, B, C, 34));
+      el.arcB.setAttribute("d", arcPath(B, C, A, 34));
+      el.arcC.setAttribute("d", arcPath(C, A, B, 34));
+      setText(el.angleA, { x: A.x + 42, y: A.y - 14 }, `${angles[0].toFixed(1)}°`);
+      setText(el.angleB, { x: B.x - 88, y: B.y - 14 }, `${angles[1].toFixed(1)}°`);
+      setText(el.angleC, { x: C.x - 24, y: C.y - 22 }, `${angles[2].toFixed(1)}°`);
+      setText(
+        el.status,
+        { x: 150, y: 84 },
+        snapped ? "connected: angles fixed" : "move the broken point until it connects"
+      );
+    }
+
+    el.vc.addEventListener("pointerdown", (event) => {
+      dragging = true;
+      snapped = false;
+      el.vc.setPointerCapture(event.pointerId);
+    });
+
+    el.vc.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      C = pointerPoint(event);
+      render();
+    });
+
+    el.vc.addEventListener("pointerup", (event) => {
+      dragging = false;
+      if (distance(C, targetC) < 34) {
+        C = { ...targetC };
+        snapped = true;
+      }
+      el.vc.releasePointerCapture(event.pointerId);
+      render();
+    });
+
+    el.vc.addEventListener("pointercancel", () => {
+      dragging = false;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

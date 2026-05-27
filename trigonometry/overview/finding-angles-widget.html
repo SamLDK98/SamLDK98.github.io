@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finding Angles</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --rule: rgba(214, 196, 168, 0.16);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --orange: #e8a13b;
+      --cyan: #6dd3c4;
+      --pink: #ef7398;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      max-width: 860px;
+      height: auto;
+      margin: 0 auto;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .side {
+      stroke-linecap: round;
+      stroke-width: 6;
+      cursor: grab;
+      filter: drop-shadow(0 0 7px rgba(212, 184, 136, 0.12));
+    }
+
+    .side:active { cursor: grabbing; }
+    .side-a { stroke: var(--orange); }
+    .side-b { stroke: var(--cyan); }
+    .side-c {
+      stroke: rgba(236, 226, 209, 0.32);
+      stroke-dasharray: 9 10;
+      stroke-width: 3;
+    }
+
+    .handle {
+      fill: var(--text);
+      stroke: var(--bg);
+      stroke-width: 2;
+      cursor: grab;
+    }
+
+    .handle-a { fill: var(--orange); }
+    .handle-b { fill: var(--cyan); }
+
+    .vertex {
+      fill: var(--text);
+      opacity: 0.9;
+    }
+
+    .angle-arc {
+      fill: none;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-width: 3;
+    }
+
+    text {
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+    }
+
+    .length-label {
+      fill: var(--dim);
+      font-size: 16px;
+    }
+
+    .angle-label {
+      fill: var(--accent);
+      font-size: 22px;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <svg viewBox="0 0 860 500" role="img" aria-label="Two connected side lengths with a movable included angle">
+      <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
+      <path class="angle-arc" id="angleArc" d="" />
+      <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
+      <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
+      <circle class="vertex" id="origin" cx="0" cy="0" r="5" />
+      <circle class="handle handle-a" id="handleA" cx="0" cy="0" r="10" />
+      <circle class="handle handle-b" id="handleB" cx="0" cy="0" r="10" />
+      <text class="length-label" id="labelA" x="0" y="0">a = 1</text>
+      <text class="length-label" id="labelB" x="0" y="0">b = 2</text>
+      <text class="length-label" id="labelC" x="0" y="0">c</text>
+      <text class="angle-label" id="angleLabel" x="0" y="0"></text>
+    </svg>
+  </section>
+
+  <script>
+    const svg = document.querySelector("svg");
+    const sideA = document.getElementById("sideA");
+    const sideB = document.getElementById("sideB");
+    const sideC = document.getElementById("sideC");
+    const handleA = document.getElementById("handleA");
+    const handleB = document.getElementById("handleB");
+    const origin = document.getElementById("origin");
+    const labelA = document.getElementById("labelA");
+    const labelB = document.getElementById("labelB");
+    const labelC = document.getElementById("labelC");
+    const angleArc = document.getElementById("angleArc");
+    const angleLabel = document.getElementById("angleLabel");
+
+    const center = { x: 360, y: 280 };
+    const lengths = { a: 120, b: 240 };
+    let angles = { a: 205, b: 330 };
+    let dragging = null;
+
+    function rad(degrees) {
+      return degrees * Math.PI / 180;
+    }
+
+    function deg(radians) {
+      return radians * 180 / Math.PI;
+    }
+
+    function pointAt(degrees, length) {
+      const theta = rad(degrees);
+      return {
+        x: center.x + Math.cos(theta) * length,
+        y: center.y + Math.sin(theta) * length
+      };
+    }
+
+    function setLine(line, from, to) {
+      line.setAttribute("x1", from.x);
+      line.setAttribute("y1", from.y);
+      line.setAttribute("x2", to.x);
+      line.setAttribute("y2", to.y);
+    }
+
+    function setCircle(circle, point) {
+      circle.setAttribute("cx", point.x);
+      circle.setAttribute("cy", point.y);
+    }
+
+    function setText(text, point, value) {
+      text.setAttribute("x", point.x);
+      text.setAttribute("y", point.y);
+      text.textContent = value;
+    }
+
+    function normalizeDelta(delta) {
+      let next = ((delta + 180) % 360) - 180;
+      if (next < -180) next += 360;
+      return next;
+    }
+
+    function describeArc(startDeg, endDeg, radius, sweep) {
+      const start = pointAt(startDeg, radius);
+      const end = pointAt(endDeg, radius);
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 ${sweep} ${end.x} ${end.y}`;
+    }
+
+    function midpoint(p, q, offsetY = 0) {
+      return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 + offsetY };
+    }
+
+    function render() {
+      const aEnd = pointAt(angles.a, lengths.a);
+      const bEnd = pointAt(angles.b, lengths.b);
+      const delta = normalizeDelta(angles.b - angles.a);
+      const included = Math.abs(delta);
+
+      setLine(sideA, center, aEnd);
+      setLine(sideB, center, bEnd);
+      setLine(sideC, aEnd, bEnd);
+      setCircle(origin, center);
+      setCircle(handleA, aEnd);
+      setCircle(handleB, bEnd);
+
+      const aLabel = pointAt(angles.a, lengths.a / 2 + 18);
+      const bLabel = pointAt(angles.b, lengths.b / 2 + 18);
+      const cLength = Math.hypot(aEnd.x - bEnd.x, aEnd.y - bEnd.y) / lengths.a;
+      setText(labelA, { x: aLabel.x - 24, y: aLabel.y - 8 }, "a = 1");
+      setText(labelB, { x: bLabel.x - 24, y: bLabel.y - 8 }, "b = 2");
+      setText(labelC, midpoint(aEnd, bEnd, -12), `c = ${cLength.toFixed(2)}`);
+
+      if (included < 3 || included > 177) {
+        angleArc.classList.add("hidden");
+        angleLabel.classList.add("hidden");
+        return;
+      }
+
+      angleArc.classList.remove("hidden");
+      angleLabel.classList.remove("hidden");
+      if (delta >= 0) {
+        angleArc.setAttribute("d", describeArc(angles.a, angles.b, 54, 1));
+      } else {
+        angleArc.setAttribute("d", describeArc(angles.b, angles.a, 54, 1));
+      }
+
+      const bisector = delta >= 0 ? angles.a + included / 2 : angles.b + included / 2;
+      const labelPoint = pointAt(bisector, 86);
+      setText(angleLabel, { x: labelPoint.x - 34, y: labelPoint.y + 7 }, `${included.toFixed(1)}°`);
+    }
+
+    function pointerPoint(event) {
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      return point.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    function startDrag(which, event) {
+      dragging = which;
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    function drag(event) {
+      if (!dragging) return;
+      const point = pointerPoint(event);
+      angles[dragging] = deg(Math.atan2(point.y - center.y, point.x - center.x));
+      render();
+    }
+
+    function stopDrag(event) {
+      if (!dragging) return;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+      dragging = null;
+    }
+
+    [
+      [sideA, "a"],
+      [handleA, "a"],
+      [sideB, "b"],
+      [handleB, "b"]
+    ].forEach(([node, which]) => {
+      node.addEventListener("pointerdown", (event) => startDrag(which, event));
+      node.addEventListener("pointermove", drag);
+      node.addEventListener("pointerup", stopDrag);
+      node.addEventListener("pointercancel", stopDrag);
+    });
+
+    render();
+  </script>
+</body>
+</html>
