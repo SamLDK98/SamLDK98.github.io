@@ -117,12 +117,21 @@
       opacity: 0.72;
     }
 
-    .drag-handle {
-      fill: var(--accent);
-      stroke: var(--bg);
+    .proof-arc {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 5;
+      opacity: 0.9;
+    }
+
+    .proof-a { stroke: var(--orange); }
+    .proof-b { stroke: var(--cyan); }
+    .proof-c { stroke: var(--pink); }
+
+    .proof-line {
+      stroke: rgba(236, 226, 209, 0.42);
       stroke-width: 2;
-      cursor: ew-resize;
-      filter: drop-shadow(0 0 8px rgba(212, 184, 136, 0.48));
+      stroke-linecap: round;
     }
 
     .angle-label,
@@ -212,6 +221,33 @@
       font: inherit;
     }
 
+    .scale-control {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.8rem;
+      align-items: center;
+      margin: 1rem 0;
+      padding: 0.85rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+    }
+
+    .vertical-slider {
+      width: 2rem;
+      height: 180px;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      accent-color: var(--accent);
+    }
+
+    .scale-hint {
+      margin: 0;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
     .hidden {
       display: none;
     }
@@ -246,7 +282,6 @@
           <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
           <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
           <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
-          <circle class="drag-handle" id="dragHandle" cx="0" cy="0" r="9" />
           <circle class="vertex" id="va" cx="0" cy="0" r="4" />
           <circle class="vertex" id="vb" cx="0" cy="0" r="4" />
           <circle class="vertex" id="vc" cx="0" cy="0" r="4" />
@@ -256,6 +291,16 @@
           <text class="side-label" id="labelA" x="0" y="0"></text>
           <text class="side-label" id="labelB" x="0" y="0"></text>
           <text class="side-label" id="labelC" x="0" y="0"></text>
+          <g id="semiProof" class="hidden">
+            <line class="proof-line" id="proofBase" x1="0" y1="0" x2="0" y2="0" />
+            <path class="proof-arc proof-a" id="proofA" d="" />
+            <path class="proof-arc proof-b" id="proofB" d="" />
+            <path class="proof-arc proof-c" id="proofC" d="" />
+            <text class="angle-label" id="proofLabel" x="0" y="0"></text>
+            <text class="side-label" id="proofALabel" x="0" y="0"></text>
+            <text class="side-label" id="proofBLabel" x="0" y="0"></text>
+            <text class="side-label" id="proofCLabel" x="0" y="0"></text>
+          </g>
         </svg>
       </div>
 
@@ -266,6 +311,7 @@
           <button type="button" id="random">Random angles</button>
           <button type="button" id="selectAll" class="active">Select All</button>
           <button type="button" id="customStart">Create custom triangle</button>
+          <button type="button" id="semiCircleToggle">Show that inner angles equal a semi-circle</button>
           <button type="button" id="reset">Reset</button>
         </div>
 
@@ -280,7 +326,12 @@
           <button type="button" id="finishCustom">Finish triangle</button>
         </div>
 
-        <p>Click a side to select it. Drag the gold handle left or right to increase or decrease the selected side. Use Select All to scale the whole triangle.</p>
+        <p>Click a side to select it, or use Select All to scale the whole triangle.</p>
+
+        <div class="scale-control">
+          <input class="vertical-slider" id="scaleSlider" type="range" min="60" max="160" value="100">
+          <p class="scale-hint">Pull the slider up or down to increase or decrease the selected side. With Select All, the whole triangle scales.</p>
+        </div>
 
         <div class="readout" id="readout"></div>
       </aside>
@@ -288,7 +339,7 @@
   </section>
 
   <script>
-    const ids = ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "dragHandle", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"];
+    const ids = ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC", "semiProof", "proofBase", "proofA", "proofB", "proofC", "proofLabel", "proofALabel", "proofBLabel", "proofCLabel"];
     const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
     const status = document.getElementById("status");
     const readout = document.getElementById("readout");
@@ -297,13 +348,14 @@
     const customPanel = document.getElementById("customPanel");
     const firstAngleInput = document.getElementById("firstAngle");
     const secondAngleInput = document.getElementById("secondAngle");
+    const scaleSlider = document.getElementById("scaleSlider");
 
     let selected = "all";
     let angles = [50, 60, 70];
     let baseSides = sidesFromAngles(angles);
     let sides = [...baseSides];
-    let dragStartX = 0;
-    let dragStartSides = null;
+    let sliderBaseSides = [...sides];
+    let showSemiCircle = false;
     let custom = {
       active: false,
       step: 0,
@@ -344,7 +396,7 @@
     }
 
     function layoutPoints([a, b, c]) {
-      const scale = 330 / Math.max(a, b, c);
+      const scale = 185;
       const A = { x: 190, y: 420 };
       const B = { x: 190 + c * scale, y: 420 };
       const xC = (b * b + c * c - a * a) / (2 * c);
@@ -367,11 +419,13 @@
     function setSelection(newSelection) {
       selected = newSelection;
       selectAll.classList.toggle("active", selected === "all");
+      sliderBaseSides = [...sides];
+      scaleSlider.value = "100";
       render();
     }
 
     function setVisibility(visible) {
-      ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "dragHandle", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"].forEach((id) => {
+      ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"].forEach((id) => {
         el[id].classList.toggle("hidden", !visible);
       });
     }
@@ -395,11 +449,55 @@
       });
     }
 
+    function proofPoint(center, radius, degreesFromLeft) {
+      const theta = Math.PI - rad(degreesFromLeft);
+      return {
+        x: center.x + Math.cos(theta) * radius,
+        y: center.y - Math.sin(theta) * radius
+      };
+    }
+
+    function proofArcPath(startDegrees, endDegrees, center, radius) {
+      const start = proofPoint(center, radius, startDegrees);
+      const end = proofPoint(center, radius, endDegrees);
+      const largeArc = endDegrees - startDegrees > 180 ? 1 : 0;
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArc} 1 ${end.x} ${end.y}`;
+    }
+
+    function renderSemiCircleProof(currentAngles) {
+      el.semiProof.classList.toggle("hidden", !showSemiCircle);
+      if (!showSemiCircle || currentAngles.length !== 3) return;
+
+      const center = { x: 380, y: 172 };
+      const radius = 118;
+      const cumulative = [0, currentAngles[0], currentAngles[0] + currentAngles[1], 180];
+
+      setLine(el.proofBase, proofPoint(center, radius, 0), proofPoint(center, radius, 180));
+      el.proofA.setAttribute("d", proofArcPath(cumulative[0], cumulative[1], center, radius));
+      el.proofB.setAttribute("d", proofArcPath(cumulative[1], cumulative[2], center, radius));
+      el.proofC.setAttribute("d", proofArcPath(cumulative[2], cumulative[3], center, radius));
+
+      el.proofLabel.setAttribute("x", center.x - 78);
+      el.proofLabel.setAttribute("y", center.y + 28);
+      el.proofLabel.textContent = "A + B + C = 180°";
+
+      const labels = [
+        ["proofALabel", currentAngles[0], cumulative[0], cumulative[1]],
+        ["proofBLabel", currentAngles[1], cumulative[1], cumulative[2]],
+        ["proofCLabel", currentAngles[2], cumulative[2], cumulative[3]]
+      ];
+      labels.forEach(([id, value, start, end]) => {
+        const p = proofPoint(center, radius + 22, (start + end) / 2);
+        el[id].setAttribute("x", p.x - 14);
+        el[id].setAttribute("y", p.y);
+        el[id].textContent = `${fmt(value)}°`;
+      });
+    }
+
     function renderCustom() {
       customPanel.classList.add("is-active");
       setVisibility(true);
       clearLabels();
-      el.dragHandle.classList.add("hidden");
       el.fill.setAttribute("points", "");
       el.arcB.setAttribute("d", "");
       el.arcC.setAttribute("d", "");
@@ -430,6 +528,7 @@
 
       if (!custom.secondAngle || !custom.secondAt) {
         el.sideA.classList.add("hidden");
+        renderSemiCircleProof([]);
         status.textContent = custom.step === 0 ? "Enter first angle" : "Select a ray";
         readout.innerHTML = custom.step === 0
           ? "Enter an angle and press Set first angle."
@@ -473,6 +572,7 @@
       el.angleC.setAttribute("x", points.C.x - 18);
       el.angleC.setAttribute("y", points.C.y - 18);
       el.angleC.textContent = `C ${fmt(builtAngles[2])}°`;
+      renderSemiCircleProof(builtAngles);
       status.textContent = "Closing side";
       readout.innerHTML = `
         third side is forced by the first two angles<br>
@@ -533,10 +633,7 @@
       el.labelC.setAttribute("x", mc.x - 18);
       el.labelC.setAttribute("y", mc.y);
       el.labelC.textContent = `c ${sides[2].toFixed(2)}`;
-
-      const handleAnchor = selected === "a" ? ma : selected === "b" ? mb : selected === "c" ? mc : { x: 560, y: 105 };
-      el.dragHandle.setAttribute("cx", handleAnchor.x + 46);
-      el.dragHandle.setAttribute("cy", handleAnchor.y);
+      renderSemiCircleProof(currentAngles);
 
       status.textContent = selected === "all" ? "Select All" : `Side ${selected}`;
       readout.innerHTML = `
@@ -546,27 +643,15 @@
       `;
     }
 
-    function scaledSidesFromDrag(delta) {
-      const factor = Math.max(0.35, 1 + delta / 180);
+    function scaledSidesFromSlider(value) {
+      const factor = Number(value) / 100;
       if (selected === "all") {
-        return dragStartSides.map((side) => side * factor);
+        return sliderBaseSides.map((side) => side * factor);
       }
       const index = { a: 0, b: 1, c: 2 }[selected];
-      const next = [...dragStartSides];
-      next[index] = Math.max(0.1, dragStartSides[index] * factor);
+      const next = [...sliderBaseSides];
+      next[index] = Math.max(0.1, sliderBaseSides[index] * factor);
       return next;
-    }
-
-    function adjust(direction) {
-      if (selected === "all") {
-        sides = sides.map((side) => side * (direction > 0 ? 1.12 : 0.88));
-      } else {
-        const index = { a: 0, b: 1, c: 2 }[selected];
-        const next = [...sides];
-        next[index] *= direction > 0 ? 1.12 : 0.88;
-        if (isValidTriangle(next)) sides = next;
-      }
-      render();
     }
 
     function randomAngles() {
@@ -577,6 +662,8 @@
       angles = [a, b, c];
       baseSides = sidesFromAngles(angles);
       sides = [...baseSides];
+      sliderBaseSides = [...sides];
+      scaleSlider.value = "100";
       setSelection("all");
     }
 
@@ -584,6 +671,8 @@
     document.getElementById("reset").addEventListener("click", () => {
       custom.active = false;
       sides = [...baseSides];
+      sliderBaseSides = [...sides];
+      scaleSlider.value = "100";
       setSelection("all");
     });
     selectAll.addEventListener("click", () => {
@@ -631,6 +720,8 @@
       angles = [...custom.angles];
       baseSides = sidesFromAngles(angles);
       sides = [...baseSides];
+      sliderBaseSides = [...sides];
+      scaleSlider.value = "100";
       custom.active = false;
       setSelection("all");
     }
@@ -655,25 +746,21 @@
       render();
     });
     document.getElementById("finishCustom").addEventListener("click", finishCustomTriangle);
-
-    el.dragHandle.addEventListener("pointerdown", (event) => {
-      dragStartX = event.clientX;
-      dragStartSides = [...sides];
-      el.dragHandle.setPointerCapture(event.pointerId);
+    document.getElementById("semiCircleToggle").addEventListener("click", (event) => {
+      showSemiCircle = !showSemiCircle;
+      event.currentTarget.classList.toggle("active", showSemiCircle);
+      event.currentTarget.textContent = showSemiCircle
+        ? "Hide semi-circle"
+        : "Show that inner angles equal a semi-circle";
+      render();
     });
 
-    el.dragHandle.addEventListener("pointermove", (event) => {
-      if (!dragStartSides) return;
-      const next = scaledSidesFromDrag(event.clientX - dragStartX);
+    scaleSlider.addEventListener("input", () => {
+      const next = scaledSidesFromSlider(scaleSlider.value);
       if (selected === "all" || isValidTriangle(next)) {
         sides = next;
         render();
       }
-    });
-
-    el.dragHandle.addEventListener("pointerup", (event) => {
-      dragStartSides = null;
-      el.dragHandle.releasePointerCapture(event.pointerId);
     });
 
     render();

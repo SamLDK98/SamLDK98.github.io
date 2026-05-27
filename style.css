@@ -1086,6 +1086,8 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .intro-linear-algebra-page .display-equation {
   max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 1.1rem;
   margin-bottom: 1.6rem;
   padding: 1rem 1.2rem;
@@ -1334,6 +1336,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem 1.4rem;
+  width: min(100%, 860px);
 }
 
 .trig-ratio-equations > span {
