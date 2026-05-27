@@ -144,6 +144,18 @@
     .angle-label { fill: var(--accent); }
     .side-label { fill: var(--dim); font-size: 15px; }
 
+    .length-key text {
+      fill: var(--text);
+      font-family: "Courier New", monospace;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .length-key line {
+      stroke-linecap: round;
+      stroke-width: 5;
+    }
+
     .controls {
       padding: 1.25rem;
       background: rgba(0, 0, 0, 0.1);
@@ -288,9 +300,14 @@
           <text class="angle-label" id="angleA" x="0" y="0"></text>
           <text class="angle-label" id="angleB" x="0" y="0"></text>
           <text class="angle-label" id="angleC" x="0" y="0"></text>
-          <text class="side-label" id="labelA" x="0" y="0"></text>
-          <text class="side-label" id="labelB" x="0" y="0"></text>
-          <text class="side-label" id="labelC" x="0" y="0"></text>
+          <g class="length-key" id="lengthKey">
+            <line class="side-a" id="lengthA" x1="0" y1="0" x2="0" y2="0" />
+            <line class="side-b" id="lengthB" x1="0" y1="0" x2="0" y2="0" />
+            <line class="side-c" id="lengthC" x1="0" y1="0" x2="0" y2="0" />
+            <text id="lengthAText" x="0" y="0"></text>
+            <text id="lengthBText" x="0" y="0"></text>
+            <text id="lengthCText" x="0" y="0"></text>
+          </g>
           <g id="semiProof" class="hidden">
             <line class="proof-line" id="proofBase" x1="0" y1="0" x2="0" y2="0" />
             <path class="proof-arc proof-a" id="proofA" d="" />
@@ -339,7 +356,7 @@
   </section>
 
   <script>
-    const ids = ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC", "semiProof", "proofBase", "proofA", "proofB", "proofC", "proofLabel", "proofALabel", "proofBLabel", "proofCLabel"];
+    const ids = ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "va", "vb", "vc", "angleA", "angleB", "angleC", "lengthKey", "lengthA", "lengthB", "lengthC", "lengthAText", "lengthBText", "lengthCText", "semiProof", "proofBase", "proofA", "proofB", "proofC", "proofLabel", "proofALabel", "proofBLabel", "proofCLabel"];
     const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
     const status = document.getElementById("status");
     const readout = document.getElementById("readout");
@@ -425,7 +442,7 @@
     }
 
     function setVisibility(visible) {
-      ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "va", "vb", "vc", "angleA", "angleB", "angleC", "labelA", "labelB", "labelC"].forEach((id) => {
+      ["sideA", "sideB", "sideC", "fill", "arcA", "arcB", "arcC", "va", "vb", "vc", "angleA", "angleB", "angleC", "lengthKey"].forEach((id) => {
         el[id].classList.toggle("hidden", !visible);
       });
     }
@@ -444,8 +461,31 @@
     }
 
     function clearLabels() {
-      ["angleA", "angleB", "angleC", "labelA", "labelB", "labelC"].forEach((id) => {
+      ["angleA", "angleB", "angleC", "lengthAText", "lengthBText", "lengthCText"].forEach((id) => {
         el[id].textContent = "";
+      });
+    }
+
+    function renderLengthKey(values, visible = true) {
+      el.lengthKey.classList.toggle("hidden", !visible);
+      if (!visible) return;
+
+      const max = Math.max(...values);
+      const startX = 540;
+      const startY = 58;
+      const maxWidth = 115;
+      const gap = 30;
+      [
+        ["lengthA", "lengthAText", values[0]],
+        ["lengthB", "lengthBText", values[1]],
+        ["lengthC", "lengthCText", values[2]]
+      ].forEach(([lineId, textId, value], index) => {
+        const y = startY + index * gap;
+        const width = Math.max(24, value / max * maxWidth);
+        setLine(el[lineId], { x: startX, y }, { x: startX + width, y });
+        el[textId].setAttribute("x", startX + width + 14);
+        el[textId].setAttribute("y", y + 5);
+        el[textId].textContent = value.toFixed(2);
       });
     }
 
@@ -528,6 +568,7 @@
 
       if (!custom.secondAngle || !custom.secondAt) {
         el.sideA.classList.add("hidden");
+        renderLengthKey([], false);
         renderSemiCircleProof([]);
         status.textContent = custom.step === 0 ? "Enter first angle" : "Select a ray";
         readout.innerHTML = custom.step === 0
@@ -543,12 +584,14 @@
 
       if (builtAngles.some((angle) => angle <= 0)) {
         el.sideA.classList.add("hidden");
+        renderLengthKey([], false);
         status.textContent = "Invalid angles";
         readout.innerHTML = "Those angles leave no room for the third angle. Use smaller values.";
         return;
       }
 
       const previewSides = sidesFromAngles(builtAngles);
+      renderLengthKey(previewSides);
       const points = layoutPoints(previewSides);
       el.fill.setAttribute("points", [points.A, points.B, points.C].map(pointString).join(" "));
       setLine(el.sideA, points.B, points.C);
@@ -621,24 +664,12 @@
       el.angleC.setAttribute("y", C.y - 18);
       el.angleC.textContent = `C ${fmt(currentAngles[2])}°`;
 
-      const ma = mid(B, C);
-      const mb = mid(A, C);
-      const mc = mid(A, B, 30);
-      el.labelA.setAttribute("x", ma.x + 18);
-      el.labelA.setAttribute("y", ma.y);
-      el.labelA.textContent = `a ${sides[0].toFixed(2)}`;
-      el.labelB.setAttribute("x", mb.x - 58);
-      el.labelB.setAttribute("y", mb.y);
-      el.labelB.textContent = `b ${sides[1].toFixed(2)}`;
-      el.labelC.setAttribute("x", mc.x - 18);
-      el.labelC.setAttribute("y", mc.y);
-      el.labelC.textContent = `c ${sides[2].toFixed(2)}`;
+      renderLengthKey(sides);
       renderSemiCircleProof(currentAngles);
 
       status.textContent = selected === "all" ? "Select All" : `Side ${selected}`;
       readout.innerHTML = `
         angles: ${currentAngles.map(fmt).join("°, ")}°<br>
-        sides: ${sides.map((value) => value.toFixed(2)).join(", ")}<br>
         sum: ${(currentAngles[0] + currentAngles[1] + currentAngles[2]).toFixed(1)}°
       `;
     }
