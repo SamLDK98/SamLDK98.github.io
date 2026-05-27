@@ -27,19 +27,60 @@
     }
 
     .widget {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
       border: 1px solid var(--rule);
       background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
+    }
+
+    .stage {
+      min-height: 520px;
+      border-right: 1px solid var(--rule);
     }
 
     svg {
       display: block;
       width: 100%;
-      max-width: 860px;
       height: auto;
-      margin: 0 auto;
       user-select: none;
       touch-action: none;
     }
+
+    .controls {
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin: 0 0 0.45rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .side-key {
+      display: grid;
+      gap: 0.65rem;
+      margin-top: 1.1rem;
+      padding: 0.85rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      font-family: "Courier New", monospace;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .key-a { color: var(--orange); }
+    .key-b { color: var(--cyan); }
+    .key-c { color: var(--pink); }
 
     .side {
       stroke-linecap: round;
@@ -95,75 +136,97 @@
       font-weight: 700;
     }
 
-    .side-label {
-      fill: var(--dim);
-      font-size: 16px;
-    }
-
     .angle-label {
       fill: var(--accent);
       font-size: 18px;
     }
 
-    .status {
-      fill: var(--text);
-      font-size: 18px;
+    @media (max-width: 760px) {
+      .widget { grid-template-columns: 1fr; }
+      .stage {
+        min-height: 420px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
     }
   </style>
 </head>
 <body>
   <section class="widget">
-    <svg id="canvas" viewBox="0 0 860 520" role="img" aria-label="Fixed side lengths forming one possible triangle">
-      <g id="triangleGroup">
-        <circle class="target" id="snapTarget" cx="0" cy="0" r="18" />
-        <path class="angle-arc" id="arcA" d="" />
-        <path class="angle-arc" id="arcB" d="" />
-        <path class="angle-arc" id="arcC" d="" />
-        <line class="gap-line" id="gapLine" x1="0" y1="0" x2="0" y2="0" />
-        <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
-        <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
-        <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
-        <circle class="vertex" id="va" cx="0" cy="0" r="5" />
-        <circle class="vertex" id="vb" cx="0" cy="0" r="5" />
-        <circle class="handle handle-a" id="handleA" cx="0" cy="0" r="10" />
-        <circle class="handle handle-b" id="handleB" cx="0" cy="0" r="10" />
-        <text class="side-label" id="labelA" x="0" y="0">a = 4</text>
-        <text class="side-label" id="labelB" x="0" y="0">b = 6</text>
-        <text class="side-label" id="labelC" x="0" y="0">c = 9</text>
-        <text class="angle-label" id="angleA" x="0" y="0"></text>
-        <text class="angle-label" id="angleB" x="0" y="0"></text>
-        <text class="angle-label" id="angleC" x="0" y="0"></text>
-        <text class="status" id="status" x="0" y="0"></text>
-      </g>
-    </svg>
+    <div class="stage">
+      <svg id="canvas" viewBox="0 0 720 520" role="img" aria-label="Fixed side lengths forming one possible triangle">
+        <g id="triangleGroup">
+          <circle class="target" id="snapTarget" cx="0" cy="0" r="18" />
+          <path class="angle-arc" id="arcA" d="" />
+          <path class="angle-arc" id="arcB" d="" />
+          <path class="angle-arc" id="arcC" d="" />
+          <line class="gap-line" id="gapLine" x1="0" y1="0" x2="0" y2="0" />
+          <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
+          <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
+          <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
+          <circle class="vertex" id="va" cx="0" cy="0" r="5" />
+          <circle class="vertex" id="vb" cx="0" cy="0" r="5" />
+          <circle class="handle handle-a" id="handleA" cx="0" cy="0" r="10" />
+          <circle class="handle handle-b" id="handleB" cx="0" cy="0" r="10" />
+          <text class="angle-label" id="angleA" x="0" y="0"></text>
+          <text class="angle-label" id="angleB" x="0" y="0"></text>
+          <text class="angle-label" id="angleC" x="0" y="0"></text>
+        </g>
+      </svg>
+    </div>
+    <aside class="controls">
+      <label for="size">size</label>
+      <input id="size" type="range" min="34" max="50" value="42">
+
+      <div class="side-key" aria-label="Fixed side lengths">
+        <span class="key-a">a = 4</span>
+        <span class="key-b">b = 6</span>
+        <span class="key-c">c = 9</span>
+      </div>
+    </aside>
   </section>
 
   <script>
     const svg = document.getElementById("canvas");
     const group = document.getElementById("triangleGroup");
+    const sizeInput = document.getElementById("size");
     const el = Object.fromEntries([
       "snapTarget", "gapLine", "sideA", "sideB", "sideC", "va", "vb", "handleA", "handleB",
-      "labelA", "labelB", "labelC", "angleA", "angleB", "angleC",
-      "arcA", "arcB", "arcC", "status"
+      "angleA", "angleB", "angleC", "arcA", "arcB", "arcC"
     ].map((id) => [id, document.getElementById(id)]));
 
-    const scale = 42;
-    const lengths = { a: 4 * scale, b: 6 * scale, c: 9 * scale };
-    const A = { x: 150, y: 350 };
-    const B = { x: A.x + lengths.c, y: A.y };
-    const targets = targetPoints();
-    let angleA = Math.atan2(targets.upper.y - A.y, targets.upper.x - A.x) - 0.5;
-    let angleB = Math.atan2(targets.upper.y - B.y, targets.upper.x - B.x) + 0.58;
+    const sideUnits = { a: 4, b: 6, c: 9 };
+    let angleA = null;
+    let angleB = null;
     let dragging = null;
     let snapped = false;
 
-    function targetPoints() {
+    function geometry() {
+      const scale = Number(sizeInput.value);
+      const lengths = {
+        a: sideUnits.a * scale,
+        b: sideUnits.b * scale,
+        c: sideUnits.c * scale
+      };
+      const A = { x: 110, y: 360 };
+      const B = { x: A.x + lengths.c, y: A.y };
       const x = (lengths.b ** 2 + lengths.c ** 2 - lengths.a ** 2) / (2 * lengths.c);
       const y = Math.sqrt(Math.max(0, lengths.b ** 2 - x ** 2));
       return {
-        upper: { x: A.x + x, y: A.y - y },
-        lower: { x: A.x + x, y: A.y + y }
+        lengths,
+        A,
+        B,
+        targets: {
+          upper: { x: A.x + x, y: A.y - y },
+          lower: { x: A.x + x, y: A.y + y }
+        }
       };
+    }
+
+    function initializeAngles() {
+      const { A, B, targets } = geometry();
+      angleA = Math.atan2(targets.upper.y - A.y, targets.upper.x - A.x) - 0.5;
+      angleB = Math.atan2(targets.upper.y - B.y, targets.upper.x - B.x) + 0.58;
     }
 
     function pointFrom(anchor, radians, length) {
@@ -185,15 +248,11 @@
       circle.setAttribute("cy", point.y);
     }
 
-    function midpoint(p, q, offsetY = 0) {
-      return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 + offsetY };
-    }
-
     function distance(p, q) {
       return Math.hypot(p.x - q.x, p.y - q.y);
     }
 
-    function nearestTarget(point) {
+    function nearestTarget(point, targets) {
       return distance(point, targets.upper) <= distance(point, targets.lower)
         ? targets.upper
         : targets.lower;
@@ -231,6 +290,13 @@
     }
 
     function render() {
+      const { lengths, A, B, targets } = geometry();
+      if (snapped && !dragging) {
+        const target = nearestTarget(pointFrom(A, angleA, lengths.b), targets);
+        angleA = Math.atan2(target.y - A.y, target.x - A.x);
+        angleB = Math.atan2(target.y - B.y, target.x - B.x);
+      }
+
       let freeA = pointFrom(B, angleB, lengths.a);
       let freeB = pointFrom(A, angleA, lengths.b);
       const gap = distance(freeA, freeB);
@@ -239,7 +305,7 @@
         const target = nearestTarget({
           x: (freeA.x + freeB.x) / 2,
           y: (freeA.y + freeB.y) / 2
-        });
+        }, targets);
         freeA = { ...target };
         freeB = { ...target };
         angleA = Math.atan2(target.y - A.y, target.x - A.x);
@@ -251,7 +317,7 @@
 
       const joined = distance(freeA, freeB) < 1;
       group.classList.toggle("is-snapped", snapped);
-      setCircle(el.snapTarget, nearestTarget(freeB));
+      setCircle(el.snapTarget, nearestTarget(freeB, targets));
       setLine(el.sideA, B, freeA);
       setLine(el.sideB, A, freeB);
       setLine(el.sideC, A, B);
@@ -262,33 +328,23 @@
       setCircle(el.handleA, freeA);
       setCircle(el.handleB, freeB);
 
-      setText(el.labelA, midpoint(B, freeA, -12), "a = 4");
-      setText(el.labelB, midpoint(A, freeB, -12), "b = 6");
-      setText(el.labelC, midpoint(A, B, 28), "c = 9");
-
       const angleAtA = degreesAt(A, B, freeB);
       const angleAtB = degreesAt(B, freeA, A);
       el.arcA.setAttribute("d", arcPath(A, B, freeB, 34));
       el.arcB.setAttribute("d", arcPath(B, freeA, A, 34));
-      setText(el.angleA, { x: A.x + 42, y: A.y - 14 }, `${angleAtA.toFixed(1)}°`);
-      setText(el.angleB, { x: B.x - 88, y: B.y - 14 }, `${angleAtB.toFixed(1)}°`);
+      setText(el.angleA, { x: A.x + 24, y: A.y + 42 }, `${angleAtA.toFixed(1)}°`);
+      setText(el.angleB, { x: B.x - 96, y: B.y + 42 }, `${angleAtB.toFixed(1)}°`);
 
       if (joined) {
         const angleAtC = degreesAt(freeB, A, B);
         el.arcC.style.display = "block";
         el.angleC.style.display = "block";
         el.arcC.setAttribute("d", arcPath(freeB, A, B, 34));
-        setText(el.angleC, { x: freeB.x - 24, y: freeB.y - 22 }, `${angleAtC.toFixed(1)}°`);
+        setText(el.angleC, { x: freeB.x - 24, y: freeB.y - 28 }, `${angleAtC.toFixed(1)}°`);
       } else {
         el.arcC.style.display = "none";
         el.angleC.style.display = "none";
       }
-
-      setText(
-        el.status,
-        { x: 150, y: 84 },
-        joined ? "connected: angles fixed" : "fixed lengths, broken apart"
-      );
     }
 
     function startDrag(which, event) {
@@ -299,6 +355,7 @@
 
     function drag(event) {
       if (!dragging) return;
+      const { A, B } = geometry();
       const point = pointerPoint(event);
       if (dragging === "a") {
         angleB = Math.atan2(point.y - B.y, point.x - B.x);
@@ -327,6 +384,8 @@
       node.addEventListener("pointercancel", stopDrag);
     });
 
+    sizeInput.addEventListener("input", render);
+    initializeAngles();
     render();
   </script>
 </body>

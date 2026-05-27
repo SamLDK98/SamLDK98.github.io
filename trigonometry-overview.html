@@ -36,11 +36,9 @@
       <section class="essay-section">
         <p>"Trigonometry" translates to <em>triangle measurement</em>.</p>
 
-        <p>Yet <strong>angles</strong> are the real subject of interest.</p>
+        <p>Yet <strong>angles</strong> are the real subject of interest; constructing triangles is just an effective method of working with them.</p>
 
-        <p>To find an angle between two lines, constructing a triangle is the simplest method. Hence the early emphasis on triangles.</p>
-
-        <p>Angles can also be understood as proportions of rotation around a circle; this idea eventually connects trigonometry to oscillations, complex numbers, and Euler's formula.</p>
+        <p>Angles can be understood as proportions of rotation around a circle; this interpretation eventually connects trigonometry to oscillations, complex numbers, and Euler's formula.</p>
 
         <div class="trig-figure-grid">
           <figure class="trig-figure">
@@ -62,18 +60,20 @@
               <line class="trig-line trig-line-accent" x1="210" y1="150" x2="282" y2="70" />
               <path class="trig-sector" d="M 306 150 A 96 96 0 0 0 274 79 L 210 150 Z" />
               <path class="trig-angle-arc" d="M 306 150 A 96 96 0 0 0 274 79" />
-              <text class="trig-label" x="276" y="122">&theta;</text>
+              <text class="trig-label" x="272" y="126">&theta;</text>
             </svg>
           </figure>
         </div>
 
         <p>Typically, I like to move through these explanations conceptually, often with a focus on the historical development of ideas.</p>
 
-        <p>However, in this case, I think it's more productive to brute force some of the properties of triangles and angles into your head, and then we can reflect on things conceptually.</p>
+        <p>In this case, however, I think it's better to simply brute force some of the behaviour, structure, and relations into your head first.</p>
 
         <h3 class="subsection-title">Finding angles</h3>
 
-        <p>Knowing the length of two sides of a triangle tells us nothing about the angles.</p>
+        <p>If we know the lengths of only two sides of a triangle, we can't determine the angles precisely.</p>
+
+        <p>Imagine we knew side $a = 1$ (blue) and side $b = 2$ (yellow). We could theoretically have a triangle with any angle.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize finding-angles-widget"
@@ -83,11 +83,15 @@
           loading="lazy"
         ></iframe>
 
-        <p>It is only once we fix the length of the third line that all three angles become invariant at once.</p>
+        <p>It is only once we fix the length of the third side that all three angles become invariant at once.</p>
 
-        <p>So, for any set of lengths for a triangles sides, there is a fixed set of angles.</p>
+        <p>We can't change the angles and preserve the side lengths.</p>
 
-        <p>In other words, for any three lines of specific lengths, there is only one set of angles that exist when they form a triangle.</p>
+        <p>The triangle below shows three sides of fixed lengths relative to each other. Notice there is no way to connect them that doesn't produce the specific angles $127.2^\circ$, $32.1^\circ$, and $20.7^\circ$.</p>
+
+        <p>However, it is not the absolute side lengths themselves that determine these angles. We can scale the triangle proportionally and preserve all the angles.</p>
+
+        <p>So it is really the ratios between the side lengths, rather than their absolute magnitudes, that determine the triangle's shape.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize fixed-triangle-widget"
