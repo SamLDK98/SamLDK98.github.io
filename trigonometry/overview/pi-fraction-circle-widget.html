@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Degrees and Pi Fractions</title>
+  <title>Angles in Degrees and Radians</title>
   <style>
     :root {
       --bg: #161311;
@@ -128,6 +128,7 @@
 
     .pi-label {
       font-size: 24px;
+      color: var(--green);
     }
 
     .hidden {
@@ -164,7 +165,7 @@
 <body>
   <section class="widget">
     <header>
-      <h1>Degrees and Pi Fractions</h1>
+      <h1>Angles in Degrees and Radians</h1>
       <div class="mode-toggle" role="group" aria-label="Label display mode">
         <button type="button" data-mode="degrees">Degrees</button>
         <button type="button" data-mode="pi">Pi fractions</button>
@@ -245,6 +246,42 @@
       return element;
     }
 
+    function addPiText(root, text, x, y, anchor, useFractionBar) {
+      if (!useFractionBar) {
+        return addMultilineText(root, "pi-label", text, x, y, anchor);
+      }
+
+      const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttribute("class", "pi-label");
+
+      const [top, bottom] = text.split("\n");
+      const numerator = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      numerator.setAttribute("x", x);
+      numerator.setAttribute("y", y - 9);
+      numerator.setAttribute("text-anchor", "middle");
+      numerator.textContent = top;
+      group.appendChild(numerator);
+
+      const bar = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      bar.setAttribute("x1", x - 17);
+      bar.setAttribute("x2", x + 17);
+      bar.setAttribute("y1", y);
+      bar.setAttribute("y2", y);
+      bar.setAttribute("stroke", "currentColor");
+      bar.setAttribute("stroke-width", "2");
+      group.appendChild(bar);
+
+      const denominator = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      denominator.setAttribute("x", x);
+      denominator.setAttribute("y", y + 24);
+      denominator.setAttribute("text-anchor", "middle");
+      denominator.textContent = bottom;
+      group.appendChild(denominator);
+
+      root.appendChild(group);
+      return group;
+    }
+
     function buildMarks() {
       marks.forEach((mark) => {
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -260,11 +297,11 @@
 
         const anchor = anchorFor(mark.degrees);
         const piPoint = pointAt(mark.degrees, radius + 47);
-        const degreeRadius = mode === "both" ? radius - 34 : radius + 34;
+        const degreeRadius = radius - 34;
         const degreePoint = pointAt(mark.degrees, degreeRadius);
         const degreeText = mark.degreeText || `${mark.degrees}°`;
 
-        const piLabel = addMultilineText(group, "pi-label", mark.pi, piPoint.x, piPoint.y - 4, anchor);
+        const piLabel = addPiText(group, mark.pi, piPoint.x, piPoint.y - 4, anchor, mark.pi.includes("\n") && mark.degrees !== 0);
         const degreeLabel = addMultilineText(group, "degree-label", degreeText, degreePoint.x, degreePoint.y + 7, anchor);
         piLabel.dataset.labelType = "pi";
         degreeLabel.dataset.labelType = "degrees";

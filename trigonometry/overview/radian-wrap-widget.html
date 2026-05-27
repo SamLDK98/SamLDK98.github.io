@@ -319,6 +319,8 @@
     function clearDynamic() {
       arcGroup.innerHTML = "";
       ghostRays.innerHTML = "";
+      radiusLine.classList.remove("hidden");
+      radiusLabel.classList.remove("hidden");
       angleArc.classList.add("hidden");
       radianLabel.classList.add("hidden");
       tailLabel.classList.add("hidden");
@@ -355,7 +357,10 @@
       }
 
       if (step === 2) {
-        setRadiusLine(cx + r, cy, cx + r, cy - r, cx + r + 18, cy - 80);
+        radiusLine.classList.add("hidden");
+        const labelPoint = pointAt(radianDegrees / 2, r + 26);
+        radiusLabel.setAttribute("x", labelPoint.x);
+        radiusLabel.setAttribute("y", labelPoint.y);
         makeArc(0, radianDegrees, "arc-pink");
         const p = pointAt(radianDegrees);
         endPoint.classList.remove("hidden");

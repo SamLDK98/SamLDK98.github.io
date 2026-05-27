@@ -118,6 +118,33 @@ $$</p>
           loading="lazy"
         ></iframe>
 
+        <h3 class="subsection-title">Degrees</h3>
+
+        <p>Let's now think of angles as measuring rotation about a point.</p>
+
+        <p>We rotate a line counterclockwise about the center of the circle, beginning with the line pointing to the right along the $x$-axis at $0^\circ$.</p>
+
+        <p>Imagine a point where the line crosses the circumference of the circle. As we rotate the line, the point moves around the circumference.</p>
+
+        <blockquote>
+          <p>When I say 'about', I am thinking of pinching the line at one end and swivelling it such that, at the other end, the point moves 'around' the circumference of the circle. I hope that clarifies the distinction between 'about' and 'around'.</p>
+        </blockquote>
+
+        <p>We have arbitrarily partitioned the circle into 360 parts, which we will call degrees. We will focus on multiples of $30^\circ$ and $45^\circ$, because they work cleanly with equilateral triangles and squares, respectively.</p>
+
+        <p>Also, take note of how coordinates are signed depending on quadrant:</p>
+
+        <p class="display-equation">$$
+\begin{array}{c|c}
+\text{Quadrant} & \text{Coordinates } (x,y) \\
+\hline
+\text{I} & (+, +) \\
+\text{II} & (-, +) \\
+\text{III} & (-, -) \\
+\text{IV} & (+, -)
+\end{array}
+$$</p>
+
         <iframe
           class="essay-widget degree-circle-widget"
           src="trigonometry/overview/degree-circle-widget.html"
@@ -126,6 +153,28 @@ $$</p>
           loading="lazy"
         ></iframe>
 
+        <h3 class="subsection-title">Radians</h3>
+
+        <p>While degrees arise from an arbitrary partitioning of the circle, radians are intrinsic to the geometry of circles.</p>
+
+        <p>Imagine taking the radius of a circle and wrapping it around the circumference, beginning at the $x$-axis (see widget below).</p>
+
+        <p>Now connect a line (ray) from the origin to the endpoint of this wrapped radius.</p>
+
+        <p>The angle created is defined as 1 radian, which is approximately equivalent to $57.3^\circ$.</p>
+
+        <p>How many radii would we need to complete one full rotation around the circle?</p>
+
+        <p>The answer is $2\pi$.</p>
+
+        <details class="notation-details">
+          <summary>Why?</summary>
+          <p>Circumference = $\pi \cdot \text{diameter}$</p>
+          <p>Diameter = $2r$</p>
+          <p>Circumference = $2\pi r$</p>
+          <p>If we have a unit circle, where $r = 1$, then the circumference is just $2\pi$, i.e. $2 \cdot 3.1415 = 6.283$.</p>
+        </details>
+
         <iframe
           class="essay-widget radian-wrap-widget"
           src="trigonometry/overview/radian-wrap-widget.html"
@@ -133,6 +182,14 @@ $$</p>
           scrolling="no"
           loading="lazy"
         ></iframe>
+
+        <p>If one complete rotation around a circle is $2\pi$ radians, then:</p>
+
+        <ul>
+          <li>half a rotation is $\pi$ radians</li>
+          <li>a quarter rotation is $\frac{\pi}{2}$ radians</li>
+          <li>and so on.</li>
+        </ul>
 
         <iframe
           class="essay-widget pi-fraction-circle-widget"
