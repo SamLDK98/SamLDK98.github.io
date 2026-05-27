@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distance to the Origin</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --x: #e8a13b;
+      --y: #6dd3c4;
+      --r: #ef7398;
+      --grid: rgba(236, 226, 209, 0.08);
+      --axis: rgba(236, 226, 209, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 720px;
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%), var(--bg);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.3rem 1.6rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 500;
+    }
+
+    .readout {
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--accent);
+      font-family: "Courier New", monospace;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      min-height: 620px;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 620px;
+      padding: 1rem;
+      border-right: 1px solid var(--rule);
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 760px);
+      height: auto;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .axis { stroke: var(--axis); stroke-width: 1.6; }
+    .unit-circle { fill: rgba(0, 0, 0, 0.06); stroke: rgba(236, 226, 209, 0.45); stroke-width: 2; }
+    .x-leg { stroke: var(--x); }
+    .y-leg { stroke: var(--y); }
+    .radius-line { stroke: var(--r); }
+    .leg {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 4;
+    }
+
+    .guide {
+      stroke: rgba(236, 226, 209, 0.22);
+      stroke-width: 1.4;
+      stroke-dasharray: 5 6;
+    }
+
+    .point {
+      fill: var(--r);
+      stroke: var(--text);
+      stroke-width: 2.5;
+      cursor: grab;
+      filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.45));
+    }
+
+    .point:active { cursor: grabbing; }
+
+    .label {
+      font-family: "Courier New", monospace;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .x-text { fill: var(--x); }
+    .y-text { fill: var(--y); }
+    .r-text { fill: var(--r); }
+    .dim-text { fill: var(--dim); font-size: 16px; }
+
+    .controls {
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .controls p {
+      margin: 0 0 1.15rem;
+      color: var(--dim);
+      font-size: 1.02rem;
+      line-height: 1.45;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.45rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin: 0 0 1rem;
+      accent-color: var(--accent);
+    }
+
+    .formula {
+      margin-top: 1rem;
+      padding: 0.9rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--text);
+      font-family: "Courier New", monospace;
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 850px) {
+      .widget { min-height: 940px; }
+      header,
+      .layout { grid-template-columns: 1fr; }
+      .stage {
+        min-height: 560px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .readout { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Distance to the Origin</h1>
+      <div class="readout" id="readout">(x, y) = (0.80, 0.60)</div>
+    </header>
+
+    <div class="layout">
+      <div class="stage">
+        <svg id="svg" viewBox="0 0 760 620" role="img" aria-label="Point forming a right triangle with the axes and origin">
+          <g id="grid"></g>
+          <circle class="unit-circle" cx="380" cy="310" r="210" />
+          <line class="axis" x1="80" y1="310" x2="680" y2="310" />
+          <line class="axis" x1="380" y1="590" x2="380" y2="30" />
+          <line class="guide" id="verticalGuide" x1="0" y1="0" x2="0" y2="0" />
+          <line class="leg x-leg" id="xLeg" x1="0" y1="0" x2="0" y2="0" />
+          <line class="leg y-leg" id="yLeg" x1="0" y1="0" x2="0" y2="0" />
+          <line class="leg radius-line" id="radiusLine" x1="0" y1="0" x2="0" y2="0" />
+          <circle class="point" id="point" cx="0" cy="0" r="10" />
+          <text class="label x-text" id="xLabel" x="0" y="0">x</text>
+          <text class="label y-text" id="yLabel" x="0" y="0">y</text>
+          <text class="label r-text" id="rLabel" x="0" y="0">r</text>
+          <text class="label dim-text" x="586" y="334">1</text>
+          <text class="label dim-text" x="154" y="334">-1</text>
+          <text class="label dim-text" x="392" y="106">1</text>
+          <text class="label dim-text" x="392" y="526">-1</text>
+        </svg>
+      </div>
+
+      <aside class="controls">
+        <p>Move the point. The horizontal and vertical legs form a right triangle, so the distance from the origin is found with Pythagoras.</p>
+
+        <label for="angle">angle</label>
+        <input id="angle" type="range" min="0" max="360" step="1" value="37">
+
+        <label for="radius">distance from origin</label>
+        <input id="radius" type="range" min="0.15" max="1.35" step="0.01" value="1">
+
+        <div class="formula" id="formula"></div>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const svg = document.getElementById("svg");
+    const grid = document.getElementById("grid");
+    const point = document.getElementById("point");
+    const xLeg = document.getElementById("xLeg");
+    const yLeg = document.getElementById("yLeg");
+    const radiusLine = document.getElementById("radiusLine");
+    const verticalGuide = document.getElementById("verticalGuide");
+    const xLabel = document.getElementById("xLabel");
+    const yLabel = document.getElementById("yLabel");
+    const rLabel = document.getElementById("rLabel");
+    const readout = document.getElementById("readout");
+    const formula = document.getElementById("formula");
+    const angleInput = document.getElementById("angle");
+    const radiusInput = document.getElementById("radius");
+
+    const cx = 380;
+    const cy = 310;
+    const scale = 210;
+    let dragging = false;
+
+    function buildGrid() {
+      for (let i = -1; i <= 1; i += 0.25) {
+        const x = cx + i * scale;
+        const y = cy - i * scale;
+        const vertical = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        vertical.setAttribute("class", "grid");
+        vertical.setAttribute("x1", x);
+        vertical.setAttribute("x2", x);
+        vertical.setAttribute("y1", cy - scale * 1.25);
+        vertical.setAttribute("y2", cy + scale * 1.25);
+        grid.appendChild(vertical);
+
+        const horizontal = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        horizontal.setAttribute("class", "grid");
+        horizontal.setAttribute("x1", cx - scale * 1.25);
+        horizontal.setAttribute("x2", cx + scale * 1.25);
+        horizontal.setAttribute("y1", y);
+        horizontal.setAttribute("y2", y);
+        grid.appendChild(horizontal);
+      }
+    }
+
+    function fmt(value) {
+      return value.toFixed(2).replace(/-0.00/, "0.00");
+    }
+
+    function pointFromState() {
+      const angle = Number(angleInput.value) * Math.PI / 180;
+      const radius = Number(radiusInput.value);
+      return {
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius
+      };
+    }
+
+    function screenPoint(x, y) {
+      return { x: cx + x * scale, y: cy - y * scale };
+    }
+
+    function setLine(line, a, b) {
+      line.setAttribute("x1", a.x);
+      line.setAttribute("y1", a.y);
+      line.setAttribute("x2", b.x);
+      line.setAttribute("y2", b.y);
+    }
+
+    function render() {
+      const p = pointFromState();
+      const origin = screenPoint(0, 0);
+      const foot = screenPoint(p.x, 0);
+      const endpoint = screenPoint(p.x, p.y);
+      const distance = Math.hypot(p.x, p.y);
+
+      point.setAttribute("cx", endpoint.x);
+      point.setAttribute("cy", endpoint.y);
+      setLine(xLeg, origin, foot);
+      setLine(yLeg, foot, endpoint);
+      setLine(radiusLine, origin, endpoint);
+      setLine(verticalGuide, screenPoint(p.x, -1.25), screenPoint(p.x, 1.25));
+
+      xLabel.setAttribute("x", (origin.x + foot.x) / 2);
+      xLabel.setAttribute("y", origin.y + 24);
+      xLabel.textContent = `x = ${fmt(p.x)}`;
+      yLabel.setAttribute("x", foot.x + 14);
+      yLabel.setAttribute("y", (foot.y + endpoint.y) / 2);
+      yLabel.textContent = `y = ${fmt(p.y)}`;
+      rLabel.setAttribute("x", (origin.x + endpoint.x) / 2 + 12);
+      rLabel.setAttribute("y", (origin.y + endpoint.y) / 2 - 12);
+      rLabel.textContent = `r = ${fmt(distance)}`;
+
+      readout.textContent = `(x, y) = (${fmt(p.x)}, ${fmt(p.y)})`;
+      formula.innerHTML = `
+        x^2 + y^2 = ${fmt(p.x * p.x)} + ${fmt(p.y * p.y)}<br>
+        = ${fmt(distance * distance)}<br>
+        distance = sqrt(x^2 + y^2) = ${fmt(distance)}
+      `;
+    }
+
+    function updateFromPointer(event) {
+      const rect = svg.getBoundingClientRect();
+      const sx = ((event.clientX - rect.left) / rect.width) * 760;
+      const sy = ((event.clientY - rect.top) / rect.height) * 620;
+      const x = (sx - cx) / scale;
+      const y = (cy - sy) / scale;
+      const radius = Math.min(1.35, Math.max(0.15, Math.hypot(x, y)));
+      const angle = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+      radiusInput.value = radius.toFixed(2);
+      angleInput.value = Math.round(angle);
+      render();
+    }
+
+    svg.addEventListener("pointerdown", (event) => {
+      dragging = true;
+      svg.setPointerCapture(event.pointerId);
+      updateFromPointer(event);
+    });
+
+    svg.addEventListener("pointermove", (event) => {
+      if (dragging) updateFromPointer(event);
+    });
+
+    svg.addEventListener("pointerup", (event) => {
+      dragging = false;
+      svg.releasePointerCapture(event.pointerId);
+    });
+
+    angleInput.addEventListener("input", render);
+    radiusInput.addEventListener("input", render);
+    buildGrid();
+    render();
+  </script>
+</body>
+</html>

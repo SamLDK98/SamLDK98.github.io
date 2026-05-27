@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Circle Coordinates</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --x: #e8a13b;
+      --y: #6dd3c4;
+      --point: #ef7398;
+      --axis: rgba(236, 226, 209, 0.44);
+      --circle: rgba(236, 226, 209, 0.68);
+      --grid: rgba(236, 226, 209, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 760px;
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%), var(--bg);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.3rem 1.6rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 500;
+    }
+
+    .readout {
+      min-width: 210px;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--accent);
+      font-family: "Courier New", monospace;
+      font-size: 1rem;
+      line-height: 1.45;
+      text-align: right;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      min-height: 660px;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 660px;
+      padding: 1rem;
+      border-right: 1px solid var(--rule);
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 780px);
+      height: auto;
+      user-select: none;
+    }
+
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .axis { stroke: var(--axis); stroke-width: 1.6; }
+    .unit-circle { fill: rgba(0, 0, 0, 0.06); stroke: var(--circle); stroke-width: 2.6; }
+    .guide { stroke-width: 3; stroke-linecap: round; stroke-dasharray: 6 7; }
+    .x-guide { stroke: var(--x); }
+    .y-guide { stroke: var(--y); }
+    .radius-line { stroke: rgba(239, 115, 152, 0.72); stroke-width: 3; stroke-linecap: round; }
+    .point {
+      fill: var(--point);
+      stroke: var(--text);
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.45));
+    }
+
+    .label {
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .dim-label { fill: var(--dim); font-size: 16px; }
+    .x-label { fill: var(--x); }
+    .y-label { fill: var(--y); }
+    .angle-label { fill: var(--accent); }
+
+    .controls {
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .controls p {
+      margin: 0 0 1.15rem;
+      color: var(--dim);
+      font-size: 1.02rem;
+      line-height: 1.45;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: #ffe7b2;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 0.45rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    select {
+      width: 100%;
+      min-height: 42px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--rule);
+      background: #161311;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .coordinate-card {
+      padding: 0.9rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--text);
+      font-family: "Courier New", monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 850px) {
+      .widget { min-height: 980px; }
+      header,
+      .layout { grid-template-columns: 1fr; }
+      .stage {
+        min-height: 560px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .readout { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Coordinates on the Unit Circle</h1>
+      <div class="readout" id="readout">0 degrees -> (1, 0)</div>
+    </header>
+
+    <div class="layout">
+      <div class="stage">
+        <svg viewBox="0 0 780 660" role="img" aria-label="Unit circle with movable point and coordinate readout">
+          <g id="grid"></g>
+          <circle class="unit-circle" cx="390" cy="330" r="230" />
+          <line class="axis" x1="90" y1="330" x2="690" y2="330" />
+          <line class="axis" x1="390" y1="630" x2="390" y2="30" />
+          <line class="guide x-guide" id="xGuide" x1="0" y1="0" x2="0" y2="0" />
+          <line class="guide y-guide" id="yGuide" x1="0" y1="0" x2="0" y2="0" />
+          <line class="radius-line" id="radiusLine" x1="0" y1="0" x2="0" y2="0" />
+          <circle class="point" id="point" cx="0" cy="0" r="10" />
+          <text class="label dim-label" x="618" y="354">1</text>
+          <text class="label dim-label" x="144" y="354">-1</text>
+          <text class="label dim-label" x="402" y="92">1</text>
+          <text class="label dim-label" x="402" y="578">-1</text>
+          <text class="label x-label" id="xText" x="0" y="0">x</text>
+          <text class="label y-label" id="yText" x="0" y="0">y</text>
+          <text class="label angle-label" id="angleText" x="0" y="0">0 degrees</text>
+        </svg>
+      </div>
+
+      <aside class="controls">
+        <p>Move in discrete jumps around the unit circle and watch the coordinate change. Since the radius is 1, every point has coordinates between -1 and 1.</p>
+
+        <div class="button-row">
+          <button type="button" id="prev">Previous</button>
+          <button type="button" id="next">Next</button>
+        </div>
+
+        <label for="angleSelect">jump to angle</label>
+        <select id="angleSelect"></select>
+
+        <div class="coordinate-card" id="coordinateCard"></div>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const point = document.getElementById("point");
+    const xGuide = document.getElementById("xGuide");
+    const yGuide = document.getElementById("yGuide");
+    const radiusLine = document.getElementById("radiusLine");
+    const xText = document.getElementById("xText");
+    const yText = document.getElementById("yText");
+    const angleText = document.getElementById("angleText");
+    const readout = document.getElementById("readout");
+    const coordinateCard = document.getElementById("coordinateCard");
+    const angleSelect = document.getElementById("angleSelect");
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+
+    const cx = 390;
+    const cy = 330;
+    const scale = 230;
+    let index = 0;
+
+    const angles = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
+
+    function buildGrid() {
+      for (let i = -1; i <= 1; i += 0.25) {
+        const x = cx + i * scale;
+        const y = cy - i * scale;
+        const vertical = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        vertical.setAttribute("class", "grid");
+        vertical.setAttribute("x1", x);
+        vertical.setAttribute("x2", x);
+        vertical.setAttribute("y1", cy - scale * 1.2);
+        vertical.setAttribute("y2", cy + scale * 1.2);
+        grid.appendChild(vertical);
+
+        const horizontal = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        horizontal.setAttribute("class", "grid");
+        horizontal.setAttribute("x1", cx - scale * 1.2);
+        horizontal.setAttribute("x2", cx + scale * 1.2);
+        horizontal.setAttribute("y1", y);
+        horizontal.setAttribute("y2", y);
+        grid.appendChild(horizontal);
+      }
+    }
+
+    function fmt(value) {
+      if (Math.abs(value) < 0.0001) return "0";
+      if (Math.abs(value - 1) < 0.0001) return "1";
+      if (Math.abs(value + 1) < 0.0001) return "-1";
+      return value.toFixed(3);
+    }
+
+    function screenPoint(x, y) {
+      return { x: cx + x * scale, y: cy - y * scale };
+    }
+
+    function setLine(line, a, b) {
+      line.setAttribute("x1", a.x);
+      line.setAttribute("y1", a.y);
+      line.setAttribute("x2", b.x);
+      line.setAttribute("y2", b.y);
+    }
+
+    function render() {
+      const degrees = angles[index];
+      const radians = degrees * Math.PI / 180;
+      const x = Math.cos(radians);
+      const y = Math.sin(radians);
+      const origin = screenPoint(0, 0);
+      const foot = screenPoint(x, 0);
+      const endpoint = screenPoint(x, y);
+
+      point.setAttribute("cx", endpoint.x);
+      point.setAttribute("cy", endpoint.y);
+      setLine(radiusLine, origin, endpoint);
+      setLine(xGuide, origin, foot);
+      setLine(yGuide, foot, endpoint);
+
+      xText.setAttribute("x", (origin.x + foot.x) / 2);
+      xText.setAttribute("y", origin.y + 26);
+      xText.textContent = `x = ${fmt(x)}`;
+      yText.setAttribute("x", foot.x + 14);
+      yText.setAttribute("y", (foot.y + endpoint.y) / 2);
+      yText.textContent = `y = ${fmt(y)}`;
+      angleText.setAttribute("x", endpoint.x + 12);
+      angleText.setAttribute("y", endpoint.y - 14);
+      angleText.textContent = `${degrees} degrees`;
+
+      readout.textContent = `${degrees} degrees -> (${fmt(x)}, ${fmt(y)})`;
+      coordinateCard.innerHTML = `
+        angle: ${degrees} degrees<br>
+        x-coordinate: ${fmt(x)}<br>
+        y-coordinate: ${fmt(y)}<br>
+        point: (${fmt(x)}, ${fmt(y)})
+      `;
+      angleSelect.value = String(degrees);
+    }
+
+    angles.forEach((degrees) => {
+      const option = document.createElement("option");
+      option.value = String(degrees);
+      option.textContent = `${degrees} degrees`;
+      angleSelect.appendChild(option);
+    });
+
+    prev.addEventListener("click", () => {
+      index = (index - 1 + angles.length) % angles.length;
+      render();
+    });
+
+    next.addEventListener("click", () => {
+      index = (index + 1) % angles.length;
+      render();
+    });
+
+    angleSelect.addEventListener("change", () => {
+      index = angles.indexOf(Number(angleSelect.value));
+      render();
+    });
+
+    buildGrid();
+    render();
+  </script>
+</body>
+</html>

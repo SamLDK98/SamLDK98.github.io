@@ -1200,6 +1200,14 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 780px;
 }
 
+.intro-linear-algebra-page .unit-circle-distance-widget {
+  height: 720px;
+}
+
+.intro-linear-algebra-page .unit-circle-coordinate-widget {
+  height: 760px;
+}
+
 .trig-figure-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

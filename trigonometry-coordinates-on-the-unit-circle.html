@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coordinates on the Unit Circle | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-unit-circle-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Coordinates on the Unit Circle</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h3 class="subsection-title">Limitations beyond ordered pairs</h3>
+
+        <p>Previously, we looked at equations like $4x-2y=2$.</p>
+
+        <p>We said that $x$ or $y$ could be anything, as long as the other adjusted accordingly to balance the equation. So, we were limited to pairings $(x,y)$, not either variable alone.</p>
+
+        <p>However, some equations fundamentally limit what $x$ and/or $y$ can be.</p>
+
+        <p>For example, can you think of an $x$ value above or below 1 that can be balanced by some $y$ value to make this equation true?</p>
+
+        <p class="display-equation">$$x^2 + y^2 =1$$</p>
+
+        <p>Let's try one for example:</p>
+
+        <p class="display-equation">$$5^2 + y^2 = 1$$</p>
+
+        <p class="display-equation">$$25+y^2=1 \to y^2=-24 \to \boxed{y = \sqrt{ -24 }}$$</p>
+
+        <p>Now -- you might be wondering, "So what if it's the square root of a negative? Why must it be a real number?". And you would be right to push on this. In fact, it was the pushing of this that would lead to a great breakthrough in maths, but we will get to this a little later on. For now, just accept that some equations are limited in what the $x$ or $y$ values can be.</p>
+
+        <h3 class="subsection-title">The equation of a circle</h3>
+
+        <p>This equation represents a circle in 2D space:</p>
+
+        <p class="display-equation">$$x^2 + y^2 = 1$$</p>
+
+        <p>How?</p>
+
+        <p>Take any point in the space -- $(x,y)$.</p>
+
+        <p>How far is that point from the origin $(0,0)$?</p>
+
+        <p>Imagine a line extending from the point to the $x$-axis, and another from the point to the origin. It's a right angled triangle. We can find the distance of this point to the origin using Pythagoras' theorem.</p>
+
+        <p class="display-equation">$\sqrt{x^2+y^2}$</p>
+
+        <p>The square root of whatever number we set this to equal will denote the distance that all solutions must be from the origin.</p>
+
+        <p>Example:</p>
+
+        <p class="display-equation">$\sqrt{x^2+y^2} = 9 \to x^2 +y^2 = 3$</p>
+
+        <p>All solutions must be a distance of 3 away from the origin.</p>
+
+        <iframe
+          class="essay-widget unit-circle-distance-widget"
+          src="trigonometry/unit-circle/pythagorean-distance-widget.html"
+          title="Interactive widget showing Pythagorean distance to the origin"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>If we want a circle with a distance of only 1, then the square root of 1 is just 1, meaning this gives us the equation of the unit circle:</p>
+
+        <p class="display-equation">$$x^2+y^2=1$$</p>
+
+        <p>The constant on the right determines the range of what $x$ or $y$ can be. It is after all the length of the radius. It is the distance that the set of all points forming the circle must be equal to.</p>
+
+        <p>Every angle on the unit circle corresponds to a unique point on the circumference.</p>
+
+        <iframe
+          class="essay-widget unit-circle-coordinate-widget"
+          src="trigonometry/unit-circle/unit-circle-coordinate-widget.html"
+          title="Interactive widget showing coordinates on the unit circle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
