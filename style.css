@@ -1112,6 +1112,33 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-style: italic;
 }
 
+.intro-linear-algebra-page table {
+  width: min(100%, 760px);
+  margin: 1.4rem auto 2rem;
+  border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.14);
+  color: var(--intro-text);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.intro-linear-algebra-page th,
+.intro-linear-algebra-page td {
+  border-bottom: 1px solid var(--intro-rule);
+  padding: 0.42rem 0.5rem;
+  color: var(--intro-text);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.intro-linear-algebra-page th {
+  background: rgba(212, 184, 136, 0.1);
+  color: var(--intro-accent);
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+}
+
 .intro-linear-algebra-page .essay-widget {
   width: min(100%, 1280px);
   margin: 2.2rem auto 3rem;
