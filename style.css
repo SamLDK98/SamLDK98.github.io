@@ -1569,6 +1569,51 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 1120px;
 }
 
+.chapter-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 4rem auto 0;
+  max-width: var(--col-width);
+}
+
+.chapter-nav-link {
+  display: flex;
+  min-height: 5.5rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.chapter-nav-link:last-child {
+  text-align: right;
+}
+
+.chapter-nav-link span {
+  color: var(--ink-light);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.chapter-nav-link strong {
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-weight: 600;
+}
+
+.chapter-nav-link:hover,
+.chapter-nav-link:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 footer {
   max-width: var(--col-width);
   margin: 0 auto;
