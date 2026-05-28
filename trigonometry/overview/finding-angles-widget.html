@@ -13,6 +13,7 @@
       --accent: #d4b888;
       --orange: #e8a13b;
       --cyan: #6dd3c4;
+      --yellow: #e7c84f;
       --pink: #ef7398;
     }
 
@@ -34,7 +35,7 @@
       display: block;
       width: min(100%, 660px);
       height: auto;
-      margin: 0 auto;
+      margin: -1.25rem auto 0;
       user-select: none;
       touch-action: none;
     }
@@ -47,8 +48,8 @@
     }
 
     .side:active { cursor: grabbing; }
-    .side-a { stroke: var(--orange); }
-    .side-b { stroke: var(--cyan); }
+    .side-a { stroke: var(--cyan); }
+    .side-b { stroke: var(--yellow); }
     .side-c {
       stroke: rgba(236, 226, 209, 0.32);
       stroke-dasharray: 9 10;
@@ -62,8 +63,8 @@
       cursor: grab;
     }
 
-    .handle-a { fill: var(--orange); }
-    .handle-b { fill: var(--cyan); }
+    .handle-a { fill: var(--cyan); }
+    .handle-b { fill: var(--yellow); }
 
     .vertex {
       fill: var(--text);
@@ -116,7 +117,7 @@
     const angleLabel = document.getElementById("angleLabel");
 
     const center = { x: 360, y: 280 };
-    const lengths = { a: 120, b: 240 };
+    const lengths = { a: 160, b: 200 };
     let angles = { a: 205, b: 330 };
     let dragging = null;
 

@@ -36,7 +36,7 @@
       <section class="essay-section">
         <p>"Trigonometry" translates to <em>triangle measurement</em>.</p>
 
-        <p>Yet <strong>angles</strong> are the real subject of interest; constructing triangles is just an effective method of working with them.</p>
+        <p>Yet <strong>angles</strong> are the real subject of interest; constructing triangles is just an effective method for working with them.</p>
 
         <p>Angles can be understood as proportions of rotation around a circle; this interpretation eventually connects trigonometry to oscillations, complex numbers, and Euler's formula.</p>
 
@@ -44,8 +44,8 @@
           <figure class="trig-figure">
             <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-triangle-title">
               <title id="angle-triangle-title">Two rays forming an angle with an extra triangle side greyed out</title>
-              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="338" y2="216" />
-              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="266" y2="64" />
+              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="360" y2="216" />
+              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="286" y2="48" />
               <line class="trig-line trig-line-muted" x1="338" y1="216" x2="266" y2="64" />
               <path class="trig-angle-arc" d="M 128 216 A 50 50 0 0 0 117 185" />
               <text class="trig-label" x="139" y="199">&theta;</text>
@@ -69,11 +69,24 @@
 
         <p>In this case, however, I think it's better to simply brute force some of the behaviour, structure, and relations into your head first.</p>
 
-        <h3 class="subsection-title">Finding angles</h3>
+        <h3 class="subsection-title">Why do we need triangles to find angles?</h3>
 
-        <p>If we know the lengths of only two sides of a triangle, we can't determine the angles precisely.</p>
+        <p>An angle is a relational construct.</p>
 
-        <p>Imagine we knew side $a = 1$ (blue) and side $b = 2$ (yellow). We could theoretically have a triangle with any angle.</p>
+        <p>If you try to picture an angle, you need at least two independent things for the angle to exist between.</p>
+
+        <p>Let's say I am thinking of two intersecting lines — an angle exists between them.</p>
+
+        <p>There's no way for you to know how big or small my angle is without more information.</p>
+
+        <p>I could tell you the length of the lines:</p>
+
+        <ul>
+          <li>line $a = 4$ (blue)</li>
+          <li>line $b = 5$ (yellow)</li>
+        </ul>
+
+        <p>Still, the angle could be anything between $0^\circ$ and $180^\circ$.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize finding-angles-widget"
@@ -83,15 +96,15 @@
           loading="lazy"
         ></iframe>
 
-        <p>It is only once we fix the length of the third side that all three angles become invariant at once.</p>
+        <p>To know what my angle is, you need to know the length of a line connecting these two.</p>
 
-        <p>We can't change the angles and preserve the side lengths.</p>
+        <p>This is because three lines that connect at their endpoints (a triangle) have certain properties that make inferring the angles of their corners possible with information about the line lengths.</p>
 
-        <p>The triangle below shows three sides of fixed lengths relative to each other. Notice there is no way to connect them that doesn't produce the specific angles $127.2^\circ$, $32.1^\circ$, and $20.7^\circ$.</p>
+        <p>In other words, three lines can be connected to form a triangle in only one way.</p>
 
-        <p>However, it is not the absolute side lengths themselves that determine these angles. We can scale the triangle proportionally and preserve all the angles.</p>
+        <p>Knowing three sides ($a = 4$, $b = 5$, and $c = 6$) means we could only have a triangle with specific angles: $41.4^\circ$, $55.8^\circ$, and $82.8^\circ$.</p>
 
-        <p>So it is really the ratios between the side lengths, rather than their absolute magnitudes, that determine the triangle's shape.</p>
+        <p>Try yourself to form a triangle with these side lengths that does not have those angles. You should realise that <strong>angles determine the shape of a triangle</strong>. To change an angle would change the length of two sides.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize fixed-triangle-widget"
@@ -101,9 +114,35 @@
           loading="lazy"
         ></iframe>
 
+        <p>Something might seem confusing.</p>
+
+        <p>You have just learned that specific triangles have specific angles.</p>
+
+        <p>However, I am only thinking of one angle between two lines. You could "draw" your third side anywhere that connects the two.</p>
+
+        <p>So does this not create different sets of angles depending on where you choose?</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize sliding-third-side-widget"
+          src="trigonometry/overview/sliding-third-side-widget.html"
+          title="Interactive widget showing a third side sliding along two intersecting lines"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Actually, what we see is that the angles remain invariant.</p>
+
+        <p>However, notice that we are increasing every side proportionately.</p>
+
+        <p>So while a triangle with side lengths 4-5-6 determines the angles $41.4^\circ-55.8^\circ-82.8^\circ$.</p>
+
+        <p>The angles $41.4^\circ-55.8^\circ-82.8^\circ$ determine proportions, not absolute lengths. We could have side lengths 8-10-12, 12-15-18, etc.</p>
+
+        <p>The key insight is that knowing the proportions between sides tells us what the angles must be.</p>
+
         <h3 class="subsection-title">Right-angled Triangles</h3>
 
-        <p>We could determine the angles of any triangle from its side lengths alone. However, the relationships become much simpler for right-angled triangles, and right angles are extremely common in practical geometry. So let's begin by considering them specifically.</p>
+        <p>So, given the lengths of three sides of a triangle, we could work out the angles based on the ratios between them. However, the most common triangles we work with are right-angled triangles, which have an easier calculation process. Let's start there.</p>
 
         <p>We can label the sides of right-angled triangles. The hypotenuse is fixed; however, the opposite and adjacent sides depend on which corner we are interested in the angle from.</p>
 
@@ -138,14 +177,6 @@
         </div>
 
         <p>We can find the mystery angle using whichever ratio is most convenient.</p>
-
-        <iframe
-          class="essay-widget trig-ratios-widget"
-          src="trigonometry/overview/trig-ratios-widget.html"
-          title="Interactive widget for building trigonometric ratios"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
 
         <p>If all we know is that we have a right-angled triangle, we know that one angle is fixed to $90^\circ$; however, the other two are free to vary as the side lengths change, although they cannot vary independently. You can see below that as you extend either sides, both angles change.</p>
 

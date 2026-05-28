@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sliding Third Side</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --rule: rgba(214, 196, 168, 0.16);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --cyan: #6dd3c4;
+      --yellow: #e7c84f;
+      --pink: #ef7398;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 700px);
+      height: auto;
+      margin: 0 auto;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .ray {
+      stroke-linecap: round;
+      stroke-width: 5;
+      filter: drop-shadow(0 0 7px rgba(212, 184, 136, 0.12));
+    }
+
+    .ray-a { stroke: var(--cyan); }
+    .ray-b { stroke: var(--yellow); }
+
+    .ray-extension {
+      opacity: 0.25;
+      stroke-dasharray: 8 9;
+    }
+
+    .third-side {
+      stroke: var(--pink);
+      stroke-linecap: round;
+      stroke-width: 5;
+      cursor: grab;
+      filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.18));
+    }
+
+    .third-side:active { cursor: grabbing; }
+
+    .angle-arc {
+      fill: none;
+      stroke: var(--accent);
+      stroke-linecap: round;
+      stroke-width: 3;
+    }
+
+    .handle {
+      fill: var(--pink);
+      stroke: var(--bg);
+      stroke-width: 2;
+      cursor: grab;
+    }
+
+    .origin {
+      fill: var(--text);
+      opacity: 0.9;
+    }
+
+    text {
+      fill: var(--text);
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+    }
+
+    .length-label {
+      fill: var(--dim);
+      font-size: 19px;
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <svg id="canvas" viewBox="0 0 760 470" role="img" aria-label="A third side sliding along two intersecting rays">
+      <path class="angle-arc" id="angleArc" d="" />
+      <line class="ray ray-a ray-extension" id="rayAExtension" x1="0" y1="0" x2="0" y2="0" />
+      <line class="ray ray-b ray-extension" id="rayBExtension" x1="0" y1="0" x2="0" y2="0" />
+      <line class="ray ray-a" id="rayA" x1="0" y1="0" x2="0" y2="0" />
+      <line class="ray ray-b" id="rayB" x1="0" y1="0" x2="0" y2="0" />
+      <line class="third-side" id="thirdSide" x1="0" y1="0" x2="0" y2="0" />
+      <circle class="origin" id="origin" cx="0" cy="0" r="5" />
+      <circle class="handle" id="handleA" cx="0" cy="0" r="9" />
+      <circle class="handle" id="handleB" cx="0" cy="0" r="9" />
+      <text id="angleLabel" x="0" y="0"></text>
+      <text class="length-label" id="lengthA" x="0" y="0"></text>
+      <text class="length-label" id="lengthB" x="0" y="0"></text>
+      <text class="length-label" id="lengthC" x="0" y="0"></text>
+    </svg>
+  </section>
+
+  <script>
+    const svg = document.getElementById("canvas");
+    const el = Object.fromEntries([
+      "rayAExtension", "rayBExtension", "rayA", "rayB", "thirdSide", "origin",
+      "handleA", "handleB", "angleArc", "angleLabel", "lengthA", "lengthB", "lengthC"
+    ].map((id) => [id, document.getElementById(id)]));
+
+    const origin = { x: 178, y: 392 };
+    const baseUnit = 38;
+    const sides = { a: 4, b: 5, c: 6 };
+    const angle = Math.acos((sides.a ** 2 + sides.b ** 2 - sides.c ** 2) / (2 * sides.a * sides.b));
+    const minScale = 1;
+    const maxScale = 2;
+    let t = (1 - minScale) / (maxScale - minScale);
+    let dragging = false;
+
+    function pointOnRayA(distance) {
+      return { x: origin.x + distance, y: origin.y };
+    }
+
+    function pointOnRayB(distance) {
+      return {
+        x: origin.x + Math.cos(-angle) * distance,
+        y: origin.y + Math.sin(-angle) * distance
+      };
+    }
+
+    function pointerPoint(event) {
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      return point.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function setLine(line, p, q) {
+      line.setAttribute("x1", p.x);
+      line.setAttribute("y1", p.y);
+      line.setAttribute("x2", q.x);
+      line.setAttribute("y2", q.y);
+    }
+
+    function setCircle(circle, p) {
+      circle.setAttribute("cx", p.x);
+      circle.setAttribute("cy", p.y);
+    }
+
+    function setText(text, p, value) {
+      text.setAttribute("x", p.x);
+      text.setAttribute("y", p.y);
+      text.textContent = value;
+    }
+
+    function distance(p, q) {
+      return Math.hypot(p.x - q.x, p.y - q.y);
+    }
+
+    function arcPath(radius) {
+      const start = pointOnRayA(radius);
+      const end = pointOnRayB(radius);
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 0 ${end.x} ${end.y}`;
+    }
+
+    function midpoint(p, q) {
+      return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 };
+    }
+
+    function updateFromPointer(point) {
+      const projectedScale = (point.x - origin.x) / (sides.a * baseUnit);
+      t = (clamp(projectedScale, minScale, maxScale) - minScale) / (maxScale - minScale);
+      render();
+    }
+
+    function render() {
+      const currentScale = minScale + t * (maxScale - minScale);
+      const distanceA = sides.a * baseUnit * currentScale;
+      const distanceB = sides.b * baseUnit * currentScale;
+      const pointA = pointOnRayA(distanceA);
+      const pointB = pointOnRayB(distanceB);
+      const rayEndA = pointOnRayA(sides.a * baseUnit * (maxScale + 0.22));
+      const rayEndB = pointOnRayB(sides.b * baseUnit * (maxScale + 0.12));
+
+      setLine(el.rayAExtension, origin, rayEndA);
+      setLine(el.rayBExtension, origin, rayEndB);
+      setLine(el.rayA, origin, pointA);
+      setLine(el.rayB, origin, pointB);
+      setLine(el.thirdSide, pointA, pointB);
+      setCircle(el.origin, origin);
+      setCircle(el.handleA, pointA);
+      setCircle(el.handleB, pointB);
+
+      el.angleArc.setAttribute("d", arcPath(44));
+      setText(el.angleLabel, { x: origin.x + 54, y: origin.y - 18 }, "82.8°");
+
+      const midA = midpoint(origin, pointA);
+      const midB = midpoint(origin, pointB);
+      const midC = midpoint(pointA, pointB);
+      setText(el.lengthA, { x: midA.x - 10, y: midA.y + 34 }, (sides.a * currentScale).toFixed(1));
+      setText(el.lengthB, {
+        x: midB.x - 58,
+        y: midB.y - 22
+      }, (sides.b * currentScale).toFixed(1));
+      setText(el.lengthC, {
+        x: midC.x + 24,
+        y: midC.y - 12
+      }, (sides.c * currentScale).toFixed(1));
+    }
+
+    function startDrag(event) {
+      dragging = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      updateFromPointer(pointerPoint(event));
+    }
+
+    function drag(event) {
+      if (!dragging) return;
+      updateFromPointer(pointerPoint(event));
+    }
+
+    function stopDrag(event) {
+      if (!dragging) return;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+      dragging = false;
+    }
+
+    [el.thirdSide, el.handleA, el.handleB].forEach((node) => {
+      node.addEventListener("pointerdown", startDrag);
+      node.addEventListener("pointermove", drag);
+      node.addEventListener("pointerup", stopDrag);
+      node.addEventListener("pointercancel", stopDrag);
+    });
+
+    render();
+  </script>
+</body>
+</html>

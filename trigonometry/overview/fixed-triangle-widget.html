@@ -14,7 +14,6 @@
       --orange: #e8a13b;
       --cyan: #6dd3c4;
       --pink: #ef7398;
-      --green: #78c884;
     }
 
     * { box-sizing: border-box; }
@@ -31,13 +30,11 @@
       background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
     }
 
-    .stage {
-      min-height: 390px;
-    }
+    .stage { min-height: 430px; }
 
     svg {
       display: block;
-      width: min(100%, 540px);
+      width: min(100%, 760px);
       height: auto;
       margin: 0 auto;
       user-select: none;
@@ -45,41 +42,37 @@
     }
 
     .controls {
-      display: grid;
-      grid-template-columns: minmax(180px, 1fr) auto;
-      gap: 1rem;
+      display: flex;
+      gap: 0.75rem;
       align-items: center;
-      padding: 0.9rem 1rem 1rem;
+      justify-content: space-between;
+      padding: 0.8rem 1rem;
       border-top: 1px solid var(--rule);
       background: rgba(0, 0, 0, 0.1);
     }
 
-    label {
-      display: block;
-      margin: 0 0 0.45rem;
-      color: var(--dim);
-      font-family: "Courier New", monospace;
-      font-size: 0.76rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    input {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
     .side-key {
-      display: grid;
-      grid-template-columns: repeat(3, auto);
-      gap: 1rem;
-      margin: 0;
-      padding: 0.7rem 0.85rem;
-      border: 1px solid var(--rule);
-      background: rgba(0, 0, 0, 0.14);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
       font-family: "Courier New", monospace;
       font-size: 1rem;
       font-weight: 700;
+    }
+
+    button {
+      min-height: 2.25rem;
+      padding: 0 0.9rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.18);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .key-a { color: var(--orange); }
@@ -96,27 +89,13 @@
     .side:active { cursor: grabbing; }
     .side-a { stroke: var(--orange); }
     .side-b { stroke: var(--cyan); }
-    .side-c { stroke: var(--pink); cursor: default; }
-    .is-snapped .side { filter: drop-shadow(0 0 9px rgba(120, 200, 132, 0.35)); }
-
-    .gap-line {
-      stroke: rgba(236, 226, 209, 0.28);
-      stroke-dasharray: 7 9;
-      stroke-linecap: round;
-      stroke-width: 2;
-    }
+    .side-c { stroke: var(--pink); }
 
     .angle-arc {
       fill: none;
       stroke: var(--accent);
       stroke-linecap: round;
       stroke-width: 3;
-      opacity: 0.85;
-    }
-
-    .vertex {
-      fill: var(--text);
-      opacity: 0.9;
     }
 
     .handle {
@@ -127,13 +106,7 @@
 
     .handle-a { fill: var(--orange); }
     .handle-b { fill: var(--cyan); }
-
-    .target {
-      fill: none;
-      stroke: var(--green);
-      stroke-width: 2;
-      opacity: 0.35;
-    }
+    .handle-c { fill: var(--pink); }
 
     text {
       font-family: "Courier New", monospace;
@@ -145,95 +118,69 @@
       font-size: 18px;
     }
 
-    @media (max-width: 760px) {
-      .stage {
-        min-height: 340px;
-      }
-      .controls {
-        grid-template-columns: 1fr;
-      }
-      .side-key {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+    .hint {
+      fill: var(--dim);
+      font-size: 14px;
+      letter-spacing: 0.05em;
     }
   </style>
 </head>
 <body>
   <section class="widget">
     <div class="stage">
-      <svg id="canvas" viewBox="0 0 720 520" role="img" aria-label="Fixed side lengths forming one possible triangle">
-        <g id="triangleGroup">
-          <circle class="target" id="snapTarget" cx="0" cy="0" r="18" />
-          <path class="angle-arc" id="arcA" d="" />
-          <path class="angle-arc" id="arcB" d="" />
-          <path class="angle-arc" id="arcC" d="" />
-          <line class="gap-line" id="gapLine" x1="0" y1="0" x2="0" y2="0" />
-          <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
-          <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
-          <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
-          <circle class="vertex" id="va" cx="0" cy="0" r="5" />
-          <circle class="vertex" id="vb" cx="0" cy="0" r="5" />
-          <circle class="handle handle-a" id="handleA" cx="0" cy="0" r="10" />
-          <circle class="handle handle-b" id="handleB" cx="0" cy="0" r="10" />
-          <text class="angle-label" id="angleA" x="0" y="0"></text>
-          <text class="angle-label" id="angleB" x="0" y="0"></text>
-          <text class="angle-label" id="angleC" x="0" y="0"></text>
-        </g>
+      <svg id="canvas" viewBox="0 0 760 430" role="img" aria-label="Disconnected fixed side lengths that can only form one triangle">
+        <path class="angle-arc" id="arc0" d="" />
+        <path class="angle-arc" id="arc1" d="" />
+        <path class="angle-arc" id="arc2" d="" />
+        <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
+        <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
+        <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
+        <circle class="handle handle-a" id="a1" cx="0" cy="0" r="9" />
+        <circle class="handle handle-a" id="a2" cx="0" cy="0" r="9" />
+        <circle class="handle handle-b" id="b1" cx="0" cy="0" r="9" />
+        <circle class="handle handle-b" id="b2" cx="0" cy="0" r="9" />
+        <circle class="handle handle-c" id="c1" cx="0" cy="0" r="9" />
+        <circle class="handle handle-c" id="c2" cx="0" cy="0" r="9" />
+        <text class="angle-label" id="angle0" x="0" y="0"></text>
+        <text class="angle-label" id="angle1" x="0" y="0"></text>
+        <text class="angle-label" id="angle2" x="0" y="0"></text>
+        <text class="hint" id="hint" x="80" y="54">drag lines to move them; drag endpoints to rotate and snap them together</text>
       </svg>
     </div>
-    <aside class="controls">
-      <label for="size">size</label>
-      <input id="size" type="range" min="34" max="50" value="42">
-
+    <div class="controls">
       <div class="side-key" aria-label="Fixed side lengths">
         <span class="key-a">a = 4</span>
-        <span class="key-b">b = 6</span>
-        <span class="key-c">c = 9</span>
+        <span class="key-b">b = 5</span>
+        <span class="key-c">c = 6</span>
       </div>
-    </aside>
+      <button type="button" id="reset">Reset</button>
+    </div>
   </section>
 
   <script>
     const svg = document.getElementById("canvas");
-    const group = document.getElementById("triangleGroup");
-    const sizeInput = document.getElementById("size");
-    const el = Object.fromEntries([
-      "snapTarget", "gapLine", "sideA", "sideB", "sideC", "va", "vb", "handleA", "handleB",
-      "angleA", "angleB", "angleC", "arcA", "arcB", "arcC"
-    ].map((id) => [id, document.getElementById(id)]));
+    const reset = document.getElementById("reset");
+    const ids = ["sideA", "sideB", "sideC", "a1", "a2", "b1", "b2", "c1", "c2", "arc0", "arc1", "arc2", "angle0", "angle1", "angle2", "hint"];
+    const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
 
-    const sideUnits = { a: 4, b: 6, c: 9 };
-    let angleA = null;
-    let angleB = null;
+    const scale = 50;
+    const lengths = { a: 4 * scale, b: 5 * scale, c: 6 * scale };
+    const segments = {};
+    let connections = [];
     let dragging = null;
-    let snapped = false;
 
-    function geometry() {
-      const scale = Number(sizeInput.value);
-      const lengths = {
-        a: sideUnits.a * scale,
-        b: sideUnits.b * scale,
-        c: sideUnits.c * scale
-      };
-      const A = { x: 110, y: 360 };
-      const B = { x: A.x + lengths.c, y: A.y };
-      const x = (lengths.b ** 2 + lengths.c ** 2 - lengths.a ** 2) / (2 * lengths.c);
-      const y = Math.sqrt(Math.max(0, lengths.b ** 2 - x ** 2));
-      return {
-        lengths,
-        A,
-        B,
-        targets: {
-          upper: { x: A.x + x, y: A.y - y },
-          lower: { x: A.x + x, y: A.y + y }
-        }
-      };
+    function resetState() {
+      segments.a = { p1: { x: 420, y: 122 }, p2: { x: 420 + lengths.a, y: 122 }, length: lengths.a };
+      segments.b = { p1: { x: 120, y: 138 }, p2: { x: 120 + lengths.b, y: 138 }, length: lengths.b };
+      segments.c = { p1: { x: 170, y: 330 }, p2: { x: 170 + lengths.c, y: 330 }, length: lengths.c };
+      connections = [];
+      dragging = null;
+      el.hint.textContent = "drag lines to move them; drag endpoints to rotate and snap them together";
+      render();
     }
 
-    function initializeAngles() {
-      const { A, B, targets } = geometry();
-      angleA = Math.atan2(targets.upper.y - A.y, targets.upper.x - A.x) - 0.5;
-      angleB = Math.atan2(targets.upper.y - B.y, targets.upper.x - B.x) + 0.58;
+    function distance(p, q) {
+      return Math.hypot(p.x - q.x, p.y - q.y);
     }
 
     function pointFrom(anchor, radians, length) {
@@ -243,26 +190,138 @@
       };
     }
 
-    function setLine(line, from, to) {
-      line.setAttribute("x1", from.x);
-      line.setAttribute("y1", from.y);
-      line.setAttribute("x2", to.x);
-      line.setAttribute("y2", to.y);
+    function setLine(line, p, q) {
+      line.setAttribute("x1", p.x);
+      line.setAttribute("y1", p.y);
+      line.setAttribute("x2", q.x);
+      line.setAttribute("y2", q.y);
     }
 
-    function setCircle(circle, point) {
-      circle.setAttribute("cx", point.x);
-      circle.setAttribute("cy", point.y);
+    function setCircle(circle, p) {
+      circle.setAttribute("cx", p.x);
+      circle.setAttribute("cy", p.y);
     }
 
-    function distance(p, q) {
-      return Math.hypot(p.x - q.x, p.y - q.y);
+    function setText(text, p, value) {
+      text.setAttribute("x", p.x);
+      text.setAttribute("y", p.y);
+      text.textContent = value;
     }
 
-    function nearestTarget(point, targets) {
-      return distance(point, targets.upper) <= distance(point, targets.lower)
-        ? targets.upper
-        : targets.lower;
+    function pointerPoint(event) {
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      return point.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    function endpointKey(endpoint) {
+      return `${endpoint.segment}.${endpoint.end}`;
+    }
+
+    function parseEndpoint(key) {
+      const [segment, end] = key.split(".");
+      return { segment, end };
+    }
+
+    function endpointPoint(endpoint) {
+      return segments[endpoint.segment][endpoint.end];
+    }
+
+    function otherEnd(end) {
+      return end === "p1" ? "p2" : "p1";
+    }
+
+    function allEndpoints() {
+      return ["a", "b", "c"].flatMap((segment) => [
+        { segment, end: "p1" },
+        { segment, end: "p2" }
+      ]);
+    }
+
+    function removeConnectionsFor(key) {
+      connections = connections.filter((connection) => !connection.includes(key));
+    }
+
+    function isConnected(key) {
+      return connections.some((connection) => connection.includes(key));
+    }
+
+    function translateSegment(segment, dx, dy) {
+      segment.p1 = { x: segment.p1.x + dx, y: segment.p1.y + dy };
+      segment.p2 = { x: segment.p2.x + dx, y: segment.p2.y + dy };
+    }
+
+    function connectedSegments(startSegment) {
+      const connected = new Set([startSegment]);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        connections.forEach(([leftKey, rightKey]) => {
+          const left = parseEndpoint(leftKey).segment;
+          const right = parseEndpoint(rightKey).segment;
+          if (connected.has(left) && !connected.has(right)) {
+            connected.add(right);
+            changed = true;
+          }
+          if (connected.has(right) && !connected.has(left)) {
+            connected.add(left);
+            changed = true;
+          }
+        });
+      }
+      return connected;
+    }
+
+    function translateConnectedSegments(segmentName, dx, dy) {
+      connectedSegments(segmentName).forEach((name) => translateSegment(segments[name], dx, dy));
+    }
+
+    function rotateSegment(segmentName, anchorEnd, point) {
+      const segment = segments[segmentName];
+      const anchor = segment[anchorEnd];
+      const movingEnd = otherEnd(anchorEnd);
+      const angle = Math.atan2(point.y - anchor.y, point.x - anchor.x);
+      segment[movingEnd] = pointFrom(anchor, angle, segment.length);
+    }
+
+    function syncConnections() {
+      connections.forEach(([leftKey, rightKey]) => {
+        const left = parseEndpoint(leftKey);
+        const right = parseEndpoint(rightKey);
+        const midpoint = {
+          x: (endpointPoint(left).x + endpointPoint(right).x) / 2,
+          y: (endpointPoint(left).y + endpointPoint(right).y) / 2
+        };
+        segments[left.segment][left.end] = { ...midpoint };
+        segments[right.segment][right.end] = { ...midpoint };
+      });
+    }
+
+    function maybeSnap() {
+      const snap = 24;
+      const endpoints = allEndpoints();
+      for (let i = 0; i < endpoints.length; i += 1) {
+        for (let j = i + 1; j < endpoints.length; j += 1) {
+          const left = endpoints[i];
+          const right = endpoints[j];
+          if (left.segment === right.segment) continue;
+          const leftKey = endpointKey(left);
+          const rightKey = endpointKey(right);
+          if (isConnected(leftKey) || isConnected(rightKey)) continue;
+          if (distance(endpointPoint(left), endpointPoint(right)) >= snap) continue;
+          const midpoint = {
+            x: (endpointPoint(left).x + endpointPoint(right).x) / 2,
+            y: (endpointPoint(left).y + endpointPoint(right).y) / 2
+          };
+          segments[left.segment][left.end] = { ...midpoint };
+          segments[right.segment][right.end] = { ...midpoint };
+          connections.push([leftKey, rightKey]);
+          el.hint.textContent = "connected endpoints create fixed corner angles; keep trying to close the triangle";
+          syncConnections();
+          return;
+        }
+      }
     }
 
     function degreesAt(vertex, p1, p2) {
@@ -283,92 +342,60 @@
       return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
     }
 
-    function setText(text, point, value) {
-      text.setAttribute("x", point.x);
-      text.setAttribute("y", point.y);
-      text.textContent = value;
-    }
-
-    function pointerPoint(event) {
-      const point = svg.createSVGPoint();
-      point.x = event.clientX;
-      point.y = event.clientY;
-      return point.matrixTransform(svg.getScreenCTM().inverse());
+    function renderAngles() {
+      ["arc0", "arc1", "arc2"].forEach((id) => el[id].setAttribute("d", ""));
+      ["angle0", "angle1", "angle2"].forEach((id) => el[id].textContent = "");
+      connections.slice(0, 3).forEach(([leftKey, rightKey], index) => {
+        const left = parseEndpoint(leftKey);
+        const right = parseEndpoint(rightKey);
+        const vertex = endpointPoint(left);
+        const leftOther = segments[left.segment][otherEnd(left.end)];
+        const rightOther = segments[right.segment][otherEnd(right.end)];
+        const angle = degreesAt(vertex, leftOther, rightOther);
+        el[`arc${index}`].setAttribute("d", arcPath(vertex, leftOther, rightOther, 32));
+        setText(el[`angle${index}`], { x: vertex.x - 22, y: vertex.y - 24 }, `${angle.toFixed(1)}°`);
+      });
+      if (connections.length === 3) {
+        el.hint.textContent = "closed: these three lengths force this exact set of angles";
+      }
     }
 
     function render() {
-      const { lengths, A, B, targets } = geometry();
-      if (snapped && !dragging) {
-        const target = nearestTarget(pointFrom(A, angleA, lengths.b), targets);
-        angleA = Math.atan2(target.y - A.y, target.x - A.x);
-        angleB = Math.atan2(target.y - B.y, target.x - B.x);
-      }
-
-      let freeA = pointFrom(B, angleB, lengths.a);
-      let freeB = pointFrom(A, angleA, lengths.b);
-      const gap = distance(freeA, freeB);
-
-      if (gap < 26) {
-        const target = nearestTarget({
-          x: (freeA.x + freeB.x) / 2,
-          y: (freeA.y + freeB.y) / 2
-        }, targets);
-        freeA = { ...target };
-        freeB = { ...target };
-        angleA = Math.atan2(target.y - A.y, target.x - A.x);
-        angleB = Math.atan2(target.y - B.y, target.x - B.x);
-        snapped = true;
-      } else if (dragging) {
-        snapped = false;
-      }
-
-      const joined = distance(freeA, freeB) < 1;
-      group.classList.toggle("is-snapped", snapped);
-      setCircle(el.snapTarget, nearestTarget(freeB, targets));
-      setLine(el.sideA, B, freeA);
-      setLine(el.sideB, A, freeB);
-      setLine(el.sideC, A, B);
-      setLine(el.gapLine, freeA, freeB);
-      el.gapLine.style.display = joined ? "none" : "block";
-      setCircle(el.va, A);
-      setCircle(el.vb, B);
-      setCircle(el.handleA, freeA);
-      setCircle(el.handleB, freeB);
-
-      const angleAtA = degreesAt(A, B, freeB);
-      const angleAtB = degreesAt(B, freeA, A);
-      el.arcA.setAttribute("d", arcPath(A, B, freeB, 34));
-      el.arcB.setAttribute("d", arcPath(B, freeA, A, 34));
-      setText(el.angleA, { x: A.x + 24, y: A.y + 42 }, `${angleAtA.toFixed(1)}°`);
-      setText(el.angleB, { x: B.x - 96, y: B.y + 42 }, `${angleAtB.toFixed(1)}°`);
-
-      if (joined) {
-        const angleAtC = degreesAt(freeB, A, B);
-        el.arcC.style.display = "block";
-        el.angleC.style.display = "block";
-        el.arcC.setAttribute("d", arcPath(freeB, A, B, 34));
-        setText(el.angleC, { x: freeB.x - 24, y: freeB.y - 28 }, `${angleAtC.toFixed(1)}°`);
-      } else {
-        el.arcC.style.display = "none";
-        el.angleC.style.display = "none";
-      }
+      syncConnections();
+      setLine(el.sideA, segments.a.p1, segments.a.p2);
+      setLine(el.sideB, segments.b.p1, segments.b.p2);
+      setLine(el.sideC, segments.c.p1, segments.c.p2);
+      ["a", "b", "c"].forEach((segment) => {
+        setCircle(el[`${segment}1`], segments[segment].p1);
+        setCircle(el[`${segment}2`], segments[segment].p2);
+      });
+      renderAngles();
     }
 
-    function startDrag(which, event) {
-      dragging = which;
-      snapped = false;
+    function startDrag(part, event) {
+      const [segment, end] = part.split(".");
+      dragging = {
+        segment,
+        end,
+        endpoint: Boolean(end),
+        last: pointerPoint(event)
+      };
+      if (dragging.endpoint) removeConnectionsFor(part);
       event.currentTarget.setPointerCapture(event.pointerId);
     }
 
     function drag(event) {
       if (!dragging) return;
-      const { A, B } = geometry();
       const point = pointerPoint(event);
-      if (dragging === "a") {
-        angleB = Math.atan2(point.y - B.y, point.x - B.x);
+      const dx = point.x - dragging.last.x;
+      const dy = point.y - dragging.last.y;
+      dragging.last = point;
+      if (dragging.endpoint) {
+        rotateSegment(dragging.segment, otherEnd(dragging.end), point);
       } else {
-        angleA = Math.atan2(point.y - A.y, point.x - A.x);
+        translateConnectedSegments(dragging.segment, dx, dy);
       }
+      maybeSnap();
       render();
     }
 
@@ -376,24 +403,23 @@
       if (!dragging) return;
       event.currentTarget.releasePointerCapture(event.pointerId);
       dragging = null;
+      maybeSnap();
       render();
     }
 
     [
-      [el.sideA, "a"],
-      [el.handleA, "a"],
-      [el.sideB, "b"],
-      [el.handleB, "b"]
-    ].forEach(([node, which]) => {
-      node.addEventListener("pointerdown", (event) => startDrag(which, event));
+      [el.sideA, "a"], [el.a1, "a.p1"], [el.a2, "a.p2"],
+      [el.sideB, "b"], [el.b1, "b.p1"], [el.b2, "b.p2"],
+      [el.sideC, "c"], [el.c1, "c.p1"], [el.c2, "c.p2"]
+    ].forEach(([node, part]) => {
+      node.addEventListener("pointerdown", (event) => startDrag(part, event));
       node.addEventListener("pointermove", drag);
       node.addEventListener("pointerup", stopDrag);
       node.addEventListener("pointercancel", stopDrag);
     });
 
-    sizeInput.addEventListener("input", render);
-    initializeAngles();
-    render();
+    reset.addEventListener("click", resetState);
+    resetState();
   </script>
 </body>
 </html>

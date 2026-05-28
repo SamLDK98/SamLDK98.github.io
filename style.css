@@ -1188,12 +1188,17 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .intro-linear-algebra-page .finding-angles-widget {
   width: min(100%, 860px);
-  height: 315px;
+  height: 335px;
 }
 
 .intro-linear-algebra-page .fixed-triangle-widget {
   width: min(100%, 860px);
   height: 500px;
+}
+
+.intro-linear-algebra-page .sliding-third-side-widget {
+  width: min(100%, 860px);
+  height: 455px;
 }
 
 .intro-linear-algebra-page .right-angle-widget {
