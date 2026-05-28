@@ -105,7 +105,49 @@
 
         <p>We could determine the angles of any triangle from its side lengths alone. However, the relationships become much simpler for right-angled triangles, and right angles are extremely common in practical geometry. So let's begin by considering them specifically.</p>
 
-        <p>While we know that one angle is fixed to $90^\circ$, the other two are free to vary as the side lengths change, although they cannot vary independently.</p>
+        <p>We can label the sides of right-angled triangles. The hypotenuse is fixed; however, the opposite and adjacent sides depend on which corner we are interested in the angle from.</p>
+
+        <figure class="trig-figure trig-triangle-figure" data-right-triangle-labels>
+          <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-title">
+            <title id="right-triangle-title">Right triangle labelled hypotenuse, opposite, and adjacent</title>
+            <polygon class="trig-triangle-fill" points="88,250 416,250 416,70" />
+            <line class="trig-line trig-line-adjacent" data-trig-base x1="88" y1="250" x2="416" y2="250" />
+            <line class="trig-line trig-line-cyan" data-trig-vertical x1="416" y1="250" x2="416" y2="70" />
+            <line class="trig-line trig-line-gold" x1="88" y1="250" x2="416" y2="70" />
+            <path class="trig-angle-arc" data-trig-arc d="M 148 250 A 60 60 0 0 0 141 219" />
+            <path class="trig-right-angle" d="M 386 250 L 386 220 L 416 220" />
+            <text class="trig-label" data-trig-theta x="157" y="241">&theta;</text>
+            <text class="trig-small-label trig-adjacent-text" data-trig-base-label x="227" y="275">adjacent</text>
+            <text class="trig-small-label trig-opposite-text" data-trig-vertical-label x="427" y="166">opposite</text>
+            <text class="trig-small-label trig-hypotenuse-text" x="180" y="116">hypotenuse</text>
+          </svg>
+          <div class="trig-figure-actions">
+            <button type="button" data-trig-switch>Switch</button>
+          </div>
+        </figure>
+
+        <p>From the three sides of a right-angled triangle, we can construct six named ratios: sine, cosine, tangent, cosecant, secant, and cotangent.</p>
+
+        <div class="display-equation trig-ratio-equations">
+          <span>$\sin(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
+          <span>$\cos(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
+          <span>$\tan(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
+          <span>$\csc(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
+          <span>$\sec(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
+          <span>$\cot(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
+        </div>
+
+        <p>We can find the mystery angle using whichever ratio is most convenient.</p>
+
+        <iframe
+          class="essay-widget trig-ratios-widget"
+          src="trigonometry/overview/trig-ratios-widget.html"
+          title="Interactive widget for building trigonometric ratios"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>If all we know is that we have a right-angled triangle, we know that one angle is fixed to $90^\circ$; however, the other two are free to vary as the side lengths change, although they cannot vary independently. You can see below that as you extend either sides, both angles change.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize right-angle-widget"
@@ -136,68 +178,6 @@
         <div class="display-equation">$$\sin(\theta) = \frac{o}{h}$$</div>
 
         <p>Such functions assume right-angled triangles. We give them an angle and receive a ratio between specific side lengths.</p>
-
-        <h3 class="subsection-title">Trigonometric Functions</h3>
-
-        <p>Angles and ratios measure shape independently of size.</p>
-
-        <p>Pick any three numbers that sum to 180 (or randomly have them generated) and notice that they determine the shape of the triangle.</p>
-
-        <p>Click 'Select All' to increase or decrease the triangles side lengths simultaneously. Notice the shape and angles do not change.</p>
-
-        <p>Select a particular side and increase or decrease it -- notice how the angles and shape changes.</p>
-
-        <iframe
-          class="essay-widget essay-widget-autosize triangle-shape-widget"
-          src="trigonometry/overview/triangle-shape-widget.html"
-          title="Interactive widget showing triangle shape and scaling"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>If we know the side lengths of a triangle, we can derive its angles.</p>
-
-        <p>For right-angled triangles, we need only know two side lengths.</p>
-
-        <figure class="trig-figure trig-triangle-figure">
-          <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-title">
-            <title id="right-triangle-title">Right triangle labelled hypotenuse, opposite, and adjacent</title>
-            <polygon class="trig-triangle-fill" points="88,250 416,250 416,70" />
-            <line class="trig-line trig-line-adjacent" x1="88" y1="250" x2="416" y2="250" />
-            <line class="trig-line trig-line-cyan" x1="416" y1="250" x2="416" y2="70" />
-            <line class="trig-line trig-line-gold" x1="88" y1="250" x2="416" y2="70" />
-            <path class="trig-angle-arc" d="M 148 250 A 60 60 0 0 0 141 219" />
-            <path class="trig-right-angle" d="M 386 250 L 386 220 L 416 220" />
-            <text class="trig-label" x="157" y="235">&theta;</text>
-            <text class="trig-small-label trig-adjacent-text" x="227" y="275">adjacent</text>
-            <text class="trig-small-label trig-opposite-text" x="427" y="166">opposite</text>
-            <text class="trig-small-label trig-hypotenuse-text" x="180" y="116">hypotenuse</text>
-          </svg>
-          <figcaption>The 'opposite' is with respect to the angle of interest.</figcaption>
-        </figure>
-
-        <p>From the three sides of a right-angled triangle, we can construct six named ratios: sine, cosine, tangent, cosecant, secant, and cotangent.</p>
-
-        <div class="display-equation trig-ratio-equations">
-          <span>$\sin(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
-          <span>$\cos(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
-          <span>$\tan(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
-          <span>$\csc(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
-          <span>$\sec(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
-          <span>$\cot(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
-        </div>
-
-        <p>We can find the mystery angle using whichever ratio is most convenient.</p>
-
-        <p>We can change which angle is being considered by redefining which sides are labelled &ldquo;opposite&rdquo; and &ldquo;adjacent.&rdquo;</p>
-
-        <iframe
-          class="essay-widget trig-ratios-widget"
-          src="trigonometry/overview/trig-ratios-widget.html"
-          title="Interactive widget for building trigonometric ratios"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
 
         <h3 class="subsection-title">Degrees</h3>
 

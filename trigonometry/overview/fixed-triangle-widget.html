@@ -27,15 +27,12 @@
     }
 
     .widget {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 220px;
       border: 1px solid var(--rule);
       background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
     }
 
     .stage {
       min-height: 390px;
-      border-right: 1px solid var(--rule);
     }
 
     svg {
@@ -48,7 +45,12 @@
     }
 
     .controls {
-      padding: 1rem;
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.9rem 1rem 1rem;
+      border-top: 1px solid var(--rule);
       background: rgba(0, 0, 0, 0.1);
     }
 
@@ -69,9 +71,10 @@
 
     .side-key {
       display: grid;
-      gap: 0.65rem;
-      margin-top: 1.1rem;
-      padding: 0.85rem;
+      grid-template-columns: repeat(3, auto);
+      gap: 1rem;
+      margin: 0;
+      padding: 0.7rem 0.85rem;
       border: 1px solid var(--rule);
       background: rgba(0, 0, 0, 0.14);
       font-family: "Courier New", monospace;
@@ -143,11 +146,14 @@
     }
 
     @media (max-width: 760px) {
-      .widget { grid-template-columns: 1fr; }
       .stage {
         min-height: 340px;
-        border-right: 0;
-        border-bottom: 1px solid var(--rule);
+      }
+      .controls {
+        grid-template-columns: 1fr;
+      }
+      .side-key {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
   </style>

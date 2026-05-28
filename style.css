@@ -1186,20 +1186,18 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 900px;
 }
 
-.intro-linear-algebra-page .triangle-shape-widget {
-  height: 760px;
-}
-
 .intro-linear-algebra-page .finding-angles-widget {
   width: min(100%, 860px);
   height: 315px;
 }
 
 .intro-linear-algebra-page .fixed-triangle-widget {
-  height: 395px;
+  width: min(100%, 860px);
+  height: 500px;
 }
 
 .intro-linear-algebra-page .right-angle-widget {
+  width: min(100%, 860px);
   height: 330px;
 }
 
@@ -1265,6 +1263,28 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-size: 0.95rem;
   font-style: italic;
   line-height: 1.45;
+}
+
+.trig-figure-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1rem 1rem;
+}
+
+.trig-figure-actions button {
+  min-height: 2.35rem;
+  padding: 0 1rem;
+  border: 1px solid var(--intro-rule);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--intro-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.trig-figure-actions button:hover {
+  border-color: var(--intro-accent);
+  color: var(--intro-accent);
 }
 
 .trig-triangle-figure {

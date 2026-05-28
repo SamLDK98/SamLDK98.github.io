@@ -64,6 +64,37 @@ document.addEventListener('DOMContentLoaded', () => {
     autoHeightFrames.forEach(resizeFrame);
   });
 
+  const rightTriangleLabels = document.querySelector('[data-right-triangle-labels]');
+
+  if (rightTriangleLabels) {
+    const button = rightTriangleLabels.querySelector('[data-trig-switch]');
+    const base = rightTriangleLabels.querySelector('[data-trig-base]');
+    const vertical = rightTriangleLabels.querySelector('[data-trig-vertical]');
+    const baseLabel = rightTriangleLabels.querySelector('[data-trig-base-label]');
+    const verticalLabel = rightTriangleLabels.querySelector('[data-trig-vertical-label]');
+    const arc = rightTriangleLabels.querySelector('[data-trig-arc]');
+    const theta = rightTriangleLabels.querySelector('[data-trig-theta]');
+    let activeCorner = 'left';
+
+    const setMode = (mode) => {
+      const left = mode === 'left';
+      base.setAttribute('class', `trig-line ${left ? 'trig-line-adjacent' : 'trig-line-cyan'}`);
+      vertical.setAttribute('class', `trig-line ${left ? 'trig-line-cyan' : 'trig-line-adjacent'}`);
+      baseLabel.setAttribute('class', `trig-small-label ${left ? 'trig-adjacent-text' : 'trig-opposite-text'}`);
+      verticalLabel.setAttribute('class', `trig-small-label ${left ? 'trig-opposite-text' : 'trig-adjacent-text'}`);
+      baseLabel.textContent = left ? 'adjacent' : 'opposite';
+      verticalLabel.textContent = left ? 'opposite' : 'adjacent';
+      arc.setAttribute('d', left ? 'M 148 250 A 60 60 0 0 0 141 219' : 'M 416 130 A 60 60 0 0 1 363 99');
+      theta.setAttribute('x', left ? '157' : '390');
+      theta.setAttribute('y', left ? '241' : '115');
+    };
+
+    button?.addEventListener('click', () => {
+      activeCorner = activeCorner === 'left' ? 'top' : 'left';
+      setMode(activeCorner);
+    });
+  }
+
   const questionCarousels = document.querySelectorAll('[data-question-carousel]');
 
   questionCarousels.forEach((carousel) => {
