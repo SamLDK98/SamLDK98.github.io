@@ -41,7 +41,7 @@
         <p>Angles can be understood as proportions of rotation around a circle; this interpretation eventually connects trigonometry to oscillations, complex numbers, and Euler's formula.</p>
 
         <div class="trig-figure-grid">
-          <figure class="trig-figure">
+          <figure class="trig-figure trig-figure-bare">
             <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-triangle-title">
               <title id="angle-triangle-title">Two rays forming an angle with an extra triangle side greyed out</title>
               <line class="trig-line trig-line-accent" x1="78" y1="216" x2="360" y2="216" />
@@ -52,7 +52,7 @@
             </svg>
           </figure>
 
-          <figure class="trig-figure">
+          <figure class="trig-figure trig-figure-bare">
             <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-circle-title">
               <title id="angle-circle-title">A circle around an angle showing the angle as part of a full turn</title>
               <circle class="trig-circle" cx="210" cy="150" r="96" />
@@ -65,28 +65,22 @@
           </figure>
         </div>
 
-        <p>Typically, I like to move through these explanations conceptually, often with a focus on the historical development of ideas.</p>
-
-        <p>In this case, however, I think it's better to simply brute force some of the behaviour, structure, and relations into your head first.</p>
-
         <h3 class="subsection-title">Why do we need triangles to find angles?</h3>
 
         <p>An angle is a relational construct.</p>
 
         <p>If you try to picture an angle, you need at least two independent things for the angle to exist between.</p>
 
-        <p>Let's say I am thinking of two intersecting lines — an angle exists between them.</p>
+        <p>Say I'm thinking of an angle between two lines.</p>
 
-        <p>There's no way for you to know how big or small my angle is without more information.</p>
+        <p>I could tell you their lengths:</p>
 
-        <p>I could tell you the length of the lines:</p>
-
-        <ul>
-          <li>line $a = 4$ (blue)</li>
-          <li>line $b = 5$ (yellow)</li>
+        <ul class="indented-list">
+          <li>Blue line = 4</li>
+          <li>Yellow line = 5</li>
         </ul>
 
-        <p>Still, the angle could be anything between $0^\circ$ and $180^\circ$.</p>
+        <p>But there's no way for you to know the size of my angle without more information. It could be anything between $0^\circ$ and $180^\circ$.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize finding-angles-widget"
@@ -96,15 +90,22 @@
           loading="lazy"
         ></iframe>
 
-        <p>To know what my angle is, you need to know the length of a line connecting these two.</p>
+        <p>If you knew the length of a line connecting these two lines, then you could work out what the angle between them must be.</p>
 
-        <p>This is because three lines that connect at their endpoints (a triangle) have certain properties that make inferring the angles of their corners possible with information about the line lengths.</p>
+        <p>But why?</p>
 
-        <p>In other words, three lines can be connected to form a triangle in only one way.</p>
+        <p>Because you can only connect three lines of fixed length to form a triangle in one specific way.</p>
 
-        <p>Knowing three sides ($a = 4$, $b = 5$, and $c = 6$) means we could only have a triangle with specific angles: $41.4^\circ$, $55.8^\circ$, and $82.8^\circ$.</p>
+        <p>For example, if we had three lines with lengths 4, 5 and 6, we could only make them form a triangle with the angles: $41.4^\circ$, $55.8^\circ$, and $82.8^\circ$.</p>
 
-        <p>Try yourself to form a triangle with these side lengths that does not have those angles. You should realise that <strong>angles determine the shape of a triangle</strong>. To change an angle would change the length of two sides.</p>
+        <p>Go ahead and try to make a triangle with anything other than these angles, given these lengths.</p>
+
+        <p>The important things to realise are:</p>
+
+        <ul>
+          <li>Angles determine the shapes of triangles.</li>
+          <li>You can't change an angle without changing the length of some side.</li>
+        </ul>
 
         <iframe
           class="essay-widget essay-widget-autosize fixed-triangle-widget"

@@ -168,6 +168,7 @@
     const segments = {};
     let connections = [];
     let dragging = null;
+    let locked = false;
 
     function resetState() {
       segments.a = { p1: { x: 420, y: 122 }, p2: { x: 420 + lengths.a, y: 122 }, length: lengths.a };
@@ -175,6 +176,7 @@
       segments.c = { p1: { x: 170, y: 330 }, p2: { x: 170 + lengths.c, y: 330 }, length: lengths.c };
       connections = [];
       dragging = null;
+      locked = false;
       el.hint.textContent = "drag lines to move them; drag endpoints to rotate and snap them together";
       render();
     }
@@ -285,20 +287,69 @@
       segment[movingEnd] = pointFrom(anchor, angle, segment.length);
     }
 
-    function syncConnections() {
-      connections.forEach(([leftKey, rightKey]) => {
-        const left = parseEndpoint(leftKey);
-        const right = parseEndpoint(rightKey);
-        const midpoint = {
-          x: (endpointPoint(left).x + endpointPoint(right).x) / 2,
-          y: (endpointPoint(left).y + endpointPoint(right).y) / 2
-        };
-        segments[left.segment][left.end] = { ...midpoint };
-        segments[right.segment][right.end] = { ...midpoint };
+    function alignEndpointTo(endpoint, target) {
+      const key = endpointKey(endpoint);
+      const anchorEnd = otherEnd(endpoint.end);
+      const anchorKey = `${endpoint.segment}.${anchorEnd}`;
+      if (isConnected(anchorKey)) {
+        rotateSegment(endpoint.segment, anchorEnd, target);
+        return;
+      }
+      const current = endpointPoint(endpoint);
+      translateSegment(segments[endpoint.segment], target.x - current.x, target.y - current.y);
+    }
+
+    function snapToExactTriangle() {
+      const vertexConnections = connections.map((pair) => pair.map(parseEndpoint));
+      const currentPoints = vertexConnections.flat().map(endpointPoint);
+      const center = currentPoints.reduce((sum, point) => ({
+        x: sum.x + point.x / currentPoints.length,
+        y: sum.y + point.y / currentPoints.length
+      }), { x: 0, y: 0 });
+
+      const vertices = vertexConnections.map((pair) => ({
+        pair,
+        key: pair.map(endpointKey).join("|"),
+        segments: pair.map((endpoint) => endpoint.segment)
+      }));
+      const vertexForSegmentPair = (first, second) => vertices.find((vertex) =>
+        vertex.segments.includes(first) && vertex.segments.includes(second)
+      );
+      const vertexAB = vertexForSegmentPair("a", "b");
+      const vertexAC = vertexForSegmentPair("a", "c");
+      const vertexBC = vertexForSegmentPair("b", "c");
+      if (!vertexAB || !vertexAC || !vertexBC) return;
+
+      const base = lengths.c;
+      const sideA = lengths.a;
+      const sideB = lengths.b;
+      const heightX = (sideB ** 2 + base ** 2 - sideA ** 2) / (2 * base);
+      const heightY = Math.sqrt(Math.max(0, sideB ** 2 - heightX ** 2));
+      const positions = new Map([
+        [vertexBC.key, { x: 0, y: 0 }],
+        [vertexAC.key, { x: base, y: 0 }],
+        [vertexAB.key, { x: heightX, y: -heightY }]
+      ]);
+      const rawCenter = [...positions.values()].reduce((sum, point) => ({
+        x: sum.x + point.x / 3,
+        y: sum.y + point.y / 3
+      }), { x: 0, y: 0 });
+      const offset = { x: center.x - rawCenter.x, y: center.y - rawCenter.y };
+
+      vertices.forEach((vertex) => {
+        const raw = positions.get(vertex.key);
+        const position = { x: raw.x + offset.x, y: raw.y + offset.y };
+        vertex.pair.forEach((endpoint) => {
+          segments[endpoint.segment][endpoint.end] = { ...position };
+        });
       });
+      dragging = null;
+      locked = true;
+      el.hint.textContent = "closed: these three lengths force this exact set of angles";
     }
 
     function maybeSnap() {
+      if (locked) return;
       const snap = 24;
       const endpoints = allEndpoints();
       for (let i = 0; i < endpoints.length; i += 1) {
@@ -310,15 +361,11 @@
           const rightKey = endpointKey(right);
           if (isConnected(leftKey) || isConnected(rightKey)) continue;
           if (distance(endpointPoint(left), endpointPoint(right)) >= snap) continue;
-          const midpoint = {
-            x: (endpointPoint(left).x + endpointPoint(right).x) / 2,
-            y: (endpointPoint(left).y + endpointPoint(right).y) / 2
-          };
-          segments[left.segment][left.end] = { ...midpoint };
-          segments[right.segment][right.end] = { ...midpoint };
+          const target = endpointPoint(left);
+          alignEndpointTo(right, target);
           connections.push([leftKey, rightKey]);
           el.hint.textContent = "connected endpoints create fixed corner angles; keep trying to close the triangle";
-          syncConnections();
+          if (connections.length === 3) snapToExactTriangle();
           return;
         }
       }
@@ -361,7 +408,6 @@
     }
 
     function render() {
-      syncConnections();
       setLine(el.sideA, segments.a.p1, segments.a.p2);
       setLine(el.sideB, segments.b.p1, segments.b.p2);
       setLine(el.sideC, segments.c.p1, segments.c.p2);
@@ -373,6 +419,7 @@
     }
 
     function startDrag(part, event) {
+      if (locked) return;
       const [segment, end] = part.split(".");
       dragging = {
         segment,
@@ -385,7 +432,7 @@
     }
 
     function drag(event) {
-      if (!dragging) return;
+      if (!dragging || locked) return;
       const point = pointerPoint(event);
       const dx = point.x - dragging.last.x;
       const dy = point.y - dragging.last.y;

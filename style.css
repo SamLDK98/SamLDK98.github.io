@@ -942,7 +942,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   max-width: none;
   margin: 0;
   padding: 1.6rem clamp(1rem, 3vw, 2.6rem) 1.1rem;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid var(--intro-rule);
 }
 
@@ -962,7 +962,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-family: "JetBrains Mono", monospace;
   font-size: 0.64rem;
   letter-spacing: 0.18em;
-  text-align: left;
+  text-align: center;
 }
 
 .intro-linear-algebra-page .essay-title {
@@ -1255,6 +1255,12 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   margin: 0;
 }
 
+.trig-figure-bare {
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
 .trig-figure svg {
   display: block;
   width: 100%;
@@ -1387,6 +1393,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   justify-content: center;
   gap: 0.4rem;
   white-space: nowrap;
+}
+
+.indented-list {
+  padding-left: 2.75rem;
 }
 
 .trig-fraction {
