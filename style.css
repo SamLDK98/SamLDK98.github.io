@@ -1191,6 +1191,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .intro-linear-algebra-page .finding-angles-widget {
+  width: min(100%, 860px);
   height: 315px;
 }
 
