@@ -194,6 +194,13 @@
       font-size: 0.9rem;
     }
 
+    .misses {
+      margin: 0.35rem 0 0;
+      color: var(--red);
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
     @media (max-width: 850px) {
       .widget { min-height: 980px; }
 
@@ -242,6 +249,7 @@
         </div>
 
         <p class="progress" id="progress">0 / 16 correct</p>
+        <p class="misses" id="misses">0 incorrect</p>
       </aside>
     </div>
   </section>
@@ -255,6 +263,7 @@
     const answerBox = document.getElementById("answerBox");
     const reset = document.getElementById("reset");
     const progress = document.getElementById("progress");
+    const misses = document.getElementById("misses");
     const degreeModeButton = document.getElementById("degreeMode");
     const radianModeButton = document.getElementById("radianMode");
     const coordinateModeButton = document.getElementById("coordinateMode");
@@ -266,6 +275,7 @@
     let active = null;
     let target = null;
     let completed = new Set();
+    let incorrect = 0;
 
     const points = [
       { degrees: 0, degree: "0°", radian: "0", coordinate: "(1, 0)" },
@@ -317,6 +327,7 @@
       });
 
       progress.textContent = `${completed.size} / ${points.length} correct`;
+      misses.textContent = `${incorrect} incorrect`;
       circle.classList.toggle("complete", completed.size === points.length);
       degreeModeButton.classList.toggle("active", mode === "degree");
       radianModeButton.classList.toggle("active", mode === "radian");
@@ -355,6 +366,7 @@
         updatePoints();
         setTimeout(chooseTarget, 500);
       } else {
+        incorrect += 1;
         answerBox.classList.add("incorrect");
         answerBox.classList.remove("correct");
         answerBox.textContent = "Not quite. Try another point.";
@@ -369,6 +381,7 @@
 
     function resetGame() {
       completed = new Set();
+      incorrect = 0;
       active = null;
       target = null;
       hint.textContent = "Click the matching point on the circle.";
