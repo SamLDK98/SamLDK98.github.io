@@ -1276,11 +1276,6 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 780px;
 }
 
-.intro-linear-algebra-page .cowboy-orientation-widget {
-  width: min(100%, 980px);
-  height: 720px;
-}
-
 .intro-linear-algebra-page .unit-circle-distance-widget {
   height: 720px;
 }
@@ -1351,6 +1346,24 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-size: 1rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.angle-arc-figure {
+  max-width: 620px;
+  margin-top: 0.85rem;
+  margin-bottom: 0.9rem;
+}
+
+.angle-column-figure {
+  max-width: 680px;
+}
+
+.section-divider {
+  width: min(100%, 860px);
+  height: 1px;
+  margin: 2.2rem auto;
+  border: 0;
+  background: var(--intro-rule);
 }
 
 .trig-figure-actions {

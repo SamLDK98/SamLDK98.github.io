@@ -113,9 +113,15 @@
     }
 
     .tick-point {
-      fill: var(--yellow);
+      fill: rgba(212, 184, 136, 0.62);
       stroke: rgba(0, 0, 0, 0.5);
       stroke-width: 2;
+    }
+
+    .tick-point.angle-45 {
+      fill: var(--yellow);
+      stroke: rgba(0, 0, 0, 0.62);
+      stroke-width: 2.4;
     }
 
     .angle-sector {
@@ -285,15 +291,16 @@
     }
 
     function buildTicks() {
-      const marks = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+      const marks = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330];
       marks.forEach((degrees) => {
         const point = pointAt(degrees);
         const label = labelAnchor(degrees);
+        const isFortyFiveMultiple = degrees % 45 === 0;
         const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        dot.setAttribute("class", "tick-point");
+        dot.setAttribute("class", isFortyFiveMultiple ? "tick-point angle-45" : "tick-point");
         dot.setAttribute("cx", point.x);
         dot.setAttribute("cy", point.y);
-        dot.setAttribute("r", "7");
+        dot.setAttribute("r", isFortyFiveMultiple ? "9" : "6");
         ticks.appendChild(dot);
 
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
