@@ -1023,6 +1023,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-weight: 400;
 }
 
+.intro-linear-algebra-page .essay-section > .subsection-title:first-child {
+  margin-top: 0.4rem;
+}
+
 .intro-linear-algebra-page .subsection-subtitle {
   max-width: 860px;
   margin: 1.8rem auto 0.8rem;
@@ -1344,7 +1348,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .direction-figure-label {
   fill: var(--intro-accent);
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 1rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
