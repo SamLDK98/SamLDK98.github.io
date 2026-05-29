@@ -171,13 +171,13 @@
   .hat-brim {
     fill: none;
     stroke: var(--accent);
-    stroke-width: 8;
+    stroke-width: 5;
   }
 
   .hat-crown {
     fill: none;
     stroke: var(--accent);
-    stroke-width: 5;
+    stroke-width: 4;
   }
 
   .vision {
@@ -236,7 +236,7 @@
 <body>
 <div class="widget">
   <div class="header">
-    <h1>Orientation as Rotation</h1>
+    <h1>Changing Direction</h1>
     <div class="readout" id="angle-summary">set two orientations</div>
   </div>
 
@@ -268,8 +268,8 @@
         <path class="vision" id="vision" />
         <line class="orientation-ray" id="orientation-ray" marker-end="url(#ray-arrow)" />
 
-        <ellipse class="hat-brim" cx="310" cy="250" rx="44" ry="24" />
-        <ellipse class="hat-crown" cx="310" cy="250" rx="22" ry="13" />
+        <circle class="hat-brim" cx="310" cy="250" r="25" />
+        <circle class="hat-crown" cx="310" cy="250" r="9" />
       </svg>
     </div>
 

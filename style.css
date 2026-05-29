@@ -1023,6 +1023,15 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-weight: 400;
 }
 
+.intro-linear-algebra-page .subsection-subtitle {
+  max-width: 860px;
+  margin: 1.8rem auto 0.8rem;
+  color: var(--intro-dim);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+  font-weight: 400;
+}
+
 .intro-linear-algebra-page .notation-details {
   max-width: 860px;
   margin: 1.4rem auto 2.2rem;
