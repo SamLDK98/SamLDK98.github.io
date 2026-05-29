@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2: Measuring Circles | Trigonometry</title>
+  <title>2: Measuring Rotation (Degrees and Radians) | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">2: Measuring Circles</h1>
+      <h1 class="essay-title">2: Measuring Rotation (Degrees and Radians)</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -201,25 +201,21 @@
 
         <h4 class="subsection-subtitle">Radians</h4>
 
-        <p>While degrees arise from an arbitrary partitioning of the circle, radians are intrinsic to the geometry of circles.</p>
+        <p>While degrees arise from an arbitrary partitioning of the circle, radians emerge naturally from the relationship between a circle's circumference and its radius.</p>
 
-        <p>Imagine taking the radius of a circle and wrapping it around the circumference, beginning at the $x$-axis (see widget below).</p>
+        <p>Imagine taking a line the length of a circle's radius.</p>
 
-        <p>Now connect a line (ray) from the origin to the endpoint of this wrapped radius.</p>
+        <p>Then you wrap it around the circle's circumference.</p>
 
-        <p>The angle created is defined as 1 radian, which is approximately equivalent to $57.3^\circ$.</p>
+        <p>How many more would we need to make it all the way around?</p>
 
-        <p>How many radii would we need to complete one full rotation around the circle?</p>
+        <p>The answer is $\approx 6.283$.</p>
 
-        <p>The answer is $2\pi$.</p>
+        <p>Which makes sense because the circumference of a circle $= 2\pi r$. In other words, $2\pi$ times the radius.</p>
 
-        <details class="notation-details">
-          <summary>Why?</summary>
-          <p>Circumference = $\pi \cdot \text{diameter}$</p>
-          <p>Diameter = $2r$</p>
-          <p>Circumference = $2\pi r$</p>
-          <p>If we have a unit circle, where $r = 1$, then the circumference is just $2\pi$, i.e. $2 \cdot 3.1415 = 6.283$.</p>
-        </details>
+        <p>So for a unit circle we can take $2\pi$ as the measure of a full rotation around the circle.</p>
+
+        <p>Imagine marking off an arc whose length is exactly equal to the radius. The angle subtended by this arc is defined as 1 radian. Since the circumference of a unit circle is $2\pi$, $\approx 6.283$ such arcs fit around the circle. Therefore, one full rotation is $2\pi$ radians.</p>
 
         <iframe
           class="essay-widget radian-wrap-widget"
@@ -229,11 +225,11 @@
           loading="lazy"
         ></iframe>
 
-        <p>If one complete rotation around a circle is $2\pi$ radians, then:</p>
+        <p>If one complete rotation around a circle is $2\pi$, then:</p>
 
         <ul>
-          <li>half a rotation is $\pi$ radians</li>
-          <li>a quarter rotation is $\frac{\pi}{2}$ radians</li>
+          <li>half a rotation is $\pi$,</li>
+          <li>a quarter rotation is $\frac{\pi}{2}$,</li>
           <li>and so on.</li>
         </ul>
 
@@ -245,31 +241,19 @@
           loading="lazy"
         ></iframe>
 
-        <p>It's worth getting familiar with these angles, in terms of both degrees and radii. I've created a game below for you to brute force this into memory.</p>
+        <p>It's worth getting familiar with both degrees and radians. I've created a game below for you to brute force this into memory.</p>
 
         <p>Once you know $0^\circ, 90^\circ, 180^\circ, 270^\circ,$ and $360^\circ$, you can work out the other points based on adding or subtracting either $30^\circ$ or $45^\circ$.</p>
 
-        <p>The radii are trickier...</p>
-
-        <p>Multiples of <strong>$30^\circ$</strong> are typically expressed in sixths of $\pi$. Multiples of <strong>$45^\circ$</strong> are typically expressed in fourths of $\pi$.</p>
-
-        <p>Because:</p>
-
-        <p class="display-equation">$$30^\circ = \frac{\pi}{6} \qquad\text{and}\qquad 45^\circ = \frac{\pi}{4}$$</p>
-
-        <p>A full circle is $360^\circ = 2\pi$ radians. Therefore:</p>
+        <p>The radii are trickier:</p>
 
         <ul>
-          <li>Dividing the circle into $12$ equal parts gives $30^\circ$ steps:</li>
+          <li>Multiples of <strong>$30^\circ$</strong> are typically expressed in sixths of $\pi$.</li>
+          <li>Multiples of <strong>$45^\circ$</strong> are typically expressed in fourths of $\pi$.</li>
+          <li>$90^\circ$ and $180^\circ$ are expressed as halves.</li>
         </ul>
 
-        <p class="display-equation">$$\frac{2\pi}{12} = \frac{\pi}{6} \text{ radians}$$</p>
-
-        <ul>
-          <li>Dividing the circle into $8$ equal parts gives $45^\circ$ steps:</li>
-        </ul>
-
-        <p class="display-equation">$$\frac{2\pi}{8} = \frac{\pi}{4} \text{ radians}$$</p>
+        <p>However, we can often express these fractions in reduced forms.</p>
 
         <p>Here's the full table:</p>
 

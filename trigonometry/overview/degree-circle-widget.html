@@ -113,7 +113,7 @@
     }
 
     .tick-point {
-      fill: rgba(212, 184, 136, 0.62);
+      fill: var(--yellow);
       stroke: rgba(0, 0, 0, 0.5);
       stroke-width: 2;
     }
@@ -295,12 +295,12 @@
       marks.forEach((degrees) => {
         const point = pointAt(degrees);
         const label = labelAnchor(degrees);
-        const isFortyFiveMultiple = degrees % 45 === 0;
+        const isNewFortyFivePoint = degrees % 45 === 0 && degrees % 90 !== 0;
         const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        dot.setAttribute("class", isFortyFiveMultiple ? "tick-point angle-45" : "tick-point");
+        dot.setAttribute("class", isNewFortyFivePoint ? "tick-point angle-45" : "tick-point");
         dot.setAttribute("cx", point.x);
         dot.setAttribute("cy", point.y);
-        dot.setAttribute("r", isFortyFiveMultiple ? "9" : "6");
+        dot.setAttribute("r", isNewFortyFivePoint ? "9" : "7");
         ticks.appendChild(dot);
 
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
