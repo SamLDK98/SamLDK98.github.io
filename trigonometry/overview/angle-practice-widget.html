@@ -62,6 +62,12 @@
       color: #ffe7b2;
     }
 
+    button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(212, 184, 136, 0.08);
+    }
+
     .layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 300px;
@@ -140,6 +146,13 @@
       line-height: 1.45;
     }
 
+    .mode-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+
     label {
       display: block;
       margin-bottom: 0.45rem;
@@ -205,6 +218,10 @@
         border-right: 0;
         border-bottom: 1px solid var(--rule);
       }
+
+      .mode-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -225,8 +242,13 @@
       </div>
 
       <aside class="controls">
+        <div class="mode-row" aria-label="Practice mode">
+          <button type="button" id="nameMode">Name selected point</button>
+          <button type="button" id="findMode">Find radian point</button>
+        </div>
+
         <p class="prompt" id="prompt">Select a point on the circle.</p>
-        <p class="hint">Enter degrees, such as 225, or radians, such as 5p/4. You can use p for pi.</p>
+        <p class="hint" id="hint">Enter degrees, such as 225, or radians, such as 5p/4. You can use p for pi.</p>
 
         <div class="answer-box" id="answerBox">
           <label for="answer">Your answer</label>
@@ -247,35 +269,41 @@
     const pointRoot = document.getElementById("points");
     const circle = document.getElementById("circle");
     const prompt = document.getElementById("prompt");
+    const hint = document.getElementById("hint");
     const answerBox = document.getElementById("answerBox");
     const answer = document.getElementById("answer");
     const submit = document.getElementById("submit");
     const reset = document.getElementById("reset");
     const progress = document.getElementById("progress");
+    const nameModeButton = document.getElementById("nameMode");
+    const findModeButton = document.getElementById("findMode");
 
     const cx = 380;
     const cy = 320;
     const radius = 250;
+    let mode = "name";
     let active = null;
+    let target = null;
+    let currentPrompt = "";
     let completed = new Set();
 
     const angles = [
-      { degrees: 0, pi: ["0", "2pi", "2p"] },
-      { degrees: 30, pi: ["pi/6", "p/6"] },
-      { degrees: 45, pi: ["pi/4", "p/4"] },
-      { degrees: 60, pi: ["pi/3", "p/3"] },
-      { degrees: 90, pi: ["pi/2", "p/2"] },
-      { degrees: 120, pi: ["2pi/3", "2p/3"] },
-      { degrees: 135, pi: ["3pi/4", "3p/4"] },
-      { degrees: 150, pi: ["5pi/6", "5p/6"] },
-      { degrees: 180, pi: ["pi", "p"] },
-      { degrees: 210, pi: ["7pi/6", "7p/6"] },
-      { degrees: 225, pi: ["5pi/4", "5p/4"] },
-      { degrees: 240, pi: ["4pi/3", "4p/3"] },
-      { degrees: 270, pi: ["3pi/2", "3p/2"] },
-      { degrees: 300, pi: ["5pi/3", "5p/3"] },
-      { degrees: 315, pi: ["7pi/4", "7p/4"] },
-      { degrees: 330, pi: ["11pi/6", "11p/6"] }
+      { degrees: 0, pi: ["0", "2pi", "2p"], prompts: ["0", "0\u03c0", "0\u03c0/6", "0\u03c0/4"] },
+      { degrees: 30, pi: ["pi/6", "p/6"], prompts: ["\u03c0/6", "1\u03c0/6"] },
+      { degrees: 45, pi: ["pi/4", "p/4"], prompts: ["\u03c0/4", "1\u03c0/4"] },
+      { degrees: 60, pi: ["pi/3", "p/3"], prompts: ["\u03c0/3", "2\u03c0/6"] },
+      { degrees: 90, pi: ["pi/2", "p/2"], prompts: ["\u03c0/2", "3\u03c0/6", "2\u03c0/4"] },
+      { degrees: 120, pi: ["2pi/3", "2p/3"], prompts: ["2\u03c0/3", "4\u03c0/6"] },
+      { degrees: 135, pi: ["3pi/4", "3p/4"], prompts: ["3\u03c0/4"] },
+      { degrees: 150, pi: ["5pi/6", "5p/6"], prompts: ["5\u03c0/6"] },
+      { degrees: 180, pi: ["pi", "p"], prompts: ["\u03c0", "6\u03c0/6", "4\u03c0/4"] },
+      { degrees: 210, pi: ["7pi/6", "7p/6"], prompts: ["7\u03c0/6"] },
+      { degrees: 225, pi: ["5pi/4", "5p/4"], prompts: ["5\u03c0/4"] },
+      { degrees: 240, pi: ["4pi/3", "4p/3"], prompts: ["4\u03c0/3", "8\u03c0/6"] },
+      { degrees: 270, pi: ["3pi/2", "3p/2"], prompts: ["3\u03c0/2", "9\u03c0/6", "6\u03c0/4"] },
+      { degrees: 300, pi: ["5pi/3", "5p/3"], prompts: ["5\u03c0/3", "10\u03c0/6"] },
+      { degrees: 315, pi: ["7pi/4", "7p/4"], prompts: ["7\u03c0/4"] },
+      { degrees: 330, pi: ["11pi/6", "11p/6"], prompts: ["11\u03c0/6"] }
     ];
 
     function pointAt(degrees) {
@@ -312,7 +340,7 @@
         dot.setAttribute("cy", point.y);
         dot.setAttribute("r", "7");
         dot.dataset.degrees = angle.degrees;
-        dot.addEventListener("click", () => selectPoint(angle));
+        dot.addEventListener("click", () => handlePointClick(angle));
         pointRoot.appendChild(dot);
       });
     }
@@ -327,12 +355,24 @@
 
       progress.textContent = `${completed.size} / ${angles.length} correct`;
       circle.classList.toggle("complete", completed.size === angles.length);
+      nameModeButton.classList.toggle("active", mode === "name");
+      findModeButton.classList.toggle("active", mode === "find");
+    }
+
+    function handlePointClick(angle) {
+      if (mode === "find") {
+        checkPointSelection(angle);
+      } else {
+        selectPoint(angle);
+      }
     }
 
     function selectPoint(angle) {
+      if (mode !== "name") return;
       if (completed.has(angle.degrees)) return;
       active = angle;
       prompt.textContent = "Enter this point in degrees or radians.";
+      answerBox.style.display = "";
       answer.value = "";
       answer.disabled = false;
       submit.disabled = false;
@@ -344,6 +384,7 @@
     function completeIfFinished() {
       if (completed.size === angles.length) {
         active = null;
+        target = null;
         prompt.textContent = "Complete. Every point is correct.";
         answer.disabled = true;
         submit.disabled = true;
@@ -359,7 +400,7 @@
     }
 
     function checkAnswer() {
-      if (!active) return;
+      if (mode !== "name" || !active) return;
       if (isCorrect()) {
         completed.add(active.degrees);
         answerBox.classList.add("correct");
@@ -378,17 +419,75 @@
       updatePoints();
     }
 
-    function resetGame() {
-      completed = new Set();
+    function targetLabel(angle) {
+      return currentPrompt || angle.pi[0].replace("pi", "\u03c0");
+    }
+
+    function chooseTarget() {
+      const remaining = angles.filter((angle) => !completed.has(angle.degrees));
+      target = remaining[Math.floor(Math.random() * remaining.length)] ?? null;
       active = null;
+      if (!target) {
+        completeIfFinished();
+        return;
+      }
+      currentPrompt = target.prompts[Math.floor(Math.random() * target.prompts.length)];
+      prompt.textContent = `Select the point for ${targetLabel(target)}.`;
+      answerBox.style.display = "none";
       answer.value = "";
       answer.disabled = true;
       submit.disabled = true;
       answerBox.classList.remove("correct", "incorrect");
-      prompt.textContent = "Select a point on the circle.";
       updatePoints();
     }
 
+    function checkPointSelection(angle) {
+      if (mode !== "find" || !target) return;
+      active = angle;
+      if (angle.degrees === target.degrees) {
+        completed.add(angle.degrees);
+        answerBox.classList.remove("incorrect");
+        answerBox.classList.add("correct");
+        prompt.textContent = "Correct. Select the next radian point.";
+        updatePoints();
+        setTimeout(() => {
+          if (mode === "find") chooseTarget();
+        }, 450);
+      } else {
+        prompt.textContent = `Not quite. Select the point for ${targetLabel(target)}.`;
+        answerBox.classList.add("incorrect");
+        answerBox.classList.remove("correct");
+        updatePoints();
+      }
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      resetGame();
+    }
+
+    function resetGame() {
+      completed = new Set();
+      active = null;
+      target = null;
+      currentPrompt = "";
+      answer.value = "";
+      answer.disabled = true;
+      submit.disabled = true;
+      answerBox.classList.remove("correct", "incorrect");
+      answerBox.style.display = mode === "name" ? "" : "none";
+      prompt.textContent = mode === "name"
+        ? "Select a point on the circle."
+        : "Select the point for the radian prompt.";
+      hint.textContent = mode === "name"
+        ? "Enter degrees, such as 225, or radians, such as 5p/4. You can use p for pi."
+        : "A radian fraction will be shown. Click the matching point on the circle.";
+      updatePoints();
+      if (mode === "find") chooseTarget();
+    }
+
+    nameModeButton.addEventListener("click", () => setMode("name"));
+    findModeButton.addEventListener("click", () => setMode("find"));
     reset.addEventListener("click", resetGame);
     submit.addEventListener("click", checkAnswer);
     answer.addEventListener("keydown", (event) => {
