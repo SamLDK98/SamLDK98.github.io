@@ -1628,9 +1628,16 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .chapter-nav-link:hover,
-.chapter-nav-link:focus-visible {
-  border-color: var(--accent);
-  color: var(--accent);
+.chapter-nav-link:focus-visible,
+.chapter-nav-link:active {
+  border-color: #e8a13b;
+  color: #e8a13b;
+}
+
+.chapter-nav-link:hover span,
+.chapter-nav-link:focus-visible span,
+.chapter-nav-link:active span {
+  color: #e8a13b;
 }
 
 footer {

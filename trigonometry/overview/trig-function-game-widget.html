@@ -286,6 +286,11 @@
     border-color: var(--accent);
     background: rgba(0, 0, 0, 0.4);
   }
+  input[readonly] {
+    color: var(--accent);
+    border-color: rgba(212, 184, 136, 0.28);
+    background: rgba(212, 184, 136, 0.06);
+  }
   input[type="text"]::placeholder { color: var(--text-faint); font-style: italic; }
 
   /* ——— Actions ——— */
@@ -344,17 +349,6 @@
   }
   .result em { color: var(--accent); font-style: italic; }
   .result-lines { display: flex; flex-direction: column; gap: 0.25rem; line-height: 1.4; }
-
-  /* ——— Footer ——— */
-  .footer {
-    padding: 0.85rem 2rem;
-    border-top: 1px solid var(--rule);
-    font-family: 'EB Garamond', serif;
-    font-style: italic;
-    font-size: 0.85rem;
-    color: var(--text-faint);
-    text-align: center;
-  }
 
   /* ——— SVG ——— */
   .tri-fill { fill: rgba(214, 196, 168, 0.025); stroke: none; }
@@ -424,7 +418,7 @@
   .role-label {
     font-family: 'EB Garamond', serif;
     font-style: italic;
-    font-size: 15px;
+    font-size: 18px;
     opacity: 0;
     transition: opacity 0.3s;
   }
@@ -453,7 +447,6 @@
 <div class="widget">
   <div class="header">
     <div class="header-left">
-      <div class="eyebrow">Figure · Inverse Trigonometry</div>
       <h1>Solving for an <em>unknown angle</em></h1>
     </div>
     <div class="header-right">
@@ -595,9 +588,9 @@
       <div class="step">
         <div class="step-head">
           <span class="step-num">06</span>
-          <span class="step-name">Compute the ratio</span>
+          <span class="step-name">Computed ratio</span>
         </div>
-        <input type="text" id="ratio-value" placeholder="ratio as a decimal" inputmode="decimal" autocomplete="off">
+        <input type="text" id="ratio-value" placeholder="computed automatically" inputmode="decimal" autocomplete="off" readonly>
       </div>
 
       <div class="actions">
@@ -609,10 +602,6 @@
         Work through each step, then press Solve.
       </div>
     </aside>
-  </div>
-
-  <div class="footer">
-    Given two side lengths, inverse trigonometry recovers the angle between them.
   </div>
 </div>
 
@@ -822,10 +811,10 @@
     setText('len-BC', sideLabelPos(B, C, centroid, 22), String(t.legB));
     setText('len-CA', sideLabelPos(C, A, centroid, 22), String(t.hyp));
 
-    // Role label positions (further out — 44)
-    setText('role-label-AB', sideLabelPos(A, B, centroid, 44));
-    setText('role-label-BC', sideLabelPos(B, C, centroid, 44));
-    setText('role-label-CA', sideLabelPos(C, A, centroid, 44));
+    // Role label positions
+    setText('role-label-AB', sideLabelPos(A, B, centroid, 58));
+    setText('role-label-BC', sideLabelPos(B, C, centroid, 58));
+    setText('role-label-CA', sideLabelPos(C, A, centroid, 58));
 
     // Answers (along the angular bisector inside the wedge)
     setText('ans-A', answerPos(A, B, C, 60), t.angleA.toFixed(1) + '°');
@@ -890,6 +879,19 @@
     $$('[data-fn]').forEach(b => {
       b.classList.toggle('active', b.dataset.fn === state.fn && b.dataset.inv === state.inv);
     });
+  }
+
+  function updateComputedRatio() {
+    const userN = num($('#num').value);
+    const userD = num($('#den').value);
+    const ratioField = $('#ratio-value');
+
+    if (isNaN(userN) || isNaN(userD) || userD === 0) {
+      ratioField.value = '';
+      return;
+    }
+
+    ratioField.value = (userN / userD).toFixed(3);
   }
 
   function showAnswer(angle) {
@@ -1090,6 +1092,7 @@
     btn.addEventListener('click', () => {
       state.ratio = btn.dataset.ratio;
       updateRatioSelection();
+      updateComputedRatio();
     });
   });
 
@@ -1107,10 +1110,17 @@
   });
   $('#new-triangle').addEventListener('click', newTriangle);
 
-  // Enter in inputs submits
-  ['num', 'den', 'ratio-value'].forEach(id => {
+  ['num', 'den'].forEach(id => {
+    $('#' + id).addEventListener('input', updateComputedRatio);
+  });
+
+  // Enter in inputs submits after the computed ratio has updated.
+  ['num', 'den'].forEach(id => {
     $('#' + id).addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submit();
+      if (e.key === 'Enter') {
+        updateComputedRatio();
+        submit();
+      }
     });
   });
 
