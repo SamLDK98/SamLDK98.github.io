@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sine and Cosine on the Unit Circle</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --rule-strong: rgba(214, 196, 168, 0.28);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --cos: #e8a13b;
+      --sin: #6dd3c4;
+      --point: #ef7398;
+      --grid: rgba(236, 226, 209, 0.08);
+      --axis: rgba(236, 226, 209, 0.4);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 720px;
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%), var(--bg);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.25rem 1.45rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      font-weight: 500;
+    }
+
+    .readout {
+      min-width: 250px;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--accent);
+      font-family: "Courier New", monospace;
+      font-size: 0.94rem;
+      line-height: 1.5;
+      text-align: right;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      min-height: 620px;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 620px;
+      padding: 1rem;
+      border-right: 1px solid var(--rule);
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 760px);
+      height: auto;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .axis { stroke: var(--axis); stroke-width: 1.6; }
+    .unit-circle { fill: rgba(0, 0, 0, 0.06); stroke: rgba(236, 226, 209, 0.68); stroke-width: 2.6; }
+    .radius { stroke: rgba(212, 184, 136, 0.7); stroke-width: 3.5; stroke-linecap: round; }
+    .cos-line { stroke: var(--cos); stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(232, 161, 59, 0.35)); }
+    .sin-line { stroke: var(--sin); stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(109, 211, 196, 0.35)); }
+    .angle-arc { fill: none; stroke: var(--point); stroke-width: 3; stroke-linecap: round; }
+    .point { fill: var(--point); stroke: var(--text); stroke-width: 2.5; cursor: grab; filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.45)); }
+    .point:active { cursor: grabbing; }
+
+    .label {
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .cos-label { fill: var(--cos); }
+    .sin-label { fill: var(--sin); }
+    .angle-label { fill: var(--point); }
+    .dim-label { fill: var(--dim); font-size: 15px; }
+
+    .controls {
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin: 0 0 0.55rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--point);
+    }
+
+    .value-card {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1.3rem;
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      font-family: "Courier New", monospace;
+      font-size: 0.98rem;
+      line-height: 1.45;
+    }
+
+    .value-card strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .cos-value { color: var(--cos); }
+    .sin-value { color: var(--sin); }
+
+    .hint {
+      margin-top: 1rem;
+      color: var(--dim);
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 850px) {
+      .widget { min-height: 940px; }
+      header,
+      .layout { grid-template-columns: 1fr; }
+      .stage {
+        min-height: 560px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .readout { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Sine and Cosine as Coordinates</h1>
+      <div class="readout" id="readout">θ = 45°<br>point = (0.707, 0.707)</div>
+    </header>
+
+    <div class="layout">
+      <div class="stage">
+        <svg id="svg" viewBox="0 0 760 620" role="img" aria-label="Unit circle with right triangle showing sine and cosine">
+          <g id="grid"></g>
+          <circle class="unit-circle" cx="380" cy="310" r="230" />
+          <line class="axis" x1="80" y1="310" x2="680" y2="310" />
+          <line class="axis" x1="380" y1="610" x2="380" y2="10" />
+          <path class="angle-arc" id="angleArc" />
+          <line class="cos-line" id="cosLine" x1="0" y1="0" x2="0" y2="0" />
+          <line class="sin-line" id="sinLine" x1="0" y1="0" x2="0" y2="0" />
+          <line class="radius" id="radiusLine" x1="0" y1="0" x2="0" y2="0" />
+          <circle class="point" id="point" cx="0" cy="0" r="10" />
+          <text class="label cos-label" id="cosLabel" x="0" y="0">cos(θ)</text>
+          <text class="label sin-label" id="sinLabel" x="0" y="0">sin(θ)</text>
+          <text class="label angle-label" id="thetaLabel" x="0" y="0">θ</text>
+          <text class="label dim-label" x="615" y="333">1</text>
+          <text class="label dim-label" x="140" y="333">-1</text>
+          <text class="label dim-label" x="392" y="90">1</text>
+          <text class="label dim-label" x="392" y="577">-1</text>
+        </svg>
+      </div>
+
+      <aside class="controls">
+        <label for="angle">angle</label>
+        <input id="angle" type="range" min="0" max="360" value="45" step="1">
+
+        <div class="value-card">
+          <div><strong>θ</strong> = <span id="thetaValue">45°</span></div>
+          <div><strong class="cos-value">cos(θ)</strong> = <span id="cosValue">0.707</span></div>
+          <div><strong class="sin-value">sin(θ)</strong> = <span id="sinValue">0.707</span></div>
+          <div><strong>point</strong> = <span id="pointValue">(0.707, 0.707)</span></div>
+        </div>
+
+        <p class="hint">Drag the point or move the slider. The horizontal leg is cosine; the vertical leg is sine.</p>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const svg = document.getElementById("svg");
+    const grid = document.getElementById("grid");
+    const slider = document.getElementById("angle");
+    const point = document.getElementById("point");
+    const radiusLine = document.getElementById("radiusLine");
+    const cosLine = document.getElementById("cosLine");
+    const sinLine = document.getElementById("sinLine");
+    const angleArc = document.getElementById("angleArc");
+    const cosLabel = document.getElementById("cosLabel");
+    const sinLabel = document.getElementById("sinLabel");
+    const thetaLabel = document.getElementById("thetaLabel");
+    const thetaValue = document.getElementById("thetaValue");
+    const cosValue = document.getElementById("cosValue");
+    const sinValue = document.getElementById("sinValue");
+    const pointValue = document.getElementById("pointValue");
+    const readout = document.getElementById("readout");
+
+    const cx = 380;
+    const cy = 310;
+    const scale = 230;
+    const arcRadius = 58;
+    let dragging = false;
+
+    function buildGrid() {
+      for (let i = -1; i <= 1; i += 0.25) {
+        const x = cx + i * scale;
+        const y = cy - i * scale;
+        const vertical = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        vertical.setAttribute("class", "grid");
+        vertical.setAttribute("x1", x);
+        vertical.setAttribute("x2", x);
+        vertical.setAttribute("y1", cy - scale * 1.2);
+        vertical.setAttribute("y2", cy + scale * 1.2);
+        grid.appendChild(vertical);
+
+        const horizontal = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        horizontal.setAttribute("class", "grid");
+        horizontal.setAttribute("x1", cx - scale * 1.2);
+        horizontal.setAttribute("x2", cx + scale * 1.2);
+        horizontal.setAttribute("y1", y);
+        horizontal.setAttribute("y2", y);
+        grid.appendChild(horizontal);
+      }
+    }
+
+    function screenPoint(x, y) {
+      return { x: cx + x * scale, y: cy - y * scale };
+    }
+
+    function polarPoint(degrees, radius) {
+      const radians = degrees * Math.PI / 180;
+      return {
+        x: cx + Math.cos(radians) * radius,
+        y: cy - Math.sin(radians) * radius
+      };
+    }
+
+    function setLine(line, a, b) {
+      line.setAttribute("x1", a.x);
+      line.setAttribute("y1", a.y);
+      line.setAttribute("x2", b.x);
+      line.setAttribute("y2", b.y);
+    }
+
+    function fmt(value) {
+      if (Math.abs(value) < 0.0005) return "0";
+      if (Math.abs(value - 1) < 0.0005) return "1";
+      if (Math.abs(value + 1) < 0.0005) return "-1";
+      return value.toFixed(3);
+    }
+
+    function arcPath(degrees) {
+      const start = polarPoint(0, arcRadius);
+      const end = polarPoint(degrees, arcRadius);
+      const largeArc = degrees > 180 ? 1 : 0;
+      return `M ${start.x} ${start.y} A ${arcRadius} ${arcRadius} 0 ${largeArc} 0 ${end.x} ${end.y}`;
+    }
+
+    function render() {
+      const degrees = Number(slider.value);
+      const radians = degrees * Math.PI / 180;
+      const cos = Math.cos(radians);
+      const sin = Math.sin(radians);
+      const origin = screenPoint(0, 0);
+      const foot = screenPoint(cos, 0);
+      const endpoint = screenPoint(cos, sin);
+      const theta = polarPoint(degrees / 2, arcRadius + 24);
+
+      setLine(cosLine, origin, foot);
+      setLine(sinLine, foot, endpoint);
+      setLine(radiusLine, origin, endpoint);
+      point.setAttribute("cx", endpoint.x);
+      point.setAttribute("cy", endpoint.y);
+      angleArc.setAttribute("d", arcPath(degrees));
+
+      cosLabel.setAttribute("x", (origin.x + foot.x) / 2 - 34);
+      cosLabel.setAttribute("y", origin.y + (sin >= 0 ? 30 : -18));
+      sinLabel.setAttribute("x", foot.x + (cos >= 0 ? 14 : -86));
+      sinLabel.setAttribute("y", (foot.y + endpoint.y) / 2);
+      thetaLabel.setAttribute("x", theta.x);
+      thetaLabel.setAttribute("y", theta.y);
+
+      thetaValue.textContent = `${degrees}°`;
+      cosValue.textContent = fmt(cos);
+      sinValue.textContent = fmt(sin);
+      pointValue.textContent = `(${fmt(cos)}, ${fmt(sin)})`;
+      readout.innerHTML = `θ = ${degrees}°<br>point = (${fmt(cos)}, ${fmt(sin)})`;
+    }
+
+    function angleFromEvent(event) {
+      const rect = svg.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 760;
+      const y = ((event.clientY - rect.top) / rect.height) * 620;
+      const degrees = Math.atan2(cy - y, x - cx) * 180 / Math.PI;
+      return Math.round((degrees + 360) % 360);
+    }
+
+    function setFromEvent(event) {
+      slider.value = String(angleFromEvent(event));
+      render();
+    }
+
+    slider.addEventListener("input", render);
+    svg.addEventListener("pointerdown", (event) => {
+      dragging = true;
+      svg.setPointerCapture(event.pointerId);
+      setFromEvent(event);
+    });
+    svg.addEventListener("pointermove", (event) => {
+      if (dragging) setFromEvent(event);
+    });
+    svg.addEventListener("pointerup", (event) => {
+      dragging = false;
+      svg.releasePointerCapture(event.pointerId);
+    });
+
+    buildGrid();
+    render();
+  </script>
+</body>
+</html>

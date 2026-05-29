@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Circle Conversion Game</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --rule-strong: rgba(214, 196, 168, 0.28);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --orange: #e8a13b;
+      --green: #88c97c;
+      --red: #e57994;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 560px;
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%), var(--bg);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.25rem 1.45rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      font-weight: 500;
+    }
+
+    .score {
+      color: var(--orange);
+      font-family: "Courier New", monospace;
+      font-size: 0.95rem;
+    }
+
+    main {
+      display: grid;
+      gap: 1.1rem;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem;
+    }
+
+    .prompt {
+      padding: 1.35rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.16);
+    }
+
+    .prompt-label {
+      margin: 0 0 0.6rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .prompt-value {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(1.7rem, 5vw, 2.7rem);
+      line-height: 1.05;
+    }
+
+    .answer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.75rem;
+    }
+
+    input {
+      min-height: 3rem;
+      width: 100%;
+      border: 1px solid var(--rule-strong);
+      background: rgba(0, 0, 0, 0.22);
+      color: var(--text);
+      padding: 0.7rem 0.85rem;
+      font: 1rem "Courier New", monospace;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+
+    button {
+      min-height: 3rem;
+      border: 1px solid var(--rule-strong);
+      background: var(--panel);
+      color: var(--text);
+      padding: 0 1rem;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .feedback {
+      min-height: 3.2rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.14);
+      color: var(--dim);
+      font-size: 1rem;
+    }
+
+    .feedback.correct {
+      border-color: var(--green);
+      color: var(--green);
+      background: rgba(136, 201, 124, 0.08);
+    }
+
+    .feedback.wrong {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(229, 121, 148, 0.07);
+    }
+
+    .hint {
+      color: var(--dim);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 620px) {
+      header,
+      .answer-row {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Unit Circle Conversions</h1>
+      <div class="score" id="score">0 correct</div>
+    </header>
+
+    <main>
+      <section class="prompt" aria-live="polite">
+        <p class="prompt-label" id="promptLabel">Prompt</p>
+        <p class="prompt-value" id="promptValue"></p>
+      </section>
+
+      <div class="answer-row">
+        <input id="answer" type="text" autocomplete="off" placeholder="type your answer">
+        <button id="check" type="button">Check</button>
+      </div>
+
+      <div class="feedback" id="feedback">Convert the prompt into the requested form.</div>
+
+      <button id="next" type="button">Next prompt</button>
+
+      <div class="hint">
+        Coordinates can be entered like <code>0,1</code> or <code>(0, 1)</code>. You can type <code>p</code> or <code>pi</code> for radians.
+      </div>
+    </main>
+  </section>
+
+  <script>
+    const promptLabel = document.getElementById("promptLabel");
+    const promptValue = document.getElementById("promptValue");
+    const answer = document.getElementById("answer");
+    const feedback = document.getElementById("feedback");
+    const score = document.getElementById("score");
+    const check = document.getElementById("check");
+    const next = document.getElementById("next");
+
+    const values = [
+      { degree: "0°", radian: "0", coordinate: "(1, 0)" },
+      { degree: "30°", radian: "π/6", coordinate: "(√3/2, 1/2)" },
+      { degree: "45°", radian: "π/4", coordinate: "(√2/2, √2/2)" },
+      { degree: "60°", radian: "π/3", coordinate: "(1/2, √3/2)" },
+      { degree: "90°", radian: "π/2", coordinate: "(0, 1)" },
+      { degree: "120°", radian: "2π/3", coordinate: "(-1/2, √3/2)" },
+      { degree: "135°", radian: "3π/4", coordinate: "(-√2/2, √2/2)" },
+      { degree: "150°", radian: "5π/6", coordinate: "(-√3/2, 1/2)" },
+      { degree: "180°", radian: "π", coordinate: "(-1, 0)" },
+      { degree: "210°", radian: "7π/6", coordinate: "(-√3/2, -1/2)" },
+      { degree: "225°", radian: "5π/4", coordinate: "(-√2/2, -√2/2)" },
+      { degree: "240°", radian: "4π/3", coordinate: "(-1/2, -√3/2)" },
+      { degree: "270°", radian: "3π/2", coordinate: "(0, -1)" },
+      { degree: "300°", radian: "5π/3", coordinate: "(1/2, -√3/2)" },
+      { degree: "315°", radian: "7π/4", coordinate: "(√2/2, -√2/2)" },
+      { degree: "330°", radian: "11π/6", coordinate: "(√3/2, -1/2)" }
+    ];
+
+    const types = ["degree", "radian", "coordinate"];
+    let current = null;
+    let correct = 0;
+
+    function normalizeText(value) {
+      return value
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/degrees?|deg/g, "°")
+        .replace(/pi/g, "π")
+        .replace(/p/g, "π")
+        .replace(/sqrt/g, "√")
+        .replace(/[()]/g, "");
+    }
+
+    function equivalentAnswers(value) {
+      const base = normalizeText(value);
+      const options = new Set([base]);
+      options.add(base.replace(/π/g, "pi"));
+      options.add(base.replace(/π/g, "p"));
+      options.add(base.replace(/√/g, "sqrt"));
+      options.add(base.replace(/°/g, ""));
+      return Array.from(options).map(normalizeText);
+    }
+
+    function choosePrompt() {
+      const item = values[Math.floor(Math.random() * values.length)];
+      const from = types[Math.floor(Math.random() * types.length)];
+      let to = types[Math.floor(Math.random() * types.length)];
+      while (to === from) {
+        to = types[Math.floor(Math.random() * types.length)];
+      }
+      current = { item, from, to };
+      promptLabel.textContent = `${labelFor(from)} given. Enter ${labelFor(to)}.`;
+      promptValue.textContent = item[from];
+      answer.value = "";
+      feedback.className = "feedback";
+      feedback.textContent = "Convert the prompt into the requested form.";
+      answer.focus();
+    }
+
+    function labelFor(type) {
+      return {
+        degree: "degrees",
+        radian: "radians",
+        coordinate: "coordinates"
+      }[type];
+    }
+
+    function checkAnswer() {
+      const user = normalizeText(answer.value);
+      const expected = current.item[current.to];
+      const accepted = equivalentAnswers(expected);
+      if (accepted.includes(user)) {
+        correct += 1;
+        score.textContent = `${correct} correct`;
+        feedback.className = "feedback correct";
+        feedback.textContent = `Correct: ${expected}`;
+      } else {
+        feedback.className = "feedback wrong";
+        feedback.textContent = `Not quite. Expected ${expected}.`;
+      }
+    }
+
+    check.addEventListener("click", checkAnswer);
+    next.addEventListener("click", choosePrompt);
+    answer.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") checkAnswer();
+    });
+
+    choosePrompt();
+  </script>
+</body>
+</html>

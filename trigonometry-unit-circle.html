@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3: The Unit Circle | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-unit-circle-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">3: The Unit Circle</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>A unit circle has a radius of 1.</p>
+
+        <p>Get familiar with the coordinates of points around its circumference.</p>
+
+        <iframe
+          class="essay-widget unit-circle-coordinate-widget"
+          src="trigonometry/unit-circle/unit-circle-coordinate-widget.html"
+          title="Interactive widget showing coordinates on the unit circle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Notice how degrees, radians, and now coordinates can all be represented as the same thing — points on a circle?</p>
+
+        <p>Get familiar switching between them mentally.</p>
+
+        <iframe
+          class="essay-widget unit-circle-conversion-game-widget"
+          src="trigonometry/unit-circle/unit-circle-conversion-game.html"
+          title="Practice game for converting between degrees, radians, and unit circle coordinates"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>A really important thing to realise is that angles encode two values, for an $x$- and $y$-axis.</p>
+
+        <p class="display-equation">$$\theta \longrightarrow (x,y)$$</p>
+
+        <h3 class="subsection-title">Sine and Cosine</h3>
+
+        <p>We have thought about angles in different ways:</p>
+
+        <ul>
+          <li>With respect to right-angled triangles, and the ratios between their side lengths.</li>
+          <li>With respect to circles, as rotations about a point.</li>
+        </ul>
+
+        <p>It turns out that these are actually the same idea from different perspectives.</p>
+
+        <p>Let's see how:</p>
+
+        <p>Take any point on the unit circle.</p>
+
+        <p>Now draw a vertical line from that point down to the $x$-axis.</p>
+
+        <p>This creates a right-angled triangle inside the circle.</p>
+
+        <figure class="trig-figure trig-figure-bare unit-circle-triangle-figure" aria-label="A unit circle with a right triangle formed by dropping a vertical line from a point to the x-axis">
+          <svg viewBox="0 0 520 360" role="img">
+            <defs>
+              <marker id="unit-circle-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.55)" />
+              </marker>
+            </defs>
+            <g transform="translate(260 185)">
+              <line x1="-190" y1="0" x2="200" y2="0" stroke="rgba(236,226,209,0.35)" stroke-width="1.5" marker-end="url(#unit-circle-axis-arrow)" />
+              <line x1="0" y1="135" x2="0" y2="-145" stroke="rgba(236,226,209,0.2)" stroke-width="1.2" />
+              <circle r="120" fill="none" stroke="rgba(232,161,59,0.82)" stroke-width="2.5" />
+              <path d="M 0 0 L 90 -79 L 90 0 Z" fill="rgba(109,211,196,0.08)" stroke="rgba(236,226,209,0.58)" stroke-width="2" />
+              <line x1="90" y1="-79" x2="90" y2="0" stroke="#6dd3c4" stroke-width="4" />
+              <line x1="0" y1="0" x2="90" y2="0" stroke="#e8a13b" stroke-width="4" />
+              <line x1="0" y1="0" x2="90" y2="-79" stroke="#d4b888" stroke-width="4" />
+              <path d="M 32 0 A 32 32 0 0 0 24 -21" fill="none" stroke="#ef7398" stroke-width="3" />
+              <text x="38" y="-10" fill="#ef7398" font-family="JetBrains Mono, monospace" font-size="18">θ</text>
+              <circle cx="90" cy="-79" r="6" fill="#ef7398" stroke="#ece2d1" stroke-width="2" />
+              <text x="96" y="-88" fill="#ece2d1" font-family="JetBrains Mono, monospace" font-size="14">(x,y)</text>
+            </g>
+          </svg>
+        </figure>
+
+        <p>The hypotenuse of this triangle is a radius of the circle.</p>
+
+        <p>Being a unit circle, the hypotenuse must equal $1$.</p>
+
+        <p>This greatly simplifies our trigonometric ratios.</p>
+
+        <p>Recall:</p>
+
+        <p class="display-equation">$$
+\sin(\theta)=\frac{o}{h}
+\qquad
+\cos(\theta)=\frac{a}{h}
+$$</p>
+
+        <p>Since:</p>
+
+        <p class="display-equation">$$h=1$$</p>
+
+        <p>we obtain:</p>
+
+        <p class="display-equation">$$
+\sin(\theta)=o
+\qquad
+\cos(\theta)=a
+$$</p>
+
+        <p>The trigonometric functions no longer give us ratios.</p>
+
+        <p>They give us side lengths directly.</p>
+
+        <p>But these side lengths are already part of our coordinate system.</p>
+
+        <p>The adjacent side is simply the horizontal distance from the origin.</p>
+
+        <p>In other words:</p>
+
+        <p class="display-equation">$$a=x$$</p>
+
+        <p>Likewise, the opposite side is the vertical distance from the origin:</p>
+
+        <p class="display-equation">$$o=y$$</p>
+
+        <p>So:</p>
+
+        <p class="display-equation">$$\cos(\theta)=x$$</p>
+
+        <p>and:</p>
+
+        <p class="display-equation">$$\sin(\theta)=y$$</p>
+
+        <p>The point on the circle corresponding to an angle $\theta$ can therefore be written as:</p>
+
+        <p class="display-equation">$$
+(x,y) =
+(\cos(\theta),\sin(\theta))
+$$</p>
+
+        <p>Every angle determines a point.</p>
+
+        <p>Every point determines a pair of coordinates.</p>
+
+        <p>And those coordinates are simply the cosine and sine of the angle.</p>
+
+        <iframe
+          class="essay-widget unit-circle-sine-cosine-widget"
+          src="trigonometry/unit-circle/sine-cosine-unit-circle-widget.html"
+          title="Interactive unit circle showing sine and cosine as coordinates"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-measuring-circles.html">
+            <span>Previous</span>
+            <strong>2: Measuring Rotation</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
+            <span>Next</span>
+            <strong>Misc</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1284,6 +1284,16 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
+.intro-linear-algebra-page .unit-circle-conversion-game-widget {
+  width: min(100%, 860px);
+  height: 560px;
+}
+
+.intro-linear-algebra-page .unit-circle-sine-cosine-widget {
+  width: min(100%, 980px);
+  height: 720px;
+}
+
 .trig-figure-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1356,6 +1366,12 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .angle-column-figure {
   max-width: 680px;
+}
+
+.unit-circle-triangle-figure {
+  max-width: 520px;
+  margin-top: 1rem;
+  margin-bottom: 1.15rem;
 }
 
 .section-divider {
