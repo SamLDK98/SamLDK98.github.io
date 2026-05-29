@@ -1198,7 +1198,12 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .intro-linear-algebra-page .sliding-third-side-widget {
   width: min(100%, 860px);
-  height: 455px;
+  height: 515px;
+}
+
+.intro-linear-algebra-page .proportional-triangle-widget {
+  width: min(100%, 860px);
+  height: 500px;
 }
 
 .intro-linear-algebra-page .right-angle-widget {
@@ -1208,6 +1213,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .intro-linear-algebra-page .right-angle-ratios-widget {
   height: 540px;
+}
+
+.intro-linear-algebra-page .trig-function-game-widget {
+  height: 980px;
 }
 
 .intro-linear-algebra-page .degree-circle-widget {

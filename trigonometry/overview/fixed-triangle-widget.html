@@ -45,19 +45,10 @@
       display: flex;
       gap: 0.75rem;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       padding: 0.8rem 1rem;
       border-top: 1px solid var(--rule);
       background: rgba(0, 0, 0, 0.1);
-    }
-
-    .side-key {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.9rem;
-      font-family: "Courier New", monospace;
-      font-size: 1rem;
-      font-weight: 700;
     }
 
     button {
@@ -74,10 +65,6 @@
       border-color: var(--accent);
       color: var(--accent);
     }
-
-    .key-a { color: var(--orange); }
-    .key-b { color: var(--cyan); }
-    .key-c { color: var(--pink); }
 
     .side {
       stroke-linecap: round;
@@ -123,6 +110,16 @@
       font-size: 14px;
       letter-spacing: 0.05em;
     }
+
+    .key-label {
+      font-size: 19px;
+      letter-spacing: 0.04em;
+      text-anchor: middle;
+    }
+
+    .key-a { fill: var(--orange); }
+    .key-b { fill: var(--cyan); }
+    .key-c { fill: var(--pink); }
   </style>
 </head>
 <body>
@@ -144,15 +141,12 @@
         <text class="angle-label" id="angle0" x="0" y="0"></text>
         <text class="angle-label" id="angle1" x="0" y="0"></text>
         <text class="angle-label" id="angle2" x="0" y="0"></text>
-        <text class="hint" id="hint" x="80" y="54">drag lines to move them; drag endpoints to rotate and snap them together</text>
+        <text class="key-label key-a" x="275" y="54">a = 4</text>
+        <text class="key-label key-b" x="380" y="54">b = 5</text>
+        <text class="key-label key-c" x="485" y="54">c = 6</text>
       </svg>
     </div>
     <div class="controls">
-      <div class="side-key" aria-label="Fixed side lengths">
-        <span class="key-a">a = 4</span>
-        <span class="key-b">b = 5</span>
-        <span class="key-c">c = 6</span>
-      </div>
       <button type="button" id="reset">Reset</button>
     </div>
   </section>
@@ -160,7 +154,7 @@
   <script>
     const svg = document.getElementById("canvas");
     const reset = document.getElementById("reset");
-    const ids = ["sideA", "sideB", "sideC", "a1", "a2", "b1", "b2", "c1", "c2", "arc0", "arc1", "arc2", "angle0", "angle1", "angle2", "hint"];
+    const ids = ["sideA", "sideB", "sideC", "a1", "a2", "b1", "b2", "c1", "c2", "arc0", "arc1", "arc2", "angle0", "angle1", "angle2"];
     const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
 
     const scale = 50;
@@ -177,7 +171,6 @@
       connections = [];
       dragging = null;
       locked = false;
-      el.hint.textContent = "drag lines to move them; drag endpoints to rotate and snap them together";
       render();
     }
 
@@ -345,7 +338,6 @@
       });
       dragging = null;
       locked = true;
-      el.hint.textContent = "closed: these three lengths force this exact set of angles";
     }
 
     function maybeSnap() {
@@ -364,7 +356,6 @@
           const target = endpointPoint(left);
           alignEndpointTo(right, target);
           connections.push([leftKey, rightKey]);
-          el.hint.textContent = "connected endpoints create fixed corner angles; keep trying to close the triangle";
           if (connections.length === 3) snapToExactTriangle();
           return;
         }
@@ -402,9 +393,6 @@
         el[`arc${index}`].setAttribute("d", arcPath(vertex, leftOther, rightOther, 32));
         setText(el[`angle${index}`], { x: vertex.x - 22, y: vertex.y - 24 }, `${angle.toFixed(1)}°`);
       });
-      if (connections.length === 3) {
-        el.hint.textContent = "closed: these three lengths force this exact set of angles";
-      }
     }
 
     function render() {

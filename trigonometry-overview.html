@@ -102,7 +102,7 @@
 
         <p>The important things to realise are:</p>
 
-        <ul>
+        <ul class="indented-list">
           <li>Angles determine the shapes of triangles.</li>
           <li>You can't change an angle without changing the length of some side.</li>
         </ul>
@@ -115,37 +115,34 @@
           loading="lazy"
         ></iframe>
 
-        <p>Something might seem confusing.</p>
+        <p>But is the same true in reverse?</p>
 
-        <p>You have just learned that specific triangles have specific angles.</p>
-
-        <p>However, I am only thinking of one angle between two lines. You could "draw" your third side anywhere that connects the two.</p>
-
-        <p>So does this not create different sets of angles depending on where you choose?</p>
+        <p>With angles fixed at $41.4^\circ$, $55.8^\circ$, and $82.8^\circ$, can we form a triangle with different lengths other than 4, 5 and 6?</p>
 
         <iframe
-          class="essay-widget essay-widget-autosize sliding-third-side-widget"
-          src="trigonometry/overview/sliding-third-side-widget.html"
-          title="Interactive widget showing a third side sliding along two intersecting lines"
+          class="essay-widget essay-widget-autosize proportional-triangle-widget"
+          src="trigonometry/overview/proportional-triangle-widget.html"
+          title="Interactive widget showing proportional scaling of a triangle"
           scrolling="no"
           loading="lazy"
         ></iframe>
 
-        <p>Actually, what we see is that the angles remain invariant.</p>
+        <p>Yes — provided the side lengths are scaled proportionally.</p>
 
-        <p>However, notice that we are increasing every side proportionately.</p>
+        <p>The key realisation is that the ratios between the sides are being preserved, i.e. it is the ratios between sides that determine angles!</p>
 
-        <p>So while a triangle with side lengths 4-5-6 determines the angles $41.4^\circ-55.8^\circ-82.8^\circ$.</p>
+        <p>So:</p>
 
-        <p>The angles $41.4^\circ-55.8^\circ-82.8^\circ$ determine proportions, not absolute lengths. We could have side lengths 8-10-12, 12-15-18, etc.</p>
+        <ul class="indented-list">
+          <li>Side lengths determine specific angles.</li>
+          <li>Angles determine specific ratios between side lengths, not absolute lengths.</li>
+        </ul>
 
-        <p>The key insight is that knowing the proportions between sides tells us what the angles must be.</p>
+        <h3 class="subsection-title">Right-Angled Triangles and Trigonometric Functions</h3>
 
-        <h3 class="subsection-title">Right-angled Triangles</h3>
+        <p>Given the lengths/ratios of all three sides, determining the angles of a <em>general</em> triangle can still be complicated. Fortunately, right-angled triangles make the relationships much simpler.</p>
 
-        <p>So, given the lengths of three sides of a triangle, we could work out the angles based on the ratios between them. However, the most common triangles we work with are right-angled triangles, which have an easier calculation process. Let's start there.</p>
-
-        <p>We can label the sides of right-angled triangles. The hypotenuse is fixed; however, the opposite and adjacent sides depend on which corner we are interested in the angle from.</p>
+        <p>We select the angle we want to find and label the sides accordingly.</p>
 
         <figure class="trig-figure trig-triangle-figure" data-right-triangle-labels>
           <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-title">
@@ -166,7 +163,7 @@
           </div>
         </figure>
 
-        <p>From the three sides of a right-angled triangle, we can construct six named ratios: sine, cosine, tangent, cosecant, secant, and cotangent.</p>
+        <p>To find angles from side ratios, or side ratios from angles, we use functions called sine, cosine, tangent, cosecant, secant, and cotangent. We will only focus on the first three for now.</p>
 
         <div class="display-equation trig-ratio-equations">
           <span>$\sin(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
@@ -177,39 +174,23 @@
           <span>$\cot(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
         </div>
 
-        <p>We can find the mystery angle using whichever ratio is most convenient.</p>
+        <p><strong>To input an angle for a side ratio as an output:</strong></p>
 
-        <p>If all we know is that we have a right-angled triangle, we know that one angle is fixed to $90^\circ$; however, the other two are free to vary as the side lengths change, although they cannot vary independently. You can see below that as you extend either sides, both angles change.</p>
+        <div class="display-equation">$$\sin(30^\circ) = 0.5$$</div>
+
+        <p><strong>To input a side ratio for an angle as an output:</strong></p>
+
+        <p><em>Here, $\sin^{-1}$ means inverse sine, not "one divided by sine".</em></p>
+
+        <div class="display-equation">$$\sin^{-1}(0.5)=30^\circ$$</div>
 
         <iframe
-          class="essay-widget essay-widget-autosize right-angle-widget"
-          src="trigonometry/overview/right-angle-widget.html"
-          title="Interactive widget showing a fixed right angle with changing side lengths"
+          class="essay-widget trig-function-game-widget"
+          src="trigonometry/overview/trig-function-game-widget.html"
+          title="Interactive game for choosing trigonometric functions and ratios"
           scrolling="no"
           loading="lazy"
         ></iframe>
-
-        <p>If we fix a second angle, the third is fixed as well, since the angles of a triangle must sum to $180^\circ$.</p>
-
-        <p>We can still vary the side lengths proportionally and preserve the ratios.</p>
-
-        <p>You can experiment with changing this second angle and notice how the ratios change. Then fix the angle and scale the triangle; notice that the ratios remain unchanged.</p>
-
-        <p>This means that particular ratios are uniquely associated with particular sets of angles.</p>
-
-        <iframe
-          class="essay-widget essay-widget-autosize right-angle-ratios-widget"
-          src="trigonometry/overview/right-angle-ratios-widget.html"
-          title="Interactive widget showing fixed right triangle angles and side ratios"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>As the ratios depend on the angle, we can think of them as functions; for example:</p>
-
-        <div class="display-equation">$$\sin(\theta) = \frac{o}{h}$$</div>
-
-        <p>Such functions assume right-angled triangles. We give them an angle and receive a ratio between specific side lengths.</p>
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
           <span></span>

@@ -30,6 +30,35 @@
       background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
     }
 
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.8rem 1rem;
+      border-top: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .tilt-controls {
+      display: flex;
+      gap: 0.55rem;
+    }
+
+    button {
+      min-height: 2.25rem;
+      padding: 0 0.9rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.18);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
     svg {
       display: block;
       width: min(100%, 700px);
@@ -57,6 +86,7 @@
       stroke: var(--pink);
       stroke-linecap: round;
       stroke-width: 5;
+      stroke-dasharray: 10 10;
       cursor: grab;
       filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.18));
     }
@@ -92,12 +122,18 @@
       fill: var(--dim);
       font-size: 19px;
     }
+
+    .is-hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <section class="widget">
     <svg id="canvas" viewBox="0 0 760 470" role="img" aria-label="A third side sliding along two intersecting rays">
       <path class="angle-arc" id="angleArc" d="" />
+      <path class="angle-arc" id="angleArcA" d="" />
+      <path class="angle-arc" id="angleArcB" d="" />
       <line class="ray ray-a ray-extension" id="rayAExtension" x1="0" y1="0" x2="0" y2="0" />
       <line class="ray ray-b ray-extension" id="rayBExtension" x1="0" y1="0" x2="0" y2="0" />
       <line class="ray ray-a" id="rayA" x1="0" y1="0" x2="0" y2="0" />
@@ -107,27 +143,41 @@
       <circle class="handle" id="handleA" cx="0" cy="0" r="9" />
       <circle class="handle" id="handleB" cx="0" cy="0" r="9" />
       <text id="angleLabel" x="0" y="0"></text>
+      <text id="angleLabelA" x="0" y="0"></text>
+      <text id="angleLabelB" x="0" y="0"></text>
       <text class="length-label" id="lengthA" x="0" y="0"></text>
       <text class="length-label" id="lengthB" x="0" y="0"></text>
       <text class="length-label" id="lengthC" x="0" y="0"></text>
     </svg>
+    <div class="controls">
+      <button type="button" id="toggleConnector">Add connecting line</button>
+      <div class="tilt-controls">
+        <button type="button" id="tiltLeft">Tilt left</button>
+        <button type="button" id="tiltRight">Tilt right</button>
+      </div>
+    </div>
   </section>
 
   <script>
     const svg = document.getElementById("canvas");
+    const toggleConnector = document.getElementById("toggleConnector");
+    const tiltLeft = document.getElementById("tiltLeft");
+    const tiltRight = document.getElementById("tiltRight");
     const el = Object.fromEntries([
       "rayAExtension", "rayBExtension", "rayA", "rayB", "thirdSide", "origin",
-      "handleA", "handleB", "angleArc", "angleLabel", "lengthA", "lengthB", "lengthC"
+      "handleA", "handleB", "angleArc", "angleArcA", "angleArcB", "angleLabel", "angleLabelA", "angleLabelB", "lengthA", "lengthB", "lengthC"
     ].map((id) => [id, document.getElementById(id)]));
 
     const origin = { x: 178, y: 392 };
     const baseUnit = 38;
-    const sides = { a: 4, b: 5, c: 6 };
+    const sides = { a: 2, b: 4, c: 3 };
     const angle = Math.acos((sides.a ** 2 + sides.b ** 2 - sides.c ** 2) / (2 * sides.a * sides.b));
     const minScale = 1;
-    const maxScale = 2;
+    const maxScale = 4;
     let t = (1 - minScale) / (maxScale - minScale);
+    let tilt = 0;
     let dragging = false;
+    let connectorVisible = false;
 
     function pointOnRayA(distance) {
       return { x: origin.x + distance, y: origin.y };
@@ -173,10 +223,22 @@
       return Math.hypot(p.x - q.x, p.y - q.y);
     }
 
-    function arcPath(radius) {
-      const start = pointOnRayA(radius);
-      const end = pointOnRayB(radius);
-      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 0 ${end.x} ${end.y}`;
+    function angleBetween(vertex, p1, p2) {
+      const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+      const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+      let diff = Math.abs((a2 - a1) * 180 / Math.PI);
+      if (diff > 180) diff = 360 - diff;
+      return diff;
+    }
+
+    function arcBetween(vertex, p1, p2, radius, sweep = 1) {
+      const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+      let a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+      while (a2 < a1) a2 += Math.PI * 2;
+      if (a2 - a1 > Math.PI) return arcBetween(vertex, p2, p1, radius, sweep);
+      const start = { x: vertex.x + Math.cos(a1) * radius, y: vertex.y + Math.sin(a1) * radius };
+      const end = { x: vertex.x + Math.cos(a2) * radius, y: vertex.y + Math.sin(a2) * radius };
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 ${sweep} ${end.x} ${end.y}`;
     }
 
     function midpoint(p, q) {
@@ -189,10 +251,15 @@
       render();
     }
 
+    function hideTriangleAngles() {
+      [el.angleArcA, el.angleArcB].forEach((arc) => arc.setAttribute("d", ""));
+      [el.angleLabelA, el.angleLabelB].forEach((label) => label.textContent = "");
+    }
+
     function render() {
       const currentScale = minScale + t * (maxScale - minScale);
       const distanceA = sides.a * baseUnit * currentScale;
-      const distanceB = sides.b * baseUnit * currentScale;
+      const distanceB = sides.b * baseUnit * currentScale * (1 + tilt);
       const pointA = pointOnRayA(distanceA);
       const pointB = pointOnRayB(distanceB);
       const rayEndA = pointOnRayA(sides.a * baseUnit * (maxScale + 0.22));
@@ -206,9 +273,12 @@
       setCircle(el.origin, origin);
       setCircle(el.handleA, pointA);
       setCircle(el.handleB, pointB);
+      [el.thirdSide, el.handleA, el.handleB, el.lengthC].forEach((node) => {
+        node.classList.toggle("is-hidden", !connectorVisible);
+      });
 
-      el.angleArc.setAttribute("d", arcPath(44));
-      setText(el.angleLabel, { x: origin.x + 54, y: origin.y - 18 }, "82.8°");
+      el.angleArc.setAttribute("d", arcBetween(origin, pointA, pointB, 44, 0));
+      setText(el.angleLabel, { x: origin.x + 54, y: origin.y - 18 }, `${angleBetween(origin, pointA, pointB).toFixed(1)}°`);
 
       const midA = midpoint(origin, pointA);
       const midB = midpoint(origin, pointB);
@@ -217,14 +287,27 @@
       setText(el.lengthB, {
         x: midB.x - 58,
         y: midB.y - 22
-      }, (sides.b * currentScale).toFixed(1));
+      }, (distance(origin, pointB) / baseUnit).toFixed(1));
       setText(el.lengthC, {
         x: midC.x + 24,
         y: midC.y - 12
-      }, (sides.c * currentScale).toFixed(1));
+      }, (distance(pointA, pointB) / baseUnit).toFixed(1));
+
+      if (!connectorVisible) {
+        hideTriangleAngles();
+        return;
+      }
+
+      const angleA = angleBetween(pointA, origin, pointB);
+      const angleB = angleBetween(pointB, origin, pointA);
+      el.angleArcA.setAttribute("d", arcBetween(pointA, origin, pointB, 28));
+      el.angleArcB.setAttribute("d", arcBetween(pointB, pointA, origin, 28));
+      setText(el.angleLabelA, { x: pointA.x + 12, y: pointA.y + 34 }, `${angleA.toFixed(1)}°`);
+      setText(el.angleLabelB, { x: pointB.x - 76, y: pointB.y - 24 }, `${angleB.toFixed(1)}°`);
     }
 
     function startDrag(event) {
+      if (!connectorVisible) return;
       dragging = true;
       event.currentTarget.setPointerCapture(event.pointerId);
       updateFromPointer(pointerPoint(event));
@@ -246,6 +329,26 @@
       node.addEventListener("pointermove", drag);
       node.addEventListener("pointerup", stopDrag);
       node.addEventListener("pointercancel", stopDrag);
+    });
+
+    toggleConnector.addEventListener("click", () => {
+      connectorVisible = !connectorVisible;
+      toggleConnector.textContent = connectorVisible ? "Remove connecting line" : "Add connecting line";
+      render();
+    });
+
+    tiltLeft.addEventListener("click", () => {
+      if (!connectorVisible) connectorVisible = true;
+      tilt = clamp(tilt - 0.08, -0.32, 0.32);
+      toggleConnector.textContent = "Remove connecting line";
+      render();
+    });
+
+    tiltRight.addEventListener("click", () => {
+      if (!connectorVisible) connectorVisible = true;
+      tilt = clamp(tilt + 0.08, -0.32, 0.32);
+      toggleConnector.textContent = "Remove connecting line";
+      render();
     });
 
     render();
