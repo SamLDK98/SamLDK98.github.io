@@ -26,6 +26,8 @@
     --hyp-glow: rgba(184, 150, 216, 0.4);
     --green: #88c97c;
     --green-glow: rgba(136, 201, 124, 0.5);
+    --selected-green: #61ff7a;
+    --selected-green-glow: rgba(97, 255, 122, 0.55);
     --red: #e57994;
   }
 
@@ -378,7 +380,11 @@
     stroke-width: 1.5;
     transition: stroke 0.25s, stroke-width 0.25s, filter 0.4s;
   }
-  .angle-arc.selected { stroke: var(--accent); stroke-width: 2.5; }
+  .angle-arc.selected {
+    stroke: var(--selected-green);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px var(--selected-green-glow));
+  }
   .angle-arc.solved {
     stroke: var(--green);
     stroke-width: 3;
