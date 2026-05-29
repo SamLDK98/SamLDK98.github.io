@@ -1289,6 +1289,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 560px;
 }
 
+.intro-linear-algebra-page .unit-circle-point-practice-widget {
+  width: min(100%, 980px);
+  height: 780px;
+}
+
 .intro-linear-algebra-page .unit-circle-sine-cosine-widget {
   width: min(100%, 980px);
   height: 720px;
