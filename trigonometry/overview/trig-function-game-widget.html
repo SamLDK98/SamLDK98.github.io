@@ -1,466 +1,1120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trig Function Game</title>
-  <style>
-    :root {
-      --bg: #161311;
-      --panel: #1e1a17;
-      --rule: rgba(214, 196, 168, 0.16);
-      --text: #ece2d1;
-      --dim: #a89c87;
-      --accent: #d4b888;
-      --green: #78c884;
-      --red: #e06b6b;
-      --orange: #e8a13b;
-      --cyan: #6dd3c4;
-      --yellow: #e7c84f;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inverse Trig — Solving for an Unknown Angle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --opp: #e8a13b;
+    --opp-glow: rgba(232, 161, 59, 0.4);
+    --adj: #6dd3c4;
+    --adj-glow: rgba(109, 211, 196, 0.4);
+    --hyp: #b896d8;
+    --hyp-glow: rgba(184, 150, 216, 0.4);
+    --green: #88c97c;
+    --green-glow: rgba(136, 201, 124, 0.5);
+    --red: #e57994;
+  }
 
-    * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Georgia, "Times New Roman", serif;
-    }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+    background-image:
+      radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(109, 211, 196, 0.03), transparent 50%);
+  }
 
-    .widget {
-      border: 1px solid var(--rule);
-      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
-    }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      align-items: center;
-      padding: 1rem 1.15rem;
-      border-bottom: 1px solid var(--rule);
-    }
+  /* ——— Header ——— */
+  .header {
+    padding: 1.75rem 2rem 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .header-left .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.35rem;
+  }
+  .header-left h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.85rem;
+    letter-spacing: -0.01em;
+    font-variation-settings: "opsz" 144;
+    color: var(--text);
+  }
+  .header-left h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.55rem;
+  }
+  .tri-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.16em;
+    font-variant-numeric: tabular-nums;
+    transition: opacity 0.18s;
+  }
+  .new-tri-btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text-dim);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.45rem 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .new-tri-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(212, 184, 136, 0.06);
+  }
+  .new-tri-btn .icn {
+    display: inline-block;
+    font-size: 0.95rem;
+    line-height: 0;
+    transform: translateY(1px);
+  }
+  .new-tri-btn:hover .icn { animation: spin 0.5s ease-out; }
+  @keyframes spin { from { transform: translateY(1px) rotate(0deg); } to { transform: translateY(1px) rotate(360deg); } }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(1.35rem, 3vw, 1.8rem);
-      font-weight: 600;
-    }
+  /* ——— Main ——— */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+  }
+  @media (max-width: 820px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { border-left: none !important; border-top: 1px solid var(--rule); }
+  }
 
-    .status {
-      color: var(--dim);
-      font-family: "Courier New", monospace;
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
+  .viz-wrap {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#triangle {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    display: block;
+    transition: opacity 0.18s ease-out;
+  }
+  svg#triangle.fading { opacity: 0.15; }
 
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
-      min-height: 720px;
-    }
+  .sidebar {
+    border-left: 1px solid var(--rule);
+    padding: 0.5rem 1.4rem 1.4rem;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+  }
 
-    .stage {
-      display: grid;
-      place-items: center;
-      min-height: 720px;
-      padding: 1rem;
-      border-right: 1px solid var(--rule);
-    }
+  /* ——— Steps ——— */
+  .step {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .step-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.55rem;
+  }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .step-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.02rem;
+    color: var(--text);
+    letter-spacing: -0.005em;
+  }
+  .step-hint {
+    font-size: 0.77rem;
+    color: var(--text-faint);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+  }
 
-    svg {
-      display: block;
-      width: min(100%, 680px);
-      height: auto;
-      user-select: none;
-    }
+  /* ——— Buttons ——— */
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.5rem 0.55rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 2.2rem;
+    position: relative;
+    text-align: center;
+  }
+  .btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.06);
+  }
+  .btn.active {
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.14);
+    color: var(--accent);
+  }
+  .btn .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .btn-row { display: grid; gap: 0.4rem; }
+  .btn-row.two-col { grid-template-columns: 1fr 1fr; }
+  .btn-row.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; }
+  .btn.has-side::after {
+    content: "✓";
+    position: absolute;
+    top: 2px; right: 5px;
+    font-size: 0.6rem;
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .btn.fn-inv, .btn.fn-norm {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.88rem;
+  }
 
-    .panel {
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.1);
-    }
+  /* ——— Inputs ——— */
+  .frac-input {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .frac-input .slash {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--text-dim);
+  }
+  input[type="text"] {
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.55rem 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.94rem;
+    width: 100%;
+    transition: border-color 0.2s, background 0.2s;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(0, 0, 0, 0.4);
+  }
+  input[type="text"]::placeholder { color: var(--text-faint); font-style: italic; }
 
-    .step {
-      padding: 0.85rem 0;
-      border-bottom: 1px solid var(--rule);
-    }
+  /* ——— Actions ——— */
+  .actions {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .btn.primary {
+    background: rgba(212, 184, 136, 0.14);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: 0.03em;
+  }
+  .btn.primary:hover { background: rgba(212, 184, 136, 0.22); }
 
-    .step:last-child { border-bottom: 0; }
+  /* ——— Result ——— */
+  .result {
+    margin-top: 0.85rem;
+    padding: 0.85rem 1rem;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    transition: border-color 0.3s, background 0.3s, color 0.3s;
+    min-height: 3.4rem;
+    display: flex;
+    align-items: center;
+  }
+  .result.good {
+    border-color: var(--green);
+    background: rgba(136, 201, 124, 0.08);
+    color: var(--green);
+    font-style: normal;
+  }
+  .result.bad {
+    border-color: var(--red);
+    background: rgba(229, 121, 148, 0.06);
+    color: var(--red);
+  }
+  .result code {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.9em;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1px 5px;
+    border-radius: 2px;
+    color: inherit;
+  }
+  .result em { color: var(--accent); font-style: italic; }
+  .result-lines { display: flex; flex-direction: column; gap: 0.25rem; line-height: 1.4; }
 
-    label,
-    .label {
-      display: block;
-      margin-bottom: 0.45rem;
-      color: var(--dim);
-      font-family: "Courier New", monospace;
-      font-size: 0.74rem;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-    }
+  /* ——— Footer ——— */
+  .footer {
+    padding: 0.85rem 2rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
 
-    select,
-    input {
-      width: 100%;
-      min-height: 2.25rem;
-      padding: 0.45rem 0.55rem;
-      border: 1px solid var(--rule);
-      background: #15110f;
-      color: var(--text);
-      font: inherit;
-    }
+  /* ——— SVG ——— */
+  .tri-fill { fill: rgba(214, 196, 168, 0.025); stroke: none; }
 
-    .button-row,
-    .side-grid,
-    .ratio-grid {
-      display: grid;
-      gap: 0.5rem;
-    }
+  /* Wedge fill that highlights the chosen angle */
+  .wedge-fill {
+    fill: transparent;
+    transition: fill 0.3s;
+    pointer-events: none;
+  }
+  .wedge-fill.active { fill: rgba(212, 184, 136, 0.08); }
+  .wedge-fill.solved { fill: rgba(136, 201, 124, 0.1); }
 
-    .button-row {
-      grid-template-columns: 1fr 1fr;
-    }
+  .right-angle {
+    fill: none;
+    stroke: rgba(168, 156, 135, 0.5);
+    stroke-width: 1.5;
+  }
 
-    .side-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .angle-arc {
+    fill: none;
+    stroke: rgba(214, 196, 168, 0.3);
+    stroke-width: 1.5;
+    transition: stroke 0.25s, stroke-width 0.25s, filter 0.4s;
+  }
+  .angle-arc.selected { stroke: var(--accent); stroke-width: 2.5; }
+  .angle-arc.solved {
+    stroke: var(--green);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px var(--green-glow));
+  }
 
-    .ratio-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .side-click { cursor: pointer; }
+  .side {
+    stroke: rgba(214, 196, 168, 0.4);
+    stroke-width: 5;
+    stroke-linecap: round;
+    transition: stroke 0.25s, stroke-width 0.25s, filter 0.25s;
+    pointer-events: none;
+  }
+  .side-group:hover .side { stroke-width: 6; }
+  .side-group:hover .side:not(.role-opposite):not(.role-adjacent):not(.role-hypotenuse) {
+    stroke: rgba(214, 196, 168, 0.75);
+  }
+  .side.role-opposite   { stroke: var(--opp); filter: drop-shadow(0 0 8px var(--opp-glow)); }
+  .side.role-adjacent   { stroke: var(--adj); filter: drop-shadow(0 0 8px var(--adj-glow)); }
+  .side.role-hypotenuse { stroke: var(--hyp); filter: drop-shadow(0 0 8px var(--hyp-glow)); }
 
-    button {
-      min-height: 2.25rem;
-      padding: 0.45rem 0.6rem;
-      border: 1px solid var(--rule);
-      background: rgba(0, 0, 0, 0.18);
-      color: var(--text);
-      font: inherit;
-      cursor: pointer;
-    }
+  .vertex { fill: rgba(232, 220, 196, 0.7); }
+  .vtx-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 21px;
+    fill: var(--text-dim);
+  }
+  .len-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    fill: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .role-label {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .role-label.visible { opacity: 1; }
+  .role-label.opposite   { fill: var(--opp); }
+  .role-label.adjacent   { fill: var(--adj); }
+  .role-label.hypotenuse { fill: var(--hyp); }
 
-    button:hover,
-    button.active {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .side-choice.correct {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .fraction-row {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 0.55rem;
-      align-items: center;
-    }
-
-    .slash {
-      color: var(--dim);
-      font-family: "Courier New", monospace;
-      font-size: 1.25rem;
-    }
-
-    .result {
-      min-height: 3.3rem;
-      margin-top: 0.8rem;
-      padding: 0.8rem;
-      border: 1px solid var(--rule);
-      color: var(--dim);
-      font-family: "Courier New", monospace;
-      font-size: 0.95rem;
-      line-height: 1.45;
-    }
-
-    .result.good {
-      border-color: var(--green);
-      color: var(--green);
-      background: rgba(120, 200, 132, 0.08);
-    }
-
-    .result.bad {
-      border-color: var(--red);
-      color: var(--red);
-      background: rgba(224, 107, 107, 0.08);
-    }
-
-    .triangle-fill { fill: rgba(214, 196, 168, 0.055); }
-    .adjacent { stroke: var(--cyan); }
-    .opposite { stroke: var(--orange); }
-    .hypotenuse { stroke: var(--yellow); }
-    .side {
-      stroke-linecap: round;
-      stroke-width: 6;
-    }
-    .right-mark,
-    .angle-arc {
-      fill: none;
-      stroke: var(--accent);
-      stroke-linecap: round;
-      stroke-width: 3;
-    }
-    .angle-arc.hidden,
-    .angle-text.hidden { display: none; }
-    .point { fill: var(--text); opacity: 0.9; }
-    .label-text {
-      fill: var(--text);
-      font-family: "Courier New", monospace;
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .angle-text {
-      fill: var(--green);
-      font-family: "Courier New", monospace;
-      font-size: 22px;
-      font-weight: 700;
-    }
-  </style>
+  .answer {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 22px;
+    fill: var(--green);
+    opacity: 0;
+    transform: scale(0.6);
+    transform-origin: center;
+    transform-box: fill-box;
+    transition: opacity 0.4s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .answer.visible { opacity: 1; transform: scale(1); }
+</style>
 </head>
 <body>
-  <section class="widget">
-    <div class="header">
-      <h1>Choosing the Right Function</h1>
-      <div class="status">right angle on the right</div>
+
+<div class="widget">
+  <div class="header">
+    <div class="header-left">
+      <div class="eyebrow">Figure · Inverse Trigonometry</div>
+      <h1>Solving for an <em>unknown angle</em></h1>
     </div>
-    <div class="layout">
-      <div class="stage">
-        <svg viewBox="0 0 680 520" role="img" aria-label="Right triangle game with two selectable unknown angles">
-          <polygon class="triangle-fill" points="110,390 520,390 520,82" />
-          <path class="angle-arc" d="M 172 390 A 62 62 0 0 0 159 352" />
-          <path class="angle-arc" d="M 520 165 A 83 83 0 0 1 451 129" />
-          <path class="angle-arc hidden" id="solvedArcA" d="M 172 390 A 62 62 0 0 0 159 352" />
-          <path class="angle-arc hidden" id="solvedArcC" d="M 520 165 A 83 83 0 0 1 451 129" />
-          <path class="right-mark" d="M 488 390 L 488 358 L 520 358" />
-          <line class="side adjacent" id="baseSide" x1="110" y1="390" x2="520" y2="390" />
-          <line class="side opposite" id="verticalSide" x1="520" y1="390" x2="520" y2="82" />
-          <line class="side hypotenuse" id="hypSide" x1="110" y1="390" x2="520" y2="82" />
-          <circle class="point" cx="110" cy="390" r="6" />
-          <circle class="point" cx="520" cy="390" r="6" />
-          <circle class="point" cx="520" cy="82" r="6" />
-          <text class="label-text" x="297" y="425">4</text>
-          <text class="label-text" x="540" y="245">3</text>
-          <text class="label-text" x="286" y="205">5</text>
-          <text class="label-text" x="155" y="366">A</text>
-          <text class="label-text" x="450" y="142">C</text>
-          <text class="angle-text hidden" id="answerA" x="145" y="345">36.9°</text>
-          <text class="angle-text hidden" id="answerC" x="426" y="118">53.1°</text>
-        </svg>
+    <div class="header-right">
+      <div class="tri-info" id="tri-info">3 · 4 · 5</div>
+      <button class="new-tri-btn" id="new-triangle">
+        <span class="icn">↻</span> New triangle
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="viz-wrap">
+      <svg id="triangle" viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg">
+        <!-- Wedge fills (visible when an angle is chosen) -->
+        <path class="wedge-fill" id="wedge-A" />
+        <path class="wedge-fill" id="wedge-C" />
+
+        <!-- Triangle fill -->
+        <polygon class="tri-fill" id="tri-fill" />
+
+        <!-- Right-angle marker -->
+        <path class="right-angle" id="right-angle" />
+
+        <!-- Angle arcs -->
+        <path class="angle-arc" id="arc-A" />
+        <path class="angle-arc" id="arc-C" />
+
+        <!-- Clickable sides -->
+        <g class="side-group" data-side="AB">
+          <line class="side-click" id="click-AB" stroke="transparent" stroke-width="22" />
+          <line class="side" id="side-AB" />
+        </g>
+        <g class="side-group" data-side="BC">
+          <line class="side-click" id="click-BC" stroke="transparent" stroke-width="22" />
+          <line class="side" id="side-BC" />
+        </g>
+        <g class="side-group" data-side="CA">
+          <line class="side-click" id="click-CA" stroke="transparent" stroke-width="22" />
+          <line class="side" id="side-CA" />
+        </g>
+
+        <!-- Vertex dots -->
+        <circle class="vertex" id="vtx-A" r="4" />
+        <circle class="vertex" id="vtx-B" r="4" />
+        <circle class="vertex" id="vtx-C" r="4" />
+
+        <!-- Vertex letter labels -->
+        <text class="vtx-label" id="vtx-label-A" text-anchor="middle" dominant-baseline="middle">A</text>
+        <text class="vtx-label" id="vtx-label-B" text-anchor="middle" dominant-baseline="middle">B</text>
+        <text class="vtx-label" id="vtx-label-C" text-anchor="middle" dominant-baseline="middle">C</text>
+
+        <!-- Side length labels -->
+        <text class="len-label" id="len-AB" text-anchor="middle" dominant-baseline="middle"></text>
+        <text class="len-label" id="len-BC" text-anchor="middle" dominant-baseline="middle"></text>
+        <text class="len-label" id="len-CA" text-anchor="middle" dominant-baseline="middle"></text>
+
+        <!-- Side role labels -->
+        <text class="role-label" id="role-label-AB" text-anchor="middle" dominant-baseline="middle"></text>
+        <text class="role-label" id="role-label-BC" text-anchor="middle" dominant-baseline="middle"></text>
+        <text class="role-label" id="role-label-CA" text-anchor="middle" dominant-baseline="middle"></text>
+
+        <!-- Answer texts -->
+        <text class="answer" id="ans-A" text-anchor="middle" dominant-baseline="middle"></text>
+        <text class="answer" id="ans-C" text-anchor="middle" dominant-baseline="middle"></text>
+      </svg>
+    </div>
+
+    <aside class="sidebar">
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">01</span>
+          <span class="step-name">Pick the unknown angle</span>
+        </div>
+        <div class="btn-row two-col">
+          <button class="btn" data-angle="A">Angle A</button>
+          <button class="btn" data-angle="C">Angle C</button>
+        </div>
       </div>
 
-      <div class="panel">
-        <div class="step">
-          <div class="label">1. Choose angle</div>
-          <div class="button-row">
-            <button type="button" data-angle="A">Angle A</button>
-            <button type="button" data-angle="C">Angle C</button>
-          </div>
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">02</span>
+          <span class="step-name">Label each side</span>
         </div>
-
-        <div class="step">
-          <div class="label">2. Identify sides</div>
-          <label for="oppSide">opposite</label>
-          <select id="oppSide">
-            <option value="">choose</option>
-            <option value="base">base length 4</option>
-            <option value="vertical">vertical length 3</option>
-            <option value="hypotenuse">hypotenuse length 5</option>
-          </select>
-          <label for="adjSide">adjacent</label>
-          <select id="adjSide">
-            <option value="">choose</option>
-            <option value="base">base length 4</option>
-            <option value="vertical">vertical length 3</option>
-            <option value="hypotenuse">hypotenuse length 5</option>
-          </select>
-          <label for="hypSideSelect">hypotenuse</label>
-          <select id="hypSideSelect">
-            <option value="">choose</option>
-            <option value="base">base length 4</option>
-            <option value="vertical">vertical length 3</option>
-            <option value="hypotenuse">hypotenuse length 5</option>
-          </select>
-        </div>
-
-        <div class="step">
-          <div class="label">3. Choose ratio</div>
-          <div class="ratio-grid">
-            <button type="button" data-ratio="o/h">o/h</button>
-            <button type="button" data-ratio="a/h">a/h</button>
-            <button type="button" data-ratio="o/a">o/a</button>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="label">4. Enter side lengths</div>
-          <div class="fraction-row">
-            <input id="numerator" inputmode="decimal" placeholder="num">
-            <span class="slash">/</span>
-            <input id="denominator" inputmode="decimal" placeholder="den">
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="label">5. Choose function</div>
-          <div class="button-row">
-            <select id="functionName">
-              <option value="">function</option>
-              <option value="sin">sine</option>
-              <option value="cos">cosine</option>
-              <option value="tan">tangent</option>
-            </select>
-            <select id="functionMode">
-              <option value="">mode</option>
-              <option value="normal">normal</option>
-              <option value="inverse">inverse</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="step">
-          <label for="ratioValue">6. Enter ratio</label>
-          <input id="ratioValue" inputmode="decimal" placeholder="e.g. 0.75">
-          <button type="button" id="submit">Enter</button>
-          <button type="button" id="reset">Reset</button>
-          <div class="result" id="result">Complete each step, then press Enter.</div>
+        <div class="step-hint">Click a role, then click the matching side on the triangle.</div>
+        <div class="btn-row three-col">
+          <button class="btn role-btn" data-role="opposite">
+            <span class="dot" style="background: var(--opp)"></span>opposite
+          </button>
+          <button class="btn role-btn" data-role="adjacent">
+            <span class="dot" style="background: var(--adj)"></span>adjacent
+          </button>
+          <button class="btn role-btn" data-role="hypotenuse">
+            <span class="dot" style="background: var(--hyp)"></span>hypotenuse
+          </button>
         </div>
       </div>
-    </div>
-  </section>
 
-  <script>
-    const choices = {
-      angle: null,
-      ratio: null
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">03</span>
+          <span class="step-name">Choose a ratio</span>
+        </div>
+        <div class="btn-row three-col">
+          <button class="btn fn-norm" data-ratio="o/h">o / h</button>
+          <button class="btn fn-norm" data-ratio="a/h">a / h</button>
+          <button class="btn fn-norm" data-ratio="o/a">o / a</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">04</span>
+          <span class="step-name">Plug in the side lengths</span>
+        </div>
+        <div class="frac-input">
+          <input type="text" id="num" placeholder="num" inputmode="decimal" autocomplete="off">
+          <span class="slash">/</span>
+          <input type="text" id="den" placeholder="den" inputmode="decimal" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">05</span>
+          <span class="step-name">Choose the function</span>
+        </div>
+        <div class="btn-grid">
+          <button class="btn fn-norm" data-fn="sin" data-inv="false">sin</button>
+          <button class="btn fn-norm" data-fn="cos" data-inv="false">cos</button>
+          <button class="btn fn-norm" data-fn="tan" data-inv="false">tan</button>
+          <button class="btn fn-inv"  data-fn="sin" data-inv="true">sin⁻¹</button>
+          <button class="btn fn-inv"  data-fn="cos" data-inv="true">cos⁻¹</button>
+          <button class="btn fn-inv"  data-fn="tan" data-inv="true">tan⁻¹</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">06</span>
+          <span class="step-name">Compute the ratio</span>
+        </div>
+        <input type="text" id="ratio-value" placeholder="ratio as a decimal" inputmode="decimal" autocomplete="off">
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="submit">Solve</button>
+        <button class="btn" id="reset">Reset</button>
+      </div>
+
+      <div class="result" id="result">
+        Work through each step, then press Solve.
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">
+    Given two side lengths, inverse trigonometry recovers the angle between them.
+  </div>
+</div>
+
+<script>
+(function () {
+  // ===== Constants =====
+  const CANVAS_W = 600, CANVAS_H = 480;
+  const MARGIN = 90;
+  const ARC_R = 38;
+  const RA_SIZE = 14;
+  const TOL = 0.015;
+
+  // Pythagorean triples — clean integer angles, leg ratios bounded ~3:1
+  const TRIPLES = [
+    { legs: [3, 4],   hyp: 5  },
+    { legs: [5, 12],  hyp: 13 },
+    { legs: [8, 15],  hyp: 17 },
+    { legs: [7, 24],  hyp: 25 },
+    { legs: [20, 21], hyp: 29 },
+    { legs: [6, 8],   hyp: 10 },
+    { legs: [9, 12],  hyp: 15 }
+  ];
+
+  // ===== State =====
+  const state = {
+    triangle: null,
+    chosenAngle: null,
+    activeRole: null,
+    sideRoles: { AB: null, BC: null, CA: null },
+    ratio: null,
+    fn: null,
+    inv: null,
+    solvedAngles: { A: false, C: false }
+  };
+
+  // ===== Vector helpers =====
+  const $  = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y });
+  const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });
+  const mul = (v, s) => ({ x: v.x * s, y: v.y * s });
+  const unit = (v) => { const L = Math.hypot(v.x, v.y); return L ? { x: v.x / L, y: v.y / L } : { x: 0, y: 0 }; };
+
+  // ===== Triangle construction =====
+  function buildTriangle({ legA, legB, hyp, rotation }) {
+    // B at origin; A in direction (cos r, sin r); C perpendicular (math-CCW)
+    const dirBA = { x: Math.cos(rotation), y: Math.sin(rotation) };
+    const dirBC = { x: -dirBA.y, y: dirBA.x };
+    const aRel  = mul(dirBA, legA);
+    const cRel  = mul(dirBC, legB);
+
+    // Bounding box (in unit math space)
+    const xs = [0, aRel.x, cRel.x];
+    const ys = [0, aRel.y, cRel.y];
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const bbW = maxX - minX, bbH = maxY - minY;
+
+    // Scale to fit, then translate so bb-center is at canvas center
+    const scl = Math.min((CANVAS_W - 2 * MARGIN) / bbW, (CANVAS_H - 2 * MARGIN) / bbH);
+    const tx  = CANVAS_W / 2 - ((minX + maxX) / 2) * scl;
+    const ty  = CANVAS_H / 2 - ((minY + maxY) / 2) * scl;
+
+    const B = { x: tx, y: ty };
+    const A = add(B, mul(aRel, scl));
+    const C = add(B, mul(cRel, scl));
+
+    return {
+      A, B, C,
+      legA, legB, hyp,
+      angleA: Math.atan(legB / legA) * 180 / Math.PI,
+      angleC: Math.atan(legA / legB) * 180 / Math.PI
     };
-    const sideValues = {
-      base: 4,
-      vertical: 3,
-      hypotenuse: 5
-    };
-    const angleData = {
-      A: {
-        answer: 36.87,
-        sides: { opposite: "vertical", adjacent: "base", hypotenuse: "hypotenuse" },
-        ratios: {
-          "o/h": { fn: "sin", num: 3, den: 5 },
-          "a/h": { fn: "cos", num: 4, den: 5 },
-          "o/a": { fn: "tan", num: 3, den: 4 }
-        },
-        answerEl: "answerA",
-        arcEl: "solvedArcA"
-      },
-      C: {
-        answer: 53.13,
-        sides: { opposite: "base", adjacent: "vertical", hypotenuse: "hypotenuse" },
-        ratios: {
-          "o/h": { fn: "sin", num: 4, den: 5 },
-          "a/h": { fn: "cos", num: 3, den: 5 },
-          "o/a": { fn: "tan", num: 4, den: 3 }
-        },
-        answerEl: "answerC",
-        arcEl: "solvedArcC"
-      }
-    };
+  }
 
-    const angleButtons = [...document.querySelectorAll("[data-angle]")];
-    const ratioButtons = [...document.querySelectorAll("[data-ratio]")];
-    const result = document.getElementById("result");
-    const fields = {
-      opposite: document.getElementById("oppSide"),
-      adjacent: document.getElementById("adjSide"),
-      hypotenuse: document.getElementById("hypSideSelect"),
-      numerator: document.getElementById("numerator"),
-      denominator: document.getElementById("denominator"),
-      functionName: document.getElementById("functionName"),
-      functionMode: document.getElementById("functionMode"),
-      ratioValue: document.getElementById("ratioValue")
-    };
-
-    function setActive(buttons, attr, value) {
-      buttons.forEach((button) => button.classList.toggle("active", button.dataset[attr] === value));
+  function pickRandomTriangle() {
+    const t = TRIPLES[Math.floor(Math.random() * TRIPLES.length)];
+    const [legA, legB] = Math.random() < 0.5 ? t.legs.slice() : [t.legs[1], t.legs[0]];
+    // Random rotation but biased gently toward "clean" angles so we sometimes
+    // see axis-aligned triangles too. 30% pure random, 70% snapped to nicer angles.
+    let rotation;
+    if (Math.random() < 0.3) {
+      rotation = Math.random() * 2 * Math.PI;
+    } else {
+      const niceAngles = [0, Math.PI/6, Math.PI/4, Math.PI/3, Math.PI/2,
+                          2*Math.PI/3, 3*Math.PI/4, 5*Math.PI/6, Math.PI,
+                          7*Math.PI/6, 5*Math.PI/4, 4*Math.PI/3, 3*Math.PI/2,
+                          5*Math.PI/3, 7*Math.PI/4, 11*Math.PI/6];
+      rotation = niceAngles[Math.floor(Math.random() * niceAngles.length)];
     }
+    return buildTriangle({ legA, legB, hyp: t.hyp, rotation });
+  }
 
-    function numeric(value) {
-      return Number(String(value).trim());
-    }
+  // ===== Geometry helpers for label placement =====
+  function outwardNormal(p1, p2, centroid) {
+    const d = sub(p2, p1);
+    const L = Math.hypot(d.x, d.y);
+    const n1 = { x: -d.y / L, y: d.x / L };
+    const n2 = { x: d.y / L, y: -d.x / L };
+    const mid = mul(add(p1, p2), 0.5);
+    const toC = sub(centroid, mid);
+    return (n1.x * toC.x + n1.y * toC.y < 0) ? n1 : n2;
+  }
+  function sideLabelPos(p1, p2, centroid, offset) {
+    const mid = mul(add(p1, p2), 0.5);
+    const n = outwardNormal(p1, p2, centroid);
+    return add(mid, mul(n, offset));
+  }
+  function vertexLabelPos(v, centroid, offset) {
+    return add(v, mul(unit(sub(v, centroid)), offset));
+  }
+  function answerPos(v, other1, other2, offset) {
+    const d1 = unit(sub(other1, v));
+    const d2 = unit(sub(other2, v));
+    const bis = unit(add(d1, d2));
+    return add(v, mul(bis, offset));
+  }
 
-    function closeEnough(a, b, tolerance = 0.015) {
-      return Math.abs(a - b) <= tolerance;
-    }
-
-    function showResult(kind, message) {
-      result.className = `result ${kind}`;
-      result.innerHTML = message;
-    }
-
-    function check() {
-      if (!choices.angle) {
-        showResult("bad", "Choose one of the unknown angles first.");
-        return;
-      }
-      const data = angleData[choices.angle];
-      const sideOk = fields.opposite.value === data.sides.opposite &&
-        fields.adjacent.value === data.sides.adjacent &&
-        fields.hypotenuse.value === data.sides.hypotenuse;
-      if (!sideOk) {
-        showResult("bad", "The side labels are not correct for the selected angle.");
-        return;
-      }
-      if (!choices.ratio) {
-        showResult("bad", "Choose one of the three ratios.");
-        return;
-      }
-      const expected = data.ratios[choices.ratio];
-      const num = numeric(fields.numerator.value);
-      const den = numeric(fields.denominator.value);
-      if (num !== expected.num || den !== expected.den) {
-        showResult("bad", `For ${choices.ratio}, the side lengths should be ${expected.num}/${expected.den}.`);
-        return;
-      }
-      const ratio = expected.num / expected.den;
-      if (fields.functionName.value !== expected.fn || fields.functionMode.value !== "inverse") {
-        showResult("bad", "To recover an angle from a side ratio, choose the matching inverse function.");
-        return;
-      }
-      if (!closeEnough(numeric(fields.ratioValue.value), ratio)) {
-        showResult("bad", `The ratio should be close to ${ratio.toFixed(3)}.`);
-        return;
-      }
-
-      document.getElementById(data.answerEl).classList.remove("hidden");
-      document.getElementById(data.arcEl).classList.remove("hidden");
-      showResult("good", `${expected.fn}<sup>-1</sup>(${ratio.toFixed(3)}) = ${data.answer.toFixed(1)}°`);
-    }
-
-    angleButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        choices.angle = button.dataset.angle;
-        setActive(angleButtons, "angle", choices.angle);
-      });
+  // ===== SVG attribute setters =====
+  function setLine(prefix, p1, p2) {
+    ['side-' + prefix, 'click-' + prefix].forEach(id => {
+      const el = document.getElementById(id);
+      el.setAttribute('x1', p1.x);
+      el.setAttribute('y1', p1.y);
+      el.setAttribute('x2', p2.x);
+      el.setAttribute('y2', p2.y);
     });
+  }
+  function setCircle(id, p) {
+    const el = document.getElementById(id);
+    el.setAttribute('cx', p.x);
+    el.setAttribute('cy', p.y);
+  }
+  function setText(id, pos, text) {
+    const el = document.getElementById(id);
+    el.setAttribute('x', pos.x);
+    el.setAttribute('y', pos.y);
+    if (text !== undefined) el.textContent = text;
+  }
+  function setArc(id, vertex, end1, end2, radius) {
+    const d1 = unit(sub(end1, vertex));
+    const d2 = unit(sub(end2, vertex));
+    const p1 = add(vertex, mul(d1, radius));
+    const p2 = add(vertex, mul(d2, radius));
+    const cross = d1.x * d2.y - d1.y * d2.x;
+    const sweep = cross > 0 ? 1 : 0;
+    document.getElementById(id).setAttribute('d',
+      `M ${p1.x} ${p1.y} A ${radius} ${radius} 0 0 ${sweep} ${p2.x} ${p2.y}`);
+  }
+  function setWedge(id, vertex, end1, end2, radius) {
+    const d1 = unit(sub(end1, vertex));
+    const d2 = unit(sub(end2, vertex));
+    const p1 = add(vertex, mul(d1, radius));
+    const p2 = add(vertex, mul(d2, radius));
+    const cross = d1.x * d2.y - d1.y * d2.x;
+    const sweep = cross > 0 ? 1 : 0;
+    document.getElementById(id).setAttribute('d',
+      `M ${vertex.x} ${vertex.y} L ${p1.x} ${p1.y} A ${radius} ${radius} 0 0 ${sweep} ${p2.x} ${p2.y} Z`);
+  }
+  function setRightAngle(B, A, C) {
+    const dirBA = unit(sub(A, B));
+    const dirBC = unit(sub(C, B));
+    const m1 = add(B, mul(dirBA, RA_SIZE));
+    const m2 = add(B, mul(add(dirBA, dirBC), RA_SIZE));
+    const m3 = add(B, mul(dirBC, RA_SIZE));
+    document.getElementById('right-angle').setAttribute('d',
+      `M ${m1.x} ${m1.y} L ${m2.x} ${m2.y} L ${m3.x} ${m3.y}`);
+  }
 
-    ratioButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        choices.ratio = button.dataset.ratio;
-        setActive(ratioButtons, "ratio", choices.ratio);
-      });
-    });
+  // ===== Rendering =====
+  function renderTriangle() {
+    const t = state.triangle;
+    const { A, B, C } = t;
+    const centroid = { x: (A.x + B.x + C.x) / 3, y: (A.y + B.y + C.y) / 3 };
 
-    document.getElementById("submit").addEventListener("click", check);
-    document.getElementById("reset").addEventListener("click", () => {
-      choices.angle = null;
-      choices.ratio = null;
-      setActive(angleButtons, "angle", null);
-      setActive(ratioButtons, "ratio", null);
-      Object.values(fields).forEach((field) => { field.value = ""; });
-      ["answerA", "answerC", "solvedArcA", "solvedArcC"].forEach((id) => {
-        document.getElementById(id).classList.add("hidden");
-      });
-      showResult("", "Complete each step, then press Enter.");
+    // Fill
+    $('#tri-fill').setAttribute('points', `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`);
+
+    // Right angle marker
+    setRightAngle(B, A, C);
+
+    // Angle arcs
+    setArc('arc-A', A, B, C, ARC_R);
+    setArc('arc-C', C, B, A, ARC_R);
+
+    // Wedge fills
+    setWedge('wedge-A', A, B, C, ARC_R);
+    setWedge('wedge-C', C, B, A, ARC_R);
+
+    // Sides
+    setLine('AB', A, B);
+    setLine('BC', B, C);
+    setLine('CA', C, A);
+
+    // Vertex dots
+    setCircle('vtx-A', A);
+    setCircle('vtx-B', B);
+    setCircle('vtx-C', C);
+
+    // Vertex letters (push outside by 22 along the away-from-centroid direction)
+    setText('vtx-label-A', vertexLabelPos(A, centroid, 22), 'A');
+    setText('vtx-label-B', vertexLabelPos(B, centroid, 22), 'B');
+    setText('vtx-label-C', vertexLabelPos(C, centroid, 22), 'C');
+
+    // Side length labels (offset 22 outward)
+    setText('len-AB', sideLabelPos(A, B, centroid, 22), String(t.legA));
+    setText('len-BC', sideLabelPos(B, C, centroid, 22), String(t.legB));
+    setText('len-CA', sideLabelPos(C, A, centroid, 22), String(t.hyp));
+
+    // Role label positions (further out — 44)
+    setText('role-label-AB', sideLabelPos(A, B, centroid, 44));
+    setText('role-label-BC', sideLabelPos(B, C, centroid, 44));
+    setText('role-label-CA', sideLabelPos(C, A, centroid, 44));
+
+    // Answers (along the angular bisector inside the wedge)
+    setText('ans-A', answerPos(A, B, C, 60), t.angleA.toFixed(1) + '°');
+    setText('ans-C', answerPos(C, B, A, 60), t.angleC.toFixed(1) + '°');
+
+    // Triangle info display
+    const sides = [t.legA, t.legB, t.hyp].sort((a, b) => a - b);
+    $('#tri-info').textContent = `${sides[0]} · ${sides[1]} · ${sides[2]}`;
+  }
+
+  // ===== User-driven UI updates =====
+  function updateAngleSelection() {
+    $$('[data-angle]').forEach(b => b.classList.toggle('active', b.dataset.angle === state.chosenAngle));
+    ['A', 'C'].forEach(letter => {
+      const arc = document.getElementById('arc-' + letter);
+      const wedge = document.getElementById('wedge-' + letter);
+      // Solved status persists
+      arc.classList.remove('selected');
+      wedge.classList.remove('active');
+      if (state.solvedAngles[letter]) {
+        arc.classList.add('solved');
+        wedge.classList.add('solved');
+      } else {
+        arc.classList.remove('solved');
+        wedge.classList.remove('solved');
+      }
     });
-  </script>
+    if (state.chosenAngle && !state.solvedAngles[state.chosenAngle]) {
+      document.getElementById('arc-' + state.chosenAngle).classList.add('selected');
+      document.getElementById('wedge-' + state.chosenAngle).classList.add('active');
+    }
+  }
+
+  function updateSideRoles() {
+    ['AB', 'BC', 'CA'].forEach(s => {
+      const sideEl = document.getElementById('side-' + s);
+      sideEl.classList.remove('role-opposite', 'role-adjacent', 'role-hypotenuse');
+      const role = state.sideRoles[s];
+      if (role) sideEl.classList.add('role-' + role);
+
+      const labelEl = document.getElementById('role-label-' + s);
+      labelEl.classList.remove('opposite', 'adjacent', 'hypotenuse');
+      if (role) {
+        labelEl.textContent = role;
+        labelEl.classList.add(role, 'visible');
+      } else {
+        labelEl.textContent = '';
+        labelEl.classList.remove('visible');
+      }
+    });
+    $$('.role-btn').forEach(btn => {
+      const role = btn.dataset.role;
+      btn.classList.toggle('has-side', Object.values(state.sideRoles).includes(role));
+      btn.classList.toggle('active', state.activeRole === role);
+    });
+  }
+
+  function updateRatioSelection() {
+    $$('[data-ratio]').forEach(b => b.classList.toggle('active', b.dataset.ratio === state.ratio));
+  }
+  function updateFunctionSelection() {
+    $$('[data-fn]').forEach(b => {
+      b.classList.toggle('active', b.dataset.fn === state.fn && b.dataset.inv === state.inv);
+    });
+  }
+
+  function showAnswer(angle) {
+    state.solvedAngles[angle] = true;
+    updateAngleSelection();  // moves selected → solved
+    document.getElementById('ans-' + angle).classList.add('visible');
+  }
+  function hideAllAnswers() {
+    ['A', 'C'].forEach(a => {
+      state.solvedAngles[a] = false;
+      document.getElementById('ans-' + a).classList.remove('visible');
+    });
+    updateAngleSelection();
+  }
+
+  function showResult(kind, html) {
+    const r = $('#result');
+    r.className = 'result' + (kind ? ' ' + kind : '');
+    r.innerHTML = html;
+  }
+
+  // ===== Validation =====
+  function num(v) {
+    const s = String(v).trim();
+    if (!s) return NaN;
+    return Number(s);
+  }
+  function closeEnough(a, b, tol = TOL) {
+    return Math.abs(a - b) <= tol;
+  }
+
+  function expectedRoles(chosenAngle) {
+    return chosenAngle === 'A'
+      ? { AB: 'adjacent', BC: 'opposite',  CA: 'hypotenuse' }
+      : { AB: 'opposite', BC: 'adjacent',  CA: 'hypotenuse' };
+  }
+  function expectedLens(t, chosenAngle) {
+    return chosenAngle === 'A'
+      ? { opposite: t.legB, adjacent: t.legA, hypotenuse: t.hyp }
+      : { opposite: t.legA, adjacent: t.legB, hypotenuse: t.hyp };
+  }
+  function expectedFnFor(ratio) {
+    return { 'o/h': 'sin', 'a/h': 'cos', 'o/a': 'tan' }[ratio];
+  }
+
+  function validate() {
+    const t = state.triangle;
+    if (!state.chosenAngle) {
+      return { ok: false, msg: 'Start by picking which unknown angle you want to solve for.' };
+    }
+
+    const filledCount = Object.values(state.sideRoles).filter(v => v !== null).length;
+    if (filledCount < 3) {
+      return { ok: false, msg: `Label all three sides — remember, the labels are <em>relative to angle ${state.chosenAngle}</em>.` };
+    }
+    const expRoles = expectedRoles(state.chosenAngle);
+    const sidesOk = state.sideRoles.AB === expRoles.AB
+                  && state.sideRoles.BC === expRoles.BC
+                  && state.sideRoles.CA === expRoles.CA;
+    if (!sidesOk) {
+      return { ok: false, msg: `Re-check the side labels for angle <code>${state.chosenAngle}</code> — opposite and adjacent <em>swap</em> depending on which angle you pick.` };
+    }
+
+    if (!state.ratio) {
+      return { ok: false, msg: 'Pick which ratio you want to use.' };
+    }
+
+    const lens = expectedLens(t, state.chosenAngle);
+    let expN, expD;
+    if (state.ratio === 'o/h')      { expN = lens.opposite; expD = lens.hypotenuse; }
+    else if (state.ratio === 'a/h') { expN = lens.adjacent; expD = lens.hypotenuse; }
+    else                            { expN = lens.opposite; expD = lens.adjacent;  }
+    const userN = num($('#num').value);
+    const userD = num($('#den').value);
+
+    if (isNaN(userN) || isNaN(userD)) {
+      return { ok: false, msg: 'Fill in both the numerator and denominator using your labelled sides.' };
+    }
+    if (userN !== expN || userD !== expD) {
+      return { ok: false, msg: `For <code>${state.ratio}</code> at angle <code>${state.chosenAngle}</code>, the sides plug in as <code>${expN}/${expD}</code>.` };
+    }
+
+    if (!state.fn || state.inv === null) {
+      return { ok: false, msg: 'Pick a function — and decide whether you need the inverse.' };
+    }
+    const expFn = expectedFnFor(state.ratio);
+    if (state.fn !== expFn) {
+      return { ok: false, msg: `The ratio <code>${state.ratio}</code> is named <code>${expFn}</code>, not <code>${state.fn}</code>.` };
+    }
+    if (state.inv !== 'true') {
+      return { ok: false, msg: `You have the ratio and want the <em>angle</em> — so you need the inverse: <code>${expFn}⁻¹</code>.` };
+    }
+
+    const expRatio = expN / expD;
+    const userR = num($('#ratio-value').value);
+    if (isNaN(userR)) {
+      return { ok: false, msg: 'Type in the ratio value as a decimal.' };
+    }
+    if (!closeEnough(userR, expRatio)) {
+      return { ok: false, msg: `Re-compute <code>${expN}/${expD}</code> — your answer should be close to <code>${expRatio.toFixed(3)}</code>.` };
+    }
+
+    return {
+      ok: true,
+      angle: state.chosenAngle,
+      fn: expFn,
+      ratio: expRatio,
+      expN, expD,
+      degrees: state.chosenAngle === 'A' ? t.angleA : t.angleC
+    };
+  }
+
+  function submit() {
+    const result = validate();
+    if (!result.ok) {
+      showResult('bad', result.msg);
+      return;
+    }
+    const ratioStr = result.expN + '/' + result.expD;
+    const decimal = result.ratio.toFixed(3);
+    showResult('good',
+      `<div class="result-lines">
+        <div><code>${ratioStr}</code> = <code>${decimal}</code></div>
+        <div><code>${result.fn}⁻¹(${decimal}) = ${result.degrees.toFixed(1)}°</code> &nbsp;→&nbsp; angle <em>${result.angle}</em></div>
+      </div>`
+    );
+    showAnswer(result.angle);
+  }
+
+  function resetUserState() {
+    state.chosenAngle = null;
+    state.activeRole = null;
+    state.sideRoles = { AB: null, BC: null, CA: null };
+    state.ratio = null;
+    state.fn = null;
+    state.inv = null;
+    state.solvedAngles = { A: false, C: false };
+    $('#num').value = '';
+    $('#den').value = '';
+    $('#ratio-value').value = '';
+    hideAllAnswers();
+    updateAngleSelection();
+    updateSideRoles();
+    updateRatioSelection();
+    updateFunctionSelection();
+    showResult('', 'Work through each step, then press Solve.');
+  }
+
+  function newTriangle() {
+    const svg = $('#triangle');
+    svg.classList.add('fading');
+    setTimeout(() => {
+      state.triangle = pickRandomTriangle();
+      resetUserState();
+      renderTriangle();
+      svg.classList.remove('fading');
+    }, 180);
+  }
+
+  // ===== Event wiring =====
+  $$('[data-angle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newAngle = btn.dataset.angle;
+      if (state.chosenAngle !== newAngle) {
+        // Switching angles: side labels are relative to angle, so clear them
+        state.sideRoles = { AB: null, BC: null, CA: null };
+        state.activeRole = null;
+      }
+      state.chosenAngle = newAngle;
+      updateAngleSelection();
+      updateSideRoles();
+    });
+  });
+
+  $$('.role-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const role = btn.dataset.role;
+      state.activeRole = state.activeRole === role ? null : role;
+      updateSideRoles();
+    });
+  });
+
+  $$('.side-group').forEach(g => {
+    g.addEventListener('click', () => {
+      if (!state.activeRole) return;
+      const side = g.dataset.side;
+      // Clear any other side that had this role
+      for (const s in state.sideRoles) {
+        if (state.sideRoles[s] === state.activeRole) state.sideRoles[s] = null;
+      }
+      state.sideRoles[side] = state.activeRole;
+      state.activeRole = null;
+      updateSideRoles();
+    });
+  });
+
+  $$('[data-ratio]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.ratio = btn.dataset.ratio;
+      updateRatioSelection();
+    });
+  });
+
+  $$('[data-fn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.fn  = btn.dataset.fn;
+      state.inv = btn.dataset.inv;
+      updateFunctionSelection();
+    });
+  });
+
+  $('#submit').addEventListener('click', submit);
+  $('#reset').addEventListener('click', () => {
+    resetUserState();
+  });
+  $('#new-triangle').addEventListener('click', newTriangle);
+
+  // Enter in inputs submits
+  ['num', 'den', 'ratio-value'].forEach(id => {
+    $('#' + id).addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submit();
+    });
+  });
+
+  // ===== Init =====
+  // Start with classic 3-4-5 in standard orientation for familiarity
+  state.triangle = buildTriangle({ legA: 4, legB: 3, hyp: 5, rotation: Math.PI });
+  renderTriangle();
+  resetUserState();
+})();
+</script>
+
 </body>
 </html>
