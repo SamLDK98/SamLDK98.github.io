@@ -142,12 +142,28 @@
     }
 
     .target {
-      display: block;
-      margin-top: 0.5rem;
+      display: none;
+      margin-top: 0;
       color: var(--accent);
       font-family: "Courier New", monospace;
       font-size: 1.45rem;
       line-height: 1.25;
+    }
+
+    .center-prompt-box {
+      fill: rgba(22, 19, 17, 0.92);
+      stroke: rgba(241, 216, 77, 0.75);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 10px rgba(241, 216, 77, 0.18));
+    }
+
+    .center-prompt-text {
+      fill: var(--yellow);
+      font-family: "Courier New", monospace;
+      font-size: 24px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
     }
 
     .hint {
@@ -229,6 +245,10 @@
           <line class="axis" x1="380" y1="610" x2="380" y2="30" />
           <circle class="circle" id="circle" cx="380" cy="320" r="250" />
           <g id="points"></g>
+          <g id="centerPrompt">
+            <rect class="center-prompt-box" id="centerPromptBox" x="270" y="286" width="220" height="68" rx="12" />
+            <text class="center-prompt-text" id="centerPromptText" x="380" y="320"></text>
+          </g>
         </svg>
       </div>
 
@@ -259,6 +279,8 @@
     const circle = document.getElementById("circle");
     const prompt = document.getElementById("prompt");
     const targetText = document.getElementById("targetText");
+    const centerPromptBox = document.getElementById("centerPromptBox");
+    const centerPromptText = document.getElementById("centerPromptText");
     const hint = document.getElementById("hint");
     const answerBox = document.getElementById("answerBox");
     const reset = document.getElementById("reset");
@@ -342,6 +364,7 @@
       if (!target) {
         prompt.firstChild.textContent = "Complete. Every point is correct.";
         targetText.textContent = "";
+        centerPromptText.textContent = "";
         answerBox.textContent = "Done.";
         updatePoints();
         return;
@@ -349,6 +372,8 @@
 
       prompt.firstChild.textContent = `Select the point for `;
       targetText.textContent = target[mode];
+      centerPromptText.textContent = target[mode];
+      requestAnimationFrame(sizeCenterPrompt);
       answerBox.classList.remove("correct", "incorrect");
       answerBox.textContent = "Select the matching point.";
       updatePoints();
@@ -377,6 +402,16 @@
     function setMode(nextMode) {
       mode = nextMode;
       resetGame();
+    }
+
+    function sizeCenterPrompt() {
+      const bbox = centerPromptText.getBBox();
+      const width = Math.max(160, bbox.width + 44);
+      const height = 68;
+      centerPromptBox.setAttribute("x", cx - width / 2);
+      centerPromptBox.setAttribute("width", width);
+      centerPromptBox.setAttribute("y", cy - height / 2);
+      centerPromptBox.setAttribute("height", height);
     }
 
     function resetGame() {
