@@ -1114,6 +1114,34 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-style: italic;
 }
 
+.intro-linear-algebra-page .concept-note {
+  max-width: 760px;
+  margin: 1.25rem auto 1.8rem;
+  padding: 1rem 1.15rem 1.05rem;
+  border: 1px solid var(--intro-rule);
+  border-top: 3px solid var(--intro-ihat);
+  border-left: 0;
+  border-radius: 4px;
+  background: rgba(232, 161, 59, 0.055);
+  box-shadow: inset 0 1px 0 rgba(236, 226, 209, 0.035);
+}
+
+.intro-linear-algebra-page .concept-note::before {
+  content: "Clarification";
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--intro-ihat);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.intro-linear-algebra-page .concept-note p {
+  color: var(--intro-text);
+  font-style: normal;
+}
+
 .intro-linear-algebra-page table {
   width: min(100%, 760px);
   margin: 1.4rem auto 2rem;
@@ -1235,6 +1263,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 780px;
 }
 
+.intro-linear-algebra-page .cowboy-orientation-widget {
+  width: min(100%, 980px);
+  height: 720px;
+}
+
 .intro-linear-algebra-page .unit-circle-distance-widget {
   height: 720px;
 }
@@ -1283,6 +1316,28 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-size: 0.95rem;
   font-style: italic;
   line-height: 1.45;
+}
+
+.direction-figure {
+  max-width: 900px;
+  border: 0;
+  background: transparent;
+}
+
+.direction-figure svg {
+  min-height: auto;
+}
+
+.compact-direction-figure {
+  max-width: 760px;
+}
+
+.direction-figure-label {
+  fill: var(--intro-accent);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .trig-figure-actions {

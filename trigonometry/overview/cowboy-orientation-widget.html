@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orientation and Angle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --panel: #1e1a17;
+    --rule: rgba(214, 196, 168, 0.14);
+    --rule-strong: rgba(214, 196, 168, 0.28);
+    --text: #ece2d1;
+    --dim: #a89c87;
+    --faint: #6f6557;
+    --accent: #d4b888;
+    --orange: #e8a13b;
+    --teal: #6dd3c4;
+    --green: #88c97c;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: transparent;
+    color: var(--text);
+    font-family: "EB Garamond", Georgia, serif;
+  }
+
+  body {
+    padding: 1rem;
+  }
+
+  .widget {
+    width: min(100%, 940px);
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background:
+      radial-gradient(circle at 50% 36%, rgba(232, 161, 59, 0.055), transparent 38%),
+      var(--panel);
+    overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+    padding: 1.2rem 1.35rem 1rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--text);
+    font-family: "Fraunces", Georgia, serif;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  .readout {
+    color: var(--orange);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+
+  .stage {
+    min-height: 500px;
+    padding: 1.2rem;
+    border-right: 1px solid var(--rule);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 500px;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem;
+    background: rgba(0, 0, 0, 0.13);
+  }
+
+  label {
+    display: grid;
+    gap: 0.55rem;
+    color: var(--dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--orange);
+  }
+
+  .angle-number {
+    color: var(--text);
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 2rem;
+  }
+
+  .button-row {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  button {
+    min-height: 2.8rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover,
+  button.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: rgba(232, 161, 59, 0.08);
+  }
+
+  .saved {
+    display: grid;
+    gap: 0.55rem;
+    padding-top: 0.25rem;
+    color: var(--dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.74rem;
+  }
+
+  .saved span {
+    color: var(--text);
+  }
+
+  .circle {
+    fill: none;
+    stroke: rgba(236, 226, 209, 0.42);
+    stroke-width: 2;
+  }
+
+  .axis {
+    stroke: rgba(236, 226, 209, 0.14);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 7;
+  }
+
+  .hat-brim {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 8;
+  }
+
+  .hat-crown {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 5;
+  }
+
+  .vision {
+    fill: rgba(109, 211, 196, 0.13);
+    stroke: rgba(109, 211, 196, 0.38);
+    stroke-width: 1.5;
+  }
+
+  .orientation-ray {
+    stroke: var(--teal);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .saved-ray.first {
+    stroke: var(--orange);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+  }
+
+  .saved-ray.second {
+    stroke: var(--green);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+  }
+
+  .angle-arc {
+    fill: none;
+    stroke: var(--orange);
+    stroke-width: 5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px rgba(232, 161, 59, 0.42));
+  }
+
+  .angle-label {
+    fill: var(--orange);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 18px;
+  }
+
+  .hidden {
+    opacity: 0;
+  }
+
+  @media (max-width: 760px) {
+    body { padding: 0.5rem; }
+    .main { grid-template-columns: 1fr; }
+    .stage {
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    svg { height: 410px; }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">
+    <h1>Orientation as Rotation</h1>
+    <div class="readout" id="angle-summary">set two orientations</div>
+  </div>
+
+  <div class="main">
+    <div class="stage">
+      <svg viewBox="0 0 620 500" aria-label="Cowboy hat orientation and possible movement directions">
+        <defs>
+          <marker id="ray-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+          </marker>
+          <marker id="saved-orange-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="#e8a13b" />
+          </marker>
+          <marker id="saved-green-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="#88c97c" />
+          </marker>
+        </defs>
+
+        <line class="axis" x1="90" y1="250" x2="530" y2="250" />
+        <line class="axis" x1="310" y1="30" x2="310" y2="470" />
+        <circle class="circle" cx="310" cy="250" r="185" />
+
+        <path class="angle-arc hidden" id="angle-arc" />
+        <text class="angle-label hidden" id="angle-label" text-anchor="middle"></text>
+
+        <line class="saved-ray first hidden" id="first-ray" marker-end="url(#saved-orange-arrow)" />
+        <line class="saved-ray second hidden" id="second-ray" marker-end="url(#saved-green-arrow)" />
+
+        <path class="vision" id="vision" />
+        <line class="orientation-ray" id="orientation-ray" marker-end="url(#ray-arrow)" />
+
+        <ellipse class="hat-brim" cx="310" cy="250" rx="44" ry="24" />
+        <ellipse class="hat-crown" cx="310" cy="250" rx="22" ry="13" />
+      </svg>
+    </div>
+
+    <div class="controls">
+      <label>
+        Orientation
+        <input id="orientation" type="range" min="0" max="359" value="0">
+      </label>
+      <div class="angle-number"><span id="current-angle">0</span>&deg;</div>
+
+      <div class="button-row">
+        <button id="set-first" type="button">Set 1st orientation</button>
+        <button id="set-second" type="button">Set 2nd orientation</button>
+      </div>
+
+      <div class="saved">
+        <div>First: <span id="first-value">not set</span></div>
+        <div>Second: <span id="second-value">not set</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const center = { x: 310, y: 250 };
+  const rayLength = 170;
+  const arcRadius = 118;
+  const coneHalfAngle = 18;
+  const coneLength = 150;
+
+  const slider = document.getElementById("orientation");
+  const currentAngle = document.getElementById("current-angle");
+  const orientationRay = document.getElementById("orientation-ray");
+  const vision = document.getElementById("vision");
+  const firstRay = document.getElementById("first-ray");
+  const secondRay = document.getElementById("second-ray");
+  const angleArc = document.getElementById("angle-arc");
+  const angleLabel = document.getElementById("angle-label");
+  const firstValue = document.getElementById("first-value");
+  const secondValue = document.getElementById("second-value");
+  const summary = document.getElementById("angle-summary");
+  const firstButton = document.getElementById("set-first");
+  const secondButton = document.getElementById("set-second");
+
+  let first = null;
+  let second = null;
+
+  function toRad(deg) {
+    return deg * Math.PI / 180;
+  }
+
+  function pointAt(deg, length) {
+    const rad = toRad(deg);
+    return {
+      x: center.x + Math.cos(rad) * length,
+      y: center.y - Math.sin(rad) * length
+    };
+  }
+
+  function setLine(line, deg, length) {
+    const p = pointAt(deg, length);
+    line.setAttribute("x1", center.x);
+    line.setAttribute("y1", center.y);
+    line.setAttribute("x2", p.x);
+    line.setAttribute("y2", p.y);
+    line.classList.remove("hidden");
+  }
+
+  function setVision(deg) {
+    const left = pointAt(deg + coneHalfAngle, coneLength);
+    const right = pointAt(deg - coneHalfAngle, coneLength);
+    const mid = pointAt(deg, coneLength * 0.7);
+    vision.setAttribute("d", `M ${center.x} ${center.y} Q ${mid.x} ${mid.y} ${left.x} ${left.y} A ${coneLength} ${coneLength} 0 0 1 ${right.x} ${right.y} Q ${mid.x} ${mid.y} ${center.x} ${center.y} Z`);
+  }
+
+  function clockwiseDelta(a, b) {
+    return (b - a + 360) % 360;
+  }
+
+  function smallerAngle(a, b) {
+    const delta = clockwiseDelta(a, b);
+    return delta > 180 ? 360 - delta : delta;
+  }
+
+  function arcPath(a, b) {
+    let delta = clockwiseDelta(a, b);
+    let start = a;
+    let end = b;
+    if (delta > 180) {
+      start = b;
+      end = a;
+      delta = 360 - delta;
+    }
+    const p1 = pointAt(start, arcRadius);
+    const p2 = pointAt(end, arcRadius);
+    const sweep = clockwiseDelta(start, end) <= 180 ? 0 : 1;
+    const large = delta > 180 ? 1 : 0;
+    return `M ${p1.x} ${p1.y} A ${arcRadius} ${arcRadius} 0 ${large} ${sweep} ${p2.x} ${p2.y}`;
+  }
+
+  function setAngleLabel(a, b) {
+    const delta = clockwiseDelta(a, b);
+    let mid = a + delta / 2;
+    if (delta > 180) {
+      mid = b + (360 - delta) / 2;
+    }
+    const p = pointAt(mid % 360, arcRadius + 30);
+    angleLabel.setAttribute("x", p.x);
+    angleLabel.setAttribute("y", p.y);
+    angleLabel.textContent = `${Math.round(smallerAngle(a, b))}°`;
+    angleLabel.classList.remove("hidden");
+  }
+
+  function render() {
+    const deg = Number(slider.value);
+    currentAngle.textContent = deg;
+    setLine(orientationRay, deg, rayLength);
+    setVision(deg);
+
+    firstButton.classList.toggle("active", first !== null);
+    secondButton.classList.toggle("active", second !== null);
+
+    if (first !== null) {
+      setLine(firstRay, first, rayLength - 12);
+      firstValue.textContent = `${first}°`;
+    } else {
+      firstRay.classList.add("hidden");
+      firstValue.textContent = "not set";
+    }
+
+    if (second !== null) {
+      setLine(secondRay, second, rayLength - 22);
+      secondValue.textContent = `${second}°`;
+    } else {
+      secondRay.classList.add("hidden");
+      secondValue.textContent = "not set";
+    }
+
+    if (first !== null && second !== null) {
+      angleArc.setAttribute("d", arcPath(first, second));
+      angleArc.classList.remove("hidden");
+      setAngleLabel(first, second);
+      summary.textContent = `angle: ${Math.round(smallerAngle(first, second))}°`;
+    } else {
+      angleArc.classList.add("hidden");
+      angleLabel.classList.add("hidden");
+      summary.textContent = "set two orientations";
+    }
+  }
+
+  slider.addEventListener("input", render);
+  firstButton.addEventListener("click", () => {
+    first = Number(slider.value);
+    render();
+  });
+  secondButton.addEventListener("click", () => {
+    second = Number(slider.value);
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
