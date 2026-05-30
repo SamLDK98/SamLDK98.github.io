@@ -42,20 +42,20 @@
 
         <p>The only coordinate values you need to remember are:</p>
 
-        <p class="display-equation">$$\frac{1}{2}, \quad \frac{\sqrt{2}}{2}, \quad \frac{\sqrt{3}}{2} \qquad \to \qquad 0.5, \quad \approx 0.71, \quad \approx 0.87$$</p>
+        <p class="display-equation equation-left">$$\frac{1}{2}, \quad \frac{\sqrt{2}}{2}, \quad \frac{\sqrt{3}}{2} \qquad \to \qquad 0.5, \quad \approx 0.71, \quad \approx 0.87$$</p>
 
         <p>Everything else is just signs and swapping positions.</p>
 
         <p>For coordinates without a '0':</p>
 
-        <ul>
+        <ul class="unit-circle-opening-list">
           <li>Multiples of $45^\circ$ are combinations of $\Large\pm \frac{\sqrt{2}}{2}$.</li>
           <li>Multiples of $30^\circ$ are combinations of $\Large \pm \frac{\sqrt{3}}{2}$ and $\large \pm \frac{1}{2}$.</li>
         </ul>
 
         <p>The signs depend on the quadrant:</p>
 
-        <p class="display-equation">$$
+        <p class="display-equation equation-left">$$
 \begin{array}{c|c}
 \text{Quadrant} & \text{Coordinates } (x,y) \\
 \hline
@@ -65,14 +65,6 @@
 \text{IV} & (+, -)
 \end{array}
 $$</p>
-
-        <iframe
-          class="essay-widget unit-circle-coordinate-widget"
-          src="trigonometry/unit-circle/unit-circle-coordinate-widget.html"
-          title="Interactive widget showing coordinates on the unit circle"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
 
         <p>Notice how degrees, radians, and coordinates can be three different ways of describing the same point on a circle?</p>
 
@@ -88,15 +80,44 @@ $$</p>
           loading="lazy"
         ></iframe>
 
-        <p>While angles and radians are single value quantities, coordinates have two. This makes something interesting possible.</p>
-
         <h3 class="subsection-title">Coordinates in Circular Motion</h3>
 
         <p>If we graphed the angle as a point moved around the circle, we would see a straight line. As time increases, the angle increases.</p>
 
         <p>(Unless we reset to $0^\circ$ after every complete revolution. In that case we would see a repeating sawtooth pattern.)</p>
 
-        <p><strong>Image A:</strong> two panels, one showing the simple increase over time; the other shows the sawtooth pattern upon resetting the angle.</p>
+        <figure class="trig-figure angle-growth-figure" aria-label="Two graphs comparing angle increasing over time with angle resetting each revolution">
+          <svg viewBox="0 0 920 360" role="img">
+            <defs>
+              <marker id="angle-growth-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.58)" />
+              </marker>
+            </defs>
+
+            <g transform="translate(54 48)">
+              <text class="angle-growth-title" x="164" y="-16" text-anchor="middle">Angle increasing</text>
+              <line class="angle-growth-axis" x1="0" y1="238" x2="335" y2="238" marker-end="url(#angle-growth-arrow)" />
+              <line class="angle-growth-axis" x1="0" y1="238" x2="0" y2="12" marker-end="url(#angle-growth-arrow)" />
+              <line class="angle-growth-grid" x1="0" y1="178" x2="315" y2="178" />
+              <line class="angle-growth-grid" x1="0" y1="118" x2="315" y2="118" />
+              <line class="angle-growth-grid" x1="0" y1="58" x2="315" y2="58" />
+              <path class="angle-growth-line" d="M 0 238 L 315 38" />
+              <text class="angle-growth-label" x="315" y="266" text-anchor="end">time</text>
+              <text class="angle-growth-label" x="-8" y="18" text-anchor="end">angle</text>
+            </g>
+
+            <g transform="translate(532 48)">
+              <text class="angle-growth-title" x="164" y="-16" text-anchor="middle">Reset after each revolution</text>
+              <line class="angle-growth-axis" x1="0" y1="238" x2="335" y2="238" marker-end="url(#angle-growth-arrow)" />
+              <line class="angle-growth-axis" x1="0" y1="238" x2="0" y2="12" marker-end="url(#angle-growth-arrow)" />
+              <line class="angle-growth-grid" x1="0" y1="58" x2="315" y2="58" />
+              <text class="angle-growth-label" x="-8" y="62" text-anchor="end">360°</text>
+              <path class="angle-sawtooth-line" d="M 0 238 L 78 58 L 78 238 L 156 58 L 156 238 L 234 58 L 234 238 L 312 58" />
+              <text class="angle-growth-label" x="315" y="266" text-anchor="end">time</text>
+              <text class="angle-growth-label" x="-8" y="18" text-anchor="end">angle</text>
+            </g>
+          </svg>
+        </figure>
 
         <p>However, what if we tracked the coordinates during a revolution?</p>
 

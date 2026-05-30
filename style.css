@@ -1112,6 +1112,65 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   text-align: center;
 }
 
+.intro-linear-algebra-page .display-equation.equation-left,
+.intro-linear-algebra-page .display-equation.equation-left mjx-container[display="true"] {
+  text-align: left !important;
+}
+
+.trigonometry-unit-circle-page .unit-circle-opening-list {
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2.4rem;
+}
+
+.trigonometry-unit-circle-page .angle-growth-figure {
+  max-width: 920px;
+}
+
+.trigonometry-unit-circle-page .angle-growth-figure svg {
+  min-height: 320px;
+}
+
+.angle-growth-axis {
+  stroke: rgba(236, 226, 209, 0.58);
+  stroke-width: 1.6;
+}
+
+.angle-growth-grid {
+  stroke: rgba(236, 226, 209, 0.1);
+  stroke-width: 1;
+}
+
+.angle-growth-line {
+  fill: none;
+  stroke: #6dd3c4;
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(109, 211, 196, 0.28));
+}
+
+.angle-sawtooth-line {
+  fill: none;
+  stroke: #e8a13b;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(232, 161, 59, 0.28));
+}
+
+.angle-growth-title {
+  fill: var(--intro-text);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 20px;
+}
+
+.angle-growth-label {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
 .intro-linear-algebra-page blockquote {
   margin-top: 1rem;
   margin-bottom: 1.6rem;
