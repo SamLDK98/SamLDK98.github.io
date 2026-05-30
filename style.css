@@ -1311,6 +1311,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 330px;
 }
 
+.intro-linear-algebra-page .cowboy-orientation-widget {
+  width: min(100%, 980px);
+  height: 690px;
+}
+
 .intro-linear-algebra-page .right-angle-ratios-widget {
   height: 540px;
 }
