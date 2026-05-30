@@ -1294,6 +1294,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 780px;
 }
 
+.intro-linear-algebra-page .unit-circle-coordinate-wave-widget {
+  width: min(100%, 1180px);
+  height: 780px;
+}
+
 .intro-linear-algebra-page .unit-circle-sine-cosine-widget {
   width: min(100%, 980px);
   height: 720px;

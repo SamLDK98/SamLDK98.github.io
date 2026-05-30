@@ -36,7 +36,33 @@
       <section class="essay-section">
         <p>A unit circle has a radius of 1.</p>
 
-        <p>Get familiar with the coordinates of points around its circumference.</p>
+        <p>Its coordinates therefore range from $-1$ to $1$ on the $x$- and $y$-axes.</p>
+
+        <p>The only coordinate values you need to remember are:</p>
+
+        <p class="display-equation">$$\frac{1}{2}, \quad \frac{\sqrt{2}}{2}, \quad \frac{\sqrt{3}}{2}$$</p>
+
+        <p>Everything else is just signs and swapping positions.</p>
+
+        <p>For coordinates without a 0:</p>
+
+        <ul>
+          <li>Multiples of $45^\circ$ are combinations of $\large\pm \frac{\sqrt{2}}{2}$.</li>
+          <li>Multiples of $30^\circ$ are combinations of $\large \pm \frac{\sqrt{3}}{2}$ and $\large \pm \frac{1}{2}$.</li>
+        </ul>
+
+        <p>The signs depend on the quadrant:</p>
+
+        <p class="display-equation">$$
+\begin{array}{c|c}
+\text{Quadrant} & \text{Coordinates } (x,y) \\
+\hline
+\text{I} & (+, +) \\
+\text{II} & (-, +) \\
+\text{III} & (-, -) \\
+\text{IV} & (+, -)
+\end{array}
+$$</p>
 
         <iframe
           class="essay-widget unit-circle-coordinate-widget"
@@ -46,9 +72,11 @@
           loading="lazy"
         ></iframe>
 
-        <p>Notice how degrees, radians, and now coordinates can all be represented as the same thing — points on a circle?</p>
+        <p>Notice how degrees, radians, and coordinates can be three different ways of describing the same point on a circle?</p>
 
-        <p>Get familiar switching between them mentally.</p>
+        <p class="display-equation">$$90^\circ \qquad \frac{\pi}{2} \qquad (0,1)$$</p>
+
+        <p>Make sure you have a good sense of all three before continuing.</p>
 
         <iframe
           class="essay-widget unit-circle-point-practice-widget"
@@ -58,9 +86,41 @@
           loading="lazy"
         ></iframe>
 
-        <p>A really important thing to realise is that angles encode two values, for an $x$- and $y$-axis.</p>
+        <p>While angles and radians are single value quantities, coordinates have two. This makes something interesting possible.</p>
+
+        <h3 class="subsection-title">Coordinates in Circular Motion</h3>
+
+        <p>If we graphed the angle as a point moved around the circle, we would see a straight line. As time increases, the angle increases.</p>
+
+        <p>(Unless we reset to $0^\circ$ after every complete revolution. In that case we would see a repeating sawtooth pattern.)</p>
+
+        <p><strong>Image A:</strong> two panels, one showing the simple increase over time; the other shows the sawtooth pattern upon resetting the angle.</p>
+
+        <p>However, what if we tracked the coordinates during a revolution?</p>
+
+        <p>Imagine the point beginning at (1,0). What happens to the $x$ and $y$ values during a counterclockwise lap of the circle? Take a moment to think about that.</p>
+
+        <p>Initially, $x$ decreases as $y$ increases $(\downarrow, \uparrow)$. After the point crosses the $y$-axis, they both decrease $(\downarrow, \downarrow)$, albeit with $x$ now in the negative numbers.</p>
+
+        <p>After passing through the $x$-axis $(-1,0)$, $x$ begins to increase again while $y$ moves down into the negative numbers $(\uparrow, \downarrow)$. Once the point crosses the $y$-axis again, both $x$ and $y$ are then increasing $(\uparrow, \uparrow)$, albeit with $y$ in the negative numbers. Eventually they would reach the starting position again with $x$ at $1$ and $y$ at $0$.</p>
+
+        <p>Thinking through that probably doesn't lead to much standing out; however, look at what happens when we graph it, plotting each coordinate against the angle of rotation.</p>
+
+        <iframe
+          class="essay-widget unit-circle-coordinate-wave-widget"
+          src="trigonometry/unit-circle/coordinate-wave-tracer-widget.html"
+          title="Interactive widget tracing x and y coordinates during circular motion"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>While angles are single values, the correspond to coordinates which have two:</p>
 
         <p class="display-equation">$$\theta \longrightarrow (x,y)$$</p>
+
+        <p>Plotting the coordinates in terms of the angle reveals a repeating wave structure.</p>
+
+        <p>A wave can be understood as the shadow of a point moving uniformly around a circle.</p>
 
         <h3 class="subsection-title">Sine and Cosine</h3>
 
