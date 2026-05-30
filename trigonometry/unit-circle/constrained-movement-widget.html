@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Constrained Movement on a Circle</title>
+<style>
+  :root {
+    --bg: #161311;
+    --panel: #1e1a17;
+    --rule: rgba(214, 196, 168, 0.14);
+    --rule-strong: rgba(214, 196, 168, 0.28);
+    --text: #ece2d1;
+    --dim: #a89c87;
+    --accent: #d4b888;
+    --orange: #e8a13b;
+    --teal: #6dd3c4;
+    --green: #88c97c;
+    --pink: #ef7398;
+    --grid: rgba(236, 226, 209, 0.08);
+    --axis: rgba(236, 226, 209, 0.42);
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: transparent;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body { padding: 1rem; }
+
+  .widget {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(232, 161, 59, 0.05), transparent 42%),
+      var(--panel);
+    overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+    padding: 1.15rem 1.35rem 0.95rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+    font-weight: 500;
+  }
+
+  .readout {
+    color: var(--orange);
+    font-family: "Courier New", monospace;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 250px;
+  }
+
+  .stage {
+    min-height: 520px;
+    padding: 1rem;
+    border-right: 1px solid var(--rule);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 520px;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem;
+    background: rgba(0, 0, 0, 0.13);
+  }
+
+  label {
+    display: grid;
+    gap: 0.55rem;
+    color: var(--dim);
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--orange);
+  }
+
+  button {
+    min-height: 2.7rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: rgba(232, 161, 59, 0.08);
+  }
+
+  .coord-card {
+    padding: 0.85rem;
+    border: 1px solid var(--rule);
+    background: rgba(0, 0, 0, 0.15);
+    color: var(--dim);
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .coord-card strong {
+    color: var(--accent);
+  }
+
+  .grid {
+    stroke: var(--grid);
+    stroke-width: 1;
+  }
+
+  .axis {
+    stroke: var(--axis);
+    stroke-width: 1.6;
+  }
+
+  .circle {
+    fill: rgba(0, 0, 0, 0.06);
+    stroke: rgba(236, 226, 209, 0.62);
+    stroke-width: 2.4;
+  }
+
+  .path {
+    fill: none;
+    stroke: var(--orange);
+    stroke-width: 4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px rgba(232, 161, 59, 0.32));
+  }
+
+  .cowboy {
+    fill: var(--accent);
+    stroke: var(--text);
+    stroke-width: 2;
+    cursor: grab;
+    filter: drop-shadow(0 0 7px rgba(212, 184, 136, 0.28));
+  }
+
+  .cowboy:active { cursor: grabbing; }
+
+  .hat-inner {
+    fill: none;
+    stroke: var(--bg);
+    stroke-width: 2;
+    pointer-events: none;
+  }
+
+  .tavern {
+    fill: rgba(136, 201, 124, 0.16);
+    stroke: var(--green);
+    stroke-width: 2.5;
+  }
+
+  .tavern-roof {
+    fill: rgba(136, 201, 124, 0.24);
+    stroke: var(--green);
+    stroke-width: 2.5;
+  }
+
+  .label {
+    fill: var(--dim);
+    font-family: "Courier New", monospace;
+    font-size: 15px;
+  }
+
+  .target-label {
+    fill: var(--green);
+  }
+
+  .cowboy-label {
+    fill: var(--accent);
+  }
+
+  .helper {
+    stroke: var(--teal);
+    stroke-width: 2;
+    stroke-dasharray: 5 6;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 760px) {
+    body { padding: 0.5rem; }
+    .main { grid-template-columns: 1fr; }
+    .stage {
+      min-height: 430px;
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    svg { height: 430px; }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">
+    <h1>Constrained Movement</h1>
+    <div class="readout" id="status">start: (-1, 0)</div>
+  </div>
+
+  <div class="main">
+    <div class="stage">
+      <svg id="canvas" viewBox="0 0 700 520" aria-label="Cowboy constrained to move along a unit circle toward a tavern">
+        <defs>
+          <marker id="axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.55)" />
+          </marker>
+        </defs>
+
+        <g id="grid"></g>
+        <line class="axis" x1="95" y1="260" x2="610" y2="260" marker-end="url(#axis-arrow)" />
+        <line class="axis" x1="350" y1="505" x2="350" y2="28" marker-end="url(#axis-arrow)" />
+        <circle class="circle" cx="350" cy="260" r="185" />
+        <path class="path" id="travelPath" />
+        <line class="helper" id="xHelper" />
+        <line class="helper" id="yHelper" />
+
+        <g transform="translate(535 260)">
+          <path class="tavern-roof" d="M -34 -12 L 0 -42 L 34 -12 Z" />
+          <rect class="tavern" x="-28" y="-12" width="56" height="46" rx="3" />
+          <rect class="tavern" x="-7" y="8" width="14" height="26" rx="2" />
+        </g>
+        <text class="label target-label" x="535" y="328" text-anchor="middle">tavern (1, 0)</text>
+
+        <g id="cowboy" class="cowboy" role="button" tabindex="0" aria-label="Drag cowboy around the circle">
+          <circle cx="0" cy="0" r="17" />
+          <circle class="hat-inner" cx="0" cy="0" r="7" />
+        </g>
+        <text class="label cowboy-label" id="cowboyLabel" text-anchor="middle">cowboy</text>
+
+        <text class="label" x="540" y="252">1</text>
+        <text class="label" x="150" y="252">-1</text>
+        <text class="label" x="360" y="78">1</text>
+        <text class="label" x="360" y="452">-1</text>
+      </svg>
+    </div>
+
+    <div class="controls">
+      <label>
+        position on circle
+        <input id="angle" type="range" min="180" max="360" value="180" step="1">
+      </label>
+      <div class="coord-card">
+        <div><strong>x</strong> = <span id="xValue">-1.000</span></div>
+        <div><strong>y</strong> = <span id="yValue">0.000</span></div>
+        <div><strong>angle</strong> = <span id="angleValue">180&deg;</span></div>
+      </div>
+      <button id="reset" type="button">Reset to left</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const cx = 350;
+  const cy = 260;
+  const r = 185;
+  const svg = document.getElementById("canvas");
+  const grid = document.getElementById("grid");
+  const cowboy = document.getElementById("cowboy");
+  const cowboyLabel = document.getElementById("cowboyLabel");
+  const slider = document.getElementById("angle");
+  const travelPath = document.getElementById("travelPath");
+  const xHelper = document.getElementById("xHelper");
+  const yHelper = document.getElementById("yHelper");
+  const xValue = document.getElementById("xValue");
+  const yValue = document.getElementById("yValue");
+  const angleValue = document.getElementById("angleValue");
+  const status = document.getElementById("status");
+  const reset = document.getElementById("reset");
+  let dragging = false;
+
+  function addLine(className, x1, y1, x2, y2) {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("class", className);
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    grid.appendChild(line);
+  }
+
+  for (let i = -1; i <= 1; i += 0.5) {
+    if (i === 0) continue;
+    addLine("grid", cx + i * r, cy - r - 10, cx + i * r, cy + r + 10);
+    addLine("grid", cx - r - 10, cy - i * r, cx + r + 10, cy - i * r);
+  }
+
+  function pointAt(deg) {
+    const rad = deg * Math.PI / 180;
+    return {
+      x: cx + Math.cos(rad) * r,
+      y: cy - Math.sin(rad) * r,
+      ux: Math.cos(rad),
+      uy: Math.sin(rad)
+    };
+  }
+
+  function fmt(value) {
+    return Math.abs(value) < 0.0005 ? "0.000" : value.toFixed(3);
+  }
+
+  function arcPath(from, to) {
+    const start = pointAt(from);
+    const end = pointAt(to);
+    const large = Math.abs(to - from) > 180 ? 1 : 0;
+    return `M ${start.x} ${start.y} A ${r} ${r} 0 ${large} 0 ${end.x} ${end.y}`;
+  }
+
+  function render() {
+    const deg = Number(slider.value);
+    const p = pointAt(deg);
+    cowboy.setAttribute("transform", `translate(${p.x} ${p.y})`);
+    cowboyLabel.setAttribute("x", p.x);
+    cowboyLabel.setAttribute("y", p.y - 26);
+    travelPath.setAttribute("d", arcPath(180, deg));
+    xHelper.setAttribute("x1", cx);
+    xHelper.setAttribute("y1", cy);
+    xHelper.setAttribute("x2", p.x);
+    xHelper.setAttribute("y2", cy);
+    yHelper.setAttribute("x1", p.x);
+    yHelper.setAttribute("y1", cy);
+    yHelper.setAttribute("x2", p.x);
+    yHelper.setAttribute("y2", p.y);
+    xValue.textContent = fmt(p.ux);
+    yValue.textContent = fmt(p.uy);
+    angleValue.innerHTML = `${deg}&deg;`;
+    status.textContent = deg >= 356 ? "arrived: (1, 0)" : `position: (${fmt(p.ux)}, ${fmt(p.uy)})`;
+  }
+
+  function angleFromEvent(event) {
+    const rect = svg.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 700;
+    const y = ((event.clientY - rect.top) / rect.height) * 520;
+    let deg = Math.atan2(cy - y, x - cx) * 180 / Math.PI;
+    if (deg < 0) deg += 360;
+    if (deg < 180) deg = 360;
+    return Math.max(180, Math.min(360, Math.round(deg)));
+  }
+
+  function setFromEvent(event) {
+    slider.value = String(angleFromEvent(event));
+    render();
+  }
+
+  slider.addEventListener("input", render);
+  reset.addEventListener("click", () => {
+    slider.value = "180";
+    render();
+  });
+
+  cowboy.addEventListener("pointerdown", (event) => {
+    dragging = true;
+    svg.setPointerCapture(event.pointerId);
+    setFromEvent(event);
+  });
+  svg.addEventListener("pointermove", (event) => {
+    if (dragging) setFromEvent(event);
+  });
+  svg.addEventListener("pointerup", (event) => {
+    dragging = false;
+    try { svg.releasePointerCapture(event.pointerId); } catch (error) {}
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

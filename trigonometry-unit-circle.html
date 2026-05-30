@@ -50,9 +50,74 @@
           loading="lazy"
         ></iframe>
 
-        <p>Here's the thing you have to appreciate: orientation in a 2D space is intrinsically circular.</p>
+        <p>Notice this and think about it: <strong>orientation in a 2D space is intrinsically circular</strong>.</p>
 
-        <p>Not only does it loop back on itself, but it has all the properties of a circle. For example, north has an opposite, south. The amount of rotation required to turn from north to east is the same as to turn west to south, etc.</p>
+        <p>Take a different type of measure — not a measure of angle, but a measure of temperature. If we move in one direction we would only ever get hotter or colder.</p>
+
+        <figure class="trig-figure orientation-measure-figure" aria-label="Temperature as a line compared with degrees as a circle">
+          <svg viewBox="0 0 920 330" role="img">
+            <defs>
+              <marker id="temperature-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.62)" />
+              </marker>
+              <marker id="orientation-loop-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#e8a13b" />
+              </marker>
+            </defs>
+
+            <g transform="translate(66 52)">
+              <text class="orientation-measure-title" x="170" y="0" text-anchor="middle">Temperature</text>
+              <line class="temperature-line" x1="18" y1="126" x2="322" y2="126" marker-start="url(#temperature-arrow)" marker-end="url(#temperature-arrow)" />
+              <text class="orientation-measure-label" x="18" y="162" text-anchor="middle">colder</text>
+              <text class="orientation-measure-label" x="322" y="162" text-anchor="middle">hotter</text>
+              <text class="orientation-measure-value" x="170" y="116" text-anchor="middle">temperature measure</text>
+            </g>
+
+            <g transform="translate(586 48)">
+              <text class="orientation-measure-title" x="120" y="0" text-anchor="middle">Degrees</text>
+              <circle class="orientation-measure-circle" cx="120" cy="130" r="92" />
+              <path class="orientation-loop" d="M 210 130 A 90 90 0 1 1 183 65" marker-end="url(#orientation-loop-arrow)" />
+              <text class="orientation-measure-value" x="120" y="36" text-anchor="middle">90°</text>
+              <text class="orientation-measure-value" x="220" y="136" text-anchor="middle">0°</text>
+              <text class="orientation-measure-value" x="120" y="238" text-anchor="middle">270°</text>
+              <text class="orientation-measure-value" x="20" y="136" text-anchor="middle">180°</text>
+            </g>
+          </svg>
+        </figure>
+
+        <p>However, if we move in one direction in terms of orientation, we will end up where we started. Just like the cowboy who only went left.</p>
+
+        <h4 class="subsection-subtitle">Constrained Movement</h4>
+
+        <p>The cowboy can only move along the circle.</p>
+
+        <p>He is on the left. The tavern is on the right.</p>
+
+        <p>In order to move rightwards, he must also move upwards (or downwards).</p>
+
+        <p>Let's impose an $xy$ grid to make things clearer.</p>
+
+        <iframe
+          class="essay-widget constrained-movement-widget"
+          src="trigonometry/unit-circle/constrained-movement-widget.html"
+          title="Interactive widget showing movement constrained to a circular path"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>To move around a circle, we are never moving purely horizontally or purely vertically.</p>
+
+        <p>If one coordinate changes, the other must change in a way that preserves the circle: sometimes $x$ go up as $y$ goes down, or the inverse, or they both go up or down at the same time.</p>
+
+        <p>The point is that every movement is a combination of horizontal and vertical changes.</p>
+
+        <p>The proportions of those changes continually vary, but they are constrained so that the point remains on the circle.</p>
+
+        <p>This suggests something interesting.</p>
+
+        <p>While an angle appears to be a single quantity, its motion around a circle can be represented by two coupled quantities.</p>
+
+        <p>As one changes, the other must change in a way that preserves the circular structure.</p>
 
         <h3 class="subsection-title">Opening</h3>
 

@@ -1171,6 +1171,51 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-size: 13px;
 }
 
+.trigonometry-unit-circle-page .orientation-measure-figure {
+  max-width: 920px;
+}
+
+.trigonometry-unit-circle-page .orientation-measure-figure svg {
+  min-height: 300px;
+}
+
+.orientation-measure-title {
+  fill: var(--intro-text);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 22px;
+}
+
+.orientation-measure-label,
+.orientation-measure-value {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
+.orientation-measure-value {
+  fill: var(--intro-accent);
+}
+
+.temperature-line {
+  stroke: rgba(236, 226, 209, 0.62);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.orientation-measure-circle {
+  fill: rgba(0, 0, 0, 0.08);
+  stroke: rgba(236, 226, 209, 0.58);
+  stroke-width: 2.4;
+}
+
+.orientation-loop {
+  fill: none;
+  stroke: #e8a13b;
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(232, 161, 59, 0.28));
+}
+
 .intro-linear-algebra-page blockquote {
   margin-top: 1rem;
   margin-bottom: 1.6rem;
@@ -1314,6 +1359,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .intro-linear-algebra-page .cowboy-orientation-widget {
   width: min(100%, 980px);
   height: 690px;
+}
+
+.intro-linear-algebra-page .constrained-movement-widget {
+  width: min(100%, 980px);
+  height: 700px;
 }
 
 .intro-linear-algebra-page .right-angle-ratios-widget {
