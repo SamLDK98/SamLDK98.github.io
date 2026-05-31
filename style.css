@@ -1374,6 +1374,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 1120px;
 }
 
+.intro-linear-algebra-page .sine-cosine-ratio-builder-widget {
+  width: min(100%, 1060px);
+  height: 760px;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }

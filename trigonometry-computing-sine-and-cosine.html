@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4: Computing Sine and Cosine | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-computing-sine-cosine-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">4: Computing Sine and Cosine</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h3 class="subsection-title">Sine and Cosine</h3>
+
+        <p>Sine and Cosine were originally not thought of as 'functions' per se.</p>
+
+        <p>They were just names for specific ratios between sides.</p>
+
+        <p class="display-equation">$$sine = \huge \frac{o}{h}$$</p>
+
+        <p>We could say "For a right-angled triangle with the angles $60^\circ$ and $30^\circ$, what is the sine ratio?"</p>
+
+        <h3 class="subsection-title">Finding Ratios Geometrically</h3>
+
+        <p>The sine function considers only angles. But if these ratios are concerned with side lengths, where does the information needed to derive these ratios come from with only angles?</p>
+
+        <p>Finding a ratio with only angle information:</p>
+
+        <p>Consider a right triangle with angles $90^\circ$, $60^\circ$, and $30^\circ$.</p>
+
+        <p>To simplify the calculations, let the hypotenuse have length $1$.</p>
+
+        <iframe
+          class="essay-widget sine-cosine-ratio-builder-widget"
+          src="trigonometry/computing-sine-cosine/sine-cosine-ratio-builder-widget.html"
+          title="Interactive widget for deriving sine and cosine ratios from a 30-60-90 triangle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Now duplicate the triangle and place the copy beside it. The two triangles form an equilateral triangle.</p>
+
+        <p>Because the resulting triangle is equilateral:</p>
+
+        <ul>
+          <li>All three sides have length $1$.</li>
+          <li>All three angles are $60^\circ$.</li>
+        </ul>
+
+        <p>The side that was split by our construction therefore has total length $1$, meaning each half has length $\frac{1}{2}$.</p>
+
+        <p>Returning to our original right triangle, we now know:</p>
+
+        <ul>
+          <li>$\text{hypotenuse} = 1$</li>
+          <li>$\text{shorter side} = \frac{1}{2}$</li>
+        </ul>
+
+        <p>We can also find the remaining side using Pythagoras:</p>
+
+        <p class="display-equation">$$\left(\frac{1}{2}\right)^2 + x^2 = 1^2$$</p>
+        <p class="display-equation">$$\frac{1}{4} + x^2 = 1$$</p>
+        <p class="display-equation">$$x^2 = \frac{3}{4}$$</p>
+        <p class="display-equation">$$x = \frac{\sqrt{3}}{2}$$</p>
+
+        <p>We now know:</p>
+
+        <ul>
+          <li>$\text{hypotenuse} = 1$</li>
+          <li>$\text{leg 1} = \frac{1}{2}$</li>
+          <li>$\text{leg 2} = \frac{\sqrt{3}}{2}$</li>
+        </ul>
+
+        <p>Now finding the ratios just requires setting an opposite and adjacent side, let's say:</p>
+
+        <p class="display-equation">$$h= 1,\qquad o = \frac{1}{2}, \qquad a = \frac{\sqrt{3}}{2}$$</p>
+
+        <p class="display-equation">$\large sine = \frac{o}{h}$</p>
+
+        <p class="display-equation">$\large cosine = \frac{a}{h}$</p>
+
+        <p class="display-equation">$sine = \frac{0.5}{1} = 0.5$</p>
+
+        <p class="display-equation">cosine  = $\frac{\frac{\sqrt{3}}{2}}{1} = \frac{\sqrt{3}}{2}$</p>
+
+        <p>Mathematicians would then record the answers in something they called "Trigonometric Tables", so that if they encountered such an angle they could immediately find the ratios between side lengths. While calculating the above ratio was relatively straightforward, it is much more challenging with more awkward values and so these tables became very useful.</p>
+
+        <div class="responsive-table trig-ratio-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Angle</th>
+                <th>Sine Ratio</th>
+                <th>Cosine Ratio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$30^\circ$</td>
+                <td>0.5</td>
+                <td>$\frac{\sqrt{3}}{2}$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-unit-circle.html">
+            <span>Previous</span>
+            <strong>3: The Unit Circle</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
+            <span>Next</span>
+            <strong>Misc</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
