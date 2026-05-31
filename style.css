@@ -206,6 +206,151 @@ body {
   white-space: nowrap;
 }
 
+.trigonometry-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(33, 28, 24, 0.96) 0%, rgba(22, 19, 17, 1) 46%, rgba(18, 16, 14, 1) 100%);
+  color: #efe7d8;
+}
+
+.trigonometry-page .trig-index-hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(2.6rem, 6vw, 4.8rem) 1.4rem 1.1rem;
+  display: block;
+  text-align: center;
+}
+
+.trigonometry-page .trig-index-kicker {
+  margin-bottom: 0.55rem;
+  color: #b9a989;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.trigonometry-page .article-index-hero h1 {
+  color: #f3eadb;
+  font-family: "Fraunces", var(--font-head);
+  font-size: clamp(2.7rem, 8vw, 6.2rem);
+  font-weight: 500;
+  line-height: 0.96;
+  text-align: center;
+}
+
+.trigonometry-page .trig-index-intro {
+  max-width: 34rem;
+  margin: 0.95rem auto 0;
+  color: #bfb29a;
+  font-size: clamp(1.05rem, 1.9vw, 1.28rem);
+  line-height: 1.45;
+}
+
+.trigonometry-page .article-index-rule {
+  width: min(100%, 44rem);
+  height: 1px;
+  margin: 1.55rem auto 0;
+  background: linear-gradient(90deg, transparent, rgba(232, 161, 59, 0.74), rgba(109, 211, 196, 0.62), transparent);
+}
+
+.trigonometry-page .article-index-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.55rem 1.4rem 5rem;
+}
+
+.trigonometry-page .trig-chapter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.trigonometry-page .trig-chapter-card {
+  min-height: 13.5rem;
+  padding: 1.15rem 1.2rem 1.05rem;
+  border: 1px solid rgba(211, 190, 157, 0.22);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(34, 29, 25, 0.95), rgba(25, 22, 19, 0.98));
+  color: #efe7d8;
+  box-shadow: inset 0 1px 0 rgba(255, 244, 220, 0.06), 0 18px 50px rgba(0, 0, 0, 0.18);
+}
+
+.trigonometry-page .trig-chapter-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #e8a13b, #6dd3c4);
+  opacity: 0.82;
+}
+
+.trigonometry-page .trig-chapter-card:nth-child(2)::before {
+  background: linear-gradient(90deg, #6dd3c4, #ef7398);
+}
+
+.trigonometry-page .trig-chapter-card:nth-child(3)::before {
+  background: linear-gradient(90deg, #ef7398, #f1c66e);
+}
+
+.trigonometry-page .trig-chapter-card:nth-child(4)::before {
+  background: linear-gradient(90deg, #f1c66e, #8bc6ff);
+}
+
+.trigonometry-page .trig-chapter-card-archive {
+  min-height: 11.5rem;
+}
+
+.trigonometry-page .trig-chapter-card:hover,
+.trigonometry-page .trig-chapter-card:focus-visible {
+  border-color: rgba(232, 202, 151, 0.62);
+  background:
+    linear-gradient(180deg, rgba(42, 36, 31, 0.98), rgba(29, 25, 22, 1));
+  transform: translateY(-3px);
+}
+
+.trigonometry-page .trig-card-number {
+  display: block;
+  margin-bottom: 0.78rem;
+  color: #a89980;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.trigonometry-page .article-card-title {
+  max-width: 12.5em;
+  color: #f2e8d8;
+  font-family: "Fraunces", var(--font-body);
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.03;
+}
+
+.trigonometry-page .trig-card-summary {
+  display: block;
+  max-width: 26rem;
+  margin-top: 0.82rem;
+  color: #b7aa93;
+  font-size: 0.94rem;
+  line-height: 1.38;
+}
+
+.trigonometry-page .article-card-footer {
+  color: #b9a989;
+  font-family: "JetBrains Mono", Consolas, monospace;
+}
+
+.trigonometry-page .article-card-footer strong {
+  color: #e8c986;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .landing-box,
 .corner-box {
   display: flex;
@@ -1379,6 +1524,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
+.intro-linear-algebra-page .angle-interest-widget {
+  width: min(100%, 980px);
+  height: 680px;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }
@@ -1948,6 +2098,29 @@ header {
     gap: 0.8rem;
   }
 
+  .trigonometry-page .trig-index-hero {
+    padding-top: 2.35rem;
+    text-align: left;
+  }
+
+  .trigonometry-page .article-index-hero h1,
+  .trigonometry-page .trig-index-intro {
+    text-align: left;
+  }
+
+  .trigonometry-page .trig-index-intro {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .trigonometry-page .article-index-rule {
+    margin-left: 0;
+  }
+
+  .trigonometry-page .trig-chapter-grid {
+    grid-template-columns: 1fr;
+  }
+
   .article-card,
   .article-card-featured {
     grid-column: auto;
@@ -1957,6 +2130,10 @@ header {
 
   .article-card-title {
     font-size: clamp(1.75rem, 9vw, 2.45rem);
+  }
+
+  .trigonometry-page .trig-chapter-card {
+    min-height: 11rem;
   }
 
   .trig-figure-grid {

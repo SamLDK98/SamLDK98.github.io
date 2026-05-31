@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angle of Interest</title>
+<style>
+  :root {
+    --bg: #161311;
+    --panel: #1e1a17;
+    --rule: rgba(214, 196, 168, 0.14);
+    --rule-strong: rgba(214, 196, 168, 0.3);
+    --text: #ece2d1;
+    --dim: #a89c87;
+    --accent: #d4b888;
+    --orange: #e8a13b;
+    --teal: #6dd3c4;
+    --green: #88c97c;
+    --pink: #ef7398;
+    --grid: rgba(236, 226, 209, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: transparent;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body { padding: 1rem; }
+
+  .widget {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--panel);
+    overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    padding: 1.05rem 1.25rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.25rem, 2.2vw, 1.8rem);
+    font-weight: 500;
+  }
+
+  .mini {
+    color: var(--dim);
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+
+  .stage {
+    min-height: 500px;
+    padding: 1rem;
+    border-right: 1px solid var(--rule);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 500px;
+    user-select: none;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+    padding: 1.15rem;
+    background: rgba(0, 0, 0, 0.13);
+  }
+
+  .control-block {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+  }
+
+  button {
+    min-height: 2.5rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover,
+  button.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: rgba(232, 161, 59, 0.08);
+  }
+
+  .ratio-panel {
+    display: grid;
+    gap: 0.7rem;
+    padding: 0.9rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.13);
+  }
+
+  .ratio {
+    display: grid;
+    grid-template-columns: 3.2rem 1fr;
+    gap: 0.7rem;
+    align-items: center;
+    color: var(--text);
+    font-size: 1.02rem;
+  }
+
+  .ratio-name {
+    color: var(--accent);
+    font-family: "Courier New", monospace;
+    font-size: 0.86rem;
+  }
+
+  .fraction {
+    display: inline-grid;
+    grid-template-rows: auto 1px auto;
+    min-width: 3.4rem;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .fraction::before {
+    content: "";
+    grid-row: 2;
+    background: currentColor;
+  }
+
+  .fraction span:first-child { grid-row: 1; }
+  .fraction span:last-child { grid-row: 3; }
+
+  .note {
+    margin: 0;
+    color: var(--dim);
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .side {
+    stroke-width: 7;
+    stroke-linecap: round;
+    cursor: pointer;
+    transition: stroke-width 140ms ease, filter 140ms ease;
+  }
+
+  .side:hover,
+  .side.selected,
+  .side.chosen {
+    stroke-width: 9;
+    filter: drop-shadow(0 0 7px rgba(232, 161, 59, 0.42));
+  }
+
+  .side.chosen {
+    filter: drop-shadow(0 0 9px rgba(136, 201, 124, 0.5));
+  }
+
+  .base { stroke: var(--orange); }
+  .height { stroke: var(--teal); }
+  .hyp { stroke: var(--accent); }
+  .axis { stroke: rgba(236, 226, 209, 0.24); stroke-width: 1; }
+  .angle-arc { fill: none; stroke: var(--green); stroke-width: 4; stroke-linecap: round; }
+  .angle-arc.inactive { stroke: rgba(236, 226, 209, 0.16); }
+  .right-angle { fill: none; stroke: var(--dim); stroke-width: 2; }
+  .label {
+    fill: var(--text);
+    font-family: "Courier New", monospace;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .small-label {
+    fill: var(--dim);
+    font-size: 15px;
+    font-weight: 400;
+  }
+  .op-label { fill: var(--teal); }
+  .adj-label { fill: var(--orange); }
+  .hyp-label { fill: var(--accent); }
+  .angle-label { fill: var(--green); }
+
+  @media (max-width: 760px) {
+    body { padding: 0.7rem; }
+    .header { display: block; }
+    .mini { margin-top: 0.45rem; }
+    .main { grid-template-columns: 1fr; }
+    .stage {
+      min-height: 360px;
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    svg { height: 360px; }
+  }
+</style>
+</head>
+<body>
+  <div class="widget">
+    <div class="header">
+      <h1>Choosing the angle of interest</h1>
+      <div class="mini">30-60-90 triangle</div>
+    </div>
+
+    <div class="main">
+      <div class="stage">
+        <svg viewBox="0 0 620 500" role="img" aria-label="Right triangle with selectable angle of interest">
+          <line class="axis" x1="70" y1="390" x2="550" y2="390"></line>
+          <line class="axis" x1="450" y1="80" x2="450" y2="430"></line>
+
+          <path id="arc30" class="angle-arc" d="M 352 390 A 98 98 0 0 0 365.1 341"></path>
+          <path id="arc60" class="angle-arc inactive" d="M 431 253 A 92 92 0 0 0 383.1 279.5"></path>
+          <path class="right-angle" d="M 420 390 L 420 360 L 450 360"></path>
+
+          <line id="baseSide" class="side base" x1="150" y1="390" x2="450" y2="390"></line>
+          <line id="heightSide" class="side height" x1="450" y1="390" x2="450" y2="130"></line>
+          <line id="hypSide" class="side hyp" x1="150" y1="390" x2="450" y2="130"></line>
+
+          <text id="angle30Label" class="label angle-label" x="330" y="371">30°</text>
+          <text id="angle60Label" class="label small-label" x="392" y="253">60°</text>
+          <text class="label small-label" x="424" y="349">90°</text>
+
+          <text id="baseLabel" class="label" x="272" y="430">√3/2</text>
+          <text id="heightLabel" class="label" x="468" y="270">1/2</text>
+          <text id="hypLabel" class="label" x="266" y="235">1</text>
+
+          <text id="baseRole" class="label adj-label" x="252" y="462">adjacent</text>
+          <text id="heightRole" class="label op-label" x="484" y="235">opposite</text>
+          <text class="label hyp-label" x="232" y="207">hypotenuse</text>
+        </svg>
+      </div>
+
+      <div class="controls">
+        <div class="control-block">
+          <div class="mini">Angle of interest</div>
+          <div class="button-row">
+            <button id="angle30" class="active" type="button">30°</button>
+            <button id="angle60" type="button">60°</button>
+          </div>
+        </div>
+
+        <div class="control-block">
+          <div class="mini">Assign sides</div>
+          <p class="note">Click the orange or blue side, then decide whether it is opposite or adjacent to the angle you are choosing.</p>
+          <div class="button-row">
+            <button id="makeOpposite" type="button">Set opposite</button>
+            <button id="makeAdjacent" type="button">Set adjacent</button>
+          </div>
+          <button id="reset" type="button">Reset</button>
+        </div>
+
+        <div class="ratio-panel" aria-live="polite">
+          <div class="mini">Ratios for selected angle</div>
+          <div class="ratio">
+            <span class="ratio-name">sin</span>
+            <span><span class="fraction"><span id="sinTop">1/2</span><span id="sinBottom">1</span></span> = <span id="sinValue">1/2</span></span>
+          </div>
+          <div class="ratio">
+            <span class="ratio-name">cos</span>
+            <span><span class="fraction"><span id="cosTop">√3/2</span><span id="cosBottom">1</span></span> = <span id="cosValue">√3/2</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const state = { angle: 30, selectedSide: 'height' };
+  const buttons = {
+    angle30: document.getElementById('angle30'),
+    angle60: document.getElementById('angle60'),
+    makeOpposite: document.getElementById('makeOpposite'),
+    makeAdjacent: document.getElementById('makeAdjacent'),
+    reset: document.getElementById('reset')
+  };
+  const els = {
+    arc30: document.getElementById('arc30'),
+    arc60: document.getElementById('arc60'),
+    angle30Label: document.getElementById('angle30Label'),
+    angle60Label: document.getElementById('angle60Label'),
+    baseSide: document.getElementById('baseSide'),
+    heightSide: document.getElementById('heightSide'),
+    baseRole: document.getElementById('baseRole'),
+    heightRole: document.getElementById('heightRole'),
+    sinTop: document.getElementById('sinTop'),
+    sinBottom: document.getElementById('sinBottom'),
+    sinValue: document.getElementById('sinValue'),
+    cosTop: document.getElementById('cosTop'),
+    cosBottom: document.getElementById('cosBottom'),
+    cosValue: document.getElementById('cosValue')
+  };
+
+  function render() {
+    const isThirty = state.angle === 30;
+    buttons.angle30.classList.toggle('active', isThirty);
+    buttons.angle60.classList.toggle('active', !isThirty);
+    els.arc30.classList.toggle('inactive', !isThirty);
+    els.arc60.classList.toggle('inactive', isThirty);
+    els.angle30Label.classList.toggle('small-label', !isThirty);
+    els.angle30Label.classList.toggle('angle-label', isThirty);
+    els.angle60Label.classList.toggle('small-label', isThirty);
+    els.angle60Label.classList.toggle('angle-label', !isThirty);
+
+    els.baseSide.classList.toggle('selected', isThirty);
+    els.heightSide.classList.toggle('selected', !isThirty);
+    els.baseSide.classList.toggle('chosen', state.selectedSide === 'base');
+    els.heightSide.classList.toggle('chosen', state.selectedSide === 'height');
+
+    if (isThirty) {
+      els.baseRole.textContent = 'adjacent';
+      els.baseRole.setAttribute('class', 'label adj-label');
+      els.heightRole.textContent = 'opposite';
+      els.heightRole.setAttribute('class', 'label op-label');
+      els.sinTop.textContent = '1/2';
+      els.sinBottom.textContent = '1';
+      els.sinValue.textContent = '1/2';
+      els.cosTop.textContent = '√3/2';
+      els.cosBottom.textContent = '1';
+      els.cosValue.textContent = '√3/2';
+    } else {
+      els.baseRole.textContent = 'opposite';
+      els.baseRole.setAttribute('class', 'label op-label');
+      els.heightRole.textContent = 'adjacent';
+      els.heightRole.setAttribute('class', 'label adj-label');
+      els.sinTop.textContent = '√3/2';
+      els.sinBottom.textContent = '1';
+      els.sinValue.textContent = '√3/2';
+      els.cosTop.textContent = '1/2';
+      els.cosBottom.textContent = '1';
+      els.cosValue.textContent = '1/2';
+    }
+  }
+
+  buttons.angle30.addEventListener('click', () => {
+    state.angle = 30;
+    state.selectedSide = 'height';
+    render();
+  });
+
+  buttons.angle60.addEventListener('click', () => {
+    state.angle = 60;
+    state.selectedSide = 'base';
+    render();
+  });
+
+  els.baseSide.addEventListener('click', () => {
+    state.selectedSide = 'base';
+    render();
+  });
+
+  els.heightSide.addEventListener('click', () => {
+    state.selectedSide = 'height';
+    render();
+  });
+
+  buttons.makeOpposite.addEventListener('click', () => {
+    state.angle = state.selectedSide === 'base' ? 60 : 30;
+    render();
+  });
+
+  buttons.makeAdjacent.addEventListener('click', () => {
+    state.angle = state.selectedSide === 'base' ? 30 : 60;
+    render();
+  });
+
+  buttons.reset.addEventListener('click', () => {
+    state.angle = 30;
+    state.selectedSide = 'height';
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
