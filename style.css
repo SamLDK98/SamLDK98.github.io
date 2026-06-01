@@ -1666,6 +1666,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 680px;
 }
 
+.intro-linear-algebra-page .triangle-orientation-widget {
+  width: min(100%, 980px);
+  height: 660px;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }

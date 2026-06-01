@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Right Triangle Orientation</title>
+<style>
+  :root {
+    --panel: #1e1a17;
+    --rule: rgba(214, 196, 168, 0.14);
+    --rule-strong: rgba(214, 196, 168, 0.3);
+    --text: #ece2d1;
+    --dim: #a89c87;
+    --accent: #d4b888;
+    --orange: #e8a13b;
+    --teal: #6dd3c4;
+    --green: #88c97c;
+    --pink: #ef7398;
+    --grid: rgba(236, 226, 209, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: transparent;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body { padding: 1rem; }
+
+  .widget {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--panel);
+    overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    padding: 1rem 1.2rem 0.85rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.2rem, 2.1vw, 1.75rem);
+    font-weight: 500;
+  }
+
+  .mini {
+    color: var(--dim);
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .stage {
+    min-height: 480px;
+    padding: 1rem;
+    border-right: 1px solid var(--rule);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 480px;
+    user-select: none;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.1rem;
+    background: rgba(0, 0, 0, 0.13);
+  }
+
+  .button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+  }
+
+  button {
+    min-height: 2.45rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: rgba(232, 161, 59, 0.08);
+  }
+
+  .slider-row {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--orange);
+  }
+
+  .facts {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.85rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.13);
+    color: var(--dim);
+    font-family: "Courier New", monospace;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .facts strong { color: var(--text); font-weight: 500; }
+
+  .grid-line {
+    stroke: var(--grid);
+    stroke-width: 1;
+  }
+
+  .triangle-fill {
+    fill: rgba(232, 161, 59, 0.08);
+    stroke: rgba(236, 226, 209, 0.18);
+    stroke-width: 1;
+  }
+
+  .side {
+    fill: none;
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .base { stroke: var(--orange); }
+  .height { stroke: var(--teal); }
+  .hyp { stroke: var(--accent); }
+
+  .arc {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .arc-a { stroke: var(--pink); }
+  .arc-b { stroke: var(--green); }
+  .right-angle {
+    fill: none;
+    stroke: var(--dim);
+    stroke-width: 2.3;
+  }
+
+  .label {
+    fill: var(--text);
+    font-family: "Courier New", monospace;
+    font-size: 18px;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+
+  .label-a { fill: var(--pink); }
+  .label-b { fill: var(--green); }
+  .label-r { fill: var(--dim); }
+
+  @media (max-width: 760px) {
+    body { padding: 0.7rem; }
+    .header { display: block; }
+    .mini { margin-top: 0.45rem; }
+    .main { grid-template-columns: 1fr; }
+    .stage {
+      min-height: 370px;
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    svg { height: 370px; }
+  }
+</style>
+</head>
+<body>
+  <div class="widget">
+    <div class="header">
+      <h1>Same triangle, different orientation</h1>
+      <div class="mini">right angle preserved</div>
+    </div>
+
+    <div class="main">
+      <div class="stage">
+        <svg id="svg" viewBox="0 0 620 480" role="img" aria-label="Right triangle whose orientation and acute angles can be changed">
+          <g id="grid"></g>
+          <g id="tri"></g>
+        </svg>
+      </div>
+
+      <div class="controls">
+        <div class="mini">Orientation</div>
+        <div class="button-grid">
+          <button id="rotateLeft" type="button">Rotate left</button>
+          <button id="rotateRight" type="button">Rotate right</button>
+          <button id="flip" type="button">Flip</button>
+          <button id="swap" type="button">Swap 30/60</button>
+        </div>
+
+        <div class="slider-row">
+          <label class="mini" for="angleSlider">Change acute angles</label>
+          <input id="angleSlider" type="range" min="15" max="75" step="1" value="60">
+        </div>
+
+        <div class="facts" aria-live="polite">
+          <div><strong id="angleFact">60° + 30° + 90°</strong></div>
+          <div>Rotate or flip: the triangle keeps the same internal angle structure.</div>
+          <div>Move the slider: the actual shape changes because the acute angles change.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const state = {
+    angleA: 60,
+    rotation: 0,
+    flipped: false
+  };
+
+  const tri = document.getElementById('tri');
+  const grid = document.getElementById('grid');
+  const angleSlider = document.getElementById('angleSlider');
+  const angleFact = document.getElementById('angleFact');
+
+  function make(tag, attrs = {}) {
+    const el = document.createElementNS(svgNS, tag);
+    Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+    return el;
+  }
+
+  function drawGrid() {
+    for (let x = 40; x <= 580; x += 40) {
+      grid.appendChild(make('line', { class: 'grid-line', x1: x, y1: 40, x2: x, y2: 440 }));
+    }
+    for (let y = 40; y <= 440; y += 40) {
+      grid.appendChild(make('line', { class: 'grid-line', x1: 40, y1: y, x2: 580, y2: y }));
+    }
+  }
+
+  function rotatePoint(p, angleDeg) {
+    const angle = angleDeg * Math.PI / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    const x = state.flipped ? -p.x : p.x;
+    return {
+      x: x * cos - p.y * sin,
+      y: x * sin + p.y * cos
+    };
+  }
+
+  function toScreen(p) {
+    const rotated = rotatePoint(p, state.rotation);
+    return { x: 310 + rotated.x, y: 250 + rotated.y };
+  }
+
+  function linePath(points) {
+    return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
+  }
+
+  function arcPath(vertex, side1, side2, radius) {
+    const a1 = Math.atan2(side1.y - vertex.y, side1.x - vertex.x);
+    const a2 = Math.atan2(side2.y - vertex.y, side2.x - vertex.x);
+    const p1 = { x: vertex.x + radius * Math.cos(a1), y: vertex.y + radius * Math.sin(a1) };
+    const p2 = { x: vertex.x + radius * Math.cos(a2), y: vertex.y + radius * Math.sin(a2) };
+    let diff = Math.abs(a2 - a1);
+    if (diff > Math.PI) diff = Math.PI * 2 - diff;
+    return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${radius} ${radius} 0 0 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+
+  function midpoint(a, b, offset = 0) {
+    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 + offset };
+  }
+
+  function render() {
+    tri.replaceChildren();
+
+    const angleA = state.angleA;
+    const angleB = 90 - angleA;
+    const hyp = 260;
+    const base = hyp * Math.cos(angleA * Math.PI / 180);
+    const height = hyp * Math.sin(angleA * Math.PI / 180);
+
+    const R0 = { x: 85, y: 80 };
+    const A0 = { x: 85 - base, y: 80 };
+    const B0 = { x: 85, y: 80 - height };
+    const A = toScreen(A0);
+    const R = toScreen(R0);
+    const B = toScreen(B0);
+
+    tri.appendChild(make('path', { class: 'triangle-fill', d: `${linePath([A, R, B])} Z` }));
+    tri.appendChild(make('path', { class: 'side base', d: linePath([A, R]) }));
+    tri.appendChild(make('path', { class: 'side height', d: linePath([R, B]) }));
+    tri.appendChild(make('path', { class: 'side hyp', d: linePath([A, B]) }));
+
+    tri.appendChild(make('path', { class: 'arc arc-a', d: arcPath(A, R, B, 42) }));
+    tri.appendChild(make('path', { class: 'arc arc-b', d: arcPath(B, A, R, 42) }));
+
+    const rightSize = 26;
+    const r1 = toScreen({ x: 85 - rightSize, y: 80 });
+    const r2 = toScreen({ x: 85 - rightSize, y: 80 - rightSize });
+    const r3 = toScreen({ x: 85, y: 80 - rightSize });
+    tri.appendChild(make('path', { class: 'right-angle', d: linePath([r1, r2, r3]) }));
+
+    const labelA = midpoint(A, R, 38);
+    const labelB = midpoint(B, R, -16);
+    const labelR = { x: R.x + 34, y: R.y + 30 };
+
+    tri.appendChild(make('text', { class: 'label label-a', x: labelA.x, y: labelA.y })).textContent = `${angleA}°`;
+    tri.appendChild(make('text', { class: 'label label-b', x: labelB.x, y: labelB.y })).textContent = `${angleB}°`;
+    tri.appendChild(make('text', { class: 'label label-r', x: labelR.x, y: labelR.y })).textContent = '90°';
+
+    angleFact.textContent = `${angleA}° + ${angleB}° + 90°`;
+  }
+
+  document.getElementById('rotateLeft').addEventListener('click', () => {
+    state.rotation -= 90;
+    render();
+  });
+
+  document.getElementById('rotateRight').addEventListener('click', () => {
+    state.rotation += 90;
+    render();
+  });
+
+  document.getElementById('flip').addEventListener('click', () => {
+    state.flipped = !state.flipped;
+    render();
+  });
+
+  document.getElementById('swap').addEventListener('click', () => {
+    state.angleA = 90 - state.angleA;
+    angleSlider.value = state.angleA;
+    render();
+  });
+
+  angleSlider.addEventListener('input', () => {
+    state.angleA = Number(angleSlider.value);
+    render();
+  });
+
+  drawGrid();
+  render();
+</script>
+</body>
+</html>
