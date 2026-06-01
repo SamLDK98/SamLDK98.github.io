@@ -108,15 +108,12 @@
   }
 
   .angle-set {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     min-height: 15rem;
   }
 
   .angle-pill {
+    position: absolute;
     min-width: 4.3rem;
     padding: 0.55rem 0.65rem;
     border: 1px solid var(--rule-strong);
@@ -132,6 +129,10 @@
   .angle-pill.right { color: var(--dim); }
   .angle-pill.large { color: var(--pink); }
   .angle-pill.small { color: var(--green); }
+  .angle-pill.pos-top-left { left: 1.25rem; top: 0.75rem; }
+  .angle-pill.pos-top-right { right: 1.25rem; top: 0.75rem; }
+  .angle-pill.pos-bottom-left { left: 1.25rem; bottom: 0.75rem; }
+  .angle-pill.pos-bottom-right { right: 1.25rem; bottom: 0.75rem; }
 
   .hint {
     margin: 0;
@@ -310,15 +311,42 @@
     return placements[Math.floor(state.index / sets.length) % placements.length];
   }
 
+  function anglePositions(name) {
+    const positions = {
+      'bottom-right': {
+        right: 'pos-bottom-right',
+        large: 'pos-bottom-left',
+        small: 'pos-top-right'
+      },
+      'bottom-left': {
+        right: 'pos-bottom-left',
+        large: 'pos-bottom-right',
+        small: 'pos-top-left'
+      },
+      'top-right': {
+        right: 'pos-top-right',
+        large: 'pos-top-left',
+        small: 'pos-bottom-right'
+      },
+      'top-left': {
+        right: 'pos-top-left',
+        large: 'pos-top-right',
+        small: 'pos-bottom-left'
+      }
+    };
+    return positions[name];
+  }
+
   function drawAngleSet() {
     display.replaceChildren();
     const [, large, small] = orderedAngles();
-    const group = make('foreignObject', { x: 95, y: 120, width: 430, height: 190 });
+    const positions = anglePositions(placement());
+    const group = make('foreignObject', { x: 95, y: 95, width: 430, height: 240 });
     group.innerHTML = `
       <div xmlns="http://www.w3.org/1999/xhtml" class="angle-set">
-        <span class="angle-pill right">90°</span>
-        <span class="angle-pill large">${large}°</span>
-        <span class="angle-pill small">${small}°</span>
+        <span class="angle-pill right ${positions.right}">90°</span>
+        <span class="angle-pill large ${positions.large}">${large}°</span>
+        <span class="angle-pill small ${positions.small}">${small}°</span>
       </div>
     `;
     display.appendChild(group);
