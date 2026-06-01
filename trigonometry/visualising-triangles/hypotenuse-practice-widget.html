@@ -3,398 +3,588 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hypotenuse Practice</title>
+<title>Find the Hypotenuse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-
-  html,
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --gold-bright: #e8c986;
+    --gold-glow: rgba(232, 201, 134, 0.55);
+    --tri: #f0e9da;
+    --green: #88c97c;
+    --green-glow: rgba(136, 201, 124, 0.5);
+    --red: #e57994;
+    --red-glow: rgba(229, 121, 148, 0.45);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
   body {
-    margin: 0;
-    min-height: 100%;
-    background: transparent;
-    color: #111;
-    font-family: Georgia, "Times New Roman", serif;
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
   }
-
-  body { padding: 1rem; }
-
   .widget {
-    width: min(100%, 920px);
+    max-width: 720px;
     margin: 0 auto;
-    border: 1px solid #d8d2c8;
-    border-radius: 8px;
-    background: #f8f5ef;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
     overflow: hidden;
+    position: relative;
   }
-
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
   .header {
+    padding: 1.3rem 1.6rem 1rem;
+    border-bottom: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
-    align-items: end;
+    align-items: flex-end;
     gap: 1rem;
-    padding: 1rem 1.2rem 0.85rem;
-    border-bottom: 1px solid #ded8ce;
+    flex-wrap: wrap;
   }
-
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.3rem;
+  }
   h1 {
-    margin: 0;
-    color: #111;
-    font-size: clamp(1.25rem, 2.2vw, 1.8rem);
-    font-weight: 600;
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    font-variation-settings: "opsz" 144;
+    color: var(--text);
   }
-
-  .meta {
-    color: #6b6257;
-    font-family: "Courier New", monospace;
-    font-size: 0.82rem;
-    text-align: right;
+  h1 em { font-style: italic; color: var(--accent); }
+  .scoreboard {
+    display: flex;
+    gap: 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
   }
-
-  .main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 285px;
+  .scoreboard .stat { text-align: right; }
+  .scoreboard .lbl {
+    font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint);
   }
-
-  .stage {
-    min-height: 500px;
-    padding: 1rem;
-    background: #fffdf8;
-    border-right: 1px solid #ded8ce;
+  .scoreboard .num {
+    font-size: 0.98rem; color: var(--accent); font-variant-numeric: tabular-nums; margin-top: 0.1rem;
   }
-
-  svg {
-    display: block;
+  .pips {
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.85rem 1.6rem 0.15rem;
+    flex-wrap: wrap;
+  }
+  .modebar {
+    display: flex;
+    gap: 0.55rem;
+    padding: 0.8rem 1.6rem 0;
+    flex-wrap: wrap;
+  }
+  .mode-btn {
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    background: rgba(0,0,0,0.18);
+    color: var(--text-dim);
+    padding: 0.42rem 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .mode-btn:hover,
+  .mode-btn.active {
+    border-color: var(--accent);
+    color: var(--gold-bright);
+    background: rgba(212, 184, 136, 0.08);
+  }
+  .mode-btn.extreme.active {
+    border-color: var(--red);
+    color: var(--red);
+    background: rgba(229, 121, 148, 0.08);
+  }
+  .pip {
+    width: 0.5rem; height: 0.5rem; border-radius: 50%;
+    border: 1px solid var(--rule-strong);
+    background: rgba(0,0,0,0.2);
+    transition: all 0.25s;
+  }
+  .trial-spacer { height: 1.3rem; }
+  .pip.current { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,184,136,0.1); }
+  .pip.correct { background: var(--green); border-color: var(--green); }
+  .pip.wrong { background: var(--red); border-color: var(--red); }
+  .prompt {
+    text-align: center;
+    padding: 0.6rem 1.6rem 0.2rem;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.32rem;
+    color: var(--text);
+  }
+  .stage-wrap { padding: 0.6rem 1.2rem 0.4rem; }
+  svg#stage {
     width: 100%;
-    height: 500px;
-    user-select: none;
+    height: auto;
+    display: block;
+    touch-action: manipulation;
   }
-
+  #tri {
+    fill: rgba(236, 226, 209, 0.03);
+    stroke: var(--tri);
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .ov { stroke: transparent; stroke-width: 13; stroke-linecap: round; pointer-events: none; transition: stroke 0.12s; }
+  .ov.ov-hover { stroke: rgba(212, 184, 136, 0.5); }
+  .ov.ov-hyp   { stroke: var(--gold-bright); stroke-width: 8; filter: drop-shadow(0 0 7px var(--gold-glow)); }
+  .ov.ov-correct { stroke: var(--green); stroke-width: 8; filter: drop-shadow(0 0 7px var(--green-glow)); }
+  .ov.ov-wrong { stroke: var(--red); stroke-width: 8; filter: drop-shadow(0 0 7px var(--red-glow)); }
+  #ra-mark { fill: none; stroke: var(--tri); stroke-width: 2.4; opacity: 0.92; }
+  .feedback {
+    margin: 0.3rem 1.6rem;
+    min-height: 3rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: rgba(0,0,0,0.16);
+    font-style: italic;
+    font-size: 0.96rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: border-color 0.3s, background 0.3s, color 0.3s;
+  }
+  .feedback.good { border-color: var(--green); background: rgba(136,201,124,0.08); color: var(--green); font-style: normal; }
+  .feedback.bad  { border-color: var(--red);   background: rgba(229,121,148,0.06); color: var(--red); }
   .controls {
     display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-    padding: 1rem;
+    justify-content: flex-end;
+    padding: 0.5rem 1.6rem 1.4rem;
   }
-
-  .prompt {
-    margin: 0;
-    color: #111;
-    font-size: 1.18rem;
-    line-height: 1.35;
-  }
-
-  .feedback {
-    min-height: 5.8rem;
-    padding: 0.8rem;
-    border: 1px solid #ded8ce;
-    border-radius: 6px;
-    background: #fffdf8;
-    color: #6b6257;
+  .btn {
+    background: rgba(212, 184, 136, 0.14);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    padding: 0.55rem 1.1rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
     font-size: 0.98rem;
-    line-height: 1.35;
-  }
-
-  .feedback.good {
-    border-color: #338a52;
-    background: #effaf2;
-    color: #15542d;
-  }
-
-  .feedback.bad {
-    border-color: #b75145;
-    background: #fff1ef;
-    color: #7e251d;
-  }
-
-  button {
-    min-height: 2.6rem;
-    border: 1px solid #211c17;
-    border-radius: 5px;
-    background: #211c17;
-    color: #fffdf8;
-    font: inherit;
     cursor: pointer;
+    transition: background 0.18s, opacity 0.18s;
   }
-
-  button:hover:not(:disabled) {
-    background: #3a3129;
-  }
-
-  button:disabled {
-    opacity: 0.42;
-    cursor: default;
-  }
-
-  .side {
-    fill: none;
-    stroke: #111;
-    stroke-width: 10;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    cursor: pointer;
-    transition: stroke 130ms ease, stroke-width 130ms ease;
-  }
-
-  .side:hover {
-    stroke-width: 12;
-  }
-
-  .side.muted {
-    stroke: #777;
-  }
-
-  .side.correct-side {
-    stroke: #1f9f61;
-    stroke-width: 13;
-  }
-
-  .side.incorrect-side {
-    stroke: #c84d3e;
-    stroke-width: 12;
-  }
-
-  .right-marker {
-    fill: none;
-    stroke: #111;
-    stroke-width: 3;
-  }
-
-  .hidden {
+  .btn:hover:not(:disabled) { background: rgba(212, 184, 136, 0.24); }
+  .btn:disabled { opacity: 0.32; cursor: default; }
+  /* Results */
+  .results {
     display: none;
+    padding: 2.2rem 1.8rem 2.6rem;
+    text-align: center;
   }
-
-  .summary {
-    display: grid;
-    gap: 0.35rem;
-    padding: 0.8rem;
-    border: 1px solid #ded8ce;
-    border-radius: 6px;
-    background: #fffdf8;
-    color: #211c17;
-    font-family: "Courier New", monospace;
+  .results.show { display: block; }
+  .results .res-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint);
+    margin-bottom: 0.7rem;
+  }
+  .results .res-score {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 3.2rem;
+    color: var(--gold-bright);
+    line-height: 1;
+  }
+  .results .res-acc {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
     font-size: 0.9rem;
-    line-height: 1.35;
+    margin-top: 0.5rem;
+    letter-spacing: 0.04em;
   }
-
-  @media (max-width: 760px) {
-    body { padding: 0.7rem; }
-    .header { display: block; }
-    .meta { margin-top: 0.35rem; text-align: left; }
-    .main { grid-template-columns: 1fr; }
-    .stage {
-      min-height: 360px;
-      border-right: 0;
-      border-bottom: 1px solid #ded8ce;
-    }
-    svg { height: 360px; }
+  .results .res-remark {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1.15rem; color: var(--text); margin-top: 1.3rem;
   }
+  .results .res-lesson {
+    max-width: 34rem; margin: 0.7rem auto 1.7rem;
+    color: var(--text-dim); font-size: 1.02rem; line-height: 1.55;
+  }
+  .play-hidden { display: none !important; }
 </style>
 </head>
 <body>
-  <div class="widget">
-    <div class="header">
-      <h1>Click the hypotenuse</h1>
-      <div class="meta"><span id="trial">Trial 1 / 10</span><br><span id="score">Score 0</span></div>
+
+<div class="widget">
+  <div class="header">
+    <div>
+      <div class="eyebrow">Widget · Right Triangles</div>
+      <h1>Find the <em>hypotenuse</em></h1>
     </div>
-
-    <div class="main">
-      <div class="stage">
-        <svg viewBox="0 0 620 500" role="img" aria-label="Right triangle practice area">
-          <g id="triangle"></g>
-        </svg>
-      </div>
-
-      <div class="controls">
-        <p class="prompt">Click the hypotenuse.</p>
-        <div id="feedback" class="feedback">The hypotenuse is the side opposite the right angle.</div>
-        <button id="next" type="button" disabled>Next triangle</button>
-        <button id="restart" type="button" class="hidden">Restart</button>
-        <div id="summary" class="summary hidden"></div>
-      </div>
+    <div class="scoreboard" id="play-scoreboard">
+      <div class="stat"><div class="lbl">Trial</div><div class="num" id="sb-trial">1 / 50</div></div>
+      <div class="stat"><div class="lbl">Errors</div><div class="num" id="sb-score">0</div></div>
     </div>
   </div>
 
+  <div id="play-view">
+    <div class="modebar" aria-label="Difficulty mode">
+      <button class="mode-btn active" id="normal-mode" type="button">Normal Mode</button>
+      <button class="mode-btn extreme" id="extreme-mode" type="button">Extreme Difficulty Mode</button>
+    </div>
+    <div class="pips" id="pips"></div>
+    <div class="prompt">Click the hypotenuse.</div>
+    <div class="stage-wrap">
+      <svg id="stage" viewBox="0 0 600 440" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="A right-angled triangle in a random orientation. Click the side you think is the hypotenuse.">
+        <rect x="0" y="0" width="600" height="440" fill="transparent" pointer-events="all"></rect>
+        <polygon id="tri" points=""></polygon>
+        <line class="ov" id="ov0"></line>
+        <line class="ov" id="ov1"></line>
+        <line class="ov" id="ov2"></line>
+        <path id="ra-mark" d="" style="display:none"></path>
+      </svg>
+    </div>
+    <div class="feedback" id="feedback" aria-live="polite">Click the side opposite the right angle.</div>
+    <div class="trial-spacer"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="res-eyebrow">Round complete</div>
+    <div class="res-score" id="res-score">0 / 10</div>
+    <div class="res-acc" id="res-acc">0% accuracy</div>
+    <div class="res-remark" id="res-remark"></div>
+    <p class="res-lesson">The hypotenuse is not always the slanted side. It is always the side opposite the right angle.</p>
+    <button class="btn" id="play-again">Play again</button>
+  </div>
+</div>
+
 <script>
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const triangle = document.getElementById('triangle');
-  const feedback = document.getElementById('feedback');
-  const nextButton = document.getElementById('next');
-  const restartButton = document.getElementById('restart');
-  const trialEl = document.getElementById('trial');
-  const scoreEl = document.getElementById('score');
-  const summaryEl = document.getElementById('summary');
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var svg = $('#stage');
+  var triEl = $('#tri');
+  var ov = [$('#ov0'), $('#ov1'), $('#ov2')];
+  var raMark = $('#ra-mark');
+  var feedbackEl = $('#feedback');
+  var pipsEl = $('#pips');
 
-  const shapes = [
-    { name: '30-60-90', a: 60 },
-    { name: '45-45-90', a: 45 },
-    { name: 'narrow', a: 78 },
-    { name: 'wide', a: 18 },
-    { name: 'near-symmetric', a: 46 },
-    { name: 'near-symmetric', a: 44 },
-    { name: 'wide', a: 25 },
-    { name: 'narrow', a: 72 }
-  ];
+  var VBW = 600, VBH = 440, THRESH = 55;
+  var NORMAL_TOTAL = 50, EXTREME_TOTAL = 20;
+  var total = NORMAL_TOTAL, mode = 'normal';
 
-  const state = {
-    trial: 1,
-    score: 0,
-    answered: false,
-    current: null
-  };
-
-  function make(tag, attrs = {}) {
-    const el = document.createElementNS(svgNS, tag);
-    Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
-    return el;
+  // Acute-angle picker: a continuous spread plus the instructive special cases.
+  // The right angle is between the two legs; the two acute angles are alpha and 90-alpha.
+  function pickAcute() {
+    if (mode === 'extreme') {
+      if (Math.random() < 0.35) return Math.random() < 0.5 ? 5 : 85;
+      return Math.random() < 0.5 ? 44 : 46;
+    }
+    var r = Math.random();
+    if (r < 0.08) return 45;                               // 45-45-90 (isoceles)
+    if (r < 0.16) return (Math.random() < 0.5 ? 30 : 60);  // 30-60-90, either handedness
+    if (r < 0.22) return 43.5 + Math.random() * 3;         // near-symmetric ~44-46
+    return 12 + Math.random() * 66;                        // broad, near-uniform 12-78
   }
 
-  function linePath(points) {
-    return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
+  // smallest angular distance between two headings in degrees
+  function angDiff(a, b) {
+    if (b === null) return 999;
+    var d = Math.abs(a - b) % 360;
+    return d > 180 ? 360 - d : d;
   }
 
-  function rotate(p, angle) {
-    const c = Math.cos(angle);
-    const s = Math.sin(angle);
-    return { x: p.x * c - p.y * s, y: p.x * s + p.y * c };
+  var lastAcute = null, lastRotDeg = null;
+
+  // geometry helpers
+  function sub(a, b) { return { x: a.x - b.x, y: a.y - b.y }; }
+  function add(a, b) { return { x: a.x + b.x, y: a.y + b.y }; }
+  function mul(a, k) { return { x: a.x * k, y: a.y * k }; }
+  function norm(a) { var m = Math.hypot(a.x, a.y) || 1; return { x: a.x / m, y: a.y / m }; }
+
+  function distToSeg(p, a, b) {
+    var vx = b.x - a.x, vy = b.y - a.y;
+    var wx = p.x - a.x, wy = p.y - a.y;
+    var c1 = vx * wx + vy * wy;
+    if (c1 <= 0) return Math.hypot(p.x - a.x, p.y - a.y);
+    var c2 = vx * vx + vy * vy;
+    if (c2 <= c1) return Math.hypot(p.x - b.x, p.y - b.y);
+    var t = c1 / c2;
+    return Math.hypot(p.x - (a.x + t * vx), p.y - (a.y + t * vy));
   }
 
-  function normalize(v) {
-    const length = Math.hypot(v.x, v.y) || 1;
-    return { x: v.x / length, y: v.y / length };
-  }
+  function makeTriangle() {
+    // Reject picks too similar to the previous one (both angle AND orientation close),
+    // so every trial feels visibly different.
+    var alpha, rotDeg, tries = 0;
+    do {
+      alpha = pickAcute();
+      rotDeg = Math.random() * 360;
+      tries++;
+    } while (tries < 24 && lastAcute !== null &&
+             Math.abs(alpha - lastAcute) < 7 && angDiff(rotDeg, lastRotDeg) < 24);
+    lastAcute = alpha; lastRotDeg = rotDeg;
 
-  function rightAnglePath(r, a, b) {
-    const size = 28;
-    const u = normalize({ x: a.x - r.x, y: a.y - r.y });
-    const v = normalize({ x: b.x - r.x, y: b.y - r.y });
-    const p1 = { x: r.x + u.x * size, y: r.y + u.y * size };
-    const p2 = { x: p1.x + v.x * size, y: p1.y + v.y * size };
-    const p3 = { x: r.x + v.x * size, y: r.y + v.y * size };
-    return linePath([p1, p2, p3]);
-  }
+    // canonical: right angle at v0; tan(angle at P) = legB/legA, so legs come from alpha
+    var legA = 1, legB = Math.tan(alpha * Math.PI / 180);
+    var v = [ { x: 0, y: 0 }, { x: legA, y: 0 }, { x: 0, y: legB } ];
 
-  function fitPoints(points) {
-    const xs = points.map((p) => p.x);
-    const ys = points.map((p) => p.y);
-    const minX = Math.min(...xs), maxX = Math.max(...xs);
-    const minY = Math.min(...ys), maxY = Math.max(...ys);
-    const dx = 310 - (minX + maxX) / 2 + (Math.random() - 0.5) * 90;
-    const dy = 250 - (minY + maxY) / 2 + (Math.random() - 0.5) * 70;
-    return points.map((p) => ({ x: p.x + dx, y: p.y + dy }));
-  }
+    // random reflection (handedness) + full random rotation (orientation)
+    if (Math.random() < 0.5) v = v.map(function (p) { return { x: -p.x, y: p.y }; });
+    var phi = rotDeg * Math.PI / 180;
+    var c = Math.cos(phi), s = Math.sin(phi);
+    v = v.map(function (p) { return { x: p.x * c - p.y * s, y: p.x * s + p.y * c }; });
 
-  function buildTriangle() {
-    const shape = shapes[Math.floor(Math.random() * shapes.length)];
-    const hyp = 300 + Math.random() * 70;
-    const base = hyp * Math.cos(shape.a * Math.PI / 180);
-    const height = hyp * Math.sin(shape.a * Math.PI / 180);
-    const raw = [
-      { key: 'legA', x: 0, y: 0 },
-      { key: 'right', x: base, y: 0 },
-      { key: 'legB', x: base, y: -height }
+    // raw bounding box
+    var xs = v.map(function (p) { return p.x; }), ys = v.map(function (p) { return p.y; });
+    var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+    var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+    var w0 = (maxX - minX) || 1, h0 = (maxY - minY) || 1;
+
+    // random size, clamped so the rotated triangle always fits with a margin
+    var margin = 40;
+    var maxScale = Math.min((VBW - 2 * margin) / w0, (VBH - 2 * margin) / h0);
+    var wantL = 230 + Math.random() * 80;                 // target longest extent (px)
+    var scale = Math.min(wantL / Math.max(w0, h0), maxScale);
+    var w = w0 * scale, h = h0 * scale;
+
+    // free placement anywhere inside the safe area (not just centred)
+    var ox = margin + Math.random() * Math.max(0, (VBW - 2 * margin - w));
+    var oy = margin + Math.random() * Math.max(0, (VBH - 2 * margin - h));
+    var tx = ox - minX * scale, ty = oy - minY * scale;
+    v = v.map(function (p) { return { x: p.x * scale + tx, y: p.y * scale + ty }; });
+
+    // v0 is the right-angle vertex; the hypotenuse joins v1 and v2
+    var sides = [
+      { a: v[0], b: v[1], isHyp: false },
+      { a: v[1], b: v[2], isHyp: true  },
+      { a: v[2], b: v[0], isHyp: false }
     ];
-    const angle = Math.random() * Math.PI * 2;
-    const rotated = raw.map((p) => ({ ...p, ...rotate(p, angle) }));
-    const fitted = fitPoints(rotated);
-    const byKey = Object.fromEntries(fitted.map((p) => [p.key, p]));
-    return {
-      shape,
-      points: byKey,
-      sides: {
-        legA: [byKey.legA, byKey.right],
-        legB: [byKey.right, byKey.legB],
-        hyp: [byKey.legA, byKey.legB]
-      }
-    };
+    return { v: v, sides: sides };
   }
 
-  function draw() {
-    triangle.replaceChildren();
-    state.current = buildTriangle();
-    state.answered = false;
-    feedback.className = 'feedback';
-    feedback.textContent = 'The hypotenuse is the side opposite the right angle.';
-    nextButton.disabled = true;
-    summaryEl.classList.add('hidden');
-    restartButton.classList.add('hidden');
-    nextButton.classList.remove('hidden');
-    trialEl.textContent = `Trial ${state.trial} / 10`;
-    scoreEl.textContent = `Score ${state.score}`;
+  function rightAngleMarker(R, P, Q, sz) {
+    sz = sz || 16;
+    var u = norm(sub(P, R)), wv = norm(sub(Q, R));
+    var p1 = add(R, mul(u, sz));
+    var p2 = add(p1, mul(wv, sz));
+    var p3 = add(R, mul(wv, sz));
+    return 'M ' + R.x.toFixed(1) + ' ' + R.y.toFixed(1) +
+           ' L ' + p1.x.toFixed(1) + ' ' + p1.y.toFixed(1) +
+           ' L ' + p2.x.toFixed(1) + ' ' + p2.y.toFixed(1) +
+           ' L ' + p3.x.toFixed(1) + ' ' + p3.y.toFixed(1) + ' Z';
+  }
 
-    Object.entries(state.current.sides).forEach(([key, points]) => {
-      const side = make('path', {
-        class: 'side',
-        d: linePath(points),
-        'data-side': key,
-        tabindex: '0'
-      });
-      side.addEventListener('click', () => answer(key));
-      side.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') answer(key);
-      });
-      triangle.appendChild(side);
+  // —— state ——
+  var T = null, state = 'question', hoverIdx = -1, chosenIdx = -1;
+  var trial = 1, score = 0, errors = 0, history = [];
+  var trialHadError = false, flashIdx = -1, advanceTimer = null, flashTimer = null;
+
+  function buildPips() {
+    pipsEl.innerHTML = '';
+    for (var i = 0; i < total; i++) {
+      var d = document.createElement('div');
+      d.className = 'pip';
+      d.dataset.i = i;
+      pipsEl.appendChild(d);
+    }
+  }
+  function paintPips() {
+    var nodes = pipsEl.children;
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].className = 'pip';
+      if (history[i] === 'clean') nodes[i].classList.add('correct');
+      else if (history[i] === 'err') nodes[i].classList.add('wrong');
+      if (i === trial - 1 && state === 'question') nodes[i].classList.add('current');
+    }
+  }
+
+  function paintTriangle() {
+    triEl.setAttribute('points', T.v.map(function (p) { return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' '));
+    T.sides.forEach(function (sd, i) {
+      ov[i].setAttribute('x1', sd.a.x); ov[i].setAttribute('y1', sd.a.y);
+      ov[i].setAttribute('x2', sd.b.x); ov[i].setAttribute('y2', sd.b.y);
     });
-  }
-
-  function reveal(selected) {
-    triangle.querySelectorAll('.side').forEach((side) => {
-      const key = side.getAttribute('data-side');
-      if (key === 'hyp') side.classList.add('correct-side');
-      else side.classList.add('muted');
-      if (key === selected && selected !== 'hyp') side.classList.add('incorrect-side');
-    });
-    const p = state.current.points;
-    triangle.appendChild(make('path', {
-      class: 'right-marker',
-      d: rightAnglePath(p.right, p.legA, p.legB)
-    }));
-  }
-
-  function answer(side) {
-    if (state.answered) return;
-    state.answered = true;
-    const correct = side === 'hyp';
-    if (correct) {
-      state.score += 1;
-      feedback.className = 'feedback good';
-      feedback.textContent = 'Correct. The hypotenuse is always opposite the right angle.';
+    paintOverlays();
+    if (state === 'answered') {
+      raMark.setAttribute('d', rightAngleMarker(T.v[0], T.v[1], T.v[2]));
+      raMark.style.display = '';
     } else {
-      feedback.className = 'feedback bad';
-      feedback.textContent = 'Not quite. The hypotenuse is the side opposite the 90° angle.';
+      raMark.style.display = 'none';
     }
-    scoreEl.textContent = `Score ${state.score}`;
-    reveal(side);
-    nextButton.disabled = false;
   }
 
-  function finish() {
-    const accuracy = Math.round((state.score / 10) * 100);
-    trialEl.textContent = 'Complete';
-    scoreEl.textContent = `Score ${state.score} / 10`;
-    feedback.className = 'feedback';
-    feedback.textContent = 'Practice complete.';
-    summaryEl.classList.remove('hidden');
-    summaryEl.innerHTML = `<strong>Accuracy: ${accuracy}%</strong><span>The hypotenuse is not always the slanted side. It is always the side opposite the right angle.</span>`;
-    nextButton.classList.add('hidden');
-    restartButton.classList.remove('hidden');
+  function paintOverlays() {
+    T.sides.forEach(function (sd, i) {
+      var el = ov[i];
+      el.setAttribute('class', 'ov');
+      if (state === 'answered') {
+        if (sd.isHyp) el.classList.add('ov-correct');          // confirm the side they got right
+      } else {
+        if (i === flashIdx) el.classList.add('ov-wrong');      // brief red flash on a wrong pick
+        else if (i === hoverIdx && flashIdx === -1) el.classList.add('ov-hover');
+      }
+    });
   }
 
-  nextButton.addEventListener('click', () => {
-    if (state.trial >= 10) {
-      finish();
-      return;
+  function updateScoreboard() {
+    $('#sb-trial').textContent = trial + ' / ' + total;
+    $('#sb-score').textContent = String(errors);
+  }
+
+  function newTrial() {
+    T = makeTriangle();
+    state = 'question';
+    hoverIdx = -1; chosenIdx = -1; flashIdx = -1; trialHadError = false;
+    paintTriangle();
+    paintPips();
+    feedbackEl.className = 'feedback';
+    feedbackEl.textContent = 'Click the side opposite the right angle.';
+    svg.style.cursor = 'default';
+    updateScoreboard();
+  }
+
+  function answer(i) {
+    var correct = T.sides[i].isHyp;
+    if (correct) {
+      chosenIdx = i;
+      state = 'answered';
+      if (!trialHadError) score++;                 // "first try" counts toward the score
+      history[trial - 1] = trialHadError ? 'err' : 'clean';
+      paintTriangle();                              // green hypotenuse + right-angle marker
+      paintPips();
+      feedbackEl.className = 'feedback good';
+      feedbackEl.textContent = 'Correct. The hypotenuse is always opposite the right angle.';
+      updateScoreboard();
+      svg.style.cursor = 'default';
+      advanceTimer = setTimeout(advance, 1000);     // pause, then move on automatically
+    } else {
+      // Wrong: note the error and flash red — but do NOT reveal the hypotenuse. Keep trying.
+      errors++;
+      trialHadError = true;
+      flashIdx = i;
+      paintOverlays();
+      feedbackEl.className = 'feedback bad';
+      feedbackEl.textContent = 'Not quite — try again. The hypotenuse is opposite the 90° angle.';
+      updateScoreboard();
+      if (flashTimer) clearTimeout(flashTimer);
+      flashTimer = setTimeout(function () {
+        flashIdx = -1;
+        if (state === 'question') paintOverlays();
+      }, 480);
     }
-    state.trial += 1;
-    draw();
+  }
+
+  function advance() {
+    advanceTimer = null;
+    if (trial >= total) { showResults(); return; }
+    trial++;
+    newTrial();
+  }
+
+  function toVB(ev) {
+    var r = svg.getBoundingClientRect();
+    return { x: (ev.clientX - r.left) * (VBW / r.width), y: (ev.clientY - r.top) * (VBH / r.height) };
+  }
+  function nearest(pt) {
+    var bi = -1, bd = Infinity;
+    T.sides.forEach(function (sd, i) {
+      var d = distToSeg(pt, sd.a, sd.b);
+      if (d < bd) { bd = d; bi = i; }
+    });
+    return { i: bi, d: bd };
+  }
+
+  svg.addEventListener('pointermove', function (ev) {
+    if (state !== 'question') return;
+    var n = nearest(toVB(ev));
+    var hi = (n.d <= THRESH) ? n.i : -1;
+    if (hi !== hoverIdx) { hoverIdx = hi; paintOverlays(); }
+    svg.style.cursor = (hoverIdx >= 0) ? 'pointer' : 'default';
+  });
+  svg.addEventListener('pointerleave', function () {
+    if (state === 'question' && hoverIdx !== -1) { hoverIdx = -1; paintOverlays(); }
+  });
+  svg.addEventListener('click', function (ev) {
+    if (state !== 'question') return;
+    var n = nearest(toVB(ev));
+    if (n.d > THRESH) return;
+    answer(n.i);
   });
 
-  restartButton.addEventListener('click', () => {
-    state.trial = 1;
-    state.score = 0;
-    draw();
+  function showResults() {
+    if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+    $('#play-view').classList.add('play-hidden');
+    $('#play-scoreboard').classList.add('play-hidden');
+    var pct = Math.round((score / total) * 100);
+    $('#res-score').textContent = score + ' / ' + total;
+    $('#res-acc').textContent = pct + '% first try · ' + errors + (errors === 1 ? ' error' : ' errors') + ' total';
+    var remark = (errors === 0) ? (mode === 'extreme' ? 'Flawless — twenty near-identical triangles, not one slip.' : 'Flawless — fifty triangles, not one slip.')
+      : pct >= 85 ? 'Excellent. Orientation isn\u2019t fooling you.'
+      : pct >= 60 ? 'Solid. You\u2019re anchoring on the right angle.'
+      : 'Keep going — find the 90\u00b0 corner first, every time.';
+    $('#res-remark').textContent = remark;
+    $('#results').classList.add('show');
+  }
+
+  function startRound(nextMode) {
+    mode = nextMode;
+    total = mode === 'extreme' ? EXTREME_TOTAL : NORMAL_TOTAL;
+    trial = 1; score = 0; errors = 0; history = [];
+    if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+    if (flashTimer) { clearTimeout(flashTimer); flashTimer = null; }
+    $('#results').classList.remove('show');
+    $('#play-view').classList.remove('play-hidden');
+    $('#play-scoreboard').classList.remove('play-hidden');
+    $('#normal-mode').classList.toggle('active', mode === 'normal');
+    $('#extreme-mode').classList.toggle('active', mode === 'extreme');
+    lastAcute = null; lastRotDeg = null;
+    buildPips();
+    newTrial();
+  }
+
+  $('#normal-mode').addEventListener('click', function () {
+    startRound('normal');
   });
 
-  draw();
+  $('#extreme-mode').addEventListener('click', function () {
+    startRound('extreme');
+  });
+
+  $('#play-again').addEventListener('click', function () {
+    startRound(mode);
+  });
+
+  // init
+  buildPips();
+  newTrial();
+})();
 </script>
+
 </body>
 </html>
