@@ -289,15 +289,34 @@
   function arcPath(vertex, side1, side2, radius) {
     const a1 = Math.atan2(side1.y - vertex.y, side1.x - vertex.x);
     const a2 = Math.atan2(side2.y - vertex.y, side2.x - vertex.x);
-    const p1 = { x: vertex.x + radius * Math.cos(a1), y: vertex.y + radius * Math.sin(a1) };
-    const p2 = { x: vertex.x + radius * Math.cos(a2), y: vertex.y + radius * Math.sin(a2) };
-    let diff = Math.abs(a2 - a1);
-    if (diff > Math.PI) diff = Math.PI * 2 - diff;
-    return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${radius} ${radius} 0 0 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+    let delta = a2 - a1;
+    while (delta > Math.PI) delta -= Math.PI * 2;
+    while (delta < -Math.PI) delta += Math.PI * 2;
+
+    const points = [];
+    for (let i = 0; i <= 16; i += 1) {
+      const angle = a1 + delta * (i / 16);
+      points.push({
+        x: vertex.x + radius * Math.cos(angle),
+        y: vertex.y + radius * Math.sin(angle)
+      });
+    }
+    return linePath(points);
   }
 
-  function midpoint(a, b, offset = 0) {
-    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 + offset };
+  function normalize(v) {
+    const length = Math.hypot(v.x, v.y) || 1;
+    return { x: v.x / length, y: v.y / length };
+  }
+
+  function outsideLabel(vertex, side1, side2, distance) {
+    const v1 = normalize({ x: side1.x - vertex.x, y: side1.y - vertex.y });
+    const v2 = normalize({ x: side2.x - vertex.x, y: side2.y - vertex.y });
+    const bisector = normalize({ x: v1.x + v2.x, y: v1.y + v2.y });
+    return {
+      x: vertex.x - bisector.x * distance,
+      y: vertex.y - bisector.y * distance
+    };
   }
 
   function render() {
@@ -305,7 +324,7 @@
 
     const angleA = state.angleA;
     const angleB = 90 - angleA;
-    const hyp = 260;
+    const hyp = 300;
     const base = hyp * Math.cos(angleA * Math.PI / 180);
     const height = hyp * Math.sin(angleA * Math.PI / 180);
 
@@ -330,9 +349,9 @@
     const r3 = toScreen({ x: 85, y: 80 - rightSize });
     tri.appendChild(make('path', { class: 'right-angle', d: linePath([r1, r2, r3]) }));
 
-    const labelA = midpoint(A, R, 38);
-    const labelB = midpoint(B, R, -16);
-    const labelR = { x: R.x + 34, y: R.y + 30 };
+    const labelA = outsideLabel(A, R, B, 58);
+    const labelB = outsideLabel(B, A, R, 70);
+    const labelR = outsideLabel(R, A, B, 46);
 
     tri.appendChild(make('text', { class: 'label label-a', x: labelA.x, y: labelA.y })).textContent = `${angleA}°`;
     tri.appendChild(make('text', { class: 'label label-b', x: labelB.x, y: labelB.y })).textContent = `${angleB}°`;
