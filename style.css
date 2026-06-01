@@ -1686,6 +1686,44 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 820px;
 }
 
+.right-triangle-shape-strip {
+  width: min(100%, 820px);
+  margin: 2rem auto 2.4rem;
+}
+
+.right-triangle-shape-strip svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.right-triangle-shape-strip .shape-fill {
+  fill: rgba(212, 184, 136, 0.08);
+}
+
+.right-triangle-shape-strip .shape-leg,
+.right-triangle-shape-strip .shape-hyp {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 5;
+}
+
+.right-triangle-shape-strip .shape-leg {
+  stroke: rgba(238, 231, 216, 0.82);
+}
+
+.right-triangle-shape-strip .shape-hyp {
+  stroke: #f4b13d;
+}
+
+.right-triangle-shape-strip .shape-right-angle {
+  fill: none;
+  stroke: #6eddd3;
+  stroke-linecap: square;
+  stroke-width: 3;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Right-Angled Triangles | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-right-angled-triangles-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Right-Angled Triangles</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h3 class="subsection-title">Right-Angled Triangles</h3>
+
+        <p>Although trigonometry was motivated by astronomy, where angles provided a way to track and predict the motions of celestial objects, its fundamental ideas can be developed using a much simpler object: the right-angled triangle.</p>
+
+        <p>Right-angled triangles have enough structure to reveal the relationship between angles and side ratios while avoiding much of the complexity of more general geometric figures.</p>
+
+        <h4 class="subsection-title">Hypotenuse</h4>
+
+        <p>A right-angled triangle has one angle at $90^\circ$. The longest side, the hypotenuse, cannot connect to this corner.</p>
+
+        <p>No matter how a right-angled triangle is rotated, the hypotenuse remains the side opposite the $90^\circ$ angle.</p>
+
+        <p>One way I like to visualise the hypotenuse is to imagine completing the triangle into a rectangle or square. The hypotenuse is the side that cuts across the interior.</p>
+
+        <p>Let's try practicing identifying the hypotenuse (Ignore 'Expert Mode' for now).</p>
+
+        <iframe
+          class="essay-widget hypotenuse-practice-widget"
+          src="trigonometry/visualising-triangles/hypotenuse-practice-widget.html"
+          title="Interactive practice widget for identifying the hypotenuse in right-angled triangles"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h4 class="subsection-title">Finding Ratios Geometrically</h4>
+
+        <p>While the $90^\circ$ angle is fixed, the other angles are free to co-vary, meaning we can have different shapes.</p>
+
+        <figure class="right-triangle-shape-strip" aria-label="Three right-angled triangles with different shapes">
+          <svg viewBox="0 0 840 230" role="img" aria-labelledby="right-triangle-shapes-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="right-triangle-shapes-title">Tall, symmetric, and flat right-angled triangle shapes</title>
+            <g class="shape-panel" transform="translate(28 20)">
+              <path class="shape-fill" d="M92 168 L92 16 L119 168 Z" />
+              <path class="shape-leg" d="M92 168 L92 16" />
+              <path class="shape-leg" d="M92 168 L119 168" />
+              <path class="shape-hyp" d="M92 16 L119 168" />
+              <path class="shape-right-angle" d="M92 150 H110 V168" />
+            </g>
+            <g class="shape-panel" transform="translate(310 20)">
+              <path class="shape-fill" d="M34 168 L168 168 L168 34 Z" />
+              <path class="shape-leg" d="M34 168 L168 168" />
+              <path class="shape-leg" d="M168 168 L168 34" />
+              <path class="shape-hyp" d="M34 168 L168 34" />
+              <path class="shape-right-angle" d="M150 168 V150 H168" />
+            </g>
+            <g class="shape-panel" transform="translate(570 20)">
+              <path class="shape-fill" d="M24 168 L178 168 L24 140 Z" />
+              <path class="shape-leg" d="M24 168 L178 168" />
+              <path class="shape-leg" d="M24 168 L24 140" />
+              <path class="shape-hyp" d="M24 140 L178 168" />
+              <path class="shape-right-angle" d="M24 150 H42 V168" />
+            </g>
+          </svg>
+        </figure>
+
+        <p>The $90^\circ$ angle determines that its opposite side will be the longest. That means the ratio between it and the other two will always be less than 1.</p>
+
+        <p>We know that certain sets of angles will result in certain ratios between the sides, so let's try to work out what this ratio is for same right-angled triangles.</p>
+
+        <h5 class="subsection-title">Consider a triangle with angles $90^\circ$, $60^\circ$, and $30^\circ$.</h5>
+
+        <p>To simplify the calculations, let the hypotenuse have length $1$.</p>
+
+        <p>Now duplicate the triangle and place the copy beside it. The two triangles form an equilateral triangle.</p>
+
+        <p>Because the resulting triangle is equilateral:</p>
+
+        <ul>
+          <li>All three sides have length $1$.</li>
+          <li>All three angles are $60^\circ$.</li>
+        </ul>
+
+        <p>The side that was split by our construction therefore has total length $1$, meaning each half has length $\frac{1}{2}$.</p>
+
+        <p>Returning to our original right triangle, we now know:</p>
+
+        <ul>
+          <li>$\text{hypotenuse} = 1$</li>
+          <li>$\text{shorter side} = \frac{1}{2}$</li>
+        </ul>
+
+        <p>We can also find the remaining side using Pythagoras:</p>
+
+        <p class="display-equation">$$\left(\frac{1}{2}\right)^2 + x^2 = 1^2$$</p>
+        <p class="display-equation">$$\frac{1}{4} + x^2 = 1$$</p>
+        <p class="display-equation">$$x^2 = \frac{3}{4}$$</p>
+        <p class="display-equation">$$x = \frac{\sqrt{3}}{2}$$</p>
+
+        <p>We now know:</p>
+
+        <ul>
+          <li>$\text{hypotenuse} = 1$</li>
+          <li>$\text{leg 1} = \frac{1}{2}$</li>
+          <li>$\text{leg 2} = \frac{\sqrt{3}}{2}$</li>
+        </ul>
+
+        <p>Now finding the ratios just requires setting an opposite and adjacent side, let's say:</p>
+
+        <p class="display-equation">$$h= 1,\qquad o = \frac{1}{2}, \qquad a = \frac{\sqrt{3}}{2}$$</p>
+
+        <p class="display-equation">$\large sine = \frac{o}{h}$</p>
+
+        <p class="display-equation">$\large cosine = \frac{a}{h}$</p>
+
+        <p class="display-equation">$sine = \frac{0.5}{1} = 0.5$</p>
+
+        <p class="display-equation">cosine  = $\frac{\frac{\sqrt{3}}{2}}{1} = \frac{\sqrt{3}}{2}$</p>
+
+        <p>Mathematicians would then record the answers in something they called "Trigonometric Tables", so that if they encountered such an angle they could immediately find the ratios between side lengths. While calculating the above ratio was relatively straightforward, it is much more challenging with more awkward values and so these tables became very useful.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-visualising-triangles.html">
+            <span>Previous</span>
+            <strong>Visualising Triangles</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
+            <span>Next</span>
+            <strong>Misc</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
