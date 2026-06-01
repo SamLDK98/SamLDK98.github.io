@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triangle Orientation Practice</title>
+<style>
+  :root {
+    --panel: #1e1a17;
+    --rule: rgba(214, 196, 168, 0.14);
+    --rule-strong: rgba(214, 196, 168, 0.3);
+    --text: #ece2d1;
+    --dim: #a89c87;
+    --accent: #d4b888;
+    --orange: #e8a13b;
+    --teal: #6dd3c4;
+    --green: #88c97c;
+    --pink: #ef7398;
+    --grid: rgba(236, 226, 209, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: transparent;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body { padding: 1rem; }
+
+  .widget {
+    width: min(100%, 960px);
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--panel);
+    overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    padding: 1rem 1.2rem 0.85rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.2rem, 2.1vw, 1.75rem);
+    font-weight: 500;
+  }
+
+  .mini {
+    color: var(--dim);
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 285px;
+  }
+
+  .stage {
+    min-height: 460px;
+    padding: 1rem;
+    border-right: 1px solid var(--rule);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 460px;
+    user-select: none;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.1rem;
+    background: rgba(0, 0, 0, 0.13);
+  }
+
+  button {
+    min-height: 2.55rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: rgba(232, 161, 59, 0.08);
+  }
+
+  .angle-set {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    justify-content: center;
+    min-height: 15rem;
+  }
+
+  .angle-pill {
+    min-width: 4.3rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.16);
+    color: var(--text);
+    font-family: "Courier New", monospace;
+    font-size: clamp(1.45rem, 3vw, 2.15rem);
+    line-height: 1;
+    text-align: center;
+  }
+
+  .angle-pill.right { color: var(--dim); }
+  .angle-pill.large { color: var(--pink); }
+  .angle-pill.small { color: var(--green); }
+
+  .hint {
+    margin: 0;
+    color: var(--dim);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .grid-line {
+    stroke: var(--grid);
+    stroke-width: 1;
+  }
+
+  .triangle-fill {
+    fill: rgba(232, 161, 59, 0.08);
+    stroke: rgba(236, 226, 209, 0.18);
+    stroke-width: 1;
+  }
+
+  .side {
+    fill: none;
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .base { stroke: var(--orange); }
+  .height { stroke: var(--teal); }
+  .hyp { stroke: var(--accent); }
+
+  .arc {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .arc-large { stroke: var(--pink); }
+  .arc-small { stroke: var(--green); }
+  .right-angle {
+    fill: none;
+    stroke: var(--dim);
+    stroke-width: 2.3;
+  }
+
+  .label {
+    fill: var(--text);
+    font-family: "Courier New", monospace;
+    font-size: 19px;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+
+  .label-large { fill: var(--pink); }
+  .label-small { fill: var(--green); }
+  .label-right { fill: var(--dim); }
+
+  @media (max-width: 760px) {
+    body { padding: 0.7rem; }
+    .header { display: block; }
+    .mini { margin-top: 0.45rem; }
+    .main { grid-template-columns: 1fr; }
+    .stage {
+      min-height: 360px;
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    svg { height: 360px; }
+  }
+</style>
+</head>
+<body>
+  <div class="widget">
+    <div class="header">
+      <h1 id="title">Visualise the triangle</h1>
+      <div id="modeLabel" class="mini">orientation practice</div>
+    </div>
+
+    <div class="main">
+      <div class="stage">
+        <svg viewBox="0 0 620 460" role="img" aria-label="Practice visualising right triangles in different orientations">
+          <g id="grid"></g>
+          <g id="display"></g>
+        </svg>
+      </div>
+
+      <div class="controls">
+        <div class="mini">Given angles</div>
+        <p id="hint" class="hint"></p>
+        <button id="displayTriangle" type="button">Display Triangle</button>
+        <button id="newSet" type="button">New Angle Set</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const mode = new URLSearchParams(window.location.search).get('mode') === 'all' ? 'all' : 'bottom';
+  const sets = [
+    [90, 60, 30],
+    [90, 45, 45],
+    [90, 70, 20],
+    [90, 55, 35],
+    [90, 75, 15]
+  ];
+  const placements = mode === 'all'
+    ? ['bottom-right', 'bottom-left', 'top-right', 'top-left']
+    : ['bottom-right', 'bottom-left'];
+  const state = { index: 0, revealed: false };
+  const grid = document.getElementById('grid');
+  const display = document.getElementById('display');
+
+  document.getElementById('modeLabel').textContent = mode === 'all' ? 'right angle in any corner' : 'right angle along the bottom';
+  document.getElementById('hint').textContent = mode === 'all'
+    ? 'The right angle may appear in any corner. Track the hypotenuse: it is always opposite the right angle.'
+    : 'The right angle may be bottom right or bottom left. Track the hypotenuse as it swaps sides.';
+
+  function make(tag, attrs = {}) {
+    const el = document.createElementNS(svgNS, tag);
+    Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+    return el;
+  }
+
+  function linePath(points) {
+    return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
+  }
+
+  function normalize(v) {
+    const length = Math.hypot(v.x, v.y) || 1;
+    return { x: v.x / length, y: v.y / length };
+  }
+
+  function arcPath(vertex, side1, side2, radius) {
+    const a1 = Math.atan2(side1.y - vertex.y, side1.x - vertex.x);
+    const a2 = Math.atan2(side2.y - vertex.y, side2.x - vertex.x);
+    let delta = a2 - a1;
+    while (delta > Math.PI) delta -= Math.PI * 2;
+    while (delta < -Math.PI) delta += Math.PI * 2;
+
+    const points = [];
+    for (let i = 0; i <= 18; i += 1) {
+      const angle = a1 + delta * (i / 18);
+      points.push({
+        x: vertex.x + radius * Math.cos(angle),
+        y: vertex.y + radius * Math.sin(angle)
+      });
+    }
+    return linePath(points);
+  }
+
+  function outsideLabel(vertex, side1, side2, distance) {
+    const v1 = normalize({ x: side1.x - vertex.x, y: side1.y - vertex.y });
+    const v2 = normalize({ x: side2.x - vertex.x, y: side2.y - vertex.y });
+    const bisector = normalize({ x: v1.x + v2.x, y: v1.y + v2.y });
+    return {
+      x: vertex.x - bisector.x * distance,
+      y: vertex.y - bisector.y * distance
+    };
+  }
+
+  function drawGrid() {
+    for (let x = 40; x <= 580; x += 40) {
+      grid.appendChild(make('line', { class: 'grid-line', x1: x, y1: 35, x2: x, y2: 425 }));
+    }
+    for (let y = 35; y <= 425; y += 40) {
+      grid.appendChild(make('line', { class: 'grid-line', x1: 40, y1: y, x2: 580, y2: y }));
+    }
+  }
+
+  function orderedAngles() {
+    const angles = sets[state.index % sets.length];
+    const acute = angles.filter((angle) => angle !== 90).sort((a, b) => b - a);
+    return [90, acute[0], acute[1]];
+  }
+
+  function placement() {
+    return placements[Math.floor(state.index / sets.length) % placements.length];
+  }
+
+  function drawAngleSet() {
+    display.replaceChildren();
+    const [, large, small] = orderedAngles();
+    const group = make('foreignObject', { x: 95, y: 120, width: 430, height: 190 });
+    group.innerHTML = `
+      <div xmlns="http://www.w3.org/1999/xhtml" class="angle-set">
+        <span class="angle-pill right">90°</span>
+        <span class="angle-pill large">${large}°</span>
+        <span class="angle-pill small">${small}°</span>
+      </div>
+    `;
+    display.appendChild(group);
+  }
+
+  function configFor(name) {
+    const configs = {
+      'bottom-right': { r: { x: 460, y: 355 }, sx: -1, sy: -1 },
+      'bottom-left': { r: { x: 160, y: 355 }, sx: 1, sy: -1 },
+      'top-right': { r: { x: 460, y: 105 }, sx: -1, sy: 1 },
+      'top-left': { r: { x: 160, y: 105 }, sx: 1, sy: 1 }
+    };
+    return configs[name];
+  }
+
+  function drawRightAngleMark(r, sx, sy) {
+    const size = 26;
+    const p1 = { x: r.x + sx * size, y: r.y };
+    const p2 = { x: r.x + sx * size, y: r.y + sy * size };
+    const p3 = { x: r.x, y: r.y + sy * size };
+    display.appendChild(make('path', { class: 'right-angle', d: linePath([p1, p2, p3]) }));
+  }
+
+  function drawTriangle() {
+    display.replaceChildren();
+    const [, large, small] = orderedAngles();
+    const config = configFor(placement());
+    const hyp = 300;
+    const base = hyp * Math.cos(large * Math.PI / 180);
+    const height = hyp * Math.sin(large * Math.PI / 180);
+    const R = config.r;
+    const A = { x: R.x + config.sx * base, y: R.y };
+    const B = { x: R.x, y: R.y + config.sy * height };
+
+    display.appendChild(make('path', { class: 'triangle-fill', d: `${linePath([A, R, B])} Z` }));
+    display.appendChild(make('path', { class: 'side base', d: linePath([A, R]) }));
+    display.appendChild(make('path', { class: 'side height', d: linePath([R, B]) }));
+    display.appendChild(make('path', { class: 'side hyp', d: linePath([A, B]) }));
+    display.appendChild(make('path', { class: 'arc arc-large', d: arcPath(A, R, B, 42) }));
+    display.appendChild(make('path', { class: 'arc arc-small', d: arcPath(B, A, R, 42) }));
+    drawRightAngleMark(R, config.sx, config.sy);
+
+    const largeLabel = outsideLabel(A, R, B, 58);
+    const smallLabel = outsideLabel(B, A, R, 66);
+    const rightLabel = outsideLabel(R, A, B, 44);
+
+    display.appendChild(make('text', { class: 'label label-large', x: largeLabel.x, y: largeLabel.y })).textContent = `${large}°`;
+    display.appendChild(make('text', { class: 'label label-small', x: smallLabel.x, y: smallLabel.y })).textContent = `${small}°`;
+    display.appendChild(make('text', { class: 'label label-right', x: rightLabel.x, y: rightLabel.y })).textContent = '90°';
+  }
+
+  function render() {
+    if (state.revealed) drawTriangle();
+    else drawAngleSet();
+  }
+
+  document.getElementById('displayTriangle').addEventListener('click', () => {
+    state.revealed = true;
+    render();
+  });
+
+  document.getElementById('newSet').addEventListener('click', () => {
+    state.index += 1;
+    state.revealed = false;
+    render();
+  });
+
+  drawGrid();
+  render();
+</script>
+</body>
+</html>
