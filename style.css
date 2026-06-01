@@ -1681,6 +1681,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 640px;
 }
 
+.intro-linear-algebra-page .hypotenuse-practice-widget {
+  width: min(100%, 920px);
+  height: 680px;
+}
+
 .intro-linear-algebra-page .degree-circle-widget {
   height: 720px;
 }

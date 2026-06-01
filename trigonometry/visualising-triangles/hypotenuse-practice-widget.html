@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypotenuse Practice</title>
+<style>
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: transparent;
+    color: #111;
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body { padding: 1rem; }
+
+  .widget {
+    width: min(100%, 920px);
+    margin: 0 auto;
+    border: 1px solid #d8d2c8;
+    border-radius: 8px;
+    background: #f8f5ef;
+    overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    padding: 1rem 1.2rem 0.85rem;
+    border-bottom: 1px solid #ded8ce;
+  }
+
+  h1 {
+    margin: 0;
+    color: #111;
+    font-size: clamp(1.25rem, 2.2vw, 1.8rem);
+    font-weight: 600;
+  }
+
+  .meta {
+    color: #6b6257;
+    font-family: "Courier New", monospace;
+    font-size: 0.82rem;
+    text-align: right;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 285px;
+  }
+
+  .stage {
+    min-height: 500px;
+    padding: 1rem;
+    background: #fffdf8;
+    border-right: 1px solid #ded8ce;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 500px;
+    user-select: none;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1rem;
+  }
+
+  .prompt {
+    margin: 0;
+    color: #111;
+    font-size: 1.18rem;
+    line-height: 1.35;
+  }
+
+  .feedback {
+    min-height: 5.8rem;
+    padding: 0.8rem;
+    border: 1px solid #ded8ce;
+    border-radius: 6px;
+    background: #fffdf8;
+    color: #6b6257;
+    font-size: 0.98rem;
+    line-height: 1.35;
+  }
+
+  .feedback.good {
+    border-color: #338a52;
+    background: #effaf2;
+    color: #15542d;
+  }
+
+  .feedback.bad {
+    border-color: #b75145;
+    background: #fff1ef;
+    color: #7e251d;
+  }
+
+  button {
+    min-height: 2.6rem;
+    border: 1px solid #211c17;
+    border-radius: 5px;
+    background: #211c17;
+    color: #fffdf8;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover:not(:disabled) {
+    background: #3a3129;
+  }
+
+  button:disabled {
+    opacity: 0.42;
+    cursor: default;
+  }
+
+  .side {
+    fill: none;
+    stroke: #111;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    cursor: pointer;
+    transition: stroke 130ms ease, stroke-width 130ms ease;
+  }
+
+  .side:hover {
+    stroke-width: 12;
+  }
+
+  .side.muted {
+    stroke: #777;
+  }
+
+  .side.correct-side {
+    stroke: #1f9f61;
+    stroke-width: 13;
+  }
+
+  .side.incorrect-side {
+    stroke: #c84d3e;
+    stroke-width: 12;
+  }
+
+  .right-marker {
+    fill: none;
+    stroke: #111;
+    stroke-width: 3;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .summary {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.8rem;
+    border: 1px solid #ded8ce;
+    border-radius: 6px;
+    background: #fffdf8;
+    color: #211c17;
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+
+  @media (max-width: 760px) {
+    body { padding: 0.7rem; }
+    .header { display: block; }
+    .meta { margin-top: 0.35rem; text-align: left; }
+    .main { grid-template-columns: 1fr; }
+    .stage {
+      min-height: 360px;
+      border-right: 0;
+      border-bottom: 1px solid #ded8ce;
+    }
+    svg { height: 360px; }
+  }
+</style>
+</head>
+<body>
+  <div class="widget">
+    <div class="header">
+      <h1>Click the hypotenuse</h1>
+      <div class="meta"><span id="trial">Trial 1 / 10</span><br><span id="score">Score 0</span></div>
+    </div>
+
+    <div class="main">
+      <div class="stage">
+        <svg viewBox="0 0 620 500" role="img" aria-label="Right triangle practice area">
+          <g id="triangle"></g>
+        </svg>
+      </div>
+
+      <div class="controls">
+        <p class="prompt">Click the hypotenuse.</p>
+        <div id="feedback" class="feedback">The hypotenuse is the side opposite the right angle.</div>
+        <button id="next" type="button" disabled>Next triangle</button>
+        <button id="restart" type="button" class="hidden">Restart</button>
+        <div id="summary" class="summary hidden"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const triangle = document.getElementById('triangle');
+  const feedback = document.getElementById('feedback');
+  const nextButton = document.getElementById('next');
+  const restartButton = document.getElementById('restart');
+  const trialEl = document.getElementById('trial');
+  const scoreEl = document.getElementById('score');
+  const summaryEl = document.getElementById('summary');
+
+  const shapes = [
+    { name: '30-60-90', a: 60 },
+    { name: '45-45-90', a: 45 },
+    { name: 'narrow', a: 78 },
+    { name: 'wide', a: 18 },
+    { name: 'near-symmetric', a: 46 },
+    { name: 'near-symmetric', a: 44 },
+    { name: 'wide', a: 25 },
+    { name: 'narrow', a: 72 }
+  ];
+
+  const state = {
+    trial: 1,
+    score: 0,
+    answered: false,
+    current: null
+  };
+
+  function make(tag, attrs = {}) {
+    const el = document.createElementNS(svgNS, tag);
+    Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+    return el;
+  }
+
+  function linePath(points) {
+    return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
+  }
+
+  function rotate(p, angle) {
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    return { x: p.x * c - p.y * s, y: p.x * s + p.y * c };
+  }
+
+  function normalize(v) {
+    const length = Math.hypot(v.x, v.y) || 1;
+    return { x: v.x / length, y: v.y / length };
+  }
+
+  function rightAnglePath(r, a, b) {
+    const size = 28;
+    const u = normalize({ x: a.x - r.x, y: a.y - r.y });
+    const v = normalize({ x: b.x - r.x, y: b.y - r.y });
+    const p1 = { x: r.x + u.x * size, y: r.y + u.y * size };
+    const p2 = { x: p1.x + v.x * size, y: p1.y + v.y * size };
+    const p3 = { x: r.x + v.x * size, y: r.y + v.y * size };
+    return linePath([p1, p2, p3]);
+  }
+
+  function fitPoints(points) {
+    const xs = points.map((p) => p.x);
+    const ys = points.map((p) => p.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const dx = 310 - (minX + maxX) / 2 + (Math.random() - 0.5) * 90;
+    const dy = 250 - (minY + maxY) / 2 + (Math.random() - 0.5) * 70;
+    return points.map((p) => ({ x: p.x + dx, y: p.y + dy }));
+  }
+
+  function buildTriangle() {
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const hyp = 300 + Math.random() * 70;
+    const base = hyp * Math.cos(shape.a * Math.PI / 180);
+    const height = hyp * Math.sin(shape.a * Math.PI / 180);
+    const raw = [
+      { key: 'legA', x: 0, y: 0 },
+      { key: 'right', x: base, y: 0 },
+      { key: 'legB', x: base, y: -height }
+    ];
+    const angle = Math.random() * Math.PI * 2;
+    const rotated = raw.map((p) => ({ ...p, ...rotate(p, angle) }));
+    const fitted = fitPoints(rotated);
+    const byKey = Object.fromEntries(fitted.map((p) => [p.key, p]));
+    return {
+      shape,
+      points: byKey,
+      sides: {
+        legA: [byKey.legA, byKey.right],
+        legB: [byKey.right, byKey.legB],
+        hyp: [byKey.legA, byKey.legB]
+      }
+    };
+  }
+
+  function draw() {
+    triangle.replaceChildren();
+    state.current = buildTriangle();
+    state.answered = false;
+    feedback.className = 'feedback';
+    feedback.textContent = 'The hypotenuse is the side opposite the right angle.';
+    nextButton.disabled = true;
+    summaryEl.classList.add('hidden');
+    restartButton.classList.add('hidden');
+    nextButton.classList.remove('hidden');
+    trialEl.textContent = `Trial ${state.trial} / 10`;
+    scoreEl.textContent = `Score ${state.score}`;
+
+    Object.entries(state.current.sides).forEach(([key, points]) => {
+      const side = make('path', {
+        class: 'side',
+        d: linePath(points),
+        'data-side': key,
+        tabindex: '0'
+      });
+      side.addEventListener('click', () => answer(key));
+      side.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') answer(key);
+      });
+      triangle.appendChild(side);
+    });
+  }
+
+  function reveal(selected) {
+    triangle.querySelectorAll('.side').forEach((side) => {
+      const key = side.getAttribute('data-side');
+      if (key === 'hyp') side.classList.add('correct-side');
+      else side.classList.add('muted');
+      if (key === selected && selected !== 'hyp') side.classList.add('incorrect-side');
+    });
+    const p = state.current.points;
+    triangle.appendChild(make('path', {
+      class: 'right-marker',
+      d: rightAnglePath(p.right, p.legA, p.legB)
+    }));
+  }
+
+  function answer(side) {
+    if (state.answered) return;
+    state.answered = true;
+    const correct = side === 'hyp';
+    if (correct) {
+      state.score += 1;
+      feedback.className = 'feedback good';
+      feedback.textContent = 'Correct. The hypotenuse is always opposite the right angle.';
+    } else {
+      feedback.className = 'feedback bad';
+      feedback.textContent = 'Not quite. The hypotenuse is the side opposite the 90° angle.';
+    }
+    scoreEl.textContent = `Score ${state.score}`;
+    reveal(side);
+    nextButton.disabled = false;
+  }
+
+  function finish() {
+    const accuracy = Math.round((state.score / 10) * 100);
+    trialEl.textContent = 'Complete';
+    scoreEl.textContent = `Score ${state.score} / 10`;
+    feedback.className = 'feedback';
+    feedback.textContent = 'Practice complete.';
+    summaryEl.classList.remove('hidden');
+    summaryEl.innerHTML = `<strong>Accuracy: ${accuracy}%</strong><span>The hypotenuse is not always the slanted side. It is always the side opposite the right angle.</span>`;
+    nextButton.classList.add('hidden');
+    restartButton.classList.remove('hidden');
+  }
+
+  nextButton.addEventListener('click', () => {
+    if (state.trial >= 10) {
+      finish();
+      return;
+    }
+    state.trial += 1;
+    draw();
+  });
+
+  restartButton.addEventListener('click', () => {
+    state.trial = 1;
+    state.score = 0;
+    draw();
+  });
+
+  draw();
+</script>
+</body>
+</html>

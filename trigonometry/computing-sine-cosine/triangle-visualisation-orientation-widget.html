@@ -239,7 +239,7 @@
   ];
   const placements = mode === 'all'
     ? ['bottom-right', 'bottom-left', 'top-right', 'top-left']
-    : ['bottom-right', 'bottom-left'];
+    : ['bottom-left'];
   const state = { index: 0, revealed: false };
   const grid = document.getElementById('grid');
   const display = document.getElementById('display');
@@ -247,7 +247,7 @@
   document.getElementById('modeLabel').textContent = mode === 'all' ? 'right angle in any corner' : 'right angle along the bottom';
   document.getElementById('hint').textContent = mode === 'all'
     ? 'The right angle may appear in any corner. Track the hypotenuse: it is always opposite the right angle.'
-    : 'The right angle may be bottom right or bottom left. Track the hypotenuse as it swaps sides.';
+    : 'The right angle is now bottom left. Track the hypotenuse on the right side of the triangle.';
 
   function make(tag, attrs = {}) {
     const el = document.createElementNS(svgNS, tag);
