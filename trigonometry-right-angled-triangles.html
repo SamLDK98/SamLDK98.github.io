@@ -34,11 +34,77 @@
   <main>
     <article>
       <section class="essay-section">
-        <h3 class="subsection-title">Right-Angled Triangles</h3>
+        <p>Previously we saw that the lengths of a triangle's sides meant it must have a certain shape.</p>
 
-        <p>Although trigonometry was motivated by astronomy, where angles provided a way to track and predict the motions of celestial objects, its fundamental ideas can be developed using a much simpler object: the right-angled triangle.</p>
+        <p>A triangle with sides 5, 7, and 10 must have angles $27.7^\circ$, $40.5^\circ$, and $111.8^\circ$.</p>
 
-        <p>Right-angled triangles have enough structure to reveal the relationship between angles and side ratios while avoiding much of the complexity of more general geometric figures.</p>
+        <figure class="triangle-opening-panels" aria-label="Side lengths forming a fixed triangle shape">
+          <svg viewBox="0 0 900 300" role="img" aria-labelledby="fixed-sides-panels-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="fixed-sides-panels-title">Three fixed side lengths assembling into one triangle</title>
+            <g class="opening-panel" transform="translate(28 24)">
+              <line class="opening-side side-blue" x1="62" y1="218" x2="62" y2="118" />
+              <line class="opening-side side-gold" x1="128" y1="218" x2="128" y2="78" />
+              <line class="opening-side side-teal" x1="194" y1="218" x2="194" y2="18" />
+              <text class="opening-label" x="52" y="244">5</text>
+              <text class="opening-label" x="118" y="244">7</text>
+              <text class="opening-label" x="177" y="244">10</text>
+            </g>
+            <g class="opening-panel" transform="translate(326 24)">
+              <line class="opening-side side-blue" x1="44" y1="218" x2="134" y2="204" />
+              <line class="opening-side side-gold" x1="153" y1="196" x2="200" y2="95" />
+              <line class="opening-side side-teal" x1="52" y1="72" x2="232" y2="62" />
+              <circle class="opening-snap-dot" cx="134" cy="204" r="4" />
+              <circle class="opening-snap-dot" cx="153" cy="196" r="4" />
+              <circle class="opening-snap-dot" cx="52" cy="72" r="4" />
+              <circle class="opening-snap-dot" cx="232" cy="62" r="4" />
+            </g>
+            <g class="opening-panel" transform="translate(594 8)">
+              <polygon class="opening-triangle-fill" points="70,230 170,230 222,100" />
+              <line class="opening-side side-blue" x1="70" y1="230" x2="170" y2="230" />
+              <line class="opening-side side-gold" x1="170" y1="230" x2="222" y2="100" />
+              <line class="opening-side side-teal" x1="222" y1="100" x2="70" y2="230" />
+              <text class="opening-angle-label" x="34" y="255">40.5°</text>
+              <text class="opening-angle-label" x="160" y="255">111.8°</text>
+              <text class="opening-angle-label" x="226" y="88">27.7°</text>
+            </g>
+          </svg>
+        </figure>
+
+        <p>However, we also saw that angles only determine the necessary ratios between side lengths, not the absolute lengths.</p>
+
+        <p>A triangle with angles  $27.7^\circ$, $40.5^\circ$, and $111.8^\circ$ could have sides $5, 7, 10$ or $50, 70, 100$ or any proportional scaling of these numbers.</p>
+
+        <figure class="triangle-opening-panels triangle-scaling-panels" aria-label="The same triangle angles preserved under proportional scaling">
+          <svg viewBox="0 64 900 190" role="img" aria-labelledby="scaled-triangle-panels-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="scaled-triangle-panels-title">Same triangle shape shown at three proportional scales</title>
+            <g class="opening-panel" transform="translate(48 20)">
+              <polygon class="opening-triangle-fill" points="70,226 118,226 143,164" />
+              <path class="opening-side side-blue" d="M70 226 H118" />
+              <path class="opening-side side-gold" d="M118 226 L143 164" />
+              <path class="opening-side side-teal" d="M143 164 L70 226" />
+            </g>
+            <g class="opening-panel" transform="translate(330 20)">
+              <polygon class="opening-triangle-fill" points="28,226 118,226 165,109" />
+              <path class="opening-side side-blue" d="M28 226 H118" />
+              <path class="opening-side side-gold" d="M118 226 L165 109" />
+              <path class="opening-side side-teal" d="M165 109 L28 226" />
+            </g>
+            <g class="opening-panel" transform="translate(616 20)">
+              <polygon class="opening-triangle-fill" points="16,226 124,226 180,86" />
+              <path class="opening-side side-blue" d="M16 226 H124" />
+              <path class="opening-side side-gold" d="M124 226 L180 86" />
+              <path class="opening-side side-teal" d="M180 86 L16 226" />
+            </g>
+          </svg>
+        </figure>
+
+        <p>However, while this deterministic relationship between angles and side ratios was known to exist, there was no general procedure for calculating specific instances of it.</p>
+
+        <p>Instead, a variety of geometric methods were used to derive individual cases, and the results were gradually recorded in books called <em>Trigonometric Tables</em> for future use.</p>
+
+        <p>Right-angled triangles became the focus because they were practical for most use-cases and greatly simplified the process of working out the relationships, since we start off already knowing one angle.</p>
+
+        <p>In this chapter we are going to get familiar with right-angled triangles are use some geometry to work out the mapping between certain angles and certain side ratios.</p>
 
         <h4 class="subsection-title">Hypotenuse</h4>
 
@@ -70,21 +136,21 @@
               <path class="shape-leg" d="M92 168 L92 16" />
               <path class="shape-leg" d="M92 168 L119 168" />
               <path class="shape-hyp" d="M92 16 L119 168" />
-              <path class="shape-right-angle" d="M92 150 H110 V168" />
+              <path class="shape-right-angle" d="M92 158 H102 V168" />
             </g>
             <g class="shape-panel" transform="translate(310 20)">
-              <path class="shape-fill" d="M34 168 L168 168 L168 34 Z" />
+              <path class="shape-fill" d="M34 168 L168 168 L34 34 Z" />
               <path class="shape-leg" d="M34 168 L168 168" />
-              <path class="shape-leg" d="M168 168 L168 34" />
-              <path class="shape-hyp" d="M34 168 L168 34" />
-              <path class="shape-right-angle" d="M150 168 V150 H168" />
+              <path class="shape-leg" d="M34 168 L34 34" />
+              <path class="shape-hyp" d="M34 34 L168 168" />
+              <path class="shape-right-angle" d="M34 154 H48 V168" />
             </g>
             <g class="shape-panel" transform="translate(570 20)">
               <path class="shape-fill" d="M24 168 L178 168 L24 140 Z" />
               <path class="shape-leg" d="M24 168 L178 168" />
               <path class="shape-leg" d="M24 168 L24 140" />
               <path class="shape-hyp" d="M24 140 L178 168" />
-              <path class="shape-right-angle" d="M24 150 H42 V168" />
+              <path class="shape-right-angle" d="M24 158 H34 V168" />
             </g>
           </svg>
         </figure>
@@ -95,9 +161,135 @@
 
         <h5 class="subsection-title">Consider a triangle with angles $90^\circ$, $60^\circ$, and $30^\circ$.</h5>
 
+        <p>What are the proportions between its sides?</p>
+
+        <figure class="thirty-sixty-triangle-figure" aria-label="A 30-60-90 right-angled triangle with the right angle at the bottom right">
+          <svg viewBox="0 0 420 260" role="img" aria-labelledby="thirty-sixty-base-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-base-title">A 30-60-90 right-angled triangle</title>
+            <path class="triangle-fill" d="M245 206 H332 V56 Z" />
+            <path class="triangle-arc" d="M280 206 A35 35 0 0 0 262.5 175.7" />
+            <path class="triangle-arc" d="M332 92 A36 36 0 0 1 314 87.2" />
+            <path class="triangle-right-angle" d="M306 206 V180 H332" />
+            <path class="triangle-leg" d="M245 206 H332 V56" />
+            <path class="triangle-hypotenuse" d="M245 206 L332 56" />
+            <text class="triangle-label" x="214" y="225">60°</text>
+            <text class="triangle-label" x="286" y="58">30°</text>
+          </svg>
+        </figure>
+
         <p>To simplify the calculations, let the hypotenuse have length $1$.</p>
 
-        <p>Now duplicate the triangle and place the copy beside it. The two triangles form an equilateral triangle.</p>
+        <figure class="thirty-sixty-triangle-figure" aria-label="A 30-60-90 right-angled triangle with hypotenuse length 1">
+          <svg viewBox="0 0 420 260" role="img" aria-labelledby="thirty-sixty-hyp-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-hyp-title">A 30-60-90 right-angled triangle with hypotenuse length 1</title>
+            <path class="triangle-fill" d="M245 206 H332 V56 Z" />
+            <path class="triangle-arc" d="M280 206 A35 35 0 0 0 262.5 175.7" />
+            <path class="triangle-arc" d="M332 92 A36 36 0 0 1 314 87.2" />
+            <path class="triangle-right-angle" d="M306 206 V180 H332" />
+            <path class="triangle-leg" d="M245 206 H332 V56" />
+            <path class="triangle-hypotenuse" d="M245 206 L332 56" />
+            <text class="triangle-label" x="214" y="225">60°</text>
+            <text class="triangle-label" x="286" y="58">30°</text>
+            <text class="triangle-length-label" x="252" y="114">1</text>
+          </svg>
+        </figure>
+
+        <p>Now duplicate the triangle and place the copy beside it.</p>
+
+        <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="Two 30-60-90 right-angled triangles forming an equilateral triangle">
+          <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-pair-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-pair-title">Two duplicated 30-60-90 triangles forming an equilateral triangle</title>
+            <path class="triangle-fill" d="M104 236 H260 V101 Z" />
+            <path class="triangle-fill triangle-fill-copy" d="M260 236 H416 L260 101 Z" />
+            <path class="triangle-right-angle" d="M236 236 V212 H260" />
+            <path class="triangle-right-angle" d="M284 236 V212 H260" />
+            <path class="triangle-arc" d="M139 236 A35 35 0 0 0 130.5 213.1" />
+            <path class="triangle-arc" d="M237.3 120.6 A30 30 0 0 0 260 131" />
+            <path class="triangle-arc" d="M260 131 A30 30 0 0 0 282.7 120.6" />
+            <path class="triangle-arc" d="M389.5 213.1 A35 35 0 0 0 381 236" />
+            <path class="triangle-leg" d="M104 236 H260 V101" />
+            <path class="triangle-leg" d="M260 236 H416" />
+            <path class="triangle-leg muted-leg" d="M260 236 V101" />
+            <path class="triangle-hypotenuse" d="M104 236 L260 101" />
+            <path class="triangle-hypotenuse" d="M260 101 L416 236" />
+            <text class="triangle-label" x="74" y="229">60°</text>
+            <text class="triangle-label" x="217" y="84">30°</text>
+            <text class="triangle-label" x="280" y="84">30°</text>
+            <text class="triangle-label" x="424" y="229">60°</text>
+            <text class="triangle-length-label" x="158" y="154">1</text>
+            <text class="triangle-length-label" x="354" y="154">1</text>
+          </svg>
+        </figure>
+
+        <p>The two triangles now form an equilateral triangle.</p>
+
+        <p>We can add the angles to see that all the angles of the equilateral triangle are $60^\circ$.</p>
+
+        <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="Two 30-degree angles adding to a 60-degree angle in an equilateral triangle">
+          <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-sum-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-sum-title">Two 30-degree angles adding to a 60-degree angle</title>
+            <path class="triangle-fill" d="M104 236 H260 V101 Z" />
+            <path class="triangle-fill triangle-fill-copy" d="M260 236 H416 L260 101 Z" />
+            <path class="triangle-right-angle" d="M236 236 V212 H260" />
+            <path class="triangle-right-angle" d="M284 236 V212 H260" />
+            <path class="triangle-arc" d="M139 236 A35 35 0 0 0 130.5 213.1" />
+            <path class="triangle-arc" d="M237.3 120.6 A30 30 0 0 0 260 131" />
+            <path class="triangle-arc" d="M260 131 A30 30 0 0 0 282.7 120.6" />
+            <path class="triangle-arc" d="M389.5 213.1 A35 35 0 0 0 381 236" />
+            <path class="triangle-leg" d="M104 236 H260 V101" />
+            <path class="triangle-leg" d="M260 236 H416" />
+            <path class="triangle-leg muted-leg" d="M260 236 V101" />
+            <path class="triangle-hypotenuse" d="M104 236 L260 101" />
+            <path class="triangle-hypotenuse" d="M260 101 L416 236" />
+            <text class="triangle-label purple-angle" x="74" y="229">60°</text>
+            <text class="triangle-label" x="217" y="84">30°</text>
+            <text class="triangle-label plus-label" x="252" y="84">+</text>
+            <text class="triangle-label" x="280" y="84">30°</text>
+            <text class="triangle-label equals-label" x="322" y="84">=</text>
+            <text class="triangle-label purple-angle" x="344" y="84">60°</text>
+            <text class="triangle-label purple-angle" x="424" y="229">60°</text>
+            <text class="triangle-length-label" x="158" y="154">1</text>
+            <text class="triangle-length-label" x="354" y="154">1</text>
+          </svg>
+        </figure>
+
+        <p>Given that all the angles are the same, all the side lengths must be the same. This means the side at the bottom must also be length $1$.</p>
+
+        <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="Equilateral triangle formed from two right triangles with the bottom side marked as length 1">
+          <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-bottom-one-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-bottom-one-title">The full bottom side of the equilateral triangle is length 1</title>
+            <path class="triangle-fill" d="M104 236 H260 V101 Z" />
+            <path class="triangle-fill triangle-fill-copy" d="M260 236 H416 L260 101 Z" />
+            <path class="triangle-leg" d="M104 236 H260 V101" />
+            <path class="triangle-leg" d="M260 236 H416" />
+            <path class="triangle-leg muted-leg" d="M260 236 V101" />
+            <path class="triangle-hypotenuse" d="M104 236 L260 101" />
+            <path class="triangle-hypotenuse" d="M260 101 L416 236" />
+            <path class="triangle-bottom-highlight orange-bottom-highlight" d="M104 236 H416" />
+            <text class="triangle-length-label orange-length-label" x="253" y="275">1</text>
+            <text class="triangle-length-label" x="158" y="154">1</text>
+            <text class="triangle-length-label" x="354" y="154">1</text>
+          </svg>
+        </figure>
+
+        <p>We can therefore tell that the size of the bottom of our original right-angled triangle must be $\frac{1}{2}$.</p>
+
+        <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="The bottom side split into two halves of length one half">
+          <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-halves-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-halves-title">Each right triangle has a bottom side of length one half</title>
+            <path class="triangle-fill" d="M104 236 H260 V101 Z" />
+            <path class="triangle-fill triangle-fill-copy" d="M260 236 H416 L260 101 Z" />
+            <path class="triangle-leg" d="M104 236 H260 V101" />
+            <path class="triangle-leg" d="M260 236 H416" />
+            <path class="triangle-leg muted-leg" d="M260 236 V101" />
+            <path class="triangle-hypotenuse" d="M104 236 L260 101" />
+            <path class="triangle-hypotenuse" d="M260 101 L416 236" />
+            <path class="triangle-half-highlight" d="M104 236 H260" />
+            <path class="triangle-half-highlight" d="M260 236 H416" />
+            <text class="triangle-length-label half-length-label orange-length-label" x="164" y="275">1/2</text>
+            <text class="triangle-length-label half-length-label orange-length-label" x="320" y="275">1/2</text>
+          </svg>
+        </figure>
 
         <p>Because the resulting triangle is equilateral:</p>
 
@@ -115,7 +307,25 @@
           <li>$\text{shorter side} = \frac{1}{2}$</li>
         </ul>
 
-        <p>We can also find the remaining side using Pythagoras:</p>
+        <figure class="thirty-sixty-triangle-figure thirty-sixty-final-triangle" aria-label="Original right triangle with hypotenuse length 1 and shorter side length one half">
+          <svg viewBox="0 0 420 280" role="img" aria-labelledby="thirty-sixty-known-sides-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-known-sides-title">The original 30-60-90 triangle with two known side lengths</title>
+            <path class="triangle-fill" d="M245 206 H332 V56 Z" />
+            <path class="triangle-right-angle" d="M306 206 V180 H332" />
+            <path class="triangle-arc" d="M280 206 A35 35 0 0 0 262.5 175.7" />
+            <path class="triangle-arc" d="M332 92 A36 36 0 0 1 314 87.2" />
+            <path class="triangle-leg triangle-half-bottom-side" d="M245 206 H332" />
+            <path class="triangle-leg" d="M332 206 V56" />
+            <path class="triangle-hypotenuse" d="M245 206 L332 56" />
+            <text class="triangle-label" x="214" y="225">60°</text>
+            <text class="triangle-label" x="286" y="58">30°</text>
+            <text class="triangle-length-label" x="252" y="114">1</text>
+            <text class="triangle-length-label half-length-label" x="266" y="244">1/2</text>
+            <text class="triangle-length-label unknown-length-label" x="350" y="145">?</text>
+          </svg>
+        </figure>
+
+        <p>We can then find the remaining side using Pythagoras:</p>
 
         <p class="display-equation">$$\left(\frac{1}{2}\right)^2 + x^2 = 1^2$$</p>
         <p class="display-equation">$$\frac{1}{4} + x^2 = 1$$</p>
@@ -130,19 +340,84 @@
           <li>$\text{leg 2} = \frac{\sqrt{3}}{2}$</li>
         </ul>
 
-        <p>Now finding the ratios just requires setting an opposite and adjacent side, let's say:</p>
+        <figure class="thirty-sixty-triangle-figure thirty-sixty-final-triangle" aria-label="Original right triangle with all side lengths labelled">
+          <svg viewBox="0 0 430 300" role="img" aria-labelledby="thirty-sixty-all-sides-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="thirty-sixty-all-sides-title">The original 30-60-90 triangle with all side lengths labelled</title>
+            <path class="triangle-fill" d="M245 206 H332 V56 Z" />
+            <path class="triangle-right-angle" d="M306 206 V180 H332" />
+            <path class="triangle-arc" d="M280 206 A35 35 0 0 0 262.5 175.7" />
+            <path class="triangle-arc" d="M332 92 A36 36 0 0 1 314 87.2" />
+            <path class="triangle-leg triangle-half-bottom-side" d="M245 206 H332" />
+            <path class="triangle-leg triangle-radical-side" d="M332 206 V56" />
+            <path class="triangle-hypotenuse" d="M245 206 L332 56" />
+            <text class="triangle-label" x="214" y="225">60°</text>
+            <text class="triangle-label" x="286" y="58">30°</text>
+            <text class="triangle-length-label" x="252" y="114">1</text>
+            <text class="triangle-length-label half-length-label" x="266" y="244">1/2</text>
+            <text class="triangle-length-label radical-length-label" x="350" y="144">√3/2</text>
+          </svg>
+        </figure>
 
-        <p class="display-equation">$$h= 1,\qquad o = \frac{1}{2}, \qquad a = \frac{\sqrt{3}}{2}$$</p>
+        <p>So, using just geometry and taking advantage of the symmetry of this shape, we have worked out what the side lengths must be relative to the hypotenuse.</p>
+
+        <p>The final step is work out what the ratios must be from the perspective of each angle.</p>
+
+        <p>We select the angle we want to find and label the sides accordingly.</p>
+
+        <figure class="trig-figure trig-triangle-figure" data-right-triangle-labels>
+          <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-ratio-labels-title">
+            <title id="right-triangle-ratio-labels-title">Right triangle labelled hypotenuse, opposite, and adjacent</title>
+            <polygon class="trig-triangle-fill" points="88,250 416,250 416,70" />
+            <line class="trig-line trig-line-adjacent" data-trig-base x1="88" y1="250" x2="416" y2="250" />
+            <line class="trig-line trig-line-cyan" data-trig-vertical x1="416" y1="250" x2="416" y2="70" />
+            <line class="trig-line trig-line-gold" x1="88" y1="250" x2="416" y2="70" />
+            <path class="trig-angle-arc" data-trig-arc d="M 148 250 A 60 60 0 0 0 141 219" />
+            <path class="trig-right-angle" d="M 386 250 L 386 220 L 416 220" />
+            <text class="trig-label" data-trig-theta x="157" y="241">&theta;</text>
+            <text class="trig-small-label trig-adjacent-text" data-trig-base-label x="227" y="275">adjacent</text>
+            <text class="trig-small-label trig-opposite-text" data-trig-vertical-label x="427" y="166">opposite</text>
+            <text class="trig-small-label trig-hypotenuse-text" x="180" y="116">hypotenuse</text>
+          </svg>
+          <div class="trig-figure-actions">
+            <button type="button" data-trig-switch>Switch</button>
+          </div>
+        </figure>
+
+        <p>So, from the perspective of the $30^\circ$ angle:</p>
+
+        <ul>
+          <li>The ratio between the opposite and hypotenuse is: $\frac{o}{h} = \frac{0.5}{1} = 0.5$</li>
+          <li>The ratio between the adjacent and hypotenuse is: $\frac{a}{h}= \frac{\frac{\sqrt{3}}{2}}{1} =\frac{\sqrt{3}}{2}$</li>
+        </ul>
+
+        <p>And from the perspective of the $60^\circ$ angle:</p>
+
+        <ul>
+          <li>The ratio between the opposite and adjacent is: $\frac{o}{h}= \frac{\frac{\sqrt{3}}{2}}{1} =\frac{\sqrt{3}}{2}$</li>
+          <li>The ratio between the adjacent and hypotenuse is: $\frac{a}{h}= \frac{0.5}{1} = 0.5$</li>
+        </ul>
+
+        <p>These particular ratios were very common and so they were given names: sine and cosine.</p>
 
         <p class="display-equation">$\large sine = \frac{o}{h}$</p>
 
         <p class="display-equation">$\large cosine = \frac{a}{h}$</p>
 
-        <p class="display-equation">$sine = \frac{0.5}{1} = 0.5$</p>
+        <p>So we have worked out that for a right-angled triangle with an angle of <strong>either</strong> $60^\circ$ or $30^\circ$ (because if we have one, we must have the other), there must be one side that is half as big as the hypotenuse and another side that is $\frac{\sqrt{3}}{2}$ times as big as the hypotenuse.</p>
 
-        <p class="display-equation">cosine  = $\frac{\frac{\sqrt{3}}{2}}{1} = \frac{\sqrt{3}}{2}$</p>
+        <p>Whether or not those sides touch the $60^\circ$ or $30^\circ$ angle depends on...</p>
 
-        <p>Mathematicians would then record the answers in something they called "Trigonometric Tables", so that if they encountered such an angle they could immediately find the ratios between side lengths. While calculating the above ratio was relatively straightforward, it is much more challenging with more awkward values and so these tables became very useful.</p>
+        <p>Mathematicians would then record this information in something they called a "Trigonometric Tables", so that if they encountered such an angle they could immediately find the ratios between side lengths.</p>
+
+        <p>While calculating the above ratio was relatively straightforward, it is much more challenging with more awkward values and so these tables became very useful.</p>
+
+        <iframe
+          class="essay-widget historical-trigonometrist-widget"
+          src="trigonometry/right-angled-triangles/historical-trigonometrist-widget.html"
+          title="Interactive widget about historical trigonometric tables"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
 
         <hr class="section-divider" />
 

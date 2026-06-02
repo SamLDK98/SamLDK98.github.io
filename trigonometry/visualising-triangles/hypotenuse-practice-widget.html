@@ -28,7 +28,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    background: var(--bg);
+    background: transparent;
     color: var(--text);
     font-family: 'EB Garamond', Georgia, serif;
     font-size: 17px;
@@ -36,9 +36,8 @@
     -webkit-font-smoothing: antialiased;
   }
   body {
-    min-height: 100vh;
-    padding: 1.5rem 1rem;
-    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+    min-height: auto;
+    padding: 0;
   }
   .widget {
     max-width: 720px;
@@ -58,7 +57,7 @@
     padding: 1.3rem 1.6rem 1rem;
     border-bottom: 1px solid var(--rule);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
@@ -180,14 +179,14 @@
     font-style: italic;
     font-size: 0.96rem;
     color: var(--text-dim);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     text-align: center;
     transition: border-color 0.3s, background 0.3s, color 0.3s;
   }
-  .feedback.good { border-color: var(--green); background: rgba(136,201,124,0.08); color: var(--green); font-style: normal; }
-  .feedback.bad  { border-color: var(--red);   background: rgba(229,121,148,0.06); color: var(--red); }
+  .feedback.good { display: flex; border-color: var(--green); background: rgba(136,201,124,0.08); color: var(--green); font-style: normal; }
+  .feedback.bad  { display: flex; border-color: var(--red);   background: rgba(229,121,148,0.06); color: var(--red); }
   .controls {
     display: flex;
     justify-content: flex-end;
@@ -248,10 +247,6 @@
 
 <div class="widget">
   <div class="header">
-    <div>
-      <div class="eyebrow">Widget · Right Triangles</div>
-      <h1>Find the <em>hypotenuse</em></h1>
-    </div>
     <div class="scoreboard" id="play-scoreboard">
       <div class="stat"><div class="lbl">Trial</div><div class="num" id="sb-trial">1 / 50</div></div>
       <div class="stat"><div class="lbl">Errors</div><div class="num" id="sb-score">0</div></div>
@@ -280,7 +275,7 @@
         <path id="ra-mark" d="" style="display:none"></path>
       </svg>
     </div>
-    <div class="feedback" id="feedback" aria-live="polite">Click the side opposite the right angle.</div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
     <div class="trial-spacer"></div>
   </div>
 
@@ -311,7 +306,7 @@
   var expert = false;
 
   function pickAcute() {
-    if (expert) return 82 + Math.random() * 2;             // near-90° slivers; other acute angle 6-8°
+    if (expert) return 82 + Math.random() * 2;
     var r = Math.random();
     if (r < 0.08) return 45;                               // 45-45-90 (isoceles)
     if (r < 0.16) return (Math.random() < 0.5 ? 30 : 60);  // 30-60-90, either handedness
@@ -474,7 +469,7 @@
     paintTriangle();
     paintPips();
     feedbackEl.className = 'feedback';
-    feedbackEl.textContent = 'Click the side opposite the right angle.';
+    feedbackEl.textContent = '';
     svg.style.cursor = 'default';
     updateScoreboard();
   }
@@ -579,7 +574,7 @@
     expert = e.target.checked;
     var hint = $('#mode-hint');
     hint.textContent = expert
-      ? 'Expert · one angle 82°–84° (near-90° slivers)'
+      ? 'Expert · one angle 82°–84°'
       : 'Standard angles · 12°–78°';
     hint.classList.toggle('expert', expert);
     resetRound();

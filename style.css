@@ -1686,6 +1686,16 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 820px;
 }
 
+.trigonometry-right-angled-triangles-page .hypotenuse-practice-widget {
+  height: 740px;
+  margin-bottom: 1.4rem;
+}
+
+.intro-linear-algebra-page .historical-trigonometrist-widget {
+  width: min(100%, 980px);
+  height: 760px;
+}
+
 .right-triangle-shape-strip {
   width: min(100%, 820px);
   margin: 2rem auto 2.4rem;
@@ -1722,6 +1732,204 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   stroke: #6eddd3;
   stroke-linecap: square;
   stroke-width: 3;
+}
+
+.triangle-opening-panels {
+  width: min(100%, 860px);
+  margin: 1.75rem auto 2.35rem;
+}
+
+.triangle-scaling-panels {
+  margin-top: 0.7rem;
+  margin-bottom: 1.5rem;
+}
+
+.triangle-opening-panels svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.triangle-opening-panels .opening-panel {
+  opacity: 0.98;
+}
+
+.triangle-opening-panels .opening-triangle-fill {
+  fill: rgba(244, 177, 61, 0.07);
+}
+
+.triangle-opening-panels .opening-side {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 6;
+}
+
+.triangle-opening-panels .side-blue {
+  stroke: #6eddd3;
+}
+
+.triangle-opening-panels .side-gold {
+  stroke: #f4b13d;
+}
+
+.triangle-opening-panels .side-teal {
+  stroke: #8ec9a7;
+}
+
+.triangle-opening-panels .opening-snap-dot {
+  fill: rgba(238, 231, 216, 0.75);
+}
+
+.triangle-opening-panels .opening-label,
+.triangle-opening-panels .opening-angle-label {
+  fill: #eee7d8;
+  font-family: "EB Garamond", Georgia, serif;
+  font-feature-settings: "zero" 0;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.triangle-opening-panels .opening-angle-label {
+  fill: #c9bba4;
+  font-size: 14px;
+}
+
+.thirty-sixty-triangle-figure {
+  width: min(100%, 860px);
+  margin: 1.6rem auto 2rem;
+}
+
+.thirty-sixty-pair-figure {
+  width: min(100%, 860px);
+}
+
+.thirty-sixty-triangle-figure svg {
+  display: block;
+  width: min(100%, 520px);
+  height: auto;
+}
+
+.thirty-sixty-pair-figure svg {
+  width: min(100%, 640px);
+}
+
+.thirty-sixty-final-triangle svg {
+  width: min(100%, 620px);
+}
+
+.thirty-sixty-triangle-figure .triangle-fill {
+  fill: rgba(244, 177, 61, 0.08);
+}
+
+.thirty-sixty-triangle-figure .triangle-leg,
+.thirty-sixty-triangle-figure .triangle-hypotenuse,
+.thirty-sixty-triangle-figure .triangle-right-angle,
+.thirty-sixty-triangle-figure .triangle-arc {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.thirty-sixty-triangle-figure .triangle-leg {
+  stroke: #ffffff;
+  stroke-width: 5;
+}
+
+.thirty-sixty-triangle-figure .triangle-half-bottom-side {
+  stroke: #f4b13d;
+}
+
+.thirty-sixty-triangle-figure .triangle-radical-side {
+  stroke: #f4b13d;
+}
+
+.thirty-sixty-triangle-figure .muted-leg {
+  stroke: rgba(238, 231, 216, 0.35);
+  stroke-dasharray: 8 8;
+}
+
+.thirty-sixty-triangle-figure .triangle-hypotenuse {
+  stroke: #f4b13d;
+  stroke-width: 5.5;
+}
+
+.thirty-sixty-triangle-figure .triangle-right-angle {
+  stroke: #6eddd3;
+  stroke-width: 2.2;
+}
+
+.thirty-sixty-triangle-figure .triangle-arc {
+  stroke: #6eddd3;
+  stroke-width: 2.2;
+}
+
+.thirty-sixty-triangle-figure .triangle-bottom-highlight,
+.thirty-sixty-triangle-figure .triangle-half-highlight {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 8;
+}
+
+.thirty-sixty-triangle-figure .triangle-bottom-highlight {
+  stroke: #c98cff;
+}
+
+.thirty-sixty-triangle-figure .orange-bottom-highlight {
+  stroke: #f4b13d;
+}
+
+.thirty-sixty-triangle-figure .triangle-half-highlight {
+  stroke: #f4b13d;
+}
+
+.thirty-sixty-triangle-figure .triangle-half-highlight-copy {
+  stroke: #6eddd3;
+}
+
+.thirty-sixty-triangle-figure .triangle-label,
+.thirty-sixty-triangle-figure .triangle-length-label {
+  fill: #eee7d8;
+  font-family: "EB Garamond", Georgia, serif;
+  font-feature-settings: "zero" 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.thirty-sixty-triangle-figure .triangle-length-label {
+  fill: #f4b13d;
+  font-size: 22px;
+}
+
+.thirty-sixty-triangle-figure .bottom-length-label {
+  fill: #c98cff;
+}
+
+.thirty-sixty-triangle-figure .half-length-label {
+  font-size: 18px;
+}
+
+.thirty-sixty-triangle-figure .orange-length-label {
+  fill: #f4b13d;
+}
+
+.thirty-sixty-triangle-figure .unknown-length-label {
+  fill: #f4b13d;
+  font-size: 24px;
+}
+
+.thirty-sixty-triangle-figure .radical-length-label {
+  font-size: 17px;
+}
+
+.thirty-sixty-triangle-figure .purple-angle {
+  fill: #c98cff;
+}
+
+.thirty-sixty-triangle-figure .plus-label,
+.thirty-sixty-triangle-figure .equals-label {
+  fill: rgba(238, 231, 216, 0.72);
 }
 
 .intro-linear-algebra-page .degree-circle-widget {

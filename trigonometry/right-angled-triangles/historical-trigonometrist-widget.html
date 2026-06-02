@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historical Trigonometrist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --opp: #e8a13b;
+    --opp-glow: rgba(232, 161, 59, 0.4);
+    --adj: #6dd3c4;
+    --adj-glow: rgba(109, 211, 196, 0.4);
+    --hyp: #b896d8;
+    --hyp-glow: rgba(184, 150, 216, 0.35);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --green: #88c97c;
+    --green-glow: rgba(136, 201, 124, 0.45);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+
+  /* —— Header —— */
+  .header {
+    padding: 1.4rem 1.75rem 1.1rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.3rem;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.55rem;
+    letter-spacing: -0.005em;
+    font-variation-settings: "opsz" 144;
+    color: var(--text);
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .level-pip-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+  .level-pip {
+    width: 1.65rem;
+    height: 1.65rem;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--text-faint);
+    transition: all 0.25s;
+  }
+  .level-pip.current {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.1);
+  }
+  .level-pip.done {
+    color: var(--green);
+    border-color: var(--green);
+    background: rgba(136, 201, 124, 0.08);
+  }
+
+  /* —— Prompt —— */
+  .prompt {
+    padding: 1.2rem 1.75rem 1rem;
+    border-bottom: 1px solid var(--rule);
+    background: rgba(0, 0, 0, 0.12);
+  }
+  .prompt-intro {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 0.96rem;
+    max-width: 60ch;
+  }
+  .prompt-mission {
+    margin-top: 0.5rem;
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 1.35rem;
+    color: var(--accent);
+    letter-spacing: -0.005em;
+  }
+  .prompt-mission .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.93em;
+  }
+
+  /* —— Main area —— */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+  }
+  @media (max-width: 880px) {
+    .main { grid-template-columns: 1fr; }
+    .toolbox { border-left: none !important; border-top: 1px solid var(--rule); }
+  }
+  .workspace {
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 360px;
+    background:
+      radial-gradient(ellipse at center, rgba(212, 184, 136, 0.025), transparent 70%);
+  }
+  svg.diagram {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    display: block;
+  }
+  .toolbox {
+    border-left: 1px solid var(--rule);
+    padding: 1.25rem 1.3rem;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 0.55rem;
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .step-btn {
+    text-align: left;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text-dim);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.55rem 0.75rem 0.55rem 2.4rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.93rem;
+    cursor: pointer;
+    transition: all 0.22s;
+    position: relative;
+    line-height: 1.35;
+  }
+  .step-btn::before {
+    content: attr(data-num);
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+  }
+  .step-btn.locked {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .step-btn.current {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(212, 184, 136, 0.08);
+  }
+  .step-btn.current::before { color: var(--accent); }
+  .step-btn.current:hover {
+    background: rgba(212, 184, 136, 0.16);
+  }
+  .step-btn.done {
+    color: var(--text-faint);
+    border-color: var(--rule);
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .step-btn.done::after {
+    content: '✓';
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+  }
+  .step-btn.done::before { color: var(--text-faint); }
+  .step-btn.done, .step-btn.visited { cursor: pointer; }
+  .step-btn.visited {
+    color: var(--text-dim);
+    border-color: var(--rule);
+    background: rgba(0, 0, 0, 0.04);
+  }
+  .step-btn.done:hover, .step-btn.visited:hover {
+    border-color: var(--rule-strong);
+    color: var(--text);
+    background: rgba(212, 184, 136, 0.05);
+  }
+  .nav-controls { display: flex; gap: 0.45rem; margin-top: 0.9rem; }
+  .nav-btn {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.18); color: var(--text-dim);
+    border: 1px solid var(--rule); border-radius: 2px;
+    padding: 0.5rem; font-family: 'EB Garamond', serif; font-style: italic;
+    font-size: 0.9rem; cursor: pointer;
+    transition: border-color 0.18s, color 0.18s, background 0.18s;
+  }
+  .nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: rgba(212, 184, 136, 0.06); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  /* explanation */
+  .explanation {
+    border-top: 1px solid var(--rule);
+    padding: 1rem 1.75rem 1.25rem;
+    background: rgba(0, 0, 0, 0.16);
+    min-height: 4.5rem;
+    display: flex;
+    align-items: center;
+  }
+  .explanation .inner {
+    color: var(--text);
+    font-style: italic;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.99rem;
+    line-height: 1.55;
+    max-width: 70ch;
+  }
+  .explanation .inner.success {
+    color: var(--green);
+    font-style: normal;
+  }
+  .explanation .inner code,
+  .explanation .inner .math {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.9em;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1px 6px;
+    border-radius: 2px;
+    color: var(--accent);
+    margin: 0 0.05em;
+  }
+  .explanation .inner .answer-final {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.4em;
+    color: var(--green);
+    background: rgba(136, 201, 124, 0.1);
+    padding: 0 0.35em;
+    border-radius: 2px;
+  }
+
+  /* next-level button */
+  .level-complete-bar {
+    display: none;
+    padding: 0.85rem 1.75rem;
+    background: rgba(136, 201, 124, 0.08);
+    border-top: 1px solid var(--green);
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .level-complete-bar.visible { display: flex; }
+  .lc-msg {
+    color: var(--green);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+  }
+  .lc-msg .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.92em;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 1px 7px;
+    border-radius: 2px;
+  }
+  .btn {
+    background: rgba(212, 184, 136, 0.14);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    padding: 0.55rem 1rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.18s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: rgba(212, 184, 136, 0.22); }
+
+  /* —— Table —— */
+  .table-section {
+    padding: 1.4rem 1.75rem 1.5rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+  }
+  .table-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .table-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--accent);
+  }
+  .table-sub {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--text-faint);
+  }
+  .trig-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .trig-table th {
+    text-align: left;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--rule);
+    font-weight: 500;
+  }
+  .trig-table td {
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .trig-table tr:last-child td { border-bottom: 0; }
+  .trig-table .angle { width: 18%; color: var(--text-dim); }
+  .trig-table .value { width: 30%; }
+  .trig-table .decimal { width: 22%; color: var(--text-dim); }
+  .trig-table .source { width: 30%; color: var(--text-faint); font-family: 'EB Garamond', serif; font-style: italic; font-size: 0.88rem; }
+  .trig-table tr.trivial td { color: var(--text-dim); }
+  .trig-table tr.trivial .value { color: var(--text-dim); }
+  .trig-table tr.locked .value,
+  .trig-table tr.locked .decimal,
+  .trig-table tr.locked .source { color: var(--text-faint); opacity: 0.6; }
+  .trig-table tr.locked .value::before { content: '— '; }
+  .trig-table tr.derived .value { color: var(--accent); }
+  .trig-table tr.derived .source { color: var(--green); font-style: italic; }
+  .trig-table tr.glow {
+    animation: row-glow 1.6s ease-out;
+  }
+  @keyframes row-glow {
+    0%   { background: rgba(136, 201, 124, 0.35); }
+    100% { background: transparent; }
+  }
+
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  /* —— SVG (Diagram) styling —— */
+  .ws-tri-fill { fill: rgba(214, 196, 168, 0.04); transition: fill 0.4s; }
+  .ws-tri-fill.dim { fill: rgba(214, 196, 168, 0.015); }
+  .ws-tri-fill.highlight { fill: rgba(212, 184, 136, 0.1); }
+  .ws-line {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    fill: none;
+    transition: stroke 0.4s, stroke-width 0.4s, opacity 0.4s;
+  }
+  .ws-line.dim { opacity: 0.25; }
+  .ws-line.bisect { stroke: var(--point); stroke-dasharray: 5 6; filter: drop-shadow(0 0 5px var(--point-glow)); }
+  .ws-line.opp { stroke: var(--opp); filter: drop-shadow(0 0 6px var(--opp-glow)); stroke-width: 4; }
+  .ws-line.adj { stroke: var(--adj); filter: drop-shadow(0 0 6px var(--adj-glow)); stroke-width: 4; }
+  .ws-line.hyp { stroke: var(--hyp); filter: drop-shadow(0 0 6px var(--hyp-glow)); stroke-width: 4; }
+  .ws-line.appearing { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw-in 0.55s ease-out forwards; }
+  @keyframes draw-in { to { stroke-dashoffset: 0; } }
+
+  .ws-arc {
+    fill: none;
+    stroke: var(--point);
+    stroke-width: 2;
+    transition: opacity 0.3s;
+  }
+  .ws-right-angle {
+    fill: none;
+    stroke: rgba(214, 196, 168, 0.6);
+    stroke-width: 1.4;
+    transition: opacity 0.3s;
+  }
+  .ws-vertex {
+    fill: rgba(232, 220, 196, 0.7);
+    r: 3.5;
+  }
+
+  .ws-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    fill: var(--text);
+    font-variant-numeric: tabular-nums;
+    transition: opacity 0.35s, fill 0.35s;
+  }
+  .ws-label.side-len { fill: var(--text); font-size: 17px; }
+  .ws-label.angle    { fill: var(--point); font-size: 15px; font-weight: 500; }
+  .ws-label.opp { fill: var(--opp); }
+  .ws-label.adj { fill: var(--adj); }
+  .ws-label.hyp { fill: var(--hyp); }
+  .ws-label.fade-in { animation: fade-in 0.45s ease-out forwards; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .ws-hidden { opacity: 0; pointer-events: none; }
+
+  /* placeholder text in empty workspace */
+  .ws-empty-text {
+    fill: var(--text-faint);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="header">
+    <div>
+      <div class="eyebrow">Game · Historical Trigonometrist</div>
+      <h1>Build the <em>sine table</em> from scratch</h1>
+    </div>
+    <div class="level-pip-row" id="level-pips">
+      <span>Level</span>
+      <span class="level-pip" data-lv="0">30</span>
+      <span class="level-pip" data-lv="1">45</span>
+      <span class="level-pip" data-lv="2">60</span>
+    </div>
+  </div>
+
+  <div class="prompt">
+    <p class="prompt-intro" id="prompt-intro">
+      Imagine trigonometric tables don't exist. There is no calculator. Your task is to compute the sine ratio from a geometric construction.
+    </p>
+    <p class="prompt-mission" id="prompt-mission">
+      Mission: derive <span class="mono">sin(30°)</span>
+    </p>
+  </div>
+
+  <div class="main">
+    <div class="workspace">
+      <svg id="diagram" class="diagram" viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="A construction diagram that updates as you apply steps">
+        <!-- Contents are rendered dynamically by JS -->
+      </svg>
+    </div>
+
+    <aside class="toolbox">
+      <div>
+        <div class="section-label">Tools</div>
+        <div class="steps" id="steps-list"></div>
+        <div class="nav-controls">
+          <button class="nav-btn" id="back-btn">◀ Back</button>
+          <button class="nav-btn" id="reset-btn">↻ Reset</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="explanation">
+    <div class="inner" id="explanation">
+      Press the first tool to start the construction.
+    </div>
+  </div>
+
+  <div class="level-complete-bar" id="lc-bar">
+    <div class="lc-msg" id="lc-msg"></div>
+    <button class="btn" id="next-level-btn">Next mission →</button>
+  </div>
+
+  <div class="table-section">
+    <div class="table-head">
+      <div class="table-title">Your sine table</div>
+      <div class="table-sub">grows as you derive each value</div>
+    </div>
+    <table class="trig-table" id="trig-table">
+      <thead>
+        <tr>
+          <th>angle</th>
+          <th>sin(θ)</th>
+          <th>decimal</th>
+          <th>source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="trivial" data-angle="0">
+          <td class="angle">0°</td>
+          <td class="value">0</td>
+          <td class="decimal">0.000</td>
+          <td class="source">point on x-axis</td>
+        </tr>
+        <tr class="locked" data-angle="30">
+          <td class="angle">30°</td>
+          <td class="value"></td>
+          <td class="decimal"></td>
+          <td class="source">not yet derived</td>
+        </tr>
+        <tr class="locked" data-angle="45">
+          <td class="angle">45°</td>
+          <td class="value"></td>
+          <td class="decimal"></td>
+          <td class="source">not yet derived</td>
+        </tr>
+        <tr class="locked" data-angle="60">
+          <td class="angle">60°</td>
+          <td class="value"></td>
+          <td class="decimal"></td>
+          <td class="source">not yet derived</td>
+        </tr>
+        <tr class="trivial" data-angle="90">
+          <td class="angle">90°</td>
+          <td class="value">1</td>
+          <td class="decimal">1.000</td>
+          <td class="source">point on y-axis</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    Every entry in your table came from a triangle you drew yourself.
+  </div>
+</div>
+
+<script>
+(function () {
+  // ——————————————————————————————————————————————————————————————
+  //  Level data
+  // ——————————————————————————————————————————————————————————————
+
+  const LEVELS = [
+    {
+      angle: 30,
+      missionHtml: 'derive <span class="mono">sin(30°)</span>',
+      construction: 'equilateral',
+      answer:       { display: '1/2',   decimal: '0.500' },
+      sourceLabel:  'equilateral · perpendicular bisector',
+      introRightTriangle: true,
+      intro: 'Here is the right triangle we want to measure — a right angle, with a <code>30°</code> angle at the top. <code>sin(30°)</code> is its opposite side divided by its hypotenuse, but we don\'t know those lengths yet. The trick: build this very triangle inside a shape we already understand.',
+      steps: [
+        {
+          tool: 'Draw an equilateral triangle',
+          explain: 'Start with a triangle whose <em>three sides are equal</em>. Call each side <code>1</code>. We don\'t know any sines yet, but we know shapes.',
+          stateKey: 'tri'
+        },
+        {
+          tool: 'Label every angle 60°',
+          explain: 'All three sides are equal, so by symmetry all three angles must be equal. Three equal angles summing to <code>180°</code> gives <code>60°</code> each.',
+          stateKey: 'angles60'
+        },
+        {
+          tool: 'Drop a perpendicular from the apex',
+          explain: 'Drop a line straight down from the top vertex to the base. By the triangle\'s mirror symmetry, this line bisects both the base <em>and</em> the apex angle.',
+          stateKey: 'bisect'
+        },
+        {
+          tool: 'Read off the 30-60-90 triangle',
+          explain: 'Look at the right half. It is a right-angled triangle with hypotenuse <code>1</code> (an original side), one angle <code>30°</code> at the top, and base <code>1/2</code> (half the original side).',
+          stateKey: 'isolate'
+        },
+        {
+          tool: 'Apply Pythagoras for the third side',
+          explain: 'For the height: <span class="math">h² + (1/2)² = 1²</span>, so <span class="math">h² = 3/4</span> and <span class="math">h = √3/2</span>.',
+          stateKey: 'pythagoras'
+        },
+        {
+          tool: 'Compute the sine ratio',
+          explain: '<span class="math">sin(30°) = opposite / hypotenuse = (1/2) / 1</span> = <span class="answer-final">1/2</span>.',
+          stateKey: 'ratio30',
+          isFinal: true
+        }
+      ]
+    },
+    {
+      angle: 45,
+      missionHtml: 'derive <span class="mono">sin(45°)</span>',
+      construction: 'square',
+      answer:       { display: '√2/2', decimal: '0.707' },
+      sourceLabel:  'unit square · diagonal',
+      steps: [
+        {
+          tool: 'Draw a unit square',
+          explain: 'A square with all sides <code>1</code>. Four right angles, four equal sides — a different starting shape from before.',
+          stateKey: 'square'
+        },
+        {
+          tool: 'Draw the diagonal',
+          explain: 'Connect two opposite corners. The diagonal cuts the square into two identical right triangles.',
+          stateKey: 'diagonal'
+        },
+        {
+          tool: 'Compute the diagonal\'s length',
+          explain: 'Pythagoras on either right triangle: <span class="math">d² = 1² + 1² = 2</span>, so <span class="math">d = √2</span>.',
+          stateKey: 'diagLen'
+        },
+        {
+          tool: 'Isolate one right triangle',
+          explain: 'Take the lower-right triangle. Its legs are <code>1</code> and <code>1</code>; its hypotenuse is <code>√2</code>.',
+          stateKey: 'isolate45'
+        },
+        {
+          tool: 'Label both non-right angles 45°',
+          explain: 'The legs are equal, so it is isoceles — the two non-right angles are equal. They sum to <code>90°</code>, so each is <code>45°</code>.',
+          stateKey: 'angles45'
+        },
+        {
+          tool: 'Compute the sine ratio',
+          explain: '<span class="math">sin(45°) = opposite / hypotenuse = 1 / √2 = √2 / 2</span>. The simplification rationalises the denominator. Result: <span class="answer-final">√2/2</span>.',
+          stateKey: 'ratio45',
+          isFinal: true
+        }
+      ]
+    },
+    {
+      angle: 60,
+      missionHtml: 'derive <span class="mono">sin(60°)</span>',
+      construction: 'equilateral',
+      answer:       { display: '√3/2', decimal: '0.866' },
+      sourceLabel:  'equilateral · reread the other angle',
+      steps: [
+        {
+          tool: 'Recall the equilateral triangle',
+          explain: 'You already built the right tool for this. Bring back the 30-60-90 triangle with hypotenuse <code>1</code>, base <code>1/2</code>, height <code>√3/2</code>.',
+          stateKey: 'pythagoras'
+        },
+        {
+          tool: 'Find the 60° angle',
+          explain: 'The original 60° angle of the equilateral lives at the bottom corner of the right triangle. Opposite this angle is the <em>height</em>, not the base.',
+          stateKey: 'mark60'
+        },
+        {
+          tool: 'Compute the sine ratio',
+          explain: '<span class="math">sin(60°) = opposite / hypotenuse = (√3/2) / 1</span> = <span class="answer-final">√3/2</span>. Same construction, different angle.',
+          stateKey: 'ratio60',
+          isFinal: true
+        }
+      ]
+    }
+  ];
+
+  // ——————————————————————————————————————————————————————————————
+  //  State
+  // ——————————————————————————————————————————————————————————————
+
+  let levelIdx = 0;
+  let stepIdx = 0;
+  let maxReached = 0;   // furthest stage unlocked (allows jumping back and forth freely)
+  let completed = { 30: false, 45: false, 60: false };
+
+  const $ = (s) => document.querySelector(s);
+  const svg = $('#diagram');
+
+  // ——————————————————————————————————————————————————————————————
+  //  Geometry for the equilateral construction
+  //  Centroid at (250, 195) on a 500x380 canvas
+  // ——————————————————————————————————————————————————————————————
+
+  // For an equilateral triangle with side 220 px, height = 220 * √3/2 ≈ 190.5
+  // Triangle apex up. Centroid at 1/3 from base, 2/3 from apex (vertical).
+  function equilateralPoints() {
+    const side = 220;
+    const h = side * Math.sqrt(3) / 2;
+    const cx = 250, cy = 195;
+    return {
+      A: { x: cx - side / 2, y: cy + h / 3 },         // bottom-left
+      B: { x: cx + side / 2, y: cy + h / 3 },         // bottom-right
+      C: { x: cx,            y: cy - 2 * h / 3 },     // apex
+      M: { x: cx,            y: cy + h / 3 }          // midpoint of AB
+    };
+  }
+
+  function squarePoints() {
+    const side = 200;
+    const cx = 250, cy = 195;
+    return {
+      A: { x: cx - side / 2, y: cy - side / 2 }, // top-left
+      B: { x: cx + side / 2, y: cy - side / 2 }, // top-right
+      C: { x: cx + side / 2, y: cy + side / 2 }, // bottom-right
+      D: { x: cx - side / 2, y: cy + side / 2 }  // bottom-left
+    };
+  }
+
+  // ——————————————————————————————————————————————————————————————
+  //  Build the diagram for the current level / step
+  //  We rebuild from scratch each time — easier than diffing state.
+  // ——————————————————————————————————————————————————————————————
+
+  function clearSvg() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+  }
+  function addEl(name, attrs, parent = svg) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for (const k in attrs) {
+      if (k === 'text') el.textContent = attrs[k];
+      else el.setAttribute(k, attrs[k]);
+    }
+    parent.appendChild(el);
+    return el;
+  }
+
+  function renderDiagram() {
+    clearSvg();
+    const lv = LEVELS[levelIdx];
+
+    // We render based on how many steps have been *completed* (stepIdx).
+    // Each construction has its own renderer.
+    if (lv.construction === 'equilateral') {
+      renderEquilateral(stepIdx, lv);
+    } else if (lv.construction === 'square') {
+      renderSquare(stepIdx, lv);
+    }
+  }
+
+  function drawIntroRightTriangle() {
+    // The target right triangle C–M–B (right angle at M) — same place it will occupy
+    // inside the equilateral, so the construction grows seamlessly around it.
+    const { B, C, M } = equilateralPoints();
+    addEl('polygon', { class: 'ws-tri-fill highlight', points: `${C.x},${C.y} ${M.x},${M.y} ${B.x},${B.y}` });
+    addEl('line', { class: 'ws-line', x1: C.x, y1: C.y, x2: M.x, y2: M.y });   // height
+    addEl('line', { class: 'ws-line', x1: M.x, y1: M.y, x2: B.x, y2: B.y });   // base
+    addEl('line', { class: 'ws-line', x1: C.x, y1: C.y, x2: B.x, y2: B.y });   // hypotenuse
+    const ra = 12;                                                            // right-angle mark, into the triangle
+    addEl('path', { class: 'ws-right-angle', d: `M ${M.x + ra} ${M.y} L ${M.x + ra} ${M.y - ra} L ${M.x} ${M.y - ra}` });
+    [B, C, M].forEach(p => addEl('circle', { class: 'ws-vertex', cx: p.x, cy: p.y }));
+    addEl('text', { class: 'ws-label angle fade-in', x: C.x + 8, y: C.y + 24, text: '30°' });
+    addEl('text', { class: 'ws-label angle fade-in', x: B.x - 30, y: B.y - 8, text: '60°' });
+  }
+
+  function renderEquilateral(progress, lv) {
+    const { A, B, C, M } = equilateralPoints();
+
+    // Whether we're in the level that ends with sin(60°)
+    const isLevel60 = lv.angle === 60;
+
+    // ——— Stage 0: show the target right triangle (level 30) or a placeholder
+    if (progress === 0) {
+      if (lv.introRightTriangle) drawIntroRightTriangle();
+      else addEl('text', {
+        class: 'ws-empty-text', x: 250, y: 195, 'text-anchor': 'middle',
+        'dominant-baseline': 'middle', text: 'apply the first tool to begin'
+      });
+      return;
+    }
+
+    // —— Step 1+: triangle drawn ——
+    // After step "isolate" or later, we want to dim the LEFT half of the triangle.
+    const stateName = lv.steps[progress - 1].stateKey;
+    const order = ['tri', 'angles60', 'bisect', 'isolate', 'pythagoras', 'ratio30', 'mark60', 'ratio60'];
+    const orderIdx = (n) => order.indexOf(n);
+    const stateRank = orderIdx(stateName);
+
+    const triangleVisible      = stateRank >= orderIdx('tri');
+    const angles60Visible      = stateRank >= orderIdx('angles60');
+    const bisectVisible        = stateRank >= orderIdx('bisect');
+    const isolated             = stateRank >= orderIdx('isolate');
+    const pythagorasVisible    = stateRank >= orderIdx('pythagoras');
+    const ratio30Done          = stateRank >= orderIdx('ratio30');
+    const mark60Done           = stateRank >= orderIdx('mark60');
+    const ratio60Done          = stateRank >= orderIdx('ratio60');
+
+    // Triangle fill
+    if (triangleVisible) {
+      addEl('polygon', {
+        class: 'ws-tri-fill' + (isolated ? ' dim' : ''),
+        points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`
+      });
+    }
+    // Highlight right half if isolated
+    if (isolated) {
+      addEl('polygon', {
+        class: 'ws-tri-fill highlight',
+        points: `${M.x},${M.y} ${B.x},${B.y} ${C.x},${C.y}`
+      });
+    }
+
+    // Role-colour the legs based on which angle this level is solving for.
+    // Level 30 (angle at apex C): opposite = half-base (MB).  baseColour=opp, heightColour=adj
+    // Level 60 (angle at vertex B): opposite = height  (CM).  baseColour=adj, heightColour=opp
+    const oppIsHeight = lv.angle === 60;
+    const baseColor   = oppIsHeight ? 'adj' : 'opp';
+    const heightColor = oppIsHeight ? 'opp' : 'adj';
+
+    // Triangle sides
+    if (triangleVisible) {
+      // CA (left side) — dim once isolated
+      addEl('line', { class: 'ws-line' + (isolated ? ' dim' : ''),
+                      x1: C.x, y1: C.y, x2: A.x, y2: A.y });
+      // CB (right side / hypotenuse of right triangle)
+      addEl('line', { class: 'ws-line' + (isolated ? ' hyp' : ''),
+                      x1: C.x, y1: C.y, x2: B.x, y2: B.y });
+      // Base: once isolated, split into AM (dim) + MB (role-coloured)
+      if (isolated) {
+        addEl('line', { class: 'ws-line dim',           x1: A.x, y1: A.y, x2: M.x, y2: M.y });
+        addEl('line', { class: 'ws-line ' + baseColor,  x1: M.x, y1: M.y, x2: B.x, y2: B.y });
+      } else {
+        addEl('line', { class: 'ws-line', x1: A.x, y1: A.y, x2: B.x, y2: B.y });
+      }
+    }
+
+    // Bisecting perpendicular — dashed-pink construction line, becomes a solid coloured leg after isolation
+    if (bisectVisible) {
+      const before = isolated ? ''                      : ' bisect';
+      const after  = isolated ? ' ' + heightColor       : '';
+      addEl('line', {
+        class: 'ws-line' + before + after,
+        x1: C.x, y1: C.y, x2: M.x, y2: M.y
+      });
+      // Right angle mark at M (foot of perpendicular)
+      const ra = 11;
+      addEl('path', {
+        class: 'ws-right-angle',
+        d: `M ${M.x - ra} ${M.y} L ${M.x - ra} ${M.y - ra} L ${M.x} ${M.y - ra}`
+      });
+    }
+
+    // Vertex dots
+    if (triangleVisible) {
+      [A, B, C].forEach(p => addEl('circle', { class: 'ws-vertex', cx: p.x, cy: p.y }));
+      if (bisectVisible) addEl('circle', { class: 'ws-vertex', cx: M.x, cy: M.y });
+    }
+
+    // Angle labels at every vertex (60° each)
+    if (angles60Visible && !isolated) {
+      addEl('text', { class: 'ws-label angle fade-in', x: A.x + 18, y: A.y - 7, text: '60°' });
+      addEl('text', { class: 'ws-label angle fade-in', x: B.x - 36, y: B.y - 7, text: '60°' });
+      addEl('text', { class: 'ws-label angle fade-in', x: C.x - 12, y: C.y + 22, text: '60°' });
+    }
+
+    // Side length labels — change as we progress
+    if (triangleVisible && !isolated) {
+      // Original equilateral with sides "1"
+      // base label (below A-B)
+      addEl('text', { class: 'ws-label side-len fade-in', x: (A.x + B.x) / 2, y: A.y + 22, 'text-anchor': 'middle', text: '1' });
+      // left side label
+      addEl('text', { class: 'ws-label side-len fade-in', x: (A.x + C.x) / 2 - 14, y: (A.y + C.y) / 2 - 2, 'text-anchor': 'end', text: '1' });
+      // right side label
+      addEl('text', { class: 'ws-label side-len fade-in', x: (B.x + C.x) / 2 + 14, y: (B.y + C.y) / 2 - 2, 'text-anchor': 'start', text: '1' });
+    }
+
+    // After isolation: relabel
+    if (isolated) {
+      // Right triangle: legs are MC (vertical, "h" or "√3/2"), MB (horizontal, "1/2"); hyp BC = "1"
+      // base label (M to B) — half-base
+      addEl('text', { class: 'ws-label side-len adj fade-in', x: (M.x + B.x) / 2, y: M.y + 22, 'text-anchor': 'middle', text: '1/2' });
+      // hypotenuse label (C to B)
+      addEl('text', { class: 'ws-label side-len hyp fade-in', x: (B.x + C.x) / 2 + 14, y: (B.y + C.y) / 2 - 2, 'text-anchor': 'start', text: '1' });
+      // height label (C to M) — only "h" before Pythagoras, then "√3/2"
+      const hText = pythagorasVisible ? '√3/2' : 'h';
+      const hClass = pythagorasVisible ? 'ws-label side-len opp fade-in' : 'ws-label side-len opp fade-in';
+      addEl('text', { class: hClass, x: M.x - 14, y: (C.y + M.y) / 2 + 5, 'text-anchor': 'end', text: hText });
+    }
+
+    // Angles inside the right triangle: 30° at top (C), 60° at bottom-left (M? no — at B!)
+    // Wait — actually the 60° angle of the original is at B, the 30° apex of the half is at C.
+    if (isolated) {
+      // 30° at C (apex, looking down into the right half)
+      addEl('text', { class: 'ws-label angle fade-in', x: C.x + 8, y: C.y + 24, text: '30°' });
+      // 60° at B
+      addEl('text', { class: 'ws-label angle fade-in', x: B.x - 30, y: B.y - 8, text: '60°' });
+    }
+
+    // After ratio computed: subtle ratio overlay on the side
+    // (Not strictly necessary — explanation panel shows the math; SVG already has labels.)
+
+    // For level 60°: highlight which side is "opposite the 60°" (the height)
+    if (isLevel60 && mark60Done) {
+      // Pulse the 60° label
+      // Already shown. Could re-emphasize, but skip for simplicity.
+    }
+  }
+
+  function renderSquare(progress, lv) {
+    const { A, B, C, D } = squarePoints();
+
+    if (progress === 0) {
+      addEl('text', {
+        class: 'ws-empty-text', x: 250, y: 195, 'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        text: 'apply the first tool to begin'
+      });
+      return;
+    }
+
+    const order = ['square', 'diagonal', 'diagLen', 'isolate45', 'angles45', 'ratio45'];
+    const orderIdx = (n) => order.indexOf(n);
+    const stateName = lv.steps[progress - 1].stateKey;
+    const stateRank = orderIdx(stateName);
+
+    const sqVisible    = stateRank >= orderIdx('square');
+    const diagVisible  = stateRank >= orderIdx('diagonal');
+    const diagLabel    = stateRank >= orderIdx('diagLen');
+    const isolated45   = stateRank >= orderIdx('isolate45');
+    const angles45Done = stateRank >= orderIdx('angles45');
+    const ratio45Done  = stateRank >= orderIdx('ratio45');
+
+    // Square fill
+    if (sqVisible) {
+      addEl('polygon', {
+        class: 'ws-tri-fill' + (isolated45 ? ' dim' : ''),
+        points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y} ${D.x},${D.y}`
+      });
+    }
+    // Highlight one triangle if isolated
+    if (isolated45) {
+      // We'll highlight triangle BCD (top-right + bottom-right + bottom-left vertices form
+      // the lower-right triangle when split along the diagonal A-C).
+      // Actually: the diagonal goes A (top-left) → C (bottom-right). Then the two triangles are:
+      //   upper-right: A, B, C
+      //   lower-left:  A, C, D
+      // Let's isolate the upper-right one: A, B, C.
+      addEl('polygon', {
+        class: 'ws-tri-fill highlight',
+        points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`
+      });
+    }
+
+    // Square sides — different styling per side depending on isolation
+    if (sqVisible) {
+      const dimL = isolated45 ? ' dim' : '';
+      // AB (top)
+      addEl('line', {
+        class: 'ws-line' + (isolated45 ? ' adj' : ''),
+        x1: A.x, y1: A.y, x2: B.x, y2: B.y
+      });
+      // BC (right)
+      addEl('line', {
+        class: 'ws-line' + (isolated45 ? ' opp' : ''),
+        x1: B.x, y1: B.y, x2: C.x, y2: C.y
+      });
+      // CD (bottom) — dimmed when isolated
+      addEl('line', {
+        class: 'ws-line' + dimL,
+        x1: C.x, y1: C.y, x2: D.x, y2: D.y
+      });
+      // DA (left) — dimmed when isolated
+      addEl('line', {
+        class: 'ws-line' + dimL,
+        x1: D.x, y1: D.y, x2: A.x, y2: A.y
+      });
+    }
+
+    // Diagonal
+    if (diagVisible) {
+      addEl('line', {
+        class: 'ws-line' + (isolated45 ? ' hyp' : ' bisect'),
+        x1: A.x, y1: A.y, x2: C.x, y2: C.y
+      });
+    }
+
+    // Right-angle marker at B if isolated
+    if (isolated45) {
+      const ra = 11;
+      addEl('path', {
+        class: 'ws-right-angle',
+        d: `M ${B.x - ra} ${B.y} L ${B.x - ra} ${B.y + ra} L ${B.x} ${B.y + ra}`
+      });
+    }
+
+    // Vertex dots
+    if (sqVisible) {
+      [A, B, C, D].forEach(p => addEl('circle', { class: 'ws-vertex', cx: p.x, cy: p.y }));
+    }
+
+    // Side labels
+    if (sqVisible && !isolated45) {
+      // four "1" labels around the square
+      addEl('text', { class: 'ws-label side-len fade-in', x: (A.x + B.x) / 2, y: A.y - 12, 'text-anchor': 'middle', text: '1' });
+      addEl('text', { class: 'ws-label side-len fade-in', x: B.x + 14, y: (B.y + C.y) / 2 + 5, 'text-anchor': 'start', text: '1' });
+      addEl('text', { class: 'ws-label side-len fade-in', x: (C.x + D.x) / 2, y: C.y + 22, 'text-anchor': 'middle', text: '1' });
+      addEl('text', { class: 'ws-label side-len fade-in', x: D.x - 14, y: (D.y + A.y) / 2 + 5, 'text-anchor': 'end', text: '1' });
+    }
+
+    // Diagonal label
+    if (diagLabel && !isolated45) {
+      // Position near the midpoint, offset perpendicular
+      const midX = (A.x + C.x) / 2, midY = (A.y + C.y) / 2;
+      addEl('text', {
+        class: 'ws-label side-len fade-in',
+        x: midX + 14, y: midY - 12, 'text-anchor': 'start',
+        fill: 'var(--accent)',
+        text: '√2'
+      });
+    }
+
+    // After isolation: relabel triangle sides
+    if (isolated45) {
+      // AB (top) = adjacent leg "1"
+      addEl('text', { class: 'ws-label side-len adj fade-in', x: (A.x + B.x) / 2, y: A.y - 12, 'text-anchor': 'middle', text: '1' });
+      // BC (right) = opposite leg "1"
+      addEl('text', { class: 'ws-label side-len opp fade-in', x: B.x + 14, y: (B.y + C.y) / 2 + 5, 'text-anchor': 'start', text: '1' });
+      // AC = hypotenuse √2
+      const midX = (A.x + C.x) / 2, midY = (A.y + C.y) / 2;
+      addEl('text', {
+        class: 'ws-label side-len hyp fade-in',
+        x: midX - 12, y: midY + 4, 'text-anchor': 'end',
+        text: '√2'
+      });
+
+      // 45° angles
+      if (angles45Done) {
+        // At A (top-left) the 45° angle of the right triangle ABA
+        addEl('text', { class: 'ws-label angle fade-in', x: A.x + 32, y: A.y + 24, text: '45°' });
+        // At C (bottom-right): the wedge sits between BC (up) and CA (up-left),
+        // so the label needs to land in the upper-left of vertex C
+        addEl('text', { class: 'ws-label angle fade-in', x: C.x - 14, y: C.y - 26, text: '45°' });
+      }
+    }
+  }
+
+  // ——————————————————————————————————————————————————————————————
+  //  UI rendering
+  // ——————————————————————————————————————————————————————————————
+
+  function renderLevelPips() {
+    const pips = document.querySelectorAll('.level-pip');
+    pips.forEach((p, i) => {
+      p.classList.remove('current', 'done');
+      const angle = Number(p.dataset.lv) === 0 ? 30 : Number(p.dataset.lv) === 1 ? 45 : 60;
+      if (completed[angle]) p.classList.add('done');
+      if (i === levelIdx && !completed[angle]) p.classList.add('current');
+    });
+  }
+
+  function renderToolbox() {
+    const lv = LEVELS[levelIdx];
+    const list = $('#steps-list');
+    list.innerHTML = '';
+    lv.steps.forEach((step, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'step-btn';
+      btn.dataset.num = String(i + 1).padStart(2, '0');
+      btn.textContent = step.tool;
+      if (i < stepIdx) btn.classList.add('done');            // applied in the current view
+      else if (i === stepIdx) btn.classList.add('current');  // the next action from here
+      else if (i <= maxReached) btn.classList.add('visited'); // seen before — jump forward
+      else btn.classList.add('locked');                       // not yet unlocked
+      if (i <= maxReached) btn.addEventListener('click', () => goToStage(i + 1));
+      list.appendChild(btn);
+    });
+    // Back is available whenever we're past stage 0
+    $('#back-btn').disabled = (stepIdx === 0);
+  }
+
+  function renderExplanation() {
+    const lv = LEVELS[levelIdx];
+    const exp = $('#explanation');
+    if (stepIdx === 0) {
+      // Intro stage — describe what we're trying to find
+      exp.classList.remove('success');
+      exp.innerHTML = lv.intro || 'Use the first tool to begin the construction.';
+    } else if (stepIdx >= lv.steps.length) {
+      // Final stage — the answer, with the closing ratio explanation
+      exp.classList.add('success');
+      exp.innerHTML = lv.steps[lv.steps.length - 1].explain;
+    } else {
+      // Mid stage — explain the action just completed
+      exp.classList.remove('success');
+      exp.innerHTML = lv.steps[stepIdx - 1].explain;
+    }
+  }
+
+  function renderPrompt() {
+    const lv = LEVELS[levelIdx];
+    $('#prompt-mission').innerHTML = 'Mission: ' + lv.missionHtml;
+    if (levelIdx === 0) {
+      $('#prompt-intro').textContent = 'Imagine trigonometric tables don\'t exist. There is no calculator. Your task is to compute the sine ratio from a geometric construction.';
+    } else if (levelIdx === 1) {
+      $('#prompt-intro').textContent = 'Different angle, different shape. The equilateral was tailor-made for 30° and 60°. For 45° we need something with a 90° corner — a square.';
+    } else {
+      $('#prompt-intro').textContent = 'You already did the work. The 30-60-90 triangle has both angles in it — you just need to read the other side.';
+    }
+  }
+
+  function showLevelCompleteBar() {
+    const lv = LEVELS[levelIdx];
+    $('#lc-msg').innerHTML = `Added <span class="mono">sin(${lv.angle}°) = ${lv.answer.display}</span> to your table.`;
+    const bar = $('#lc-bar');
+    bar.classList.add('visible');
+    const nextBtn = $('#next-level-btn');
+    if (levelIdx < LEVELS.length - 1) {
+      nextBtn.textContent = `Next: derive sin(${LEVELS[levelIdx + 1].angle}°) →`;
+      nextBtn.style.display = '';
+    } else {
+      nextBtn.textContent = 'All missions complete';
+      nextBtn.disabled = true;
+      nextBtn.style.opacity = '0.7';
+      nextBtn.style.cursor = 'default';
+    }
+  }
+  function hideLevelCompleteBar() {
+    $('#lc-bar').classList.remove('visible');
+    const nextBtn = $('#next-level-btn');
+    nextBtn.disabled = false;
+    nextBtn.style.opacity = '';
+    nextBtn.style.cursor = '';
+  }
+
+  function updateTable(animateAngle) {
+    LEVELS.forEach(lv => {
+      const tr = document.querySelector(`tr[data-angle="${lv.angle}"]`);
+      if (!tr) return;
+      if (completed[lv.angle]) {
+        tr.classList.remove('locked');
+        tr.classList.add('derived');
+        tr.querySelector('.value').textContent = lv.answer.display;
+        tr.querySelector('.decimal').textContent = lv.answer.decimal;
+        tr.querySelector('.source').textContent = lv.sourceLabel;
+      }
+    });
+    if (animateAngle != null) {
+      const tr = document.querySelector(`tr[data-angle="${animateAngle}"]`);
+      if (tr) {
+        tr.classList.remove('glow');
+        // Trigger reflow so animation re-runs
+        void tr.offsetWidth;
+        tr.classList.add('glow');
+      }
+    }
+  }
+
+  // ——————————————————————————————————————————————————————————————
+  //  Interaction
+  // ——————————————————————————————————————————————————————————————
+
+  function goToStage(s) {
+    const lv = LEVELS[levelIdx];
+    stepIdx = Math.max(0, Math.min(s, lv.steps.length));
+    if (stepIdx > maxReached) maxReached = stepIdx;
+    renderDiagram();
+    renderToolbox();
+    renderExplanation();
+
+    if (stepIdx >= lv.steps.length) {
+      if (!completed[lv.angle]) {       // mark the table the first time the level is finished
+        completed[lv.angle] = true;
+        updateTable(lv.angle);
+        renderLevelPips();
+      }
+      showLevelCompleteBar();
+    } else {
+      hideLevelCompleteBar();
+    }
+  }
+
+  $('#back-btn').addEventListener('click', () => goToStage(stepIdx - 1));
+  $('#reset-btn').addEventListener('click', () => {
+    // Full reset of this level: clear the construction and start from the intro
+    maxReached = 0;
+    stepIdx = 0;
+    renderDiagram();
+    renderToolbox();
+    renderExplanation();
+    hideLevelCompleteBar();
+  });
+
+  function startLevel(idx) {
+    levelIdx = idx;
+    stepIdx = 0;
+    maxReached = 0;
+    hideLevelCompleteBar();
+    renderPrompt();
+    renderToolbox();
+    renderDiagram();
+    renderExplanation();
+    renderLevelPips();
+  }
+
+  $('#next-level-btn').addEventListener('click', () => {
+    if (levelIdx < LEVELS.length - 1) {
+      startLevel(levelIdx + 1);
+    }
+  });
+
+  // ——————————————————————————————————————————————————————————————
+  //  Init
+  // ——————————————————————————————————————————————————————————————
+
+  startLevel(0);
+})();
+</script>
+
+</body>
+</html>
