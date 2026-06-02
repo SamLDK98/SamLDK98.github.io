@@ -138,7 +138,7 @@
 
         <h4 class="subsection-title">Finding Ratios Geometrically</h4>
 
-        <p>While the $90^\circ$ angle is fixed, the other angles are free to co-vary, meaning we can have different shapes.</p>
+        <p>While the $90^\circ$ angle is fixed, the other angles are free to co-vary, meaning the triangle can take on different shapes.</p>
 
         <figure class="right-triangle-shape-strip" aria-label="Three right-angled triangles with different shapes">
           <svg viewBox="0 0 840 230" role="img" aria-labelledby="right-triangle-shapes-title" xmlns="http://www.w3.org/2000/svg">
@@ -167,13 +167,19 @@
           </svg>
         </figure>
 
-        <p>The $90^\circ$ angle determines that its opposite side will be the longest. That means the ratio between it and the other two will always be less than 1.</p>
+        <p>As the $90^\circ$ angle determines that its opposite side, the hypotenuse, will be the longest, the other sides can only ever be some fraction of it.</p>
 
-        <p>We know that certain sets of angles will result in certain ratios between the sides, so let's try to work out what this ratio is for same right-angled triangles.</p>
+        <p class="display-equation">$$0<\frac{\text{Either other side}}{\text{Hypotenuse}}<1$$</p>
+
+        <p>We know that certain sets of angles result in certain ratios between the sides, so let's try to work out what these ratios must be for some right-angled triangles.</p>
 
         <h5 class="subsection-title">Consider a triangle with angles $90^\circ$, $60^\circ$, and $30^\circ$.</h5>
 
         <p>What are the proportions between its sides?</p>
+
+        <p>By eye, the shorter leg appears to be roughly half or a third of the hypotenuse, while the longer leg looks to be perhaps four-fifths of its length.</p>
+
+        <p>But how can we determine these proportions precisely?</p>
 
         <figure class="thirty-sixty-triangle-figure" aria-label="A 30-60-90 right-angled triangle with the right angle at the bottom right">
           <svg viewBox="0 0 420 260" role="img" aria-labelledby="thirty-sixty-base-title" xmlns="http://www.w3.org/2000/svg">
@@ -206,7 +212,7 @@
           </svg>
         </figure>
 
-        <p>Now duplicate the triangle and place the copy beside it.</p>
+        <p>Imagine a carbon copy of this right-angled triangle. If we flipped it over we could place the two together.</p>
 
         <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="Two 30-60-90 right-angled triangles forming an equilateral triangle">
           <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-pair-title" xmlns="http://www.w3.org/2000/svg">
@@ -235,7 +241,7 @@
 
         <p>The two triangles now form an equilateral triangle.</p>
 
-        <p>We can add the angles to see that all the angles of the equilateral triangle are $60^\circ$.</p>
+        <p>The two $30^\circ$ angles combine to form a $60^\circ$ angle, while the other two angles are already $60^\circ$. The larger triangle therefore has three $60^\circ$ angles.</p>
 
         <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="Two 30-degree angles adding to a 60-degree angle in an equilateral triangle">
           <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-sum-title" xmlns="http://www.w3.org/2000/svg">
@@ -265,7 +271,7 @@
           </svg>
         </figure>
 
-        <p>Given that all the angles are the same, all the side lengths must be the same. This means the side at the bottom must also be length $1$.</p>
+        <p>Given that all the angles are the same, the side lengths must also be the same. Therefore, the bottom side has length 1.</p>
 
         <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="Equilateral triangle formed from two right triangles with the bottom side marked as length 1">
           <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-bottom-one-title" xmlns="http://www.w3.org/2000/svg">
@@ -284,7 +290,7 @@
           </svg>
         </figure>
 
-        <p>We can therefore tell that the size of the bottom of our original right-angled triangle must be $\frac{1}{2}$.</p>
+        <p>Since the two triangles are identical, each contributes the same length to the bottom side. Therefore each half must be $\large \frac{1}{2}$.</p>
 
         <figure class="thirty-sixty-triangle-figure thirty-sixty-pair-figure" aria-label="The bottom side split into two halves of length one half">
           <svg viewBox="0 0 520 300" role="img" aria-labelledby="thirty-sixty-halves-title" xmlns="http://www.w3.org/2000/svg">
@@ -303,20 +309,11 @@
           </svg>
         </figure>
 
-        <p>Because the resulting triangle is equilateral:</p>
-
-        <ul>
-          <li>All three sides have length $1$.</li>
-          <li>All three angles are $60^\circ$.</li>
-        </ul>
-
-        <p>The side that was split by our construction therefore has total length $1$, meaning each half has length $\frac{1}{2}$.</p>
-
-        <p>Returning to our original right triangle, we now know:</p>
+        <p>Returning to our original triangle, we now know:</p>
 
         <ul>
           <li>$\text{hypotenuse} = 1$</li>
-          <li>$\text{shorter side} = \frac{1}{2}$</li>
+          <li>$\text{shorter side} = \large \frac{1}{2}$</li>
         </ul>
 
         <figure class="thirty-sixty-triangle-figure thirty-sixty-final-triangle" aria-label="Original right triangle with hypotenuse length 1 and shorter side length one half">
@@ -337,7 +334,7 @@
           </svg>
         </figure>
 
-        <p>We can then find the remaining side using Pythagoras:</p>
+        <p>We can find the remaining side using Pythagoras' theorem:</p>
 
         <p class="display-equation">$$\left(\frac{1}{2}\right)^2 + x^2 = 1^2$$</p>
         <p class="display-equation">$$\frac{1}{4} + x^2 = 1$$</p>
@@ -348,8 +345,8 @@
 
         <ul>
           <li>$\text{hypotenuse} = 1$</li>
-          <li>$\text{leg 1} = \frac{1}{2}$</li>
-          <li>$\text{leg 2} = \frac{\sqrt{3}}{2}$</li>
+          <li>$\text{shorter side} = \large \frac{1}{2}$</li>
+          <li>$\text{longer side} = \large \frac{\sqrt{3}}{2}$</li>
         </ul>
 
         <figure class="thirty-sixty-triangle-figure thirty-sixty-final-triangle" aria-label="Original right triangle with all side lengths labelled">
@@ -370,11 +367,13 @@
           </svg>
         </figure>
 
-        <p>So, using just geometry and taking advantage of the symmetry of this shape, we have worked out what the side lengths must be relative to the hypotenuse.</p>
+        <p>So, using only geometry and taking advantage of the symmetry of this shape, we have determined the proportions of the sides relative to the hypotenuse.</p>
 
-        <p>The final step is work out what the ratios must be from the perspective of each angle.</p>
+        <p>The final step is to work out what the ratios must be from the perspective of each angle.</p>
 
-        <p>We select the angle we want to find and label the sides accordingly.</p>
+        <p>It may be worth remembering that the greater the angle between two line segments, the longer the line connecting their endpoints must be. Consequently, if we choose the larger angle, the opposite side will be the longer leg.</p>
+
+        <p>Let's work with both angles to see how this changes the labels.</p>
 
         <figure class="trig-figure trig-triangle-figure" data-right-triangle-labels>
           <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-ratio-labels-title">
@@ -397,6 +396,10 @@
 
         <p>So, from the perspective of the $30^\circ$ angle:</p>
 
+        <p>The opposite = $\frac{1}{2}$ (short leg)</p>
+
+        <p>The adjacent = $\frac{\sqrt{3}}{2}$ (long leg)</p>
+
         <ul>
           <li>The ratio between the opposite and hypotenuse is: $\frac{o}{h} = \frac{0.5}{1} = 0.5$</li>
           <li>The ratio between the adjacent and hypotenuse is: $\frac{a}{h}= \frac{\frac{\sqrt{3}}{2}}{1} =\frac{\sqrt{3}}{2}$</li>
@@ -404,24 +407,68 @@
 
         <p>And from the perspective of the $60^\circ$ angle:</p>
 
+        <p>The opposite = $\frac{\sqrt{3}}{2}$ (long leg)</p>
+
+        <p>The adjacent = $\frac{1}{2}$ (short leg)</p>
+
         <ul>
-          <li>The ratio between the opposite and adjacent is: $\frac{o}{h}= \frac{\frac{\sqrt{3}}{2}}{1} =\frac{\sqrt{3}}{2}$</li>
+          <li>The ratio between the opposite and hypotenuse is: $\frac{o}{h}= \frac{\frac{\sqrt{3}}{2}}{1} =\frac{\sqrt{3}}{2}$</li>
           <li>The ratio between the adjacent and hypotenuse is: $\frac{a}{h}= \frac{0.5}{1} = 0.5$</li>
         </ul>
 
-        <p>These particular ratios were very common and so they were given names: sine and cosine.</p>
+        <p>Notice that both perspectives describe the same triangle.</p>
 
-        <p class="display-equation">$\large sine = \frac{o}{h}$</p>
+        <p>In each case we discover the same three side lengths:</p>
 
-        <p class="display-equation">$\large cosine = \frac{a}{h}$</p>
+        <p class="display-equation">$$1:\frac{1}{2}: \frac{\sqrt{3}}{2}$$</p>
 
-        <p>So we have worked out that for a right-angled triangle with an angle of <strong>either</strong> $60^\circ$ or $30^\circ$ (because if we have one, we must have the other), there must be one side that is half as big as the hypotenuse and another side that is $\frac{\sqrt{3}}{2}$ times as big as the hypotenuse.</p>
+        <p>How do we know which angle belongs with which side?</p>
 
-        <p>Whether or not those sides touch the $60^\circ$ or $30^\circ$ angle depends on...</p>
+        <p>Recall that larger angles must be opposite longer sides.</p>
 
-        <p>Mathematicians would then record this information in something they called a "Trigonometric Tables", so that if they encountered such an angle they could immediately find the ratios between side lengths.</p>
+        <p>Since</p>
 
-        <p>While calculating the above ratio was relatively straightforward, it is much more challenging with more awkward values and so these tables became very useful.</p>
+        <p class="display-equation">$$\frac{\sqrt{3}}{2} > \frac{1}{2}$$</p>
+
+        <p>the larger angle, $60^\circ$, must be opposite the side of length $\frac{\sqrt{3}}{2}$.</p>
+
+        <p>Consequently, the $60^\circ$ angle must lie between the sides of lengths $1$ and $\frac{1}{2}$.</p>
+
+        <p>Likewise, the $30^\circ$ angle must be opposite the side of length $\frac{1}{2}$, and therefore lie between the sides of lengths $1$ and $\frac{\sqrt{3}}{2}$.</p>
+
+        <p>Labelling sides in a right-angled triangle as opposite and adjacent became such a common practice that these ratios were given their own names:</p>
+
+        <p class="display-equation">$$\large \text{sine} = \frac{o}{h} \qquad \large \text{cosine} = \frac{a}{h}$$</p>
+
+        <p>Mathematicians would then record the values of these ratios for many different angles in books called Trigonometric Tables.</p>
+
+        <p>A table entry might have looked something like this:</p>
+
+        <div class="responsive-table trig-ratio-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Angle</th>
+                <th>Sine</th>
+                <th>Cosine</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$30^\circ$</td>
+                <td>$\frac{1}{2}$</td>
+                <td>$\frac{\sqrt{3}}{2}$</td>
+              </tr>
+              <tr>
+                <td>$60^\circ$</td>
+                <td>$\frac{\sqrt{3}}{2}$</td>
+                <td>$\frac{1}{2}$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>While the above example was relatively straightforward to derive geometrically, many other angles were considerably more difficult. Trigonometric tables therefore allowed people to look up these values directly rather than deriving them from scratch each time.</p>
 
         <iframe
           class="essay-widget historical-trigonometrist-widget"
