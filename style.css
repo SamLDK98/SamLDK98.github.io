@@ -2003,10 +2003,52 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   overflow: visible;
 }
 
+.angle-question-figure {
+  width: min(100%, 420px);
+  max-width: none;
+  margin: 0.65rem auto 1rem max(0px, calc((100% - 860px) / 2));
+}
+
+.angle-question-figure-wide {
+  width: min(100%, 540px);
+}
+
 .trig-figure svg {
   display: block;
   width: 100%;
   min-height: 260px;
+}
+
+.angle-question-figure svg {
+  min-height: 0;
+}
+
+.euler-formula-statement {
+  width: min(100%, 430px);
+  max-width: none;
+  margin: 1.15rem auto 1.45rem max(0px, calc((100% - 860px) / 2));
+}
+
+.euler-formula-statement svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.euler-formula-statement text {
+  fill: var(--intro-text);
+  font-family: "Libre Baskerville", "EB Garamond", Georgia, serif;
+  font-size: 56px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  filter: drop-shadow(0 0 10px rgba(241, 243, 239, 0.18));
+}
+
+.euler-formula-statement .euler-sup {
+  font-size: 30px;
+  fill: var(--intro-text);
 }
 
 .trig-figure figcaption {
@@ -2133,6 +2175,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   stroke: var(--intro-accent);
   stroke-linecap: round;
   stroke-width: 4;
+}
+
+.angle-question-arc {
+  stroke: #56c7ff;
 }
 
 .trig-triangle-fill {

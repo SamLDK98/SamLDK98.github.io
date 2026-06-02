@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-overview-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Introduction</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>"Trigonometry" translates to <em>triangle measurement</em>.</p>
+
+        <p>Yet <strong>angles</strong> are the real subject of interest; constructing triangles is just an effective method for working with them.</p>
+
+        <p>But why are angles interesting? What even is an angle?</p>
+
+        <p>I would highly recommend pausing and thinking about this second question. Learning is only satisfying when driven by curiosity, so make yourself interested in this question. Interrogate what you think you know. If you can discover what you don't know, it will naturally motivate the search for clarity.</p>
+
+        <p>So...</p>
+
+        <p>Perhaps you pictured an arc between two lines.</p>
+
+        <figure class="trig-figure trig-figure-bare angle-question-figure">
+          <svg viewBox="0 0 520 260" role="img" aria-labelledby="acute-angle-arc-title">
+            <title id="acute-angle-arc-title">An acute angle with a dotted arc marking the angle</title>
+            <path class="trig-angle-arc angle-question-arc" d="M 242 202 A 130 130 0 0 0 227 141" stroke-dasharray="6 7" />
+            <line class="trig-line trig-line-accent" x1="112" y1="202" x2="390" y2="202" stroke-linecap="butt" />
+            <line class="trig-line trig-line-accent" x1="112" y1="202" x2="326" y2="88" stroke-linecap="butt" />
+          </svg>
+        </figure>
+
+        <p>Does the arc represent some kind of distance between the two lines?</p>
+
+        <p>Why is it curved rather than straight if it merely represents distance?</p>
+
+        <figure class="trig-figure trig-figure-bare angle-question-figure">
+          <svg viewBox="0 0 520 260" role="img" aria-labelledby="acute-angle-line-title">
+            <title id="acute-angle-line-title">An acute angle with a straight line drawn between the two rays</title>
+            <line class="trig-line" x1="224" y1="202" x2="224" y2="142" stroke="#56c7ff" stroke-width="4" stroke-linecap="butt" />
+            <line class="trig-line trig-line-accent" x1="112" y1="202" x2="390" y2="202" stroke-linecap="butt" />
+            <line class="trig-line trig-line-accent" x1="112" y1="202" x2="326" y2="88" stroke-linecap="butt" />
+          </svg>
+        </figure>
+
+        <p>What's the nature of this distance? Is it spatial?</p>
+
+        <p>Does the angle increase as the distance between the two lines increases?</p>
+
+        <figure class="trig-figure trig-figure-bare angle-question-figure angle-question-figure-wide">
+          <svg viewBox="0 0 620 300" role="img" aria-labelledby="acute-angle-many-arcs-title">
+            <title id="acute-angle-many-arcs-title">An acute angle with three progressively larger arcs drawn between the rays</title>
+            <path class="trig-angle-arc angle-question-arc" d="M 166 236 A 80 80 0 0 0 158 202" />
+            <path class="trig-angle-arc angle-question-arc" d="M 256 236 A 170 170 0 0 0 239 163" />
+            <path class="trig-angle-arc angle-question-arc" d="M 366 236 A 280 280 0 0 0 339 115" />
+            <line class="trig-line trig-line-accent" x1="86" y1="236" x2="520" y2="236" stroke-linecap="butt" />
+            <line class="trig-line trig-line-accent" x1="86" y1="236" x2="468" y2="54" stroke-linecap="butt" />
+          </svg>
+        </figure>
+
+        <p>If you can't resolve all of these questions just yet, don't fret. There are many interesting ways to think about angles. One of my favourites is as fractions of circles.</p>
+
+        <div class="trig-figure-grid">
+          <figure class="trig-figure trig-figure-bare">
+            <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-circle-title">
+              <title id="angle-circle-title">A circle around an angle showing the angle as part of a full turn</title>
+              <circle class="trig-circle" cx="210" cy="150" r="96" />
+              <line class="trig-line trig-line-accent" x1="210" y1="150" x2="330" y2="150" />
+              <line class="trig-line trig-line-accent" x1="210" y1="150" x2="282" y2="70" />
+              <path class="trig-sector" d="M 306 150 A 96 96 0 0 0 274 79 L 210 150 Z" />
+              <path class="trig-angle-arc" d="M 306 150 A 96 96 0 0 0 274 79" />
+              <text class="trig-label" x="272" y="126">&theta;</text>
+            </svg>
+          </figure>
+        </div>
+
+        <p>We will clarify everything over the coming chapters. However, before we get stuck into the slightly flavourless meat of basic trigonometry, there is one final point I want to make.</p>
+
+        <p>Trigonometry leads to a fascinating revelation about the relationship between geometry, algebra, and imaginary numbers. This is captured in Euler's Formula, often cited as "the most beautiful equation in mathematics". The goal of this course is to reveal its meaning to you.</p>
+
+        <figure class="euler-formula-statement" aria-label="Euler's formula">
+          <svg viewBox="0 0 540 120" role="img" aria-labelledby="euler-identity-title">
+            <title id="euler-identity-title">e to the i pi plus one equals zero</title>
+            <text x="0" y="84">e<tspan class="euler-sup" dx="3" dy="-42">iπ</tspan><tspan dx="8" dy="42"> + 1 = 0</tspan></text>
+          </svg>
+        </figure>
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <span></span>
+          <a class="chapter-nav-link" href="trigonometry-overview.html">
+            <span>Next</span>
+            <strong>Angles and Side-Length Ratios</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
