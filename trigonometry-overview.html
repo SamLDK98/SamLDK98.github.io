@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Angles and Side-Length Ratios | Trigonometry</title>
+  <title>Triangles, Lengths, and Angles | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">Angles and Side-Length Ratios</h1>
+      <h1 class="essay-title">Triangles, Lengths, and Angles</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -34,22 +34,17 @@
   <main>
     <article>
       <section class="essay-section">
-        <h3 class="subsection-title">Why do we need triangles to find angles?</h3>
+        <h3 class="subsection-title">Why do we need triangles to measure angles?</h3>
 
         <p>An angle is a relational construct.</p>
 
         <p>If you try to picture an angle, you need at least two independent things for the angle to exist between.</p>
 
-        <p>Say I'm thinking of an angle between two lines.</p>
+        <p>But why do we need to introduce a third thing (i.e. create a triangle) to work with this relationship?</p>
 
-        <p>I could tell you their lengths:</p>
+        <p>Well, imagine an angle between two lines of fixed length: 4 (blue) and 5 (red).</p>
 
-        <ul class="indented-list">
-          <li>Blue line = 4</li>
-          <li>Yellow line = 5</li>
-        </ul>
-
-        <p>But there's no way for you to know the size of my angle without more information. It could be anything between $0^\circ$ and $180^\circ$.</p>
+        <p>The angle could be anything between $0^\circ$ and $180^\circ$. It's completely free to vary.</p>
 
         <iframe
           class="essay-widget essay-widget-autosize finding-angles-widget"
@@ -59,11 +54,9 @@
           loading="lazy"
         ></iframe>
 
-        <p>If you knew the length of a line connecting the endpoints of these two lines, then you could work out what the angle between them must be.</p>
+        <p>However, if there were another line of fixed length connecting their endpoints, the angle becomes fixed.</p>
 
-        <p>But why?</p>
-
-        <p>Because you can only connect three lines of fixed length to form a triangle in one specific way.</p>
+        <p>Think about it like this: you can only connect three lines of fixed length to form a triangle in one specific way.</p>
 
         <p>For example, if we had three lines with lengths 4, 5 and 6, we could only make them form a triangle with the angles: $41.4^\circ$, $55.8^\circ$, and $82.8^\circ$.</p>
 
@@ -77,6 +70,8 @@
           loading="lazy"
         ></iframe>
 
+        <p>So the side lengths determine the size of angles in a triangle.</p>
+
         <p>But is the same true in reverse?</p>
 
         <p>With angles fixed at $41.4^\circ$, $55.8^\circ$, and $82.8^\circ$, can we form a triangle with different lengths other than 4, 5 and 6?</p>
@@ -89,16 +84,29 @@
           loading="lazy"
         ></iframe>
 
-        <p>Yes — provided the side lengths are scaled proportionally.</p>
+        <p>Yes &mdash; provided the side lengths are scaled proportionally.</p>
 
         <p>The key realisation is that the ratios between the sides are being preserved, i.e. it is the ratios between sides that determine angles!</p>
 
         <p>So:</p>
 
-        <ul class="indented-list">
-          <li>Side lengths determine specific angles.</li>
-          <li>Angles determine specific ratios between side lengths, not absolute lengths.</li>
-        </ul>
+        <p>A specific set of side lengths determines a specific set of angles.</p>
+
+        <p>A specific set of angles determines specific <u>ratios</u> between side lengths.</p>
+
+        <h3 class="subsection-title">Why is this useful?</h3>
+
+        <p>This might seem like a bad deal.</p>
+
+        <p>We introduced an extra line, creating even more quantities to worry about.</p>
+
+        <p>The problem is that an angle by itself is difficult to quantify.</p>
+
+        <p>By embedding an angle inside a triangle, we reduce the challenge to quantifying line lengths, which is typically easier.</p>
+
+        <p>More importantly, the additional constraint makes the sides and angles dependent upon one another. Once this dependency exists, information about the side lengths can be used to infer information about the angles, and vice versa.</p>
+
+        <p>Trigonometry is the study of these relationships.</p>
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
           <a class="chapter-nav-link" href="trigonometry-introduction.html">
