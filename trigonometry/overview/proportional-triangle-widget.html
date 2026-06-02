@@ -10,6 +10,7 @@
       --rule: rgba(214, 196, 168, 0.16);
       --text: #ece2d1;
       --dim: #a89c87;
+      --faint: #6f6557;
       --accent: #d4b888;
       --orange: #e8a13b;
       --cyan: #6dd3c4;
@@ -39,15 +40,80 @@
     }
 
     .controls {
-      display: block;
-      padding: 0.85rem 1rem;
+      padding: 0.6rem 1.25rem 0.4rem;
       border-top: 1px solid var(--rule);
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.12);
     }
 
-    input {
+    .scale-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.35rem;
+    }
+
+    .scale-head .lbl {
+      color: var(--dim);
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+
+    .scale-head .val {
+      color: var(--accent);
+      font-family: "Courier New", monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    input[type="range"] {
+      appearance: none;
+      -webkit-appearance: none;
       width: 100%;
-      accent-color: var(--accent);
+      height: 22px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 2px;
+      background: var(--rule);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 2px;
+      background: var(--rule);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      margin-top: -7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 9px rgba(212, 184, 136, 0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 9px rgba(212, 184, 136, 0.5);
+    }
+
+    .caption {
+      padding: 0.1rem 1.25rem 0.8rem;
+      color: var(--faint);
+      font-size: 0.86rem;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .caption b {
+      color: var(--accent);
+      font-style: normal;
     }
 
     .side {
@@ -111,13 +177,19 @@
       <text class="length-label length-c" id="lengthC" x="0" y="0"></text>
     </svg>
     <div class="controls">
+      <div class="scale-head">
+        <span class="lbl">size</span>
+        <span class="val" id="scaleDisp">&times;1.0</span>
+      </div>
       <input id="scale" type="range" min="1" max="2" value="1" step="0.01" aria-label="Scale triangle proportionally">
     </div>
+    <div class="caption">Same angles, same <b>4 : 5 : 6</b> ratio &mdash; only the size changes.</div>
   </section>
 
   <script>
     const svg = document.getElementById("canvas");
     const scaleInput = document.getElementById("scale");
+    const scaleDisp = document.getElementById("scaleDisp");
     const el = Object.fromEntries([
       "sideA", "sideB", "sideC", "vertexA", "vertexB", "vertexC",
       "arcA", "arcB", "arcC", "angleA", "angleB", "angleC", "lengthA", "lengthB", "lengthC"
@@ -177,6 +249,7 @@
 
     function render() {
       const scale = Number(scaleInput.value);
+      scaleDisp.textContent = `\u00d7${scale.toFixed(1)}`;
       const sideA = sides.a * unit * scale;
       const sideB = sides.b * unit * scale;
       const sideC = sides.c * unit * scale;
