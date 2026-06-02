@@ -40,20 +40,60 @@
 
         <p>Yet <strong>angles</strong> are the real subject of interest; constructing triangles is just an effective method for working with them.</p>
 
-        <p>Angles can be understood as proportions of rotation around a circle; this interpretation eventually connects trigonometry to oscillations, complex numbers, and Euler's formula.</p>
+        <p>But why are angles interesting? What even is an angle?</p>
+
+        <p>I would highly recommend pausing and thinking about this second question. Learning is only satisfying when driven by curiosity, so make yourself interested in this question. Wrestle with it. Doing so will make it clear where you are unclear, and motivate the search for clarity.</p>
+
+        <p>So...</p>
+
+        <p>Perhaps you pictured an arc between two lines.</p>
+
+        <figure class="trig-figure trig-figure-bare">
+          <svg viewBox="0 0 520 260" role="img" aria-labelledby="acute-angle-arc-title">
+            <title id="acute-angle-arc-title">An acute angle with a dotted arc marking the angle</title>
+            <line class="trig-line trig-line-accent" x1="92" y1="205" x2="450" y2="205" />
+            <line class="trig-line trig-line-accent" x1="92" y1="205" x2="370" y2="64" />
+            <path class="trig-angle-arc" d="M 172 205 A 80 80 0 0 0 163 169" stroke-dasharray="5 7" />
+          </svg>
+        </figure>
+
+        <p>You might think of the arc as representing the distance between both lines.</p>
+
+        <p>So why then is it curved? Why not just a straight line?</p>
+
+        <p>How exactly is this distance measured?</p>
+
+        <figure class="trig-figure trig-figure-bare">
+          <svg viewBox="0 0 520 260" role="img" aria-labelledby="acute-angle-line-title">
+            <title id="acute-angle-line-title">An acute angle with a straight line drawn between the two rays</title>
+            <line class="trig-line trig-line-accent" x1="92" y1="205" x2="450" y2="205" />
+            <line class="trig-line trig-line-accent" x1="92" y1="205" x2="370" y2="64" />
+            <line class="trig-line trig-line-muted" x1="224" y1="205" x2="206" y2="151" />
+          </svg>
+        </figure>
+
+        <p>Does the angle between two lines increase as the distance between them increases?</p>
+
+        <figure class="trig-figure trig-figure-bare">
+          <svg viewBox="0 0 620 300" role="img" aria-labelledby="acute-angle-many-arcs-title">
+            <title id="acute-angle-many-arcs-title">An acute angle with three progressively larger arcs drawn between the rays</title>
+            <line class="trig-line trig-line-accent" x1="76" y1="248" x2="562" y2="248" />
+            <line class="trig-line trig-line-accent" x1="76" y1="248" x2="510" y2="54" />
+            <path class="trig-angle-arc" d="M 150 248 A 74 74 0 0 0 144 218" />
+            <path class="trig-angle-arc" d="M 254 248 A 178 178 0 0 0 239 175" />
+            <path class="trig-angle-arc" d="M 386 248 A 310 310 0 0 0 360 132" />
+          </svg>
+        </figure>
+
+        <p>If you can't quite articulate a crisp, clear definition for what an angle is, don't worry. To quote David Henderson:</p>
+
+        <blockquote>
+          <p>"There is no universally agreed definition of an angle. Angles can be conceived of and used in a variety of ways, and while valid definitions may be given for specific contexts, it is difficult to give a single formal definition that is completely satisfactory in capturing all aspects of the general concept of angle."</p>
+        </blockquote>
+
+        <p>But don't fret, there are many interesting ways to think about angles. One of my favourites is as fractions of circles. We will get to these later.</p>
 
         <div class="trig-figure-grid">
-          <figure class="trig-figure trig-figure-bare">
-            <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-triangle-title">
-              <title id="angle-triangle-title">Two rays forming an angle with an extra triangle side greyed out</title>
-              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="360" y2="216" />
-              <line class="trig-line trig-line-accent" x1="78" y1="216" x2="286" y2="48" />
-              <line class="trig-line trig-line-muted" x1="338" y1="216" x2="266" y2="64" />
-              <path class="trig-angle-arc" d="M 128 216 A 50 50 0 0 0 117 185" />
-              <text class="trig-label" x="139" y="199">&theta;</text>
-            </svg>
-          </figure>
-
           <figure class="trig-figure trig-figure-bare">
             <svg viewBox="0 0 420 280" role="img" aria-labelledby="angle-circle-title">
               <title id="angle-circle-title">A circle around an angle showing the angle as part of a full turn</title>
@@ -66,6 +106,12 @@
             </svg>
           </figure>
         </div>
+
+        <p>Before we get stuck into the slightly flavourless meat of early trigonometry learning, there is one finally point I want to make. Trigonometry leads to an incredibly interesting revelation about how geometry, algebra, and imaginary numbers are part of the same underlying structure. This is captured in Euler's Formula, often cited as "the most beautiful equation in mathematics":</p>
+
+        <div class="display-equation">$$e^{i\pi}+1=0$$</div>
+
+        <p>Understanding this seemingly unassuming mathematical statement requires only a handful of ideas, and we will get there quickly. I mention it because I want you to be excited by it and to treat it as a north star. However, we must now start with the basic mechanics of angles, triangles, and ratios.</p>
 
         <h3 class="subsection-title">Why do we need triangles to find angles?</h3>
 
