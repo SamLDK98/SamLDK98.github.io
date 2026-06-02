@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1: Triangles and Trig Functions | Trigonometry</title>
+  <title>1: Angles and Side-Length Ratios | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">1: Triangles and Trig Functions</h1>
+      <h1 class="essay-title">1: Angles and Side-Length Ratios</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -34,6 +34,8 @@
   <main>
     <article>
       <section class="essay-section">
+        <h3 class="subsection-title">Opening</h3>
+
         <p>"Trigonometry" translates to <em>triangle measurement</em>.</p>
 
         <p>Yet <strong>angles</strong> are the real subject of interest; constructing triangles is just an effective method for working with them.</p>
@@ -90,7 +92,7 @@
           loading="lazy"
         ></iframe>
 
-        <p>If you knew the length of a line connecting these two lines, then you could work out what the angle between them must be.</p>
+        <p>If you knew the length of a line connecting the endpoints of these two lines, then you could work out what the angle between them must be.</p>
 
         <p>But why?</p>
 
@@ -99,13 +101,6 @@
         <p>For example, if we had three lines with lengths 4, 5 and 6, we could only make them form a triangle with the angles: $41.4^\circ$, $55.8^\circ$, and $82.8^\circ$.</p>
 
         <p>Go ahead and try to make a triangle with anything other than these angles, given these lengths.</p>
-
-        <p>The important things to realise are:</p>
-
-        <ul class="indented-list">
-          <li>Angles determine the shapes of triangles.</li>
-          <li>You can't change an angle without changing the length of some side.</li>
-        </ul>
 
         <iframe
           class="essay-widget essay-widget-autosize fixed-triangle-widget"
@@ -137,60 +132,6 @@
           <li>Side lengths determine specific angles.</li>
           <li>Angles determine specific ratios between side lengths, not absolute lengths.</li>
         </ul>
-
-        <h3 class="subsection-title">Right-Angled Triangles and Trigonometric Functions</h3>
-
-        <p>Given the lengths/ratios of all three sides, determining the angles of a general triangle can still be complicated. Fortunately, right-angled triangles make the relationships much simpler.</p>
-
-        <p>We select the angle we want to find and label the sides accordingly.</p>
-
-        <figure class="trig-figure trig-triangle-figure" data-right-triangle-labels>
-          <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-title">
-            <title id="right-triangle-title">Right triangle labelled hypotenuse, opposite, and adjacent</title>
-            <polygon class="trig-triangle-fill" points="88,250 416,250 416,70" />
-            <line class="trig-line trig-line-adjacent" data-trig-base x1="88" y1="250" x2="416" y2="250" />
-            <line class="trig-line trig-line-cyan" data-trig-vertical x1="416" y1="250" x2="416" y2="70" />
-            <line class="trig-line trig-line-gold" x1="88" y1="250" x2="416" y2="70" />
-            <path class="trig-angle-arc" data-trig-arc d="M 148 250 A 60 60 0 0 0 141 219" />
-            <path class="trig-right-angle" d="M 386 250 L 386 220 L 416 220" />
-            <text class="trig-label" data-trig-theta x="157" y="241">&theta;</text>
-            <text class="trig-small-label trig-adjacent-text" data-trig-base-label x="227" y="275">adjacent</text>
-            <text class="trig-small-label trig-opposite-text" data-trig-vertical-label x="427" y="166">opposite</text>
-            <text class="trig-small-label trig-hypotenuse-text" x="180" y="116">hypotenuse</text>
-          </svg>
-          <div class="trig-figure-actions">
-            <button type="button" data-trig-switch>Switch</button>
-          </div>
-        </figure>
-
-        <p>To find angles from side ratios, or side ratios from angles, we use functions called sine, cosine, tangent, cosecant, secant, and cotangent. We will only focus on the first three for now.</p>
-
-        <div class="display-equation trig-ratio-equations">
-          <span>$\sin(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
-          <span>$\cos(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-hypotenuse-text">h</span></span></span>
-          <span>$\tan(\theta) =$ <span class="trig-fraction"><span class="trig-opposite-text">o</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
-          <span>$\csc(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
-          <span>$\sec(\theta) =$ <span class="trig-fraction"><span class="trig-hypotenuse-text">h</span><span class="trig-bar"></span><span class="trig-adjacent-text">a</span></span></span>
-          <span>$\cot(\theta) =$ <span class="trig-fraction"><span class="trig-adjacent-text">a</span><span class="trig-bar"></span><span class="trig-opposite-text">o</span></span></span>
-        </div>
-
-        <p><strong>To input an angle for a side ratio as an output:</strong></p>
-
-        <div class="display-equation">$$\sin(30^\circ) = 0.5$$</div>
-
-        <p><strong>To input a side ratio for an angle as an output:</strong></p>
-
-        <p><em>Here, $\sin^{-1}$ means inverse sine, not "one divided by sine".</em></p>
-
-        <div class="display-equation">$$\sin^{-1}(0.5)=30^\circ$$</div>
-
-        <iframe
-          class="essay-widget trig-function-game-widget"
-          src="trigonometry/overview/trig-function-game-widget.html"
-          title="Interactive game for choosing trigonometric functions and ratios"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
           <span></span>
