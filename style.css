@@ -2202,6 +2202,59 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   stroke: #56c7ff;
 }
 
+.sine-cosine-angle-figure {
+  max-width: 860px;
+  margin-top: 1.2rem;
+  margin-bottom: 1.6rem;
+}
+
+.sine-cosine-angle-figure svg {
+  min-height: 210px;
+}
+
+.sine-cosine-angle-figure .angle-side,
+.sine-cosine-angle-figure .opposite-side {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sine-cosine-angle-figure .angle-side {
+  stroke-width: 6;
+}
+
+.sine-cosine-angle-figure .angle-side-blue {
+  stroke: #6dd3c4;
+}
+
+.sine-cosine-angle-figure .angle-side-gold {
+  stroke: #e8a13b;
+}
+
+.sine-cosine-angle-figure .opposite-side {
+  stroke: #ef7398;
+  stroke-width: 5;
+  filter: drop-shadow(0 0 6px rgba(239, 115, 152, 0.25));
+}
+
+.sine-cosine-angle-figure .opposite-fill {
+  fill: rgba(232, 161, 59, 0.08);
+}
+
+.sine-cosine-angle-figure .angle-arc {
+  fill: none;
+  stroke: #56c7ff;
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgba(86, 199, 255, 0.22));
+}
+
+.sine-cosine-angle-figure .opposite-label {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 15px;
+}
+
 .trig-triangle-fill {
   fill: rgba(109, 211, 196, 0.08);
   stroke: none;

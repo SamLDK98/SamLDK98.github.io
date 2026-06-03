@@ -34,17 +34,72 @@
   <main>
     <article>
       <section class="essay-section">
-        <p>Sine and cosine were originally not thought of as 'functions' per se.</p>
+        <h3 class="subsection-title">Opposite and Adjacent Sides</h3>
 
-        <p>They were just names for specific ratios between sides in right-angled triangles.</p>
+        <p>As we saw in the last chapter, there are no 'opposite' and 'adjacent' sides intrinsic to the triangle. They are relative to specific angles.</p>
 
-        <p class="display-equation">$$\large \text{sine} = \frac{o}{h} \qquad \large \text{cosine} = \frac{a}{h}$$</p>
+        <p>The opposite side of an angle is the side connecting the endpoints of the two sides that form the angle.</p>
 
-        <p>In the previous example, we saw that sine could be $\frac{1}{2}$ or $\frac{\sqrt{3}}{2}$, depending on which angle we were considering.</p>
+        <figure class="trig-figure trig-figure-bare sine-cosine-angle-figure">
+          <svg viewBox="0 0 860 250" role="img" aria-label="An angle shown first without and then with its opposite side">
+            <g transform="translate(60 28)">
+              <path class="angle-side angle-side-blue" d="M 70 172 L 255 172" />
+              <path class="angle-side angle-side-gold" d="M 70 172 L 224 70" />
+              <path class="angle-arc" d="M 136 172 A 66 66 0 0 0 125 136" />
+            </g>
+            <g transform="translate(470 28)">
+              <path class="opposite-fill" d="M 70 172 L 255 172 L 224 70 Z" />
+              <path class="angle-side angle-side-blue" d="M 70 172 L 255 172" />
+              <path class="angle-side angle-side-gold" d="M 70 172 L 224 70" />
+              <path class="opposite-side" d="M 255 172 L 224 70" />
+              <path class="angle-arc" d="M 136 172 A 66 66 0 0 0 125 136" />
+              <text class="opposite-label" x="272" y="124">opposite</text>
+            </g>
+          </svg>
+        </figure>
 
-        <p>So, although they are 'ratios between sides', it's important to thing of them as associated with angles, not the sides themselves.</p>
+        <p>The bigger an angle is, the longer its opposite must be.</p>
+
+        <figure class="trig-figure trig-figure-bare sine-cosine-angle-figure sine-cosine-obtuse-figure">
+          <svg viewBox="0 0 860 250" role="img" aria-label="An obtuse angle shown first without and then with its longer opposite side">
+            <g transform="translate(60 30)">
+              <path class="angle-side angle-side-blue" d="M 232 170 L 62 170" />
+              <path class="angle-side angle-side-gold" d="M 232 170 L 70 58" />
+              <path class="angle-arc" d="M 166 170 A 66 66 0 0 1 178 132" />
+            </g>
+            <g transform="translate(470 30)">
+              <path class="opposite-fill" d="M 232 170 L 62 170 L 70 58 Z" />
+              <path class="angle-side angle-side-blue" d="M 232 170 L 62 170" />
+              <path class="angle-side angle-side-gold" d="M 232 170 L 70 58" />
+              <path class="opposite-side" d="M 62 170 L 70 58" />
+              <path class="angle-arc" d="M 166 170 A 66 66 0 0 1 178 132" />
+              <text class="opposite-label" x="28" y="119">longer opposite</text>
+            </g>
+          </svg>
+        </figure>
+
+        <p>For right-angled triangles, the 90 degree angle will always have the largest opposite side; however, of the remaining two (unless equal), there will be a bigger and smaller angle.</p>
+
+        <p>The larger angle has the longer opposite side. The smaller angle has the shorter opposite side.</p>
+
+        <p>So:</p>
+
+        <ul>
+          <li>The shorter side refers to either the sine of the smaller angle or the cosine of the larger angle.</li>
+          <li>The longer side refers to either the cosine of the smaller angle or the sine of the larger angle.</li>
+        </ul>
 
         <p>You can think of the sine of an angle as describing what fraction of the hypotenuse lies opposite that angle, while the cosine describes what fraction of the hypotenuse lies adjacent to it.</p>
+
+        <h3 class="subsection-title">Thinking of Sine and Cosine as Percentages</h3>
+
+        <p>$\sin(30)=0.5$ is the same as saying $\sin(30)=50\%$</p>
+
+        <p>But 50% makes it far more obvious that it's a comparative ratio.</p>
+
+        <p>If the sine of an angle is $50\%$, this means that its opposite side is $50\%$ the length of the hypotenuse.</p>
+
+        <p>Likewise if cosine is $75\%$, the adjacent side is $75\%$ of the hypotenuse.</p>
 
         <iframe
           class="essay-widget sine-height-widget"
@@ -52,8 +107,6 @@
           title="Interactive widget showing sine as the height of a rotating unit line"
           loading="lazy"
         ></iframe>
-
-        <p>Historically, deriving sine and cosine values often required lengthy geometric arguments. As a result, mathematicians compiled trigonometric tables so that these values could be looked up rather than repeatedly derived. Today, calculators compute these values almost instantly using numerical algorithms based on infinite power series.</p>
 
         <hr class="section-divider" />
 
