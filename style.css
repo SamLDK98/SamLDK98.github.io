@@ -1993,6 +1993,16 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 720px;
 }
 
+.intro-linear-algebra-page .polar-form-widget {
+  width: min(100%, 720px);
+  height: 780px;
+}
+
+.intro-linear-algebra-page .complex-rotation-widget {
+  width: min(100%, 720px);
+  height: 720px;
+}
+
 .trig-figure-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2311,6 +2321,101 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .polar-coordinate {
   font-size: 16px;
   fill: var(--intro-text);
+}
+
+.complex-half-turn-figure,
+.complex-unit-cycle-figure,
+.complex-point-triangle-figure {
+  max-width: 860px;
+  margin-top: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+
+.complex-half-turn-figure svg {
+  min-height: 220px;
+}
+
+.complex-unit-cycle-figure svg {
+  min-height: 340px;
+}
+
+.complex-point-triangle-figure svg {
+  min-height: 310px;
+}
+
+.complex-axis {
+  stroke: rgba(236, 226, 209, 0.54);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.complex-tick {
+  stroke: rgba(236, 226, 209, 0.5);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.complex-rotation-arc,
+.complex-cycle-arc,
+.complex-angle {
+  fill: none;
+  stroke: #ef7398;
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(239, 115, 152, 0.22));
+}
+
+.complex-cycle-arc {
+  stroke-dasharray: 7 9;
+}
+
+.complex-circle {
+  fill: rgba(0, 0, 0, 0.08);
+  stroke: rgba(236, 226, 209, 0.46);
+  stroke-width: 2;
+}
+
+.complex-point-start {
+  fill: #e8a13b;
+  filter: drop-shadow(0 0 7px rgba(232, 161, 59, 0.38));
+}
+
+.complex-point-end {
+  fill: #ef7398;
+  filter: drop-shadow(0 0 7px rgba(239, 115, 152, 0.42));
+}
+
+.complex-radius {
+  stroke: #d4b888;
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(212, 184, 136, 0.28));
+}
+
+.complex-label {
+  fill: var(--intro-text);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+}
+
+.complex-label-faint {
+  fill: var(--intro-dim);
+}
+
+.complex-label-pink {
+  fill: #ef7398;
+}
+
+.complex-label-orange {
+  fill: #e8a13b;
+}
+
+.complex-label-teal {
+  fill: #6dd3c4;
+}
+
+.complex-label-gold {
+  fill: #d4b888;
 }
 
 .trig-triangle-fill {

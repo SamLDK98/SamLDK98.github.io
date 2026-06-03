@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polar Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311; --panel: #1e1a17;
+    --text: #ece2d1; --dim: #a89c87; --faint: #6f6557;
+    --rule: rgba(214,196,168,0.14);
+    --accent: #d4b888;       /* gold = radius r / hypotenuse, unit circle */
+    --x: #e8a13b;            /* orange = x = r cos θ (adjacent) */
+    --y: #6dd3c4;            /* teal   = y = r sin θ (opposite) */
+    --pink: #ef7398;         /* angle θ and the point */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'EB Garamond', Georgia, serif; font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  body { padding: 1.4rem 1rem; background-image: radial-gradient(ellipse at top, rgba(212,184,136,0.045), transparent 56%); }
+  .widget { max-width: 560px; margin: 0 auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .header { padding: 1.15rem 1.5rem 0.95rem; border-bottom: 1px solid var(--rule); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.3rem; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.4rem; line-height: 1.05; }
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .stage { padding: 0.5rem; display: flex; justify-content: center; }
+  svg#plane { width: 100%; max-width: 460px; height: auto; display: block; touch-action: none; cursor: grab; }
+  svg#plane:active { cursor: grabbing; }
+
+  .panel { padding: 0.5rem 1.5rem 1.2rem; }
+  .controls { display: grid; grid-template-columns: auto 1fr auto; gap: 0.55rem 0.9rem; align-items: center; margin-bottom: 1rem; }
+  .controls .lbl { font-style: italic; color: var(--dim); font-size: 0.95rem; white-space: nowrap; }
+  .controls .lbl .sym { font-family: 'JetBrains Mono', monospace; font-style: normal; }
+  .controls .lbl .theta { color: var(--pink); }
+  .controls .lbl .rad { color: var(--accent); }
+  .controls .val { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text); text-align: right; min-width: 3.4em; font-variant-numeric: tabular-nums; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; background: transparent; cursor: pointer; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: var(--rule); }
+  input[type="range"]::-moz-range-track { height: 2px; background: var(--rule); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%; margin-top: -6.5px; box-shadow: 0 0 8px rgba(0,0,0,0.4); }
+  input#theta::-webkit-slider-thumb { background: var(--pink); }
+  input#rad::-webkit-slider-thumb { background: var(--accent); }
+  input#theta::-moz-range-thumb { background: var(--pink); border: none; width: 15px; height: 15px; border-radius: 50%; }
+  input#rad::-moz-range-thumb { background: var(--accent); border: none; width: 15px; height: 15px; border-radius: 50%; }
+
+  .readout { border-top: 1px solid var(--rule); padding-top: 0.85rem; font-family: 'JetBrains Mono', monospace; }
+  .forms { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.7rem; }
+  .form .tag { font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+  .form .body { font-size: 1.02rem; color: var(--text); font-variant-numeric: tabular-nums; margin-top: 0.1rem; }
+  .form .body .r { color: var(--accent); } .form .body .t { color: var(--pink); }
+  .form .body .vx { color: var(--x); } .form .body .vy { color: var(--y); }
+  .eqs { font-size: 0.82rem; color: var(--dim); line-height: 1.85; font-variant-numeric: tabular-nums; }
+  .eqs .vx { color: var(--x); } .eqs .vy { color: var(--y); } .eqs .r { color: var(--accent); } .eqs .t { color: var(--pink); }
+
+  .footer { padding: 0.8rem 1.5rem; border-top: 1px solid var(--rule); font-style: italic; font-size: 0.82rem; color: var(--faint); text-align: center; }
+
+  /* plane elements */
+  .grid { stroke: rgba(214,196,168,0.07); stroke-width: 1; }
+  .axis { stroke: rgba(214,196,168,0.32); stroke-width: 1.2; }
+  .axis-tip { fill: rgba(214,196,168,0.32); }
+  .ticklab { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--faint); }
+  .unit { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 3 4; opacity: 0.6; }
+  .ray { stroke: rgba(214,196,168,0.28); stroke-width: 1; stroke-dasharray: 2 5; }
+  .radius { stroke: var(--accent); stroke-width: 2.6; stroke-linecap: round; filter: drop-shadow(0 0 5px rgba(212,184,136,0.4)); }
+  .leg-x { stroke: var(--x); stroke-width: 3; stroke-linecap: round; }
+  .leg-y { stroke: var(--y); stroke-width: 3; stroke-linecap: round; }
+  .ra { fill: none; stroke: rgba(214,196,168,0.5); stroke-width: 1.1; }
+  .ang { fill: none; stroke: var(--pink); stroke-width: 2.2; stroke-linecap: round; }
+  .dirdot { fill: var(--text); }
+  .point { fill: var(--pink); stroke: var(--bg); stroke-width: 2; filter: drop-shadow(0 0 7px rgba(239,115,152,0.6)); }
+  .lab { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; }
+  .lab-r { fill: var(--accent); } .lab-x { fill: var(--x); } .lab-y { fill: var(--y); } .lab-t { fill: var(--pink); }
+  .lab-dir { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--dim); }
+  .lab-unit { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--faint); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">
+    <div class="eyebrow">Widget · Polar Form</div>
+    <h1>A point is a <em>direction</em> and a <em>distance</em></h1>
+  </div>
+
+  <div class="stage">
+    <svg id="plane" viewBox="0 0 480 480" role="img" aria-label="A plane where a point is set by an angle and a radius, shown in both polar and Cartesian form."></svg>
+  </div>
+
+  <div class="panel">
+    <div class="controls">
+      <span class="lbl"><span class="sym theta">&theta;</span> — direction</span>
+      <input id="theta" type="range" min="0" max="359" value="52" step="1" aria-label="Angle theta in degrees">
+      <span class="val" id="thetaVal">52&deg;</span>
+
+      <span class="lbl"><span class="sym rad">r</span> — distance</span>
+      <input id="rad" type="range" min="0" max="2.6" value="1.6" step="0.02" aria-label="Radius r">
+      <span class="val" id="radVal">1.60</span>
+    </div>
+
+    <div class="readout">
+      <div class="forms">
+        <div class="form">
+          <div class="tag">Polar</div>
+          <div class="body">(<span class="r" id="pr">1.60</span>, <span class="t" id="pt">52&deg;</span>)</div>
+        </div>
+        <div class="form">
+          <div class="tag">Cartesian</div>
+          <div class="body">(<span class="vx" id="cx">0.98</span>, <span class="vy" id="cy">1.26</span>)</div>
+        </div>
+      </div>
+      <div class="eqs">
+        <div><span class="vx">x</span> = <span class="r">r</span> cos&thinsp;<span class="t">&theta;</span> = <span class="r" id="ex_r">1.60</span> &middot; cos&thinsp;<span class="t" id="ex_t">52&deg;</span> = <span class="vx" id="ex_v">0.98</span></div>
+        <div><span class="vy">y</span> = <span class="r">r</span> sin&thinsp;<span class="t">&theta;</span> = <span class="r" id="ey_r">1.60</span> &middot; sin&thinsp;<span class="t" id="ey_t">52&deg;</span> = <span class="vy" id="ey_v">1.26</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Move around the unit circle to choose a direction, then in or out to choose a distance.</div>
+</div>
+
+<script>
+(function () {
+  var $ = function (s) { return document.getElementById(s); };
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = $('plane');
+  var CX = 240, CY = 240, RANGE = 2.7, S = (240 - 24) / RANGE;  // world units -> px
+  var R_MAX = 2.6;
+
+  var rad = 1.6, thetaDeg = 52;
+
+  function add(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e); return e;
+  }
+  function sx(wx) { return CX + wx * S; }
+  function sy(wy) { return CY - wy * S; }
+
+  // ---- static layer: grid, axes, unit circle ----
+  var stat = add('g', {});
+  for (var i = -2; i <= 2; i++) {
+    if (i === 0) continue;
+    add('line', { class: 'grid', x1: sx(i), y1: sy(-RANGE), x2: sx(i), y2: sy(RANGE) }, stat);
+    add('line', { class: 'grid', x1: sx(-RANGE), y1: sy(i), x2: sx(RANGE), y2: sy(i) }, stat);
+  }
+  add('line', { class: 'axis', x1: sx(-RANGE), y1: sy(0), x2: sx(RANGE), y2: sy(0) }, stat);
+  add('line', { class: 'axis', x1: sx(0), y1: sy(-RANGE), x2: sx(0), y2: sy(RANGE) }, stat);
+  // axis arrow tips
+  add('path', { class: 'axis-tip', d: 'M ' + sx(RANGE) + ' ' + sy(0) + ' l -8 -4 l 0 8 z' }, stat);
+  add('path', { class: 'axis-tip', d: 'M ' + sx(0) + ' ' + sy(RANGE) + ' l -4 8 l 8 0 z' }, stat);
+  // integer ticks
+  [-2, -1, 1, 2].forEach(function (i) {
+    var t1 = add('text', { class: 'ticklab', x: sx(i), y: sy(0) + 13, 'text-anchor': 'middle' }, stat); t1.textContent = i;
+    var t2 = add('text', { class: 'ticklab', x: sx(0) - 9, y: sy(i) + 3, 'text-anchor': 'end' }, stat); t2.textContent = i;
+  });
+  add('circle', { class: 'unit', cx: sx(0), cy: sy(0), r: S }, stat);
+  var ul = add('text', { class: 'lab-unit', x: sx(-RANGE) + 4, y: sy(RANGE) + 4 }, stat); ul.textContent = 'unit circle (r = 1)';
+
+  // ---- dynamic layer ----
+  var dyn = add('g', {});
+
+  function angArc(thRad, rho) {
+    var pts = [], steps = Math.max(2, Math.round(Math.abs(thRad) / (Math.PI / 90)));
+    for (var k = 0; k <= steps; k++) {
+      var a = thRad * k / steps;
+      pts.push((sx(rho * Math.cos(a))) + ',' + (sy(rho * Math.sin(a))));
+    }
+    return pts.join(' ');
+  }
+
+  function render() {
+    while (dyn.firstChild) dyn.removeChild(dyn.firstChild);
+    var th = thetaDeg * Math.PI / 180;
+    var ct = Math.cos(th), st = Math.sin(th);
+    var x = rad * ct, y = rad * st;
+    var P = { x: sx(x), y: sy(y) }, O = { x: sx(0), y: sy(0) }, F = { x: sx(x), y: sy(0) };
+    var dir = { x: sx(ct), y: sy(st) };  // unit-circle direction point
+
+    // faint full ray in the chosen direction
+    add('line', { class: 'ray', x1: sx(-RANGE * ct), y1: sy(-RANGE * st), x2: sx(RANGE * ct), y2: sy(RANGE * st) }, dyn);
+
+    // right-triangle legs: x along the axis (orange), y vertical (teal)
+    if (Math.abs(x) > 0.02) add('line', { class: 'leg-x', x1: O.x, y1: O.y, x2: F.x, y2: F.y }, dyn);
+    if (Math.abs(y) > 0.02) add('line', { class: 'leg-y', x1: F.x, y1: F.y, x2: P.x, y2: P.y }, dyn);
+    // right-angle mark at the foot
+    if (Math.abs(x) > 0.25 && Math.abs(y) > 0.25) {
+      var ddx = x >= 0 ? -1 : 1, ddy = y >= 0 ? -1 : 1, z = 9;
+      add('path', { class: 'ra', d: 'M ' + (F.x + ddx * z) + ' ' + F.y + ' L ' + (F.x + ddx * z) + ' ' + (F.y + ddy * z) + ' L ' + F.x + ' ' + (F.y + ddy * z) }, dyn);
+    }
+
+    // radius (gold) and angle arc (pink)
+    add('line', { class: 'radius', x1: O.x, y1: O.y, x2: P.x, y2: P.y }, dyn);
+    if (thetaDeg > 1) add('polyline', { class: 'ang', points: angArc(th, 0.42), fill: 'none' }, dyn);
+
+    // screen direction + perpendicular (kept on the upper side of the radius)
+    var ux = P.x - O.x, uy = P.y - O.y, um = Math.hypot(ux, uy) || 1; ux /= um; uy /= um;
+    var perpx = -uy, perpy = ux; if (perpy > 0) { perpx = -perpx; perpy = -perpy; }
+
+    // direction point on the unit circle + label
+    add('circle', { class: 'dirdot', cx: dir.x, cy: dir.y, r: 3 }, dyn);
+    var dl = add('text', { class: 'lab-dir', x: dir.x + perpx * 13, y: dir.y + perpy * 13 + 3, 'text-anchor': 'middle' }, dyn);
+    dl.textContent = '(cos\u2009\u03b8, sin\u2009\u03b8)';
+
+    // the point
+    add('circle', { class: 'point', cx: P.x, cy: P.y, r: 6 }, dyn);
+
+    // labels: r along the radius (outer half when r>1, so it clears the direction dot)
+    var tR = rad > 1 ? (1 + rad) / 2 : rad / 2;
+    var rl = add('text', { class: 'lab lab-r', x: sx(tR * ct) + perpx * 17, y: sy(tR * st) + perpy * 17 + 3, 'text-anchor': 'middle' }, dyn); rl.textContent = 'r';
+    if (Math.abs(x) > 0.3) { var xl = add('text', { class: 'lab lab-x', x: (O.x + F.x) / 2, y: O.y + (y >= 0 ? 16 : -8), 'text-anchor': 'middle' }, dyn); xl.textContent = 'x'; }
+    if (Math.abs(y) > 0.3) { var yl = add('text', { class: 'lab lab-y', x: F.x + (x >= 0 ? 11 : -11), y: (F.y + P.y) / 2 + 4, 'text-anchor': x >= 0 ? 'start' : 'end' }, dyn); yl.textContent = 'y'; }
+    if (thetaDeg > 12) { var tl = add('text', { class: 'lab lab-t', x: sx(0.58 * Math.cos(th / 2)), y: sy(0.58 * Math.sin(th / 2)) + 4, 'text-anchor': 'middle' }, dyn); tl.textContent = '\u03b8'; }
+
+    // readouts
+    $('thetaVal').innerHTML = thetaDeg + '\u00b0';
+    $('radVal').textContent = rad.toFixed(2);
+    $('pr').textContent = rad.toFixed(2);
+    $('pt').innerHTML = thetaDeg + '\u00b0';
+    $('cx').textContent = x.toFixed(2);
+    $('cy').textContent = y.toFixed(2);
+    $('ex_r').textContent = rad.toFixed(2); $('ex_t').innerHTML = thetaDeg + '\u00b0'; $('ex_v').textContent = x.toFixed(2);
+    $('ey_r').textContent = rad.toFixed(2); $('ey_t').innerHTML = thetaDeg + '\u00b0'; $('ey_v').textContent = y.toFixed(2);
+  }
+
+  // ---- inputs ----
+  $('theta').addEventListener('input', function () { thetaDeg = +this.value; render(); });
+  $('rad').addEventListener('input', function () { rad = +this.value; render(); });
+
+  function fromPointer(ev) {
+    var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    var wx = (p.x - CX) / S, wy = (CY - p.y) / S;
+    var r = Math.min(R_MAX, Math.hypot(wx, wy));
+    var deg = Math.round(Math.atan2(wy, wx) * 180 / Math.PI); if (deg < 0) deg += 360;
+    rad = r; thetaDeg = deg;
+    $('theta').value = thetaDeg; $('rad').value = rad;
+    render();
+  }
+  var dragging = false;
+  svg.addEventListener('pointerdown', function (e) { dragging = true; svg.setPointerCapture(e.pointerId); fromPointer(e); });
+  svg.addEventListener('pointermove', function (e) { if (dragging) fromPointer(e); });
+  svg.addEventListener('pointerup', function (e) { dragging = false; try { svg.releasePointerCapture(e.pointerId); } catch (x) {} });
+  svg.addEventListener('pointercancel', function () { dragging = false; });
+
+  render();
+})();
+</script>
+</body>
+</html>
