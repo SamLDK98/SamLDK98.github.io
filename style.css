@@ -1993,6 +1993,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 720px;
 }
 
+.intro-linear-algebra-page .triangle-family-circle-widget {
+  width: min(100%, 1080px);
+  height: 780px;
+}
+
 .intro-linear-algebra-page .polar-form-widget {
   width: min(100%, 720px);
   height: 780px;
