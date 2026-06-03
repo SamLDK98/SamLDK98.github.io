@@ -2255,6 +2255,64 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   font-size: 15px;
 }
 
+.polar-cartesian-figure {
+  max-width: 860px;
+  margin-top: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+
+.polar-cartesian-figure svg {
+  min-height: 260px;
+}
+
+.polar-grid line {
+  stroke: rgba(236, 226, 209, 0.08);
+  stroke-width: 1;
+}
+
+.polar-axis {
+  stroke: rgba(236, 226, 209, 0.58);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.polar-axis-arrow {
+  fill: rgba(236, 226, 209, 0.58);
+}
+
+.polar-point {
+  fill: #ef7398;
+  filter: drop-shadow(0 0 7px rgba(239, 115, 152, 0.45));
+}
+
+.polar-guide {
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.polar-guide-x {
+  stroke: #e8a13b;
+}
+
+.polar-guide-y {
+  stroke: #6dd3c4;
+}
+
+.polar-label,
+.polar-coordinate {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.polar-label {
+  font-size: 15px;
+}
+
+.polar-coordinate {
+  font-size: 16px;
+  fill: var(--intro-text);
+}
+
 .trig-triangle-fill {
   fill: rgba(109, 211, 196, 0.08);
   stroke: none;

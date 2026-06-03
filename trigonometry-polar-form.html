@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polar Form | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-polar-form-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Polar Form</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h3 class="subsection-title">Polar Form</h3>
+
+        <p>Any position in a two-dimensional space can be represented using $(x,y)$ coordinates.</p>
+
+        <figure class="trig-figure trig-figure-bare polar-cartesian-figure" aria-label="Cartesian coordinate plane">
+          <svg viewBox="0 0 760 360" role="img">
+            <defs>
+              <marker id="polar-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
+              </marker>
+            </defs>
+            <g class="polar-grid">
+              <line x1="80" y1="60" x2="80" y2="300" />
+              <line x1="140" y1="60" x2="140" y2="300" />
+              <line x1="200" y1="60" x2="200" y2="300" />
+              <line x1="260" y1="60" x2="260" y2="300" />
+              <line x1="320" y1="60" x2="320" y2="300" />
+              <line x1="380" y1="60" x2="380" y2="300" />
+              <line x1="440" y1="60" x2="440" y2="300" />
+              <line x1="500" y1="60" x2="500" y2="300" />
+              <line x1="560" y1="60" x2="560" y2="300" />
+              <line x1="620" y1="60" x2="620" y2="300" />
+              <line x1="680" y1="60" x2="680" y2="300" />
+              <line x1="80" y1="60" x2="680" y2="60" />
+              <line x1="80" y1="120" x2="680" y2="120" />
+              <line x1="80" y1="180" x2="680" y2="180" />
+              <line x1="80" y1="240" x2="680" y2="240" />
+              <line x1="80" y1="300" x2="680" y2="300" />
+            </g>
+            <line class="polar-axis" x1="80" y1="180" x2="690" y2="180" marker-end="url(#polar-axis-arrow)" />
+            <line class="polar-axis" x1="380" y1="310" x2="380" y2="50" marker-end="url(#polar-axis-arrow)" />
+            <circle class="polar-point" cx="560" cy="120" r="7" />
+            <line class="polar-guide polar-guide-x" x1="380" y1="120" x2="560" y2="120" />
+            <line class="polar-guide polar-guide-y" x1="560" y1="180" x2="560" y2="120" />
+            <text class="polar-label" x="696" y="173">x</text>
+            <text class="polar-label" x="392" y="55">y</text>
+            <text class="polar-coordinate" x="572" y="112">(x, y)</text>
+          </svg>
+        </figure>
+
+        <p>Any position on the unit circle can also be represented by an angle $\theta$, because the functions sine and cosine map that angle to its corresponding $x$- and $y$-coordinates:</p>
+
+        <p class="display-equation">$$(\cos\theta,\sin\theta)$$</p>
+
+        <p>As $\theta$ varies, these coordinates trace out every point on the unit circle.</p>
+
+        <p>The unit circle has a radius of $1$. To reach points elsewhere in the plane, we keep the same angle but extend or shrink the radius.</p>
+
+        <p>This can be thought of as first moving around the unit circle to choose a direction, and then moving further away from or closer to the origin along that direction.</p>
+
+        <p>If the radius is $r$, then both coordinates scale proportionally:</p>
+
+        <p class="display-equation">$$x=r\cos\theta \qquad y=r\sin\theta$$</p>
+
+        <p>So any point can be represented as:</p>
+
+        <p class="display-equation">$$(r\cos\theta, r\sin\theta)$$</p>
+
+        <p>In other words, every point in the plane can be described either by its coordinates $(x,y)$, or by a distance $r$ from the origin and an angle $\theta$.</p>
+
+        <p>This is known as polar form.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-unit-circle.html">
+            <span>Previous</span>
+            <strong>The Unit Circle</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
+            <span>Next</span>
+            <strong>Misc</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
