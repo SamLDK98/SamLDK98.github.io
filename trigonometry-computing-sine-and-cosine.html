@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sine and Cosine | Trigonometry</title>
+  <title>Interpreting Sine and Cosine | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">Sine and Cosine</h1>
+      <h1 class="essay-title">Interpreting Sine and Cosine</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -53,7 +53,6 @@
               <path class="angle-side angle-side-gold" d="M 70 172 L 224 70" />
               <path class="opposite-side" d="M 255 172 L 224 70" />
               <path class="angle-arc" d="M 136 172 A 66 66 0 0 0 125 136" />
-              <text class="opposite-label" x="272" y="124">opposite</text>
             </g>
           </svg>
         </figure>
@@ -63,43 +62,86 @@
         <figure class="trig-figure trig-figure-bare sine-cosine-angle-figure sine-cosine-obtuse-figure">
           <svg viewBox="0 0 860 250" role="img" aria-label="An obtuse angle shown first without and then with its longer opposite side">
             <g transform="translate(60 30)">
-              <path class="angle-side angle-side-blue" d="M 232 170 L 62 170" />
-              <path class="angle-side angle-side-gold" d="M 232 170 L 70 58" />
-              <path class="angle-arc" d="M 166 170 A 66 66 0 0 1 178 132" />
+              <path class="angle-side angle-side-blue" d="M 120 170 L 320 170" />
+              <path class="angle-side angle-side-gold" d="M 120 170 L 48 58" />
+              <path class="angle-arc" d="M 162 170 A 42 42 0 0 0 97 135" />
             </g>
             <g transform="translate(470 30)">
-              <path class="opposite-fill" d="M 232 170 L 62 170 L 70 58 Z" />
-              <path class="angle-side angle-side-blue" d="M 232 170 L 62 170" />
-              <path class="angle-side angle-side-gold" d="M 232 170 L 70 58" />
-              <path class="opposite-side" d="M 62 170 L 70 58" />
-              <path class="angle-arc" d="M 166 170 A 66 66 0 0 1 178 132" />
-              <text class="opposite-label" x="28" y="119">longer opposite</text>
+              <path class="opposite-fill" d="M 120 170 L 320 170 L 48 58 Z" />
+              <path class="angle-side angle-side-blue" d="M 120 170 L 320 170" />
+              <path class="angle-side angle-side-gold" d="M 120 170 L 48 58" />
+              <path class="opposite-side" d="M 320 170 L 48 58" />
+              <path class="angle-arc" d="M 162 170 A 42 42 0 0 0 97 135" />
             </g>
           </svg>
         </figure>
 
-        <p>For right-angled triangles, the 90 degree angle will always have the largest opposite side; however, of the remaining two (unless equal), there will be a bigger and smaller angle.</p>
+        <p>For right-angled triangles, the 90 degree angle will always have the largest opposite side; however, of the remaining two (unless they are equal), there will be a larger and smaller angle.</p>
 
         <p>The larger angle has the longer opposite side. The smaller angle has the shorter opposite side.</p>
 
         <p>So:</p>
 
         <ul>
-          <li>The shorter side refers to either the sine of the smaller angle or the cosine of the larger angle.</li>
-          <li>The longer side refers to either the cosine of the smaller angle or the sine of the larger angle.</li>
+          <li>The shorter side appears in either the sine of the smaller angle or the cosine of the larger angle.</li>
+          <li>The longer side appears in either the cosine of the smaller angle or the sine of the larger angle.</li>
         </ul>
-
-        <p>You can think of the sine of an angle as describing what fraction of the hypotenuse lies opposite that angle, while the cosine describes what fraction of the hypotenuse lies adjacent to it.</p>
 
         <h3 class="subsection-title">Thinking of Sine and Cosine as Percentages</h3>
 
-        <p>$\sin(30)=0.5$ is the same as saying $\sin(30)=50\%$</p>
+        <p>A ratio compares the size of two quantities.</p>
 
-        <p>But 50% makes it far more obvious that it's a comparative ratio.</p>
+        <p>One way to think about a ratio is as describing how many times one quantity fits into another. For example:</p>
 
-        <p>If the sine of an angle is $50\%$, this means that its opposite side is $50\%$ the length of the hypotenuse.</p>
+        <p class="display-equation">$$\frac{8}{4}=2$$</p>
 
-        <p>Likewise if cosine is $75\%$, the adjacent side is $75\%$ of the hypotenuse.</p>
+        <p>means that 4 fits into 8 exactly twice. However, when a ratio is less than 1, it is often easier to think of it as a percentage. If one quantity 'fits into' another 0.6 times, it is equivalent to saying that it is $60\%$ of the size.</p>
+
+        <p>This is always the case for sine and cosine because the numerator is always a side shorter than the length of the hypotenuse.</p>
+
+        <p class="display-equation">$$\sin(\theta)=\frac{o}{h} \qquad \cos(\theta)=\frac{a}{h}$$</p>
+
+        <p>So if:</p>
+
+        <p class="display-equation">$$\sin(30^\circ)=\frac{1}{2}=0.5$$</p>
+
+        <p>then the opposite side is 50% the length of the hypotenuse.</p>
+
+        <p>Also, remember that the side opposite one acute angle is adjacent to the other. The side opposite the $30^\circ$ angle <strong>is also the side</strong> adjacent to the $60^\circ$ angle.</p>
+
+        <p>Therefore if $\sin(30^\circ)=50\%$, then:</p>
+
+        <p class="display-equation">$$\cos(60^\circ)=50\%$$</p>
+
+        <p>because they are referring to the same side of the right-angled triangle.</p>
+
+        <blockquote>
+          <p>You can think of the sine of an angle as describing what fraction of the hypotenuse lies opposite that angle, while the cosine describes what fraction of the hypotenuse lies adjacent to it.</p>
+        </blockquote>
+
+        <h3 class="subsection-title">Thinking of Sine and Cosine in Terms of $x$- and $y$-Coordinates</h3>
+
+        <p>Imagine a line of length 1 extending from the origin.</p>
+
+        <p>If the line points directly upward, its endpoint has coordinates $(0,1)$, so its height is 1.</p>
+
+        <p>As the line rotates, and becomes slanted, its length remains the same, but its height changes.</p>
+
+        <p>Sine tells us what fraction of the line's maximum possible height remains.</p>
+
+        <p>For example, if:</p>
+
+        <p class="display-equation">$$\sin(\theta)=0.5$$</p>
+
+        <p>then the height of the endpoint is half of what it would be if the line were perfectly vertical.</p>
+
+        <p>Similarly, cosine tells us what fraction of the line's maximum possible horizontal length remains.</p>
+
+        <p>If:</p>
+
+        <p class="display-equation">$$\cos(\theta)=0.75$$</p>
+
+        <p>then the horizontal position of the endpoint is 75% of what it would be if the line were perfectly horizontal.</p>
 
         <iframe
           class="essay-widget sine-height-widget"
