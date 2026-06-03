@@ -40,7 +40,7 @@
 
         <p>Around him is the circle representing all the possible directions he can face — the set of all possible orientations.</p>
 
-        <p>This is an indecisive cowboy. He begins facing north, then turns west, south, east, and finally back to north again.</p>
+        <p>This is an indecisive cowboy. He begins facing east, then turns south, west, north, and finally back to east again.</p>
 
         <iframe
           class="essay-widget cowboy-orientation-widget"
@@ -50,9 +50,9 @@
           loading="lazy"
         ></iframe>
 
-        <p>Notice this and think about it: <strong>orientation in a 2D space is intrinsically circular</strong>.</p>
+        <p>Notice that <strong>orientation in a 2D space is intrinsically circular</strong>.</p>
 
-        <p>Take a different type of measure — not a measure of angle, but a measure of temperature. If we move in one direction we would only ever get hotter or colder.</p>
+        <p>Take a different type of measure like temperature. If we move in one direction we would only ever get hotter or colder.</p>
 
         <figure class="trig-figure orientation-measure-figure" aria-label="Temperature as a line compared with degrees as a circle">
           <svg viewBox="0 0 920 330" role="img">
@@ -67,10 +67,21 @@
 
             <g transform="translate(66 52)">
               <text class="orientation-measure-title" x="170" y="0" text-anchor="middle">Temperature</text>
-              <line class="temperature-line" x1="18" y1="126" x2="322" y2="126" marker-start="url(#temperature-arrow)" marker-end="url(#temperature-arrow)" />
-              <text class="orientation-measure-label" x="18" y="162" text-anchor="middle">colder</text>
-              <text class="orientation-measure-label" x="322" y="162" text-anchor="middle">hotter</text>
-              <text class="orientation-measure-value" x="170" y="116" text-anchor="middle">temperature measure</text>
+              <line class="temperature-line" x1="18" y1="136" x2="322" y2="136" />
+              <line class="temperature-line" x1="142" y1="88" x2="42" y2="88" marker-end="url(#temperature-arrow)" />
+              <line class="temperature-line" x1="198" y1="88" x2="298" y2="88" marker-end="url(#temperature-arrow)" />
+              <line class="temperature-line" x1="18" y1="126" x2="18" y2="146" />
+              <line class="temperature-line" x1="94" y1="128" x2="94" y2="144" />
+              <line class="temperature-line" x1="170" y1="126" x2="170" y2="146" />
+              <line class="temperature-line" x1="246" y1="128" x2="246" y2="144" />
+              <line class="temperature-line" x1="322" y1="126" x2="322" y2="146" />
+              <text class="orientation-measure-value" x="18" y="172" text-anchor="middle">-20°C</text>
+              <text class="orientation-measure-value" x="94" y="172" text-anchor="middle">0°C</text>
+              <text class="orientation-measure-value" x="170" y="172" text-anchor="middle">20°C</text>
+              <text class="orientation-measure-value" x="246" y="172" text-anchor="middle">40°C</text>
+              <text class="orientation-measure-value" x="322" y="172" text-anchor="middle">60°C</text>
+              <text class="orientation-measure-label" x="42" y="72" text-anchor="middle">colder</text>
+              <text class="orientation-measure-label" x="298" y="72" text-anchor="middle">hotter</text>
             </g>
 
             <g transform="translate(586 48)">
@@ -350,9 +361,9 @@ $$</p>
             <span>Previous</span>
             <strong>Measuring Rotation</strong>
           </a>
-          <a class="chapter-nav-link" href="trigonometry-computing-sine-and-cosine.html">
+          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
             <span>Next</span>
-            <strong>Computing Sine and Cosine</strong>
+            <strong>Misc</strong>
           </a>
         </nav>
       </section>

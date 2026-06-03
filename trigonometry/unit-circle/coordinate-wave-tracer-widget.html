@@ -58,40 +58,6 @@
     background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
     pointer-events: none;
   }
-  .header {
-    padding: 1.4rem 1.75rem 1rem;
-    border-bottom: 1px solid var(--rule);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.66rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 0.3rem;
-  }
-  h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 1.6rem;
-    letter-spacing: -0.005em;
-    font-variation-settings: "opsz" 144;
-    color: var(--text);
-  }
-  h1 em { font-style: italic; color: var(--accent); }
-  .header-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--text-faint);
-    letter-spacing: 0.04em;
-    text-align: right;
-    line-height: 1.5;
-  }
   .viz-wrap {
     padding: 1.4rem 1.25rem;
     display: flex;
@@ -332,17 +298,6 @@
 <body>
 
 <div class="widget">
-  <div class="header">
-    <div>
-      <div class="eyebrow">Widget · Circular Motion</div>
-      <h1>Track <em>x</em> and <em>y</em> around the circle</h1>
-    </div>
-    <div class="header-meta">
-      circle · angle · coordinates<br>
-      side-by-side
-    </div>
-  </div>
-
   <div class="viz-wrap">
     <svg id="canvas" viewBox="0 0 1100 460" xmlns="http://www.w3.org/2000/svg" role="img"
          aria-label="Unit circle paired with x and y coordinate graphs; a moving point on the circle traces out coordinate waves">

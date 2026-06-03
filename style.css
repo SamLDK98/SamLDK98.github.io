@@ -1673,6 +1673,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
+.intro-linear-algebra-page .sine-height-widget {
+  width: min(100%, 860px);
+  height: 520px;
+}
+
 .intro-linear-algebra-page .angle-interest-widget {
   width: min(100%, 980px);
   height: 680px;

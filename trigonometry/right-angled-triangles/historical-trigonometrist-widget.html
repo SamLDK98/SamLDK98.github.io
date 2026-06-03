@@ -506,7 +506,6 @@
 <div class="widget">
   <div class="header">
     <div>
-      <div class="eyebrow">Game · Historical Trigonometrist</div>
       <h1>Build the <em>sine table</em> from scratch</h1>
     </div>
     <div class="level-pip-row" id="level-pips">
@@ -518,9 +517,7 @@
   </div>
 
   <div class="prompt">
-    <p class="prompt-intro" id="prompt-intro">
-      Imagine trigonometric tables don't exist. There is no calculator. Your task is to compute the sine ratio from a geometric construction.
-    </p>
+    <p class="prompt-intro" id="prompt-intro"></p>
     <p class="prompt-mission" id="prompt-mission">
       Mission: derive <span class="mono">sin(30°)</span>
     </p>
@@ -628,8 +625,8 @@
       intro: 'Here is the right triangle we want to measure — a right angle, with a <code>30°</code> angle at the top. <code>sin(30°)</code> is its opposite side divided by its hypotenuse, but we don\'t know those lengths yet. The trick: build this very triangle inside a shape we already understand.',
       steps: [
         {
-          tool: 'Draw an equilateral triangle',
-          explain: 'Start with a triangle whose <em>three sides are equal</em>. Call each side <code>1</code>. We don\'t know any sines yet, but we know shapes.',
+          tool: 'Duplicate and flip the triangle',
+          explain: 'Place a flipped copy of the right triangle beside the original. Together, the two right triangles form one equilateral triangle.',
           stateKey: 'tri'
         },
         {
@@ -811,8 +808,8 @@
     const ra = 12;                                                            // right-angle mark, into the triangle
     addEl('path', { class: 'ws-right-angle', d: `M ${M.x + ra} ${M.y} L ${M.x + ra} ${M.y - ra} L ${M.x} ${M.y - ra}` });
     [B, C, M].forEach(p => addEl('circle', { class: 'ws-vertex', cx: p.x, cy: p.y }));
-    addEl('text', { class: 'ws-label angle fade-in', x: C.x + 8, y: C.y + 24, text: '30°' });
-    addEl('text', { class: 'ws-label angle fade-in', x: B.x - 30, y: B.y - 8, text: '60°' });
+    addEl('text', { class: 'ws-label angle fade-in', x: C.x + 22, y: C.y - 10, text: '30°' });
+    addEl('text', { class: 'ws-label angle fade-in', x: B.x + 16, y: B.y + 10, text: '60°' });
   }
 
   function renderEquilateral(progress, lv) {
@@ -849,10 +846,21 @@
 
     // Triangle fill
     if (triangleVisible) {
-      addEl('polygon', {
-        class: 'ws-tri-fill' + (isolated ? ' dim' : ''),
-        points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`
-      });
+      if (!angles60Visible && !isolated) {
+        addEl('polygon', {
+          class: 'ws-tri-fill dim',
+          points: `${C.x},${C.y} ${A.x},${A.y} ${M.x},${M.y}`
+        });
+        addEl('polygon', {
+          class: 'ws-tri-fill highlight',
+          points: `${C.x},${C.y} ${M.x},${M.y} ${B.x},${B.y}`
+        });
+      } else {
+        addEl('polygon', {
+          class: 'ws-tri-fill' + (isolated ? ' dim' : ''),
+          points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`
+        });
+      }
     }
     // Highlight right half if isolated
     if (isolated) {
@@ -884,6 +892,10 @@
       } else {
         addEl('line', { class: 'ws-line', x1: A.x, y1: A.y, x2: B.x, y2: B.y });
       }
+    }
+
+    if (triangleVisible && !angles60Visible && !isolated) {
+      addEl('line', { class: 'ws-line bisect', x1: C.x, y1: C.y, x2: M.x, y2: M.y });
     }
 
     // Bisecting perpendicular — dashed-pink construction line, becomes a solid coloured leg after isolation
@@ -943,9 +955,9 @@
     // Wait — actually the 60° angle of the original is at B, the 30° apex of the half is at C.
     if (isolated) {
       // 30° at C (apex, looking down into the right half)
-      addEl('text', { class: 'ws-label angle fade-in', x: C.x + 8, y: C.y + 24, text: '30°' });
+      addEl('text', { class: 'ws-label angle fade-in', x: C.x + 22, y: C.y - 10, text: '30°' });
       // 60° at B
-      addEl('text', { class: 'ws-label angle fade-in', x: B.x - 30, y: B.y - 8, text: '60°' });
+      addEl('text', { class: 'ws-label angle fade-in', x: B.x + 16, y: B.y + 10, text: '60°' });
     }
 
     // After ratio computed: subtle ratio overlay on the side
@@ -1153,7 +1165,7 @@
     const lv = LEVELS[levelIdx];
     $('#prompt-mission').innerHTML = 'Mission: ' + lv.missionHtml;
     if (levelIdx === 0) {
-      $('#prompt-intro').textContent = 'Imagine trigonometric tables don\'t exist. There is no calculator. Your task is to compute the sine ratio from a geometric construction.';
+      $('#prompt-intro').textContent = '';
     } else if (levelIdx === 1) {
       $('#prompt-intro').textContent = 'Different angle, different shape. The equilateral was tailor-made for 30° and 60°. For 45° we need something with a 90° corner — a square.';
     } else {

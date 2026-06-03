@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Computing Sine and Cosine | Trigonometry</title>
+  <title>Sine and Cosine | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">Computing Sine and Cosine</h1>
+      <h1 class="essay-title">Sine and Cosine</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -34,164 +34,37 @@
   <main>
     <article>
       <section class="essay-section">
-        <h3 class="subsection-title">Sine and Cosine</h3>
-
-        <h3 class="subsection-title">Getting familiar with right-angled triangles</h3>
-
-        <p>You should now appreciate that angles determine the shape of triangles.</p>
-
-        <p>I think we can ensure you have a clear sense of this by practicing visualising right-angled triangles given sets of angles.</p>
-
-        <p>For example, when given angles $90-60-30$, how would you picture the triangle?</p>
-
-        <p>You will have to first decide an orientation. With three angles, you could have two above and one below, or vice versa.</p>
-
-        <p>Personally, I like to always imagine two below, with the $90^\circ$ on the right, and the bigger of the two other angles on the bottom left.</p>
-
-        <p>The hypotenuse will always be on the 'left' of the triangle in such cases.</p>
-
-        <iframe
-          class="essay-widget triangle-visualisation-widget"
-          src="trigonometry/computing-sine-cosine/triangle-visualisation-widget.html"
-          title="Interactive widget for visualising a right triangle from a given set of angles"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>Okay. Now, let's try picturing triangles with the $90^\circ$ angle on the bottom left instead. Still there will be two angles below. This time the hypotenuse will be on the 'right'.</p>
-
-        <iframe
-          class="essay-widget triangle-visualisation-orientation-widget"
-          src="trigonometry/computing-sine-cosine/triangle-visualisation-orientation-widget.html?mode=bottom"
-          title="Interactive widget for visualising right triangles with the right angle on the bottom left or bottom right"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>Now, let's try thinking of the 90 degree angle as being above the other two in either the top right or bottom right.</p>
-
-        <iframe
-          class="essay-widget triangle-visualisation-orientation-widget"
-          src="trigonometry/computing-sine-cosine/triangle-visualisation-orientation-widget.html?mode=all"
-          title="Interactive widget for visualising right triangles with the right angle in any corner"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
         <p>Sine and cosine were originally not thought of as 'functions' per se.</p>
 
         <p>They were just names for specific ratios between sides in right-angled triangles.</p>
 
-        <p class="display-equation">$$sine = \huge \frac{o}{h}$$</p>
+        <p class="display-equation">$$\large \text{sine} = \frac{o}{h} \qquad \large \text{cosine} = \frac{a}{h}$$</p>
 
-        <h3 class="subsection-title">The arbitrary selecting of the angle of interest</h3>
+        <p>In the previous example, we saw that sine could be $\frac{1}{2}$ or $\frac{\sqrt{3}}{2}$, depending on which angle we were considering.</p>
 
-        <p>It seemed odd to me at first that the opposite and adjacent sides changed depending on the angle you 'chose'.</p>
+        <p>So, although they are 'ratios between sides', it's important to thing of them as associated with angles, not the sides themselves.</p>
 
-        <p>If the length of the opposite side changes depending on which side you select as the opposite, then does that mean there are two different sine ratios per triangle?</p>
+        <p>You can think of the sine of an angle as describing what fraction of the hypotenuse lies opposite that angle, while the cosine describes what fraction of the hypotenuse lies adjacent to it.</p>
 
         <iframe
-          class="essay-widget angle-interest-widget"
-          src="trigonometry/computing-sine-cosine/angle-of-interest-widget.html"
-          title="Interactive widget showing how sine and cosine depend on the selected angle of interest"
-          scrolling="no"
+          class="essay-widget sine-height-widget"
+          src="trigonometry/computing-sine-cosine/sine-height-widget.html"
+          title="Interactive widget showing sine as the height of a rotating unit line"
           loading="lazy"
         ></iframe>
 
-        <h3 class="subsection-title">Finding Ratios Geometrically</h3>
-
-        <p>The sine function considers only angles. But if these ratios are concerned with side lengths, where does the information needed to derive these ratios come from with only angles?</p>
-
-        <p>Finding a ratio with only angle information:</p>
-
-        <p>Consider a right triangle with angles $90^\circ$, $60^\circ$, and $30^\circ$.</p>
-
-        <p>To simplify the calculations, let the hypotenuse have length $1$.</p>
-
-        <iframe
-          class="essay-widget sine-cosine-ratio-builder-widget"
-          src="trigonometry/computing-sine-cosine/sine-cosine-ratio-builder-widget.html"
-          title="Interactive widget for deriving sine and cosine ratios from a 30-60-90 triangle"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>Now duplicate the triangle and place the copy beside it. The two triangles form an equilateral triangle.</p>
-
-        <p>Because the resulting triangle is equilateral:</p>
-
-        <ul>
-          <li>All three sides have length $1$.</li>
-          <li>All three angles are $60^\circ$.</li>
-        </ul>
-
-        <p>The side that was split by our construction therefore has total length $1$, meaning each half has length $\frac{1}{2}$.</p>
-
-        <p>Returning to our original right triangle, we now know:</p>
-
-        <ul>
-          <li>$\text{hypotenuse} = 1$</li>
-          <li>$\text{shorter side} = \frac{1}{2}$</li>
-        </ul>
-
-        <p>We can also find the remaining side using Pythagoras:</p>
-
-        <p class="display-equation">$$\left(\frac{1}{2}\right)^2 + x^2 = 1^2$$</p>
-        <p class="display-equation">$$\frac{1}{4} + x^2 = 1$$</p>
-        <p class="display-equation">$$x^2 = \frac{3}{4}$$</p>
-        <p class="display-equation">$$x = \frac{\sqrt{3}}{2}$$</p>
-
-        <p>We now know:</p>
-
-        <ul>
-          <li>$\text{hypotenuse} = 1$</li>
-          <li>$\text{leg 1} = \frac{1}{2}$</li>
-          <li>$\text{leg 2} = \frac{\sqrt{3}}{2}$</li>
-        </ul>
-
-        <p>Now finding the ratios just requires setting an opposite and adjacent side, let's say:</p>
-
-        <p class="display-equation">$$h= 1,\qquad o = \frac{1}{2}, \qquad a = \frac{\sqrt{3}}{2}$$</p>
-
-        <p class="display-equation">$\large sine = \frac{o}{h}$</p>
-
-        <p class="display-equation">$\large cosine = \frac{a}{h}$</p>
-
-        <p class="display-equation">$sine = \frac{0.5}{1} = 0.5$</p>
-
-        <p class="display-equation">cosine  = $\frac{\frac{\sqrt{3}}{2}}{1} = \frac{\sqrt{3}}{2}$</p>
-
-        <p>Mathematicians would then record the answers in something they called "Trigonometric Tables", so that if they encountered such an angle they could immediately find the ratios between side lengths. While calculating the above ratio was relatively straightforward, it is much more challenging with more awkward values and so these tables became very useful.</p>
-
-        <div class="responsive-table trig-ratio-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Angle</th>
-                <th>Sine Ratio</th>
-                <th>Cosine Ratio</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>$30^\circ$</td>
-                <td>0.5</td>
-                <td>$\frac{\sqrt{3}}{2}$</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <p>Historically, deriving sine and cosine values often required lengthy geometric arguments. As a result, mathematicians compiled trigonometric tables so that these values could be looked up rather than repeatedly derived. Today, calculators compute these values almost instantly using numerical algorithms based on infinite power series.</p>
 
         <hr class="section-divider" />
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
-          <a class="chapter-nav-link" href="trigonometry-unit-circle.html">
-            <span>Previous</span>
-            <strong>The Unit Circle</strong>
-          </a>
           <a class="chapter-nav-link" href="trigonometry-right-angled-triangles.html">
-            <span>Next</span>
+            <span>Previous</span>
             <strong>Right-Angled Triangles</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-measuring-circles.html">
+            <span>Next</span>
+            <strong>Measuring Rotation</strong>
           </a>
         </nav>
       </section>
