@@ -36,23 +36,9 @@
       <section class="essay-section">
         <h3 class="subsection-title">The Circular Nature of Angles</h3>
 
-        <p>Imagine looking down upon a cowboy living in a 2D world. You would see, of course, two concentric circles — his hat.</p>
+        <p>Most types of measurements are linear and are naturally represented on a number line. As they increase in one direction, they decrease in the other.</p>
 
-        <p>Around him is the circle representing all the possible directions he can face — the set of all possible orientations.</p>
-
-        <p>This is an indecisive cowboy. He begins facing east, then turns south, west, north, and finally back to east again.</p>
-
-        <iframe
-          class="essay-widget cowboy-orientation-widget"
-          src="Storage/Cowboy-Orientation.html"
-          title="Interactive cowboy orientation widget showing direction as circular"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>Notice that <strong>orientation in a 2D space is intrinsically circular</strong>.</p>
-
-        <p>Take a different type of measure like temperature. If we move in one direction we would only ever get hotter or colder.</p>
+        <p>Angles, however, are naturally represented by a circle. If we continually increase an angle, we eventually return to where we started.</p>
 
         <figure class="trig-figure orientation-measure-figure" aria-label="Temperature as a line compared with degrees as a circle">
           <svg viewBox="0 0 920 330" role="img">
@@ -96,41 +82,19 @@
           </svg>
         </figure>
 
-        <p>However, if we move in one direction in terms of orientation, we will end up where we started. Just like the cowboy who only went left.</p>
+        <p>We can represent an angle as a point moving around a circle.</p>
 
-        <h4 class="subsection-subtitle">Constrained Movement</h4>
+        <p>As that point moves, it is never moving purely horizontally or purely vertically, but always some combination of both.</p>
 
-        <p>The cowboy can only move along the circle.</p>
+        <p>If one coordinate changes, the other must change in a way that preserves the circular path. Sometimes $x$ increases while $y$ decreases, sometimes the reverse, and sometimes they increase or decrease together.</p>
 
-        <p>He is on the left. The tavern is on the right.</p>
+        <p>So while an angle appears to be a single quantity, its motion around a circle can be represented by two coupled quantities.</p>
 
-        <p>In order to move rightwards, he must also move upwards (or downwards).</p>
+        <h3 class="subsection-title">Unit Circle</h3>
 
-        <p>Let's impose an $xy$ grid to make things clearer.</p>
+        <p>Let's take a moment to understand the unit circle within the context of a coordinate system, and then we will see how this helps with the interpretation of angles.</p>
 
-        <iframe
-          class="essay-widget constrained-movement-widget"
-          src="trigonometry/unit-circle/constrained-movement-widget.html"
-          title="Interactive widget showing movement constrained to a circular path"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>To move around a circle, we are never moving purely horizontally or purely vertically.</p>
-
-        <p>If one coordinate changes, the other must change in a way that preserves the circle: sometimes $x$ go up as $y$ goes down, or the inverse, or they both go up or down at the same time.</p>
-
-        <p>The point is that every movement is a combination of horizontal and vertical changes.</p>
-
-        <p>The proportions of those changes continually vary, but they are constrained so that the point remains on the circle.</p>
-
-        <p>This suggests something interesting.</p>
-
-        <p>While an angle appears to be a single quantity, its motion around a circle can be represented by two coupled quantities.</p>
-
-        <p>As one changes, the other must change in a way that preserves the circular structure.</p>
-
-        <h3 class="subsection-title">Opening</h3>
+        <p>Every point on the circle has both an $x$-coordinate and a $y$-coordinate. As a point moves around the circle, these coordinates change together in a way that preserves the circular path.</p>
 
         <p>A unit circle has a radius of 1.</p>
 
@@ -180,7 +144,7 @@ $$</p>
 
         <p>If we graphed the angle as a point moved around the circle, we would see a straight line. As time increases, the angle increases.</p>
 
-        <p>(Unless we reset to $0^\circ$ after every complete revolution. In that case we would see a repeating sawtooth pattern.)</p>
+        <p>(Unless we reset to $0^\circ$ after each revolution. In that case we would see a repeating sawtooth pattern.)</p>
 
         <figure class="trig-figure angle-growth-figure" aria-label="Two graphs comparing angle increasing over time with angle resetting each revolution">
           <svg viewBox="0 0 920 360" role="img">
@@ -233,13 +197,9 @@ $$</p>
           loading="lazy"
         ></iframe>
 
-        <p>While angles are single values, the correspond to coordinates which have two:</p>
+        <p>It might seem odd. The angle is changing at a constant rate, yet the coordinates trace out smooth wave patterns.</p>
 
-        <p class="display-equation">$$\theta \longrightarrow (x,y)$$</p>
-
-        <p>Plotting the coordinates in terms of the angle reveals a repeating wave structure.</p>
-
-        <p>A wave can be understood as the shadow of a point moving uniformly around a circle.</p>
+        <p>In other words, uniform motion around a circle produces oscillatory behaviour when viewed through its coordinates.</p>
 
         <h3 class="subsection-title">Sine and Cosine</h3>
 
