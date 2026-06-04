@@ -1628,6 +1628,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .intro-linear-algebra-page .finding-angles-widget {
   width: min(100%, 860px);
   height: 335px;
+  margin-bottom: 0.8rem;
 }
 
 .intro-linear-algebra-page .fixed-triangle-widget {
