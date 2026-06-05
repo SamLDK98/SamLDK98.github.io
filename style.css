@@ -2760,7 +2760,6 @@ footer {
   box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
 }
 
-.trig-floating-nav-tab::before,
 .trig-floating-nav-panel::before {
   content: "";
   position: absolute;
