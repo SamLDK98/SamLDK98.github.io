@@ -2733,13 +2733,16 @@ footer {
   top: 25vh;
   right: 0;
   z-index: 50;
-  display: flex;
-  align-items: flex-start;
+  width: 2.35rem;
+  min-height: 7.6rem;
   color: var(--intro-text);
   font-family: "JetBrains Mono", Consolas, monospace;
 }
 
 .trig-floating-nav-tab {
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 2.35rem;
   min-height: 7.6rem;
   padding: 0.8rem 0.3rem;
@@ -2764,6 +2767,9 @@ footer {
 }
 
 .trig-floating-nav-panel {
+  position: absolute;
+  top: 0;
+  right: 2.35rem;
   width: min(17rem, calc(100vw - 3rem));
   max-height: min(74vh, 33rem);
   overflow-y: auto;
@@ -2949,6 +2955,8 @@ header {
     top: auto;
     right: 0;
     bottom: 1rem;
+    width: 2.35rem;
+    min-height: 6.2rem;
   }
 
   .trig-floating-nav-tab {
