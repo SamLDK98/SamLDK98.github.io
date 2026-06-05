@@ -1,6 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.documentElement.classList.add('js');
 
+  const isTrigonometryChapter = document.body.classList.contains('chapter-page')
+    && /^trigonometry-.*\.html$/.test(window.location.pathname.split('/').pop() || '');
+
+  if (isTrigonometryChapter) {
+    const trigChapters = [
+      { href: 'trigonometry.html', kicker: 'Home', title: 'Trigonometry' },
+      { href: 'trigonometry-overview.html', kicker: 'Chapter 1', title: 'Triangles, Lengths, and Angles' },
+      { href: 'trigonometry-right-angled-triangles.html', kicker: 'Chapter 2', title: 'Right-Angled Triangles' },
+      { href: 'trigonometry-computing-sine-and-cosine.html', kicker: 'Chapter 3', title: 'Interpreting Sine and Cosine' },
+      { href: 'trigonometry-measuring-circles.html', kicker: 'Chapter 4', title: 'Measuring Rotation' },
+      { href: 'trigonometry-unit-circle.html', kicker: 'Chapter 5', title: 'The Unit Circle' },
+      { href: 'trigonometry-polar-form.html', kicker: 'Chapter 6', title: 'Polar Form' },
+      { href: 'trigonometry-coordinates-on-the-unit-circle.html', kicker: 'Archive', title: 'Misc' },
+    ];
+    const currentPage = window.location.pathname.split('/').pop();
+    const nav = document.createElement('nav');
+    nav.className = 'trig-floating-nav';
+    nav.setAttribute('aria-label', 'Trigonometry chapter navigation');
+    nav.innerHTML = `
+      <button class="trig-floating-nav-tab" type="button" aria-expanded="false">
+        <span>Chapters</span>
+      </button>
+      <div class="trig-floating-nav-panel">
+        ${trigChapters.map((chapter) => `
+          <a class="trig-floating-nav-link${chapter.href === currentPage ? ' is-current' : ''}" href="${chapter.href}">
+            <span>${chapter.kicker}</span>
+            <strong>${chapter.title}</strong>
+          </a>
+        `).join('')}
+      </div>
+    `;
+    document.body.appendChild(nav);
+
+    const tab = nav.querySelector('.trig-floating-nav-tab');
+    const setExpanded = (expanded) => {
+      tab?.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    };
+
+    nav.addEventListener('mouseenter', () => setExpanded(true));
+    nav.addEventListener('mouseleave', () => setExpanded(false));
+    tab?.addEventListener('click', () => {
+      const expanded = tab.getAttribute('aria-expanded') === 'true';
+      setExpanded(!expanded);
+      nav.classList.toggle('is-open', !expanded);
+    });
+    nav.addEventListener('focusin', () => setExpanded(true));
+    nav.addEventListener('focusout', (event) => {
+      if (!nav.contains(event.relatedTarget)) {
+        setExpanded(false);
+        nav.classList.remove('is-open');
+      }
+    });
+  }
+
   const shelfArt = document.querySelector('.shelf-art');
 
   if (shelfArt) {

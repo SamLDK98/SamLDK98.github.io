@@ -2728,6 +2728,113 @@ footer {
   text-align: center;
 }
 
+.trig-floating-nav {
+  position: fixed;
+  top: 25vh;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  color: var(--intro-text);
+  font-family: "JetBrains Mono", Consolas, monospace;
+}
+
+.trig-floating-nav-tab {
+  width: 2.35rem;
+  min-height: 7.6rem;
+  padding: 0.8rem 0.3rem;
+  border: 1px solid var(--intro-rule);
+  border-right: 0;
+  border-radius: 5px 0 0 5px;
+  background:
+    linear-gradient(180deg, rgba(34, 29, 25, 0.98), rgba(25, 22, 19, 0.99));
+  color: var(--intro-accent);
+  cursor: pointer;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
+}
+
+.trig-floating-nav-tab span {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.58rem;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.trig-floating-nav-panel {
+  width: min(17rem, calc(100vw - 3rem));
+  max-height: min(74vh, 33rem);
+  overflow-y: auto;
+  border: 1px solid var(--intro-rule);
+  border-right: 0;
+  border-radius: 5px 0 0 5px;
+  background:
+    radial-gradient(ellipse at top left, rgba(232, 161, 59, 0.055), transparent 55%),
+    linear-gradient(180deg, rgba(34, 29, 25, 0.98), rgba(21, 18, 16, 0.995));
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0.8rem);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.trig-floating-nav:hover .trig-floating-nav-panel,
+.trig-floating-nav:focus-within .trig-floating-nav-panel,
+.trig-floating-nav.is-open .trig-floating-nav-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.trig-floating-nav-link {
+  display: block;
+  padding: 0.78rem 0.95rem 0.82rem;
+  border-bottom: 1px solid var(--intro-rule);
+  color: var(--intro-text);
+  text-decoration: none;
+}
+
+.trig-floating-nav-link:last-child {
+  border-bottom: 0;
+}
+
+.trig-floating-nav-link span {
+  display: block;
+  margin-bottom: 0.18rem;
+  color: var(--intro-faint);
+  font-size: 0.58rem;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.trig-floating-nav-link strong {
+  display: block;
+  color: var(--intro-text);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 0.98rem;
+  font-weight: 400;
+  line-height: 1.12;
+}
+
+.trig-floating-nav-link:hover,
+.trig-floating-nav-link:focus-visible,
+.trig-floating-nav-link.is-current {
+  background: rgba(232, 161, 59, 0.08);
+  outline: none;
+}
+
+.trig-floating-nav-link:hover span,
+.trig-floating-nav-link:focus-visible span,
+.trig-floating-nav-link.is-current span,
+.trig-floating-nav-link:hover strong,
+.trig-floating-nav-link:focus-visible strong,
+.trig-floating-nav-link.is-current strong {
+  color: var(--intro-accent);
+}
+
 /* ─── Fade-in on load ───────────────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
@@ -2836,6 +2943,21 @@ header {
   .trigonometry-page .trig-card-glyph svg {
     width: 1.75rem;
     height: 1.75rem;
+  }
+
+  .trig-floating-nav {
+    top: auto;
+    right: 0;
+    bottom: 1rem;
+  }
+
+  .trig-floating-nav-tab {
+    min-height: 6.2rem;
+  }
+
+  .trig-floating-nav-panel {
+    width: min(16rem, calc(100vw - 3rem));
+    max-height: 64vh;
   }
 
   .trig-figure-grid {
