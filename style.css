@@ -2754,9 +2754,7 @@ footer {
   border: 1px solid var(--intro-rule);
   border-right: 0;
   border-radius: 5px 0 0 5px;
-  background:
-    radial-gradient(ellipse at top left, rgba(109, 211, 196, 0.12), transparent 48%),
-    linear-gradient(180deg, rgba(34, 29, 25, 0.98), rgba(25, 22, 19, 0.99));
+  background: #221d19;
   color: var(--intro-accent);
   cursor: pointer;
   box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
@@ -2770,17 +2768,6 @@ footer {
   height: 3px;
   background: linear-gradient(90deg, #e8a13b, #6dd3c4, #ef7398);
   opacity: 0.86;
-  pointer-events: none;
-}
-
-.trig-floating-nav-tab::after,
-.trig-floating-nav-panel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(115deg, transparent 0 34%, rgba(255, 244, 220, 0.075) 46%, transparent 58% 100%);
-  opacity: 0.8;
   pointer-events: none;
 }
 
@@ -2811,10 +2798,7 @@ footer {
   border: 1px solid var(--intro-rule);
   border-right: 0;
   border-radius: 5px 0 0 5px;
-  background:
-    radial-gradient(ellipse at top left, rgba(239, 115, 152, 0.08), transparent 45%),
-    radial-gradient(ellipse at top left, rgba(232, 161, 59, 0.055), transparent 55%),
-    linear-gradient(180deg, rgba(34, 29, 25, 0.98), rgba(21, 18, 16, 0.995));
+  background: #221d19;
   box-shadow: 0 18px 54px rgba(0, 0, 0, 0.3);
   opacity: 0;
   pointer-events: none;
