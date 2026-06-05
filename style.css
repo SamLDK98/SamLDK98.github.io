@@ -2731,10 +2731,12 @@ footer {
 .trig-floating-nav {
   position: fixed;
   top: 25vh;
-  right: 0;
+  left: 100vw;
+  right: auto;
   z-index: 50;
   width: 2.35rem;
   min-height: 7.6rem;
+  transform: translateX(-2.35rem);
   color: var(--intro-text);
   font-family: "JetBrains Mono", Consolas, monospace;
 }
@@ -2953,10 +2955,12 @@ header {
 
   .trig-floating-nav {
     top: auto;
-    right: 0;
+    left: 100vw;
+    right: auto;
     bottom: 1rem;
     width: 2.35rem;
     min-height: 6.2rem;
+    transform: translateX(-2.35rem);
   }
 
   .trig-floating-nav-tab {
