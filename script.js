@@ -20,8 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     nav.className = 'trig-floating-nav';
     nav.setAttribute('aria-label', 'Trigonometry chapter navigation');
     nav.innerHTML = `
-      <button class="trig-floating-nav-tab" type="button" aria-expanded="false">
-        <span>Chapters</span>
+      <button class="trig-floating-nav-tab" type="button" aria-expanded="false" aria-label="Open trigonometry chapter navigation">
+        <span class="trig-floating-nav-dots" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
       </button>
       <div class="trig-floating-nav-panel">
         ${trigChapters.map((chapter) => `
