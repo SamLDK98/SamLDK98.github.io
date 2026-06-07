@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { href: 'trigonometry-unit-circle.html', kicker: 'Chapter 5', title: 'The Unit Circle' },
       { href: 'trigonometry-polar-form.html', kicker: 'Chapter 6', title: 'Polar Form' },
       { href: 'trigonometry-coordinates-on-the-unit-circle.html', kicker: 'Archive', title: 'Misc' },
+      { href: 'trigonometry-introduction.html', kicker: 'Chapter 99', title: 'Introduction' },
     ];
     const currentPage = window.location.pathname.split('/').pop();
     const nav = document.createElement('nav');

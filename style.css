@@ -1679,6 +1679,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 520px;
 }
 
+.intro-linear-algebra-page .angle-orientation-widget {
+  width: min(100%, 900px);
+  height: 520px;
+}
+
 .intro-linear-algebra-page .angle-interest-widget {
   width: min(100%, 980px);
   height: 680px;
