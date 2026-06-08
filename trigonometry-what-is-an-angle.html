@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Is an Angle? | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-what-is-angle-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">What Is an Angle?</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>"Trigonometry" translates to <em>triangle measurement</em>.</p>
+
+        <p>Yet <strong>angles</strong> are the real subject of interest.</p>
+
+        <p>Angles measure <strong>differences between orientations</strong>.</p>
+
+        <p>This is most simply explained using lines.</p>
+
+        <p>A line can be rotated about its midpoint.</p>
+
+        <p>Each position produced by this rotation corresponds to an orientation.</p>
+
+        <iframe
+          class="essay-widget angle-orientation-widget"
+          src="trigonometry/introduction/angle-orientation-widget.html"
+          title="Interactive widget comparing two line orientations"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>The quantity being measured is rotation, not distance.</p>
+
+        <p>This can be confusing because in order to represent angles, we must use visualisations that depict some sense of length.</p>
+
+        <p>The standard arc shown between two lines might suggest that the length of the arc represents the difference in orientation.</p>
+
+        <p>Of course, the length of these arcs is arbitrary.</p>
+
+        <figure class="trig-figure direction-figure angle-arc-figure" aria-label="A 45 degree angle shown with arcs of different radii">
+          <svg viewBox="0 0 760 420" role="img">
+            <defs>
+              <marker id="chapter0-angle-ray-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+              </marker>
+            </defs>
+            <g transform="translate(250 300)">
+              <line x1="0" y1="0" x2="260" y2="0" stroke="rgba(236,226,209,0.55)" stroke-width="4" marker-end="url(#chapter0-angle-ray-arrow)" />
+              <line x1="0" y1="0" x2="184" y2="-184" stroke="rgba(236,226,209,0.55)" stroke-width="4" marker-end="url(#chapter0-angle-ray-arrow)" />
+              <path d="M 54 0 A 54 54 0 0 0 38 -38" fill="none" stroke="#e8a13b" stroke-width="4" />
+              <path d="M 96 0 A 96 96 0 0 0 68 -68" fill="none" stroke="rgba(232,161,59,0.7)" stroke-width="4" />
+              <path d="M 142 0 A 142 142 0 0 0 100 -100" fill="none" stroke="rgba(232,161,59,0.45)" stroke-width="4" />
+              <circle r="6" fill="#ece2d1" />
+            </g>
+          </svg>
+          <figcaption class="trig-figure-caption">All of these arcs and curvy lines represent the same angle.</figcaption>
+        </figure>
+
+        <p>It may help to imagine a circle partitioned as shown below.</p>
+
+        <p>Notice that all of the curved lines cross the same number of partitions regardless of their length or shape.</p>
+
+        <figure class="trig-figure direction-figure angle-column-figure" aria-label="A point with a full circle of radial directions and two orientations crossed by differently shaped arcs">
+          <svg viewBox="0 0 820 560" role="img">
+            <defs>
+              <marker id="chapter0-column-ray-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+              </marker>
+            </defs>
+            <g transform="translate(410 280)">
+              <g stroke="rgba(236,226,209,0.3)" stroke-width="1.5">
+                <line x1="0" y1="0" x2="230" y2="0" />
+                <line x1="0" y1="0" x2="217" y2="-79" />
+                <line x1="0" y1="0" x2="176" y2="-148" />
+                <line x1="0" y1="0" x2="115" y2="-199" />
+                <line x1="0" y1="0" x2="40" y2="-226" />
+                <line x1="0" y1="0" x2="-40" y2="-226" />
+                <line x1="0" y1="0" x2="-115" y2="-199" />
+                <line x1="0" y1="0" x2="-176" y2="-148" />
+                <line x1="0" y1="0" x2="-217" y2="-79" />
+                <line x1="0" y1="0" x2="-230" y2="0" />
+                <line x1="0" y1="0" x2="-217" y2="79" />
+                <line x1="0" y1="0" x2="-176" y2="148" />
+                <line x1="0" y1="0" x2="-115" y2="199" />
+                <line x1="0" y1="0" x2="-40" y2="226" />
+                <line x1="0" y1="0" x2="40" y2="226" />
+                <line x1="0" y1="0" x2="115" y2="199" />
+                <line x1="0" y1="0" x2="176" y2="148" />
+                <line x1="0" y1="0" x2="217" y2="79" />
+              </g>
+              <circle r="230" fill="none" stroke="rgba(232,161,59,0.82)" stroke-width="3.5" />
+              <line x1="0" y1="0" x2="230" y2="0" stroke="#6dd3c4" stroke-width="4" marker-end="url(#chapter0-column-ray-arrow)" />
+              <line x1="0" y1="0" x2="-176" y2="-148" stroke="#6dd3c4" stroke-width="4" marker-end="url(#chapter0-column-ray-arrow)" />
+              <path d="M 72 0 A 72 72 0 0 0 -55 -46" fill="none" stroke="#e8a13b" stroke-width="4" />
+              <path d="M 118 0 C 112 -88 22 -124 -90 -76" fill="none" stroke="rgba(232,161,59,0.75)" stroke-width="4" />
+              <path d="M 170 0 A 170 170 0 0 0 -130 -109" fill="none" stroke="rgba(232,161,59,0.48)" stroke-width="4" />
+              <circle r="6" fill="#ece2d1" />
+            </g>
+          </svg>
+        </figure>
+
+        <p>The familiar degree system is based on a similar idea, partitioning a circle into 360 equal parts.</p>
+
+        <p>We can therefore think of an angle as measuring how many such partitions must be crossed to rotate one orientation into another.</p>
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-overview.html">
+            <span>Next</span>
+            <strong>Triangles, Lengths, and Angles</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (isTrigonometryChapter) {
     const trigChapters = [
       { href: 'trigonometry.html', kicker: 'Home', title: 'Trigonometry' },
+      { href: 'trigonometry-what-is-an-angle.html', kicker: 'Chapter 0', title: 'What Is an Angle?' },
       { href: 'trigonometry-overview.html', kicker: 'Chapter 1', title: 'Triangles, Lengths, and Angles' },
       { href: 'trigonometry-right-angled-triangles.html', kicker: 'Chapter 2', title: 'Right-Angled Triangles' },
       { href: 'trigonometry-computing-sine-and-cosine.html', kicker: 'Chapter 3', title: 'Interpreting Sine and Cosine' },
