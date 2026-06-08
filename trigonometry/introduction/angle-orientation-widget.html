@@ -11,15 +11,14 @@
       --rule: rgba(214, 190, 154, 0.22);
       --text: #efe7d8;
       --muted: #a89980;
-      --line-a: #f0ddba;
-      --line-b: #ef7398;
-      --angle: #6dd3c4;
+      --active: #f0ddba;
+      --first: #f1c66e;
+      --second: #f1c66e;
+      --arc: #6dd3c4;
       --button: #33271d;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -47,93 +46,137 @@
       border-radius: 5px;
       overflow: hidden;
       background:
-        radial-gradient(circle at 50% 50%, rgba(240, 221, 186, 0.07), transparent 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 50%, rgba(240, 221, 186, 0.1), transparent 0 2px, transparent 3px),
         linear-gradient(rgba(240, 221, 186, 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(240, 221, 186, 0.04) 1px, transparent 1px);
       background-size: auto, 34px 34px, 34px 34px;
     }
 
-    .svg-stage {
+    svg {
       display: block;
       width: 100%;
       height: 100%;
     }
 
-    .line-a,
-    .line-b {
-      stroke-width: 7;
+    .orientation-line {
+      stroke-width: 8;
       stroke-linecap: round;
-      transform-box: fill-box;
-      transform-origin: center;
-      transition: transform 680ms cubic-bezier(0.22, 0.84, 0.26, 1), opacity 260ms ease;
+      transition: x1 140ms ease, y1 140ms ease, x2 140ms ease, y2 140ms ease, opacity 160ms ease;
     }
 
-    .line-a {
-      stroke: var(--line-a);
+    .active-line {
+      stroke: var(--active);
+      opacity: 0.72;
       filter: drop-shadow(0 0 8px rgba(240, 221, 186, 0.18));
     }
 
-    .line-b {
-      stroke: var(--line-b);
-      filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.2));
+    .first-line {
+      stroke: var(--first);
+      opacity: 0;
+      filter: drop-shadow(0 0 8px rgba(109, 211, 196, 0.22));
     }
 
-    .line-ghost {
-      opacity: 0.22;
+    .second-line {
+      stroke: var(--second);
+      opacity: 0;
+      filter: drop-shadow(0 0 8px rgba(241, 198, 110, 0.22));
     }
 
-    .compare-mode .line-a,
-    .compare-mode .line-b {
-      transition: x1 650ms ease, y1 650ms ease, x2 650ms ease, y2 650ms ease, transform 650ms ease;
+    .has-first .first-line,
+    .has-second .second-line {
+      opacity: 1;
+    }
+
+    .has-second .active-line {
+      opacity: 0;
     }
 
     .angle-ray {
-      stroke-width: 7;
+      stroke-width: 8;
       stroke-linecap: round;
       opacity: 0;
-      transition: opacity 360ms ease 600ms;
+      transition: opacity 220ms ease;
     }
 
-    .angle-ray-a {
-      stroke: var(--line-a);
-    }
-
-    .angle-ray-b {
-      stroke: var(--line-b);
-    }
+    .angle-ray-first { stroke: var(--first); }
+    .angle-ray-second { stroke: var(--second); }
 
     .angle-arc {
       fill: none;
-      stroke: var(--angle);
+      stroke: var(--arc);
       stroke-width: 4;
       stroke-linecap: round;
       opacity: 0;
-      transition: opacity 360ms ease 720ms;
-      filter: drop-shadow(0 0 7px rgba(109, 211, 196, 0.24));
+      filter: drop-shadow(0 0 7px rgba(109, 211, 196, 0.26));
+      transition: opacity 220ms ease;
     }
 
-    .angle-label {
-      fill: var(--angle);
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 18px;
-      letter-spacing: 0.03em;
-      opacity: 0;
-      transition: opacity 360ms ease 760ms;
-    }
-
-    .compare-mode .angle-ray,
-    .compare-mode .angle-arc,
-    .compare-mode .angle-label {
+    .has-second .angle-ray,
+    .has-second .angle-arc {
       opacity: 1;
     }
 
     .controls {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.75rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.85rem;
       padding-top: 1rem;
       border-top: 1px solid var(--rule);
       margin-top: 1rem;
+    }
+
+    .slider-label,
+    .status {
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(240, 221, 186, 0.18);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--active);
+      box-shadow: 0 0 9px rgba(240, 221, 186, 0.34);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--active);
+      box-shadow: 0 0 9px rgba(240, 221, 186, 0.34);
+    }
+
+    .button-row {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 0.65rem;
       flex-wrap: wrap;
     }
 
@@ -163,31 +206,15 @@
       transform: none;
     }
 
-    .status {
-      align-self: center;
-      color: var(--muted);
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
     @media (max-width: 640px) {
-      .angle-widget {
-        padding: 0.85rem;
-      }
-
-      .stage {
-        height: 300px;
-      }
-
+      .angle-widget { padding: 0.85rem; }
+      .stage { height: 300px; }
       .controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
       }
-
-      .status {
-        grid-column: 1 / -1;
+      .button-row {
+        display: grid;
+        gap: 0.65rem;
       }
     }
   </style>
@@ -195,158 +222,148 @@
 <body>
   <main class="angle-widget" aria-label="Angle as a comparison between orientations">
     <div class="stage" id="stage">
-      <svg class="svg-stage" viewBox="0 0 860 330" role="img" aria-label="Two line orientations compared as an angle">
-        <line id="lineA" class="line-a" x1="110" y1="165" x2="320" y2="165" />
-        <line id="lineB" class="line-b" x1="540" y1="165" x2="750" y2="165" />
-        <line id="rayA" class="angle-ray angle-ray-a" x1="430" y1="165" x2="560" y2="165" />
-        <line id="rayB" class="angle-ray angle-ray-b" x1="430" y1="165" x2="560" y2="165" />
+      <svg viewBox="0 0 860 330" role="img" aria-label="A rotatable line segment with two stored orientations">
+        <line id="firstLine" class="orientation-line first-line" x1="290" y1="165" x2="570" y2="165" />
+        <line id="secondLine" class="orientation-line second-line" x1="290" y1="165" x2="570" y2="165" />
+        <line id="activeLine" class="orientation-line active-line" x1="290" y1="165" x2="570" y2="165" />
+        <line id="rayFirst" class="angle-ray angle-ray-first" x1="430" y1="165" x2="570" y2="165" />
+        <line id="raySecond" class="angle-ray angle-ray-second" x1="430" y1="165" x2="570" y2="165" />
         <path id="angleArc" class="angle-arc" d="" />
-        <text id="angleLabel" class="angle-label" x="0" y="0"></text>
       </svg>
     </div>
     <div class="controls">
-      <button id="rotateA" type="button">Rotate first</button>
-      <button id="rotateB" type="button">Rotate second</button>
-      <button id="compare" type="button" disabled>Compare</button>
-      <button id="reset" type="button">Reset</button>
-      <span class="status" id="status">Spin both line segments</span>
+      <span class="slider-label">Rotate</span>
+      <input id="angleSlider" type="range" min="0" max="360" value="0" step="1" aria-label="Rotate the line segment" />
+      <span class="status" id="angleReadout">0°</span>
+      <div class="button-row">
+        <div class="buttons">
+          <button id="setFirst" type="button">Set 1st Orientation</button>
+          <button id="setSecond" type="button" disabled>Set 2nd Orientation</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+        <span class="status" id="status">Choose the first orientation</span>
+      </div>
     </div>
   </main>
 
   <script>
     const stage = document.getElementById('stage');
-    const lineA = document.getElementById('lineA');
-    const lineB = document.getElementById('lineB');
-    const rayA = document.getElementById('rayA');
-    const rayB = document.getElementById('rayB');
+    const slider = document.getElementById('angleSlider');
+    const angleReadout = document.getElementById('angleReadout');
+    const activeLine = document.getElementById('activeLine');
+    const firstLine = document.getElementById('firstLine');
+    const secondLine = document.getElementById('secondLine');
+    const rayFirst = document.getElementById('rayFirst');
+    const raySecond = document.getElementById('raySecond');
     const angleArc = document.getElementById('angleArc');
-    const angleLabel = document.getElementById('angleLabel');
-    const rotateA = document.getElementById('rotateA');
-    const rotateB = document.getElementById('rotateB');
-    const compare = document.getElementById('compare');
+    const setFirst = document.getElementById('setFirst');
+    const setSecond = document.getElementById('setSecond');
     const reset = document.getElementById('reset');
     const status = document.getElementById('status');
 
-    let angleA = 0;
-    let angleB = 0;
-    let spunA = false;
-    let spunB = false;
+    const CX = 430;
+    const CY = 165;
+    const HALF = 140;
+    const RAY = 140;
+    let firstAngle = null;
+    let secondAngle = null;
 
-    const options = [18, 32, 47, 63, 78, 104, 127, 146, 161];
-    let optionIndex = 0;
-
-    function nextAngle(offset = 0) {
-      optionIndex = (optionIndex + 3 + offset) % options.length;
-      return options[optionIndex];
-    }
-
-    function polar(cx, cy, length, degrees) {
+    function polar(length, degrees) {
       const radians = degrees * Math.PI / 180;
       return {
-        x: cx + Math.cos(radians) * length,
-        y: cy - Math.sin(radians) * length,
+        x: CX + Math.cos(radians) * length,
+        y: CY - Math.sin(radians) * length,
       };
     }
 
-    function smallestDifference(a, b) {
-      let diff = Math.abs(a - b) % 180;
-      return diff > 90 ? 180 - diff : diff;
-    }
-
-    function arcPath(cx, cy, radius, fromDeg, toDeg) {
-      let start = fromDeg % 360;
-      let end = toDeg % 360;
-      let delta = ((end - start + 540) % 360) - 180;
-      if (Math.abs(delta) > 90) {
-        delta = delta > 0 ? delta - 180 : delta + 180;
-      }
-      end = start + delta;
-
-      const p1 = polar(cx, cy, radius, start);
-      const p2 = polar(cx, cy, radius, end);
-      const largeArc = Math.abs(delta) > 180 ? 1 : 0;
-      const sweep = delta < 0 ? 1 : 0;
-      return `M ${p1.x} ${p1.y} A ${radius} ${radius} 0 ${largeArc} ${sweep} ${p2.x} ${p2.y}`;
-    }
-
-    function setLine(line, cx, cy, length, degrees) {
-      const start = polar(cx, cy, length / 2, degrees + 180);
-      const end = polar(cx, cy, length / 2, degrees);
+    function setLine(line, degrees, length = HALF) {
+      const start = polar(length, degrees + 180);
+      const end = polar(length, degrees);
       line.setAttribute('x1', start.x);
       line.setAttribute('y1', start.y);
       line.setAttribute('x2', end.x);
       line.setAttribute('y2', end.y);
     }
 
+    function signedDelta(fromDeg, toDeg) {
+      let delta = ((toDeg - fromDeg + 540) % 360) - 180;
+      if (Math.abs(delta) > 90) {
+        delta = delta > 0 ? delta - 180 : delta + 180;
+      }
+      return delta;
+    }
+
+    function arcPath(radius, fromDeg, toDeg) {
+      const delta = signedDelta(fromDeg, toDeg);
+      const start = polar(radius, fromDeg);
+      const end = polar(radius, fromDeg + delta);
+      const sweep = delta < 0 ? 1 : 0;
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 ${sweep} ${end.x} ${end.y}`;
+    }
+
     function setRay(line, degrees) {
-      const end = polar(430, 165, 138, degrees);
-      line.setAttribute('x1', 430);
-      line.setAttribute('y1', 165);
+      const end = polar(RAY, degrees);
+      line.setAttribute('x1', CX);
+      line.setAttribute('y1', CY);
       line.setAttribute('x2', end.x);
       line.setAttribute('y2', end.y);
     }
 
-    function updateStatus() {
-      compare.disabled = !(spunA && spunB);
-      if (stage.classList.contains('compare-mode')) {
-        status.textContent = `${Math.round(smallestDifference(angleA, angleB))} degree difference`;
-      } else if (spunA && spunB) {
-        status.textContent = 'Compare the orientations';
+    function render() {
+      const currentAngle = Number(slider.value);
+      setLine(activeLine, currentAngle);
+      angleReadout.textContent = `${currentAngle === 360 ? 0 : currentAngle}°`;
+
+      if (firstAngle !== null) {
+        stage.classList.add('has-first');
+        setLine(firstLine, firstAngle);
+        setRay(rayFirst, firstAngle);
       } else {
-        status.textContent = 'Spin both line segments';
+        stage.classList.remove('has-first');
+      }
+
+      if (secondAngle !== null) {
+        stage.classList.add('has-second');
+        setLine(secondLine, secondAngle);
+        setRay(raySecond, secondAngle);
+        angleArc.setAttribute('d', arcPath(58, firstAngle, secondAngle));
+      } else {
+        stage.classList.remove('has-second');
+      }
+
+      setSecond.disabled = firstAngle === null || secondAngle !== null;
+      setFirst.disabled = secondAngle !== null;
+
+      if (secondAngle !== null) {
+        status.textContent = 'Difference between orientations';
+      } else if (firstAngle !== null) {
+        status.textContent = 'Choose the second orientation';
+      } else {
+        status.textContent = 'Choose the first orientation';
       }
     }
 
-    function renderSeparated() {
-      stage.classList.remove('compare-mode');
-      setLine(lineA, 215, 165, 210, angleA);
-      setLine(lineB, 645, 165, 210, angleB);
-      lineA.classList.remove('line-ghost');
-      lineB.classList.remove('line-ghost');
-      updateStatus();
-    }
+    slider.addEventListener('input', render);
 
-    function renderComparison() {
-      stage.classList.add('compare-mode');
-      lineA.classList.add('line-ghost');
-      lineB.classList.add('line-ghost');
-      setLine(lineA, 430, 165, 276, angleA);
-      setLine(lineB, 430, 165, 276, angleB);
-      setRay(rayA, angleA);
-      setRay(rayB, angleB);
-      angleArc.setAttribute('d', arcPath(430, 165, 58, angleA, angleB));
-
-      const midAngle = angleA + (((angleB - angleA + 540) % 360) - 180) / 2;
-      const labelPoint = polar(430, 165, 84, midAngle);
-      angleLabel.setAttribute('x', labelPoint.x - 15);
-      angleLabel.setAttribute('y', labelPoint.y + 6);
-      angleLabel.textContent = `${Math.round(smallestDifference(angleA, angleB))}°`;
-      updateStatus();
-    }
-
-    rotateA.addEventListener('click', () => {
-      angleA = nextAngle(0);
-      spunA = true;
-      renderSeparated();
+    setFirst.addEventListener('click', () => {
+      firstAngle = Number(slider.value);
+      secondAngle = null;
+      render();
     });
 
-    rotateB.addEventListener('click', () => {
-      angleB = nextAngle(2);
-      spunB = true;
-      renderSeparated();
+    setSecond.addEventListener('click', () => {
+      secondAngle = Number(slider.value);
+      render();
     });
-
-    compare.addEventListener('click', renderComparison);
 
     reset.addEventListener('click', () => {
-      angleA = 0;
-      angleB = 0;
-      spunA = false;
-      spunB = false;
-      renderSeparated();
+      firstAngle = null;
+      secondAngle = null;
+      slider.value = 0;
+      render();
     });
 
-    renderSeparated();
+    render();
   </script>
 </body>
 </html>
