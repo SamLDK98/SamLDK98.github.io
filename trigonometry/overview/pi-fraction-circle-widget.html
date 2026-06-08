@@ -3,19 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Angles in Degrees and Radians</title>
+  <title>Radians Around a Circle</title>
   <style>
     :root {
-      --bg: #161311;
-      --panel: #1e1a17;
-      --rule: rgba(214, 196, 168, 0.14);
       --text: #ece2d1;
       --dim: #a89c87;
-      --accent: #d4b888;
-      --green: #7ea35f;
-      --yellow: #f1d84d;
-      --axis: rgba(236, 226, 209, 0.36);
-      --circle: rgba(236, 226, 209, 0.68);
+      --blue: #6dd3c4;
+      --orange: #e8a13b;
     }
 
     * {
@@ -24,313 +18,323 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
+      min-height: 0;
+      background: transparent;
       color: var(--text);
       font-family: Georgia, "Times New Roman", serif;
     }
 
     .widget {
-      min-height: 760px;
-      border: 1px solid var(--rule);
-      background:
-        radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%),
-        var(--bg);
-    }
-
-    header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 1rem;
-      align-items: end;
-      padding: 1.3rem 1.6rem;
-      border-bottom: 1px solid var(--rule);
-    }
-
-    h1 {
-      margin: 0;
-      color: var(--text);
-      font-size: clamp(1.45rem, 3vw, 2.2rem);
-      font-weight: 500;
-    }
-
-    .mode-toggle {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(90px, 1fr));
-      gap: 0.4rem;
-      width: min(100%, 420px);
-    }
-
-    button {
-      min-height: 38px;
-      border: 1px solid var(--rule);
-      background: var(--panel);
-      color: var(--dim);
-      font: inherit;
-      cursor: pointer;
-    }
-
-    button:hover,
-    button.active {
-      border-color: var(--accent);
-      color: #ffe7b2;
+      min-height: 380px;
+      border: 0;
+      background: transparent;
     }
 
     .stage {
       display: grid;
       place-items: center;
-      min-height: 660px;
-      padding: 1rem;
+      min-height: 380px;
+      padding: 0.6rem;
     }
 
     svg {
       display: block;
-      width: min(100%, 820px);
+      width: min(100%, 430px);
       height: auto;
+      touch-action: none;
       user-select: none;
     }
 
     .circle {
       fill: rgba(0, 0, 0, 0.08);
-      stroke: var(--circle);
-      stroke-width: 2.6;
+      stroke: var(--orange);
+      stroke-width: 3;
     }
 
     .axis {
-      stroke: var(--axis);
+      stroke: rgba(168, 156, 135, 0.45);
       stroke-width: 1.4;
       stroke-dasharray: 4 5;
-      marker-start: url(#axisArrow);
-      marker-end: url(#axisArrow);
     }
 
-    .axis-arrow {
-      fill: var(--axis);
-    }
-
-    .tick-point {
-      fill: var(--yellow);
-      stroke: rgba(0, 0, 0, 0.55);
-      stroke-width: 2;
-    }
-
-    .degree-label,
-    .pi-label {
-      fill: var(--green);
+    .radian-label {
+      fill: var(--text);
       font-family: "Courier New", monospace;
+      font-size: 21px;
       font-weight: 700;
     }
 
-    .degree-label {
-      font-size: 20px;
-      opacity: 0.72;
+    .fraction-bar {
+      stroke: var(--text);
+      stroke-width: 1.6;
+      stroke-linecap: round;
     }
 
-    .pi-label {
-      font-size: 24px;
-      color: var(--green);
+    .tick-point {
+      fill: var(--blue);
+      stroke: rgba(0, 0, 0, 0.42);
+      stroke-width: 1.8;
     }
 
-    .hidden {
-      display: none;
+    .tick-point.angle-45 {
+      stroke: rgba(0, 0, 0, 0.56);
+      stroke-width: 2.2;
+    }
+
+    .angle-sector {
+      fill: rgba(110, 167, 255, 0.16);
+      stroke: none;
+    }
+
+    .angle-arc,
+    .angle-ray,
+    .base-ray {
+      fill: none;
+      stroke: var(--blue);
+      stroke-linecap: round;
+      stroke-width: 2.6;
+    }
+
+    .angle-ray {
+      filter: drop-shadow(0 0 5px rgba(110, 167, 255, 0.36));
+    }
+
+    .handle {
+      fill: var(--blue);
+      stroke: var(--text);
+      stroke-width: 2;
+      cursor: grab;
+    }
+
+    .handle:active {
+      cursor: grabbing;
     }
 
     @media (max-width: 720px) {
       .widget {
-        min-height: 690px;
-      }
-
-      header {
-        grid-template-columns: 1fr;
-      }
-
-      .mode-toggle {
-        grid-template-columns: 1fr;
+        min-height: 380px;
       }
 
       .stage {
-        min-height: 520px;
+        min-height: 365px;
       }
 
-      .degree-label {
-        font-size: 16px;
-      }
-
-      .pi-label {
-        font-size: 18px;
+      .radian-label {
+        font-size: 17px;
       }
     }
   </style>
 </head>
 <body>
   <section class="widget">
-    <header>
-      <h1>Angles in Degrees and Radians</h1>
-      <div class="mode-toggle" role="group" aria-label="Label display mode">
-        <button type="button" data-mode="degrees">Degrees</button>
-        <button type="button" data-mode="pi">Pi fractions</button>
-        <button type="button" data-mode="both" class="active">Both</button>
-      </div>
-    </header>
-
     <div class="stage">
-      <svg viewBox="0 0 840 660" role="img" aria-label="Circle labelled with degrees and pi-fraction radian measures">
+      <svg id="circleSvg" viewBox="0 0 430 390" role="img" aria-label="Interactive circle labelled with radians">
         <defs>
-          <marker id="axisArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-            <path d="M 0 0 L 7 3.5 L 0 7 Z" class="axis-arrow"></path>
+          <marker id="blueArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M 0 0 L 8 4 L 0 8 Z" fill="#6dd3c4"></path>
           </marker>
         </defs>
 
-        <line class="axis" x1="80" y1="330" x2="760" y2="330" />
-        <line class="axis" x1="420" y1="620" x2="420" y2="40" />
-        <circle class="circle" cx="420" cy="330" r="250" />
-        <g id="marks"></g>
+        <line class="axis" x1="86" y1="185" x2="364" y2="185" />
+        <line class="axis" x1="225" y1="324" x2="225" y2="46" />
+        <circle class="circle" cx="225" cy="185" r="139" />
+
+        <g id="ticks"></g>
+        <path class="angle-sector" id="sector"></path>
+        <line class="base-ray" x1="225" y1="185" x2="380" y2="185" marker-end="url(#blueArrow)" />
+        <path class="angle-arc" id="arc"></path>
+        <line class="angle-ray" id="ray" x1="225" y1="185" x2="0" y2="0" marker-end="url(#blueArrow)" />
+        <circle class="handle" id="handle" cx="0" cy="0" r="10" tabindex="0" aria-label="Drag or use arrow keys to change the angle" />
       </svg>
     </div>
   </section>
 
   <script>
-    const marksRoot = document.getElementById("marks");
-    const buttons = [...document.querySelectorAll("button[data-mode]")];
-    const cx = 420;
-    const cy = 330;
-    const radius = 250;
-    let mode = "both";
+    const svg = document.getElementById("circleSvg");
+    const ticks = document.getElementById("ticks");
+    const sector = document.getElementById("sector");
+    const arc = document.getElementById("arc");
+    const ray = document.getElementById("ray");
+    const handle = document.getElementById("handle");
+    const cx = 225;
+    const cy = 185;
+    const radius = 139;
+    const rayRadius = 155;
+    const arcRadius = 45;
+    let angle = 30;
+    let dragging = false;
 
     const marks = [
-      { degrees: 0, pi: "0 or\n2π", degreeText: "0° or\n360°" },
-      { degrees: 30, pi: "π\n6" },
-      { degrees: 45, pi: "π\n4" },
-      { degrees: 60, pi: "π\n3" },
-      { degrees: 90, pi: "π\n2" },
-      { degrees: 120, pi: "2π\n3" },
-      { degrees: 135, pi: "3π\n4" },
-      { degrees: 150, pi: "5π\n6" },
-      { degrees: 180, pi: "π" },
-      { degrees: 210, pi: "7π\n6" },
-      { degrees: 225, pi: "5π\n4" },
-      { degrees: 240, pi: "4π\n3" },
-      { degrees: 270, pi: "3π\n2" },
-      { degrees: 300, pi: "5π\n3" },
-      { degrees: 315, pi: "7π\n4" },
-      { degrees: 330, pi: "11π\n6" }
+      { degrees: 0, label: "0" },
+      { degrees: 30, top: "π", bottom: "6" },
+      { degrees: 45, top: "π", bottom: "4" },
+      { degrees: 60, top: "π", bottom: "3" },
+      { degrees: 90, top: "π", bottom: "2" },
+      { degrees: 120, top: "2π", bottom: "3" },
+      { degrees: 135, top: "3π", bottom: "4" },
+      { degrees: 150, top: "5π", bottom: "6" },
+      { degrees: 180, label: "π" },
+      { degrees: 210, top: "7π", bottom: "6" },
+      { degrees: 225, top: "5π", bottom: "4" },
+      { degrees: 240, top: "4π", bottom: "3" },
+      { degrees: 270, top: "3π", bottom: "2" },
+      { degrees: 300, top: "5π", bottom: "3" },
+      { degrees: 315, top: "7π", bottom: "4" },
+      { degrees: 330, top: "11π", bottom: "6" }
     ];
 
+    function toRad(degrees) {
+      return degrees * Math.PI / 180;
+    }
+
     function pointAt(degrees, r = radius) {
-      const radians = degrees * Math.PI / 180;
+      const radians = toRad(degrees);
       return {
         x: cx + Math.cos(radians) * r,
         y: cy - Math.sin(radians) * r
       };
     }
 
-    function anchorFor(degrees) {
-      if (degrees === 90 || degrees === 270) return "middle";
-      return degrees > 90 && degrees < 270 ? "end" : "start";
+    function describeArc(startAngle, endAngle, r) {
+      const start = pointAt(startAngle, r);
+      const end = pointAt(endAngle, r);
+      const largeArc = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
+      return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y}`;
     }
 
-    function addMultilineText(root, className, text, x, y, anchor) {
-      const element = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      element.setAttribute("class", className);
-      element.setAttribute("x", x);
-      element.setAttribute("y", y);
-      element.setAttribute("text-anchor", anchor);
-      text.split("\n").forEach((line, index) => {
-        const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-        tspan.setAttribute("x", x);
-        tspan.setAttribute("dy", index === 0 ? 0 : 24);
-        tspan.textContent = line;
-        element.appendChild(tspan);
-      });
-      root.appendChild(element);
-      return element;
+    function describeSector(degrees) {
+      const start = pointAt(0, arcRadius);
+      const end = pointAt(degrees, arcRadius);
+      const largeArc = degrees > 180 ? 1 : 0;
+      return `M ${cx} ${cy} L ${start.x} ${start.y} A ${arcRadius} ${arcRadius} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
     }
 
-    function addPiText(root, text, x, y, anchor, useFractionBar) {
-      if (!useFractionBar) {
-        return addMultilineText(root, "pi-label", text, x, y, anchor);
+    function normalize(degrees) {
+      return ((Math.round(degrees / 5) * 5) % 360 + 360) % 360;
+    }
+
+    function labelAnchor(degrees) {
+      const p = pointAt(degrees, radius + 34);
+      if (degrees === 90 || degrees === 270) {
+        return { x: p.x - 2, y: p.y, anchor: "middle" };
       }
+      const anchor = degrees > 90 && degrees < 270 ? "end" : "start";
+      return { ...p, anchor };
+    }
 
+    function addPlainLabel(mark, label) {
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("class", "radian-label");
+      text.setAttribute("x", label.x);
+      text.setAttribute("y", label.y + 7);
+      text.setAttribute("text-anchor", label.anchor);
+      text.textContent = mark.label;
+      ticks.appendChild(text);
+    }
+
+    function addFractionLabel(mark, label) {
       const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      group.setAttribute("class", "pi-label");
+      group.setAttribute("class", "radian-label");
 
-      const [top, bottom] = text.split("\n");
       const numerator = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      numerator.setAttribute("x", x);
-      numerator.setAttribute("y", y - 9);
-      numerator.setAttribute("text-anchor", "middle");
-      numerator.textContent = top;
-      group.appendChild(numerator);
-
-      const bar = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      bar.setAttribute("x1", x - 17);
-      bar.setAttribute("x2", x + 17);
-      bar.setAttribute("y1", y);
-      bar.setAttribute("y2", y);
-      bar.setAttribute("stroke", "currentColor");
-      bar.setAttribute("stroke-width", "2");
-      group.appendChild(bar);
+      numerator.setAttribute("x", label.x);
+      numerator.setAttribute("y", label.y - 7);
+      numerator.setAttribute("text-anchor", label.anchor);
+      numerator.textContent = mark.top;
 
       const denominator = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      denominator.setAttribute("x", x);
-      denominator.setAttribute("y", y + 24);
-      denominator.setAttribute("text-anchor", "middle");
-      denominator.textContent = bottom;
-      group.appendChild(denominator);
+      denominator.setAttribute("x", label.x);
+      denominator.setAttribute("y", label.y + 19);
+      denominator.setAttribute("text-anchor", label.anchor);
+      denominator.textContent = mark.bottom;
 
-      root.appendChild(group);
-      return group;
+      const width = Math.max(mark.top.length, mark.bottom.length) * 11 + 8;
+      const offset = label.anchor === "end" ? -width : label.anchor === "middle" ? -width / 2 : 0;
+      const bar = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      bar.setAttribute("class", "fraction-bar");
+      bar.setAttribute("x1", label.x + offset);
+      bar.setAttribute("x2", label.x + offset + width);
+      bar.setAttribute("y1", label.y + 2);
+      bar.setAttribute("y2", label.y + 2);
+
+      group.appendChild(numerator);
+      group.appendChild(bar);
+      group.appendChild(denominator);
+      ticks.appendChild(group);
     }
 
-    function buildMarks() {
+    function buildTicks() {
       marks.forEach((mark) => {
-        const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        group.dataset.degrees = mark.degrees;
-
         const point = pointAt(mark.degrees);
+        const label = labelAnchor(mark.degrees);
+        const isNewFortyFivePoint = mark.degrees % 45 === 0 && mark.degrees % 90 !== 0;
         const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        dot.setAttribute("class", "tick-point");
+        dot.setAttribute("class", isNewFortyFivePoint ? "tick-point angle-45" : "tick-point");
         dot.setAttribute("cx", point.x);
         dot.setAttribute("cy", point.y);
-        dot.setAttribute("r", "7");
-        group.appendChild(dot);
+        dot.setAttribute("r", isNewFortyFivePoint ? "8" : "6");
+        ticks.appendChild(dot);
 
-        const anchor = anchorFor(mark.degrees);
-        const piPoint = pointAt(mark.degrees, radius + 47);
-        const degreeRadius = radius - 62;
-        const degreePoint = pointAt(mark.degrees, degreeRadius);
-        const degreeText = mark.degreeText || `${mark.degrees}°`;
-
-        const piLabel = addPiText(group, mark.pi, piPoint.x, piPoint.y - 4, anchor, mark.pi.includes("\n") && mark.degrees !== 0);
-        const degreeLabel = addMultilineText(group, "degree-label", degreeText, degreePoint.x, degreePoint.y + 7, anchor);
-        piLabel.dataset.labelType = "pi";
-        degreeLabel.dataset.labelType = "degrees";
-        marksRoot.appendChild(group);
+        if (mark.label) {
+          addPlainLabel(mark, label);
+        } else {
+          addFractionLabel(mark, label);
+        }
       });
     }
 
-    function refreshMode() {
-      buttons.forEach((button) => {
-        button.classList.toggle("active", button.dataset.mode === mode);
-      });
-
-      document.querySelectorAll("[data-label-type='degrees']").forEach((label) => {
-        label.classList.toggle("hidden", mode === "pi");
-      });
-      document.querySelectorAll("[data-label-type='pi']").forEach((label) => {
-        label.classList.toggle("hidden", mode === "degrees");
-      });
+    function setAngle(degrees) {
+      angle = normalize(degrees);
+      const end = pointAt(angle, rayRadius);
+      const handlePoint = pointAt(angle, radius);
+      ray.setAttribute("x1", cx);
+      ray.setAttribute("y1", cy);
+      ray.setAttribute("x2", end.x);
+      ray.setAttribute("y2", end.y);
+      handle.setAttribute("cx", handlePoint.x);
+      handle.setAttribute("cy", handlePoint.y);
+      sector.setAttribute("d", describeSector(angle));
+      arc.setAttribute("d", describeArc(0, angle, arcRadius));
     }
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => {
-        mode = button.dataset.mode;
-        refreshMode();
-      });
+    function angleFromEvent(event) {
+      const rect = svg.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 430;
+      const y = ((event.clientY - rect.top) / rect.height) * 390;
+      const radians = Math.atan2(cy - y, x - cx);
+      return radians * 180 / Math.PI;
+    }
+
+    svg.addEventListener("pointerdown", (event) => {
+      dragging = true;
+      svg.setPointerCapture(event.pointerId);
+      setAngle(angleFromEvent(event));
     });
 
-    buildMarks();
-    refreshMode();
+    svg.addEventListener("pointermove", (event) => {
+      if (dragging) {
+        setAngle(angleFromEvent(event));
+      }
+    });
+
+    svg.addEventListener("pointerup", (event) => {
+      dragging = false;
+      svg.releasePointerCapture(event.pointerId);
+    });
+
+    handle.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+        event.preventDefault();
+        setAngle(angle + 5);
+      }
+      if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+        event.preventDefault();
+        setAngle(angle - 5);
+      }
+    });
+
+    buildTicks();
+    setAngle(angle);
   </script>
 </body>
 </html>

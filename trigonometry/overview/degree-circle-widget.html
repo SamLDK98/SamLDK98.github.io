@@ -12,9 +12,8 @@
       --text: #ece2d1;
       --dim: #a89c87;
       --accent: #d4b888;
-      --blue: #6ea7ff;
+      --blue: #6dd3c4;
       --yellow: #f1d84d;
-      --green: #7ea35f;
     }
 
     * {
@@ -23,59 +22,29 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
+      min-height: 0;
+      background: transparent;
       color: var(--text);
       font-family: Georgia, "Times New Roman", serif;
     }
 
     .widget {
-      min-height: 720px;
-      border: 1px solid var(--rule);
-      background:
-        radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%),
-        var(--bg);
-    }
-
-    header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 1rem;
-      align-items: end;
-      padding: 1.3rem 1.6rem;
-      border-bottom: 1px solid var(--rule);
-    }
-
-    h1 {
-      margin: 0;
-      color: var(--text);
-      font-size: clamp(1.45rem, 3vw, 2.2rem);
-      font-weight: 500;
-      letter-spacing: 0;
-    }
-
-    .readout {
-      min-width: 130px;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid var(--rule);
-      background: rgba(0, 0, 0, 0.14);
-      color: var(--blue);
-      font-family: "Courier New", monospace;
-      font-size: 1.35rem;
-      text-align: center;
+      min-height: 380px;
+      border: 0;
+      background: transparent;
     }
 
     .stage {
       position: relative;
       display: grid;
       place-items: center;
-      min-height: 620px;
-      padding: 1rem;
+      min-height: 380px;
+      padding: 0.6rem;
     }
 
     svg {
       display: block;
-      width: min(100%, 760px);
+      width: min(100%, 410px);
       height: auto;
       touch-action: none;
       user-select: none;
@@ -83,8 +52,8 @@
 
     .circle {
       fill: rgba(0, 0, 0, 0.08);
-      stroke: rgba(236, 226, 209, 0.66);
-      stroke-width: 2.5;
+      stroke: #e8a13b;
+      stroke-width: 3;
     }
 
     .axis {
@@ -93,35 +62,23 @@
       stroke-dasharray: 4 5;
     }
 
-    .axis-arrow {
-      fill: rgba(168, 156, 135, 0.55);
-    }
-
-    .quadrant {
-      fill: rgba(236, 226, 209, 0.62);
-      font-size: 70px;
-      font-style: italic;
-      font-weight: 700;
-      opacity: 0.52;
-    }
-
     .degree-label {
-      fill: var(--green);
+      fill: var(--text);
       font-family: "Courier New", monospace;
       font-size: 23px;
       font-weight: 700;
     }
 
     .tick-point {
-      fill: var(--yellow);
-      stroke: rgba(0, 0, 0, 0.5);
-      stroke-width: 2;
+      fill: var(--blue);
+      stroke: rgba(0, 0, 0, 0.42);
+      stroke-width: 1.8;
     }
 
     .tick-point.angle-45 {
-      fill: var(--yellow);
-      stroke: rgba(0, 0, 0, 0.62);
-      stroke-width: 2.4;
+      fill: var(--blue);
+      stroke: rgba(0, 0, 0, 0.56);
+      stroke-width: 2.2;
     }
 
     .angle-sector {
@@ -135,7 +92,7 @@
       fill: none;
       stroke: var(--blue);
       stroke-linecap: round;
-      stroke-width: 4;
+      stroke-width: 2.6;
     }
 
     .angle-ray {
@@ -145,19 +102,12 @@
     .handle {
       fill: var(--blue);
       stroke: var(--text);
-      stroke-width: 2.5;
+      stroke-width: 2;
       cursor: grab;
     }
 
     .handle:active {
       cursor: grabbing;
-    }
-
-    .angle-text {
-      fill: var(--blue);
-      font-family: "Courier New", monospace;
-      font-size: 21px;
-      font-weight: 700;
     }
 
     .hint {
@@ -173,23 +123,11 @@
 
     @media (max-width: 720px) {
       .widget {
-        min-height: 650px;
-      }
-
-      header {
-        grid-template-columns: 1fr;
-      }
-
-      .readout {
-        justify-self: start;
+        min-height: 380px;
       }
 
       .stage {
-        min-height: 540px;
-      }
-
-      .quadrant {
-        font-size: 52px;
+        min-height: 365px;
       }
 
       .degree-label {
@@ -200,38 +138,24 @@
 </head>
 <body>
   <section class="widget">
-    <header>
-      <h1>Degrees Around a Circle</h1>
-      <div class="readout" id="readout">30&deg;</div>
-    </header>
-
     <div class="stage">
-      <svg id="circleSvg" viewBox="0 0 760 620" role="img" aria-label="Interactive degree circle with a movable angle ray">
+      <svg id="circleSvg" viewBox="0 0 430 390" role="img" aria-label="Interactive degree circle with a movable angle ray">
         <defs>
           <marker id="blueArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-            <path d="M 0 0 L 8 4 L 0 8 Z" fill="#6ea7ff"></path>
-          </marker>
-          <marker id="axisArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-            <path d="M 0 0 L 7 3.5 L 0 7 Z" class="axis-arrow"></path>
+            <path d="M 0 0 L 8 4 L 0 8 Z" fill="#6dd3c4"></path>
           </marker>
         </defs>
 
-        <line class="axis" x1="70" y1="310" x2="690" y2="310" marker-start="url(#axisArrow)" marker-end="url(#axisArrow)" />
-        <line class="axis" x1="380" y1="600" x2="380" y2="20" marker-start="url(#axisArrow)" marker-end="url(#axisArrow)" />
-        <circle class="circle" cx="380" cy="310" r="260" />
-
-        <text class="quadrant" x="485" y="240">I</text>
-        <text class="quadrant" x="260" y="240">II</text>
-        <text class="quadrant" x="260" y="435">III</text>
-        <text class="quadrant" x="470" y="435">IV</text>
+        <line class="axis" x1="86" y1="185" x2="364" y2="185" />
+        <line class="axis" x1="225" y1="324" x2="225" y2="46" />
+        <circle class="circle" cx="225" cy="185" r="139" />
 
         <g id="ticks"></g>
         <path class="angle-sector" id="sector"></path>
-        <line class="base-ray" x1="380" y1="310" x2="660" y2="310" marker-end="url(#blueArrow)" />
+        <line class="base-ray" x1="225" y1="185" x2="380" y2="185" marker-end="url(#blueArrow)" />
         <path class="angle-arc" id="arc"></path>
-        <line class="angle-ray" id="ray" x1="380" y1="310" x2="0" y2="0" marker-end="url(#blueArrow)" />
+        <line class="angle-ray" id="ray" x1="225" y1="185" x2="0" y2="0" marker-end="url(#blueArrow)" />
         <circle class="handle" id="handle" cx="0" cy="0" r="10" tabindex="0" aria-label="Drag or use arrow keys to change the angle" />
-        <text class="angle-text" id="angleText" x="0" y="0">30&deg;</text>
       </svg>
     </div>
   </section>
@@ -243,14 +167,11 @@
     const arc = document.getElementById("arc");
     const ray = document.getElementById("ray");
     const handle = document.getElementById("handle");
-    const angleText = document.getElementById("angleText");
-    const readout = document.getElementById("readout");
-
-    const cx = 380;
-    const cy = 310;
-    const radius = 260;
-    const rayRadius = 290;
-    const arcRadius = 82;
+    const cx = 225;
+    const cy = 185;
+    const radius = 139;
+    const rayRadius = 155;
+    const arcRadius = 45;
     let angle = 30;
     let dragging = false;
 
@@ -286,6 +207,9 @@
 
     function labelAnchor(degrees) {
       const p = pointAt(degrees, radius + 30);
+      if (degrees === 90 || degrees === 270) {
+        return { x: p.x - 2, y: p.y, anchor: "middle" };
+      }
       const anchor = degrees > 90 && degrees < 270 ? "end" : "start";
       return { ...p, anchor };
     }
@@ -300,7 +224,7 @@
         dot.setAttribute("class", isNewFortyFivePoint ? "tick-point angle-45" : "tick-point");
         dot.setAttribute("cx", point.x);
         dot.setAttribute("cy", point.y);
-        dot.setAttribute("r", isNewFortyFivePoint ? "9" : "7");
+        dot.setAttribute("r", isNewFortyFivePoint ? "8" : "6");
         ticks.appendChild(dot);
 
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -317,24 +241,20 @@
       angle = normalize(degrees);
       const end = pointAt(angle, rayRadius);
       const handlePoint = pointAt(angle, radius);
-      const label = pointAt(angle / 2, arcRadius + 32);
-
+      ray.setAttribute("x1", cx);
+      ray.setAttribute("y1", cy);
       ray.setAttribute("x2", end.x);
       ray.setAttribute("y2", end.y);
       handle.setAttribute("cx", handlePoint.x);
       handle.setAttribute("cy", handlePoint.y);
       sector.setAttribute("d", describeSector(angle));
       arc.setAttribute("d", describeArc(0, angle, arcRadius));
-      angleText.setAttribute("x", label.x + 6);
-      angleText.setAttribute("y", label.y + 7);
-      angleText.textContent = `${angle}\u00b0`;
-      readout.innerHTML = `${angle}&deg;`;
     }
 
     function angleFromEvent(event) {
       const rect = svg.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 760;
-      const y = ((event.clientY - rect.top) / rect.height) * 620;
+      const x = ((event.clientX - rect.left) / rect.width) * 430;
+      const y = ((event.clientY - rect.top) / rect.height) * 390;
       const radians = Math.atan2(cy - y, x - cx);
       return radians * 180 / Math.PI;
     }

@@ -1684,6 +1684,50 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 520px;
 }
 
+.angle-opening-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 230px);
+  gap: clamp(1rem, 3vw, 1.7rem);
+  align-items: center;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 4.2rem;
+}
+
+.angle-opening-layout p:first-child {
+  margin-top: 0;
+}
+
+.intro-linear-algebra-page .simple-rotatable-line-widget {
+  width: 100%;
+  height: 260px;
+  margin: 0;
+}
+
+.angle-arc-layout {
+  display: grid;
+  grid-template-columns: minmax(210px, 300px) minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 1.8rem);
+  align-items: center;
+  max-width: 860px;
+  margin: 1.9rem auto 2.2rem;
+}
+
+.angle-arc-layout .angle-arc-figure {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.angle-arc-layout p:first-child {
+  margin-top: 0;
+}
+
+.angle-arc-layout p:last-child {
+  margin-bottom: 0;
+}
+
 .intro-linear-algebra-page .axis-distribution-widget {
   width: min(100%, 900px);
   height: 640px;
@@ -1969,12 +2013,22 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 720px;
 }
 
+.trigonometry-what-is-angle-page .degree-circle-widget {
+  width: min(100%, 540px);
+  height: 385px;
+}
+
 .intro-linear-algebra-page .radian-wrap-widget {
   height: 760px;
 }
 
 .intro-linear-algebra-page .pi-fraction-circle-widget {
   height: 760px;
+}
+
+.trigonometry-what-is-angle-page .pi-fraction-circle-widget {
+  width: min(100%, 540px);
+  height: 385px;
 }
 
 .intro-linear-algebra-page .angle-practice-widget {
@@ -3002,6 +3056,14 @@ header {
   .trig-floating-nav-panel {
     width: min(16rem, calc(100vw - 3rem));
     max-height: 64vh;
+  }
+
+  .angle-opening-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .angle-arc-layout {
+    grid-template-columns: 1fr;
   }
 
   .trig-figure-grid {
