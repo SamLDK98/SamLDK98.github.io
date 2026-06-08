@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>What Is an Angle? | Trigonometry</title>
+  <title>Measuring Angles | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">What Is an Angle?</h1>
+      <h1 class="essay-title">Measuring Angles</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -60,13 +60,13 @@
 
         <div class="angle-arc-layout">
           <figure class="trig-figure direction-figure angle-arc-figure" aria-label="A 45 degree angle shown with arcs of different radii">
-            <svg viewBox="0 0 760 420" role="img">
+            <svg viewBox="80 40 560 340" role="img">
               <defs>
                 <marker id="chapter0-angle-ray-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
                   <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
                 </marker>
               </defs>
-              <g transform="translate(250 300)">
+              <g transform="translate(250 300) scale(1.12)">
                 <line x1="0" y1="0" x2="260" y2="0" stroke="rgba(236,226,209,0.55)" stroke-width="4" marker-end="url(#chapter0-angle-ray-arrow)" />
                 <line x1="0" y1="0" x2="184" y2="-184" stroke="rgba(236,226,209,0.55)" stroke-width="4" marker-end="url(#chapter0-angle-ray-arrow)" />
                 <path d="M 54 0 A 54 54 0 0 0 38 -38" fill="none" stroke="#e8a13b" stroke-width="4" />
@@ -75,7 +75,6 @@
                 <circle r="6" fill="#ece2d1" />
               </g>
             </svg>
-            <figcaption class="trig-figure-caption">All these arcs represent the same angle.</figcaption>
           </figure>
 
           <div>
@@ -150,21 +149,17 @@
 
         <h3 class="subsection-title">Radians</h3>
 
-        <p>While degrees arise from an arbitrary partitioning of the circle, radians emerge naturally from the relationship between a circle's circumference and its radius.</p>
+        <p>While degrees arise from partitioning a circle into an arbitrary number of parts, there is another unit of angle measurement that emerges directly from the geometry of the circle itself: the radian.</p>
 
-        <p>Imagine taking a line the length of a circle's radius.</p>
+        <p>Imagine taking the radius of a circle and wrapping it around the circumference to form an arc starting from $(1,0)$.</p>
 
-        <p>Then you wrap it around the circle's circumference.</p>
+        <p>The angle formed between the two radii connecting the centre to the endpoints of this arc is defined as 1 radian.</p>
 
-        <p>How many more would we need to make it all the way around?</p>
+        <p>We know that the circumference of a circle is $2\pi r$. So if we let $r = 1$ then the circumference is just $2\pi$.</p>
 
-        <p>The answer is $\approx 6.283$.</p>
+        <p>It therefore takes $2\pi$, or $\approx 6.283$, radians to rotate through one complete revolution.</p>
 
-        <p>Which makes sense because the circumference of a circle $= 2\pi r$. In other words, $2\pi$ times the radius.</p>
-
-        <p>So for a unit circle we can take $2\pi$ as the measure of a full rotation around the circle.</p>
-
-        <p>Imagine marking off an arc whose length is exactly equal to the radius. The angle subtended by this arc is defined as 1 radian. Since the circumference of a unit circle is $2\pi$, $\approx 6.283$ such arcs fit around the circle. Therefore, one full rotation is $2\pi$ radians.</p>
+        <p>Note that a radian is not a fraction of $\pi$. Fractions of $\pi$ arise simply because one full rotation happens to be $2\pi$ radians. One radian is approximately $57.3^\circ$, or a little less than $\frac{\pi}{3}$.</p>
 
         <iframe
           class="essay-widget radian-wrap-widget"
@@ -174,13 +169,18 @@
           loading="lazy"
         ></iframe>
 
-        <p>If one complete rotation around a circle is $2\pi$, then:</p>
+        <p>So:</p>
 
         <ul>
-          <li>half a rotation is $\pi$,</li>
-          <li>a quarter rotation is $\frac{\pi}{2}$,</li>
-          <li>and so on.</li>
+          <li>A full rotation around the circle → $2\pi$</li>
+          <li>Half a rotation → $\pi$</li>
+          <li>Quarter rotation → $\frac{\pi}{2}$</li>
+          <li>Three-quarter rotation → $\frac{3\pi}{2}$</li>
         </ul>
+
+        <p>Angles that are multiples of $30^\circ$ are typically expressed as sixths of $\pi$, which can often be reduced to thirds.</p>
+
+        <p>Angles that are multiples of $45^\circ$ are typically expressed as fourths of $\pi$.</p>
 
         <iframe
           class="essay-widget pi-fraction-circle-widget"
@@ -190,62 +190,15 @@
           loading="lazy"
         ></iframe>
 
-        <p>It's worth getting familiar with both degrees and radians. I've created a game below for you to brute force this into memory.</p>
-
-        <p>Once you know $0^\circ, 90^\circ, 180^\circ, 270^\circ,$ and $360^\circ$, you can work out the other points based on adding or subtracting either $30^\circ$ or $45^\circ$.</p>
-
-        <p>The radii are trickier:</p>
-
-        <ul>
-          <li>Multiples of <strong>$30^\circ$</strong> are typically expressed in sixths of $\pi$.</li>
-          <li>Multiples of <strong>$45^\circ$</strong> are typically expressed in fourths of $\pi$.</li>
-          <li>$90^\circ$ and $180^\circ$ are expressed as halves.</li>
-        </ul>
-
-        <p>However, we can often express these fractions in reduced forms.</p>
-
-        <p>Here's the full table:</p>
-
-        <table>
-          <thead>
-            <tr>
-              <th><strong>$30^\circ$</strong></th>
-              <th><strong>$45^\circ$</strong></th>
-              <th><strong>Radians ($30^\circ$)</strong></th>
-              <th><strong>Radians ($45^\circ$)</strong></th>
-              <th><strong>Reduced</strong></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>$0^\circ$</td><td>$0^\circ$</td><td>$0/6\,\pi$</td><td>$0/4\,\pi$</td><td>$0\,\pi$</td></tr>
-            <tr><td>$30^\circ$</td><td></td><td>$1/6\,\pi$</td><td></td><td>$\pi/6$</td></tr>
-            <tr><td></td><td>$45^\circ$</td><td></td><td>$1/4\,\pi$</td><td>$\pi/4$</td></tr>
-            <tr><td>$60^\circ$</td><td></td><td>$2/6\,\pi$</td><td></td><td>$\pi/3$</td></tr>
-            <tr><td>$90^\circ$</td><td>$90^\circ$</td><td>$3/6\,\pi$</td><td>$2/4\,\pi$</td><td>$\pi/2$</td></tr>
-            <tr><td>$120^\circ$</td><td></td><td>$4/6\,\pi$</td><td></td><td>$2\pi/3$</td></tr>
-            <tr><td></td><td>$135^\circ$</td><td></td><td>$3/4\,\pi$</td><td>$3\pi/4$</td></tr>
-            <tr><td>$150^\circ$</td><td></td><td>$5/6\,\pi$</td><td></td><td>$5\pi/6$</td></tr>
-            <tr><td>$180^\circ$</td><td>$180^\circ$</td><td>$6/6\,\pi$</td><td>$4/4\,\pi$</td><td>$\pi$</td></tr>
-            <tr><td>$210^\circ$</td><td></td><td>$7/6\,\pi$</td><td></td><td>$7\pi/6$</td></tr>
-            <tr><td></td><td>$225^\circ$</td><td></td><td>$5/4\,\pi$</td><td>$5\pi/4$</td></tr>
-            <tr><td>$240^\circ$</td><td></td><td>$8/6\,\pi$</td><td></td><td>$4\pi/3$</td></tr>
-            <tr><td>$270^\circ$</td><td>$270^\circ$</td><td>$9/6\,\pi$</td><td>$6/4\,\pi$</td><td>$3\pi/2$</td></tr>
-            <tr><td>$300^\circ$</td><td></td><td>$10/6\,\pi$</td><td></td><td>$5\pi/3$</td></tr>
-            <tr><td></td><td>$315^\circ$</td><td></td><td>$7/4\,\pi$</td><td>$7\pi/4$</td></tr>
-            <tr><td>$330^\circ$</td><td></td><td>$11/6\,\pi$</td><td></td><td>$11\pi/6$</td></tr>
-            <tr><td>$360^\circ$</td><td>$360^\circ$</td><td>$12/6\,\pi$</td><td>$8/4\,\pi$</td><td>$2\pi$</td></tr>
-          </tbody>
-        </table>
+        <p>Here's a little mini-game to practice your understanding of both degrees and radians.</p>
 
         <iframe
           class="essay-widget angle-practice-widget"
-          src="trigonometry/overview/angle-practice-widget.html"
-          title="Interactive practice game for identifying standard angle points"
+          src="trigonometry/overview/degree-radian-point-practice-widget.html"
+          title="Interactive practice game for identifying degree and radian points"
           scrolling="no"
           loading="lazy"
         ></iframe>
-
-        <p>Move on to the next chapter once you are fluently selecting the correct radian fraction when prompted.</p>
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
           <a class="chapter-nav-link" href="trigonometry-overview.html">

@@ -1707,11 +1707,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .angle-arc-layout {
   display: grid;
-  grid-template-columns: minmax(210px, 300px) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: clamp(1rem, 3vw, 1.8rem);
   align-items: center;
   max-width: 860px;
-  margin: 1.9rem auto 2.2rem;
+  margin: 1.9rem auto 3.6rem;
 }
 
 .angle-arc-layout .angle-arc-figure {
@@ -2022,13 +2022,18 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 760px;
 }
 
+.trigonometry-what-is-angle-page .radian-wrap-widget {
+  width: min(100%, 860px);
+  height: 480px;
+}
+
 .intro-linear-algebra-page .pi-fraction-circle-widget {
   height: 760px;
 }
 
 .trigonometry-what-is-angle-page .pi-fraction-circle-widget {
   width: min(100%, 540px);
-  height: 385px;
+  height: 415px;
 }
 
 .intro-linear-algebra-page .angle-practice-widget {

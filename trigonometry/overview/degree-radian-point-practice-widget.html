@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Degree and Radian Point Practice</title>
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #1e1a17;
+      --rule: rgba(214, 196, 168, 0.14);
+      --text: #ece2d1;
+      --dim: #a89c87;
+      --accent: #d4b888;
+      --yellow: #f1d84d;
+      --blue: #6ea7ff;
+      --green: #57c884;
+      --red: #ef6a5b;
+      --axis: rgba(236, 226, 209, 0.36);
+      --circle: rgba(236, 226, 209, 0.68);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .widget {
+      min-height: 780px;
+      border: 1px solid var(--rule);
+      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 55%), var(--bg);
+    }
+
+    header {
+      padding: 1.3rem 1.6rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 500;
+    }
+
+    button {
+      min-height: 40px;
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      color: var(--dim);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(212, 184, 136, 0.08);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      min-height: 680px;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 680px;
+      padding: 1rem;
+      border-right: 1px solid var(--rule);
+    }
+
+    svg {
+      display: block;
+      width: min(100%, 760px);
+      height: auto;
+      user-select: none;
+    }
+
+    .circle {
+      fill: rgba(0, 0, 0, 0.08);
+      stroke: var(--circle);
+      stroke-width: 2.6;
+      transition: stroke 180ms ease, filter 180ms ease;
+    }
+
+    .circle.complete {
+      stroke: var(--green);
+      filter: drop-shadow(0 0 8px rgba(87, 200, 132, 0.45));
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 1.4;
+      stroke-dasharray: 4 5;
+    }
+
+    .point {
+      fill: var(--yellow);
+      stroke: rgba(0, 0, 0, 0.55);
+      stroke-width: 2;
+      cursor: pointer;
+      transition: fill 150ms ease, r 150ms ease, filter 150ms ease;
+    }
+
+    .point:hover,
+    .point.active {
+      fill: var(--blue);
+      filter: drop-shadow(0 0 8px rgba(110, 167, 255, 0.65));
+    }
+
+    .point.correct {
+      fill: var(--green);
+      filter: none;
+    }
+
+    .controls {
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .mode-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+
+    .prompt {
+      margin: 0 0 1rem;
+      color: var(--text);
+      font-size: 1.18rem;
+      line-height: 1.45;
+    }
+
+    .target {
+      display: none;
+    }
+
+    .center-prompt-box {
+      fill: rgba(22, 19, 17, 0.92);
+      stroke: rgba(241, 216, 77, 0.75);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 10px rgba(241, 216, 77, 0.18));
+    }
+
+    .center-prompt-text {
+      fill: var(--yellow);
+      font-family: "Courier New", monospace;
+      font-size: 24px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .hint {
+      margin: 0 0 1.25rem;
+      color: var(--dim);
+      font-family: "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .answer-box {
+      min-height: 3.2rem;
+      padding: 0.85rem;
+      border: 1px solid var(--rule);
+      background: rgba(0, 0, 0, 0.13);
+      color: var(--dim);
+      transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+    }
+
+    .answer-box.correct {
+      border-color: rgba(87, 200, 132, 0.75);
+      background: rgba(87, 200, 132, 0.14);
+      color: var(--green);
+    }
+
+    .answer-box.incorrect {
+      border-color: rgba(239, 106, 91, 0.75);
+      background: rgba(239, 106, 91, 0.12);
+      color: var(--red);
+    }
+
+    .reset-row {
+      margin-top: 0.85rem;
+    }
+
+    .reset-row button {
+      width: 100%;
+    }
+
+    .progress,
+    .misses {
+      margin: 1rem 0 0;
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    .progress {
+      color: var(--accent);
+    }
+
+    .misses {
+      margin-top: 0.35rem;
+      color: var(--red);
+    }
+
+    @media (max-width: 850px) {
+      .widget { min-height: 980px; }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        min-height: 560px;
+        border-right: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="widget">
+    <header>
+      <h1>Degree and Radian Point Practice</h1>
+    </header>
+
+    <div class="layout">
+      <div class="stage">
+        <svg viewBox="0 0 760 640" role="img" aria-label="Degree and radian point practice with unlabeled standard points">
+          <line class="axis" x1="90" y1="320" x2="670" y2="320" />
+          <line class="axis" x1="380" y1="610" x2="380" y2="30" />
+          <circle class="circle" id="circle" cx="380" cy="320" r="250" />
+          <g id="points"></g>
+          <g id="centerPrompt">
+            <rect class="center-prompt-box" id="centerPromptBox" x="270" y="286" width="220" height="68" rx="12" />
+            <text class="center-prompt-text" id="centerPromptText" x="380" y="320"></text>
+          </g>
+        </svg>
+      </div>
+
+      <aside class="controls">
+        <div class="mode-row" aria-label="Practice mode">
+          <button type="button" id="degreeMode">Degrees</button>
+          <button type="button" id="radianMode">Radians</button>
+        </div>
+
+        <p class="prompt" id="prompt">Select the point for <span class="target" id="targetText"></span></p>
+        <p class="hint" id="hint">Click the matching point on the circle.</p>
+
+        <div class="answer-box" id="answerBox">Select the matching point.</div>
+
+        <div class="reset-row">
+          <button type="button" id="reset">Reset</button>
+        </div>
+
+        <p class="progress" id="progress">0 / 16 correct</p>
+        <p class="misses" id="misses">0 incorrect</p>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const pointRoot = document.getElementById("points");
+    const circle = document.getElementById("circle");
+    const prompt = document.getElementById("prompt");
+    const targetText = document.getElementById("targetText");
+    const centerPromptBox = document.getElementById("centerPromptBox");
+    const centerPromptText = document.getElementById("centerPromptText");
+    const hint = document.getElementById("hint");
+    const answerBox = document.getElementById("answerBox");
+    const reset = document.getElementById("reset");
+    const progress = document.getElementById("progress");
+    const misses = document.getElementById("misses");
+    const degreeModeButton = document.getElementById("degreeMode");
+    const radianModeButton = document.getElementById("radianMode");
+
+    const cx = 380;
+    const cy = 320;
+    const radius = 250;
+    let mode = "radian";
+    let active = null;
+    let target = null;
+    let completed = new Set();
+    let incorrect = 0;
+
+    const points = [
+      { degrees: 0, degree: "0°", radian: "0" },
+      { degrees: 30, degree: "30°", radian: "π/6" },
+      { degrees: 45, degree: "45°", radian: "π/4" },
+      { degrees: 60, degree: "60°", radian: "π/3" },
+      { degrees: 90, degree: "90°", radian: "π/2" },
+      { degrees: 120, degree: "120°", radian: "2π/3" },
+      { degrees: 135, degree: "135°", radian: "3π/4" },
+      { degrees: 150, degree: "150°", radian: "5π/6" },
+      { degrees: 180, degree: "180°", radian: "π" },
+      { degrees: 210, degree: "210°", radian: "7π/6" },
+      { degrees: 225, degree: "225°", radian: "5π/4" },
+      { degrees: 240, degree: "240°", radian: "4π/3" },
+      { degrees: 270, degree: "270°", radian: "3π/2" },
+      { degrees: 300, degree: "300°", radian: "5π/3" },
+      { degrees: 315, degree: "315°", radian: "7π/4" },
+      { degrees: 330, degree: "330°", radian: "11π/6" }
+    ];
+
+    function pointAt(degrees) {
+      const radians = degrees * Math.PI / 180;
+      return {
+        x: cx + Math.cos(radians) * radius,
+        y: cy - Math.sin(radians) * radius
+      };
+    }
+
+    function buildPoints() {
+      points.forEach((pointData) => {
+        const point = pointAt(pointData.degrees);
+        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("class", "point");
+        dot.setAttribute("cx", point.x);
+        dot.setAttribute("cy", point.y);
+        dot.setAttribute("r", "7");
+        dot.dataset.degrees = pointData.degrees;
+        dot.addEventListener("click", () => checkPoint(pointData));
+        pointRoot.appendChild(dot);
+      });
+    }
+
+    function updatePoints() {
+      document.querySelectorAll(".point").forEach((dot) => {
+        const degrees = Number(dot.dataset.degrees);
+        dot.classList.toggle("active", active?.degrees === degrees);
+        dot.classList.toggle("correct", completed.has(degrees));
+        dot.setAttribute("r", active?.degrees === degrees ? "12" : "7");
+      });
+
+      progress.textContent = `${completed.size} / ${points.length} correct`;
+      misses.textContent = `${incorrect} incorrect`;
+      circle.classList.toggle("complete", completed.size === points.length);
+      degreeModeButton.classList.toggle("active", mode === "degree");
+      radianModeButton.classList.toggle("active", mode === "radian");
+    }
+
+    function chooseTarget() {
+      const remaining = points.filter((pointData) => !completed.has(pointData.degrees));
+      target = remaining[Math.floor(Math.random() * remaining.length)] ?? null;
+      active = null;
+
+      if (!target) {
+        prompt.firstChild.textContent = "Complete. Every point is correct.";
+        targetText.textContent = "";
+        centerPromptText.textContent = "";
+        answerBox.textContent = "Done.";
+        updatePoints();
+        return;
+      }
+
+      prompt.firstChild.textContent = "Select the point for ";
+      targetText.textContent = target[mode];
+      centerPromptText.textContent = target[mode];
+      requestAnimationFrame(sizeCenterPrompt);
+      answerBox.classList.remove("correct", "incorrect");
+      answerBox.textContent = "Select the matching point.";
+      updatePoints();
+    }
+
+    function checkPoint(pointData) {
+      if (!target) return;
+      active = pointData;
+
+      if (pointData.degrees === target.degrees) {
+        completed.add(pointData.degrees);
+        answerBox.classList.add("correct");
+        answerBox.classList.remove("incorrect");
+        answerBox.textContent = `Correct: ${target.degree} = ${target.radian}`;
+        updatePoints();
+        setTimeout(chooseTarget, 500);
+      } else {
+        incorrect += 1;
+        answerBox.classList.add("incorrect");
+        answerBox.classList.remove("correct");
+        answerBox.textContent = "Not quite. Try another point.";
+        updatePoints();
+      }
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      resetGame();
+    }
+
+    function sizeCenterPrompt() {
+      const bbox = centerPromptText.getBBox();
+      const width = Math.max(160, bbox.width + 44);
+      const height = 68;
+      centerPromptBox.setAttribute("x", cx - width / 2);
+      centerPromptBox.setAttribute("width", width);
+      centerPromptBox.setAttribute("y", cy - height / 2);
+      centerPromptBox.setAttribute("height", height);
+    }
+
+    function resetGame() {
+      completed = new Set();
+      incorrect = 0;
+      active = null;
+      target = null;
+      hint.textContent = "Click the matching point on the circle.";
+      chooseTarget();
+    }
+
+    degreeModeButton.addEventListener("click", () => setMode("degree"));
+    radianModeButton.addEventListener("click", () => setMode("radian"));
+    reset.addEventListener("click", resetGame);
+
+    buildPoints();
+    resetGame();
+  </script>
+</body>
+</html>

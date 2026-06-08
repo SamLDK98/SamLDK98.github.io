@@ -25,7 +25,7 @@
     }
 
     .widget {
-      min-height: 380px;
+      min-height: 410px;
       border: 0;
       background: transparent;
     }
@@ -33,7 +33,7 @@
     .stage {
       display: grid;
       place-items: center;
-      min-height: 380px;
+      min-height: 410px;
       padding: 0.6rem;
     }
 
@@ -112,11 +112,11 @@
 
     @media (max-width: 720px) {
       .widget {
-        min-height: 380px;
+        min-height: 410px;
       }
 
       .stage {
-        min-height: 365px;
+        min-height: 395px;
       }
 
       .radian-label {
@@ -128,22 +128,22 @@
 <body>
   <section class="widget">
     <div class="stage">
-      <svg id="circleSvg" viewBox="0 0 430 390" role="img" aria-label="Interactive circle labelled with radians">
+      <svg id="circleSvg" viewBox="0 0 430 420" role="img" aria-label="Interactive circle labelled with radians">
         <defs>
           <marker id="blueArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
             <path d="M 0 0 L 8 4 L 0 8 Z" fill="#6dd3c4"></path>
           </marker>
         </defs>
 
-        <line class="axis" x1="86" y1="185" x2="364" y2="185" />
-        <line class="axis" x1="225" y1="324" x2="225" y2="46" />
-        <circle class="circle" cx="225" cy="185" r="139" />
+        <line class="axis" x1="86" y1="205" x2="364" y2="205" />
+        <line class="axis" x1="225" y1="344" x2="225" y2="66" />
+        <circle class="circle" cx="225" cy="205" r="139" />
 
         <g id="ticks"></g>
         <path class="angle-sector" id="sector"></path>
-        <line class="base-ray" x1="225" y1="185" x2="380" y2="185" marker-end="url(#blueArrow)" />
+        <line class="base-ray" x1="225" y1="205" x2="380" y2="205" marker-end="url(#blueArrow)" />
         <path class="angle-arc" id="arc"></path>
-        <line class="angle-ray" id="ray" x1="225" y1="185" x2="0" y2="0" marker-end="url(#blueArrow)" />
+        <line class="angle-ray" id="ray" x1="225" y1="205" x2="0" y2="0" marker-end="url(#blueArrow)" />
         <circle class="handle" id="handle" cx="0" cy="0" r="10" tabindex="0" aria-label="Drag or use arrow keys to change the angle" />
       </svg>
     </div>
@@ -157,7 +157,7 @@
     const ray = document.getElementById("ray");
     const handle = document.getElementById("handle");
     const cx = 225;
-    const cy = 185;
+    const cy = 205;
     const radius = 139;
     const rayRadius = 155;
     const arcRadius = 45;
@@ -300,7 +300,7 @@
     function angleFromEvent(event) {
       const rect = svg.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 430;
-      const y = ((event.clientY - rect.top) / rect.height) * 390;
+      const y = ((event.clientY - rect.top) / rect.height) * 420;
       const radians = Math.atan2(cy - y, x - cx);
       return radians * 180 / Math.PI;
     }
