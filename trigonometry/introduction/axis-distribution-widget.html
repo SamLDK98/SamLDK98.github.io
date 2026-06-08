@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axis distribution widget</title>
+  <style>
+    :root {
+      --bg: #17130f;
+      --panel: #221d19;
+      --rule: rgba(214,190,154,0.22);
+      --text: #efe7d8;
+      --muted: #a89980;
+      --x: #e8a13b;
+      --y: #6dd3c4;
+      --line: #f0ddba;
+      --btn: #33271d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Fraunces", Georgia, serif;
+    }
+    .widget {
+      width: min(860px, calc(100vw - 24px));
+      padding: 1.2rem;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      background: var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,244,220,0.05), 0 18px 54px rgba(0,0,0,0.24);
+    }
+    .stage {
+      border: 1px solid rgba(240,221,186,0.14);
+      border-radius: 5px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(240,221,186,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(240,221,186,0.04) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+    svg { display: block; width: 100%; }
+    .controls {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .ctrl-label {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: rgba(240,221,186,0.18);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: var(--line);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(240,221,186,0.28);
+    }
+    .angle-val {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.85rem;
+      min-width: 2.8rem;
+      text-align: right;
+    }
+    .presets {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    button {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.76rem;
+      padding: 0.3rem 0.65rem;
+      border: 1px solid rgba(232,202,151,0.3);
+      border-radius: 4px;
+      background: var(--btn);
+      color: var(--muted);
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: border-color 140ms ease, color 140ms ease;
+    }
+    button:hover, button.active {
+      border-color: rgba(232,202,151,0.72);
+      color: var(--text);
+    }
+    .bars {
+      display: grid;
+      grid-template-columns: 6.5rem 1fr;
+      gap: 0.42rem 0.65rem;
+      align-items: center;
+    }
+    .bar-lbl {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.67rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      text-align: right;
+    }
+    .bar-lbl.x { color: var(--x); }
+    .bar-lbl.y { color: var(--y); }
+    .bar-track {
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(240,221,186,0.08);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+    .bar-fill.x { background: var(--x); box-shadow: 0 0 6px rgba(232,161,59,0.25); }
+    .bar-fill.y { background: var(--y); box-shadow: 0 0 6px rgba(109,211,196,0.25); }
+
+    @media (max-width: 540px) {
+      .presets { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" aria-label="Widget A: line segment separation across axes">
+    <div class="stage">
+      <svg viewBox="0 0 720 340" aria-label="A line segment rotating from horizontal to vertical, showing its horizontal and vertical components">
+        <!-- Axis lines -->
+        <line x1="44" y1="185" x2="676" y2="185" stroke="rgba(240,221,186,0.11)" stroke-width="1.5"/>
+        <line x1="360" y1="18"  x2="360" y2="328" stroke="rgba(240,221,186,0.11)" stroke-width="1.5"/>
+        <!-- Axis tick labels -->
+        <text x="672" y="180" font-family="JetBrains Mono,monospace" font-size="10" fill="rgba(240,221,186,0.28)" text-anchor="end">horizontal</text>
+        <text x="364" y="26"  font-family="JetBrains Mono,monospace" font-size="10" fill="rgba(240,221,186,0.28)">vertical</text>
+
+        <!-- Dynamic: horizontal component leg (amber dashed) -->
+        <line id="h-leg" stroke-width="3" stroke-dasharray="8 5" stroke-linecap="round"/>
+        <!-- Dynamic: vertical component leg (teal dashed) -->
+        <line id="v-leg" stroke-width="3" stroke-dasharray="8 5" stroke-linecap="round"/>
+        <!-- Right-angle mark at corner -->
+        <path id="ra" fill="none" stroke-width="2"/>
+        <!-- The line segment itself -->
+        <line id="seg" stroke-linecap="round" stroke-width="7"
+              filter="url(#seg-glow)"/>
+        <!-- Angle arc at centre -->
+        <path id="arc" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <!-- Angle degree label -->
+        <text id="arc-lbl" font-family="JetBrains Mono,monospace" font-size="14"
+              fill="#6dd3c4" text-anchor="middle" dominant-baseline="middle"/>
+        <!-- Endpoint dots -->
+        <circle id="dot-l" r="5.5" fill="#f0ddba"/>
+        <circle id="dot-r" r="5.5" fill="#f0ddba"/>
+        <!-- Component labels on the legs -->
+        <text id="lbl-x" font-family="JetBrains Mono,monospace" font-size="11"
+              fill="#e8a13b" text-anchor="middle" letter-spacing="0.05em">horizontal separation</text>
+        <text id="lbl-y" font-family="JetBrains Mono,monospace" font-size="11"
+              fill="#6dd3c4" text-anchor="start"  letter-spacing="0.05em">vertical separation</text>
+
+        <defs>
+          <filter id="seg-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="controls">
+      <div class="slider-row">
+        <span class="ctrl-label">Rotate</span>
+        <input type="range" id="slider" min="0" max="90" value="0" step="1"
+               aria-label="Rotation angle in degrees"/>
+        <span class="angle-val" id="av">0°</span>
+      </div>
+
+      <div class="presets">
+        <span class="ctrl-label">Snap to</span>
+        <button data-deg="0"  class="active">0°</button>
+        <button data-deg="45">45°</button>
+        <button data-deg="90">90°</button>
+      </div>
+
+      <div class="bars" aria-label="Proportion of separation along each axis">
+        <span class="bar-lbl x">Horizontal</span>
+        <div class="bar-track" role="progressbar" aria-label="Horizontal separation">
+          <div class="bar-fill x" id="bx" style="width:100%"></div>
+        </div>
+        <span class="bar-lbl y">Vertical</span>
+        <div class="bar-track" role="progressbar" aria-label="Vertical separation">
+          <div class="bar-fill y" id="by" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const CX = 360, CY = 185, HL = 130, AR = 44;
+
+    const slider  = document.getElementById('slider');
+    const av      = document.getElementById('av');
+    const seg     = document.getElementById('seg');
+    const hLeg    = document.getElementById('h-leg');
+    const vLeg    = document.getElementById('v-leg');
+    const ra      = document.getElementById('ra');
+    const arc     = document.getElementById('arc');
+    const arcLbl  = document.getElementById('arc-lbl');
+    const dotL    = document.getElementById('dot-l');
+    const dotR    = document.getElementById('dot-r');
+    const lblX    = document.getElementById('lbl-x');
+    const lblY    = document.getElementById('lbl-y');
+    const bx      = document.getElementById('bx');
+    const by      = document.getElementById('by');
+
+    function set(el, obj) {
+      for (const [k, v] of Object.entries(obj)) el.setAttribute(k, v);
+    }
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function update() {
+      const deg = +slider.value;
+      const rad = deg * Math.PI / 180;
+      const c   = Math.cos(rad);
+      const s   = Math.sin(rad);
+
+      // Endpoints (line rotates counter-clockwise from horizontal)
+      const rx  = CX + HL * c,  ry = CY - HL * s;  // right / upper end
+      const lx  = CX - HL * c,  ly = CY + HL * s;  // left  / lower end
+
+      // Corner of the right triangle (directly right of left end, directly below right end)
+      const kx = rx, ky = ly;
+
+      // ── Line segment ──────────────────────────────────────────────────
+      set(seg,  { x1: lx, y1: ly, x2: rx, y2: ry, stroke: '#f0ddba' });
+      set(dotL, { cx: lx, cy: ly });
+      set(dotR, { cx: rx, cy: ry });
+
+      // ── Component legs ────────────────────────────────────────────────
+      // Fade each leg as its component approaches zero
+      const hOp = clamp(c / 0.15, 0, 1);
+      const vOp = clamp(s / 0.15, 0, 1);
+
+      set(hLeg, { x1: lx, y1: ly, x2: kx, y2: ky, stroke: '#e8a13b', opacity: hOp });
+      set(vLeg, { x1: kx, y1: ky, x2: rx, y2: ry, stroke: '#6dd3c4', opacity: vOp });
+
+      // ── Right-angle mark ──────────────────────────────────────────────
+      if (c > 0.1 && s > 0.1) {
+        const sq = 11;
+        set(ra, {
+          d:       `M ${kx - sq} ${ky} L ${kx - sq} ${ky - sq} L ${kx} ${ky - sq}`,
+          stroke:  'rgba(240,221,186,0.32)',
+          opacity: '1'
+        });
+      } else {
+        set(ra, { opacity: '0' });
+      }
+
+      // ── Angle arc ─────────────────────────────────────────────────────
+      if (deg > 1) {
+        const ex = CX + AR * c, ey = CY - AR * s;
+        set(arc, {
+          d:       `M ${CX + AR} ${CY} A ${AR} ${AR} 0 0 0 ${ex} ${ey}`,
+          stroke:  '#6dd3c4',
+          opacity: '0.82'
+        });
+        const mr = rad / 2;
+        const lr = AR + 22;
+        set(arcLbl, {
+          x:       CX + lr * Math.cos(mr),
+          y:       CY - lr * Math.sin(mr),
+          opacity: '1'
+        });
+        arcLbl.textContent = deg + '°';
+      } else {
+        set(arc,    { opacity: '0' });
+        set(arcLbl, { opacity: '0' });
+      }
+
+      // ── Component labels ──────────────────────────────────────────────
+      // Horizontal: centred below the midpoint of h-leg
+      const hLblOp = clamp((c - 0.22) * 5, 0, 0.88);
+      set(lblX, { x: (lx + kx) / 2, y: ky + 19, opacity: hLblOp });
+
+      // Vertical: left-aligned, beside the midpoint of v-leg
+      // When angle > ~60°, kx approaches CX — shift label left to avoid overlap
+      const vLblOp = clamp((s - 0.22) * 5, 0, 0.88);
+      const vLblX  = c > 0.35 ? kx + 10 : kx - 10;
+      const vAnchor = c > 0.35 ? 'start' : 'end';
+      set(lblY, {
+        x:           vLblX,
+        y:           (ky + ry) / 2,
+        opacity:     vLblOp,
+        'text-anchor': vAnchor
+      });
+
+      // ── Proportion bars ───────────────────────────────────────────────
+      bx.style.width = (c * 100).toFixed(1) + '%';
+      by.style.width = (s * 100).toFixed(1) + '%';
+
+      // ── UI state ──────────────────────────────────────────────────────
+      av.textContent = deg + '°';
+      document.querySelectorAll('[data-deg]').forEach(b =>
+        b.classList.toggle('active', +b.dataset.deg === deg));
+    }
+
+    slider.addEventListener('input', update);
+
+    document.querySelectorAll('[data-deg]').forEach(btn =>
+      btn.addEventListener('click', () => {
+        // Animate smoothly to preset angle
+        const target = +btn.dataset.deg;
+        const start  = +slider.value;
+        if (start === target) return;
+        const duration = 480;
+        const t0 = performance.now();
+        function step(now) {
+          const p = Math.min(1, (now - t0) / duration);
+          const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+          slider.value = Math.round(start + (target - start) * ease);
+          update();
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }));
+
+    update();
+  </script>
+</body>
+</html>

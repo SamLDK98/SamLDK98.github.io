@@ -1684,6 +1684,16 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 520px;
 }
 
+.intro-linear-algebra-page .axis-distribution-widget {
+  width: min(100%, 900px);
+  height: 640px;
+}
+
+.intro-linear-algebra-page .orientation-circle-widget {
+  width: min(100%, 900px);
+  height: 590px;
+}
+
 .intro-linear-algebra-page .angle-interest-widget {
   width: min(100%, 980px);
   height: 680px;
