@@ -124,12 +124,26 @@
     .bar-lbl.x { color: var(--x); }
     .bar-lbl.y { color: var(--y); }
     .bar-track {
+      position: relative;
       height: 8px;
       border-radius: 4px;
       background: rgba(240,221,186,0.08);
       overflow: hidden;
     }
+    .bar-track::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+      background: rgba(240,221,186,0.28);
+      z-index: 1;
+    }
     .bar-fill {
+      position: absolute;
+      top: 0;
+      left: 50%;
       height: 100%;
       border-radius: 4px;
     }
@@ -144,7 +158,7 @@
 <body>
   <main class="widget" aria-label="Widget A: line segment separation across axes">
     <div class="stage">
-      <svg viewBox="0 0 720 340" aria-label="A line segment rotating from horizontal to vertical, showing its horizontal and vertical components">
+      <svg viewBox="0 0 720 340" aria-label="A line segment rotating through a full turn, showing its horizontal and vertical components">
         <!-- Axis lines -->
         <line x1="44" y1="185" x2="676" y2="185" stroke="rgba(240,221,186,0.11)" stroke-width="1.5"/>
         <line x1="360" y1="18"  x2="360" y2="328" stroke="rgba(240,221,186,0.11)" stroke-width="1.5"/>
@@ -187,7 +201,7 @@
     <div class="controls">
       <div class="slider-row">
         <span class="ctrl-label">Rotate</span>
-        <input type="range" id="slider" min="0" max="90" value="0" step="1"
+        <input type="range" id="slider" min="0" max="360" value="0" step="1"
                aria-label="Rotation angle in degrees"/>
         <span class="angle-val" id="av">0°</span>
       </div>
@@ -197,15 +211,17 @@
         <button data-deg="0"  class="active">0°</button>
         <button data-deg="45">45°</button>
         <button data-deg="90">90°</button>
+        <button data-deg="180">180°</button>
+        <button data-deg="270">270°</button>
       </div>
 
-      <div class="bars" aria-label="Proportion of separation along each axis">
+      <div class="bars" aria-label="Signed separation along each axis">
         <span class="bar-lbl x">Horizontal</span>
-        <div class="bar-track" role="progressbar" aria-label="Horizontal separation">
-          <div class="bar-fill x" id="bx" style="width:100%"></div>
+        <div class="bar-track" role="img" aria-label="Signed horizontal separation">
+          <div class="bar-fill x" id="bx" style="width:50%"></div>
         </div>
         <span class="bar-lbl y">Vertical</span>
-        <div class="bar-track" role="progressbar" aria-label="Vertical separation">
+        <div class="bar-track" role="img" aria-label="Signed vertical separation">
           <div class="bar-fill y" id="by" style="width:0%"></div>
         </div>
       </div>
@@ -256,17 +272,19 @@
 
       // ── Component legs ────────────────────────────────────────────────
       // Fade each leg as its component approaches zero
-      const hOp = clamp(c / 0.15, 0, 1);
-      const vOp = clamp(s / 0.15, 0, 1);
+      const hOp = clamp(Math.abs(c) / 0.15, 0, 1);
+      const vOp = clamp(Math.abs(s) / 0.15, 0, 1);
 
       set(hLeg, { x1: lx, y1: ly, x2: kx, y2: ky, stroke: '#e8a13b', opacity: hOp });
       set(vLeg, { x1: kx, y1: ky, x2: rx, y2: ry, stroke: '#6dd3c4', opacity: vOp });
 
       // ── Right-angle mark ──────────────────────────────────────────────
-      if (c > 0.1 && s > 0.1) {
+      if (Math.abs(c) > 0.1 && Math.abs(s) > 0.1) {
         const sq = 11;
+        const dx = c >= 0 ? -sq : sq;
+        const dy = s >= 0 ? -sq : sq;
         set(ra, {
-          d:       `M ${kx - sq} ${ky} L ${kx - sq} ${ky - sq} L ${kx} ${ky - sq}`,
+          d:       `M ${kx + dx} ${ky} L ${kx + dx} ${ky + dy} L ${kx} ${ky + dy}`,
           stroke:  'rgba(240,221,186,0.32)',
           opacity: '1'
         });
@@ -275,10 +293,11 @@
       }
 
       // ── Angle arc ─────────────────────────────────────────────────────
-      if (deg > 1) {
+      if (deg > 1 && deg < 360) {
         const ex = CX + AR * c, ey = CY - AR * s;
+        const largeArc = deg > 180 ? 1 : 0;
         set(arc, {
-          d:       `M ${CX + AR} ${CY} A ${AR} ${AR} 0 0 0 ${ex} ${ey}`,
+          d:       `M ${CX + AR} ${CY} A ${AR} ${AR} 0 ${largeArc} 0 ${ex} ${ey}`,
           stroke:  '#6dd3c4',
           opacity: '0.82'
         });
@@ -297,12 +316,12 @@
 
       // ── Component labels ──────────────────────────────────────────────
       // Horizontal: centred below the midpoint of h-leg
-      const hLblOp = clamp((c - 0.22) * 5, 0, 0.88);
+      const hLblOp = clamp((Math.abs(c) - 0.22) * 5, 0, 0.88);
       set(lblX, { x: (lx + kx) / 2, y: ky + 19, opacity: hLblOp });
 
       // Vertical: left-aligned, beside the midpoint of v-leg
       // When angle > ~60°, kx approaches CX — shift label left to avoid overlap
-      const vLblOp = clamp((s - 0.22) * 5, 0, 0.88);
+      const vLblOp = clamp((Math.abs(s) - 0.22) * 5, 0, 0.88);
       const vLblX  = c > 0.35 ? kx + 10 : kx - 10;
       const vAnchor = c > 0.35 ? 'start' : 'end';
       set(lblY, {
@@ -313,13 +332,24 @@
       });
 
       // ── Proportion bars ───────────────────────────────────────────────
-      bx.style.width = (c * 100).toFixed(1) + '%';
-      by.style.width = (s * 100).toFixed(1) + '%';
+      setSignedBar(bx, c);
+      setSignedBar(by, s);
 
       // ── UI state ──────────────────────────────────────────────────────
-      av.textContent = deg + '°';
+      av.textContent = (deg === 360 ? 0 : deg) + '°';
       document.querySelectorAll('[data-deg]').forEach(b =>
         b.classList.toggle('active', +b.dataset.deg === deg));
+    }
+
+    function setSignedBar(el, value) {
+      const width = Math.abs(value) * 50;
+      if (value >= 0) {
+        el.style.left = '50%';
+        el.style.width = width.toFixed(1) + '%';
+      } else {
+        el.style.left = (50 - width).toFixed(1) + '%';
+        el.style.width = width.toFixed(1) + '%';
+      }
     }
 
     slider.addEventListener('input', update);
