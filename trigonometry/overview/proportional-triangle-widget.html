@@ -4,31 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Proportional Triangle Scaling</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #161311;
-      --rule: rgba(214, 196, 168, 0.16);
-      --text: #ece2d1;
-      --dim: #a89c87;
-      --faint: #6f6557;
-      --accent: #d4b888;
-      --orange: #e8a13b;
-      --cyan: #6dd3c4;
-      --pink: #ef7398;
+      --paper:    #f3ead9;
+      --ink:      #ece2d1;
+      --ink-soft: #c9bda7;
+      --ink-faint:#a89c87;
+      --hair:     rgba(236, 226, 209, 0.18);
+      --a:        #c44536;
+      --b:        #2c6e9b;
+      --c:        #bd8b2a;
+      --arc:      #d4b888;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Georgia, "Times New Roman", serif;
+      background: transparent;
+      color: var(--ink);
+      font-family: "EB Garamond", Georgia, serif;
     }
 
     .widget {
-      border: 1px solid var(--rule);
-      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
+      border: 0;
+      background: transparent;
+      padding: 0.5rem 0 0;
     }
 
     svg {
@@ -36,33 +40,34 @@
       width: min(100%, 760px);
       height: auto;
       margin: 0 auto;
+      overflow: visible;
       user-select: none;
     }
 
     .controls {
-      padding: 0.6rem 1.25rem 0.4rem;
-      border-top: 1px solid var(--rule);
-      background: rgba(0, 0, 0, 0.12);
+      max-width: 440px;
+      margin: 0.2rem auto 0;
+      padding: 0 1.25rem;
     }
 
     .scale-head {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.2rem;
     }
 
     .scale-head .lbl {
-      color: var(--dim);
-      font-size: 0.95rem;
+      color: var(--ink-faint);
+      font-size: 0.98rem;
       font-style: italic;
+      letter-spacing: 0.04em;
     }
 
     .scale-head .val {
-      color: var(--accent);
-      font-family: "Courier New", monospace;
-      font-size: 0.85rem;
-      font-weight: 700;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      font-variant-numeric: tabular-nums;
     }
 
     input[type="range"] {
@@ -75,100 +80,93 @@
     }
 
     input[type="range"]::-webkit-slider-runnable-track {
-      height: 2px;
-      background: var(--rule);
+      height: 1px;
+      background: var(--hair);
     }
-
     input[type="range"]::-moz-range-track {
-      height: 2px;
-      background: var(--rule);
+      height: 1px;
+      background: var(--hair);
     }
 
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       margin-top: -7px;
       border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 9px rgba(212, 184, 136, 0.5);
+      background: var(--paper);
+      border: 2px solid var(--c);
+      box-shadow: 0 1px 2px rgba(26, 24, 20, 0.2);
+      transition: transform 0.12s ease;
     }
-
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
     input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border: 0;
+      width: 15px;
+      height: 15px;
+      border: 2px solid var(--c);
       border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 9px rgba(212, 184, 136, 0.5);
+      background: var(--paper);
+      box-shadow: 0 1px 2px rgba(26, 24, 20, 0.2);
     }
 
     .caption {
-      padding: 0.1rem 1.25rem 0.8rem;
-      color: var(--faint);
-      font-size: 0.86rem;
+      margin: 0.5rem auto 0.6rem;
+      color: var(--ink-faint);
+      font-size: 0.95rem;
       font-style: italic;
       text-align: center;
     }
-
     .caption b {
-      color: var(--accent);
+      color: var(--ink-soft);
       font-style: normal;
+      font-variant-numeric: tabular-nums;
     }
 
     .side {
       stroke-linecap: round;
-      stroke-width: 6;
-      filter: drop-shadow(0 0 7px rgba(212, 184, 136, 0.12));
+      stroke-width: 5;
     }
-
-    .side-a { stroke: var(--orange); }
-    .side-b { stroke: var(--cyan); }
-    .side-c { stroke: var(--pink); }
+    .side-a { stroke: var(--a); }
+    .side-b { stroke: var(--b); }
+    .side-c { stroke: var(--c); }
 
     .angle-arc {
       fill: none;
-      stroke: var(--accent);
+      stroke: var(--arc);
       stroke-linecap: round;
-      stroke-width: 3;
+      stroke-width: 2;
     }
 
-    .vertex {
-      fill: var(--text);
-      opacity: 0.9;
-    }
-
-    text {
-      font-family: "Courier New", monospace;
-      font-weight: 700;
-    }
+    .vertex { fill: var(--ink); }
 
     .angle-label {
-      fill: var(--accent);
-      font-size: 18px;
+      fill: var(--ink-soft);
+      font-size: 17px;
+      font-style: italic;
     }
 
     .length-label {
       font-size: 18px;
+      font-style: italic;
+      font-variant-numeric: tabular-nums;
     }
-
-    .length-a { fill: var(--orange); }
-    .length-b { fill: var(--cyan); }
-    .length-c { fill: var(--pink); }
+    .length-a { fill: var(--a); }
+    .length-b { fill: var(--b); }
+    .length-c { fill: var(--c); }
   </style>
 </head>
 <body>
   <section class="widget">
-    <svg id="canvas" viewBox="0 0 760 430" role="img" aria-label="A triangle scaling proportionally from side lengths 4, 5, 6 to 8, 10, 12">
+    <svg id="canvas" viewBox="0 0 760 430" role="img" aria-label="A triangle scaling proportionally from side lengths 3, 6, 8 to 6, 12, 16">
       <path class="angle-arc" id="arcA" d="" />
       <path class="angle-arc" id="arcB" d="" />
       <path class="angle-arc" id="arcC" d="" />
       <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
       <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
       <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
-      <circle class="vertex" id="vertexA" cx="0" cy="0" r="5" />
-      <circle class="vertex" id="vertexB" cx="0" cy="0" r="5" />
-      <circle class="vertex" id="vertexC" cx="0" cy="0" r="5" />
+      <circle class="vertex" id="vertexA" cx="0" cy="0" r="4" />
+      <circle class="vertex" id="vertexB" cx="0" cy="0" r="4" />
+      <circle class="vertex" id="vertexC" cx="0" cy="0" r="4" />
       <text class="angle-label" id="angleA" x="0" y="0"></text>
       <text class="angle-label" id="angleB" x="0" y="0"></text>
       <text class="angle-label" id="angleC" x="0" y="0"></text>
@@ -183,7 +181,7 @@
       </div>
       <input id="scale" type="range" min="1" max="2" value="1" step="0.01" aria-label="Scale triangle proportionally">
     </div>
-    <div class="caption">Same angles, same <b>4 : 5 : 6</b> ratio &mdash; only the size changes.</div>
+    <div class="caption">Same angles, same <b>3 : 6 : 8</b> ratio.</div>
   </section>
 
   <script>
@@ -195,10 +193,10 @@
       "arcA", "arcB", "arcC", "angleA", "angleB", "angleC", "lengthA", "lengthB", "lengthC"
     ].map((id) => [id, document.getElementById(id)]));
 
-    const unit = 42;
-    const sides = { a: 4, b: 5, c: 6 };
+    const unit = 34;
+    const sides = { a: 3, b: 6, c: 8 };
     const baseY = 334;
-    const baseX = 128;
+    const baseX = 110;
 
     function pointFrom(anchor, radians, length) {
       return {
@@ -249,7 +247,7 @@
 
     function render() {
       const scale = Number(scaleInput.value);
-      scaleDisp.textContent = `\u00d7${scale.toFixed(1)}`;
+      scaleDisp.textContent = `×${scale.toFixed(1)}`;
       const sideA = sides.a * unit * scale;
       const sideB = sides.b * unit * scale;
       const sideC = sides.c * unit * scale;

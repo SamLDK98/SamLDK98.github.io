@@ -4,150 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fixed Triangle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #161311;
-      --rule: rgba(214, 196, 168, 0.16);
-      --text: #ece2d1;
-      --dim: #a89c87;
-      --accent: #d4b888;
-      --orange: #e8a13b;
-      --cyan: #6dd3c4;
-      --pink: #ef7398;
+      --paper:    #161311;
+      --ink:      #ece2d1;
+      --ink-soft: #c9bda7;
+      --ink-faint:#a89c87;
+      --hair:     rgba(214, 196, 168, 0.16);
+      --a:        #c44536;
+      --b:        #2c6e9b;
+      --c:        #bd8b2a;
+      --arc:      #d4b888;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Georgia, "Times New Roman", serif;
+      background: transparent;
+      color: var(--ink);
+      font-family: "EB Garamond", Georgia, serif;
     }
 
     .widget {
-      border: 1px solid var(--rule);
-      background: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.045), transparent 56%), var(--bg);
+      border: 0;
+      background: transparent;
+      padding: 0.5rem 0 0;
     }
-
-    .stage { min-height: 430px; }
 
     svg {
       display: block;
       width: min(100%, 760px);
       height: auto;
       margin: 0 auto;
+      overflow: visible;
       user-select: none;
       touch-action: none;
     }
 
     .controls {
       display: flex;
-      gap: 0.75rem;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 0.8rem 1rem;
-      border-top: 1px solid var(--rule);
-      background: rgba(0, 0, 0, 0.1);
+      justify-content: center;
+      padding: 0.4rem 0 0.6rem;
     }
 
-    button {
-      min-height: 2.25rem;
-      padding: 0 0.9rem;
-      border: 1px solid var(--rule);
-      background: rgba(0, 0, 0, 0.18);
-      color: var(--text);
-      font: inherit;
+    .reset {
+      border: 0;
+      background: none;
+      color: var(--ink-soft);
+      font-family: inherit;
+      font-size: 1rem;
+      font-style: italic;
+      letter-spacing: 0.02em;
       cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s ease;
+      pointer-events: none;
     }
-
-    button:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .reset::before { content: "\21BA  "; font-style: normal; }
+    .reset.show { opacity: 1; transform: none; pointer-events: auto; }
+    .reset:hover { color: var(--a); }
 
     .side {
       stroke-linecap: round;
-      stroke-width: 6;
+      stroke-width: 5;
       cursor: grab;
-      filter: drop-shadow(0 0 7px rgba(212, 184, 136, 0.12));
     }
-
     .side:active { cursor: grabbing; }
-    .side-a { stroke: var(--orange); }
-    .side-b { stroke: var(--cyan); }
-    .side-c { stroke: var(--pink); }
+    .side-a { stroke: var(--a); }
+    .side-b { stroke: var(--b); }
+    .side-c { stroke: var(--c); }
 
     .angle-arc {
       fill: none;
-      stroke: var(--accent);
+      stroke: var(--arc);
       stroke-linecap: round;
-      stroke-width: 3;
+      stroke-width: 2;
     }
 
     .handle {
-      stroke: var(--bg);
-      stroke-width: 2;
+      stroke: var(--paper);
+      stroke-width: 3;
       cursor: grab;
     }
-
-    .handle-a { fill: var(--orange); }
-    .handle-b { fill: var(--cyan); }
-    .handle-c { fill: var(--pink); }
-
-    text {
-      font-family: "Courier New", monospace;
-      font-weight: 700;
-    }
+    .handle-a { fill: var(--a); }
+    .handle-b { fill: var(--b); }
+    .handle-c { fill: var(--c); }
 
     .angle-label {
-      fill: var(--accent);
+      fill: var(--ink-soft);
       font-size: 18px;
-    }
-
-    .hint {
-      fill: var(--dim);
-      font-size: 14px;
-      letter-spacing: 0.05em;
+      font-style: italic;
     }
 
     .key-label {
-      font-size: 19px;
-      letter-spacing: 0.04em;
+      font-size: 24px;
+      font-style: italic;
+      letter-spacing: 0.01em;
       text-anchor: middle;
     }
-
-    .key-a { fill: var(--orange); }
-    .key-b { fill: var(--cyan); }
-    .key-c { fill: var(--pink); }
+    .key-a { fill: var(--a); }
+    .key-b { fill: var(--b); }
+    .key-c { fill: var(--c); }
   </style>
 </head>
 <body>
   <section class="widget">
-    <div class="stage">
-      <svg id="canvas" viewBox="0 0 760 430" role="img" aria-label="Disconnected fixed side lengths that can only form one triangle">
-        <path class="angle-arc" id="arc0" d="" />
-        <path class="angle-arc" id="arc1" d="" />
-        <path class="angle-arc" id="arc2" d="" />
-        <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
-        <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
-        <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
-        <circle class="handle handle-a" id="a1" cx="0" cy="0" r="9" />
-        <circle class="handle handle-a" id="a2" cx="0" cy="0" r="9" />
-        <circle class="handle handle-b" id="b1" cx="0" cy="0" r="9" />
-        <circle class="handle handle-b" id="b2" cx="0" cy="0" r="9" />
-        <circle class="handle handle-c" id="c1" cx="0" cy="0" r="9" />
-        <circle class="handle handle-c" id="c2" cx="0" cy="0" r="9" />
-        <text class="angle-label" id="angle0" x="0" y="0"></text>
-        <text class="angle-label" id="angle1" x="0" y="0"></text>
-        <text class="angle-label" id="angle2" x="0" y="0"></text>
-        <text class="key-label key-a" x="275" y="54">a = 4</text>
-        <text class="key-label key-b" x="380" y="54">b = 5</text>
-        <text class="key-label key-c" x="485" y="54">c = 6</text>
-      </svg>
-    </div>
+    <svg id="canvas" viewBox="0 0 760 430" role="img" aria-label="Disconnected fixed side lengths that can only form one triangle">
+      <path class="angle-arc" id="arc0" d="" />
+      <path class="angle-arc" id="arc1" d="" />
+      <path class="angle-arc" id="arc2" d="" />
+      <line class="side side-c" id="sideC" x1="0" y1="0" x2="0" y2="0" />
+      <line class="side side-b" id="sideB" x1="0" y1="0" x2="0" y2="0" />
+      <line class="side side-a" id="sideA" x1="0" y1="0" x2="0" y2="0" />
+      <circle class="handle handle-a" id="a1" cx="0" cy="0" r="8" />
+      <circle class="handle handle-a" id="a2" cx="0" cy="0" r="8" />
+      <circle class="handle handle-b" id="b1" cx="0" cy="0" r="8" />
+      <circle class="handle handle-b" id="b2" cx="0" cy="0" r="8" />
+      <circle class="handle handle-c" id="c1" cx="0" cy="0" r="8" />
+      <circle class="handle handle-c" id="c2" cx="0" cy="0" r="8" />
+      <text class="angle-label" id="angle0" x="0" y="0"></text>
+      <text class="angle-label" id="angle1" x="0" y="0"></text>
+      <text class="angle-label" id="angle2" x="0" y="0"></text>
+      <text class="key-label key-a" x="275" y="50">a = 3</text>
+      <text class="key-label key-b" x="380" y="50">b = 6</text>
+      <text class="key-label key-c" x="485" y="50">c = 8</text>
+    </svg>
     <div class="controls">
-      <button type="button" id="reset">Reset</button>
+      <button type="button" id="reset" class="reset">reset</button>
     </div>
   </section>
 
@@ -158,19 +147,20 @@
     const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
 
     const scale = 50;
-    const lengths = { a: 4 * scale, b: 5 * scale, c: 6 * scale };
+    const lengths = { a: 3 * scale, b: 6 * scale, c: 8 * scale };
     const segments = {};
     let connections = [];
     let dragging = null;
     let locked = false;
 
     function resetState() {
-      segments.a = { p1: { x: 420, y: 122 }, p2: { x: 420 + lengths.a, y: 122 }, length: lengths.a };
+      segments.a = { p1: { x: 420, y: 182 }, p2: { x: 420 + lengths.a, y: 182 }, length: lengths.a };
       segments.b = { p1: { x: 120, y: 138 }, p2: { x: 120 + lengths.b, y: 138 }, length: lengths.b };
       segments.c = { p1: { x: 170, y: 330 }, p2: { x: 170 + lengths.c, y: 330 }, length: lengths.c };
       connections = [];
       dragging = null;
       locked = false;
+      reset.classList.remove("show");
       render();
     }
 
@@ -281,7 +271,6 @@
     }
 
     function alignEndpointTo(endpoint, target) {
-      const key = endpointKey(endpoint);
       const anchorEnd = otherEnd(endpoint.end);
       const anchorKey = `${endpoint.segment}.${anchorEnd}`;
       if (isConnected(anchorKey)) {
@@ -338,6 +327,7 @@
       });
       dragging = null;
       locked = true;
+      reset.classList.add("show");
     }
 
     function maybeSnap() {
