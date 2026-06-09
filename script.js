@@ -6,16 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (isTrigonometryChapter) {
     const trigChapters = [
-      { href: 'trigonometry.html', kicker: 'Home', title: 'Trigonometry' },
-      { href: 'trigonometry-what-is-an-angle.html', kicker: 'Chapter 0', title: 'Measuring Angles' },
-      { href: 'trigonometry-overview.html', kicker: 'Chapter 1', title: 'Why Triangles?' },
-      { href: 'trigonometry-right-angled-triangles.html', kicker: 'Chapter 2', title: 'Right-Angled Triangles' },
-      { href: 'trigonometry-computing-sine-and-cosine.html', kicker: 'Chapter 3', title: 'Interpreting Sine and Cosine' },
-      { href: 'trigonometry-measuring-circles.html', kicker: 'Chapter 4', title: 'Measuring Rotation' },
+      { href: 'trigonometry-what-is-an-angle.html', kicker: 'Chapter 1', title: 'Measuring Angles' },
+      { href: 'trigonometry-overview.html', kicker: 'Chapter 2', title: 'Why Triangles?' },
+      { href: 'trigonometry-right-angled-triangles.html', kicker: 'Chapter 3', title: 'Right-Angled Triangles' },
+      { href: 'trigonometry-computing-sine-and-cosine.html', kicker: 'Chapter 4', title: 'Interpreting Sine and Cosine' },
       { href: 'trigonometry-unit-circle.html', kicker: 'Chapter 5', title: 'The Unit Circle' },
       { href: 'trigonometry-polar-form.html', kicker: 'Chapter 6', title: 'Polar Form' },
       { href: 'trigonometry-coordinates-on-the-unit-circle.html', kicker: 'Archive', title: 'Misc' },
-      { href: 'trigonometry-introduction.html', kicker: 'Chapter 99', title: 'Introduction' },
     ];
     const currentPage = window.location.pathname.split('/').pop();
     const nav = document.createElement('nav');
@@ -30,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
         </span>
       </button>
       <div class="trig-floating-nav-panel">
+        <div class="trig-floating-nav-home-row">
+          <a class="trig-floating-nav-home-link${currentPage === 'trigonometry.html' ? ' is-current' : ''}" href="trigonometry.html">Trigonometry</a>
+          <a class="trig-floating-nav-home-link${currentPage === 'index.html' ? ' is-current' : ''}" href="index.html">Home</a>
+        </div>
         ${trigChapters.map((chapter) => `
           <a class="trig-floating-nav-link${chapter.href === currentPage ? ' is-current' : ''}" href="${chapter.href}">
             <span>${chapter.kicker}</span>

@@ -1809,7 +1809,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .intro-linear-algebra-page .historical-trigonometrist-widget {
   width: min(100%, 980px);
-  height: 760px;
+  height: 1180px;
 }
 
 .right-triangle-shape-strip {
@@ -2932,6 +2932,37 @@ footer {
   border-bottom: 1px solid var(--intro-rule);
   color: var(--intro-text);
   text-decoration: none;
+}
+
+.trig-floating-nav-home-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--intro-rule);
+}
+
+.trig-floating-nav-home-link {
+  display: grid;
+  min-height: 3rem;
+  place-items: center;
+  padding: 0.72rem 0.65rem;
+  color: var(--intro-text);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 0.92rem;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+}
+
+.trig-floating-nav-home-link + .trig-floating-nav-home-link {
+  border-left: 1px solid var(--intro-rule);
+}
+
+.trig-floating-nav-home-link:hover,
+.trig-floating-nav-home-link:focus-visible,
+.trig-floating-nav-home-link.is-current {
+  background: rgba(232, 161, 59, 0.08);
+  color: var(--intro-accent);
+  outline: none;
 }
 
 .trig-floating-nav-link:last-child {

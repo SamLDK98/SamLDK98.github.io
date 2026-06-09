@@ -6,33 +6,35 @@
 <title>Historical Trigonometrist</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #161311;
-    --bg-elev: #1e1a17;
-    --bg-card: #221d1a;
-    --text: #ece2d1;
-    --text-dim: #a89c87;
-    --text-faint: #6f6557;
-    --rule: rgba(214, 196, 168, 0.12);
-    --rule-strong: rgba(214, 196, 168, 0.22);
-    --accent: #d4b888;
-    --accent-glow: rgba(212, 184, 136, 0.4);
-    --opp: #e8a13b;
-    --opp-glow: rgba(232, 161, 59, 0.4);
-    --adj: #6dd3c4;
-    --adj-glow: rgba(109, 211, 196, 0.4);
-    --hyp: #b896d8;
-    --hyp-glow: rgba(184, 150, 216, 0.35);
-    --point: #ef7398;
-    --point-glow: rgba(239, 115, 152, 0.45);
-    --green: #88c97c;
-    --green-glow: rgba(136, 201, 124, 0.45);
+    --bg: #1b1410;
+    --bg-elev: #241a13;
+    --bg-card: #29201a;
+    --text: #e8dcc4;
+    --text-dim: #b6a489;
+    --text-faint: #8a7a64;
+    --rule: rgba(205, 168, 95, 0.16);
+    --rule-strong: rgba(205, 168, 95, 0.34);
+    --accent: #d8b87a;
+    --accent-glow: rgba(216, 184, 122, 0.4);
+    --gilt: #ecc987;
+    --ink-hand: #ddc8a4;
+    --opp: #c47a3d;
+    --opp-glow: rgba(196, 122, 61, 0.4);
+    --adj: #6f9e86;
+    --adj-glow: rgba(111, 158, 134, 0.4);
+    --hyp: #9a83b6;
+    --hyp-glow: rgba(154, 131, 182, 0.35);
+    --point: #c06a5a;
+    --point-glow: rgba(192, 106, 90, 0.45);
+    --green: #9aa55c;
+    --green-glow: rgba(154, 165, 92, 0.42);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    background: var(--bg);
+    background: transparent;
     color: var(--text);
     font-family: 'EB Garamond', Georgia, serif;
     font-size: 17px;
@@ -42,22 +44,41 @@
   body {
     min-height: 100vh;
     padding: 1.5rem 1rem;
-    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
   }
   .widget {
     max-width: 1100px;
     margin: 0 auto;
-    background: var(--bg-elev);
-    border: 1px solid var(--rule);
-    border-radius: 4px;
+    color: var(--text);
+    background:
+      radial-gradient(ellipse at 28% -12%, rgba(216, 184, 122, 0.06), transparent 60%),
+      linear-gradient(180deg, #241a13 0%, #1b1410 100%);
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    box-shadow:
+      inset 0 0 0 1px rgba(236, 201, 135, 0.10),
+      inset 0 0 70px rgba(0, 0, 0, 0.5),
+      0 16px 44px rgba(0, 0, 0, 0.55);
     overflow: hidden;
     position: relative;
   }
+  /* aged-paper / leather grain */
   .widget::before {
     content: ""; position: absolute; inset: 0;
-    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.045;
+    mix-blend-mode: overlay;
     pointer-events: none;
+    z-index: 1;
   }
+  /* embossed inner gilt rule — the ledger frame */
+  .widget::after {
+    content: ""; position: absolute; inset: 5px;
+    border: 1px solid rgba(216, 184, 122, 0.18);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .widget > * { position: relative; z-index: 2; }
 
   /* —— Header —— */
   .header {
@@ -70,15 +91,15 @@
     flex-wrap: wrap;
   }
   .eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.66rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 0.3rem;
+    font-family: 'IM Fell English SC', 'IM Fell English', serif;
+    font-size: 0.92rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    opacity: 0.8;
+    margin-bottom: 0.15rem;
   }
   h1 {
-    font-family: 'Fraunces', serif;
+    font-family: 'IM Fell English', 'Fraunces', serif;
     font-weight: 400;
     font-size: 1.55rem;
     letter-spacing: -0.005em;
@@ -90,6 +111,7 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    margin-top: 0.65rem;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.66rem;
     letter-spacing: 0.16em;
@@ -97,23 +119,37 @@
     text-transform: uppercase;
   }
   .level-pip {
-    width: 1.65rem;
-    height: 1.65rem;
+    width: 1.95rem;
+    height: 1.95rem;
     border: 1px solid var(--rule);
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Fraunces', serif;
+    font-family: 'IM Fell English', 'Fraunces', serif;
     font-style: italic;
-    font-size: 0.85rem;
+    font-size: 0.98rem;
     color: var(--text-faint);
+    cursor: pointer;
     transition: all 0.25s;
+  }
+  .level-pip:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(212, 184, 136, 0.06);
   }
   .level-pip.current {
     color: var(--accent);
     border-color: var(--accent);
     background: rgba(212, 184, 136, 0.1);
+  }
+  .level-pip-row .hint {
+    font-family: 'Caveat', cursive;
+    font-size: 1.05rem;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-faint);
+    margin-left: 0.25rem;
   }
   .level-pip.done {
     color: var(--green);
@@ -128,14 +164,16 @@
     background: rgba(0, 0, 0, 0.12);
   }
   .prompt-intro {
-    color: var(--text-dim);
-    font-style: italic;
-    font-size: 0.96rem;
+    font-family: 'Caveat', cursive;
+    color: var(--ink-hand);
+    font-size: 1.32rem;
+    line-height: 1.25;
     max-width: 60ch;
   }
+  .prompt-intro:empty { display: none; }
   .prompt-mission {
     margin-top: 0.5rem;
-    font-family: 'Fraunces', serif;
+    font-family: 'IM Fell English', 'Fraunces', serif;
     font-weight: 400;
     font-style: italic;
     font-size: 1.35rem;
@@ -181,11 +219,11 @@
     gap: 0.85rem;
   }
   .section-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    color: var(--text-faint);
-    text-transform: uppercase;
+    font-family: 'IM Fell English SC', 'IM Fell English', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    opacity: 0.78;
     margin-bottom: 0.55rem;
   }
   .steps {
@@ -282,16 +320,14 @@
     align-items: center;
   }
   .explanation .inner {
-    color: var(--text);
-    font-style: italic;
-    font-family: 'EB Garamond', serif;
-    font-size: 0.99rem;
-    line-height: 1.55;
+    color: var(--ink-hand);
+    font-family: 'Caveat', cursive;
+    font-size: 1.38rem;
+    line-height: 1.3;
     max-width: 70ch;
   }
   .explanation .inner.success {
     color: var(--green);
-    font-style: normal;
   }
   .explanation .inner code,
   .explanation .inner .math {
@@ -305,7 +341,7 @@
     margin: 0 0.05em;
   }
   .explanation .inner .answer-final {
-    font-family: 'Fraunces', serif;
+    font-family: 'IM Fell English', 'Fraunces', serif;
     font-style: italic;
     font-size: 1.4em;
     color: var(--green);
@@ -328,7 +364,7 @@
   .level-complete-bar.visible { display: flex; }
   .lc-msg {
     color: var(--green);
-    font-family: 'Fraunces', serif;
+    font-family: 'IM Fell English', 'Fraunces', serif;
     font-style: italic;
     font-size: 1.05rem;
   }
@@ -370,40 +406,42 @@
     gap: 0.5rem;
   }
   .table-title {
-    font-family: 'Fraunces', serif;
+    font-family: 'IM Fell English', 'Fraunces', serif;
     font-style: italic;
     font-size: 1.15rem;
     color: var(--accent);
   }
   .table-sub {
-    font-family: 'EB Garamond', serif;
-    font-style: italic;
-    font-size: 0.85rem;
+    font-family: 'Caveat', cursive;
+    font-size: 1.2rem;
     color: var(--text-faint);
   }
   .trig-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.92rem;
-    background: rgba(0, 0, 0, 0.18);
-    border: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-size: 1.02rem;
+    background: rgba(0, 0, 0, 0.16);
+    border: 1px solid var(--rule-strong);
     border-radius: 2px;
     overflow: hidden;
   }
   .trig-table th {
     text-align: left;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.62rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    background: rgba(0, 0, 0, 0.25);
-    border-bottom: 1px solid var(--rule);
-    font-weight: 500;
+    padding: 0.5rem 0.9rem;
+    font-family: 'IM Fell English SC', 'IM Fell English', serif;
+    font-size: 0.92rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    background: rgba(0, 0, 0, 0.28);
+    border-bottom: 3px double var(--rule-strong);
+    font-weight: 400;
+  }
+  .trig-table tbody tr:nth-child(even) td {
+    background: rgba(216, 184, 122, 0.035);
   }
   .trig-table td {
-    padding: 0.65rem 0.9rem;
+    padding: 0.6rem 0.9rem;
     border-bottom: 1px solid var(--rule);
     color: var(--text);
     font-variant-numeric: tabular-nums;
@@ -412,7 +450,7 @@
   .trig-table .angle { width: 18%; color: var(--text-dim); }
   .trig-table .value { width: 30%; }
   .trig-table .decimal { width: 22%; color: var(--text-dim); }
-  .trig-table .source { width: 30%; color: var(--text-faint); font-family: 'EB Garamond', serif; font-style: italic; font-size: 0.88rem; }
+  .trig-table .source { width: 30%; color: var(--ink-hand); font-family: 'Caveat', cursive; font-size: 1.16rem; line-height: 1.15; }
   .trig-table tr.trivial td { color: var(--text-dim); }
   .trig-table tr.trivial .value { color: var(--text-dim); }
   .trig-table tr.locked .value,
@@ -430,11 +468,10 @@
   }
 
   .footer {
-    padding: 0.85rem 1.6rem;
+    padding: 0.7rem 1.6rem 0.85rem;
     border-top: 1px solid var(--rule);
-    font-family: 'EB Garamond', serif;
-    font-style: italic;
-    font-size: 0.82rem;
+    font-family: 'Caveat', cursive;
+    font-size: 1.22rem;
     color: var(--text-faint);
     text-align: center;
   }
@@ -476,11 +513,17 @@
   }
 
   .ws-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
+    font-family: 'EB Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
     fill: var(--text);
     font-variant-numeric: tabular-nums;
     transition: opacity 0.35s, fill 0.35s;
+    /* halo so numbers stay legible and never visually merge with a line */
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 3.5px;
+    stroke-linejoin: round;
   }
   .ws-label.side-len { fill: var(--text); font-size: 17px; }
   .ws-label.angle    { fill: var(--point); font-size: 15px; font-weight: 500; }
@@ -499,6 +542,65 @@
     font-style: italic;
     font-size: 16px;
   }
+
+  /* ——— Parchment surfaces (diagram pane + ledger table) ——— */
+  .parchment {
+    background-color: #eddfbb;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.22' intercept='0.74'/%3E%3CfeFuncG type='linear' slope='0.22' intercept='0.74'/%3E%3CfeFuncB type='linear' slope='0.22' intercept='0.74'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23eddfbb' filter='url(%23p)'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(0deg, rgba(110, 82, 44, 0.03) 0px, rgba(110, 82, 44, 0.03) 1px, transparent 1px, transparent 5px),
+      radial-gradient(circle at 16% 20%, rgba(150, 116, 64, 0.09), transparent 42%),
+      radial-gradient(circle at 84% 26%, rgba(120, 88, 46, 0.08), transparent 46%),
+      radial-gradient(circle at 66% 86%, rgba(140, 104, 56, 0.07), transparent 48%),
+      radial-gradient(ellipse at center, transparent 60%, rgba(74, 52, 26, 0.10) 100%),
+      linear-gradient(160deg, #f4ead2 0%, #eddfb8 55%, #e4d2a8 100%);
+    background-blend-mode: multiply, normal, normal, normal, normal, normal, normal;
+    background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  }
+
+  /* Diagram pane as paper — construction redrawn in ink */
+  .workspace.parchment {
+    color: #2b1f11;
+    box-shadow: inset 0 0 0 1px rgba(70, 50, 25, 0.22), inset 0 2px 9px rgba(60, 40, 20, 0.12);
+    --accent: #574019;
+    --text: #2b1f11;
+    --text-faint: #786040;
+    --bg: #eddfbb;
+    --opp: #9a3a08;
+    --adj: #1f5340;
+    --hyp: #46276c;
+    --point: #8c2417;
+    --green: #4b561c;
+  }
+  .workspace.parchment .ws-line { filter: none; }
+  .workspace.parchment .ws-right-angle { stroke: rgba(43, 31, 17, 0.6); }
+  .workspace.parchment .ws-vertex { fill: rgba(43, 31, 17, 0.8); }
+  .workspace.parchment .ws-tri-fill { fill: rgba(96, 70, 34, 0.05); }
+  .workspace.parchment .ws-tri-fill.dim { fill: rgba(96, 70, 34, 0.02); }
+  .workspace.parchment .ws-tri-fill.highlight { fill: rgba(150, 100, 30, 0.13); }
+
+  /* Sine table as a parchment leaf */
+  .table-section.parchment {
+    color: #2b1f11;
+    border-top: 2px solid rgba(205, 168, 95, 0.42);
+    box-shadow: inset 0 2px 10px rgba(60, 40, 20, 0.08);
+    --text: #2b1f11;
+    --text-dim: #574630;
+    --text-faint: #786040;
+    --accent: #654214;
+    --ink-hand: #4a3519;
+    --rule: rgba(80, 58, 32, 0.28);
+    --rule-strong: rgba(80, 58, 32, 0.48);
+    --green: #4d5a1f;
+  }
+  .table-section.parchment .trig-table { background: transparent; }
+  .table-section.parchment .trig-table th { background: rgba(120, 90, 46, 0.12); }
+  .table-section.parchment .trig-table tbody tr:nth-child(even) td { background: rgba(120, 90, 46, 0.07); }
+  .table-section.parchment .trig-table tr.glow { animation-name: row-glow-parch; }
+  @keyframes row-glow-parch {
+    0%   { background: rgba(150, 120, 40, 0.4); }
+    100% { background: transparent; }
+  }
 </style>
 </head>
 <body>
@@ -506,25 +608,24 @@
 <div class="widget">
   <div class="header">
     <div>
-      <h1>Build the <em>sine table</em> from scratch</h1>
-    </div>
-    <div class="level-pip-row" id="level-pips">
-      <span>Level</span>
-      <span class="level-pip" data-lv="0">30</span>
-      <span class="level-pip" data-lv="1">45</span>
-      <span class="level-pip" data-lv="2">60</span>
+      <h1><em>Trigonometric Tables</em></h1>
+      <div class="level-pip-row" id="level-pips">
+        <span>Level</span>
+        <span class="level-pip" data-lv="0">30</span>
+        <span class="level-pip" data-lv="1">45</span>
+        <span class="level-pip" data-lv="2">60</span>
+      </div>
     </div>
   </div>
 
   <div class="prompt">
-    <p class="prompt-intro" id="prompt-intro"></p>
     <p class="prompt-mission" id="prompt-mission">
-      Mission: derive <span class="mono">sin(30°)</span>
+      Task: derive <span class="mono">sin(30°)</span>
     </p>
   </div>
 
   <div class="main">
-    <div class="workspace">
+    <div class="workspace parchment">
       <svg id="diagram" class="diagram" viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg"
            role="img" aria-label="A construction diagram that updates as you apply steps">
         <!-- Contents are rendered dynamically by JS -->
@@ -533,7 +634,6 @@
 
     <aside class="toolbox">
       <div>
-        <div class="section-label">Tools</div>
         <div class="steps" id="steps-list"></div>
         <div class="nav-controls">
           <button class="nav-btn" id="back-btn">◀ Back</button>
@@ -551,13 +651,12 @@
 
   <div class="level-complete-bar" id="lc-bar">
     <div class="lc-msg" id="lc-msg"></div>
-    <button class="btn" id="next-level-btn">Next mission →</button>
+    <button class="btn" id="next-level-btn">Next task →</button>
   </div>
 
-  <div class="table-section">
+  <div class="table-section parchment">
     <div class="table-head">
       <div class="table-title">Your sine table</div>
-      <div class="table-sub">grows as you derive each value</div>
     </div>
     <table class="trig-table" id="trig-table">
       <thead>
@@ -565,7 +664,6 @@
           <th>angle</th>
           <th>sin(θ)</th>
           <th>decimal</th>
-          <th>source</th>
         </tr>
       </thead>
       <tbody>
@@ -573,39 +671,28 @@
           <td class="angle">0°</td>
           <td class="value">0</td>
           <td class="decimal">0.000</td>
-          <td class="source">point on x-axis</td>
         </tr>
         <tr class="locked" data-angle="30">
           <td class="angle">30°</td>
           <td class="value"></td>
-          <td class="decimal"></td>
-          <td class="source">not yet derived</td>
-        </tr>
+          <td class="decimal"></td>        </tr>
         <tr class="locked" data-angle="45">
           <td class="angle">45°</td>
           <td class="value"></td>
-          <td class="decimal"></td>
-          <td class="source">not yet derived</td>
-        </tr>
+          <td class="decimal"></td>        </tr>
         <tr class="locked" data-angle="60">
           <td class="angle">60°</td>
           <td class="value"></td>
-          <td class="decimal"></td>
-          <td class="source">not yet derived</td>
-        </tr>
+          <td class="decimal"></td>        </tr>
         <tr class="trivial" data-angle="90">
           <td class="angle">90°</td>
           <td class="value">1</td>
           <td class="decimal">1.000</td>
-          <td class="source">point on y-axis</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="footer">
-    Every entry in your table came from a triangle you drew yourself.
-  </div>
 </div>
 
 <script>
@@ -675,8 +762,8 @@
           stateKey: 'diagonal'
         },
         {
-          tool: 'Compute the diagonal\'s length',
-          explain: 'Pythagoras on either right triangle: <span class="math">d² = 1² + 1² = 2</span>, so <span class="math">d = √2</span>.',
+          tool: 'Apply Pythagoras to find the diagonal',
+          explain: 'The diagonal is the hypotenuse of each right triangle, so <strong>Pythagoras\' theorem</strong> gives its length: <span class="math">d² = 1² + 1² = 2</span>, hence the diagonal <span class="math">d = √2</span>.',
           stateKey: 'diagLen'
         },
         {
@@ -941,14 +1028,14 @@
     // After isolation: relabel
     if (isolated) {
       // Right triangle: legs are MC (vertical, "h" or "√3/2"), MB (horizontal, "1/2"); hyp BC = "1"
-      // base label (M to B) — half-base
-      addEl('text', { class: 'ws-label side-len adj fade-in', x: (M.x + B.x) / 2, y: M.y + 22, 'text-anchor': 'middle', text: '1/2' });
+      // base label (M to B) — half-base. Colour must match the base line (baseColor).
+      addEl('text', { class: 'ws-label side-len ' + baseColor + ' fade-in', x: (M.x + B.x) / 2, y: M.y + 22, 'text-anchor': 'middle', text: '1/2' });
       // hypotenuse label (C to B)
       addEl('text', { class: 'ws-label side-len hyp fade-in', x: (B.x + C.x) / 2 + 14, y: (B.y + C.y) / 2 - 2, 'text-anchor': 'start', text: '1' });
-      // height label (C to M) — only "h" before Pythagoras, then "√3/2"
+      // height label (C to M) — only "h" before Pythagoras, then "√3/2". Colour matches the height line.
       const hText = pythagorasVisible ? '√3/2' : 'h';
-      const hClass = pythagorasVisible ? 'ws-label side-len opp fade-in' : 'ws-label side-len opp fade-in';
-      addEl('text', { class: hClass, x: M.x - 14, y: (C.y + M.y) / 2 + 5, 'text-anchor': 'end', text: hText });
+      const hClass = 'ws-label side-len ' + heightColor + ' fade-in';
+      addEl('text', { class: hClass, x: M.x - 16, y: (C.y + M.y) / 2 + 5, 'text-anchor': 'end', text: hText });
     }
 
     // Angles inside the right triangle: 30° at top (C), 60° at bottom-left (M? no — at B!)
@@ -1077,7 +1164,7 @@
       const midX = (A.x + C.x) / 2, midY = (A.y + C.y) / 2;
       addEl('text', {
         class: 'ws-label side-len fade-in',
-        x: midX + 14, y: midY - 12, 'text-anchor': 'start',
+        x: midX + 20, y: midY - 16, 'text-anchor': 'start',
         fill: 'var(--accent)',
         text: '√2'
       });
@@ -1093,7 +1180,7 @@
       const midX = (A.x + C.x) / 2, midY = (A.y + C.y) / 2;
       addEl('text', {
         class: 'ws-label side-len hyp fade-in',
-        x: midX - 12, y: midY + 4, 'text-anchor': 'end',
+        x: midX - 24, y: midY + 22, 'text-anchor': 'end',
         text: '√2'
       });
 
@@ -1119,6 +1206,14 @@
       const angle = Number(p.dataset.lv) === 0 ? 30 : Number(p.dataset.lv) === 1 ? 45 : 60;
       if (completed[angle]) p.classList.add('done');
       if (i === levelIdx && !completed[angle]) p.classList.add('current');
+      // Jump straight to any level by clicking its pip
+      p.setAttribute('role', 'button');
+      p.setAttribute('tabindex', '0');
+      p.title = `Switch to the ${angle}° derivation`;
+      p.onclick = () => { if (i !== levelIdx) startLevel(i); };
+      p.onkeydown = (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && i !== levelIdx) { e.preventDefault(); startLevel(i); }
+      };
     });
   }
 
@@ -1163,14 +1258,7 @@
 
   function renderPrompt() {
     const lv = LEVELS[levelIdx];
-    $('#prompt-mission').innerHTML = 'Mission: ' + lv.missionHtml;
-    if (levelIdx === 0) {
-      $('#prompt-intro').textContent = '';
-    } else if (levelIdx === 1) {
-      $('#prompt-intro').textContent = 'Different angle, different shape. The equilateral was tailor-made for 30° and 60°. For 45° we need something with a 90° corner — a square.';
-    } else {
-      $('#prompt-intro').textContent = 'You already did the work. The 30-60-90 triangle has both angles in it — you just need to read the other side.';
-    }
+    $('#prompt-mission').innerHTML = 'Task: ' + lv.missionHtml;
   }
 
   function showLevelCompleteBar() {
@@ -1183,7 +1271,7 @@
       nextBtn.textContent = `Next: derive sin(${LEVELS[levelIdx + 1].angle}°) →`;
       nextBtn.style.display = '';
     } else {
-      nextBtn.textContent = 'All missions complete';
+      nextBtn.textContent = 'All tasks complete';
       nextBtn.disabled = true;
       nextBtn.style.opacity = '0.7';
       nextBtn.style.cursor = 'default';
@@ -1206,7 +1294,6 @@
         tr.classList.add('derived');
         tr.querySelector('.value').textContent = lv.answer.display;
         tr.querySelector('.decimal').textContent = lv.answer.decimal;
-        tr.querySelector('.source').textContent = lv.sourceLabel;
       }
     });
     if (animateAngle != null) {

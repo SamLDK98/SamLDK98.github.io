@@ -34,6 +34,84 @@
   <main>
     <article>
       <section class="essay-section">
+        <h3 class="subsection-title">Angles as Differences between Directions</h3>
+
+        <p>On a line, you can travel in two directions: left or right.</p>
+
+        <p>On a plane, you can travel in infinitely many directions.</p>
+
+        <figure class="trig-figure direction-figure" aria-label="A line has two directions while a plane has infinitely many directions">
+          <svg viewBox="0 0 900 360" role="img">
+            <defs>
+              <marker id="dir-arrow-line" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+              </marker>
+              <marker id="dir-arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+              </marker>
+            </defs>
+
+            <g transform="translate(45 40)">
+              <text x="190" y="42" text-anchor="middle" class="direction-figure-label">Line</text>
+              <line x1="70" y1="150" x2="310" y2="150" stroke="rgba(236,226,209,0.55)" stroke-width="2" />
+              <line x1="170" y1="112" x2="105" y2="112" stroke="#6dd3c4" stroke-width="4" marker-end="url(#dir-arrow-line)" />
+              <line x1="210" y1="112" x2="275" y2="112" stroke="#6dd3c4" stroke-width="4" marker-end="url(#dir-arrow-line)" />
+              <circle cx="190" cy="150" r="4" fill="#ece2d1" />
+            </g>
+
+            <g transform="translate(475 40)">
+              <text x="190" y="42" text-anchor="middle" class="direction-figure-label">Plane</text>
+              <g transform="translate(190 155)" stroke="#6dd3c4" stroke-width="2.5" opacity="0.88" marker-end="url(#dir-arrow-teal)">
+                <line x1="0" y1="0" x2="0" y2="-93" />
+                <line x1="0" y1="0" x2="46" y2="-81" />
+                <line x1="0" y1="0" x2="81" y2="-47" />
+                <line x1="0" y1="0" x2="93" y2="0" />
+                <line x1="0" y1="0" x2="81" y2="47" />
+                <line x1="0" y1="0" x2="46" y2="81" />
+                <line x1="0" y1="0" x2="0" y2="93" />
+                <line x1="0" y1="0" x2="-46" y2="81" />
+                <line x1="0" y1="0" x2="-81" y2="47" />
+                <line x1="0" y1="0" x2="-93" y2="0" />
+                <line x1="0" y1="0" x2="-81" y2="-47" />
+                <line x1="0" y1="0" x2="-46" y2="-81" />
+              </g>
+              <circle cx="190" cy="155" r="5" fill="#ece2d1" />
+            </g>
+          </svg>
+        </figure>
+
+        <p>A circle can be thought of as a set of all possible directions.</p>
+
+        <figure class="trig-figure direction-figure compact-direction-figure" aria-label="A circle surrounds a point and gathers many possible directions from that point">
+          <svg viewBox="0 0 760 420" role="img">
+            <defs>
+              <marker id="circle-dir-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(109, 211, 196, 0.52)" />
+              </marker>
+            </defs>
+            <g transform="translate(380 210)">
+              <circle r="145" fill="none" stroke="#e8a13b" stroke-width="3" />
+              <g stroke="rgba(109, 211, 196, 0.52)" stroke-width="3" marker-end="url(#circle-dir-arrow)">
+                <line x1="0" y1="0" x2="0" y2="-132" />
+                <line x1="0" y1="0" x2="66" y2="-114" />
+                <line x1="0" y1="0" x2="114" y2="-66" />
+                <line x1="0" y1="0" x2="132" y2="0" />
+                <line x1="0" y1="0" x2="114" y2="66" />
+                <line x1="0" y1="0" x2="66" y2="114" />
+                <line x1="0" y1="0" x2="0" y2="132" />
+                <line x1="0" y1="0" x2="-66" y2="114" />
+                <line x1="0" y1="0" x2="-114" y2="66" />
+                <line x1="0" y1="0" x2="-132" y2="0" />
+                <line x1="0" y1="0" x2="-114" y2="-66" />
+                <line x1="0" y1="0" x2="-66" y2="-114" />
+              </g>
+              <circle r="7" fill="#ece2d1" />
+            </g>
+          </svg>
+        </figure>
+
+        <p>Angles are just a way of quantifying <strong>differences between directions</strong>.</p>
+
         <h3 class="subsection-title">Limitations beyond ordered pairs</h3>
 
         <p>Previously, we looked at equations like $4x-2y=2$.</p>
@@ -102,15 +180,63 @@
           loading="lazy"
         ></iframe>
 
+        <p>"Trigonometry" translates to <em>triangle measurement</em>.</p>
+
+        <p>Yet <strong>angles</strong> are the real subject of interest.</p>
+
+        <p>Angles are measured as <strong>differences between orientations</strong>.</p>
+
+        <iframe
+          class="essay-widget angle-orientation-widget"
+          src="trigonometry/introduction/angle-orientation-widget.html"
+          title="Interactive widget comparing two orientations as an angle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Orientation only makes sense if there is a space in which an object could be rotated.</p>
+
+        <p>A space provides independent directions, and an object's orientation describes how its structure is distributed across those directions.</p>
+
+        <p>For example, in a two-dimensional space, we can think of these directions as up/down along a vertical axis, and left/right along a horizontal axis.</p>
+
+        <p>Consider a horizontal line segment:</p>
+
+        <ul>
+          <li>The separation between its endpoints is entirely horizontal.</li>
+          <li>As we rotate the line, some of this separation becomes vertical.</li>
+          <li>At a $45^\circ$ rotation, the separation is shared equally between the horizontal and vertical directions.</li>
+          <li>At a $90^\circ$ rotation, the separation is entirely vertical.</li>
+        </ul>
+
+        <p>Rotation is therefore a continuous change in how an object's structure is distributed across the available directions of a space.</p>
+
+        <iframe
+          class="essay-widget axis-distribution-widget"
+          src="trigonometry/introduction/axis-distribution-widget.html"
+          title="Widget A: rotating line segment showing axis distribution"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>In a 2D space, if we continuously rotate an object, notice that the object's endpoints would trace out a circle.</p>
+
+        <p>A circle therefore provides a natural way to represent the complete set of possible orientations.</p>
+
+        <iframe
+          class="essay-widget orientation-circle-widget"
+          src="trigonometry/introduction/orientation-circle-widget.html"
+          title="Widget B: rotating line segment tracing the circle of all orientations"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
         <nav class="chapter-nav" aria-label="Chapter navigation">
           <a class="chapter-nav-link" href="trigonometry-polar-form.html">
             <span>Previous</span>
             <strong>Polar Form</strong>
           </a>
-          <a class="chapter-nav-link" href="trigonometry-introduction.html">
-            <span>Next</span>
-            <strong>Introduction</strong>
-          </a>
+          <span></span>
         </nav>
       </section>
     </article>
