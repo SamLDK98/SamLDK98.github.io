@@ -1965,6 +1965,10 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   stroke-dasharray: 8 8;
 }
 
+.thirty-sixty-triangle-figure .triangle-altitude-line {
+  stroke-width: 3;
+}
+
 .thirty-sixty-triangle-figure .triangle-hypotenuse {
   stroke: #f4b13d;
   stroke-width: 5.5;

@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const trigChapters = [
       { href: 'trigonometry-what-is-an-angle.html', kicker: 'Chapter 1', title: 'Measuring Angles' },
       { href: 'trigonometry-overview.html', kicker: 'Chapter 2', title: 'Why Triangles?' },
-      { href: 'trigonometry-right-angled-triangles.html', kicker: 'Chapter 3', title: 'Right-Angled Triangles' },
-      { href: 'trigonometry-computing-sine-and-cosine.html', kicker: 'Chapter 4', title: 'Interpreting Sine and Cosine' },
+      { href: 'trigonometry-right-angled-triangles.html', kicker: 'Chapter 3', title: 'Deriving Angle-Ratio Correspondences' },
+      { href: 'trigonometry-computing-sine-and-cosine.html', kicker: 'Chapter 4', title: 'How to Think About Sine and Cosine' },
       { href: 'trigonometry-unit-circle.html', kicker: 'Chapter 5', title: 'The Unit Circle' },
       { href: 'trigonometry-polar-form.html', kicker: 'Chapter 6', title: 'Polar Form' },
       { href: 'trigonometry-coordinates-on-the-unit-circle.html', kicker: 'Archive', title: 'Misc' },

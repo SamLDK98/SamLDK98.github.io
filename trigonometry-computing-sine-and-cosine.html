@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interpreting Sine and Cosine | Trigonometry</title>
+  <title>How to Think About Sine and Cosine | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">Interpreting Sine and Cosine</h1>
+      <h1 class="essay-title">How to Think About Sine and Cosine</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -34,9 +34,11 @@
   <main>
     <article>
       <section class="essay-section">
-        <h3 class="subsection-title">Opposite and Adjacent Sides</h3>
+        <p>In the previous chapter we derived our first angle-ratio correspondences and introduced the names <em>sine</em> and <em>cosine</em>.</p>
 
-        <p>As we saw in the last chapter, there are no 'opposite' and 'adjacent' sides intrinsic to the triangle. They are relative to specific angles.</p>
+        <p>In this chapter we will formalise some of the terminology and develop a more intuitive understanding of these relationships.</p>
+
+        <h3 class="subsection-title">Hypotenuse, Opposite, and Adjacent</h3>
 
         <p>The opposite side of an angle is the side connecting the endpoints of the two sides that form the angle.</p>
 
@@ -57,7 +59,7 @@
           </svg>
         </figure>
 
-        <p>The bigger an angle is, the longer its opposite must be.</p>
+        <p>The larger the angle between two line segments, the longer the line connecting their endpoints must be.</p>
 
         <figure class="trig-figure trig-figure-bare sine-cosine-angle-figure sine-cosine-obtuse-figure">
           <svg viewBox="0 0 860 250" role="img" aria-label="An obtuse angle shown first without and then with its longer opposite side">
@@ -76,7 +78,53 @@
           </svg>
         </figure>
 
-        <p>For right-angled triangles, the 90 degree angle will always have the largest opposite side; however, of the remaining two (unless they are equal), there will be a larger and smaller angle.</p>
+        <p>In a right-angled triangle, no angle can be greater than $90^\circ$, so the line connecting the endpoints of the right angle must be the longest side.</p>
+
+        <p>We call the side opposite the right angle the <em>hypotenuse</em>.</p>
+
+        <p>It is useful to be able to spot it quickly. One way I like to identify it is to imagine completing the triangle into a rectangle or square. The hypotenuse is the side that cuts across the interior -- the diagonal line.</p>
+
+        <p>If there is another angle that is close to $90^\circ$ in the triangle, then it can be difficult to spot the hypotenuse. There will be two long sides. Such examples feature in 'Expert Mode' in the mini-game below.</p>
+
+        <iframe
+          class="essay-widget hypotenuse-practice-widget"
+          src="trigonometry/visualising-triangles/hypotenuse-practice-widget.html"
+          title="Interactive practice widget for identifying the hypotenuse in right-angled triangles"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>There is always a fixed hypotenuse, because there is always a $90^\circ$ angle in a right triangle; however, there is no fixed 'opposite' or 'adjacent' side.</p>
+
+        <p>They are literally just descriptions of sides in relation to an angle that you pick.</p>
+
+        <ul>
+          <li>"The side opposite to this angle."</li>
+          <li>"The side adjacent to this angle."</li>
+        </ul>
+
+        <p>'Adjacent' here really means, "The side forming this angle that is not the hypotenuse."</p>
+
+        <figure class="trig-figure trig-triangle-figure" data-right-triangle-labels>
+          <svg viewBox="0 0 520 320" role="img" aria-labelledby="right-triangle-ratio-labels-title-ch4">
+            <title id="right-triangle-ratio-labels-title-ch4">Right triangle labelled hypotenuse, opposite, and adjacent</title>
+            <polygon class="trig-triangle-fill" points="88,250 416,250 416,70" />
+            <line class="trig-line trig-line-adjacent" data-trig-base x1="88" y1="250" x2="416" y2="250" />
+            <line class="trig-line trig-line-cyan" data-trig-vertical x1="416" y1="250" x2="416" y2="70" />
+            <line class="trig-line trig-line-gold" x1="88" y1="250" x2="416" y2="70" />
+            <path class="trig-angle-arc" data-trig-arc d="M 148 250 A 60 60 0 0 0 141 219" />
+            <path class="trig-right-angle" d="M 386 250 L 386 220 L 416 220" />
+            <text class="trig-label" data-trig-theta x="157" y="241">&theta;</text>
+            <text class="trig-small-label trig-adjacent-text" data-trig-base-label x="227" y="275">adjacent</text>
+            <text class="trig-small-label trig-opposite-text" data-trig-vertical-label x="427" y="166">opposite</text>
+            <text class="trig-small-label trig-hypotenuse-text" x="180" y="116">hypotenuse</text>
+          </svg>
+          <div class="trig-figure-actions">
+            <button type="button" data-trig-switch>Switch</button>
+          </div>
+        </figure>
+
+        <p>Unless the other angles are both the same ($45^\circ$), there must be a longer and a shorter side.</p>
 
         <p>The larger angle has the longer opposite side. The smaller angle has the shorter opposite side.</p>
 
@@ -87,75 +135,81 @@
           <li>The longer side appears in either the cosine of the smaller angle or the sine of the larger angle.</li>
         </ul>
 
-        <h3 class="subsection-title">Thinking of Sine and Cosine as Percentages</h3>
+        <h3 class="subsection-title">Right Triangle Shapes</h3>
 
-        <p>A ratio compares the size of two quantities.</p>
+        <p>While the $90^\circ$ angle is fixed, the other angles are free to co-vary (they must add to $90^\circ$), meaning the triangle can take on different shapes.</p>
 
-        <p>One way to think about a ratio is as describing how many times one quantity fits into another. For example:</p>
+        <figure class="right-triangle-shape-strip" aria-label="Three right-angled triangles with different shapes">
+          <svg viewBox="0 0 840 230" role="img" aria-labelledby="right-triangle-shapes-title-ch4" xmlns="http://www.w3.org/2000/svg">
+            <title id="right-triangle-shapes-title-ch4">Tall, symmetric, and flat right-angled triangle shapes</title>
+            <g class="shape-panel" transform="translate(28 20)">
+              <path class="shape-fill" d="M92 168 L92 16 L119 168 Z" />
+              <path class="shape-leg" d="M92 168 L92 16" />
+              <path class="shape-leg" d="M92 168 L119 168" />
+              <path class="shape-hyp" d="M92 16 L119 168" />
+              <path class="shape-right-angle" d="M92 158 H102 V168" />
+            </g>
+            <g class="shape-panel" transform="translate(310 20)">
+              <path class="shape-fill" d="M34 168 L168 168 L34 34 Z" />
+              <path class="shape-leg" d="M34 168 L168 168" />
+              <path class="shape-leg" d="M34 168 L34 34" />
+              <path class="shape-hyp" d="M34 34 L168 168" />
+              <path class="shape-right-angle" d="M34 154 H48 V168" />
+            </g>
+            <g class="shape-panel" transform="translate(570 20)">
+              <path class="shape-fill" d="M24 168 L178 168 L24 140 Z" />
+              <path class="shape-leg" d="M24 168 L178 168" />
+              <path class="shape-leg" d="M24 168 L24 140" />
+              <path class="shape-hyp" d="M24 140 L178 168" />
+              <path class="shape-right-angle" d="M24 158 H34 V168" />
+            </g>
+          </svg>
+        </figure>
 
-        <p class="display-equation">$$\frac{8}{4}=2$$</p>
+        <h3 class="subsection-title">Sine and Cosine</h3>
 
-        <p>means that 4 fits into 8 exactly twice. However, when a ratio is less than 1, it is often easier to think of it as a percentage. If one quantity 'fits into' another 0.6 times, it is equivalent to saying that it is $60\%$ of the size.</p>
+        <p>We saw that sine and cosine were useful ratios for working out the lengths of unknown 'sides'.</p>
 
-        <p>This is always the case for sine and cosine because the numerator is always a side shorter than the length of the hypotenuse.</p>
+        <p>Sine and cosine take an angle as input and return a number. We can therefore think of them as functions. The symbol $\theta$ ("theta") is conventionally used to represent an unknown angle.</p>
 
         <p class="display-equation">$$\sin(\theta)=\frac{o}{h} \qquad \cos(\theta)=\frac{a}{h}$$</p>
 
-        <p>So if:</p>
+        <p>In a right-angled triangle, the hypotenuse is always the longest side. The other two sides must therefore be some fraction of its length.</p>
 
-        <p class="display-equation">$$\sin(30^\circ)=\frac{1}{2}=0.5$$</p>
+        <p class="display-equation">$$0<\frac{\text{Either other side}}{\text{Hypotenuse}}<1$$</p>
 
-        <p>then the opposite side is 50% the length of the hypotenuse.</p>
+        <p>Sine and cosine are therefore answering the question, "What fraction of the hypotenuse is this side?"</p>
 
-        <p>Also, remember that the side opposite one acute angle is adjacent to the other. The side opposite the $30^\circ$ angle <strong>is also the side</strong> adjacent to the $60^\circ$ angle.</p>
+        <p>Fractions, or numbers less than 1, are often easier to think of as percentages. If one quantity 'fits into' another 0.6 times, it is equivalent to saying that it is $60\%$ of the size.</p>
 
-        <p>Therefore if $\sin(30^\circ)=50\%$, then:</p>
+        <p>For example, if sine of $30^\circ$ is $.5$, then the side opposite this angle is 50% the length of the hypotenuse.</p>
 
-        <p class="display-equation">$$\cos(60^\circ)=50\%$$</p>
+        <p class="display-equation">$$\sin(30^\circ)=\frac{1}{2}=0.5=50 \%$$</p>
 
-        <p>because they are referring to the same side of the right-angled triangle.</p>
+        <p>Also, remember that the side opposite one acute angle is adjacent to the other.</p>
+
+        <p>The side opposite the $30^\circ$ angle <strong>is the same side</strong> that is adjacent to the $60^\circ$ angle.</p>
+
+        <p>Therefore:</p>
+
+        <p class="display-equation">$$\sin(30^\circ) = 50\%$$</p>
+
+        <p>implies</p>
+
+        <p class="display-equation">$$\cos(60^\circ) = 50\%$$</p>
+
+        <p>because both ratios refer to the same side of the triangle.</p>
 
         <blockquote>
           <p>You can think of the sine of an angle as describing what fraction of the hypotenuse lies opposite that angle, while the cosine describes what fraction of the hypotenuse lies adjacent to it.</p>
         </blockquote>
-
-        <h3 class="subsection-title">Thinking of Sine and Cosine in Terms of $x$- and $y$-Coordinates</h3>
-
-        <p>Imagine a line of length 1 extending from the origin.</p>
-
-        <p>If the line points directly upward, its endpoint has coordinates $(0,1)$, so its height is 1.</p>
-
-        <p>As the line rotates, and becomes slanted, its length remains the same, but its height changes.</p>
-
-        <p>Sine tells us what fraction of the line's maximum possible height remains.</p>
-
-        <p>For example, if:</p>
-
-        <p class="display-equation">$$\sin(\theta)=0.5$$</p>
-
-        <p>then the height of the endpoint is half of what it would be if the line were perfectly vertical.</p>
-
-        <p>Similarly, cosine tells us what fraction of the line's maximum possible horizontal length remains.</p>
-
-        <p>If:</p>
-
-        <p class="display-equation">$$\cos(\theta)=0.75$$</p>
-
-        <p>then the horizontal position of the endpoint is 75% of what it would be if the line were perfectly horizontal.</p>
-
-        <iframe
-          class="essay-widget sine-height-widget"
-          src="trigonometry/computing-sine-cosine/sine-height-widget.html"
-          title="Interactive widget showing sine as the height of a rotating unit line"
-          loading="lazy"
-        ></iframe>
 
         <hr class="section-divider" />
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
           <a class="chapter-nav-link" href="trigonometry-right-angled-triangles.html">
             <span>Previous</span>
-            <strong>Right-Angled Triangles</strong>
+            <strong>Deriving Angle-Ratio Correspondences</strong>
           </a>
           <a class="chapter-nav-link" href="trigonometry-unit-circle.html">
             <span>Next</span>
