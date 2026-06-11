@@ -139,8 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const setMode = (mode) => {
       const left = mode === 'left';
-      base.setAttribute('class', `trig-line ${left ? 'trig-line-adjacent' : 'trig-line-cyan'}`);
-      vertical.setAttribute('class', `trig-line ${left ? 'trig-line-cyan' : 'trig-line-adjacent'}`);
+      base.setAttribute('class', `trig-line ${left ? 'trig-line-leg-green' : 'trig-line-leg-gold'}`);
+      vertical.setAttribute('class', `trig-line ${left ? 'trig-line-leg-gold' : 'trig-line-leg-green'}`);
       baseLabel.setAttribute('class', `trig-small-label ${left ? 'trig-adjacent-text' : 'trig-opposite-text'}`);
       verticalLabel.setAttribute('class', `trig-small-label ${left ? 'trig-opposite-text' : 'trig-adjacent-text'}`);
       baseLabel.textContent = left ? 'adjacent' : 'opposite';

@@ -877,6 +877,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: auto;
 }
 
+.tower-angle-figure {
+  max-width: 760px;
+  margin: 1.6rem auto 1.9rem;
+}
+
 .newton-figure {
   max-width: 88%;
   margin-right: auto;
@@ -2301,16 +2306,17 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   stroke-dasharray: 9 10;
 }
 
-.trig-line-cyan {
-  stroke: var(--intro-jhat);
-}
-
-.trig-line-adjacent {
+.trig-line-leg-green {
   stroke: #78c884;
 }
 
-.trig-line-gold {
+.trig-line-leg-gold {
   stroke: #e7c84f;
+}
+
+.trig-line-hypotenuse {
+  stroke: #ef7398;
+  filter: drop-shadow(0 0 6px rgba(239, 115, 152, 0.25));
 }
 
 .trig-circle {
@@ -2326,7 +2332,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .trig-angle-arc,
 .trig-right-angle {
   fill: none;
-  stroke: var(--intro-accent);
+  stroke: #56c7ff;
   stroke-linecap: round;
   stroke-width: 4;
 }
@@ -2547,7 +2553,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .trig-label {
-  fill: var(--intro-accent);
+  fill: #56c7ff;
   font-family: "Fraunces", Georgia, serif;
   font-size: 30px;
 }
@@ -2560,8 +2566,8 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .trig-opposite-text {
-  color: var(--intro-jhat);
-  fill: var(--intro-jhat);
+  color: #e7c84f;
+  fill: #e7c84f;
 }
 
 .trig-adjacent-text {
@@ -2570,8 +2576,8 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .trig-hypotenuse-text {
-  color: #e7c84f;
-  fill: #e7c84f;
+  color: #ef7398;
+  fill: #ef7398;
 }
 
 .trig-ratio-equations {

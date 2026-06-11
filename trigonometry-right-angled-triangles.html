@@ -118,8 +118,8 @@
           <svg viewBox="0 0 520 300" role="img" aria-labelledby="equilateral-all-sides-title" xmlns="http://www.w3.org/2000/svg">
             <title id="equilateral-all-sides-title">Equilateral triangle with all sides labelled one and all angles labelled sixty degrees</title>
             <path class="triangle-fill" d="M104 236 H416 L260 56 Z" />
-            <path class="triangle-arc" d="M140 236 A36 36 0 0 0 122 205" />
-            <path class="triangle-arc" d="M380 236 A36 36 0 0 1 398 205" />
+            <path class="triangle-arc" d="M138 232 A34 34 0 0 0 128 209" />
+            <path class="triangle-arc" d="M382 232 A34 34 0 0 1 392 209" />
             <path class="triangle-arc" d="M242 86 A34 34 0 0 0 278 86" />
             <path class="triangle-hypotenuse" d="M104 236 L416 236" />
             <path class="triangle-hypotenuse" d="M416 236 L260 56" />
@@ -140,12 +140,9 @@
             <title id="equilateral-altitude-title">Line from top vertex to midpoint of the base</title>
             <path class="triangle-fill" d="M104 236 H416 L260 56 Z" />
             <path class="triangle-leg muted-leg triangle-altitude-line" d="M260 56 V236" />
-            <path class="triangle-right-angle" d="M260 210 H286 V236" />
-            <path class="triangle-right-angle" d="M234 236 V210 H260" />
             <path class="triangle-hypotenuse" d="M104 236 L416 236" />
             <path class="triangle-hypotenuse" d="M416 236 L260 56" />
             <path class="triangle-hypotenuse" d="M260 56 L104 236" />
-            <circle class="opening-snap-dot" cx="260" cy="236" r="4" />
             <text class="triangle-length-label" x="253" y="274">1</text>
             <text class="triangle-length-label" x="154" y="142">1</text>
             <text class="triangle-length-label" x="360" y="142">1</text>
@@ -171,8 +168,9 @@
             <path class="triangle-arc" d="M237.3 120.6 A30 30 0 0 0 260 131" />
             <path class="triangle-arc" d="M260 131 A30 30 0 0 0 282.7 120.6" />
             <path class="triangle-arc" d="M389.5 213.1 A35 35 0 0 0 381 236" />
-            <path class="triangle-leg" d="M104 236 H260 V101" />
-            <path class="triangle-leg" d="M260 236 H416" />
+            <path class="triangle-leg triangle-half-bottom-side" d="M104 236 H260" />
+            <path class="triangle-leg triangle-half-bottom-side" d="M260 236 H416" />
+            <path class="triangle-leg" d="M260 236 V101" />
             <path class="triangle-leg muted-leg" d="M260 236 V101" />
             <path class="triangle-hypotenuse" d="M104 236 L260 101" />
             <path class="triangle-hypotenuse" d="M260 101 L416 236" />
@@ -182,12 +180,12 @@
             <text class="triangle-label" x="424" y="229">60&#176;</text>
             <text class="triangle-length-label" x="158" y="154">1</text>
             <text class="triangle-length-label" x="354" y="154">1</text>
+            <text class="triangle-length-label half-length-label" x="164" y="274">1/2</text>
+            <text class="triangle-length-label half-length-label" x="320" y="274">1/2</text>
           </svg>
         </figure>
 
-        <p>Each right-angled triangle in this construction therefore contains the angles:</p>
-
-        <p class="display-equation">$$30^\circ, \quad 60^\circ, \quad 90^\circ$$</p>
+        <p>Each right-angled triangle in this construction therefore contains the angles: $30^\circ, \ \ 60^\circ, \ \ 90^\circ$.</p>
 
         <p>And has a hypotenuse of $1$ and one leg of $\frac{1}{2}$.</p>
 
@@ -211,10 +209,12 @@
 
         <p>We can find the remaining side using Pythagoras' theorem:</p>
 
-        <p class="display-equation">$$\left(\frac{1}{2}\right)^2 + x^2 = 1^2$$</p>
-        <p class="display-equation">$$\frac{1}{4} + x^2 = 1$$</p>
-        <p class="display-equation">$$x^2 = \frac{3}{4}$$</p>
-        <p class="display-equation">$$x = \frac{\sqrt{3}}{2}$$</p>
+        <p class="display-equation equation-plain">$$\begin{gathered}
+\left(\frac{1}{2}\right)^2 + x^2 = 1^2 \\
+\frac{1}{4} + x^2 = 1 \\
+x^2 = \frac{3}{4} \\
+x = \frac{\sqrt{3}}{2}
+\end{gathered}$$</p>
 
         <p>We now have:</p>
 
@@ -248,42 +248,50 @@
 
         <p>So we could also think of this as mapping one angle to a set of side-length ratios.</p>
 
-        <p class="display-equation">$$30^\circ \longleftrightarrow 1 : \frac{1}{2} : \frac{\sqrt{3}}{2}$$</p>
-        <p class="display-equation">$$60^\circ \longleftrightarrow 1 : \frac{1}{2} : \frac{\sqrt{3}}{2}$$</p>
+        <p class="display-equation">$$30^\circ \implies 1 : \frac{1}{2} : \frac{\sqrt{3}}{2}$$</p>
+        <p class="display-equation">$$60^\circ \implies 1 : \frac{1}{2} : \frac{\sqrt{3}}{2}$$</p>
 
         <p>However, it does not immediately tell us what the length of the side opposite or adjacent to each angle is. Of course, we know that the smaller angle must be opposite the smaller side length; however, it would be nice to have this mapped one-to-one.</p>
 
         <p>We could record our information like this:</p>
 
-        <p class="display-equation">$$30^\circ \qquad \text{is opposite to the side of length} \qquad\frac{1}{2}$$</p>
-        <p class="display-equation">$$30^\circ \qquad \text{is adjacent to the side of length} \qquad \frac{\sqrt{3}}{2}$$</p>
-        <p class="display-equation">$$60^\circ \qquad \text{is opposite to the side of length} \qquad \frac{\sqrt{3}}{2}$$</p>
-        <p class="display-equation">$$60^\circ \qquad \text{is adjacent to the side of length} \qquad\frac{1}{2}$$</p>
+        <p class="display-equation equation-plain">$$\begin{gathered}
+30^\circ \qquad \text{is opposite to the side of length} \qquad \frac{1}{2} \\[0.25em]
+30^\circ \qquad \text{is adjacent to the side of length} \qquad \frac{\sqrt{3}}{2} \\[0.25em]
+60^\circ \qquad \text{is opposite to the side of length} \qquad \frac{\sqrt{3}}{2} \\[0.25em]
+60^\circ \qquad \text{is adjacent to the side of length} \qquad \frac{1}{2}
+\end{gathered}$$</p>
 
-        <p>That way, if we knew the angle between the ground and some building was $30^\circ$ we could immediately see that the height of this building must be $\frac{1}{2}$ of the hypotenuse.</p>
+        <p>Let's say we wanted to know the height of some building.</p>
 
-        <p>We could measure the distance along the ground between our position and the building. This would give us an absolute length for the adjacent side. Let's say it's 50 meters.</p>
+        <figure class="essay-figure tower-angle-figure">
+          <img src="images/tower_angle_cutout.png" alt="A man standing on the ground looking up at a tower, with a sight line forming a right triangle to the top of the tower.">
+        </figure>
 
-        <p>We can see that this length must be $\frac{\sqrt{3}}{2}$ of the hypotenuse, therefore the hypotenuse is $50 \div \frac{\sqrt{3}}{2}$.</p>
+        <p>If we measure the angle between it and the ground as $30^\circ$, we could look at our table of information and immediately see that the height must be $\frac{1}{2}$ of the hypotenuse.</p>
 
-        <p>We know that the height of the building must be half that.</p>
+        <p>We can't measure the hypotenuse directly, and we obviously can't measure the building's height directly (because we are trying to find it using trig!), but we can walk along the ground and measure the distance between the position we took the angle from and the building.</p>
+
+        <p>This distance is the absolute length of the adjacent side to our $30^\circ$ angle.</p>
+
+        <p>It's 50 meters.</p>
+
+        <p>Looking at our table of information we see that this must be $\frac{\sqrt{3}}{2}$ of the hypotenuse, therefore the hypotenuse is 50 times the reciprocal of that.</p>
+
+        <p class="display-equation">$$50\cdot\frac{2}{\sqrt{3}}\approx 57.7$$</p>
+
+        <p>We know that the height of the building must be half that: $\approx 28.9$.</p>
 
         <p>These ratios were used so frequently, they were given their own names: sine and cosine. We could rewrite the above information as:</p>
 
-        <p class="display-equation">$$\sin(30^\circ) =\frac{1}{2}$$</p>
-        <p class="display-equation">$$\cos(30^\circ) = \frac{\sqrt{3}}{2}$$</p>
-        <p class="display-equation">$$\sin(60^\circ) =\frac{\sqrt{3}}{2}$$</p>
-        <p class="display-equation">$$\cos(60^\circ) =\frac{1}{2}$$</p>
+        <p class="display-equation equation-plain">$$\begin{gathered}
+\sin(30^\circ) = \frac{1}{2} \\[0.25em]
+\cos(30^\circ) = \frac{\sqrt{3}}{2} \\[0.25em]
+\sin(60^\circ) = \frac{\sqrt{3}}{2} \\[0.25em]
+\cos(60^\circ) = \frac{1}{2}
+\end{gathered}$$</p>
 
         <p>While the above example was relatively straightforward to derive geometrically, many other angles were considerably more difficult. Trigonometric tables therefore allowed people to look up these values directly rather than deriving them from scratch each time.</p>
-
-        <iframe
-          class="essay-widget historical-trigonometrist-widget essay-widget-autosize"
-          src="trigonometry/right-angled-triangles/historical-trigonometrist-widget.html"
-          title="Interactive widget about historical trigonometric tables"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
 
         <hr class="section-divider" />
 
