@@ -14,9 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { href: 'trigonometry-oscillations.html', kicker: 'Chapter 6', title: 'Oscillations' },
       { href: 'trigonometry-waves.html', kicker: 'Chapter 7', title: 'Waves' },
       { href: 'trigonometry-algebra-branch.html', kicker: 'Chapter 8', title: 'Algebra Branch' },
-      { href: 'trigonometry-complex-numbers.html', kicker: 'Chapter 9', title: 'Complex Numbers' },
-      { href: 'trigonometry-polar-form.html', kicker: 'Chapter 10', title: 'Polar Form' },
-      { href: 'trigonometry-eulers-formula.html', kicker: 'Chapter 11', title: "Euler's Formula" },
+      { href: 'trigonometry-eulers-formula.html', kicker: 'Chapter 10', title: "Euler's Formula" },
       { href: 'trigonometry-coordinates-on-the-unit-circle.html', kicker: 'Archive', title: 'Misc' },
     ];
     const currentPage = window.location.pathname.split('/').pop();

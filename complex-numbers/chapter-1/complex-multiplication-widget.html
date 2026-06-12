@@ -6,33 +6,33 @@
 <title>Complex Multiplication</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #161311;
-    --bg-elev: #1e1a17;
-    --bg-card: #221d1a;
-    --text: #ece2d1;
-    --text-dim: #a89c87;
-    --text-faint: #6f6557;
-    --rule: rgba(214, 196, 168, 0.12);
-    --rule-strong: rgba(214, 196, 168, 0.22);
-    --accent: #d4b888;
-    --accent-glow: rgba(212, 184, 136, 0.4);
-    --sin: #6dd3c4;
-    --sin-glow: rgba(109, 211, 196, 0.4);
-    --cos: #e8a13b;
-    --cos-glow: rgba(232, 161, 59, 0.4);
-    --point: #ef7398;
-    --point-glow: rgba(239, 115, 152, 0.45);
-    --axis: rgba(236, 226, 209, 0.4);
-    --grid: rgba(236, 226, 209, 0.045);
+    --bg: #0d0c16;
+    --bg-elev: #14131f;
+    --bg-card: #191827;
+    --text: #dcdcea;
+    --text-dim: #9a98b5;
+    --text-faint: #5d5b77;
+    --rule: rgba(168, 154, 255, 0.12);
+    --rule-strong: rgba(168, 154, 255, 0.4);
+    --accent: #a89aff;
+    --accent-glow: rgba(168, 154, 255, 0.4);
+    --sin: #a86bff;
+    --sin-glow: rgba(168, 107, 255, 0.4);
+    --cos: #45e0e6;
+    --cos-glow: rgba(69, 224, 230, 0.4);
+    --point: #ff4fa3;
+    --point-glow: rgba(255, 79, 163, 0.45);
+    --axis: rgba(220, 220, 234, 0.4);
+    --grid: rgba(220, 220, 234, 0.045);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'EB Garamond', Georgia, serif;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
     font-size: 17px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -40,20 +40,20 @@
   body {
     min-height: 100vh;
     padding: 1.5rem 1rem;
-    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+    background-image: radial-gradient(ellipse at top, rgba(168, 154, 255, 0.04), transparent 55%);
   }
   .widget {
     max-width: 1080px;
     margin: 0 auto;
     background: var(--bg-elev);
     border: 1px solid var(--rule);
-    border-radius: 4px;
+    border-radius: 0;
     overflow: hidden;
     position: relative;
   }
   .widget::before {
     content: ""; position: absolute; inset: 0;
-    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(220, 220, 234, 0.012) 2px, rgba(220, 220, 234, 0.012) 3px);
     pointer-events: none;
   }
   .viz-wrap {
@@ -99,7 +99,7 @@
   .footer {
     padding: 0.85rem 1.6rem;
     border-top: 1px solid var(--rule);
-    font-family: 'EB Garamond', serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-style: italic;
     font-size: 0.84rem;
     color: var(--text-faint);
@@ -109,7 +109,7 @@
   .axis { stroke: var(--axis); stroke-width: 1.4; }
   .grid-line { stroke: var(--grid); stroke-width: 1; }
   .unit-circle-ghost {
-    stroke: rgba(236, 226, 209, 0.22);
+    stroke: rgba(220, 220, 234, 0.22);
     stroke-width: 1.2;
     stroke-dasharray: 3 6;
     fill: none;
@@ -121,7 +121,7 @@
   }
   .axis-name {
     fill: var(--text-dim);
-    font-family: 'EB Garamond', serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-style: italic;
     font-size: 14px;
   }
@@ -158,7 +158,7 @@
   .pt-label.p { fill: var(--point); }
   .offchart-note {
     fill: var(--point);
-    font-family: 'EB Garamond', serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-style: italic;
     font-size: 15px;
   }

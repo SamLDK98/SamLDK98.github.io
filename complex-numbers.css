@@ -1,0 +1,386 @@
+/* ==========================================================================
+   Complex Numbers — section stylesheet
+   "The void off the number line": a cold, instrument-like darkness. Near-
+   black ultraviolet space, hairline HUD geometry, sharp corners, spaced-caps
+   display type, sans-serif body. Phosphor inks: cyan for the real axis,
+   violet for the imaginary, magenta for points, pale lavender linework.
+   Same darkness as night — but an observatory, not a candlelit study.
+   ========================================================================== */
+
+/* ——— Section index page ——— */
+
+.complex-numbers-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 60% 40% at 12% 0%, rgba(69, 224, 230, 0.05), transparent),
+    radial-gradient(ellipse 55% 45% at 92% 12%, rgba(168, 107, 255, 0.055), transparent),
+    radial-gradient(ellipse 120% 90% at 50% 110%, rgba(13, 12, 26, 0) 40%, rgba(5, 4, 10, 0.6) 100%),
+    #0d0c16;
+  color: #dcdcea;
+}
+
+.complex-numbers-page .cn-index-hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 5.4rem) 1.4rem 1.1rem;
+  display: block;
+  text-align: center;
+}
+
+.complex-numbers-page .article-index-hero h1 {
+  color: #e9e8f7;
+  font-family: "Space Grotesk", var(--font-head, sans-serif);
+  font-size: clamp(1.7rem, 4.6vw, 3.3rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em; /* optically recentre spaced caps */
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.complex-numbers-page .article-index-rule {
+  width: min(100%, 36rem);
+  height: 1px;
+  margin: 1.7rem auto 0;
+  background: linear-gradient(90deg, transparent, rgba(69, 224, 230, 0.7), rgba(168, 107, 255, 0.65), transparent);
+}
+
+.complex-numbers-page .article-index-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.7rem 1.4rem 5rem;
+}
+
+.complex-numbers-page .cn-chapter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+.complex-numbers-page .cn-chapter-card {
+  position: relative;
+  min-height: 13.5rem;
+  padding: 1.35rem 1.4rem 1.2rem;
+  border: 1px solid rgba(168, 154, 255, 0.16);
+  border-radius: 0;
+  background: linear-gradient(165deg, rgba(25, 24, 39, 0.9), rgba(13, 12, 22, 0.97));
+  color: #dcdcea;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* HUD corner brackets instead of a coloured top bar */
+
+.complex-numbers-page .cn-chapter-card::before,
+.complex-numbers-page .cn-chapter-card::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+  transition: border-color 0.2s ease;
+}
+
+.complex-numbers-page .cn-chapter-card::before {
+  top: 7px;
+  left: 7px;
+  border-top: 1.5px solid rgba(69, 224, 230, 0.55);
+  border-left: 1.5px solid rgba(69, 224, 230, 0.55);
+}
+
+.complex-numbers-page .cn-chapter-card::after {
+  bottom: 7px;
+  right: 7px;
+  border-bottom: 1.5px solid rgba(168, 107, 255, 0.55);
+  border-right: 1.5px solid rgba(168, 107, 255, 0.55);
+}
+
+.complex-numbers-page .cn-chapter-card:hover,
+.complex-numbers-page .cn-chapter-card:focus-visible {
+  border-color: rgba(69, 224, 230, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba(69, 224, 230, 0.12), 0 0 34px rgba(69, 224, 230, 0.07), 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.complex-numbers-page .cn-chapter-card:hover::before,
+.complex-numbers-page .cn-chapter-card:focus-visible::before {
+  border-color: rgba(69, 224, 230, 0.95);
+}
+
+.complex-numbers-page .cn-chapter-card:hover::after,
+.complex-numbers-page .cn-chapter-card:focus-visible::after {
+  border-color: rgba(255, 79, 163, 0.85);
+}
+
+.complex-numbers-page .cn-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.complex-numbers-page .cn-card-number {
+  display: block;
+  color: #45e0e6;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.6rem;
+  line-height: 1.2;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.complex-numbers-page .article-card-title {
+  max-width: 14em;
+  color: #ecebf9;
+  font-family: "Space Grotesk", var(--font-body, sans-serif);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+}
+
+.complex-numbers-page .cn-card-summary {
+  display: block;
+  max-width: 26rem;
+  margin-top: 0.85rem;
+  color: #9a98b5;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cn-card-glyph {
+  display: inline-flex;
+}
+
+.cn-card-glyph svg {
+  width: 2rem;
+  height: 2rem;
+  display: block;
+}
+
+.cn-card-glyph .g-stroke {
+  fill: none;
+  stroke: rgba(168, 154, 255, 0.45);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s ease;
+}
+
+.cn-card-glyph .g-dot {
+  fill: rgba(168, 154, 255, 0.65);
+  transition: fill 0.3s ease;
+}
+
+.complex-numbers-page .cn-chapter-card:hover .cn-card-glyph .g-stroke,
+.complex-numbers-page .cn-chapter-card:focus-visible .cn-card-glyph .g-stroke {
+  stroke: #45e0e6;
+}
+
+.complex-numbers-page .cn-chapter-card:hover .cn-card-glyph .g-dot,
+.complex-numbers-page .cn-chapter-card:focus-visible .cn-card-glyph .g-dot {
+  fill: #ff4fa3;
+}
+
+/* ——— Hero motif: a static chart — the powers of one number, spiralling in ——— */
+
+.cn-hero-motif {
+  width: min(100%, 840px);
+  margin: 2rem auto 0.1rem;
+}
+
+.cn-hero-motif svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.cn-chart-axis {
+  stroke: rgba(220, 220, 234, 0.13);
+  stroke-width: 1;
+}
+
+.cn-chart-tick {
+  stroke: rgba(220, 220, 234, 0.22);
+  stroke-width: 1;
+}
+
+.cn-chart-circle {
+  fill: none;
+  stroke: rgba(168, 154, 255, 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+
+.cn-chart-trail {
+  fill: none;
+  stroke: rgba(168, 154, 255, 0.22);
+  stroke-width: 1;
+}
+
+.cn-chart-dot {
+  fill: #a89aff;
+}
+
+.cn-chart-dot-z {
+  fill: #ff4fa3;
+  filter: drop-shadow(0 0 6px rgba(255, 79, 163, 0.5));
+}
+
+.cn-chart-label {
+  fill: #5d5b77;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 12px;
+}
+
+.cn-chart-caption {
+  fill: #5d5b77;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* ——— Chapter pages: void re-skin of the shared chapter layout ——— */
+
+.complex-numbers-chapter.intro-linear-algebra-page {
+  --intro-bg: #0d0c16;
+  --intro-panel: #14131f;
+  --intro-card: #191827;
+  --intro-rule: rgba(168, 154, 255, 0.16);
+  --intro-rule-strong: rgba(168, 154, 255, 0.3);
+  --intro-text: #dcdcea;
+  --intro-dim: #9a98b5;
+  --intro-faint: #5d5b77;
+  --intro-accent: #a89aff;
+  --intro-ihat: #45e0e6;
+  --intro-jhat: #a86bff;
+  background:
+    radial-gradient(ellipse 60% 35% at 10% 0%, rgba(69, 224, 230, 0.045), transparent),
+    radial-gradient(ellipse 55% 40% at 95% 8%, rgba(168, 107, 255, 0.05), transparent),
+    var(--intro-bg);
+  color: var(--intro-text);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+.complex-numbers-chapter.intro-linear-algebra-page .chapter-kicker {
+  color: #45e0e6;
+  letter-spacing: 0.3em;
+  opacity: 0.8;
+}
+
+.complex-numbers-chapter.intro-linear-algebra-page .essay-title {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.7rem, 4.2vw, 3.2rem);
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  text-transform: uppercase;
+}
+
+.complex-numbers-chapter.intro-linear-algebra-page .subsection-title {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #45e0e6;
+}
+
+.complex-numbers-chapter.intro-linear-algebra-page .display-equation {
+  border-radius: 0;
+  border-color: rgba(168, 154, 255, 0.18);
+  background: rgba(10, 9, 18, 0.55);
+}
+
+.complex-numbers-chapter.intro-linear-algebra-page .trig-figure {
+  border-radius: 0;
+}
+
+/* chapter nav: pale instrument links, cyan hover (never trig's gold) */
+
+.complex-numbers-chapter .chapter-nav-link {
+  border: 1px solid rgba(168, 154, 255, 0.22);
+  border-radius: 0;
+  color: #dcdcea;
+}
+
+.complex-numbers-chapter .chapter-nav-link span {
+  color: #5d5b77;
+}
+
+.complex-numbers-chapter .chapter-nav-link:hover,
+.complex-numbers-chapter .chapter-nav-link:focus-visible,
+.complex-numbers-chapter .chapter-nav-link:active {
+  border-color: #45e0e6;
+  color: #45e0e6;
+}
+
+.complex-numbers-chapter .chapter-nav-link:hover span,
+.complex-numbers-chapter .chapter-nav-link:focus-visible span,
+.complex-numbers-chapter .chapter-nav-link:active span {
+  color: #45e0e6;
+}
+
+/* the "where does i live?" figure, re-inked for the void */
+
+.complex-numbers-chapter .i-off-line-figure .numline-axis {
+  stroke: rgba(220, 220, 234, 0.4);
+}
+
+.complex-numbers-chapter .i-off-line-figure svg marker path {
+  fill: rgba(220, 220, 234, 0.4);
+}
+
+.complex-numbers-chapter .i-off-line-figure .numline-ticks line {
+  stroke: rgba(220, 220, 234, 0.4);
+}
+
+.complex-numbers-chapter .i-off-line-figure .numline-ticks text {
+  fill: #9a98b5;
+}
+
+.complex-numbers-chapter .i-off-line-figure .i-floating {
+  fill: #ff4fa3;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-style: italic;
+}
+
+.complex-numbers-chapter .i-off-line-figure .i-question {
+  fill: #5d5b77;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+.complex-numbers-chapter .i-off-line-figure .i-dashed-drop {
+  stroke: rgba(255, 79, 163, 0.45);
+}
+
+/* ——— Responsive ——— */
+
+@media (max-width: 760px) {
+  .complex-numbers-page .cn-index-hero {
+    padding-top: 2.4rem;
+  }
+
+  .complex-numbers-page .article-index-hero h1 {
+    letter-spacing: 0.18em;
+    text-indent: 0.18em;
+  }
+
+  .complex-numbers-page .cn-chapter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .complex-numbers-page .cn-chapter-card {
+    min-height: 11rem;
+  }
+
+  .cn-card-glyph svg {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+}
