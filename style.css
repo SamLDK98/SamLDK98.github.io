@@ -2127,7 +2127,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .trigonometry-unit-circle-page .angle-growth-widget {
   width: min(100%, 920px);
-  height: 330px;
+  height: 370px;
 }
 
 .intro-linear-algebra-page .unit-circle-coupled-motion-widget {
