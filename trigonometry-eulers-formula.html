@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Euler's Formula | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-eulers-formula-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Euler's Formula</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Three stories have been told in this course.</p>
+
+        <p>The geometric branch began with the question "what is an angle?" and ended with circles, sine and cosine as coordinates, and waves as the shadows of rotation.</p>
+
+        <p>The algebra branch began with repeated multiplication and ended with continuous growth, the number $e$, and an infinite series for $e^x$ built from powers over factorials.</p>
+
+        <p>The complex numbers turned rotation into arithmetic: multiplying by a unit-length number rotates, angles add like exponents, and a daring guess took shape -- that $e^{i\theta}$, growth forever pushed sideways, ought to be <em>rotation by</em> $\theta$.</p>
+
+        <p>A guess is not knowledge. In this chapter, we do the calculation.</p>
+
+        <p>Everything you have learned is about to converge on a single line of mathematics.</p>
+
+        <h3 class="subsection-title">The Test</h3>
+
+        <p>How do you test a guess about $e^{i\theta}$? You need a definition of $e^{x}$ solid enough to survive a strange input.</p>
+
+        <p>We own one. From the algebra branch:</p>
+
+        <p class="display-equation">$$e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \cdots$$</p>
+
+        <p>Look at what this recipe actually asks of its input. Raise it to powers -- that is repeated multiplication. Divide by factorials. Add everything up.</p>
+
+        <p>Multiply and add. That is all.</p>
+
+        <p>And multiplying and adding complex numbers is precisely what we spent the last chapter learning to do. The series doesn't care that nobody had triangles in mind when it was built from compound interest. It will accept any input we can multiply and add.</p>
+
+        <p>So feed it the quarter-turned input. Set $x = i\theta$.</p>
+
+        <h3 class="subsection-title">Feeding the Machine</h3>
+
+        <p>Substituting:</p>
+
+        <p class="display-equation">$$e^{i\theta} = 1 + i\theta + \frac{(i\theta)^2}{2!} + \frac{(i\theta)^3}{3!} + \frac{(i\theta)^4}{4!} + \frac{(i\theta)^5}{5!} + \cdots$$</p>
+
+        <p>Each term contains a power of $i$ -- and we know exactly what powers of $i$ do. They cycle. Quarter-turn after quarter-turn: $i, -1, -i, 1$, then round again, forever.</p>
+
+        <p>Apply the cycle term by term:</p>
+
+        <p class="display-equation">$$(i\theta)^2 = -\theta^2 \qquad (i\theta)^3 = -i\theta^3 \qquad (i\theta)^4 = \theta^4 \qquad (i\theta)^5 = i\theta^5$$</p>
+
+        <p>So the series becomes:</p>
+
+        <p class="display-equation">$$e^{i\theta} = 1 + i\theta - \frac{\theta^2}{2!} - i\frac{\theta^3}{3!} + \frac{\theta^4}{4!} + i\frac{\theta^5}{5!} - \cdots$$</p>
+
+        <p>Now sort the terms into two piles: those without an $i$, and those with one. (We are allowed to -- the real and imaginary parts of a complex number never mix.)</p>
+
+        <p class="display-equation">$$e^{i\theta} = \left(1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \cdots\right) + i\left(\theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \cdots\right)$$</p>
+
+        <p>Study the structure that has appeared, because the series did this entirely on its own.</p>
+
+        <p>The even powers landed in the first pile, the odd powers in the second. And running through each pile is an alternating sign pattern, $+,-,+,-$, stamped there by $i^2 = -1$ striking every second visit.</p>
+
+        <p>The quarter-turn rhythm of $i$ has sorted growth's series into <strong>two interleaved families</strong>: even powers, and odd powers, each with alternating signs, each still wearing its factorial.</p>
+
+        <p>Keep both piles in view. We are about to meet them somewhere else.</p>
+
+        <h3 class="subsection-title">Two Familiar Strangers</h3>
+
+        <p>At the end of the algebra branch, I mentioned that sine and cosine can also be written as infinite series -- built from the same parts as $e^x$, but with "half the terms missing, and alternating signs".</p>
+
+        <p>Here they are:</p>
+
+        <p class="display-equation">$$\cos\theta = 1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \frac{\theta^6}{6!} + \cdots$$</p>
+
+        <p class="display-equation">$$\sin\theta = \theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \frac{\theta^7}{7!} + \cdots$$</p>
+
+        <p>Cosine has taken the even powers. Sine has taken the odd ones. Alternating signs. Factorials below.</p>
+
+        <p>Deriving these two series properly requires tools from calculus that this course has deliberately avoided, so this is the one place I will ask you to accept a result on evidence rather than construction. But the evidence is easy to gather.</p>
+
+        <p>Set $\theta = 0$: the cosine series gives $1$ and the sine series gives $0$ -- exactly where the point $(\cos\theta, \sin\theta)$ sits on the unit circle at angle zero.</p>
+
+        <p>For a tiny angle, the sine series says $\sin\theta \approx \theta$, with only microscopic corrections. That is a fact you already own from the geometric branch: measured in radians, a tiny angle's height is almost exactly its arc. The series knows about radians.</p>
+
+        <p>And numerically the agreement is devastating. Take $\theta = \frac{\pi}{6}$, where we know $\sin\theta$ is exactly $\frac{1}{2}$. Three terms of the series give:</p>
+
+        <p class="display-equation">$$\frac{\pi}{6} - \frac{(\pi/6)^3}{3!} + \frac{(\pi/6)^5}{5!} = 0.5000...$$</p>
+
+        <p>Test both series yourself, anywhere along the wave:</p>
+
+        <iframe
+          class="essay-widget sin-cos-series-widget"
+          src="trigonometry/eulers-formula/sin-cos-series-widget.html"
+          title="Interactive widget building the sine and cosine waves from their infinite series, term by term"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Pause on how strange this is in its own right. Sine and cosine were born as <em>ratios of triangle sides</em>. Yet here they are, computable to any precision by nothing but multiplying and adding -- the same powers, the same factorials, as the series for growth.</p>
+
+        <p>The two halves of this course have been speaking the same language all along.</p>
+
+        <h3 class="subsection-title">The Meeting Point</h3>
+
+        <p>Now place the pieces side by side.</p>
+
+        <p>From feeding $i\theta$ into the exponential series:</p>
+
+        <p class="display-equation">$$e^{i\theta} = \underbrace{\left(1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \cdots\right)}_{\text{even powers, alternating signs}} + \; i\underbrace{\left(\theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \cdots\right)}_{\text{odd powers, alternating signs}}$$</p>
+
+        <p>The first pile <em>is</em> the cosine series. The second pile <em>is</em> the sine series. Not approximately -- term for term, sign for sign, factorial for factorial.</p>
+
+        <p>So:</p>
+
+        <p class="display-equation">$$\Large e^{i\theta} = \cos\theta + i\sin\theta$$</p>
+
+        <p>This is <strong>Euler's Formula</strong>.</p>
+
+        <p>Read it slowly.</p>
+
+        <p>The left-hand side is pure algebra branch. Its ancestry is repeated multiplication, bank interest paid in ever-finer instalments, a limiting number discovered in the bookkeeping of continuous growth.</p>
+
+        <p>The right-hand side is pure geometric branch. Its ancestry is triangles, ratios of sides, shadows cast on the axes by a point moving around a circle.</p>
+
+        <p>At no point did we tell the left side about triangles. We fed the growth machine one strange input -- a quarter-turned number -- and trigonometry fell out of it. The two oldest subjects in this course were never separate subjects. <strong>Growth, viewed sideways, is rotation.</strong></p>
+
+        <p>You can watch the identity assemble itself. Below, the terms of the series are drawn as arrows, tip to tail: each one is the previous arrow given a quarter-turn and shrunk by the next factorial. The chain spirals inwards -- always onto the unit circle, always onto $\cos\theta + i\sin\theta$:</p>
+
+        <iframe
+          class="essay-widget euler-spiral-widget"
+          src="trigonometry/eulers-formula/euler-spiral-widget.html"
+          title="Interactive widget drawing the series terms of e to the i theta as arrows tip to tail, spiralling onto the point cosine theta plus i sine theta on the unit circle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">Why $e^{i\theta}$ Traces a Circle</h3>
+
+        <p>Euler's Formula hands us its first consequence immediately. How far is $e^{i\theta}$ from the origin?</p>
+
+        <p>Its real part is $\cos\theta$ and its imaginary part is $\sin\theta$, so its distance from the origin is:</p>
+
+        <p class="display-equation">$$\sqrt{\cos^2\theta + \sin^2\theta} = \sqrt{1} = 1$$</p>
+
+        <p>That square root is Pythagoras on the unit circle -- the very first identity the geometric branch gave us. Whatever $\theta$ is, $e^{i\theta}$ sits at distance exactly 1.</p>
+
+        <p><strong>Every imaginary exponential lives on the unit circle.</strong> As $\theta$ runs, the point runs around the rim. The exponential -- the function whose whole reputation is explosive growth -- never grows at all when its input is imaginary. It only turns.</p>
+
+        <p>This confirms the sideways-growth intuition from last chapter, and it settles what the angle means. Back in Chapter 1, radians measured an angle by <em>arc length</em>. So:</p>
+
+        <p>$e^{i\theta}$ is <strong>the point you reach by walking a distance $\theta$ along the rim of the unit circle</strong>, starting from 1.</p>
+
+        <iframe
+          class="essay-widget rim-walk-widget"
+          src="trigonometry/eulers-formula/rim-walk-widget.html"
+          title="Interactive widget where a walker travels a chosen distance along the unit circle rim, landing at e to the i theta"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">Rotation, Multiplication, Exponentiation</h3>
+
+        <p>In the last chapter we noticed something suspicious: complex multiplication <em>adds angles</em>, just as exponents add. We called it an echo.</p>
+
+        <p>It was not an echo. With Euler's Formula, the angles literally <em>are</em> exponents, and the suspicious rule is just the oldest law of the algebra branch doing its job:</p>
+
+        <p class="display-equation">$$e^{i\theta_1} \cdot e^{i\theta_2} = e^{i(\theta_1+\theta_2)}$$</p>
+
+        <p>Rotate by $\theta_1$, then by $\theta_2$, and you have rotated by $\theta_1 + \theta_2$. The geometry of turning and the algebra of exponents are the same bookkeeping.</p>
+
+        <p>It also explains why multiplying by a unit complex number rotates. Multiplying any $z$ by $e^{i\theta}$ adds $\theta$ to $z$'s angle and multiplies $z$'s length by $\left|e^{i\theta}\right| = 1$ -- a turn with no stretch:</p>
+
+        <iframe
+          class="essay-widget euler-rotation-widget"
+          src="trigonometry/eulers-formula/euler-rotation-widget.html"
+          title="Interactive widget multiplying a draggable complex number by e to the i theta, rotating it without changing its length"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>And polar form reaches its final, cleanest shape. A complex number with length $r$ and angle $\theta$ is:</p>
+
+        <p class="display-equation">$$z = r(\cos\theta + i\sin\theta) = re^{i\theta}$$</p>
+
+        <p>Length, times rotation. Two symbols.</p>
+
+        <h3 class="subsection-title">Oscillation, Completed</h3>
+
+        <p>One more thread to tie. In the Waves chapter, we summarised every pure wave with three numbers:</p>
+
+        <p class="display-equation">$$x(t) = A\sin(2\pi f t + \varphi)$$</p>
+
+        <p>In the Complex Numbers chapter, we saw that an oscillation is the shadow of a rotation.</p>
+
+        <p>Euler's Formula fuses the two statements. A point circling at $f$ revolutions per second is:</p>
+
+        <p class="display-equation">$$z(t) = e^{i 2\pi f t}$$</p>
+
+        <p>The whole apparatus of circular motion -- both coordinates, the coupling between them, the wrap-around at $2\pi$ -- compressed into one exponential of time. Scale it by $A$ and start it $\varphi$ into its cycle, and the wave we wrote in the Waves chapter is simply the imaginary-part shadow of:</p>
+
+        <p class="display-equation">$$A\,e^{i(2\pi f t + \varphi)}$$</p>
+
+        <p>This is why scientists and engineers reach for $e^{i\theta}$ the moment anything oscillates. Waves written as exponentials <em>multiply like exponentials</em>: combining phases, shifting cycles, mixing signals -- all of it collapses into adding exponents. The trigonometry does itself.</p>
+
+        <h3 class="subsection-title">Five Symbols</h3>
+
+        <p>Set $\theta = \pi$ in Euler's Formula and watch what happens.</p>
+
+        <p>Walking $\pi$ along the rim is half a lap. Half a lap from 1 lands at $-1$. The formula agrees: $\cos\pi = -1$ and $\sin\pi = 0$, so:</p>
+
+        <p class="display-equation">$$e^{i\pi} = -1$$</p>
+
+        <p>Moved to one side:</p>
+
+        <p class="display-equation">$$\Large e^{i\pi} + 1 = 0$$</p>
+
+        <p>This line is regularly voted the most beautiful equation in mathematics. It is worth asking why.</p>
+
+        <p>Count what is in it. $0$, the nothing that arithmetic is built on. $1$, the unit of counting. $\pi$, smuggled out of circles by geometers measuring rims against diameters. $e$, found in the fine print of compound interest. And $i$, invented to answer an impossible question about squares.</p>
+
+        <p>Five constants, from five different centuries and five different corners of mathematics, discovered by people who in most cases never knew of each other -- sitting together in one statement, with nothing left over.</p>
+
+        <p>And yet -- you can now <em>read</em> it. It is not an incantation. It says: <strong>grow sideways for half a turn, and you are facing backwards.</strong> Walk $\pi$ along the rim and you arrive at $-1$. You watched it happen in the widget above.</p>
+
+        <p>That is the real beauty -- not that five famous symbols appear together, but that the sentence they spell is <em>simple</em>. The equation is only mysterious from outside. From inside -- from where you now stand -- it is almost obvious. The five symbols were always describing the same circle.</p>
+
+        <h3 class="subsection-title">Where the Stories Meet</h3>
+
+        <figure class="trig-figure trig-figure-bare branches-converge-figure" aria-label="Three branches of the course, geometry, algebra, and complex numbers, converging on Euler's Formula">
+          <svg viewBox="0 0 860 400" role="img" aria-labelledby="branches-converge-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="branches-converge-title">Geometry, algebra, and complex numbers flowing together into Euler's Formula</title>
+            <defs>
+              <marker id="branch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(214, 196, 168, 0.55)" />
+              </marker>
+            </defs>
+
+            <g class="branch-node" transform="translate(20 30)">
+              <rect class="branch-box branch-box-geo" x="0" y="0" width="230" height="92" rx="3" />
+              <text class="branch-title branch-title-geo" x="115" y="32" text-anchor="middle">Geometry</text>
+              <text class="branch-line" x="115" y="56" text-anchor="middle">angles · circles · sine and cosine</text>
+              <text class="branch-line" x="115" y="76" text-anchor="middle">rotation · oscillation</text>
+            </g>
+
+            <g class="branch-node" transform="translate(315 30)">
+              <rect class="branch-box branch-box-alg" x="0" y="0" width="230" height="92" rx="3" />
+              <text class="branch-title branch-title-alg" x="115" y="32" text-anchor="middle">Algebra</text>
+              <text class="branch-line" x="115" y="56" text-anchor="middle">exponents · continuous growth</text>
+              <text class="branch-line" x="115" y="76" text-anchor="middle">e · infinite series</text>
+            </g>
+
+            <g class="branch-node" transform="translate(610 30)">
+              <rect class="branch-box branch-box-cpx" x="0" y="0" width="230" height="92" rx="3" />
+              <text class="branch-title branch-title-cpx" x="115" y="32" text-anchor="middle">Complex Numbers</text>
+              <text class="branch-line" x="115" y="56" text-anchor="middle">i · the plane · polar form</text>
+              <text class="branch-line" x="115" y="76" text-anchor="middle">multiplication as rotation</text>
+            </g>
+
+            <path class="branch-flow" d="M 135 130 C 135 210, 330 235, 398 262" marker-end="url(#branch-arrow)" />
+            <path class="branch-flow" d="M 430 130 C 430 190, 430 220, 430 256" marker-end="url(#branch-arrow)" />
+            <path class="branch-flow" d="M 725 130 C 725 210, 530 235, 462 262" marker-end="url(#branch-arrow)" />
+
+            <g transform="translate(250 268)">
+              <rect class="euler-box" x="0" y="0" width="360" height="84" rx="3" />
+              <text class="euler-text" x="180" y="50" text-anchor="middle">e<tspan baseline-shift="super" font-size="15">iθ</tspan> = cos θ + i sin θ</text>
+            </g>
+          </svg>
+        </figure>
+
+        <p>The geometric branch supplied the cast: angles measured by arc, the unit circle, sine and cosine as the coordinates of rotation, and waves as rotation's shadow.</p>
+
+        <p>The algebra branch supplied the engine: exponents that turn multiplication into addition, growth compounding into $e$, and the infinite series that let us evaluate $e^x$ with nothing but arithmetic.</p>
+
+        <p>The complex numbers supplied the meeting ground: a plane where numbers have directions, where multiplying turns, and where the series could be fed a rotated input.</p>
+
+        <p>Euler's Formula is the single point where the three converge. Rotation, written in the language of geometry, is $\cos\theta + i\sin\theta$. Written in the language of algebra, it is $e^{i\theta}$. Written in the language of complex arithmetic, it is multiplication by a point on the unit circle.</p>
+
+        <p>One idea. Three languages. One equation translating between all of them.</p>
+
+        <hr class="section-divider" />
+
+        <p>Look back at where this course began: a single line, rotating away from another, and the question of how to measure the gap between them.</p>
+
+        <p>Every chapter since -- the radian, the triangle ratios, the unit circle, the waves, the growth, the series, the strange new numbers -- has been quietly building the vocabulary for one sentence.</p>
+
+        <p class="display-equation">$$e^{i\theta} = \cos\theta + i\sin\theta$$</p>
+
+        <p>It was all one subject. It just took the whole course to say so.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-polar-form.html">
+            <span>Previous</span>
+            <strong>Polar Form</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
+            <span>Next</span>
+            <strong>Misc</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

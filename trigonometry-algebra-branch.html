@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Algebra Branch | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-algebra-branch-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Algebra Branch</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Everything so far has been geometry. Angles, triangles, circles, and the waves they generate.</p>
+
+        <p>In this chapter we set all of that aside and begin a second story -- a story about growth.</p>
+
+        <p>For a while, it will seem to have nothing to do with sine and cosine. But the two stories are on a collision course. A few chapters from now they will crash into each other, producing one of the most celebrated equations in mathematics.</p>
+
+        <p>To appreciate the collision, you need to be fluent in both stories. So let's begin.</p>
+
+        <h3 class="subsection-title">Exponents</h3>
+
+        <p>Multiplication is repeated addition:</p>
+
+        <p class="display-equation">$$3+3+3+3 = 3 \times 4$$</p>
+
+        <p>Exponents do the same job for multiplication:</p>
+
+        <p class="display-equation">$$3 \cdot 3 \cdot 3 \cdot 3 = 3^4$$</p>
+
+        <p>The raised number simply counts how many copies are being multiplied together.</p>
+
+        <p>One consequence falls out immediately. To multiply two powers, just pool the copies:</p>
+
+        <p class="display-equation">$$3^2 \cdot 3^3 = (3 \cdot 3)(3 \cdot 3 \cdot 3) = 3^5$$</p>
+
+        <p>In general:</p>
+
+        <p class="display-equation">$$a^m \cdot a^n = a^{m+n}$$</p>
+
+        <p>Multiplying the numbers <em>adds</em> the exponents.</p>
+
+        <p><strong>Exponents turn multiplication into addition.</strong></p>
+
+        <p>This is the single most important fact about them, and it will come back to haunt us in the best possible way.</p>
+
+        <hr class="section-divider" />
+
+        <p>But the "count the copies" reading has a limit. What could $3^{0}$ mean? Zero copies of 3? And $3^{1/2}$ -- half a copy?</p>
+
+        <p>Rather than inventing new meanings, we let the addition rule decide what these <em>must</em> be.</p>
+
+        <p>Whatever $3^{1/2}$ is, the rule demands:</p>
+
+        <p class="display-equation">$$3^{1/2} \cdot 3^{1/2} = 3^{1/2+1/2} = 3^1 = 3$$</p>
+
+        <p>So $3^{1/2}$ is the number that multiplies by itself to give 3. We already have a name for that: $\sqrt{3}$.</p>
+
+        <p>Similarly, whatever $3^0$ is, it must leave other powers unchanged when multiplied in ($3^0 \cdot 3^n = 3^{0+n} = 3^n$), so $3^0$ must be 1.</p>
+
+        <p>Once the exponent is freed from counting, it can be <em>any</em> number -- $2.5$, $\pi$, anything. And that means $a^x$ has become a function: a smooth machine that takes in a number and returns a grown (or shrunk) result.</p>
+
+        <h3 class="subsection-title">Growth That Multiplies</h3>
+
+        <p>Imagine a colony of bacteria that doubles every hour. Starting from a single cell, after $t$ hours there are:</p>
+
+        <p class="display-equation">$$2^t$$</p>
+
+        <p>Compare that with a colony that gains two cells every hour.</p>
+
+        <p>One population grows by <em>adding</em>. The other grows by <em>multiplying</em>.</p>
+
+        <p>For the first few steps they look similar. Then they do not.</p>
+
+        <iframe
+          class="essay-widget exponential-growth-widget"
+          src="trigonometry/algebra-branch/exponential-growth-widget.html"
+          title="Interactive widget racing additive growth against doubling, on linear and logarithmic scales"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Notice what the logarithmic scale does in the widget above. On that scale, moving up one gridline means "ten times more" -- equal steps represent equal <em>multiplications</em>.</p>
+
+        <p>And on that scale, the doubling curve becomes a straight line.</p>
+
+        <p>This is our earlier observation wearing different clothes: exponents turn multiplication into addition. Growth that multiplies looks wild on an adding scale, and perfectly tame on a multiplying one.</p>
+
+        <h3 class="subsection-title">Compound Interest</h3>
+
+        <p>Multiplying growth shows up anywhere that growth feeds on the thing growing. The classic example is money.</p>
+
+        <p>Suppose a generous bank offers $100\%$ interest per year. Deposit £1, and a year later you have £2.</p>
+
+        <p>Now suppose the bank instead pays in two instalments: $50\%$ after six months, and $50\%$ at the end of the year.</p>
+
+        <p>Is that the same?</p>
+
+        <p>It is not -- it's better. After six months you have £1.50. The second instalment then pays interest <em>on that</em>, including on the 50p of interest you just earned:</p>
+
+        <p class="display-equation">$$\left(1+\tfrac{1}{2}\right)^2 = 2.25$$</p>
+
+        <p>The interest earned interest. That's all "compounding" means.</p>
+
+        <p>Why stop at two instalments? Split the year into $n$ pieces, each paying $\frac{1}{n}$ of the interest, and the year-end total is:</p>
+
+        <p class="display-equation">$$\left(1+\frac{1}{n}\right)^n$$</p>
+
+        <p>Watch what happens as the instalments get smaller and more frequent:</p>
+
+        <p class="display-equation equation-plain">$$
+\begin{array}{c|c}
+n & \left(1+\frac{1}{n}\right)^n \\
+\hline
+1 & 2 \\
+2 & 2.25 \\
+4 & 2.4414... \\
+12 & 2.6130... \\
+365 & 2.7146... \\
+\end{array}
+$$</p>
+
+        <p>Every extra split helps, because interest starts earning interest sooner.</p>
+
+        <p>But look closely at the numbers. The gains are shrinking. Going from yearly to half-yearly earned us 25p; going from monthly to daily earns barely 10p.</p>
+
+        <p>The values are climbing towards something -- a ceiling they approach but never pass.</p>
+
+        <h3 class="subsection-title">Continuous Growth and the Number $e$</h3>
+
+        <p>Push the splitting to its extreme. Interest paid every day. Every second. Every <em>instant</em> -- growth flowing in continuously, always proportional to what's already there.</p>
+
+        <p>The year-end total settles on a definite number:</p>
+
+        <p class="display-equation">$$\left(1+\frac{1}{n}\right)^n \to 2.71828... \quad \text{as } n \text{ grows}$$</p>
+
+        <p>This number is called $e$.</p>
+
+        <p>It is not chosen by anyone, and there is nothing arbitrary about it. $e$ is simply <strong>what $100\%$ growth becomes when compounding happens continuously</strong>. It has the same inevitability as $\pi$: ask the question, and this number answers.</p>
+
+        <iframe
+          class="essay-widget compound-interest-widget"
+          src="trigonometry/algebra-branch/compound-interest-widget.html"
+          title="Interactive widget showing one pound compounding in n instalments, with the staircase approaching continuous growth at e"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Nothing in the argument depended on the rate being $100\%$. Growing continuously at a rate $x$ for one unit of time gives:</p>
+
+        <p class="display-equation">$$e^x = \lim_{n \to \infty}\left(1+\frac{x}{n}\right)^n$$</p>
+
+        <p>(The "$\lim$" notation just makes "as $n$ grows forever" official.)</p>
+
+        <p>So $e^x$ answers a very concrete question: <em>start with 1, grow continuously at rate $x$ for one unit of time -- what do you end up with?</em></p>
+
+        <p>Hold on to that expression on the right. We will need it again shortly.</p>
+
+        <h3 class="subsection-title">What If We Never Stop Adding?</h3>
+
+        <p>Now we come to the heart of this chapter, and to one of the strangest, most useful ideas in mathematics.</p>
+
+        <p>You have spent years working with expressions built from powers of $x$:</p>
+
+        <p class="display-equation">$$1 + x + x^2$$</p>
+
+        <p>Such expressions are pleasant company. To evaluate one, you only ever multiply and add. Stack as many terms as you like -- the recipe never changes.</p>
+
+        <p>Here is the question this chapter has been building towards:</p>
+
+        <p><strong>What happens if we never stop adding terms?</strong></p>
+
+        <p>Your first instinct might be that adding infinitely many things must produce an infinite result.</p>
+
+        <p>Sometimes. Not always.</p>
+
+        <p>Walk towards a wall, covering half the remaining distance with each step. Step one covers $\frac{1}{2}$, step two covers $\frac{1}{4}$, then $\frac{1}{8}$, and so on, forever.</p>
+
+        <p>Infinitely many steps. Yet the total distance walked can never exceed 1 -- you never pass the wall.</p>
+
+        <figure class="trig-figure trig-figure-bare halving-figure" aria-label="A unit length bar repeatedly halved: one half, one quarter, one eighth, approaching but never exceeding the whole">
+          <svg viewBox="0 0 860 170" role="img" aria-labelledby="halving-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="halving-title">A bar of length one being filled by halves: one half plus one quarter plus one eighth and so on</title>
+            <g transform="translate(40 30)">
+              <rect class="halving-outline" x="0" y="30" width="780" height="56" />
+              <rect class="halving-seg halving-seg-a" x="0" y="30" width="390" height="56" />
+              <rect class="halving-seg halving-seg-b" x="390" y="30" width="195" height="56" />
+              <rect class="halving-seg halving-seg-a" x="585" y="30" width="97.5" height="56" />
+              <rect class="halving-seg halving-seg-b" x="682.5" y="30" width="48.75" height="56" />
+              <rect class="halving-seg halving-seg-a" x="731.25" y="30" width="24.375" height="56" />
+              <text class="halving-label" x="195" y="64" text-anchor="middle">½</text>
+              <text class="halving-label" x="487.5" y="64" text-anchor="middle">¼</text>
+              <text class="halving-label" x="633.75" y="64" text-anchor="middle">⅛</text>
+              <text class="halving-label halving-label-small" x="707" y="63" text-anchor="middle">…</text>
+              <text class="halving-end-label" x="780" y="16" text-anchor="middle">1</text>
+              <line class="halving-end-line" x1="780" y1="22" x2="780" y2="94" />
+            </g>
+          </svg>
+        </figure>
+
+        <p>As an equation:</p>
+
+        <p class="display-equation">$$\frac{1}{2}+\frac{1}{4}+\frac{1}{8}+\frac{1}{16}+\cdots = 1$$</p>
+
+        <p>Infinitely many terms, and the total <em>settles</em>. When the terms shrink fast enough, an endless sum can quietly add up to an ordinary, finite number.</p>
+
+        <hr class="section-divider" />
+
+        <p>Now let's do the same thing with powers of $x$. Take every power, and add them all:</p>
+
+        <p class="display-equation">$$S = 1 + x + x^2 + x^3 + x^4 + \cdots$$</p>
+
+        <p>It looks untouchable -- how do you work with a sum that never ends? But watch this trick.</p>
+
+        <p>Multiply the whole thing by $x$:</p>
+
+        <p class="display-equation">$$xS = x + x^2 + x^3 + x^4 + \cdots$$</p>
+
+        <p>Look carefully at the right-hand side. It is the original sum with the leading 1 missing. Every other term is still there -- infinity doesn't run out.</p>
+
+        <p class="display-equation">$$xS = S - 1$$</p>
+
+        <p>This is now an ordinary equation, and we can solve it for $S$:</p>
+
+        <p class="display-equation">$$S = \frac{1}{1-x}$$</p>
+
+        <p>Pause on what just happened.</p>
+
+        <p>On the left: an infinite, never-ending sum. On the right: an ordinary fraction.</p>
+
+        <p>And they are <em>the same thing</em>. Try $x = \frac{1}{2}$. The fraction says $\frac{1}{1-\frac12} = 2$. The sum says $1 + \frac{1}{2} + \frac{1}{4} + \cdots$ -- our walk to the wall, starting from 1, which indeed totals 2.</p>
+
+        <p><strong>A function can sometimes be written as an infinite sum.</strong></p>
+
+        <p>Explore that equality below. Add terms one at a time and watch the partial sums close in on the fraction.</p>
+
+        <iframe
+          class="essay-widget geometric-series-widget"
+          src="trigonometry/algebra-branch/geometric-series-widget.html"
+          title="Interactive widget showing partial sums of one plus x plus x squared approaching one over one minus x"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>The widget also shows where the magic stops. For $x$ between $-1$ and $1$, the powers of $x$ shrink, and the sum settles. At $x = 2$, the terms $1, 2, 4, 8, \ldots$ <em>grow</em>, and the sum runs away to infinity. No number of extra terms will ever rescue it.</p>
+
+        <p>So infinite sums have personalities. They must earn their keep: <strong>the terms have to shrink fast enough for the total to settle.</strong></p>
+
+        <p>Keep that in mind as you meet the next one.</p>
+
+        <h3 class="subsection-title">An Infinite Series for $e^x$</h3>
+
+        <p>Return to continuous growth:</p>
+
+        <p class="display-equation">$$e^x = \lim_{n \to \infty}\left(1+\frac{x}{n}\right)^n$$</p>
+
+        <p>Here is the key observation: for any particular $n$, the expression $\left(1+\frac{x}{n}\right)^n$ is just a polynomial. We can multiply it out by hand.</p>
+
+        <p>For $n=2$:</p>
+
+        <p class="display-equation">$$\left(1+\frac{x}{2}\right)^2 = 1 + x + \frac{x^2}{4}$$</p>
+
+        <p>For $n=3$:</p>
+
+        <p class="display-equation">$$\left(1+\frac{x}{3}\right)^3 = 1 + x + \frac{x^2}{3} + \frac{x^3}{27}$$</p>
+
+        <p>For $n=4$:</p>
+
+        <p class="display-equation">$$\left(1+\frac{x}{4}\right)^4 = 1 + x + \frac{3x^2}{8} + \frac{x^3}{16} + \frac{x^4}{256}$$</p>
+
+        <p>Now read these <em>column by column</em>, like watching the compound-interest table settle.</p>
+
+        <p>The constant term is always 1. Locked in.</p>
+
+        <p>The $x$ coefficient is always 1. Locked in.</p>
+
+        <p>The $x^2$ coefficient is moving: $\frac{1}{4}$, then $\frac{1}{3}$, then $\frac{3}{8}$, then $\frac{2}{5}$... climbing steadily towards $\frac{1}{2}$.</p>
+
+        <p>The $x^3$ coefficient is also moving, creeping up towards $\frac{1}{6}$.</p>
+
+        <p>And the column after that heads for $\frac{1}{24}$.</p>
+
+        <p>Where do these targets come from? Look at them together:</p>
+
+        <p class="display-equation">$$2 = 2 \cdot 1 \qquad 6 = 3 \cdot 2 \cdot 1 \qquad 24 = 4 \cdot 3 \cdot 2 \cdot 1$$</p>
+
+        <p>Each is built by multiplying all the whole numbers from 1 up to the power. This construction is so common that it has its own shorthand: $k!$, read "$k$ factorial".</p>
+
+        <p>So when $n$ grows without bound, each column settles onto its target, and the polynomial becomes an infinite series:</p>
+
+        <p class="display-equation">$$e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \cdots$$</p>
+
+        <p>Take a moment to appreciate how clean this is. Every term is built the same way: <strong>a power of $x$ on top, its factorial below.</strong> No exceptions, no special cases, forever.</p>
+
+        <hr class="section-divider" />
+
+        <p>But should we trust it? The geometric series taught us to ask: do the terms shrink fast enough?</p>
+
+        <p>Here, yes -- and emphatically. Powers grow by multiplying by $x$ each time, but factorials grow by multiplying by $2$, then $3$, then $4$, then $100$... Whatever $x$ is, the factorials in the denominators eventually outrun the powers above them, and the terms collapse towards zero at tremendous speed.</p>
+
+        <p>The geometric series only worked between $-1$ and $1$. This series works for <em>every</em> $x$.</p>
+
+        <p>As a quick check, set $x=1$. The series should give $e$ itself:</p>
+
+        <p class="display-equation">$$1 + 1 + \frac{1}{2} + \frac{1}{6} + \frac{1}{24} + \frac{1}{120} = 2.71\overline{6}...$$</p>
+
+        <p>Six terms in, and we already have $e$ to two decimal places.</p>
+
+        <p>Now build the function yourself. Add terms one at a time and watch a humble polynomial wrap itself around the exponential curve:</p>
+
+        <iframe
+          class="essay-widget exp-series-widget"
+          src="trigonometry/algebra-branch/exp-series-widget.html"
+          title="Interactive widget building e to the x term by term from its infinite series"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <hr class="section-divider" />
+
+        <p>Three ideas to carry forward from this chapter:</p>
+
+        <p>Functions can sometimes be written as infinite sums.</p>
+
+        <p>Infinite sums can encode surprisingly rich behaviour -- a never-ending pile of simple terms adding up to continuous growth itself.</p>
+
+        <p>And $e^x$ has a particularly elegant series: powers over factorials, every term alike.</p>
+
+        <p>Keep that series within arm's reach. It turns out that sine and cosine -- our companions from the geometric branch -- can <em>also</em> be written as infinite sums, built from the very same parts: powers over factorials. Theirs have a curious quirk: half the terms are missing, and the signs alternate.</p>
+
+        <p>When we finally lay the three series side by side, the two branches of this story will snap together.</p>
+
+        <p>That is where we are heading next.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-waves.html">
+            <span>Previous</span>
+            <strong>Waves</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-polar-form.html">
+            <span>Next</span>
+            <strong>Polar Form</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

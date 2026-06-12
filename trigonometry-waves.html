@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waves | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-waves-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Waves</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>In the previous chapters we made an unexpected discovery. A point moving steadily around a circle, viewed through its coordinates, traces out a wave.</p>
+
+        <p>In this chapter we take that wave seriously as an object in its own right.</p>
+
+        <h3 class="subsection-title">What Is a Wave?</h3>
+
+        <p>Waves are everywhere. Sound is a wave in air pressure. Light is a wave in electric and magnetic fields. There are water waves, radio waves, the alternating current in your walls, and the rhythm of your own heartbeat.</p>
+
+        <p>These seem like very different things. What do they have in common?</p>
+
+        <p><strong>A wave is a pattern that repeats.</strong></p>
+
+        <p>Some waves travel through a medium, and physicists sort these by <em>how</em> the medium moves.</p>
+
+        <p>In a <em>transverse</em> wave, each point of the medium moves at right angles to the direction the wave travels. A ripple crosses a pond horizontally, but the water itself only bobs up and down.</p>
+
+        <p>In a <em>longitudinal</em> wave, each point moves back and forth <em>along</em> the direction of travel. Sound squeezes and stretches the air in the same direction it is heading.</p>
+
+        <p>And some waves don't travel anywhere at all. A pendulum swings, a weight on a spring bounces, a heart beats. Nothing moves from place to place. The pattern repeats purely in time. We call this an <em>oscillation</em>.</p>
+
+        <iframe
+          class="essay-widget wave-types-widget"
+          src="trigonometry/waves/wave-types-widget.html"
+          title="Interactive widget comparing transverse waves, longitudinal waves, and oscillations in time"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>While switching between the three motions above, keep your eye on the bottom panel.</p>
+
+        <p>The rope point bobs vertically. The air molecule shuffles horizontally. The spring bounces in place. Three different motions.</p>
+
+        <p>Yet the displacement of a single point, tracked over time, traces out <strong>the same shape in all three cases</strong>.</p>
+
+        <p>That shape is the sine wave.</p>
+
+        <p>This is why trigonometry, a subject that began with triangles, ends up describing sound, light, and electricity. Learn to describe this one shape, and you have a language for all of them.</p>
+
+        <h3 class="subsection-title">From Angle to Time</h3>
+
+        <p>There is a problem, though.</p>
+
+        <p>Sine takes an <em>angle</em> as input.</p>
+
+        <p class="display-equation">$$\sin(\theta)$$</p>
+
+        <p>But a wave unfolds in <em>time</em>. To describe one, we need a function that takes a time as input.</p>
+
+        <p>The unit circle provides the bridge.</p>
+
+        <p>Imagine the point moving around the circle at a steady speed, completing exactly one revolution per second.</p>
+
+        <p>After $t$ seconds, it has completed $t$ revolutions.</p>
+
+        <p>One revolution is $2\pi$ radians, so after $t$ seconds the angle is:</p>
+
+        <p class="display-equation">$$\theta = 2\pi t$$</p>
+
+        <p>Substituting this into sine:</p>
+
+        <p class="display-equation">$$x(t) = \sin(2\pi t)$$</p>
+
+        <p>Sine of an angle has become sine of a time.</p>
+
+        <p>The input $t$ is a number of seconds. The output $x(t)$ is the height of the point on the circle: a number between $-1$ and $1$ that rises and falls forever as $t$ increases.</p>
+
+        <h3 class="subsection-title">Frequency and Period</h3>
+
+        <p>There is no reason the point must complete exactly one revolution per second. It could spin faster, or slower.</p>
+
+        <p>The number of revolutions completed per second is called the <strong>frequency</strong>, written $f$. It is measured in hertz (Hz), where $1$ Hz means one full cycle per second.</p>
+
+        <p>A point spinning at $f$ revolutions per second has completed $ft$ revolutions after $t$ seconds, so the angle becomes:</p>
+
+        <p class="display-equation">$$\theta = 2\pi f t$$</p>
+
+        <p>We could also ask the reverse question. Rather than "how many cycles fit into one second?", we could ask, "how much time does one cycle take?"</p>
+
+        <p>This is called the <strong>period</strong>, written $T$, and measured in seconds.</p>
+
+        <p>Frequency and period are two descriptions of the same fact, so each determines the other. If a wave completes 2 cycles every second, then each cycle must take half a second.</p>
+
+        <p class="display-equation">$$T = \frac{1}{f} \qquad \qquad f = \frac{1}{T}$$</p>
+
+        <p>They are reciprocals. As one goes up, the other comes down.</p>
+
+        <iframe
+          class="essay-widget frequency-period-widget"
+          src="trigonometry/waves/frequency-period-widget.html"
+          title="Interactive widget showing a circle spinning at f revolutions per second and the resulting wave, with the period marked"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">Amplitude</h3>
+
+        <p>On the unit circle the radius is 1, so the height of the point ranges between $-1$ and $1$.</p>
+
+        <p>Real waves come in different sizes. A whisper and a shout are both pressure waves with the same shape, but one displaces the air far more than the other.</p>
+
+        <p>To change the size of the wave, we change the size of the circle.</p>
+
+        <p>If the radius is $A$ instead of 1, every height gets scaled by $A$:</p>
+
+        <p class="display-equation">$$x(t) = A\sin(2\pi f t)$$</p>
+
+        <p>$A$ is called the <strong>amplitude</strong>: the maximum displacement from rest.</p>
+
+        <p>It stretches the wave vertically without affecting its timing.</p>
+
+        <figure class="trig-figure trig-figure-bare wave-anatomy-figure" aria-label="A sine wave annotated with its amplitude and its period">
+          <svg viewBox="0 0 860 300" role="img" aria-labelledby="wave-anatomy-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="wave-anatomy-title">Two cycles of a sine wave with the amplitude marked vertically and the period marked horizontally</title>
+            <defs>
+              <marker id="wave-amp-arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#ef7398" />
+              </marker>
+            </defs>
+            <g transform="translate(70 30)">
+              <line class="wave-anatomy-axis" x1="0" y1="120" x2="740" y2="120" />
+              <path class="wave-anatomy-curve" d="M 0 120
+                C 30 40, 60 20, 90 20
+                C 120 20, 150 40, 180 120
+                C 210 200, 240 220, 270 220
+                C 300 220, 330 200, 360 120
+                C 390 40, 420 20, 450 20
+                C 480 20, 510 40, 540 120
+                C 570 200, 600 220, 630 220
+                C 660 220, 690 200, 720 120" />
+              <line class="wave-anatomy-amp" x1="90" y1="120" x2="90" y2="26" marker-end="url(#wave-amp-arrowhead)" />
+              <text class="wave-anatomy-label wave-anatomy-label-pink" x="104" y="76">A</text>
+              <path class="wave-anatomy-period" d="M 90 -2 L 90 -10 L 450 -10 L 450 -2" />
+              <text class="wave-anatomy-label wave-anatomy-label-gold" x="270" y="-20" text-anchor="middle">T</text>
+            </g>
+          </svg>
+        </figure>
+
+        <h3 class="subsection-title">Phase</h3>
+
+        <p>Two waves can have the same frequency and the same amplitude, and still fail to line up.</p>
+
+        <p>How? One of them started at a different point in its cycle.</p>
+
+        <p>On the circle, this corresponds to the point beginning its journey at some angle other than $0$.</p>
+
+        <p>We call this starting angle the <strong>phase</strong>, written $\varphi$ ("phi"). It is added to the angle inside sine:</p>
+
+        <p class="display-equation">$$x(t) = A\sin(2\pi f t + \varphi)$$</p>
+
+        <p>Phase slides the wave horizontally without affecting its size or its speed.</p>
+
+        <iframe
+          class="essay-widget amplitude-phase-widget"
+          src="trigonometry/waves/amplitude-phase-widget.html"
+          title="Interactive widget with amplitude and phase sliders showing how each reshapes the wave"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Phase also reveals the true relationship between sine and cosine.</p>
+
+        <p>In the widget above, set the phase to $90^\circ$ (that is, $\frac{\pi}{2}$) and compare the wave against the dashed reference.</p>
+
+        <p>Cosine is just sine with a quarter-turn head start:</p>
+
+        <p class="display-equation">$$\cos(\theta) = \sin\!\left(\theta + \frac{\pi}{2}\right)$$</p>
+
+        <p>They are the same wave, out of phase by a quarter of a cycle.</p>
+
+        <h3 class="subsection-title">Interpreting $x(t)=\sin(2\pi ft)$</h3>
+
+        <p>Let's return to the expression at the heart of this chapter.</p>
+
+        <p class="display-equation">$$x(t) = \sin(2\pi f t)$$</p>
+
+        <p>Expressions like this appear constantly in physics, engineering, and signal processing, so it is worth being able to read them fluently.</p>
+
+        <p>The trick is to read from the inside out.</p>
+
+        <p>$t$ is the time, in seconds.</p>
+
+        <p>$ft$ answers the question: spinning at $f$ revolutions per second, how many revolutions have been completed after $t$ seconds?</p>
+
+        <p>$2\pi f t$ converts those revolutions into an angle, because one revolution is $2\pi$ radians.</p>
+
+        <p>$\sin(2\pi f t)$ looks up the height of the point on the unit circle at that angle.</p>
+
+        <p>So the whole expression says: <strong>"Spin around the unit circle $f$ times per second. $x(t)$ is your height at time $t$."</strong></p>
+
+        <p>Let's check this with $f = 2$ Hz at time $t = \frac{1}{4}$ s.</p>
+
+        <p>After a quarter of a second, spinning twice per second, the point has completed $ft = \frac{1}{2}$ a revolution.</p>
+
+        <p>Half a revolution is an angle of $\pi$, which lands the point at $(-1, 0)$, on the $x$-axis.</p>
+
+        <p>Its height there is 0, so:</p>
+
+        <p class="display-equation">$$\sin\!\left(2\pi \cdot 2 \cdot \tfrac{1}{4}\right) = \sin(\pi) = 0$$</p>
+
+        <p>Use the widget below to walk through the pipeline for yourself: a time goes in, revolutions become an angle, and a height comes out.</p>
+
+        <iframe
+          class="essay-widget sine-equation-anatomy-widget"
+          src="trigonometry/waves/sine-equation-anatomy-widget.html"
+          title="Interactive widget breaking the expression sine of two pi f t into time, revolutions, angle, and height"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <hr class="section-divider" />
+
+        <p>With just three numbers -- an amplitude, a frequency, and a phase -- we can now describe any pure wave:</p>
+
+        <p class="display-equation">$$x(t) = A\sin(2\pi f t + \varphi)$$</p>
+
+        <p>Remarkably, more complicated waves -- a violin note, a heartbeat, a voice -- turn out to be <em>sums</em> of these pure waves.</p>
+
+        <p>How that works is a story for another chapter.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-oscillations.html">
+            <span>Previous</span>
+            <strong>Oscillations</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-algebra-branch.html">
+            <span>Next</span>
+            <strong>Algebra Branch</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

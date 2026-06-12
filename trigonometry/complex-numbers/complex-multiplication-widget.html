@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complex Multiplication</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --cos-glow: rgba(232, 161, 59, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 1020px;
+    height: auto;
+    display: block;
+    touch-action: none;
+  }
+  .sums-bar {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 0.3rem 1.6rem 1rem;
+    flex-wrap: wrap;
+  }
+  .sum-block {
+    text-align: center;
+  }
+  .sum-block .head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+  .sum-block .body {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.02rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-dim);
+  }
+  .sum-block .body .z-col { color: var(--sin); }
+  .sum-block .body .w-col { color: var(--cos); }
+  .sum-block .body .p-col { color: var(--point); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .unit-circle-ghost {
+    stroke: rgba(236, 226, 209, 0.22);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 6;
+    fill: none;
+  }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .axis-name {
+    fill: var(--text-dim);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .arrow-z {
+    stroke: var(--sin);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--sin-glow));
+  }
+  .arrow-w {
+    stroke: var(--cos);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--cos-glow));
+  }
+  .arrow-p {
+    stroke: var(--point);
+    stroke-width: 3;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px var(--point-glow));
+  }
+  .handle-z { fill: var(--sin); stroke: var(--text); stroke-width: 1.8; cursor: grab; filter: drop-shadow(0 0 7px var(--sin-glow)); }
+  .handle-w { fill: var(--cos); stroke: var(--text); stroke-width: 1.8; cursor: grab; filter: drop-shadow(0 0 7px var(--cos-glow)); }
+  .handle-p { fill: var(--point); stroke: var(--text); stroke-width: 1.8; filter: drop-shadow(0 0 8px var(--point-glow)); }
+  .arc-z { stroke: var(--sin); stroke-width: 2.4; fill: none; opacity: 0.9; }
+  .arc-w { stroke: var(--cos); stroke-width: 2.4; fill: none; opacity: 0.9; }
+  .arc-p { stroke: var(--point); stroke-width: 2; fill: none; opacity: 0.7; stroke-dasharray: 4 4; }
+  .pt-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+  }
+  .pt-label.z { fill: var(--sin); }
+  .pt-label.w { fill: var(--cos); }
+  .pt-label.p { fill: var(--point); }
+  .offchart-note {
+    fill: var(--point);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 1020 560" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Two draggable complex numbers and their product; the product's angle is the sum of the two angles and its magnitude is the product of the two magnitudes">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="36" y="26">Drag z and w — the product follows</text>
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <g id="ticks"></g>
+      <circle id="unit-ghost" class="unit-circle-ghost" />
+      <text class="axis-name" id="re-name" text-anchor="end">real</text>
+      <text class="axis-name" id="im-name">imaginary</text>
+
+      <path id="arc-z" class="arc-z" />
+      <path id="arc-w" class="arc-w" />
+      <path id="arc-p" class="arc-p" />
+
+      <line id="arrow-z" class="arrow-z" />
+      <line id="arrow-w" class="arrow-w" />
+      <line id="arrow-p" class="arrow-p" />
+      <circle id="handle-z" class="handle-z" r="10" />
+      <circle id="handle-w" class="handle-w" r="10" />
+      <circle id="handle-p" class="handle-p" r="8" />
+      <text id="label-z" class="pt-label z">z</text>
+      <text id="label-w" class="pt-label w">w</text>
+      <text id="label-p" class="pt-label p">z·w</text>
+      <text id="offchart" class="offchart-note" style="display:none">z·w is off the chart!</text>
+    </svg>
+  </div>
+
+  <div class="sums-bar">
+    <div class="sum-block">
+      <div class="head">Angles add</div>
+      <div class="body"><span class="z-col" id="ang-z">38.7°</span> + <span class="w-col" id="ang-w">59.0°</span> = <span class="p-col" id="ang-p">97.7°</span></div>
+    </div>
+    <div class="sum-block">
+      <div class="head">Magnitudes multiply</div>
+      <div class="body"><span class="z-col" id="mag-z">1.28</span> × <span class="w-col" id="mag-w">1.17</span> = <span class="p-col" id="mag-p">1.49</span></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    The pink arrow turns by the green angle plus the orange angle, and stretches by one length times the other. Try putting w on the unit circle: the product keeps z's length and only turns.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('#canvas');
+
+  // ——— Layout ———
+  const CX = 510, CY = 300, UNIT = 116;
+  const px = (re) => CX + re * UNIT;
+  const py = (im) => CY - im * UNIT;
+
+  // ——— Static decoration ———
+  const xAxis = $('#x-axis');
+  xAxis.setAttribute('x1', 30); xAxis.setAttribute('x2', 995);
+  xAxis.setAttribute('y1', CY); xAxis.setAttribute('y2', CY);
+  const yAxis = $('#y-axis');
+  yAxis.setAttribute('x1', CX); yAxis.setAttribute('x2', CX);
+  yAxis.setAttribute('y1', 545); yAxis.setAttribute('y2', 38);
+
+  const grid = $('#grid');
+  const ticks = $('#ticks');
+  for (let v = -4; v <= 4; v++) {
+    if (v === 0) continue;
+    if (px(v) < 35 || px(v) > 990) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(v)); l.setAttribute('x2', px(v));
+    l.setAttribute('y1', 42); l.setAttribute('y2', 542);
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', px(v)); t.setAttribute('y', CY + 20);
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = v;
+    ticks.appendChild(t);
+  }
+  for (let v = -2; v <= 2; v++) {
+    if (v === 0) continue;
+    if (py(v) < 40 || py(v) > 544) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', 36); l.setAttribute('x2', 990);
+    l.setAttribute('y1', py(v)); l.setAttribute('y2', py(v));
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', CX - 10); t.setAttribute('y', py(v) + 4);
+    t.setAttribute('text-anchor', 'end');
+    t.textContent = (v === 1) ? 'i' : (v === -1) ? '−i' : v + 'i';
+    ticks.appendChild(t);
+  }
+  const ug = $('#unit-ghost');
+  ug.setAttribute('cx', CX); ug.setAttribute('cy', CY); ug.setAttribute('r', UNIT);
+  $('#re-name').setAttribute('x', 988); $('#re-name').setAttribute('y', CY - 12);
+  $('#im-name').setAttribute('x', CX + 12); $('#im-name').setAttribute('y', 54);
+
+  // ——— State ———
+  let z = { re: 1.0, im: 0.8 };
+  let w = { re: 0.6, im: 1.0 };
+
+  const mag = (c) => Math.sqrt(c.re * c.re + c.im * c.im);
+  const ang = (c) => {
+    let a = Math.atan2(c.im, c.re);
+    if (a < 0) a += 2 * Math.PI;
+    return a;
+  };
+  const mul = (a, b) => ({ re: a.re * b.re - a.im * b.im, im: a.re * b.im + a.im * b.re });
+
+  function setLine(id, c) {
+    const e = $('#' + id);
+    e.setAttribute('x1', CX); e.setAttribute('y1', CY);
+    e.setAttribute('x2', px(c.re).toFixed(1)); e.setAttribute('y2', py(c.im).toFixed(1));
+  }
+  function setHandle(id, c) {
+    const e = $('#' + id);
+    e.setAttribute('cx', px(c.re).toFixed(1)); e.setAttribute('cy', py(c.im).toFixed(1));
+  }
+  function setLabel(id, c, dx, dy) {
+    const e = $('#' + id);
+    e.setAttribute('x', (px(c.re) + dx).toFixed(1));
+    e.setAttribute('y', (py(c.im) + dy).toFixed(1));
+  }
+  function arcPath(fromAngle, toAngle, radius) {
+    // anticlockwise arc from fromAngle to toAngle (radians, toAngle > fromAngle)
+    if (toAngle - fromAngle < 0.04) return '';
+    const x1 = CX + radius * Math.cos(fromAngle), y1 = CY - radius * Math.sin(fromAngle);
+    const x2 = CX + radius * Math.cos(toAngle), y2 = CY - radius * Math.sin(toAngle);
+    const large = (toAngle - fromAngle) > Math.PI ? 1 : 0;
+    return `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${radius} ${radius} 0 ${large} 0 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+  }
+
+  function render() {
+    const p = mul(z, w);
+    const az = ang(z), aw = ang(w);
+    const mz = mag(z), mw = mag(w);
+    const apSum = az + aw;          // may exceed 2π — that's a full wrap
+    const mp = mz * mw;
+
+    setLine('arrow-z', z); setHandle('handle-z', z); setLabel('label-z', z, 14, -10);
+    setLine('arrow-w', w); setHandle('handle-w', w); setLabel('label-w', w, 14, -10);
+
+    // product (may leave the visible window)
+    const onChart = Math.abs(p.re) <= 4.2 && Math.abs(p.im) <= 2.3;
+    $('#arrow-p').style.display = onChart ? '' : 'none';
+    $('#handle-p').style.display = onChart ? '' : 'none';
+    $('#label-p').style.display = onChart ? '' : 'none';
+    $('#offchart').style.display = onChart ? 'none' : '';
+    if (onChart) {
+      setLine('arrow-p', p); setHandle('handle-p', p); setLabel('label-p', p, 14, -10);
+    } else {
+      const oc = $('#offchart');
+      oc.setAttribute('x', 700); oc.setAttribute('y', 70);
+    }
+
+    // angle arcs: z's angle at radius 40, then w's angle stacked on top of it at radius 56;
+    // product angle (dashed pink) at radius 74
+    $('#arc-z').setAttribute('d', arcPath(0, az, 40));
+    $('#arc-w').setAttribute('d', arcPath(az, apSum, 56));
+    $('#arc-p').setAttribute('d', arcPath(0, Math.min(apSum, 2 * Math.PI - 0.001), 74));
+
+    // readouts (product angle shown mod 360)
+    const deg = (a) => (a * 180 / Math.PI);
+    $('#ang-z').textContent = deg(az).toFixed(1) + '°';
+    $('#ang-w').textContent = deg(aw).toFixed(1) + '°';
+    const sumDeg = deg(apSum);
+    $('#ang-p').textContent = sumDeg <= 360 ? sumDeg.toFixed(1) + '°' : sumDeg.toFixed(1) + '° (= ' + (sumDeg - 360).toFixed(1) + '°)';
+    $('#mag-z').textContent = mz.toFixed(2);
+    $('#mag-w').textContent = mw.toFixed(2);
+    $('#mag-p').textContent = mp.toFixed(2);
+  }
+
+  // ——— Dragging ———
+  function svgPointFromEvent(evt) {
+    if (!svg.createSVGPoint || !svg.getScreenCTM) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    const m = svg.getScreenCTM();
+    if (!m) return null;
+    return pt.matrixTransform(m.inverse());
+  }
+  let dragging = null;   // 'z' | 'w' | null
+
+  function complexFromSvg(p) {
+    return {
+      re: Math.max(-3.9, Math.min(3.9, (p.x - CX) / UNIT)),
+      im: Math.max(-2.05, Math.min(2.05, (CY - p.y) / UNIT))
+    };
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    const p = svgPointFromEvent(e);
+    if (!p) return;
+    const dz = Math.hypot(p.x - px(z.re), p.y - py(z.im));
+    const dw = Math.hypot(p.x - px(w.re), p.y - py(w.im));
+    if (Math.min(dz, dw) > 60) return;
+    dragging = dz <= dw ? 'z' : 'w';
+    if (svg.setPointerCapture) { try { svg.setPointerCapture(e.pointerId); } catch (err) {} }
+    const c = complexFromSvg(p);
+    if (dragging === 'z') z = c; else w = c;
+    render();
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const p = svgPointFromEvent(e);
+    if (!p) return;
+    const c = complexFromSvg(p);
+    if (dragging === 'z') z = c; else w = c;
+    render();
+  });
+  svg.addEventListener('pointerup', () => { dragging = null; });
+  svg.addEventListener('pointercancel', () => { dragging = null; });
+
+  // Init
+  render();
+})();
+</script>
+
+</body>
+</html>

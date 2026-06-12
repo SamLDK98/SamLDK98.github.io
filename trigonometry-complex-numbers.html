@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complex Numbers | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-complex-numbers-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Complex Numbers</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>We now have two completed stories.</p>
+
+        <p>The geometric branch gave us circles, sine and cosine as coordinates, and the discovery that rotation produces oscillation.</p>
+
+        <p>The algebra branch gave us exponents, continuous growth, the number $e$, and an infinite series for $e^x$.</p>
+
+        <p>These stories appear to have nothing in common. One is about turning; the other is about growing.</p>
+
+        <p>This chapter builds the bridge between them. The bridge is made of a new kind of number.</p>
+
+        <h3 class="subsection-title">Numbers That Answer Impossible Questions</h3>
+
+        <p>The number system has been stretched before. Each time, the stretching was provoked by a question the existing numbers could not answer.</p>
+
+        <p>What is $3 - 5$? No counting number answers that. The negatives were invented -- and dismissed by many mathematicians of the time as absurd.</p>
+
+        <p>What is $3 \div 5$? No whole number answers that. Fractions were admitted.</p>
+
+        <p>Each new layer seemed suspicious at first, then became indispensable.</p>
+
+        <p>Here is the question that provoked the next stretch:</p>
+
+        <p class="display-equation">$$x^2 = -1$$</p>
+
+        <p>What number, multiplied by itself, gives $-1$?</p>
+
+        <p>A positive times a positive is positive. A negative times a negative is also positive. Zero gives zero. Every number on the number line fails.</p>
+
+        <p>The historical response was the same move as before: rather than declaring the question impossible, <em>invent</em> a number that answers it, and see whether arithmetic survives.</p>
+
+        <p>The new number is written $i$, and it is defined by one property alone:</p>
+
+        <p class="display-equation">$$i^2 = -1$$</p>
+
+        <p>Arithmetic survives. Everything works. The only casualty was the name: sceptics called $i$ "imaginary", and the insult stuck as terminology.</p>
+
+        <p>For now, $i^2 = -1$ has to be taken on faith as a rule of the game. By the middle of this chapter, you will <em>see</em> why it is true.</p>
+
+        <h3 class="subsection-title">A Number With Two Parts</h3>
+
+        <p>Once $i$ exists, it starts combining with ordinary numbers. We can scale it ($2i$, $-\frac{1}{2}i$) and add it to ordinary numbers:</p>
+
+        <p class="display-equation">$$z = 3 + 2i$$</p>
+
+        <p>Notice that this sum cannot be simplified any further. Three of one thing plus two of another -- like 3 apples and 2 oranges -- the parts stay separate.</p>
+
+        <p>So this new kind of number permanently carries <strong>two independent components</strong>: an ordinary part and an $i$ part. Numbers like this are called <em>complex</em> numbers -- "complex" in the old sense of <em>composed of parts</em>, not in the sense of complicated.</p>
+
+        <p>But this raises a question. Ordinary numbers live on the number line. Every position is already taken.</p>
+
+        <p>Where does $i$ live?</p>
+
+        <figure class="trig-figure trig-figure-bare i-off-line-figure" aria-label="The real number line with every position occupied, and the number i hovering off the line with nowhere to sit">
+          <svg viewBox="0 0 860 220" role="img" aria-labelledby="i-off-line-title" xmlns="http://www.w3.org/2000/svg">
+            <title id="i-off-line-title">A number line from minus three to three, with the number i floating above it, off the line</title>
+            <defs>
+              <marker id="numline-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+              </marker>
+            </defs>
+            <g transform="translate(40 0)">
+              <line class="numline-axis" x1="0" y1="160" x2="770" y2="160" marker-end="url(#numline-arrow)" />
+              <g class="numline-ticks">
+                <line x1="65"  y1="152" x2="65"  y2="168" /><text x="65"  y="192" text-anchor="middle">−3</text>
+                <line x1="175" y1="152" x2="175" y2="168" /><text x="175" y="192" text-anchor="middle">−2</text>
+                <line x1="285" y1="152" x2="285" y2="168" /><text x="285" y="192" text-anchor="middle">−1</text>
+                <line x1="395" y1="152" x2="395" y2="168" /><text x="395" y="192" text-anchor="middle">0</text>
+                <line x1="505" y1="152" x2="505" y2="168" /><text x="505" y="192" text-anchor="middle">1</text>
+                <line x1="615" y1="152" x2="615" y2="168" /><text x="615" y="192" text-anchor="middle">2</text>
+                <line x1="725" y1="152" x2="725" y2="168" /><text x="725" y="192" text-anchor="middle">3</text>
+              </g>
+              <text class="i-floating" x="395" y="58" text-anchor="middle">i</text>
+              <text class="i-question" x="445" y="52">?</text>
+              <line class="i-dashed-drop" x1="395" y1="72" x2="395" y2="148" />
+            </g>
+          </svg>
+        </figure>
+
+        <p>Not at 0 -- it isn't nothing. Not at 1 or $-1$ -- squaring those gives $+1$. There is no room anywhere on the line.</p>
+
+        <p>So it lives <em>off</em> the line.</p>
+
+        <p>Give the imaginary numbers their own axis, perpendicular to the real one, crossing at zero. The real numbers run east-west; the imaginary numbers run north-south.</p>
+
+        <p>And now every complex number $a + bi$ has a home: walk $a$ along the real axis, then $b$ up the imaginary one.</p>
+
+        <p><strong>A complex number is a point in a plane.</strong></p>
+
+        <p>Or, often more usefully: an arrow from the origin to that point.</p>
+
+        <iframe
+          class="essay-widget complex-plane-widget"
+          src="trigonometry/complex-numbers/complex-plane-widget.html"
+          title="Interactive complex plane with a draggable point showing real and imaginary parts, magnitude, and angle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">Length and Direction</h3>
+
+        <p>If a complex number is an arrow, then it has the two properties every arrow has: a <strong>length</strong> and a <strong>direction</strong>.</p>
+
+        <p>These should feel familiar. They are exactly the quantities we spent the geometric branch studying.</p>
+
+        <p>The length comes from Pythagoras -- the real and imaginary parts are the legs of a right triangle:</p>
+
+        <p class="display-equation">$$r = \sqrt{a^2+b^2}$$</p>
+
+        <p>The direction is an angle $\theta$, measured anticlockwise from the positive real axis.</p>
+
+        <p>And from the geometric branch, we know how to recover the legs from $r$ and $\theta$:</p>
+
+        <p class="display-equation">$$a = r\cos\theta \qquad b = r\sin\theta$$</p>
+
+        <p>Substituting these into $z = a + bi$ and factoring out the $r$:</p>
+
+        <p class="display-equation">$$z = r(\cos\theta + i\sin\theta)$$</p>
+
+        <p>We derived this expression at the end of the Polar Form chapter, where it may have felt like a curiosity. Look who is standing inside it now: <strong>cosine and sine, the coordinates of a point on a circle</strong>, living in the middle of a number.</p>
+
+        <p>Every complex number can be described in two interchangeable ways: by its parts $(a, b)$, or by its length and direction $(r, \theta)$. Toggle between them in the widget above.</p>
+
+        <h3 class="subsection-title">What Multiplication Does</h3>
+
+        <p>Adding complex numbers is unremarkable: add the real parts, add the imaginary parts.</p>
+
+        <p>Multiplication is where the magic is. Let's sneak up on it by multiplying the simplest things we can.</p>
+
+        <p>Start with the number 1: an arrow of length 1 pointing east. Multiply it by $i$:</p>
+
+        <p class="display-equation">$$1 \cdot i = i$$</p>
+
+        <p>The arrow now points <em>north</em>. Multiplying by $i$ turned it a quarter-circle anticlockwise.</p>
+
+        <p>Multiply by $i$ again:</p>
+
+        <p class="display-equation">$$i \cdot i = i^2 = -1$$</p>
+
+        <p>North has become <em>west</em>. Another quarter-turn.</p>
+
+        <p>Again: $-1 \cdot i = -i$. West to <em>south</em>. Again: $-i \cdot i = -i^2 = 1$. South back to <em>east</em>. Home.</p>
+
+        <p><strong>Multiplying by $i$ is a $90^\circ$ rotation.</strong></p>
+
+        <iframe
+          class="essay-widget powers-of-i-widget"
+          src="trigonometry/complex-numbers/powers-of-i-widget.html"
+          title="Interactive widget where each press of times-i rotates an arrow a quarter turn around the complex plane"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>And now $i^2 = -1$ stops being mysterious.</p>
+
+        <p>Multiplying by $-1$ flips a number to the opposite side of zero -- it points the arrow backwards. Pointing backwards is a $180^\circ$ rotation.</p>
+
+        <p>So the question "what number squares to $-1$?" is really asking:</p>
+
+        <p><em>"What operation, done twice, makes a half-turn?"</em></p>
+
+        <p>A quarter-turn. $i$ is not a strange quantity hiding somewhere on the number line. <strong>It is the halfway point of a flip</strong> -- and it was invisible for centuries because everyone was looking <em>on</em> the line, where no halfway point exists.</p>
+
+        <p>Notice also what the widget shows about repetition: each press of "$\times\, i$" adds another quarter-turn. <strong>Repeated multiplication is repeated rotation.</strong> Four turns bring you home, which is why the powers of $i$ cycle forever:</p>
+
+        <p class="display-equation">$$i^1 = i \qquad i^2 = -1 \qquad i^3 = -i \qquad i^4 = 1 \qquad i^5 = i \;\; \ldots$$</p>
+
+        <h3 class="subsection-title">Multiplying Any Two Complex Numbers</h3>
+
+        <p>Multiplying by $i$ rotates by $90^\circ$ exactly. What about multiplying by a general complex number $w$?</p>
+
+        <p>Here is the claim, and it is the most important fact in this chapter:</p>
+
+        <p>Multiplying by $w$ does two things at once. It <strong>rotates by $w$'s angle</strong>, and it <strong>scales by $w$'s length</strong>.</p>
+
+        <p>Why should that be? Think about what $w = r(\cos\theta + i\sin\theta)$ is made of. The real part says "keep some of the original direction". The imaginary part says "mix in some of the quarter-turned version". Blending an arrow with its own quarter-turned copy tilts it part-way -- a rotation by something <em>between</em> $0^\circ$ and $90^\circ$. The proportions of the blend set the tilt; the overall size of $w$ sets the stretch.</p>
+
+        <p>Let's verify it on an example where we can check both ways. Take $z = 1 + i$ and square it.</p>
+
+        <p>The algebraic way -- expand, and use $i^2 = -1$:</p>
+
+        <p class="display-equation">$$(1+i)(1+i) = 1 + i + i + i^2 = 1 + 2i - 1 = 2i$$</p>
+
+        <p>The geometric way: $1+i$ sits at $45^\circ$ with length $\sqrt{2}$. Multiplying it by itself should rotate $45^\circ$ by another $45^\circ$ (giving $90^\circ$) and scale $\sqrt{2}$ by another $\sqrt{2}$ (giving 2).</p>
+
+        <p>An arrow of length 2 pointing straight up is... $2i$. The two answers agree.</p>
+
+        <p>The algebra grinds it out symbol by symbol. The geometry <em>sees</em> it. Drag the arrows below and watch the rule hold everywhere:</p>
+
+        <iframe
+          class="essay-widget complex-multiplication-widget"
+          src="trigonometry/complex-numbers/complex-multiplication-widget.html"
+          title="Interactive widget with two draggable complex numbers showing that their product's angle is the sum of their angles and its magnitude the product of their magnitudes"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>In summary, when complex numbers multiply:</p>
+
+        <p class="display-equation">$$\text{angles } \textbf{add} \qquad \text{magnitudes } \textbf{multiply}$$</p>
+
+        <h3 class="subsection-title">An Echo From the Algebra Branch</h3>
+
+        <p>Read that summary line again, slowly. Multiplying the numbers... <em>adds</em> the angles.</p>
+
+        <p>We have met behaviour like this before. It was the very first thing we learned in the algebra branch:</p>
+
+        <p class="display-equation">$$a^m \cdot a^n = a^{m+n}$$</p>
+
+        <p>Multiplying powers adds the exponents. Exponents turn multiplication into addition.</p>
+
+        <p>And here, on the complex plane: multiplying rotations adds the angles. <strong>Angles are behaving exactly like exponents.</strong></p>
+
+        <p>Hold that thought. It is the loose thread the final chapter will pull.</p>
+
+        <h3 class="subsection-title">The Circle, Packaged Into a Number</h3>
+
+        <p>Among all complex numbers, the ones with length exactly 1 deserve special attention. Multiplying by them doesn't stretch anything -- it <em>only rotates</em>.</p>
+
+        <p>Where do they live? At distance 1 from the origin: <strong>on the unit circle</strong>.</p>
+
+        <p>Our old friend has reappeared, and in this setting every point on it is a pure rotation, waiting to be applied:</p>
+
+        <p class="display-equation">$$\cos\theta + i\sin\theta$$</p>
+
+        <p>This is worth pausing on. In the geometric branch, a point on the unit circle was a <em>pair</em> of coordinates, $(\cos\theta, \sin\theta)$, and rotating it meant fussy bookkeeping with two components.</p>
+
+        <p>Now the pair has been packaged into a single number -- and rotation has become ordinary multiplication. Because angles add, rotating by $\theta$ and then by $\varphi$ is one clean statement:</p>
+
+        <p class="display-equation">$$(\cos\theta + i\sin\theta)(\cos\varphi + i\sin\varphi) = \cos(\theta+\varphi) + i\sin(\theta+\varphi)$$</p>
+
+        <p>No triangle diagrams, no coordinate juggling. The arithmetic of complex numbers does the geometry <em>for us</em>. This is why they are so useful: they are the natural language of rotation.</p>
+
+        <h3 class="subsection-title">Oscillation, Revisited</h3>
+
+        <p>In the Waves chapter, a point circling at $f$ revolutions per second had coordinates that oscillated: the $x$-coordinate traced a cosine wave, the $y$-coordinate a sine wave.</p>
+
+        <p>In our new language, that circling point is a single rotating complex number:</p>
+
+        <p class="display-equation">$$z(t) = \cos(2\pi f t) + i\sin(2\pi f t)$$</p>
+
+        <p>Its real part is the cosine wave. Its imaginary part is the sine wave.</p>
+
+        <p>Think of the rotating arrow casting shadows: one onto the real axis, one onto the imaginary axis. Each shadow bobs back and forth as the arrow turns.</p>
+
+        <p><strong>An oscillation is the shadow of a rotation.</strong></p>
+
+        <iframe
+          class="essay-widget rotation-projection-widget"
+          src="trigonometry/complex-numbers/rotation-projection-widget.html"
+          title="Interactive widget showing a rotating complex number whose real and imaginary shadows trace cosine and sine waves over time"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>This is more than a pretty picture. The wave -- the thing we measure in sound, light, and current -- is one component of something simpler: steady, uniform rotation. Working with the rotation and taking the shadow at the end is often far easier than wrestling with the wave itself. This single idea underlies a large share of physics and engineering.</p>
+
+        <h3 class="subsection-title">A Suspicious Resemblance</h3>
+
+        <p>Let's gather the clues this chapter has produced.</p>
+
+        <p>Rotations compose by <em>adding angles</em>. Powers compose by <em>adding exponents</em>. So if rotation by $\theta$ could be written as a power -- some base raised to $\theta$ -- the bookkeeping would match perfectly:</p>
+
+        <p class="display-equation">$$R^{\theta_1} \cdot R^{\theta_2} = R^{\theta_1+\theta_2}$$</p>
+
+        <p>But raised to <em>what base</em>? For that, recall the algebra branch.</p>
+
+        <p>$e^x$ is continuous growth: at every instant, the quantity grows in proportion to itself -- it grows <em>in the direction it already points</em>, which is why it races off along the number line.</p>
+
+        <p>Now ask a strange question. What if, at every instant, the growth were turned <strong>sideways</strong> -- pushed at $90^\circ$ to the direction the arrow currently points?</p>
+
+        <p>Pushing sideways never lengthens an arrow. It only changes where it points. An arrow forever nudged at right angles to itself doesn't grow at all -- <strong>it travels in a circle</strong>.</p>
+
+        <p>And we have just spent a chapter with the number whose entire job is to turn things $90^\circ$: the number $i$.</p>
+
+        <p>So here is a daring guess. Continuous growth is $e^x$. Continuous growth <em>turned sideways</em> -- growth in the $i$ direction -- ought to be:</p>
+
+        <p class="display-equation">$$e^{i\theta}$$</p>
+
+        <p>If the guess is right, $e^{i\theta}$ doesn't grow at all. It rotates. After turning through an angle $\theta$, it should be sitting on the unit circle at exactly the point we have learned to call:</p>
+
+        <p class="display-equation">$$\cos\theta + i\sin\theta$$</p>
+
+        <p>Which would mean that these two expressions -- one from the algebra branch, one from the geometric branch -- are <em>the same thing</em>.</p>
+
+        <p>That is an extraordinary claim, and we have not earned it yet. A guess built on intuition needs to survive contact with something solid.</p>
+
+        <p>Fortunately, we own something solid: an infinite series for $e^x$ -- powers over factorials -- that works for <em>every</em> input. Nothing stops us from feeding it $i\theta$ and grinding out what comes back.</p>
+
+        <p>That calculation is the next chapter. The two branches are about to meet.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-algebra-branch.html">
+            <span>Previous</span>
+            <strong>Algebra Branch</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-polar-form.html">
+            <span>Next</span>
+            <strong>Polar Form</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

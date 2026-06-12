@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Types of Waves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-card);
+  }
+  .tabs button {
+    flex: 1;
+    padding: 0.85rem 0.6rem;
+    background: transparent;
+    color: var(--text-dim);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .tabs button + button { border-left: 1px solid var(--rule); }
+  .tabs button:hover { color: var(--accent); }
+  .tabs button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(212, 184, 136, 0.06);
+  }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 1020px;
+    height: auto;
+    display: block;
+  }
+  .controls {
+    padding: 1rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .mode-note {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.55rem 0.95rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .medium-dot { fill: rgba(236, 226, 209, 0.5); }
+  .tracked-dot {
+    fill: var(--point);
+    stroke: var(--text);
+    stroke-width: 1.6;
+    filter: drop-shadow(0 0 8px var(--point-glow));
+  }
+  .rest-marker {
+    stroke: var(--text-faint);
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+    opacity: 0.55;
+  }
+  .trace {
+    fill: none;
+    stroke: var(--sin);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .trace-marker {
+    fill: var(--sin);
+    stroke: var(--text);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .annotation {
+    fill: var(--text-dim);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+  }
+  .motion-arrow { stroke: var(--point); stroke-width: 1.8; opacity: 0.85; }
+  .travel-arrow { stroke: rgba(236, 226, 209, 0.55); stroke-width: 1.8; }
+  .spring-line {
+    stroke: var(--accent);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.8;
+  }
+  .anchor-bar { stroke: var(--rule-strong); stroke-width: 4; }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="tabs" id="tabs">
+    <button data-mode="transverse" class="active">Transverse</button>
+    <button data-mode="longitudinal">Longitudinal</button>
+    <button data-mode="oscillation">Oscillation in time</button>
+  </div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 1020 480" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Animated wave with one highlighted point; below, the displacement of that point traced against time">
+      <defs>
+        <marker id="arrow-pink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#ef7398" />
+        </marker>
+        <marker id="arrow-dim" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.55)" />
+        </marker>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+
+      <!-- ——— TOP: the medium ——— -->
+      <text class="panel-label" x="40" y="28" id="medium-label">The medium</text>
+      <g id="medium"></g>
+      <g id="medium-annotations"></g>
+
+      <!-- ——— SEPARATOR ——— -->
+      <line x1="40" y1="252" x2="980" y2="252" stroke="rgba(214, 196, 168, 0.08)" stroke-width="1" />
+
+      <!-- ——— BOTTOM: displacement of tracked point over time ——— -->
+      <text class="panel-label" x="40" y="282">Displacement of the pink point over time</text>
+      <g id="trace-grid"></g>
+      <line class="axis" x1="40" y1="385" x2="985" y2="385" marker-end="url(#ax-arrow)" />
+      <text class="graph-tick" x="978" y="406" text-anchor="end">time →</text>
+      <text class="graph-tick" x="34" y="320" text-anchor="end">+</text>
+      <text class="graph-tick" x="34" y="458" text-anchor="end">−</text>
+      <path id="trace" class="trace" />
+      <circle id="trace-pt" class="trace-marker" r="5.5" />
+    </svg>
+  </div>
+
+  <div class="controls">
+    <span class="mode-note" id="mode-note"></span>
+    <button class="btn" id="play"><span id="play-icon">❚❚</span> <span id="play-label">Pause</span></button>
+  </div>
+
+  <div class="footer">
+    Whatever the medium does, the displacement of a single point traces out the same shape.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // Layout
+  const MED = { x0: 60, x1: 960, yMid: 145, amp: 62 };            // medium panel
+  const TRC = { x0: 60, x1: 960, yMid: 385, amp: 62, window: 6 }; // trace panel, 6 s window
+
+  // Wave parameters (shared)
+  const FREQ = 0.5;                       // cycles per second
+  const OMEGA = 2 * Math.PI * FREQ;
+  const WAVELEN = 360;                    // pixels
+  const K = 2 * Math.PI / WAVELEN;
+
+  const medium = $('#medium');
+  const annot = $('#medium-annotations');
+
+  // Trace gridlines
+  const tGrid = $('#trace-grid');
+  [-1, -0.5, 0.5, 1].forEach(v => {
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', TRC.x0); l.setAttribute('x2', TRC.x1);
+    l.setAttribute('y1', TRC.yMid - v * TRC.amp);
+    l.setAttribute('y2', TRC.yMid - v * TRC.amp);
+    tGrid.appendChild(l);
+  });
+
+  // Each mode provides: build() to create elements, update(t) to animate,
+  // disp(t) for the tracked point's displacement in [-1, 1].
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+  // Transverse: a row of dots, each moving vertically; the pattern travels right
+  const transverse = (() => {
+    const N = 46;
+    const dots = [];
+    let tracked = null;
+    const trackedIndex = 22;
+    function build() {
+      dots.length = 0;
+      for (let i = 0; i < N; i++) {
+        const x = MED.x0 + (i / (N - 1)) * (MED.x1 - MED.x0);
+        const isTracked = (i === trackedIndex);
+        const d = el('circle', { class: isTracked ? 'tracked-dot' : 'medium-dot', r: isTracked ? 8 : 4.5, cx: x, cy: MED.yMid });
+        dots.push({ elt: d, x });
+        medium.appendChild(d);
+        if (isTracked) tracked = dots[i];
+      }
+      annot.appendChild(el('line', { class: 'rest-marker', x1: tracked.x, y1: MED.yMid - MED.amp - 12, x2: tracked.x, y2: MED.yMid + MED.amp + 12 }));
+      annot.appendChild(el('line', { class: 'travel-arrow', x1: 700, y1: 52, x2: 790, y2: 52, 'marker-end': 'url(#arrow-dim)' }));
+      const t1 = el('text', { class: 'annotation', x: 692, y: 57, 'text-anchor': 'end' });
+      t1.textContent = 'the wave travels'; annot.appendChild(t1);
+      annot.appendChild(el('line', { class: 'motion-arrow', x1: tracked.x + 22, y1: MED.yMid + 26, x2: tracked.x + 22, y2: MED.yMid - 26, 'marker-end': 'url(#arrow-pink)' }));
+      const t2 = el('text', { class: 'annotation', x: tracked.x + 34, y: MED.yMid + 5 });
+      t2.textContent = 'each point only moves up and down'; annot.appendChild(t2);
+    }
+    function pointDisp(x, t) { return Math.sin(K * x - OMEGA * t); }
+    function update(t) {
+      dots.forEach(d => d.elt.setAttribute('cy', MED.yMid - MED.amp * pointDisp(d.x, t)));
+    }
+    function disp(t) { return pointDisp(tracked ? tracked.x : 0, t); }
+    return { build, update, disp, note: 'Water ripples, a shaken rope, light. Displacement is perpendicular to travel.' };
+  })();
+
+  // Longitudinal: dots displaced along the direction of travel; compressions form
+  const longitudinal = (() => {
+    const COLS = 38, ROWS = 4;
+    const dots = [];
+    let tracked = null;
+    const trackedCol = 18;
+    function build() {
+      dots.length = 0;
+      const rowYs = [];
+      for (let r = 0; r < ROWS; r++) rowYs.push(MED.yMid - 58 + r * 32);
+      for (let c = 0; c < COLS; c++) {
+        const x = MED.x0 + (c / (COLS - 1)) * (MED.x1 - MED.x0);
+        for (let r = 0; r < ROWS; r++) {
+          const isTracked = (c === trackedCol && r === 1);
+          const d = el('circle', { class: isTracked ? 'tracked-dot' : 'medium-dot', r: isTracked ? 8 : 4.5, cx: x, cy: rowYs[r] });
+          const rec = { elt: d, x, y: rowYs[r] };
+          dots.push(rec);
+          medium.appendChild(d);
+          if (isTracked) tracked = rec;
+        }
+      }
+      annot.appendChild(el('line', { class: 'rest-marker', x1: tracked.x, y1: tracked.y - 30, x2: tracked.x, y2: tracked.y + 30 }));
+      annot.appendChild(el('line', { class: 'travel-arrow', x1: 700, y1: 40, x2: 790, y2: 40, 'marker-end': 'url(#arrow-dim)' }));
+      const t1 = el('text', { class: 'annotation', x: 692, y: 45, 'text-anchor': 'end' });
+      t1.textContent = 'the wave travels'; annot.appendChild(t1);
+      // motion arrow below the dot field so it stays clear of the moving dots
+      const arrowY = tracked.y + 92;
+      annot.appendChild(el('line', { class: 'motion-arrow', x1: tracked.x - 30, y1: arrowY, x2: tracked.x + 30, y2: arrowY, 'marker-end': 'url(#arrow-pink)' }));
+      const t2 = el('text', { class: 'annotation', x: tracked.x + 44, y: arrowY + 5 });
+      t2.textContent = 'each point only moves back and forth'; annot.appendChild(t2);
+    }
+    const DX = 26; // pixel amplitude of horizontal displacement
+    function pointDisp(x, t) { return Math.sin(K * x - OMEGA * t); }
+    function update(t) {
+      dots.forEach(d => d.elt.setAttribute('cx', d.x + DX * pointDisp(d.x, t)));
+    }
+    function disp(t) { return pointDisp(tracked ? tracked.x : 0, t); }
+    return { build, update, disp, note: 'Sound. The air is squeezed and stretched along the direction of travel.' };
+  })();
+
+  // Oscillation in time: a mass on a spring, nothing travels at all
+  const oscillation = (() => {
+    let spring, mass;
+    const anchorY = 38;
+    const massX = 510;
+    const restY = MED.yMid + 10;
+    function springPath(yMass) {
+      const coils = 9;
+      const top = anchorY + 8;
+      const bottom = yMass - 16;
+      const seg = (bottom - top) / (coils * 2);
+      let d = 'M ' + massX + ' ' + top;
+      for (let i = 0; i < coils * 2; i++) {
+        const y = top + seg * (i + 0.5);
+        const x = massX + (i % 2 === 0 ? 16 : -16);
+        d += ' L ' + x + ' ' + y.toFixed(1);
+      }
+      d += ' L ' + massX + ' ' + bottom;
+      return d;
+    }
+    function build() {
+      annot.appendChild(el('line', { class: 'anchor-bar', x1: massX - 56, y1: anchorY, x2: massX + 56, y2: anchorY }));
+      spring = el('path', { class: 'spring-line', d: springPath(restY) });
+      medium.appendChild(spring);
+      annot.appendChild(el('line', { class: 'rest-marker', x1: massX - 70, y1: restY, x2: massX + 70, y2: restY }));
+      mass = el('circle', { class: 'tracked-dot', r: 14, cx: massX, cy: restY });
+      medium.appendChild(mass);
+      annot.appendChild(el('line', { class: 'motion-arrow', x1: massX + 92, y1: restY + 26, x2: massX + 92, y2: restY - 26, 'marker-end': 'url(#arrow-pink)' }));
+      const t2 = el('text', { class: 'annotation', x: massX + 106, y: restY - 6 });
+      t2.textContent = 'nothing travels anywhere —'; annot.appendChild(t2);
+      const t3 = el('text', { class: 'annotation', x: massX + 106, y: restY + 16 });
+      t3.textContent = 'the pattern repeats in time'; annot.appendChild(t3);
+    }
+    function disp(t) { return Math.sin(OMEGA * t); }
+    function update(t) {
+      const y = restY - 50 * disp(t);
+      mass.setAttribute('cy', y);
+      spring.setAttribute('d', springPath(y));
+    }
+    return { build, update, disp, note: 'A bouncing spring, a swinging pendulum, a beating heart. A cycle repeating in time.' };
+  })();
+
+  const MODES = { transverse: transverse, longitudinal: longitudinal, oscillation: oscillation };
+
+  // State
+  let mode = 'transverse';
+  let t = 0;
+  let playing = true;
+  let lastFrame = null;
+
+  function setMode(m) {
+    mode = m;
+    t = 0;
+    clear(medium);
+    clear(annot);
+    MODES[m].build();
+    $('#mode-note').textContent = MODES[m].note;
+    document.querySelectorAll('#tabs button').forEach(b =>
+      b.classList.toggle('active', b.dataset.mode === m));
+    render();
+  }
+
+  // Trace: displacement of the tracked point over the last TRC.window seconds
+  function renderTrace() {
+    const fn = MODES[mode].disp;
+    const pxPerSec = (TRC.x1 - TRC.x0) / TRC.window;
+    const tStart = Math.max(0, t - TRC.window);
+    let d = '';
+    const N = 240;
+    for (let i = 0; i <= N; i++) {
+      const tau = tStart + (i / N) * (t - tStart);
+      const x = TRC.x1 - (t - tau) * pxPerSec;
+      const y = TRC.yMid - TRC.amp * fn(tau);
+      d += (i === 0 ? 'M ' : ' L ') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }
+    if (t === 0) d = '';
+    $('#trace').setAttribute('d', d);
+    const pt = $('#trace-pt');
+    pt.setAttribute('cx', TRC.x1);
+    pt.setAttribute('cy', TRC.yMid - TRC.amp * fn(t));
+  }
+
+  function render() {
+    MODES[mode].update(t);
+    renderTrace();
+  }
+
+  function tick(ts) {
+    if (!playing) return;
+    if (lastFrame === null) lastFrame = ts;
+    const dt = Math.min(0.05, (ts - lastFrame) / 1000);
+    lastFrame = ts;
+    t += dt;
+    render();
+    requestAnimationFrame(tick);
+  }
+
+  function updatePlayButton() {
+    $('#play-icon').textContent = playing ? '❚❚' : '▶';
+    $('#play-label').textContent = playing ? 'Pause' : 'Play';
+  }
+
+  $('#play').addEventListener('click', () => {
+    playing = !playing;
+    lastFrame = null;
+    updatePlayButton();
+    if (playing) requestAnimationFrame(tick);
+  });
+
+  $('#tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    setMode(btn.dataset.mode);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { playing = false; updatePlayButton(); }
+  });
+
+  // Init
+  setMode('transverse');
+  requestAnimationFrame(tick);
+})();
+</script>
+
+</body>
+</html>

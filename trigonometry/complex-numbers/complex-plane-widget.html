@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Complex Plane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --cos-glow: rgba(232, 161, 59, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .equation-bar {
+    padding: 0.95rem 1.6rem 0.75rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.18rem;
+    color: var(--text);
+  }
+  .equation-bar .re-part { color: var(--cos); }
+  .equation-bar .im-part { color: var(--sin); }
+  .equation-bar .polar-part { color: var(--text-dim); font-size: 0.95rem; }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 880px;
+    height: auto;
+    display: block;
+    touch-action: none;
+    cursor: crosshair;
+  }
+  .controls {
+    padding: 1.05rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .toggle-group { display: flex; align-items: center; gap: 0.5rem; }
+  .toggle-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+  .toggle-pill {
+    display: inline-flex;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .toggle-pill button {
+    padding: 0.45rem 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-dim);
+    border: 0;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+  .toggle-pill button + button { border-left: 1px solid var(--rule); }
+  .toggle-pill button.active {
+    background: rgba(212, 184, 136, 0.14);
+    color: var(--accent);
+  }
+  .readouts {
+    display: flex;
+    gap: 1.8rem;
+    flex-wrap: wrap;
+  }
+  .readout { display: flex; align-items: baseline; gap: 0.5rem; }
+  .readout .name {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  .readout .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .readout .value.re { color: var(--cos); }
+  .readout .value.im { color: var(--sin); }
+  .readout .value.mag { color: var(--accent); }
+  .readout .value.ang { color: var(--point); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .axis-name {
+    fill: var(--text-dim);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+  }
+  .re-leg {
+    stroke: var(--cos);
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+  .im-leg {
+    stroke: var(--sin);
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+  .z-arrow {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--accent-glow));
+  }
+  .z-pt {
+    fill: var(--point);
+    stroke: var(--text);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px var(--point-glow));
+    cursor: grab;
+  }
+  .angle-arc {
+    stroke: var(--point);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.85;
+  }
+  .mag-label {
+    fill: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .ang-label {
+    fill: var(--point);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="equation-bar" id="z-display">z = <span class="re-part">2</span> + <span class="im-part">1.5i</span></div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 880 520" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A draggable point on the complex plane showing its real and imaginary parts, with an optional magnitude and angle view">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="36" y="26">The complex plane</text>
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <g id="ticks"></g>
+      <text class="axis-name" id="re-name">real</text>
+      <text class="axis-name" id="im-name">imaginary</text>
+
+      <line id="re-leg" class="re-leg" />
+      <line id="im-leg" class="im-leg" />
+      <path id="angle-arc" class="angle-arc" />
+      <line id="z-arrow" class="z-arrow" />
+      <text id="mag-label" class="mag-label"></text>
+      <text id="ang-label" class="ang-label"></text>
+      <circle id="z-pt" class="z-pt" r="9" />
+    </svg>
+  </div>
+
+  <div class="controls">
+    <div class="readouts">
+      <div class="readout"><span class="name">real part</span><span class="value re" id="re-val">2.0</span></div>
+      <div class="readout"><span class="name">imaginary part</span><span class="value im" id="im-val">1.5</span></div>
+      <div class="readout"><span class="name">magnitude r</span><span class="value mag" id="mag-val">2.50</span></div>
+      <div class="readout"><span class="name">angle θ</span><span class="value ang" id="ang-val">36.9°</span></div>
+    </div>
+    <div class="toggle-group">
+      <span class="toggle-label">View</span>
+      <div class="toggle-pill" id="view-toggle">
+        <button data-view="rect" class="active">a + bi</button>
+        <button data-view="polar">r, θ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Drag the point anywhere. The same number can be described by its two parts, or by its length and direction.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('#canvas');
+
+  // ——— Layout: re in [-3.2, 3.2], im in [-1.9, 1.9] mapped onto 880x520 with square units ———
+  const CX = 440, CY = 264, UNIT = 124;   // pixels per unit
+  const px = (re) => CX + re * UNIT;
+  const py = (im) => CY - im * UNIT;
+
+  // ——— Static decoration ———
+  const grid = $('#grid');
+  const ticks = $('#ticks');
+  const xAxis = $('#x-axis');
+  xAxis.setAttribute('x1', 30); xAxis.setAttribute('x2', 855);
+  xAxis.setAttribute('y1', CY); xAxis.setAttribute('y2', CY);
+  const yAxis = $('#y-axis');
+  yAxis.setAttribute('x1', CX); yAxis.setAttribute('x2', CX);
+  yAxis.setAttribute('y1', 505); yAxis.setAttribute('y2', 36);
+
+  for (let v = -3; v <= 3; v++) {
+    if (v === 0) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(v)); l.setAttribute('x2', px(v));
+    l.setAttribute('y1', 40); l.setAttribute('y2', 500);
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', px(v)); t.setAttribute('y', CY + 20);
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = v;
+    ticks.appendChild(t);
+  }
+  for (let v = -1; v <= 1; v++) {
+    if (v === 0) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', 36); l.setAttribute('x2', 848);
+    l.setAttribute('y1', py(v)); l.setAttribute('y2', py(v));
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', CX - 10); t.setAttribute('y', py(v) + 4);
+    t.setAttribute('text-anchor', 'end');
+    t.textContent = (v === 1) ? 'i' : '−i';
+    ticks.appendChild(t);
+  }
+  $('#re-name').setAttribute('x', 845); $('#re-name').setAttribute('y', CY - 12);
+  $('#re-name').setAttribute('text-anchor', 'end');
+  $('#im-name').setAttribute('x', CX + 12); $('#im-name').setAttribute('y', 52);
+
+  // ——— State ———
+  let re = 2, im = 1.5;
+  let view = 'rect';
+
+  function fmt(n, dp) {
+    const s = n.toFixed(dp === undefined ? 1 : dp);
+    return s === '-0.0' ? '0.0' : s;
+  }
+
+  function zString() {
+    const a = fmt(re), bAbs = fmt(Math.abs(im));
+    const sign = im < 0 ? '−' : '+';
+    return `z = <span class="re-part">${a}</span> ${sign} <span class="im-part">${bAbs}i</span>`;
+  }
+  function zPolarString(r, thetaDeg) {
+    return `z = <span class="re-part">${r.toFixed(2)}</span> <span class="polar-part">at angle</span> <span class="im-part">${thetaDeg.toFixed(1)}°</span>`;
+  }
+
+  function render() {
+    const X = px(re), Y = py(im);
+    const r = Math.sqrt(re * re + im * im);
+    let thetaDeg = Math.atan2(im, re) * 180 / Math.PI;
+    if (thetaDeg < 0) thetaDeg += 360;
+
+    // arrow + point
+    $('#z-arrow').setAttribute('x1', CX); $('#z-arrow').setAttribute('y1', CY);
+    $('#z-arrow').setAttribute('x2', X); $('#z-arrow').setAttribute('y2', Y);
+    $('#z-pt').setAttribute('cx', X); $('#z-pt').setAttribute('cy', Y);
+
+    const rectMode = (view === 'rect');
+
+    // legs (rect view)
+    const reLeg = $('#re-leg'), imLeg = $('#im-leg');
+    reLeg.style.display = rectMode ? '' : 'none';
+    imLeg.style.display = rectMode ? '' : 'none';
+    if (rectMode) {
+      reLeg.setAttribute('x1', CX); reLeg.setAttribute('y1', CY);
+      reLeg.setAttribute('x2', X); reLeg.setAttribute('y2', CY);
+      imLeg.setAttribute('x1', X); imLeg.setAttribute('y1', CY);
+      imLeg.setAttribute('x2', X); imLeg.setAttribute('y2', Y);
+    }
+
+    // polar decorations
+    const arc = $('#angle-arc'), magLbl = $('#mag-label'), angLbl = $('#ang-label');
+    arc.style.display = rectMode ? 'none' : '';
+    magLbl.style.display = rectMode ? 'none' : '';
+    angLbl.style.display = rectMode ? 'none' : '';
+    if (!rectMode) {
+      const thetaRad = Math.atan2(im, re);
+      const ta = thetaRad < 0 ? thetaRad + 2 * Math.PI : thetaRad;
+      const aR = Math.min(46, r * UNIT * 0.45);
+      if (ta > 0.08 && aR > 12) {
+        const ax = CX + aR, ay = CY;
+        const ex = CX + aR * Math.cos(ta), ey = CY - aR * Math.sin(ta);
+        const large = ta > Math.PI ? 1 : 0;
+        arc.setAttribute('d', `M ${ax} ${ay} A ${aR} ${aR} 0 ${large} 0 ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+      } else {
+        arc.setAttribute('d', '');
+      }
+      // magnitude label at the arrow midpoint, offset perpendicular
+      const mx = (CX + X) / 2, my = (CY + Y) / 2;
+      const len = Math.max(r * UNIT, 1);
+      const ox = -(Y - CY) / len * 16, oy = (X - CX) / len * 16;
+      magLbl.setAttribute('x', (mx + ox).toFixed(1));
+      magLbl.setAttribute('y', (my + oy).toFixed(1));
+      magLbl.textContent = 'r = ' + r.toFixed(2);
+      angLbl.setAttribute('x', CX + 56);
+      angLbl.setAttribute('y', CY - 12);
+      angLbl.textContent = 'θ';
+    }
+
+    // readouts
+    $('#z-display').innerHTML = rectMode ? zString() : zPolarString(r, thetaDeg);
+    $('#re-val').textContent = fmt(re);
+    $('#im-val').textContent = fmt(im);
+    $('#mag-val').textContent = r.toFixed(2);
+    $('#ang-val').textContent = thetaDeg.toFixed(1) + '°';
+  }
+
+  // ——— Dragging ———
+  function svgPointFromEvent(evt) {
+    if (!svg.createSVGPoint || !svg.getScreenCTM) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    const m = svg.getScreenCTM();
+    if (!m) return null;
+    return pt.matrixTransform(m.inverse());
+  }
+  let dragging = false;
+  function moveTo(evt) {
+    const p = svgPointFromEvent(evt);
+    if (!p) return;
+    re = Math.max(-3.1, Math.min(3.1, (p.x - CX) / UNIT));
+    im = Math.max(-1.8, Math.min(1.8, (CY - p.y) / UNIT));
+    re = Math.round(re * 10) / 10;
+    im = Math.round(im * 10) / 10;
+    render();
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    if (svg.setPointerCapture) { try { svg.setPointerCapture(e.pointerId); } catch (err) {} }
+    moveTo(e);
+  });
+  svg.addEventListener('pointermove', (e) => { if (dragging) moveTo(e); });
+  svg.addEventListener('pointerup', () => { dragging = false; });
+  svg.addEventListener('pointercancel', () => { dragging = false; });
+
+  // ——— View toggle ———
+  $('#view-toggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    view = btn.dataset.view;
+    document.querySelectorAll('#view-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  });
+
+  // Init
+  render();
+})();
+</script>
+
+</body>
+</html>

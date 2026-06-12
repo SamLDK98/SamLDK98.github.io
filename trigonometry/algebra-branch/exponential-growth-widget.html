@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adding versus Doubling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .viz-wrap {
+    padding: 1.3rem 1.25rem 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 920px;
+    height: auto;
+    display: block;
+  }
+  .readout-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2.6rem;
+    padding: 0.2rem 1.6rem 0.9rem;
+    flex-wrap: wrap;
+  }
+  .readout { display: flex; align-items: baseline; gap: 0.55rem; }
+  .readout .name {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .readout .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.02rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .readout .value.lin { color: var(--sin); }
+  .readout .value.exp { color: var(--point); }
+  .controls {
+    padding: 1.05rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .toggle-group { display: flex; align-items: center; gap: 0.5rem; }
+  .toggle-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+  .toggle-pill {
+    display: inline-flex;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .toggle-pill button {
+    padding: 0.45rem 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-dim);
+    border: 0;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+  .toggle-pill button + button { border-left: 1px solid var(--rule); }
+  .toggle-pill button.active {
+    background: rgba(212, 184, 136, 0.14);
+    color: var(--accent);
+  }
+  .btn-group { display: flex; gap: 0.5rem; }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.55rem 0.95rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .lin-path {
+    fill: none;
+    stroke: var(--sin);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .exp-path {
+    fill: none;
+    stroke: var(--point);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px var(--point-glow));
+  }
+  .lin-dot { fill: var(--sin); stroke: var(--text); stroke-width: 1.5; }
+  .exp-dot { fill: var(--point); stroke: var(--text); stroke-width: 1.5; }
+  .escape-note {
+    fill: var(--point);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 920 400" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A race between a population that adds two each step and one that doubles each step, on a linear or logarithmic scale">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="48" y="26" id="scale-label">Linear scale</text>
+      <g id="grid"></g>
+      <line class="axis" x1="60" y1="350" x2="895" y2="350" marker-end="url(#ax-arrow)" />
+      <line class="axis" x1="60" y1="350" x2="60" y2="40" marker-end="url(#ax-arrow)" />
+      <g id="ticks"></g>
+      <text class="graph-tick" x="890" y="372" text-anchor="end">step</text>
+      <path id="lin-path" class="lin-path" />
+      <path id="exp-path" class="exp-path" />
+      <circle id="lin-dot" class="lin-dot" r="6" />
+      <circle id="exp-dot" class="exp-dot" r="6" />
+      <text id="escape-note" class="escape-note" style="display:none">off the chart!</text>
+    </svg>
+  </div>
+
+  <div class="readout-bar">
+    <div class="readout"><span class="name">step</span><span class="value" id="step-display" style="color:var(--accent)">0</span></div>
+    <div class="readout"><span class="name">adds 2 each step</span><span class="value lin" id="lin-display">1</span></div>
+    <div class="readout"><span class="name">doubles each step</span><span class="value exp" id="exp-display">1</span></div>
+  </div>
+
+  <div class="controls">
+    <div class="toggle-group">
+      <span class="toggle-label">Scale</span>
+      <div class="toggle-pill" id="scale-toggle">
+        <button data-scale="linear" class="active">linear</button>
+        <button data-scale="log">logarithmic</button>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn" id="play"><span id="play-icon">▶</span> <span id="play-label">Play</span></button>
+      <button class="btn" id="reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Both start at 1. On the logarithmic scale, each gridline means "ten times more" — and the doubling curve becomes a straight line.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // ——— Layout ———
+  const G = { x0: 60, x1: 870, y0: 350, y1: 50 };
+  const STEPS = 12;                 // 2^12 = 4096
+  const LIN_MAX = 130;              // linear-scale ceiling
+  const LOG_MAX = Math.log10(5000); // log-scale ceiling
+
+  const linVal = (t) => 1 + 2 * t;
+  const expVal = (t) => Math.pow(2, t);
+
+  const tx = (t) => G.x0 + (t / STEPS) * (G.x1 - G.x0);
+
+  let scale = 'linear';
+
+  function vy(v) {
+    if (scale === 'linear') {
+      return G.y0 - (v / LIN_MAX) * (G.y0 - G.y1);
+    }
+    return G.y0 - (Math.log10(Math.max(v, 0.8)) / LOG_MAX) * (G.y0 - G.y1);
+  }
+
+  // ——— Axis decoration (rebuilt on scale change) ———
+  const grid = $('#grid');
+  const ticks = $('#ticks');
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+  function buildAxes() {
+    clear(grid); clear(ticks);
+    // x ticks every 2 steps
+    for (let s = 2; s <= STEPS; s += 2) {
+      const x = tx(s);
+      const l = document.createElementNS(NS, 'line');
+      l.setAttribute('x1', x); l.setAttribute('x2', x);
+      l.setAttribute('y1', G.y0 - 4); l.setAttribute('y2', G.y0 + 4);
+      l.setAttribute('stroke', 'rgba(236, 226, 209, 0.32)');
+      ticks.appendChild(l);
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('class', 'graph-tick');
+      t.setAttribute('x', x); t.setAttribute('y', G.y0 + 22);
+      t.setAttribute('text-anchor', 'middle');
+      t.textContent = s;
+      ticks.appendChild(t);
+    }
+    // y gridlines
+    const levels = (scale === 'linear') ? [25, 50, 75, 100, 125] : [1, 10, 100, 1000];
+    levels.forEach(v => {
+      const y = vy(v);
+      const l = document.createElementNS(NS, 'line');
+      l.setAttribute('class', 'grid-line');
+      l.setAttribute('x1', G.x0); l.setAttribute('x2', G.x1);
+      l.setAttribute('y1', y); l.setAttribute('y2', y);
+      grid.appendChild(l);
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('class', 'graph-tick');
+      t.setAttribute('x', G.x0 - 8); t.setAttribute('y', y + 4);
+      t.setAttribute('text-anchor', 'end');
+      t.textContent = v;
+      ticks.appendChild(t);
+    });
+    $('#scale-label').textContent = (scale === 'linear') ? 'Linear scale' : 'Logarithmic scale';
+  }
+
+  // ——— State ———
+  let t = 0;          // current step (continuous while animating)
+  let playing = false;
+  let lastFrame = null;
+  let raf = null;
+
+  function buildPath(fn, upTo) {
+    let d = '';
+    let pen = false;
+    const N = Math.max(2, Math.round(upTo * 24));
+    for (let i = 0; i <= N; i++) {
+      const tt = (i / N) * upTo;
+      const v = fn(tt);
+      const ceiling = (scale === 'linear') ? LIN_MAX : Math.pow(10, LOG_MAX);
+      if (v > ceiling) break;
+      const cmd = pen ? ' L ' : 'M ';
+      d += cmd + tx(tt).toFixed(1) + ' ' + vy(v).toFixed(1);
+      pen = true;
+    }
+    return d;
+  }
+
+  function placeDot(id, fn) {
+    const dot = $('#' + id);
+    const v = fn(t);
+    const ceiling = (scale === 'linear') ? LIN_MAX : Math.pow(10, LOG_MAX);
+    if (v > ceiling) {
+      dot.style.display = 'none';
+      return false;
+    }
+    dot.style.display = '';
+    dot.setAttribute('cx', tx(t).toFixed(1));
+    dot.setAttribute('cy', vy(v).toFixed(1));
+    return true;
+  }
+
+  function render() {
+    $('#lin-path').setAttribute('d', t > 0 ? buildPath(linVal, t) : '');
+    $('#exp-path').setAttribute('d', t > 0 ? buildPath(expVal, t) : '');
+    placeDot('lin-dot', linVal);
+    const expVisible = placeDot('exp-dot', expVal);
+
+    const note = $('#escape-note');
+    if (!expVisible) {
+      note.style.display = '';
+      note.setAttribute('x', Math.min(tx(t), G.x1 - 110).toFixed(1));
+      note.setAttribute('y', G.y1 + 16);
+    } else {
+      note.style.display = 'none';
+    }
+
+    const step = Math.floor(t + 1e-9);
+    $('#step-display').textContent = String(step);
+    $('#lin-display').textContent = String(linVal(step));
+    $('#exp-display').textContent = expVal(step).toLocaleString('en-US');
+  }
+
+  // ——— Animation ———
+  function tick(ts) {
+    if (!playing) return;
+    if (lastFrame === null) lastFrame = ts;
+    const dt = Math.min(0.05, (ts - lastFrame) / 1000);
+    lastFrame = ts;
+    t += dt * 1.6;
+    if (t >= STEPS) {
+      t = STEPS;
+      playing = false;
+      updatePlayButton();
+    }
+    render();
+    if (playing) raf = requestAnimationFrame(tick);
+  }
+  function updatePlayButton() {
+    $('#play-icon').textContent = playing ? '❚❚' : '▶';
+    $('#play-label').textContent = playing ? 'Pause' : 'Play';
+  }
+  function play() {
+    if (t >= STEPS) t = 0;
+    playing = true;
+    lastFrame = null;
+    updatePlayButton();
+    raf = requestAnimationFrame(tick);
+  }
+  function pause() {
+    playing = false;
+    updatePlayButton();
+    if (raf) cancelAnimationFrame(raf);
+  }
+
+  // ——— Wire up ———
+  $('#play').addEventListener('click', () => { if (playing) pause(); else play(); });
+  $('#reset').addEventListener('click', () => { pause(); t = 0; render(); });
+  $('#scale-toggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    scale = btn.dataset.scale;
+    document.querySelectorAll('#scale-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+    buildAxes();
+    render();
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+  // Init
+  buildAxes();
+  render();
+})();
+</script>
+
+</body>
+</html>

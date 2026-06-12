@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oscillation as the Shadow of Rotation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --cos-glow: rgba(232, 161, 59, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --circle: rgba(236, 226, 209, 0.68);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1180px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .viz-wrap {
+    padding: 1.4rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+    display: block;
+  }
+  .controls {
+    padding: 1.1rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .toggle-group { display: flex; align-items: center; gap: 0.5rem; }
+  .toggle-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+  .toggle-pill {
+    display: inline-flex;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .toggle-pill button {
+    padding: 0.45rem 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-dim);
+    border: 0;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+  .toggle-pill button + button { border-left: 1px solid var(--rule); }
+  .toggle-pill button.active {
+    background: rgba(212, 184, 136, 0.14);
+    color: var(--accent);
+  }
+  .btn-group { display: flex; gap: 0.5rem; }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.55rem 0.95rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .circle-outline { stroke: var(--circle); stroke-width: 2.4; fill: rgba(0, 0, 0, 0.06); }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .axis-name {
+    fill: var(--text-dim);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .radius {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--accent-glow));
+  }
+  .z-pt {
+    fill: var(--point);
+    stroke: var(--text);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px var(--point-glow));
+  }
+  .re-shadow {
+    stroke: var(--cos);
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+  .im-shadow {
+    stroke: var(--sin);
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+  .drop-line {
+    stroke-width: 1.4;
+    stroke-dasharray: 4 4;
+    opacity: 0.55;
+  }
+  .drop-line.re { stroke: var(--cos); }
+  .drop-line.im { stroke: var(--sin); }
+  .shadow-dot-re {
+    fill: var(--cos);
+    stroke: var(--text);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 6px var(--cos-glow));
+  }
+  .shadow-dot-im {
+    fill: var(--sin);
+    stroke: var(--text);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .re-trace {
+    fill: none;
+    stroke: var(--cos);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px var(--cos-glow));
+  }
+  .im-trace {
+    fill: none;
+    stroke: var(--sin);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .trace-marker-re {
+    fill: var(--cos);
+    stroke: var(--text);
+    stroke-width: 1.5;
+  }
+  .trace-marker-im {
+    fill: var(--sin);
+    stroke: var(--text);
+    stroke-width: 1.5;
+  }
+  .connector {
+    stroke: var(--text-dim);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 4;
+    opacity: 0.4;
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 1100 470" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A point rotating on the unit circle in the complex plane; the shadows it casts on the real and imaginary axes trace cosine and sine waves over time">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+
+      <!-- ——— LEFT: complex plane ——— -->
+      <text class="panel-label" x="40" y="30">A rotating complex number</text>
+      <line class="axis" x1="45"  y1="245" x2="395" y2="245" marker-end="url(#ax-arrow)" />
+      <line class="axis" x1="210" y1="420" x2="210" y2="70"  marker-end="url(#ax-arrow)" />
+      <text class="axis-name" x="392" y="233" text-anchor="end">real</text>
+      <text class="axis-name" x="220" y="80">imaginary</text>
+      <circle class="circle-outline" cx="210" cy="245" r="150" />
+      <text class="graph-tick" x="368" y="263">1</text>
+      <text class="graph-tick" x="218" y="100">i</text>
+
+      <line id="re-shadow" class="re-shadow" />
+      <line id="im-shadow" class="im-shadow" />
+      <line id="drop-re" class="drop-line re" />
+      <line id="drop-im" class="drop-line im" />
+      <line id="radius" class="radius" x1="210" y1="245" x2="360" y2="245" />
+      <circle id="shadow-dot-re" class="shadow-dot-re" r="6" />
+      <circle id="shadow-dot-im" class="shadow-dot-im" r="6" />
+      <circle id="z-pt" class="z-pt" r="8" cx="360" cy="245" />
+
+      <!-- ——— SEPARATOR ——— -->
+      <line x1="430" y1="70" x2="430" y2="420" stroke="rgba(214, 196, 168, 0.08)" stroke-width="1" />
+
+      <!-- ——— RIGHT: the shadows over time ——— -->
+      <text class="panel-label" x="460" y="30">The shadows, traced over time</text>
+      <g id="wave-grid"></g>
+      <line class="axis" x1="450" y1="245" x2="1085" y2="245" marker-end="url(#ax-arrow)" />
+      <line class="axis" x1="460" y1="420" x2="460" y2="70"  marker-end="url(#ax-arrow)" />
+      <text class="graph-tick" x="455" y="99"  text-anchor="end">1</text>
+      <text class="graph-tick" x="455" y="249" text-anchor="end">0</text>
+      <text class="graph-tick" x="455" y="402" text-anchor="end">−1</text>
+      <text class="graph-tick" x="1080" y="267" text-anchor="end">time →</text>
+
+      <line id="connector" class="connector" />
+      <path id="re-trace" class="re-trace" />
+      <path id="im-trace" class="im-trace" />
+      <circle id="trace-marker-re" class="trace-marker-re" r="5" />
+      <circle id="trace-marker-im" class="trace-marker-im" r="5" />
+    </svg>
+  </div>
+
+  <div class="controls">
+    <div class="toggle-group">
+      <span class="toggle-label">Shadow</span>
+      <div class="toggle-pill" id="show-toggle">
+        <button data-show="re" class="active">real part</button>
+        <button data-show="im">imaginary part</button>
+        <button data-show="both">both</button>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn" id="play"><span id="play-icon">❚❚</span> <span id="play-label">Pause</span></button>
+      <button class="btn" id="reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    One rotating number, two shadows: its real part traces a cosine wave, its imaginary part a sine wave.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+
+  // ——— Layout ———
+  const CIRC = { cx: 210, cy: 245, r: 150 };
+  const WAVE = { x0: 460, x1: 1060, yMid: 245, amp: 150, window: 6 };  // 6-second window
+  const FREQ = 0.35;                                                   // gentle rotation
+  const OMEGA = 2 * Math.PI * FREQ;
+
+  // wave gridlines
+  const NS = 'http://www.w3.org/2000/svg';
+  const wGrid = $('#wave-grid');
+  [-1, -0.5, 0.5, 1].forEach(v => {
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', WAVE.x0); l.setAttribute('x2', WAVE.x1);
+    l.setAttribute('y1', WAVE.yMid - v * WAVE.amp);
+    l.setAttribute('y2', WAVE.yMid - v * WAVE.amp);
+    wGrid.appendChild(l);
+  });
+
+  // ——— State ———
+  let t = 0;
+  let playing = true;
+  let lastFrame = null;
+  let showMode = 're';
+
+  function buildTrace(fn) {
+    const pxPerSec = (WAVE.x1 - WAVE.x0) / WAVE.window;
+    const tStart = Math.max(0, t - WAVE.window);
+    if (t === 0) return '';
+    let d = '';
+    const N = 240;
+    for (let i = 0; i <= N; i++) {
+      const tau = tStart + (i / N) * (t - tStart);
+      const x = WAVE.x1 - (t - tau) * pxPerSec;
+      const y = WAVE.yMid - WAVE.amp * fn(tau);
+      d += (i === 0 ? 'M ' : ' L ') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }
+    return d;
+  }
+
+  function render() {
+    const theta = OMEGA * t;
+    const c = Math.cos(theta), s = Math.sin(theta);
+    const X = CIRC.cx + c * CIRC.r;
+    const Y = CIRC.cy - s * CIRC.r;
+
+    // rotating arrow + point
+    $('#radius').setAttribute('x2', X.toFixed(1));
+    $('#radius').setAttribute('y2', Y.toFixed(1));
+    $('#z-pt').setAttribute('cx', X.toFixed(1));
+    $('#z-pt').setAttribute('cy', Y.toFixed(1));
+
+    const showRe = (showMode === 're' || showMode === 'both');
+    const showIm = (showMode === 'im' || showMode === 'both');
+
+    // real shadow: segment on the real axis from origin to (cos, 0)
+    const reShadow = $('#re-shadow'), dropRe = $('#drop-re'), dotRe = $('#shadow-dot-re');
+    reShadow.style.display = showRe ? '' : 'none';
+    dropRe.style.display = showRe ? '' : 'none';
+    dotRe.style.display = showRe ? '' : 'none';
+    if (showRe) {
+      reShadow.setAttribute('x1', CIRC.cx); reShadow.setAttribute('y1', CIRC.cy);
+      reShadow.setAttribute('x2', X.toFixed(1)); reShadow.setAttribute('y2', CIRC.cy);
+      dropRe.setAttribute('x1', X.toFixed(1)); dropRe.setAttribute('y1', Y.toFixed(1));
+      dropRe.setAttribute('x2', X.toFixed(1)); dropRe.setAttribute('y2', CIRC.cy);
+      dotRe.setAttribute('cx', X.toFixed(1)); dotRe.setAttribute('cy', CIRC.cy);
+    }
+
+    // imaginary shadow: segment on the imaginary axis from origin to (0, sin)
+    const imShadow = $('#im-shadow'), dropIm = $('#drop-im'), dotIm = $('#shadow-dot-im');
+    imShadow.style.display = showIm ? '' : 'none';
+    dropIm.style.display = showIm ? '' : 'none';
+    dotIm.style.display = showIm ? '' : 'none';
+    if (showIm) {
+      imShadow.setAttribute('x1', CIRC.cx); imShadow.setAttribute('y1', CIRC.cy);
+      imShadow.setAttribute('x2', CIRC.cx); imShadow.setAttribute('y2', Y.toFixed(1));
+      dropIm.setAttribute('x1', X.toFixed(1)); dropIm.setAttribute('y1', Y.toFixed(1));
+      dropIm.setAttribute('x2', CIRC.cx); dropIm.setAttribute('y2', Y.toFixed(1));
+      dotIm.setAttribute('cx', CIRC.cx); dotIm.setAttribute('cy', Y.toFixed(1));
+    }
+
+    // traces
+    const reTrace = $('#re-trace'), imTrace = $('#im-trace');
+    reTrace.style.display = showRe ? '' : 'none';
+    imTrace.style.display = showIm ? '' : 'none';
+    if (showRe) reTrace.setAttribute('d', buildTrace((tau) => Math.cos(OMEGA * tau)));
+    if (showIm) imTrace.setAttribute('d', buildTrace((tau) => Math.sin(OMEGA * tau)));
+
+    const mRe = $('#trace-marker-re'), mIm = $('#trace-marker-im');
+    mRe.style.display = showRe ? '' : 'none';
+    mIm.style.display = showIm ? '' : 'none';
+    mRe.setAttribute('cx', WAVE.x1); mRe.setAttribute('cy', (WAVE.yMid - WAVE.amp * c).toFixed(1));
+    mIm.setAttribute('cx', WAVE.x1); mIm.setAttribute('cy', (WAVE.yMid - WAVE.amp * s).toFixed(1));
+
+    // connector from the rotating point to the leading edge of whichever trace is primary
+    const connector = $('#connector');
+    if (showRe && !showIm) {
+      connector.style.display = '';
+      connector.setAttribute('x1', X.toFixed(1)); connector.setAttribute('y1', Y.toFixed(1));
+      connector.setAttribute('x2', WAVE.x1); connector.setAttribute('y2', (WAVE.yMid - WAVE.amp * c).toFixed(1));
+    } else if (showIm && !showRe) {
+      connector.style.display = '';
+      connector.setAttribute('x1', X.toFixed(1)); connector.setAttribute('y1', Y.toFixed(1));
+      connector.setAttribute('x2', WAVE.x1); connector.setAttribute('y2', (WAVE.yMid - WAVE.amp * s).toFixed(1));
+    } else {
+      connector.style.display = 'none';
+    }
+  }
+
+  // ——— Animation ———
+  function tick(ts) {
+    if (!playing) return;
+    if (lastFrame === null) lastFrame = ts;
+    const dt = Math.min(0.05, (ts - lastFrame) / 1000);
+    lastFrame = ts;
+    t += dt;
+    render();
+    requestAnimationFrame(tick);
+  }
+  function updatePlayButton() {
+    $('#play-icon').textContent = playing ? '❚❚' : '▶';
+    $('#play-label').textContent = playing ? 'Pause' : 'Play';
+  }
+
+  // ——— Wire up ———
+  $('#play').addEventListener('click', () => {
+    playing = !playing;
+    lastFrame = null;
+    updatePlayButton();
+    if (playing) requestAnimationFrame(tick);
+  });
+  $('#reset').addEventListener('click', () => {
+    t = 0;
+    render();
+  });
+  $('#show-toggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    showMode = btn.dataset.show;
+    document.querySelectorAll('#show-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { playing = false; updatePlayButton(); }
+  });
+
+  // Init
+  render();
+  requestAnimationFrame(tick);
+})();
+</script>
+
+</body>
+</html>

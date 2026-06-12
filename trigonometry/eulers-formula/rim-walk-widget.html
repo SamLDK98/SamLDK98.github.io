@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Walking the Rim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --circle: rgba(236, 226, 209, 0.68);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .equation-bar {
+    padding: 0.95rem 1.6rem 0.75rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.12rem;
+    color: var(--text);
+  }
+  .equation-bar .walk-part { color: var(--sin); }
+  .equation-bar .land-part { color: var(--point); }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    display: block;
+  }
+  .controls {
+    padding: 1.05rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.4rem;
+    align-items: center;
+  }
+  @media (max-width: 760px) {
+    .controls { grid-template-columns: 1fr; gap: 0.9rem; }
+  }
+  .slider-block { display: flex; flex-direction: column; gap: 0.4rem; }
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-head .lbl {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .slider-head .val {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]:focus { outline: none; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px;
+    background: var(--sin);
+    border-radius: 50%;
+    margin-top: -7px;
+    box-shadow: 0 0 10px var(--sin-glow);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--sin); border: none; border-radius: 50%;
+    box-shadow: 0 0 10px var(--sin-glow);
+  }
+  .btn-group { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.5rem 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.1rem;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .circle-outline { stroke: var(--circle); stroke-width: 2.4; fill: rgba(0, 0, 0, 0.06); }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .axis-name {
+    fill: var(--text-dim);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .walk-arc {
+    stroke: var(--sin);
+    stroke-width: 5;
+    fill: none;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .radius {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0.8;
+  }
+  .start-dot {
+    fill: var(--text);
+    stroke: rgba(0,0,0,0.5);
+    stroke-width: 1;
+  }
+  .land-pt {
+    fill: var(--point);
+    stroke: var(--text);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px var(--point-glow));
+  }
+  .landmark {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+  }
+  .landmark.lit { fill: var(--point); }
+  .dist-label {
+    fill: var(--sin);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="equation-bar" id="eq-display">
+    e<sup>i·<span class="walk-part">1.57</span></sup> = <span class="land-part">0.00 + 1.00i</span>
+  </div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 700 560" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A unit circle where a walker starts at one and walks a chosen distance theta along the rim; the landing point is e to the i theta">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+        <marker id="walk-arrowhead" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="36" y="26">Start at 1. Walk θ along the rim.</text>
+
+      <line class="axis" x1="40" y1="295" x2="670" y2="295" marker-end="url(#ax-arrow)" />
+      <line class="axis" x1="350" y1="545" x2="350" y2="55" marker-end="url(#ax-arrow)" />
+      <text class="axis-name" x="664" y="283" text-anchor="end">real</text>
+      <text class="axis-name" x="360" y="66">imaginary</text>
+      <circle class="circle-outline" cx="350" cy="295" r="190" />
+
+      <text class="landmark" id="lm-1"  x="552" y="318">1</text>
+      <text class="landmark" id="lm-i"  x="336" y="92">i</text>
+      <text class="landmark" id="lm-m1" x="118" y="318">−1</text>
+      <text class="landmark" id="lm-mi" x="330" y="512">−i</text>
+
+      <path id="walk-arc" class="walk-arc" marker-end="url(#walk-arrowhead)" />
+      <line id="radius" class="radius" x1="350" y1="295" x2="540" y2="295" />
+      <circle class="start-dot" cx="540" cy="295" r="5" />
+      <circle id="land-pt" class="land-pt" r="9" cx="540" cy="295" />
+      <text id="dist-label" class="dist-label"></text>
+    </svg>
+  </div>
+
+  <div class="controls">
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">distance walked θ (radians)</span>
+        <span class="val" id="theta-val">1.57 · π/2</span>
+      </div>
+      <input id="theta-slider" type="range" min="0" max="6.2832" value="1.5708" step="0.0157">
+    </div>
+    <div class="btn-group" id="presets">
+      <button class="btn" data-theta="1.5708">π/2</button>
+      <button class="btn" data-theta="3.1416">π</button>
+      <button class="btn" data-theta="4.7124">3π/2</button>
+      <button class="btn" data-theta="6.2832">2π</button>
+    </div>
+  </div>
+
+  <div class="footer" id="footer-note">
+    Radians, repaid in full: the angle θ is literally the distance walked along the rim. Walk π and you arrive at −1.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+
+  // ——— Layout ———
+  const CX = 350, CY = 295, R = 190;
+  const TWO_PI = 2 * Math.PI;
+
+  // ——— State ———
+  let theta = Math.PI / 2;
+
+  function fmtTheta(th) {
+    const landmarks = [
+      [Math.PI / 2, 'π/2'], [Math.PI, 'π'], [3 * Math.PI / 2, '3π/2'], [TWO_PI, '2π'],
+      [Math.PI / 4, 'π/4'], [3 * Math.PI / 4, '3π/4'], [5 * Math.PI / 4, '5π/4'], [7 * Math.PI / 4, '7π/4'],
+      [0, '0']
+    ];
+    const m = landmarks.find(([v]) => Math.abs(v - th) < 0.02);
+    return th.toFixed(2) + (m ? ' · ' + m[1] : '');
+  }
+
+  function fmtComplex(re, im) {
+    // snap near-integers so the landmarks read exactly
+    const snap = (v) => Math.abs(v) < 0.005 ? 0 : Math.abs(v - 1) < 0.005 ? 1 : Math.abs(v + 1) < 0.005 ? -1 : v;
+    const a = snap(re), b = snap(im);
+    const sign = b < 0 ? '−' : '+';
+    return a.toFixed(2) + ' ' + sign + ' ' + Math.abs(b).toFixed(2) + 'i';
+  }
+
+  function render() {
+    const c = Math.cos(theta), s = Math.sin(theta);
+    const X = CX + R * c, Y = CY - R * s;
+
+    // walked arc from angle 0 to theta (anticlockwise)
+    const arc = $('#walk-arc');
+    if (theta > 0.03) {
+      // split into two arcs when over half a turn so the path stays unambiguous
+      let d = `M ${CX + R} ${CY}`;
+      if (theta > Math.PI) {
+        d += ` A ${R} ${R} 0 0 0 ${CX - R} ${CY}`;
+        const x2 = CX + R * Math.cos(theta), y2 = CY - R * Math.sin(theta);
+        const rem = theta - Math.PI;
+        const large = rem > Math.PI ? 1 : 0;
+        d += ` A ${R} ${R} 0 ${large} 0 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+      } else {
+        const large = theta > Math.PI ? 1 : 0;
+        d += ` A ${R} ${R} 0 ${large} 0 ${X.toFixed(1)} ${Y.toFixed(1)}`;
+      }
+      arc.setAttribute('d', d);
+      arc.style.display = '';
+    } else {
+      arc.style.display = 'none';
+    }
+
+    // radius + landing point
+    $('#radius').setAttribute('x2', X.toFixed(1));
+    $('#radius').setAttribute('y2', Y.toFixed(1));
+    $('#land-pt').setAttribute('cx', X.toFixed(1));
+    $('#land-pt').setAttribute('cy', Y.toFixed(1));
+
+    // distance label drifting along midway round the walked arc
+    const mid = theta / 2;
+    const lx = CX + (R + 30) * Math.cos(mid);
+    const ly = CY - (R + 30) * Math.sin(mid);
+    const dl = $('#dist-label');
+    if (theta > 0.25) {
+      dl.style.display = '';
+      dl.setAttribute('x', lx.toFixed(1));
+      dl.setAttribute('y', ly.toFixed(1));
+      dl.setAttribute('text-anchor', mid > Math.PI / 2 && mid < 3 * Math.PI / 2 ? 'end' : 'start');
+      dl.textContent = theta.toFixed(2);
+    } else {
+      dl.style.display = 'none';
+    }
+
+    // landmark highlighting
+    const near = (v) => Math.abs(theta - v) < 0.04 || Math.abs(theta - v - TWO_PI) < 0.04;
+    $('#lm-1').classList.toggle('lit', near(0) || near(TWO_PI));
+    $('#lm-i').classList.toggle('lit', near(Math.PI / 2));
+    $('#lm-m1').classList.toggle('lit', near(Math.PI));
+    $('#lm-mi').classList.toggle('lit', near(3 * Math.PI / 2));
+
+    // readouts
+    $('#eq-display').innerHTML =
+      'e<sup>i·<span class="walk-part">' + theta.toFixed(2) + '</span></sup> = <span class="land-part">' + fmtComplex(c, s) + '</span>';
+    $('#theta-val').textContent = fmtTheta(theta);
+
+    const note = $('#footer-note');
+    if (near(Math.PI)) {
+      note.textContent = 'You have walked π along the rim and arrived at −1. That is the whole of e^iπ = −1: half a turn faces you backwards.';
+    } else if (near(TWO_PI)) {
+      note.textContent = 'A full lap of 2π brings you home to 1: e^2πi = 1. The walk has used up one entire circumference.';
+    } else {
+      note.textContent = 'Radians, repaid in full: the angle θ is literally the distance walked along the rim. Walk π and you arrive at −1.';
+    }
+  }
+
+  // ——— Wire up ———
+  $('#theta-slider').addEventListener('input', () => {
+    theta = Number($('#theta-slider').value);
+    render();
+  });
+  $('#presets').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    theta = Number(btn.dataset.theta);
+    $('#theta-slider').value = String(theta);
+    render();
+  });
+
+  // Init
+  render();
+})();
+</script>
+
+</body>
+</html>

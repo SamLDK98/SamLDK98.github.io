@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading x(t) = sin(2πft)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --circle: rgba(236, 226, 209, 0.68);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+
+  .formula-bar {
+    padding: 1.1rem 1.6rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.25rem;
+  }
+  .formula-bar .p-t { color: var(--text); border-bottom: 2px solid rgba(236,226,209,0.5); }
+  .formula-bar .p-f { color: var(--point); border-bottom: 2px solid var(--point); }
+  .formula-bar .p-2pi { color: var(--cos); border-bottom: 2px solid var(--cos); }
+  .formula-bar .p-sin { color: var(--sin); border-bottom: 2px solid var(--sin); }
+  .formula-bar .dim { color: var(--text-faint); }
+
+  /* pipeline cards */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .step {
+    padding: 0.95rem 1rem 1.05rem;
+    position: relative;
+  }
+  .step + .step { border-left: 1px solid var(--rule); }
+  .step .step-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.3rem;
+  }
+  .step .step-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.12rem;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.25rem;
+  }
+  .step .step-desc {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.86rem;
+    color: var(--text-dim);
+    line-height: 1.35;
+  }
+  .step.s-t .step-value { color: var(--text); }
+  .step.s-rev .step-value { color: var(--point); }
+  .step.s-ang .step-value { color: var(--cos); }
+  .step.s-out .step-value { color: var(--sin); }
+  .step::after {
+    content: "→";
+    position: absolute;
+    right: -0.62rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-faint);
+    background: var(--bg-elev);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    z-index: 1;
+    padding: 0 0.12rem;
+  }
+  .step:last-child::after { display: none; }
+  @media (max-width: 760px) {
+    .pipeline { grid-template-columns: repeat(2, 1fr); }
+    .step:nth-child(2)::after { display: none; }
+  }
+
+  .viz-wrap {
+    padding: 1.2rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 1020px;
+    height: auto;
+    display: block;
+  }
+  .controls {
+    padding: 1.1rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 1.4rem;
+    align-items: center;
+  }
+  @media (max-width: 820px) {
+    .controls { grid-template-columns: 1fr; gap: 0.9rem; }
+  }
+  .slider-block { display: flex; flex-direction: column; gap: 0.4rem; }
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-head .lbl {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .slider-head .val {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]:focus { outline: none; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px;
+    background: var(--text);
+    border-radius: 50%;
+    margin-top: -7px;
+    box-shadow: 0 0 10px rgba(236,226,209,0.3);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--text); border: none; border-radius: 50%;
+    box-shadow: 0 0 10px rgba(236,226,209,0.3);
+  }
+  input[type="range"].f-slider::-webkit-slider-thumb { background: var(--point); box-shadow: 0 0 10px var(--point-glow); }
+  input[type="range"].f-slider::-moz-range-thumb { background: var(--point); box-shadow: 0 0 10px var(--point-glow); }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.55rem 0.95rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  /* SVG styling */
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .circle-outline { stroke: var(--circle); stroke-width: 2.4; fill: rgba(0, 0, 0, 0.06); }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .radius {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--accent-glow));
+  }
+  .pt-circle {
+    fill: var(--point);
+    stroke: var(--text);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px var(--point-glow));
+  }
+  .angle-arc {
+    stroke: var(--cos);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.9;
+  }
+  .height-line {
+    stroke: var(--sin);
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+  .sin-trace {
+    fill: none;
+    stroke: var(--sin);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .pt-marker {
+    fill: var(--sin);
+    stroke: var(--text);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 6px var(--sin-glow));
+  }
+  .vline-current {
+    stroke: var(--text-dim);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 4;
+    opacity: 0.6;
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .rev-counter {
+    fill: var(--point);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="formula-bar">
+    x(<span class="p-t">t</span>) <span class="dim">=</span> <span class="p-sin">sin(</span><span class="p-2pi">2π</span> <span class="dim">·</span> <span class="p-f">f</span> <span class="dim">·</span> <span class="p-t">t</span><span class="p-sin">)</span>
+  </div>
+
+  <div class="pipeline">
+    <div class="step s-t">
+      <div class="step-kicker">Time</div>
+      <div class="step-value" id="step-t">t = 0.00 s</div>
+      <div class="step-desc">how long we have been spinning</div>
+    </div>
+    <div class="step s-rev">
+      <div class="step-kicker">× f &nbsp;→&nbsp; revolutions</div>
+      <div class="step-value" id="step-rev">ft = 0.00</div>
+      <div class="step-desc">full turns completed so far</div>
+    </div>
+    <div class="step s-ang">
+      <div class="step-kicker">× 2π &nbsp;→&nbsp; angle</div>
+      <div class="step-value" id="step-ang">2πft = 0.00 rad</div>
+      <div class="step-desc">turns converted into radians</div>
+    </div>
+    <div class="step s-out">
+      <div class="step-kicker">sin &nbsp;→&nbsp; height</div>
+      <div class="step-value" id="step-out">x(t) = 0.00</div>
+      <div class="step-desc">the y-coordinate at that angle</div>
+    </div>
+  </div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 1020 420" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A unit circle showing the angle two pi f t, beside the wave x of t with a marker at the chosen time">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+        <marker id="arc-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#e8a13b" />
+        </marker>
+      </defs>
+
+      <!-- ——— LEFT: unit circle ——— -->
+      <text class="panel-label" x="40" y="28">Where on the circle</text>
+      <line class="axis" x1="50"  y1="220" x2="360" y2="220" marker-end="url(#ax-arrow)" />
+      <line class="axis" x1="200" y1="385" x2="200" y2="62"  marker-end="url(#ax-arrow)" />
+      <circle class="circle-outline" cx="200" cy="220" r="135" />
+      <path id="angle-arc" class="angle-arc" marker-end="url(#arc-arrow)" />
+      <line id="height-line" class="height-line" />
+      <line id="radius" class="radius" x1="200" y1="220" x2="335" y2="220" />
+      <circle id="circle-pt" class="pt-circle" r="8" cx="335" cy="220" />
+      <text id="rev-counter" class="rev-counter" x="40" y="402">0 full turns + 0°</text>
+
+      <!-- ——— SEPARATOR ——— -->
+      <line x1="400" y1="55" x2="400" y2="390" stroke="rgba(214, 196, 168, 0.08)" stroke-width="1" />
+
+      <!-- ——— RIGHT: the wave ——— -->
+      <text class="panel-label" x="435" y="28">The wave so far</text>
+      <g id="wave-grid"></g>
+      <line class="axis" x1="425" y1="220" x2="1005" y2="220" marker-end="url(#ax-arrow)" />
+      <line class="axis" x1="435" y1="385" x2="435" y2="62"  marker-end="url(#ax-arrow)" />
+      <text class="graph-tick" x="430" y="76"  text-anchor="end">1</text>
+      <text class="graph-tick" x="430" y="224" text-anchor="end">0</text>
+      <text class="graph-tick" x="430" y="380" text-anchor="end">−1</text>
+      <g id="time-ticks"></g>
+      <path id="sin-trace" class="sin-trace" />
+      <line id="vline" class="vline-current" />
+      <circle id="wave-pt" class="pt-marker" r="6" />
+    </svg>
+  </div>
+
+  <div class="controls">
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">time t</span>
+        <span class="val" id="t-val">0.00 s</span>
+      </div>
+      <input id="time" type="range" min="0" max="2" value="0" step="0.01">
+    </div>
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">frequency f</span>
+        <span class="val" id="f-val">1.0 Hz</span>
+      </div>
+      <input id="freq" class="f-slider" type="range" min="0.5" max="3" value="1" step="0.5">
+    </div>
+    <button class="btn" id="reset">Reset</button>
+  </div>
+
+  <div class="footer">
+    Read it inside-out: time, times f, gives turns; times 2π, gives an angle; sine of that angle gives a height.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // ——— Layout ———
+  const CIRC = { cx: 200, cy: 220, r: 135 };
+  const WAVE = { x0: 435, width: 555, yMid: 220, amp: 140, seconds: 2 };
+
+  const tx = (t) => WAVE.x0 + (t / WAVE.seconds) * WAVE.width;
+  const vy = (v) => WAVE.yMid - v * WAVE.amp;
+
+  // ——— Static gridlines + time ticks ———
+  const wGrid = $('#wave-grid');
+  [-1, -0.5, 0.5, 1].forEach(v => {
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', WAVE.x0); l.setAttribute('x2', WAVE.x0 + WAVE.width);
+    l.setAttribute('y1', vy(v)); l.setAttribute('y2', vy(v));
+    wGrid.appendChild(l);
+  });
+  const tGroup = $('#time-ticks');
+  for (let s = 0.5; s <= WAVE.seconds; s += 0.5) {
+    const x = tx(s);
+    const tick = document.createElementNS(NS, 'line');
+    tick.setAttribute('x1', x); tick.setAttribute('x2', x);
+    tick.setAttribute('y1', WAVE.yMid - 4); tick.setAttribute('y2', WAVE.yMid + 4);
+    tick.setAttribute('stroke', 'rgba(236, 226, 209, 0.32)');
+    tGroup.appendChild(tick);
+    const txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('class', 'graph-tick');
+    txt.setAttribute('x', x);
+    txt.setAttribute('y', WAVE.yMid + 22);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.textContent = (s % 1 === 0 ? s.toFixed(0) : s.toFixed(1)) + 's';
+    tGroup.appendChild(txt);
+  }
+
+  // ——— State ———
+  let t = 0;
+  let f = 1;
+
+  function render() {
+    const revs = f * t;
+    const theta = 2 * Math.PI * revs;
+    const s = Math.sin(theta), c = Math.cos(theta);
+
+    // — Pipeline cards —
+    $('#step-t').textContent = `t = ${t.toFixed(2)} s`;
+    $('#step-rev').textContent = `ft = ${revs.toFixed(2)}`;
+    $('#step-ang').textContent = `2πft = ${theta.toFixed(2)} rad`;
+    $('#step-out').textContent = `x(t) = ${s.toFixed(2)}`;
+
+    // — Circle panel —
+    const px = CIRC.cx + c * CIRC.r;
+    const py = CIRC.cy - s * CIRC.r;
+    $('#radius').setAttribute('x2', px.toFixed(1));
+    $('#radius').setAttribute('y2', py.toFixed(1));
+    $('#circle-pt').setAttribute('cx', px.toFixed(1));
+    $('#circle-pt').setAttribute('cy', py.toFixed(1));
+
+    // height (sine) leg from the x-axis up to the point
+    const hl = $('#height-line');
+    hl.setAttribute('x1', px.toFixed(1)); hl.setAttribute('y1', CIRC.cy);
+    hl.setAttribute('x2', px.toFixed(1)); hl.setAttribute('y2', py.toFixed(1));
+
+    // angle arc for the angle within the current turn
+    const within = theta % (2 * Math.PI);
+    const arc = $('#angle-arc');
+    if (within > 0.12) {
+      const aR = 44;
+      const ax = CIRC.cx + aR, ay = CIRC.cy;
+      const ex = CIRC.cx + aR * Math.cos(within);
+      const ey = CIRC.cy - aR * Math.sin(within);
+      const large = within > Math.PI ? 1 : 0;
+      arc.setAttribute('d', `M ${ax} ${ay} A ${aR} ${aR} 0 ${large} 0 ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+      arc.style.display = '';
+    } else {
+      arc.style.display = 'none';
+    }
+
+    const fullTurns = Math.floor(revs + 1e-9);
+    const degWithin = Math.round((revs - fullTurns) * 360);
+    $('#rev-counter').textContent =
+      `${fullTurns} full turn${fullTurns === 1 ? '' : 's'} + ${degWithin}°`;
+
+    // — Wave panel —
+    let d = '';
+    if (t > 0) {
+      const N = Math.max(8, Math.round(300 * t * Math.max(1, f)));
+      for (let i = 0; i <= N; i++) {
+        const tt = (i / N) * t;
+        d += (i === 0 ? 'M ' : ' L ') + tx(tt).toFixed(1) + ' ' + vy(Math.sin(2 * Math.PI * f * tt)).toFixed(1);
+      }
+    }
+    $('#sin-trace').setAttribute('d', d);
+    const xCur = tx(t);
+    $('#wave-pt').setAttribute('cx', xCur.toFixed(1));
+    $('#wave-pt').setAttribute('cy', vy(s).toFixed(1));
+    const vline = $('#vline');
+    vline.setAttribute('x1', xCur); vline.setAttribute('x2', xCur);
+    vline.setAttribute('y1', vy(1) - 4); vline.setAttribute('y2', vy(-1) + 4);
+
+    // — Slider readouts —
+    $('#t-val').textContent = `${t.toFixed(2)} s`;
+    $('#f-val').textContent = `${f.toFixed(1)} Hz`;
+  }
+
+  // ——— Wire up ———
+  $('#time').addEventListener('input', () => { t = Number($('#time').value); render(); });
+  $('#freq').addEventListener('input', () => { f = Number($('#freq').value); render(); });
+  $('#reset').addEventListener('click', () => {
+    t = 0; f = 1;
+    $('#time').value = '0'; $('#freq').value = '1';
+    render();
+  });
+
+  // Init
+  render();
+})();
+</script>
+
+</body>
+</html>

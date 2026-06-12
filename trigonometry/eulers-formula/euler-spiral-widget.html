@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Series Assembles the Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --cos-glow: rgba(232, 161, 59, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --circle: rgba(236, 226, 209, 0.68);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .equation-bar {
+    padding: 0.95rem 1.6rem 0.75rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.02rem;
+    color: var(--text-dim);
+  }
+  .equation-bar .t0 { color: #e8a13b; }
+  .equation-bar .t1 { color: #6dd3c4; }
+  .equation-bar .t2 { color: #ef7398; }
+  .equation-bar .t3 { color: #d4b888; }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 1020px;
+    height: auto;
+    display: block;
+  }
+  .controls {
+    padding: 1.05rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1.4rem;
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .controls { grid-template-columns: 1fr; gap: 0.9rem; }
+  }
+  .slider-block { display: flex; flex-direction: column; gap: 0.4rem; }
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-head .lbl {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .slider-head .val {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]:focus { outline: none; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px;
+    background: var(--point);
+    border-radius: 50%;
+    margin-top: -7px;
+    box-shadow: 0 0 10px var(--point-glow);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--point); border: none; border-radius: 50%;
+    box-shadow: 0 0 10px var(--point-glow);
+  }
+  input[type="range"].n-slider::-webkit-slider-thumb { background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+  input[type="range"].n-slider::-moz-range-thumb { background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+  .btn-group { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.5rem 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.1rem;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .unit-circle-ghost {
+    stroke: rgba(236, 226, 209, 0.4);
+    stroke-width: 1.6;
+    stroke-dasharray: 4 6;
+    fill: none;
+  }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .term-arrow {
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    fill: none;
+  }
+  .term-dot { stroke: none; }
+  .target-pt {
+    fill: none;
+    stroke: var(--point);
+    stroke-width: 2.4;
+    filter: drop-shadow(0 0 8px var(--point-glow));
+  }
+  .sum-pt {
+    fill: var(--text);
+    stroke: rgba(0,0,0,0.5);
+    stroke-width: 1;
+  }
+  .readout-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .readout-name {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    fill: var(--text-dim);
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="equation-bar">
+    e<sup>iθ</sup> = <span class="t0">1</span> + <span class="t1">iθ</span> + <span class="t2">(iθ)²/2!</span> + <span class="t3">(iθ)³/3!</span> + <span class="t0">(iθ)⁴/4!</span> + … <span style="color:var(--text-faint)">— added tip to tail</span>
+  </div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 1020 620" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="The terms of the series for e to the i theta drawn as arrows tip to tail in the complex plane, spiralling in on the point cosine theta plus i sine theta on the unit circle">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="36" y="26">Adding the terms, one arrow at a time</text>
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <g id="ticks"></g>
+      <circle id="unit-ghost" class="unit-circle-ghost" />
+
+      <g id="arrows"></g>
+      <circle id="target-pt" class="target-pt" r="9" />
+      <circle id="sum-pt" class="sum-pt" r="5" />
+
+      <!-- right-side readout -->
+      <g id="readout">
+        <text class="readout-name" x="745" y="120">sum of the arrows so far</text>
+        <text class="readout-text" id="sum-display" x="745" y="146" fill="#d4b888">1.000 + 0.000i</text>
+        <text class="readout-name" x="745" y="196">cos θ + i sin θ</text>
+        <text class="readout-text" id="target-display" x="745" y="222" fill="#ef7398">1.000 + 0.000i</text>
+        <text class="readout-name" x="745" y="272">distance between them</text>
+        <text class="readout-text" id="gap-display" x="745" y="298" fill="#ece2d1">0.00000</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="controls">
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">angle θ</span>
+        <span class="val" id="theta-val">90° · π/2</span>
+      </div>
+      <input id="theta-slider" type="range" min="0" max="3.1416" value="1.5708" step="0.0157">
+    </div>
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">number of terms</span>
+        <span class="val" id="n-val">3</span>
+      </div>
+      <input id="n-slider" class="n-slider" type="range" min="1" max="16" value="3" step="1">
+    </div>
+    <div class="btn-group" id="presets">
+      <button class="btn" data-theta="0.7854">θ = π/4</button>
+      <button class="btn" data-theta="1.5708">θ = π/2</button>
+      <button class="btn" data-theta="3.1416">θ = π</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Each arrow is a quarter-turn of the one before, shrunk by the factorial. The chain spirals tighter and tighter — onto the unit circle, exactly at cos θ + i sin θ.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // ——— Layout: re in [-4.7, ~2.4], im in [-2.6, 3.5], UNIT px per unit ———
+  const UNIT = 92;
+  const X0 = 50, YTOP = 40;
+  const REMIN = -4.7, IMMAX = 3.5;
+  const px = (re) => X0 + (re - REMIN) * UNIT;
+  const py = (im) => YTOP + (IMMAX - im) * UNIT;
+
+  const COLORS = ['#e8a13b', '#6dd3c4', '#ef7398', '#d4b888'];  // quarter-turn rhythm
+
+  // ——— Static decoration ———
+  const grid = $('#grid');
+  const ticks = $('#ticks');
+  const xAxis = $('#x-axis');
+  xAxis.setAttribute('x1', 36); xAxis.setAttribute('x2', 700);
+  xAxis.setAttribute('y1', py(0)); xAxis.setAttribute('y2', py(0));
+  const yAxis = $('#y-axis');
+  yAxis.setAttribute('x1', px(0)); yAxis.setAttribute('x2', px(0));
+  yAxis.setAttribute('y1', 608); yAxis.setAttribute('y2', 48);
+
+  for (let v = -4; v <= 2; v++) {
+    if (v === 0) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(v)); l.setAttribute('x2', px(v));
+    l.setAttribute('y1', 48); l.setAttribute('y2', 606);
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', px(v)); t.setAttribute('y', py(0) + 18);
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = v;
+    ticks.appendChild(t);
+  }
+  for (let v = -2; v <= 3; v++) {
+    if (v === 0) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', 40); l.setAttribute('x2', 700);
+    l.setAttribute('y1', py(v)); l.setAttribute('y2', py(v));
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', px(0) - 8); t.setAttribute('y', py(v) + 4);
+    t.setAttribute('text-anchor', 'end');
+    t.textContent = (v === 1) ? 'i' : (v === -1) ? '−i' : v + 'i';
+    ticks.appendChild(t);
+  }
+  const ug = $('#unit-ghost');
+  ug.setAttribute('cx', px(0)); ug.setAttribute('cy', py(0)); ug.setAttribute('r', UNIT);
+
+  // ——— State ———
+  let theta = Math.PI / 2;
+  let terms = 3;
+
+  function fmtTheta(th) {
+    const deg = Math.round(th * 180 / Math.PI);
+    const fracs = [
+      [0, '0'], [45, 'π/4'], [90, 'π/2'], [135, '3π/4'], [180, 'π']
+    ];
+    const m = fracs.find(([d]) => Math.abs(d - deg) < 1);
+    return deg + '° · ' + (m ? m[1] : (th / Math.PI).toFixed(2) + 'π');
+  }
+  function fmtComplex(re, im) {
+    const sign = im < 0 ? '−' : '+';
+    return re.toFixed(3) + ' ' + sign + ' ' + Math.abs(im).toFixed(3) + 'i';
+  }
+
+  function render() {
+    // terms of the series: t_k = (iθ)^k / k!, added tip to tail
+    const arrows = $('#arrows');
+    while (arrows.firstChild) arrows.removeChild(arrows.firstChild);
+
+    let sRe = 0, sIm = 0;       // running sum
+    let tRe = 1, tIm = 0;       // current term, starts at 1
+    for (let k = 0; k < terms; k++) {
+      const x1 = px(sRe), y1 = py(sIm);
+      sRe += tRe; sIm += tIm;
+      const x2 = px(sRe), y2 = py(sIm);
+      const col = COLORS[k % 4];
+
+      const seg = document.createElementNS(NS, 'line');
+      seg.setAttribute('class', 'term-arrow');
+      seg.setAttribute('stroke', col);
+      seg.setAttribute('x1', x1.toFixed(1)); seg.setAttribute('y1', y1.toFixed(1));
+      seg.setAttribute('x2', x2.toFixed(1)); seg.setAttribute('y2', y2.toFixed(1));
+      arrows.appendChild(seg);
+
+      // small dot at the joint (skip if the term is microscopic)
+      const len = Math.hypot(x2 - x1, y2 - y1);
+      if (len > 3) {
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('class', 'term-dot');
+        dot.setAttribute('fill', col);
+        dot.setAttribute('r', Math.min(4, 1.5 + len / 60).toFixed(1));
+        dot.setAttribute('cx', x2.toFixed(1)); dot.setAttribute('cy', y2.toFixed(1));
+        arrows.appendChild(dot);
+      }
+
+      // next term: multiply by iθ/(k+1)  (quarter-turn + factorial shrink)
+      const f = theta / (k + 1);
+      const nRe = -tIm * f, nIm = tRe * f;
+      tRe = nRe; tIm = nIm;
+    }
+
+    // endpoint + target
+    $('#sum-pt').setAttribute('cx', px(sRe).toFixed(1));
+    $('#sum-pt').setAttribute('cy', py(sIm).toFixed(1));
+    const cRe = Math.cos(theta), cIm = Math.sin(theta);
+    $('#target-pt').setAttribute('cx', px(cRe).toFixed(1));
+    $('#target-pt').setAttribute('cy', py(cIm).toFixed(1));
+
+    // readouts
+    $('#sum-display').textContent = fmtComplex(sRe, sIm);
+    $('#target-display').textContent = fmtComplex(cRe, cIm);
+    $('#gap-display').textContent = Math.hypot(sRe - cRe, sIm - cIm).toFixed(5);
+    $('#theta-val').textContent = fmtTheta(theta);
+    $('#n-val').textContent = String(terms);
+  }
+
+  // ——— Wire up ———
+  $('#theta-slider').addEventListener('input', () => { theta = Number($('#theta-slider').value); render(); });
+  $('#n-slider').addEventListener('input', () => { terms = Number($('#n-slider').value); render(); });
+  $('#presets').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    theta = Number(btn.dataset.theta);
+    $('#theta-slider').value = String(theta);
+    render();
+  });
+
+  // Init
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiplying by e^iθ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --cos-glow: rgba(232, 161, 59, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .equation-bar {
+    padding: 0.95rem 1.6rem 0.75rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.08rem;
+    color: var(--text-dim);
+  }
+  .equation-bar .z-part { color: var(--sin); }
+  .equation-bar .rot-part { color: var(--accent); }
+  .equation-bar .p-part { color: var(--point); }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 1020px;
+    height: auto;
+    display: block;
+    touch-action: none;
+  }
+  .readout-bar {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 0.2rem 1.6rem 0.9rem;
+    flex-wrap: wrap;
+  }
+  .readout { display: flex; align-items: baseline; gap: 0.55rem; }
+  .readout .name {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .readout .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.0rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .controls {
+    padding: 1.05rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.4rem;
+    align-items: center;
+  }
+  @media (max-width: 760px) {
+    .controls { grid-template-columns: 1fr; gap: 0.9rem; }
+  }
+  .slider-block { display: flex; flex-direction: column; gap: 0.4rem; }
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-head .lbl {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .slider-head .val {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]:focus { outline: none; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: -7px;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--accent); border: none; border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.55rem 0.95rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .unit-circle-ghost {
+    stroke: rgba(236, 226, 209, 0.28);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 6;
+    fill: none;
+  }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .arrow-z {
+    stroke: var(--sin);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--sin-glow));
+  }
+  .arrow-rot {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 6 5;
+    opacity: 0.85;
+  }
+  .arrow-p {
+    stroke: var(--point);
+    stroke-width: 3;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px var(--point-glow));
+  }
+  .handle-z { fill: var(--sin); stroke: var(--text); stroke-width: 1.8; cursor: grab; filter: drop-shadow(0 0 7px var(--sin-glow)); }
+  .rot-dot { fill: var(--accent); stroke: var(--text); stroke-width: 1.4; filter: drop-shadow(0 0 6px var(--accent-glow)); }
+  .handle-p { fill: var(--point); stroke: var(--text); stroke-width: 1.8; filter: drop-shadow(0 0 8px var(--point-glow)); }
+  .sweep-arc {
+    stroke: var(--point);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.55;
+    stroke-dasharray: 5 5;
+  }
+  .pt-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+  }
+  .pt-label.z { fill: var(--sin); }
+  .pt-label.rot { fill: var(--accent); }
+  .pt-label.p { fill: var(--point); }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="equation-bar">
+    <span class="z-part">z</span> · <span class="rot-part">e<sup>iθ</sup></span> = <span class="p-part">z, rotated by θ</span>
+  </div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 1020 560" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A draggable complex number z, the rotator e to the i theta on the unit circle, and the product: z rotated by theta with its length unchanged">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="36" y="26">Drag z, then turn the dial</text>
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <g id="ticks"></g>
+      <circle id="unit-ghost" class="unit-circle-ghost" />
+
+      <path id="sweep-arc" class="sweep-arc" />
+      <line id="arrow-rot" class="arrow-rot" />
+      <line id="arrow-z" class="arrow-z" />
+      <line id="arrow-p" class="arrow-p" />
+      <circle id="rot-dot" class="rot-dot" r="7" />
+      <circle id="handle-z" class="handle-z" r="10" />
+      <circle id="handle-p" class="handle-p" r="8" />
+      <text id="label-z" class="pt-label z">z</text>
+      <text id="label-rot" class="pt-label rot">e^iθ</text>
+      <text id="label-p" class="pt-label p">z·e^iθ</text>
+    </svg>
+  </div>
+
+  <div class="readout-bar">
+    <div class="readout"><span class="name">length of z</span><span class="value" id="len-z">1.80</span></div>
+    <div class="readout"><span class="name">length of z·e<sup>iθ</sup></span><span class="value" id="len-p">1.80</span></div>
+    <div class="readout"><span class="name">angle gained</span><span class="value" id="gain">90°</span></div>
+  </div>
+
+  <div class="controls">
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">rotation θ</span>
+        <span class="val" id="theta-val">90°</span>
+      </div>
+      <input id="theta-slider" type="range" min="0" max="360" value="90" step="1">
+    </div>
+    <button class="btn" id="reset">Reset</button>
+  </div>
+
+  <div class="footer">
+    The pink arrow is always exactly as long as the green one. e<sup>iθ</sup> lives on the unit circle, so it turns without stretching — a pure rotation, packaged as a number.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('#canvas');
+
+  // ——— Layout ———
+  const CX = 510, CY = 295, UNIT = 112;
+  const px = (re) => CX + re * UNIT;
+  const py = (im) => CY - im * UNIT;
+
+  // ——— Static decoration ———
+  const xAxis = $('#x-axis');
+  xAxis.setAttribute('x1', 30); xAxis.setAttribute('x2', 995);
+  xAxis.setAttribute('y1', CY); xAxis.setAttribute('y2', CY);
+  const yAxis = $('#y-axis');
+  yAxis.setAttribute('x1', CX); yAxis.setAttribute('x2', CX);
+  yAxis.setAttribute('y1', 548); yAxis.setAttribute('y2', 38);
+
+  const grid = $('#grid');
+  const ticks = $('#ticks');
+  for (let v = -4; v <= 4; v++) {
+    if (v === 0) continue;
+    if (px(v) < 35 || px(v) > 990) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(v)); l.setAttribute('x2', px(v));
+    l.setAttribute('y1', 42); l.setAttribute('y2', 545);
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', px(v)); t.setAttribute('y', CY + 20);
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = v;
+    ticks.appendChild(t);
+  }
+  for (let v = -2; v <= 2; v++) {
+    if (v === 0) continue;
+    if (py(v) < 40 || py(v) > 546) continue;
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', 36); l.setAttribute('x2', 990);
+    l.setAttribute('y1', py(v)); l.setAttribute('y2', py(v));
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', CX - 10); t.setAttribute('y', py(v) + 4);
+    t.setAttribute('text-anchor', 'end');
+    t.textContent = (v === 1) ? 'i' : (v === -1) ? '−i' : v + 'i';
+    ticks.appendChild(t);
+  }
+  const ug = $('#unit-ghost');
+  ug.setAttribute('cx', CX); ug.setAttribute('cy', CY); ug.setAttribute('r', UNIT);
+
+  // ——— State ———
+  let z = { re: 1.6, im: 0.8 };
+  let thetaDeg = 90;
+
+  function render() {
+    const th = thetaDeg * Math.PI / 180;
+    const c = Math.cos(th), s = Math.sin(th);
+    const p = { re: z.re * c - z.im * s, im: z.re * s + z.im * c };
+    const rot = { re: c, im: s };
+    const mz = Math.hypot(z.re, z.im);
+
+    function setLine(id, v) {
+      const e = $('#' + id);
+      e.setAttribute('x1', CX); e.setAttribute('y1', CY);
+      e.setAttribute('x2', px(v.re).toFixed(1)); e.setAttribute('y2', py(v.im).toFixed(1));
+    }
+    function setDot(id, v) {
+      const e = $('#' + id);
+      e.setAttribute('cx', px(v.re).toFixed(1)); e.setAttribute('cy', py(v.im).toFixed(1));
+    }
+    function setLabel(id, v, dx, dy) {
+      const e = $('#' + id);
+      e.setAttribute('x', (px(v.re) + dx).toFixed(1));
+      e.setAttribute('y', (py(v.im) + dy).toFixed(1));
+    }
+
+    setLine('arrow-z', z); setDot('handle-z', z); setLabel('label-z', z, 14, -10);
+    setLine('arrow-rot', rot); setDot('rot-dot', rot); setLabel('label-rot', rot, 12, -12);
+    setLine('arrow-p', p); setDot('handle-p', p); setLabel('label-p', p, 14, -10);
+
+    // sweep arc: path of z as it rotates from its own angle through θ, at radius |z|
+    const az = Math.atan2(z.im, z.re);
+    const arc = $('#sweep-arc');
+    if (th > 0.03 && mz * UNIT > 14) {
+      const r = mz * UNIT;
+      const x1 = CX + r * Math.cos(az), y1 = CY - r * Math.sin(az);
+      const x2 = CX + r * Math.cos(az + th), y2 = CY - r * Math.sin(az + th);
+      const large = th > Math.PI ? 1 : 0;
+      arc.setAttribute('d', `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r.toFixed(1)} ${r.toFixed(1)} 0 ${large} 0 ${x2.toFixed(1)} ${y2.toFixed(1)}`);
+    } else {
+      arc.setAttribute('d', '');
+    }
+
+    $('#len-z').textContent = mz.toFixed(2);
+    $('#len-p').textContent = Math.hypot(p.re, p.im).toFixed(2);
+    $('#gain').textContent = thetaDeg + '°';
+    $('#theta-val').textContent = thetaDeg + '°';
+  }
+
+  // ——— Dragging z ———
+  function svgPointFromEvent(evt) {
+    if (!svg.createSVGPoint || !svg.getScreenCTM) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    const m = svg.getScreenCTM();
+    if (!m) return null;
+    return pt.matrixTransform(m.inverse());
+  }
+  let dragging = false;
+  svg.addEventListener('pointerdown', (e) => {
+    const p = svgPointFromEvent(e);
+    if (!p) return;
+    if (Math.hypot(p.x - px(z.re), p.y - py(z.im)) > 60) return;
+    dragging = true;
+    if (svg.setPointerCapture) { try { svg.setPointerCapture(e.pointerId); } catch (err) {} }
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const p = svgPointFromEvent(e);
+    if (!p) return;
+    z = {
+      re: Math.max(-3.9, Math.min(3.9, (p.x - CX) / UNIT)),
+      im: Math.max(-2.0, Math.min(2.0, (CY - p.y) / UNIT))
+    };
+    render();
+  });
+  svg.addEventListener('pointerup', () => { dragging = false; });
+  svg.addEventListener('pointercancel', () => { dragging = false; });
+
+  // ——— Wire up ———
+  $('#theta-slider').addEventListener('input', () => {
+    thetaDeg = Number($('#theta-slider').value);
+    render();
+  });
+  $('#reset').addEventListener('click', () => {
+    z = { re: 1.6, im: 0.8 };
+    thetaDeg = 90;
+    $('#theta-slider').value = '90';
+    render();
+  });
+
+  // Init
+  render();
+})();
+</script>
+
+</body>
+</html>

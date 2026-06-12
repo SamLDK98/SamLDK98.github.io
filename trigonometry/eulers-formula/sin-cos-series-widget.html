@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Series for Sine and Cosine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --cos-glow: rgba(232, 161, 59, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .terms-bar {
+    padding: 0.9rem 1.4rem 0.85rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    justify-content: center;
+    align-items: center;
+    min-height: 3.1rem;
+  }
+  .term-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    padding: 0.32rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--text-faint);
+    background: rgba(0, 0, 0, 0.18);
+    transition: color 0.25s, border-color 0.25s, background 0.25s;
+    white-space: nowrap;
+  }
+  .term-chip.on.sin-mode {
+    color: var(--sin);
+    border-color: rgba(109, 211, 196, 0.5);
+    background: rgba(109, 211, 196, 0.08);
+  }
+  .term-chip.on.cos-mode {
+    color: var(--cos);
+    border-color: rgba(232, 161, 59, 0.5);
+    background: rgba(232, 161, 59, 0.08);
+  }
+  .term-chip.dots {
+    border: 0;
+    background: transparent;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+  }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 1020px;
+    height: auto;
+    display: block;
+  }
+  .readout-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2.4rem;
+    padding: 0.2rem 1.6rem 0.9rem;
+    flex-wrap: wrap;
+  }
+  .readout { display: flex; align-items: baseline; gap: 0.55rem; }
+  .readout .name {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .readout .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.02rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .readout .value.partial { color: var(--accent); }
+  .readout .value.target { color: var(--point); }
+  .controls {
+    padding: 1.05rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 1.4rem;
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .controls { grid-template-columns: 1fr; gap: 0.9rem; }
+  }
+  .toggle-group { display: flex; align-items: center; gap: 0.5rem; }
+  .toggle-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+  .toggle-pill {
+    display: inline-flex;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .toggle-pill button {
+    padding: 0.45rem 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-dim);
+    border: 0;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+  .toggle-pill button + button { border-left: 1px solid var(--rule); }
+  .toggle-pill button.active {
+    background: rgba(212, 184, 136, 0.14);
+    color: var(--accent);
+  }
+  .slider-block { display: flex; flex-direction: column; gap: 0.4rem; }
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-head .lbl {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .slider-head .val {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]:focus { outline: none; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px; background: var(--rule-strong); border-radius: 1px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: -7px;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--accent); border: none; border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  input[type="range"].probe-slider::-webkit-slider-thumb { background: var(--point); box-shadow: 0 0 10px var(--point-glow); }
+  input[type="range"].probe-slider::-moz-range-thumb { background: var(--point); box-shadow: 0 0 10px var(--point-glow); }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .target-path {
+    fill: none;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .target-path.sin-mode { stroke: var(--sin); filter: drop-shadow(0 0 6px var(--sin-glow)); }
+  .target-path.cos-mode { stroke: var(--cos); filter: drop-shadow(0 0 6px var(--cos-glow)); }
+  .partial-path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--accent-glow));
+  }
+  .probe-line {
+    stroke: var(--point);
+    stroke-width: 1.3;
+    stroke-dasharray: 4 4;
+    opacity: 0.7;
+  }
+  .probe-dot-partial {
+    fill: var(--accent);
+    stroke: var(--text);
+    stroke-width: 1.5;
+  }
+  .probe-dot-target {
+    fill: var(--point);
+    stroke: var(--text);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 6px var(--point-glow));
+  }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="terms-bar" id="terms-bar"></div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 1020 440" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="The sine or cosine wave with a polynomial built from its series terms wrapping around it as terms are added">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+        <clipPath id="plot-clip">
+          <rect x="40" y="40" width="940" height="360" />
+        </clipPath>
+      </defs>
+
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <g id="ticks"></g>
+
+      <g clip-path="url(#plot-clip)">
+        <path id="target-path" class="target-path sin-mode" />
+        <path id="partial-path" class="partial-path" />
+      </g>
+
+      <line id="probe-line" class="probe-line" />
+      <circle id="probe-dot-target" class="probe-dot-target" r="5.5" />
+      <circle id="probe-dot-partial" class="probe-dot-partial" r="5.5" />
+    </svg>
+  </div>
+
+  <div class="readout-bar">
+    <div class="readout"><span class="name">polynomial at x₀</span><span class="value partial" id="partial-display">—</span></div>
+    <div class="readout"><span class="name" id="target-name">sin(x₀) exactly</span><span class="value target" id="target-display">—</span></div>
+  </div>
+
+  <div class="controls">
+    <div class="toggle-group">
+      <span class="toggle-label">Target</span>
+      <div class="toggle-pill" id="fn-toggle">
+        <button data-fn="sin" class="active">sine</button>
+        <button data-fn="cos">cosine</button>
+      </div>
+    </div>
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">number of terms</span>
+        <span class="val" id="n-val">2</span>
+      </div>
+      <input id="n-slider" type="range" min="1" max="9" value="2" step="1">
+    </div>
+    <div class="slider-block">
+      <div class="slider-head">
+        <span class="lbl">probe point x₀</span>
+        <span class="val" id="x-val">2.00</span>
+      </div>
+      <input id="x-slider" class="probe-slider" type="range" min="-6" max="6" value="2" step="0.1">
+    </div>
+  </div>
+
+  <div class="footer">
+    Powers over factorials, with alternating signs and half the terms missing — and out come the waves of the geometric branch.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // ——— Layout: x in [-6.6, 6.6], y in [-2.4, 2.4] ———
+  const G = { x0: 40, x1: 980, yTop: 40, yBot: 400 };
+  const XMIN = -6.6, XMAX = 6.6, YMIN = -2.4, YMAX = 2.4;
+
+  const px = (x) => G.x0 + ((x - XMIN) / (XMAX - XMIN)) * (G.x1 - G.x0);
+  const py = (y) => G.yBot - ((y - YMIN) / (YMAX - YMIN)) * (G.yBot - G.yTop);
+
+  // ——— Static decoration ———
+  const xAxis = $('#x-axis');
+  xAxis.setAttribute('x1', G.x0); xAxis.setAttribute('x2', G.x1 + 25);
+  xAxis.setAttribute('y1', py(0)); xAxis.setAttribute('y2', py(0));
+  const yAxis = $('#y-axis');
+  yAxis.setAttribute('x1', px(0)); yAxis.setAttribute('x2', px(0));
+  yAxis.setAttribute('y1', G.yBot); yAxis.setAttribute('y2', G.yTop - 5);
+
+  const grid = $('#grid');
+  const ticks = $('#ticks');
+  [-2, -1, 1, 2].forEach(v => {
+    const y = py(v);
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', G.x0); l.setAttribute('x2', G.x1);
+    l.setAttribute('y1', y); l.setAttribute('y2', y);
+    grid.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', px(0) - 8); t.setAttribute('y', y + 4);
+    t.setAttribute('text-anchor', 'end');
+    t.textContent = v;
+    ticks.appendChild(t);
+  });
+  const PI = Math.PI;
+  [[-2 * PI, '−2π'], [-PI, '−π'], [PI, 'π'], [2 * PI, '2π']].forEach(([v, lbl]) => {
+    const x = px(v);
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('x1', x); l.setAttribute('x2', x);
+    l.setAttribute('y1', py(0) - 4); l.setAttribute('y2', py(0) + 4);
+    l.setAttribute('stroke', 'rgba(236, 226, 209, 0.32)');
+    ticks.appendChild(l);
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'graph-tick');
+    t.setAttribute('x', x); t.setAttribute('y', py(0) + 20);
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = lbl;
+    ticks.appendChild(t);
+  });
+
+  // ——— State ———
+  let fn = 'sin';
+  let terms = 2;
+  let xProbe = 2;
+
+  const factorial = (k) => { let f = 1; for (let i = 2; i <= k; i++) f *= i; return f; };
+
+  // partial sums: sin uses powers 1,3,5,...; cos uses 0,2,4,...
+  function partial(x, k, mode) {
+    let s = 0;
+    for (let j = 0; j < k; j++) {
+      const p = (mode === 'sin') ? 2 * j + 1 : 2 * j;
+      s += (j % 2 === 0 ? 1 : -1) * Math.pow(x, p) / factorial(p);
+    }
+    return s;
+  }
+  const target = (x) => (fn === 'sin' ? Math.sin(x) : Math.cos(x));
+
+  // ——— Term chips ———
+  function superscript(n) {
+    const map = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹' };
+    return String(n).split('').map(c => map[c]).join('');
+  }
+  const termsBar = $('#terms-bar');
+  let chips = [];
+  function buildChips() {
+    termsBar.innerHTML = '';
+    chips = [];
+    for (let j = 0; j < 9; j++) {
+      const p = (fn === 'sin') ? 2 * j + 1 : 2 * j;
+      let lbl;
+      if (p === 0) lbl = '1';
+      else if (p === 1) lbl = 'x';
+      else lbl = 'x' + superscript(p) + '/' + p + '!';
+      if (j > 0) {
+        const sign = document.createElement('span');
+        sign.className = 'term-chip dots';
+        sign.textContent = (j % 2 === 1) ? '−' : '+';
+        termsBar.appendChild(sign);
+      }
+      const c = document.createElement('span');
+      c.className = 'term-chip';
+      c.textContent = lbl;
+      termsBar.appendChild(c);
+      chips.push(c);
+    }
+    const dots = document.createElement('span');
+    dots.className = 'term-chip dots';
+    dots.textContent = '− …';
+    termsBar.appendChild(dots);
+  }
+
+  function render() {
+    chips.forEach((c, j) => {
+      c.classList.toggle('on', j < terms);
+      c.classList.toggle('sin-mode', fn === 'sin');
+      c.classList.toggle('cos-mode', fn === 'cos');
+    });
+
+    // target curve
+    const tp = $('#target-path');
+    tp.setAttribute('class', 'target-path ' + fn + '-mode');
+    let d = '';
+    const N = 500;
+    for (let i = 0; i <= N; i++) {
+      const x = XMIN + (i / N) * (XMAX - XMIN);
+      d += (i === 0 ? 'M ' : ' L ') + px(x).toFixed(1) + ' ' + py(target(x)).toFixed(1);
+    }
+    tp.setAttribute('d', d);
+
+    // partial-sum curve
+    let dp = '';
+    let pen = false;
+    for (let i = 0; i <= N; i++) {
+      const x = XMIN + (i / N) * (XMAX - XMIN);
+      const y = partial(x, terms, fn);
+      if (y < YMIN - 6 || y > YMAX + 6) { pen = false; continue; }
+      dp += (pen ? ' L ' : 'M ') + px(x).toFixed(1) + ' ' + py(y).toFixed(1);
+      pen = true;
+    }
+    $('#partial-path').setAttribute('d', dp);
+
+    // probe
+    const pv = partial(xProbe, terms, fn);
+    const tv = target(xProbe);
+    const probeLine = $('#probe-line');
+    probeLine.setAttribute('x1', px(xProbe)); probeLine.setAttribute('x2', px(xProbe));
+    probeLine.setAttribute('y1', G.yTop); probeLine.setAttribute('y2', G.yBot);
+    const dotP = $('#probe-dot-partial');
+    if (pv >= YMIN && pv <= YMAX) {
+      dotP.style.display = '';
+      dotP.setAttribute('cx', px(xProbe).toFixed(1));
+      dotP.setAttribute('cy', py(pv).toFixed(1));
+    } else {
+      dotP.style.display = 'none';
+    }
+    const dotT = $('#probe-dot-target');
+    dotT.setAttribute('cx', px(xProbe).toFixed(1));
+    dotT.setAttribute('cy', py(tv).toFixed(1));
+
+    $('#partial-display').textContent = Math.abs(pv) > 99999 ? 'enormous' : pv.toFixed(5);
+    $('#target-display').textContent = tv.toFixed(5);
+    $('#target-name').textContent = fn + '(x₀) exactly';
+    $('#n-val').textContent = String(terms);
+    $('#x-val').textContent = xProbe.toFixed(2);
+  }
+
+  // ——— Wire up ———
+  $('#fn-toggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    fn = btn.dataset.fn;
+    document.querySelectorAll('#fn-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+    buildChips();
+    render();
+  });
+  $('#n-slider').addEventListener('input', () => { terms = Number($('#n-slider').value); render(); });
+  $('#x-slider').addEventListener('input', () => { xProbe = Number($('#x-slider').value); render(); });
+
+  // Init
+  buildChips();
+  render();
+})();
+</script>
+
+</body>
+</html>

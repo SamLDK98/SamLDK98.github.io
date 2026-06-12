@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiplying by i</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --axis: rgba(236, 226, 209, 0.4);
+    --circle: rgba(236, 226, 209, 0.68);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .history-bar {
+    padding: 0.9rem 1.4rem 0.85rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    justify-content: center;
+    align-items: center;
+    min-height: 3.2rem;
+  }
+  .hist-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    padding: 0.32rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--text-dim);
+    background: rgba(0, 0, 0, 0.18);
+    white-space: nowrap;
+  }
+  .hist-chip.current {
+    color: var(--point);
+    border-color: rgba(239, 115, 152, 0.55);
+    background: rgba(239, 115, 152, 0.08);
+  }
+  .hist-chip.arrow-chip {
+    border: 0;
+    background: transparent;
+    color: var(--text-faint);
+    padding-left: 0.05rem;
+    padding-right: 0.05rem;
+  }
+  .viz-wrap {
+    padding: 1.2rem 1.25rem 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  svg#canvas {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    display: block;
+  }
+  .controls {
+    padding: 1.05rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.6rem 1.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    min-height: 2.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(212, 184, 136, 0.06); color: var(--accent); }
+  .btn.primary {
+    border-color: rgba(239, 115, 152, 0.5);
+    color: var(--point);
+  }
+  .btn.primary:hover {
+    background: rgba(239, 115, 152, 0.08);
+    border-color: var(--point);
+    color: var(--point);
+  }
+  .turn-count {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .turn-count strong {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-weight: 400;
+    font-style: normal;
+  }
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .circle-outline {
+    stroke: rgba(236, 226, 209, 0.3);
+    stroke-width: 1.4;
+    stroke-dasharray: 4 6;
+    fill: none;
+  }
+  .graph-tick {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .axis-name {
+    fill: var(--text-dim);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .z-arrow {
+    stroke: var(--point);
+    stroke-width: 3;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px var(--point-glow));
+  }
+  .z-head { fill: var(--point); filter: drop-shadow(0 0 6px var(--point-glow)); }
+  .ghost-arrow {
+    stroke: rgba(236, 226, 209, 0.25);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 3 5;
+  }
+  .turn-arc {
+    stroke: var(--sin);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.9;
+  }
+  .corner-label {
+    fill: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+  }
+  .corner-label.lit { fill: var(--point); }
+  .panel-label {
+    fill: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="history-bar" id="history-bar"></div>
+
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 640 520" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="An arrow on the complex plane starting at one; each press of the multiply-by-i button rotates it a quarter turn anticlockwise">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+        <marker id="turn-arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+        </marker>
+      </defs>
+
+      <g id="grid"></g>
+      <line class="axis" x1="40" y1="270" x2="615" y2="270" marker-end="url(#ax-arrow)" />
+      <line class="axis" x1="320" y1="500" x2="320" y2="45" marker-end="url(#ax-arrow)" />
+      <circle class="circle-outline" cx="320" cy="270" r="180" />
+      <text class="axis-name" x="610" y="258" text-anchor="end">real</text>
+      <text class="axis-name" x="330" y="58">imaginary</text>
+
+      <text class="corner-label" id="lbl-1"  x="514" y="292">1</text>
+      <text class="corner-label" id="lbl-i"  x="306" y="80">i</text>
+      <text class="corner-label" id="lbl-m1" x="108" y="292">−1</text>
+      <text class="corner-label" id="lbl-mi" x="300" y="476">−i</text>
+
+      <path id="turn-arc" class="turn-arc" marker-end="url(#turn-arrowhead)" style="display:none" />
+      <line id="ghost-arrow" class="ghost-arrow" style="display:none" />
+      <line id="z-arrow" class="z-arrow" x1="320" y1="270" x2="500" y2="270" />
+      <circle id="z-head" class="z-head" r="8" cx="500" cy="270" />
+    </svg>
+  </div>
+
+  <div class="controls">
+    <button class="btn primary" id="mult">× i</button>
+    <button class="btn" id="reset">Reset to 1</button>
+    <span class="turn-count">quarter-turns so far: <strong id="count">0</strong></span>
+  </div>
+
+  <div class="footer">
+    Start at 1 and keep multiplying by i. Four presses bring you home — because four quarter-turns make a full circle.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+
+  // ——— Layout ———
+  const CX = 320, CY = 270, R = 180;
+
+  // ——— State ———
+  let k = 0;               // number of multiplications so far
+  let displayAngle = 0;    // animated angle in radians
+  let targetAngle = 0;
+  let animating = false;
+
+  const valueOf = (n) => ['1', 'i', '−1', '−i'][((n % 4) + 4) % 4];
+  const powerLabel = (n) => {
+    if (n === 0) return '1';
+    if (n === 1) return 'i';
+    return 'i' + superscript(n) + ' = ' + valueOf(n);
+  };
+  function superscript(n) {
+    const map = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹' };
+    return String(n).split('').map(c => map[c]).join('');
+  }
+
+  // ——— History chips ———
+  const bar = $('#history-bar');
+  function renderHistory() {
+    bar.innerHTML = '';
+    const start = Math.max(0, k - 7);   // keep the bar from overflowing
+    if (start > 0) {
+      const dots = document.createElement('span');
+      dots.className = 'hist-chip arrow-chip';
+      dots.textContent = '…';
+      bar.appendChild(dots);
+    }
+    for (let n = start; n <= k; n++) {
+      if (n > start) {
+        const a = document.createElement('span');
+        a.className = 'hist-chip arrow-chip';
+        a.textContent = '×i →';
+        bar.appendChild(a);
+      }
+      const c = document.createElement('span');
+      c.className = 'hist-chip' + (n === k ? ' current' : '');
+      c.textContent = powerLabel(n);
+      bar.appendChild(c);
+    }
+  }
+
+  // ——— Drawing ———
+  function draw() {
+    const x = CX + R * Math.cos(displayAngle);
+    const y = CY - R * Math.sin(displayAngle);
+    const arrow = $('#z-arrow');
+    arrow.setAttribute('x2', x.toFixed(1));
+    arrow.setAttribute('y2', y.toFixed(1));
+    const head = $('#z-head');
+    head.setAttribute('cx', x.toFixed(1));
+    head.setAttribute('cy', y.toFixed(1));
+
+    // corner labels light up at rest positions
+    const rest = !animating ? ((k % 4) + 4) % 4 : -1;
+    $('#lbl-1').classList.toggle('lit', rest === 0);
+    $('#lbl-i').classList.toggle('lit', rest === 1);
+    $('#lbl-m1').classList.toggle('lit', rest === 2);
+    $('#lbl-mi').classList.toggle('lit', rest === 3);
+  }
+
+  function drawTurnArc(fromAngle, toAngle) {
+    const arc = $('#turn-arc');
+    const aR = R + 22;
+    const x1 = CX + aR * Math.cos(fromAngle), y1 = CY - aR * Math.sin(fromAngle);
+    const x2 = CX + aR * Math.cos(toAngle), y2 = CY - aR * Math.sin(toAngle);
+    arc.setAttribute('d', `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${aR} ${aR} 0 0 0 ${x2.toFixed(1)} ${y2.toFixed(1)}`);
+    arc.style.display = '';
+  }
+
+  // ——— Animation ———
+  function animateTo(newTarget, onDone) {
+    targetAngle = newTarget;
+    animating = true;
+    const startAngle = displayAngle;
+    const startTime = performance.now();
+    const DURATION = 450;
+    function frame(now) {
+      const t = Math.min(1, (now - startTime) / DURATION);
+      const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      displayAngle = startAngle + (targetAngle - startAngle) * ease;
+      draw();
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        displayAngle = targetAngle;
+        animating = false;
+        draw();
+        if (onDone) onDone();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ——— Wire up ———
+  $('#mult').addEventListener('click', () => {
+    if (animating) return;
+    const fromAngle = displayAngle;
+    // ghost of previous position
+    const ghost = $('#ghost-arrow');
+    ghost.setAttribute('x1', CX); ghost.setAttribute('y1', CY);
+    ghost.setAttribute('x2', (CX + R * Math.cos(fromAngle)).toFixed(1));
+    ghost.setAttribute('y2', (CY - R * Math.sin(fromAngle)).toFixed(1));
+    ghost.style.display = '';
+
+    k += 1;
+    renderHistory();
+    $('#count').textContent = String(k);
+    drawTurnArc(fromAngle, fromAngle + Math.PI / 2);
+    animateTo(fromAngle + Math.PI / 2);
+  });
+
+  $('#reset').addEventListener('click', () => {
+    if (animating) return;
+    k = 0;
+    displayAngle = 0;
+    targetAngle = 0;
+    $('#count').textContent = '0';
+    $('#ghost-arrow').style.display = 'none';
+    $('#turn-arc').style.display = 'none';
+    renderHistory();
+    draw();
+  });
+
+  // Init
+  renderHistory();
+  draw();
+})();
+</script>
+
+</body>
+</html>
