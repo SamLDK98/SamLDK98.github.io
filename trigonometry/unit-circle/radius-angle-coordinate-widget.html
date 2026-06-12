@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angle Determines Coordinates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: transparent;
+    --panel: rgba(31, 27, 23, 0.94);
+    --text: #f1eee7;
+    --dim: rgba(241, 238, 231, 0.62);
+    --rule: rgba(241, 238, 231, 0.14);
+    --axis: rgba(241, 238, 231, 0.58);
+    --circle: rgba(241, 238, 231, 0.78);
+    --radius: #ef7398;
+    --angle: #56c7ff;
+    --point: #ef7398;
+    --number: #f1c66e;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  }
+
+  body { padding: 1rem; }
+
+  .widget {
+    width: min(100%, 820px);
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background:
+      radial-gradient(circle at 28% 22%, rgba(86, 199, 255, 0.08), transparent 32%),
+      linear-gradient(180deg, var(--panel), rgba(22, 19, 16, 0.98));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+  }
+
+  .stage { padding: 1rem 1rem 0.7rem; }
+
+  svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .axis {
+    stroke: var(--axis);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .circle {
+    fill: rgba(232, 161, 59, 0.035);
+    stroke: var(--circle);
+    stroke-width: 2.5;
+  }
+
+  .angle-arc {
+    fill: none;
+    stroke: var(--angle);
+    stroke-width: 6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px rgba(86, 199, 255, 0.28));
+  }
+
+  .radius {
+    stroke: var(--radius);
+    stroke-width: 6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px rgba(239, 115, 152, 0.28));
+  }
+
+  .point {
+    fill: var(--point);
+    stroke: #171411;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.42));
+  }
+
+  text {
+    font-family: "JetBrains Mono", monospace;
+    fill: var(--dim);
+    font-size: 14px;
+  }
+
+  .angle-label {
+    fill: var(--angle);
+    font-size: 18px;
+  }
+
+  .radius-label,
+  .coordinate-label {
+    fill: var(--radius);
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .coordinate-label-bg {
+    fill: #171411;
+    stroke: rgba(239, 115, 152, 0.42);
+    stroke-width: 1;
+    rx: 9;
+    ry: 9;
+  }
+
+  .angle-pill-bg {
+    fill: #171411;
+    stroke: rgba(86, 199, 255, 0.36);
+    stroke-width: 1;
+    rx: 9;
+    ry: 9;
+  }
+
+  .pill-arrow {
+    fill: none;
+    stroke: rgba(241, 238, 231, 0.72);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 4px rgba(241, 238, 231, 0.26));
+    marker-start: url(#pill-arrowhead-start);
+    marker-end: url(#pill-arrowhead-end);
+  }
+
+  .tick-label {
+    fill: var(--number);
+    font-size: 13px;
+  }
+
+  .angle-pill-label {
+    fill: var(--angle);
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .controls {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.95rem 1.1rem 1.1rem;
+    border-top: 1px solid var(--rule);
+    background: rgba(0, 0, 0, 0.14);
+  }
+
+  .readout {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85rem;
+  }
+
+  .readout strong {
+    color: var(--angle);
+    font-weight: 500;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--angle);
+  }
+
+  @media (max-width: 680px) {
+    body { padding: 0.75rem; }
+    text { font-size: 12px; }
+    .coordinate-label { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+  <main class="widget">
+    <div class="stage">
+      <svg viewBox="0 0 720 420" role="img" aria-label="A radius of length one determining coordinates on the unit circle">
+        <defs>
+          <marker id="pill-arrowhead-end" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 0 0 L 8 4 L 0 8 Z" fill="rgba(241, 238, 231, 0.72)" />
+          </marker>
+          <marker id="pill-arrowhead-start" viewBox="0 0 8 8" refX="1" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 8 0 L 0 4 L 8 8 Z" fill="rgba(241, 238, 231, 0.72)" />
+          </marker>
+        </defs>
+        <line class="axis" x1="104" y1="215" x2="616" y2="215" />
+        <line class="axis" x1="360" y1="44" x2="360" y2="386" />
+        <circle class="circle" cx="360" cy="215" r="145" />
+        <path id="angleArc" class="angle-arc" d="" />
+        <line id="radiusLine" class="radius" x1="360" y1="215" x2="505" y2="215" />
+        <circle id="point" class="point" cx="505" cy="215" r="9" />
+        <text x="620" y="236">x-axis</text>
+        <text x="374" y="38">y</text>
+        <text class="tick-label" x="530" y="241" text-anchor="middle">1</text>
+        <text class="tick-label" x="190" y="241" text-anchor="middle">-1</text>
+        <text class="tick-label" x="342" y="54" text-anchor="end">1</text>
+        <text class="tick-label" x="342" y="385" text-anchor="end">-1</text>
+        <text class="radius-label" id="radiusText" x="418" y="180">radius = 1</text>
+        <rect id="anglePillBg" class="angle-pill-bg" x="390" y="189" width="82" height="28" />
+        <text class="angle-pill-label" id="anglePillText" x="431" y="208" text-anchor="middle">70°</text>
+        <line id="pillArrow" class="pill-arrow" x1="472" y1="203" x2="508" y2="203" />
+        <rect id="coordinateBg" class="coordinate-label-bg" x="508" y="189" width="132" height="28" />
+        <text class="coordinate-label" id="coordinateText" x="518" y="205">(1.00, 0.00)</text>
+      </svg>
+    </div>
+
+    <div class="controls">
+      <div class="readout"><span></span><strong id="readout">0°</strong></div>
+      <input id="angle" type="range" min="0" max="360" value="70">
+    </div>
+  </main>
+
+<script>
+  const cx = 360;
+  const cy = 215;
+  const r = 145;
+  const arcR = 58;
+  const input = document.getElementById('angle');
+  const readout = document.getElementById('readout');
+  const radiusLine = document.getElementById('radiusLine');
+  const point = document.getElementById('point');
+  const angleArc = document.getElementById('angleArc');
+  const radiusText = document.getElementById('radiusText');
+  const anglePillBg = document.getElementById('anglePillBg');
+  const anglePillText = document.getElementById('anglePillText');
+  const pillArrow = document.getElementById('pillArrow');
+  const coordinateBg = document.getElementById('coordinateBg');
+  const coordinateText = document.getElementById('coordinateText');
+
+  function pointAt(degrees, radius) {
+    const radians = degrees * Math.PI / 180;
+    return {
+      x: cx + radius * Math.cos(radians),
+      y: cy - radius * Math.sin(radians)
+    };
+  }
+
+  function format(value) {
+    return Math.abs(value) < 0.005 ? '0.00' : value.toFixed(2);
+  }
+
+  function sampledArc(degrees) {
+    if (degrees <= 0) return '';
+    const steps = Math.max(2, Math.ceil(degrees / 4));
+    const parts = [];
+    for (let i = 0; i <= steps; i += 1) {
+      const p = pointAt(degrees * (i / steps), arcR);
+      parts.push(`${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`);
+    }
+    return parts.join(' ');
+  }
+
+  function render() {
+    const degrees = Number(input.value);
+    const radians = degrees * Math.PI / 180;
+    const p = pointAt(degrees, r);
+    const mid = pointAt(degrees, 76);
+    const anchorRight = p.x >= cx;
+    const labelX = p.x + (anchorRight ? 16 : -16);
+    const labelY = p.y + (p.y >= cy ? 24 : -14);
+    const bgWidth = 138;
+    const bgHeight = 30;
+    const bgX = anchorRight ? labelX - 8 : labelX - bgWidth + 8;
+    const bgY = labelY - 18;
+    const angleWidth = 82;
+    const gap = 38;
+    const angleX = anchorRight ? bgX - gap - angleWidth : bgX + bgWidth + gap;
+    const angleY = bgY;
+    const arrowStartX = anchorRight ? angleX + angleWidth + 4 : bgX + bgWidth + 4;
+    const arrowEndX = anchorRight ? bgX - 4 : angleX - 4;
+    const arrowY = bgY + bgHeight / 2;
+
+    radiusLine.setAttribute('x2', p.x);
+    radiusLine.setAttribute('y2', p.y);
+    point.setAttribute('cx', p.x);
+    point.setAttribute('cy', p.y);
+    angleArc.setAttribute('d', sampledArc(degrees));
+    readout.textContent = `${degrees}°`;
+
+    radiusText.setAttribute('x', mid.x + 8);
+    radiusText.setAttribute('y', mid.y - 8);
+
+    coordinateBg.setAttribute('x', bgX);
+    coordinateBg.setAttribute('y', bgY);
+    coordinateBg.setAttribute('width', bgWidth);
+    coordinateBg.setAttribute('height', bgHeight);
+    coordinateText.setAttribute('x', labelX);
+    coordinateText.setAttribute('y', labelY);
+    coordinateText.setAttribute('text-anchor', anchorRight ? 'start' : 'end');
+    coordinateText.textContent = `(${format(Math.cos(radians))}, ${format(Math.sin(radians))})`;
+
+    anglePillBg.setAttribute('x', angleX);
+    anglePillBg.setAttribute('y', angleY);
+    anglePillBg.setAttribute('width', angleWidth);
+    anglePillBg.setAttribute('height', bgHeight);
+    anglePillText.setAttribute('x', angleX + angleWidth / 2);
+    anglePillText.setAttribute('y', angleY + 20);
+    anglePillText.textContent = `${degrees}°`;
+    pillArrow.setAttribute('x1', arrowStartX);
+    pillArrow.setAttribute('x2', arrowEndX);
+    pillArrow.setAttribute('y1', arrowY);
+    pillArrow.setAttribute('y2', arrowY);
+  }
+
+  input.addEventListener('input', render);
+  render();
+</script>
+</body>
+</html>
