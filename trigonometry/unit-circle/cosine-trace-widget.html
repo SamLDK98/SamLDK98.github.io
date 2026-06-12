@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tracing Cosine from Circular Motion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #161311;
+      --panel: #211a15;
+      --text: #ece2d1;
+      --muted: rgba(236, 226, 209, 0.58);
+      --faint: rgba(236, 226, 209, 0.18);
+      --circle: rgba(236, 226, 209, 0.66);
+      --orange: #e8a13b;
+      --blue: #6dd3c4;
+      --pink: #ef7398;
+      --yellow: #f3d36b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      background: transparent;
+      color: var(--text);
+      font-family: "EB Garamond", Georgia, serif;
+    }
+
+    body { padding: 1rem; }
+
+    .widget {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      border: 1px solid rgba(232, 161, 59, 0.22);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 32%), var(--panel);
+      overflow: hidden;
+    }
+
+    .stage {
+      padding: 1rem 1rem 0.35rem;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .axis {
+      stroke: rgba(236, 226, 209, 0.45);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+    }
+
+    .grid {
+      stroke: rgba(236, 226, 209, 0.08);
+      stroke-width: 1;
+    }
+
+    .circle {
+      fill: rgba(0, 0, 0, 0.08);
+      stroke: var(--circle);
+      stroke-width: 2.3;
+    }
+
+    .radius {
+      stroke: #d4b888;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 6px rgba(212, 184, 136, 0.35));
+    }
+
+    .x-displacement {
+      stroke: var(--orange);
+      stroke-width: 5;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 7px rgba(232, 161, 59, 0.36));
+    }
+
+    .vertical-guide {
+      stroke: rgba(232, 161, 59, 0.45);
+      stroke-width: 1.5;
+      stroke-dasharray: 5 6;
+    }
+
+    .cos-trace {
+      fill: none;
+      stroke: var(--orange);
+      stroke-width: 3.3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 7px rgba(232, 161, 59, 0.35));
+    }
+
+    .trace-ghost {
+      fill: none;
+      stroke: rgba(232, 161, 59, 0.18);
+      stroke-width: 1.4;
+      stroke-dasharray: 3 5;
+    }
+
+    .point {
+      fill: var(--pink);
+      stroke: #ece2d1;
+      stroke-width: 2;
+      filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.45));
+    }
+
+    .graph-dot {
+      fill: var(--yellow);
+      stroke: #171411;
+      stroke-width: 2;
+    }
+
+    .motion-arrow {
+      stroke: var(--blue);
+      stroke-width: 4;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 7px rgba(109, 211, 196, 0.35));
+    }
+
+    .label {
+      fill: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .value {
+      fill: var(--yellow);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0.85rem;
+      align-items: center;
+      padding: 0.9rem 1.15rem 1rem;
+      border-top: 1px solid rgba(232, 161, 59, 0.16);
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .controls label,
+    .readout {
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .readout {
+      color: var(--yellow);
+      font-size: 0.78rem;
+      font-variant-numeric: tabular-nums;
+      text-transform: none;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--orange);
+      cursor: pointer;
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 0.6rem; }
+      .controls { grid-template-columns: 1fr; }
+      .controls label,
+      .readout { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="stage">
+      <svg viewBox="0 0 980 430" role="img" aria-label="A point moving around a circle while cosine is traced on a graph">
+        <defs>
+          <marker id="motionArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="#6dd3c4" />
+          </marker>
+        </defs>
+
+        <g id="circleGroup" transform="translate(205 214)">
+          <line class="axis" x1="-150" y1="0" x2="150" y2="0" />
+          <line class="axis" x1="0" y1="150" x2="0" y2="-150" />
+          <circle class="circle" r="128" />
+          <line id="xDisplacement" class="x-displacement" x1="0" y1="0" x2="128" y2="0" />
+          <line id="radius" class="radius" x1="0" y1="0" x2="128" y2="0" />
+          <line id="verticalGuide" class="vertical-guide" x1="128" y1="0" x2="128" y2="0" />
+          <line id="motionArrow" class="motion-arrow" x1="96" y1="-32" x2="132" y2="-32" marker-end="url(#motionArrowHead)" />
+          <circle id="point" class="point" cx="128" cy="0" r="7" />
+          <text class="label" x="138" y="5">1</text>
+          <text class="label" x="-143" y="5">-1</text>
+          <text id="cosLabel" class="value" x="-95" y="-154">cos(theta) = 1.00</text>
+        </g>
+
+        <g id="graphGroup" transform="translate(415 62)">
+          <line class="grid" x1="0" y1="0" x2="500" y2="0" />
+          <line class="grid" x1="0" y1="126" x2="500" y2="126" />
+          <line class="grid" x1="0" y1="252" x2="500" y2="252" />
+          <line class="axis" x1="0" y1="126" x2="510" y2="126" />
+          <line class="axis" x1="0" y1="260" x2="0" y2="-12" />
+          <text class="label" x="-10" y="4" text-anchor="end">1</text>
+          <text class="label" x="-10" y="130" text-anchor="end">0</text>
+          <text class="label" x="-10" y="256" text-anchor="end">-1</text>
+          <text class="label" x="500" y="292" text-anchor="end">theta</text>
+          <text class="label" x="0" y="292" text-anchor="middle">0</text>
+          <text class="label" x="250" y="292" text-anchor="middle">180</text>
+          <text class="label" x="500" y="292" text-anchor="middle">360</text>
+          <path id="ghostTrace" class="trace-ghost" d="" />
+          <path id="cosTrace" class="cos-trace" d="" />
+          <circle id="graphDot" class="graph-dot" cx="0" cy="0" r="6" />
+        </g>
+      </svg>
+    </div>
+    <div class="controls">
+      <label for="angle">angle</label>
+      <input id="angle" type="range" min="0" max="360" value="0" />
+      <div class="readout"><span id="angleText">0</span> degrees</div>
+    </div>
+  </div>
+
+  <script>
+    const slider = document.getElementById('angle');
+    const angleText = document.getElementById('angleText');
+    const point = document.getElementById('point');
+    const radius = document.getElementById('radius');
+    const xDisplacement = document.getElementById('xDisplacement');
+    const verticalGuide = document.getElementById('verticalGuide');
+    const motionArrow = document.getElementById('motionArrow');
+    const cosLabel = document.getElementById('cosLabel');
+    const ghostTrace = document.getElementById('ghostTrace');
+    const cosTrace = document.getElementById('cosTrace');
+    const graphDot = document.getElementById('graphDot');
+
+    const r = 128;
+    const graphW = 500;
+    const graphMidY = 126;
+    const graphAmp = 126;
+
+    function graphPoint(deg) {
+      const t = deg * Math.PI / 180;
+      return {
+        x: (deg / 360) * graphW,
+        y: graphMidY - Math.cos(t) * graphAmp
+      };
+    }
+
+    function tracePath(maxDeg) {
+      let d = '';
+      const steps = Math.max(2, Math.ceil(maxDeg / 3));
+      for (let i = 0; i <= steps; i++) {
+        const deg = maxDeg * (i / steps);
+        const p = graphPoint(deg);
+        d += `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)} `;
+      }
+      return d.trim();
+    }
+
+    function fullTracePath() {
+      let d = '';
+      for (let deg = 0; deg <= 360; deg += 3) {
+        const p = graphPoint(deg);
+        d += `${deg === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)} `;
+      }
+      return d.trim();
+    }
+
+    function update() {
+      const deg = Number(slider.value);
+      const t = deg * Math.PI / 180;
+      const x = Math.cos(t) * r;
+      const y = -Math.sin(t) * r;
+      const cosValue = Math.cos(t);
+      const horizontalSpeed = Math.abs(Math.sin(t));
+      const arrowLength = 14 + horizontalSpeed * 56;
+      const direction = Math.sin(t) >= 0 ? -1 : 1;
+      const arrowY = y - 34;
+      const arrowStartX = x - direction * arrowLength * 0.5;
+      const arrowEndX = x + direction * arrowLength * 0.5;
+      const graphP = graphPoint(deg);
+
+      angleText.textContent = Math.round(deg);
+      point.setAttribute('cx', x.toFixed(2));
+      point.setAttribute('cy', y.toFixed(2));
+      radius.setAttribute('x2', x.toFixed(2));
+      radius.setAttribute('y2', y.toFixed(2));
+      xDisplacement.setAttribute('x2', x.toFixed(2));
+      verticalGuide.setAttribute('x1', x.toFixed(2));
+      verticalGuide.setAttribute('x2', x.toFixed(2));
+      verticalGuide.setAttribute('y2', y.toFixed(2));
+      motionArrow.setAttribute('x1', arrowStartX.toFixed(2));
+      motionArrow.setAttribute('x2', arrowEndX.toFixed(2));
+      motionArrow.setAttribute('y1', arrowY.toFixed(2));
+      motionArrow.setAttribute('y2', arrowY.toFixed(2));
+      cosLabel.textContent = `cos(theta) = ${cosValue.toFixed(2)}`;
+      cosTrace.setAttribute('d', tracePath(deg));
+      graphDot.setAttribute('cx', graphP.x.toFixed(2));
+      graphDot.setAttribute('cy', graphP.y.toFixed(2));
+    }
+
+    ghostTrace.setAttribute('d', fullTracePath());
+    slider.addEventListener('input', update);
+    update();
+  </script>
+</body>
+</html>

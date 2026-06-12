@@ -56,15 +56,44 @@
           loading="lazy"
         ></iframe>
 
-        <p>However, what if we tracked the coordinates during a revolution?</p>
+        <p>However, what if we tracked the coordinates linked to the angle during a revolution?</p>
 
-        <p>Imagine the point beginning at (1,0). What happens to the $x$ and $y$ values during a counterclockwise lap of the circle? Take a moment to think about that.</p>
+        <p>Let's take the $x$-coordinate, or as we will now call it, $\cos(\theta)$.</p>
 
-        <p>Initially, $x$ decreases as $y$ increases $(\downarrow, \uparrow)$. After the point crosses the $y$-axis, they both decrease $(\downarrow, \downarrow)$, albeit with $x$ now in the negative numbers.</p>
+        <p>As the point travels around the circle, the $x$-coordinate moves from:</p>
 
-        <p>After passing through the $x$-axis $(-1,0)$, $x$ begins to increase again while $y$ moves down into the negative numbers $(\uparrow, \downarrow)$. Once the point crosses the $y$-axis again, both $x$ and $y$ are then increasing $(\uparrow, \uparrow)$, albeit with $y$ in the negative numbers. Eventually they would reach the starting position again with $x$ at $1$ and $y$ at $0$.</p>
+        <p class="display-equation">$$1 \rightarrow 0 \rightarrow -1 \rightarrow 0 \rightarrow 1$$</p>
 
-        <p>Thinking through that probably doesn't lead to much standing out; however, look at what happens when we graph it, plotting each coordinate against the angle of rotation.</p>
+        <p>and then repeats.</p>
+
+        <p>At first glance this sounds similar to the sawtooth pattern. The value still moves back and forth between a maximum and minimum.</p>
+
+        <p>However, notice that while the angle increases at a constant rate, the coordinate does not.</p>
+
+        <ul>
+          <li>Near the left and right edges of the circle, the point moves mostly up or down, so the $x$-coordinate changes only slowly.</li>
+          <li>Near the top or bottom of the circle, the point moves mostly left and right rather than up or down, so the $x$-coordinate changes much more rapidly.</li>
+        </ul>
+
+        <p>Consequently, we see a smooth curve when graphed.</p>
+
+        <iframe
+          class="essay-widget cosine-trace-widget"
+          src="trigonometry/unit-circle/cosine-trace-widget.html"
+          title="Interactive widget tracing cosine from circular motion"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>If we instead tracked $\sin(\theta)$, the $y$-coordinate, we would see the same pattern except the starting position would be shifted.</p>
+
+        <p class="display-equation">$$\cos(0^\circ)= 1$$</p>
+
+        <p class="display-equation">$$\sin(0^\circ) = 0$$</p>
+
+        <p>As a result, the sine oscillation starts at the midpoint of its cycle, whereas the cosine oscillation starts at its maximum.</p>
+
+        <p>A single point moving around a circle therefore generates two oscillations simultaneously: one horizontal and one vertical.</p>
 
         <iframe
           class="essay-widget unit-circle-coordinate-wave-widget"
@@ -78,16 +107,26 @@
 
         <p>In other words, uniform motion around a circle produces oscillatory behaviour when viewed through its coordinates.</p>
 
+        <h3 class="subsection-title">Oscillations vs Waves</h3>
+
+        <p>An oscillation is a quantity that repeatedly varies between larger and smaller values.</p>
+
+        <p>The sine and cosine curves we have just derived are examples of oscillations.</p>
+
+        <p>However, these oscillations currently exist at a single location.</p>
+
+        <p>A wave emerges when an oscillation is distributed across space.</p>
+
         <hr class="section-divider" />
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
-          <a class="chapter-nav-link" href="trigonometry-complex-numbers.html">
+          <a class="chapter-nav-link" href="trigonometry-unit-circle.html">
             <span>Previous</span>
-            <strong>Complex Numbers</strong>
+            <strong>Sine and Cosine as Coordinates</strong>
           </a>
-          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
+          <a class="chapter-nav-link" href="trigonometry-waves.html">
             <span>Next</span>
-            <strong>Misc</strong>
+            <strong>Waves</strong>
           </a>
         </nav>
       </section>

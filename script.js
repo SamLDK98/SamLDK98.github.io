@@ -11,11 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
       { href: 'trigonometry-right-angled-triangles.html', kicker: 'Chapter 3', title: 'Deriving Angle-Ratio Correspondences' },
       { href: 'trigonometry-computing-sine-and-cosine.html', kicker: 'Chapter 4', title: 'How to Think About Sine and Cosine' },
       { href: 'trigonometry-unit-circle.html', kicker: 'Chapter 5', title: 'Sine and Cosine as Coordinates' },
-      { href: 'trigonometry-polar-form.html', kicker: 'Chapter 6', title: 'Polar Form' },
+      { href: 'trigonometry-oscillations.html', kicker: 'Chapter 6', title: 'Oscillations' },
       { href: 'trigonometry-waves.html', kicker: 'Chapter 7', title: 'Waves' },
       { href: 'trigonometry-algebra-branch.html', kicker: 'Chapter 8', title: 'Algebra Branch' },
       { href: 'trigonometry-complex-numbers.html', kicker: 'Chapter 9', title: 'Complex Numbers' },
-      { href: 'trigonometry-oscillations.html', kicker: 'Chapter 16', title: 'Oscillations' },
+      { href: 'trigonometry-polar-form.html', kicker: 'Chapter 10', title: 'Polar Form' },
+      { href: 'trigonometry-eulers-formula.html', kicker: 'Chapter 11', title: "Euler's Formula" },
       { href: 'trigonometry-coordinates-on-the-unit-circle.html', kicker: 'Archive', title: 'Misc' },
     ];
     const currentPage = window.location.pathname.split('/').pop();

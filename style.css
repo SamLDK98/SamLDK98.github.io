@@ -2130,6 +2130,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 370px;
 }
 
+.trigonometry-oscillations-page .cosine-trace-widget {
+  width: min(100%, 980px);
+  height: 560px;
+}
+
 .intro-linear-algebra-page .unit-circle-coupled-motion-widget {
   width: min(100%, 980px);
   height: 700px;
@@ -2390,6 +2395,81 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   stroke: rgba(239, 115, 152, 0.45);
   stroke-width: 1.4;
   stroke-dasharray: 4 5;
+}
+
+.intro-linear-algebra-page .sin-cos-series-widget {
+  width: min(100%, 1080px);
+  height: 840px;
+}
+
+.intro-linear-algebra-page .euler-spiral-widget {
+  width: min(100%, 1080px);
+  height: 940px;
+}
+
+.intro-linear-algebra-page .euler-rotation-widget {
+  width: min(100%, 1080px);
+  height: 880px;
+}
+
+.intro-linear-algebra-page .rim-walk-widget {
+  width: min(100%, 980px);
+  height: 880px;
+}
+
+.branches-converge-figure {
+  width: min(100%, 820px);
+  margin: 2.2rem auto 2.6rem;
+}
+
+.branches-converge-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.branches-converge-figure .branch-box {
+  fill: rgba(0, 0, 0, 0.18);
+  stroke-width: 1.4;
+}
+
+.branches-converge-figure .branch-box-geo { stroke: rgba(109, 211, 196, 0.45); }
+.branches-converge-figure .branch-box-alg { stroke: rgba(232, 161, 59, 0.45); }
+.branches-converge-figure .branch-box-cpx { stroke: rgba(239, 115, 152, 0.45); }
+
+.branches-converge-figure .branch-title {
+  font-family: "Fraunces", "EB Garamond", serif;
+  font-size: 19px;
+}
+
+.branches-converge-figure .branch-title-geo { fill: #6dd3c4; }
+.branches-converge-figure .branch-title-alg { fill: #e8a13b; }
+.branches-converge-figure .branch-title-cpx { fill: #ef7398; }
+
+.branches-converge-figure .branch-line {
+  fill: #a89c87;
+  font-family: "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.branches-converge-figure .branch-flow {
+  fill: none;
+  stroke: rgba(214, 196, 168, 0.4);
+  stroke-width: 1.6;
+}
+
+.branches-converge-figure .euler-box {
+  fill: rgba(212, 184, 136, 0.07);
+  stroke: #d4b888;
+  stroke-width: 1.6;
+}
+
+.branches-converge-figure .euler-text {
+  fill: #ece2d1;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 24px;
 }
 
 .trig-figure-grid {
