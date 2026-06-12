@@ -1462,6 +1462,13 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   padding-left: 2.4rem;
 }
 
+.trigonometry-unit-circle-page .unit-circle-quadrant-table,
+.trigonometry-unit-circle-page .unit-circle-quadrant-table mjx-container[display="true"] {
+  color: var(--intro-text);
+  background: transparent;
+  border: 0;
+}
+
 .trigonometry-unit-circle-page .angle-growth-figure {
   max-width: 920px;
 }
@@ -1511,6 +1518,9 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .trigonometry-unit-circle-page .orientation-measure-figure {
   max-width: 920px;
+  border: 0;
+  background: transparent;
+  overflow: visible;
 }
 
 .trigonometry-unit-circle-page .orientation-measure-figure svg {
@@ -1525,24 +1535,38 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 
 .orientation-measure-label,
 .orientation-measure-value {
-  fill: var(--intro-dim);
+  fill: rgba(241, 243, 239, 0.78);
   font-family: "JetBrains Mono", monospace;
   font-size: 13px;
 }
 
 .orientation-measure-value {
-  fill: var(--intro-accent);
+  fill: #f4c76d;
 }
 
 .temperature-line {
-  stroke: rgba(236, 226, 209, 0.62);
+  stroke: #b8dff2;
   stroke-width: 3;
   stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgba(86, 199, 255, 0.2));
+}
+
+.temperature-scale-line {
+  stroke: url(#temperature-scale-gradient);
+}
+
+.temperature-cold-line {
+  stroke: #56c7ff;
+}
+
+.temperature-hot-line {
+  stroke: #ef7398;
+  filter: drop-shadow(0 0 5px rgba(239, 115, 152, 0.22));
 }
 
 .orientation-measure-circle {
-  fill: rgba(0, 0, 0, 0.08);
-  stroke: rgba(236, 226, 209, 0.58);
+  fill: rgba(232, 161, 59, 0.06);
+  stroke: rgba(241, 243, 239, 0.76);
   stroke-width: 2.4;
 }
 
@@ -2111,6 +2135,31 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 780px;
 }
 
+.intro-linear-algebra-page .unit-circle-coupled-motion-widget {
+  width: min(100%, 980px);
+  height: 700px;
+}
+
+.intro-linear-algebra-page .unit-circle-radius-angle-widget {
+  width: min(100%, 860px);
+  height: 620px;
+}
+
+.intro-linear-algebra-page .unit-circle-radius-angle-triangle-widget {
+  width: min(100%, 860px);
+  height: 580px;
+}
+
+.intro-linear-algebra-page .unit-circle-triangle-labels-widget {
+  width: min(100%, 860px);
+  height: 520px;
+}
+
+.intro-linear-algebra-page .unit-circle-coordinate-sine-cosine-widget {
+  width: min(100%, 980px);
+  height: 620px;
+}
+
 .intro-linear-algebra-page .unit-circle-sine-cosine-widget {
   width: min(100%, 980px);
   height: 720px;
@@ -2288,7 +2337,7 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 }
 
 .trig-triangle-figure {
-  max-width: 760px;
+  max-width: 620px;
 }
 
 .trig-line {

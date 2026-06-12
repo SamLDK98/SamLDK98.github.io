@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angle Creates a Triangle on the Unit Circle</title>
+  <style>
+    :root {
+      --bg: #171411;
+      --panel: rgba(255, 244, 220, 0.04);
+      --text: #f1eee7;
+      --muted: rgba(241, 238, 231, 0.62);
+      --grid: rgba(241, 238, 231, 0.11);
+      --axis: rgba(241, 238, 231, 0.58);
+      --circle: rgba(241, 238, 231, 0.78);
+      --angle: #56c7ff;
+      --radius: #ef7398;
+      --vertical: #6dd3c4;
+      --base: #f1c66e;
+      --point: #ef7398;
+      --fill: rgba(239, 115, 152, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    }
+
+    .widget {
+      width: min(100%, 860px);
+      padding: clamp(16px, 3vw, 28px);
+      border: 1px solid rgba(241, 238, 231, 0.14);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 28% 22%, rgba(86, 199, 255, 0.08), transparent 32%),
+        linear-gradient(180deg, rgba(31, 27, 23, 0.94), rgba(22, 19, 16, 0.98));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .stage {
+      width: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .grid-line {
+      stroke: var(--grid);
+      stroke-width: 1;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .unit-circle {
+      fill: rgba(232, 161, 59, 0.035);
+      stroke: var(--circle);
+      stroke-width: 2.4;
+    }
+
+    .triangle-fill {
+      fill: var(--fill);
+      stroke: none;
+    }
+
+    .triangle-base,
+    .triangle-vertical,
+    .radius-line {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .triangle-base {
+      stroke: var(--base);
+      stroke-width: 4;
+      filter: drop-shadow(0 0 5px rgba(241, 198, 110, 0.22));
+    }
+
+    .triangle-vertical {
+      stroke: var(--vertical);
+      stroke-width: 4;
+      filter: drop-shadow(0 0 5px rgba(109, 211, 196, 0.22));
+    }
+
+    .radius-line {
+      stroke: var(--radius);
+      stroke-width: 4.4;
+      filter: drop-shadow(0 0 6px rgba(239, 115, 152, 0.28));
+    }
+
+    .angle-arc {
+      fill: none;
+      stroke: var(--angle);
+      stroke-width: 4;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 5px rgba(86, 199, 255, 0.28));
+    }
+
+    .point {
+      fill: var(--point);
+      stroke: #171411;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.42));
+    }
+
+    .foot-point {
+      fill: var(--base);
+      stroke: #171411;
+      stroke-width: 2.4;
+    }
+
+    .label {
+      fill: var(--muted);
+      font-family: "JetBrains Mono", "Consolas", monospace;
+      font-size: 14px;
+    }
+
+    .angle-label {
+      fill: var(--angle);
+      font-family: "JetBrains Mono", "Consolas", monospace;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-top: 12px;
+      color: var(--muted);
+      font-family: "JetBrains Mono", "Consolas", monospace;
+      font-size: 13px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--angle);
+    }
+
+    .readout {
+      min-width: 52px;
+      color: var(--angle);
+      text-align: right;
+    }
+
+    @media (max-width: 560px) {
+      .widget {
+        padding: 14px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .readout {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" aria-label="Interactive widget showing a right triangle inside the unit circle">
+    <svg class="stage" viewBox="0 0 720 430" role="img">
+      <line class="grid-line" x1="360" y1="48" x2="360" y2="348" />
+      <line class="grid-line" x1="210" y1="198" x2="510" y2="198" />
+      <line class="axis" x1="160" y1="198" x2="560" y2="198" />
+      <line class="axis" x1="360" y1="380" x2="360" y2="18" />
+      <circle class="unit-circle" cx="360" cy="198" r="150" />
+
+      <path id="triangleFill" class="triangle-fill" d="" />
+      <line id="baseLine" class="triangle-base" x1="360" y1="198" x2="360" y2="198" />
+      <line id="verticalLine" class="triangle-vertical" x1="360" y1="198" x2="360" y2="198" />
+      <path id="angleArc" class="angle-arc" d="" />
+      <line id="radiusLine" class="radius-line" x1="360" y1="198" x2="510" y2="198" />
+      <circle id="footPoint" class="foot-point" cx="510" cy="198" r="5.5" />
+      <circle id="point" class="point" cx="510" cy="198" r="8" />
+
+      <text class="label" x="568" y="204">positive x-axis</text>
+      <text class="label" x="372" y="34">y</text>
+      <text id="angleText" class="angle-label" x="422" y="178">30°</text>
+    </svg>
+
+    <div class="controls">
+      <label for="angle">angle</label>
+      <input id="angle" type="range" min="0" max="360" value="30" step="1" />
+      <output id="readout" class="readout" for="angle">30°</output>
+    </div>
+  </main>
+
+  <script>
+    const cx = 360;
+    const cy = 198;
+    const radius = 150;
+    const angleRadius = 58;
+
+    const slider = document.getElementById("angle");
+    const readout = document.getElementById("readout");
+    const point = document.getElementById("point");
+    const footPoint = document.getElementById("footPoint");
+    const radiusLine = document.getElementById("radiusLine");
+    const baseLine = document.getElementById("baseLine");
+    const verticalLine = document.getElementById("verticalLine");
+    const triangleFill = document.getElementById("triangleFill");
+    const angleArc = document.getElementById("angleArc");
+    const angleText = document.getElementById("angleText");
+
+    function pointAt(degrees, r) {
+      const radians = degrees * Math.PI / 180;
+      return {
+        x: cx + Math.cos(radians) * r,
+        y: cy - Math.sin(radians) * r
+      };
+    }
+
+    function arcPath(degrees) {
+      const clamped = Math.max(0.1, Math.min(359.9, degrees));
+      const start = pointAt(0, angleRadius);
+      const end = pointAt(clamped, angleRadius);
+      const largeArc = clamped > 180 ? 1 : 0;
+      return `M ${start.x} ${start.y} A ${angleRadius} ${angleRadius} 0 ${largeArc} 0 ${end.x} ${end.y}`;
+    }
+
+    function render() {
+      const degrees = Number(slider.value);
+      const p = pointAt(degrees, radius);
+      const label = `${degrees}\u00b0`;
+
+      point.setAttribute("cx", p.x);
+      point.setAttribute("cy", p.y);
+      footPoint.setAttribute("cx", p.x);
+      footPoint.setAttribute("cy", cy);
+
+      radiusLine.setAttribute("x2", p.x);
+      radiusLine.setAttribute("y2", p.y);
+      baseLine.setAttribute("x2", p.x);
+      verticalLine.setAttribute("x1", p.x);
+      verticalLine.setAttribute("x2", p.x);
+      verticalLine.setAttribute("y2", p.y);
+      triangleFill.setAttribute("d", `M ${cx} ${cy} L ${p.x} ${cy} L ${p.x} ${p.y} Z`);
+
+      angleArc.setAttribute("d", arcPath(degrees));
+      const textPoint = pointAt(Math.max(12, degrees / 2), 84);
+      angleText.setAttribute("x", textPoint.x + 4);
+      angleText.setAttribute("y", textPoint.y - 4);
+      angleText.textContent = label;
+      readout.textContent = label;
+    }
+
+    slider.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>

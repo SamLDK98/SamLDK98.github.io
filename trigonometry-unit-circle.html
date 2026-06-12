@@ -43,8 +43,15 @@
         <figure class="trig-figure orientation-measure-figure" aria-label="Temperature as a line compared with degrees as a circle">
           <svg viewBox="0 0 920 330" role="img">
             <defs>
-              <marker id="temperature-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.62)" />
+              <linearGradient id="temperature-scale-gradient" x1="18" y1="136" x2="322" y2="136" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#56c7ff" />
+                <stop offset="100%" stop-color="#ef7398" />
+              </linearGradient>
+              <marker id="temperature-cold-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#b8dff2" />
+              </marker>
+              <marker id="temperature-hot-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#ef7398" />
               </marker>
               <marker id="orientation-loop-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
                 <path d="M 0 0 L 10 5 L 0 10 Z" fill="#e8a13b" />
@@ -53,9 +60,9 @@
 
             <g transform="translate(66 52)">
               <text class="orientation-measure-title" x="170" y="0" text-anchor="middle">Temperature</text>
-              <line class="temperature-line" x1="18" y1="136" x2="322" y2="136" />
-              <line class="temperature-line" x1="142" y1="88" x2="42" y2="88" marker-end="url(#temperature-arrow)" />
-              <line class="temperature-line" x1="198" y1="88" x2="298" y2="88" marker-end="url(#temperature-arrow)" />
+              <line class="temperature-line temperature-scale-line" x1="18" y1="136" x2="322" y2="136" />
+              <line class="temperature-line temperature-cold-line" x1="142" y1="88" x2="42" y2="88" marker-end="url(#temperature-cold-arrow)" />
+              <line class="temperature-line temperature-hot-line" x1="198" y1="88" x2="298" y2="88" marker-end="url(#temperature-hot-arrow)" />
               <line class="temperature-line" x1="18" y1="126" x2="18" y2="146" />
               <line class="temperature-line" x1="94" y1="128" x2="94" y2="144" />
               <line class="temperature-line" x1="170" y1="126" x2="170" y2="146" />
@@ -82,27 +89,128 @@
           </svg>
         </figure>
 
-        <p>We can represent an angle as a point moving around a circle.</p>
+        <p>It might therefore be misleading to think of angles as represented by one number -- because that would imply the properties of a number line structure.</p>
 
-        <p>As that point moves, it is never moving purely horizontally or purely vertically, but always some combination of both.</p>
+        <p>Let's look at what it means to move along a circle.</p>
 
-        <p>If one coordinate changes, the other must change in a way that preserves the circular path. Sometimes $x$ increases while $y$ decreases, sometimes the reverse, and sometimes they increase or decrease together.</p>
+        <p>Say we start at $(1, 0)$ and we want to move horizontally to $(-1, 0)$.</p>
 
-        <p>So while an angle appears to be a single quantity, its motion around a circle can be represented by two coupled quantities.</p>
+        <p>Notice that we can't move purely horizontally. We must move according to some combination of vertical and horizontal.</p>
+
+        <p>If one coordinate changes, the other must change in a way that preserves the circular path. Sometimes $x$ decreases while $y$ increases, sometimes the reverse, and sometimes they increase or decrease together.</p>
+
+        <iframe
+          class="essay-widget unit-circle-coupled-motion-widget"
+          src="trigonometry/unit-circle/coupled-coordinate-motion-widget.html"
+          title="Interactive widget showing coupled coordinate motion on a circle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Now, let's imagine something similar.</p>
+
+        <p>This time there is a line connecting the point to the origin. As the point moves counterclockwise around the circle, an angle is formed between this line and the positive $x$-axis.</p>
+
+        <iframe
+          class="essay-widget unit-circle-radius-angle-widget"
+          src="trigonometry/unit-circle/radius-angle-widget.html"
+          title="Interactive widget showing the angle made by a radius from the x-axis"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Notice that the angle determines the position of the point on the circle.</p>
+
+        <ul>
+          <li>If the angle changes, the point moves.</li>
+          <li>If the point moves, its coordinates change.</li>
+        </ul>
+
+        <p>This means that a single angle determines a unique pair of coordinates.</p>
+
+        <p>But how could we work out what those coordinates are?</p>
+
+        <p>At first glance, there seems to be no connection between an angle such as $30^\circ$ and a coordinate such as $(0.87, 0.5)$.</p>
+
+        <p>However, we have actually seen this problem before.</p>
+
+        <p>In the previous chapters we learned how to determine unknown lengths in a right-angled triangle from a known angle.</p>
+
+        <p>What happens if we draw such a triangle inside the circle?</p>
+
+        <iframe
+          class="essay-widget unit-circle-radius-angle-triangle-widget"
+          src="trigonometry/unit-circle/radius-angle-triangle-widget.html"
+          title="Interactive widget showing a right triangle inside the unit circle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>The horizontal distance between the origin and the point's projection onto the $x$-axis is simply the point's $x$-coordinate.</p>
+
+        <p>Likewise, the vertical distance between the $x$-axis and the point is the point's $y$-coordinate.</p>
+
+        <p>Because we are working with a unit circle, the line connecting the origin to the point has length $1$.</p>
+
+        <p>In other words, it is the hypotenuse of a right-angled triangle whose other two sides are exactly the point's $x$- and $y$-coordinates.</p>
+
+        <iframe
+          class="essay-widget unit-circle-triangle-labels-widget"
+          src="trigonometry/unit-circle/unit-circle-triangle-labels-widget.html"
+          title="Widget labelling the unit circle triangle sides as x, y, and 1"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>This should look familiar.</p>
+
+        <p>We already know how to describe the sides of a right-angled triangle relative to a chosen angle.</p>
+
+        <ul>
+          <li>The horizontal side is <strong>adjacent</strong> to the angle.</li>
+          <li>The vertical side is <strong>opposite</strong> the angle.</li>
+          <li>And the line connecting the origin to the point is the <strong>hypotenuse</strong>.</li>
+        </ul>
+
+        <p>So from our previous definitions:</p>
+
+        <p class="display-equation">$$\begin{gathered}
+\cos(\theta) = \frac{\text{adjacent}}{\text{hypotenuse}} \\
+\sin(\theta) = \frac{\text{opposite}}{\text{hypotenuse}}
+\end{gathered}$$</p>
+
+        <p>But the hypotenuse has length $1$. Therefore:</p>
+
+        <p class="display-equation">$$\begin{gathered}
+\cos(\theta) = \frac{x}{1} = x \\
+\sin(\theta) = \frac{y}{1} = y
+\end{gathered}$$</p>
+
+        <p>This gives us a completely new way to think about sine and cosine.</p>
+
+        <p>They are not just ratios between sides of a triangle. On the unit circle, <strong>they are the coordinates of a point.</strong></p>
+
+        <p class="display-equation">$$(x, y) = (\cos(\theta), \sin(\theta))$$</p>
+
+        <iframe
+          class="essay-widget unit-circle-coordinate-sine-cosine-widget"
+          src="trigonometry/unit-circle/unit-circle-coordinate-sine-cosine-widget.html"
+          title="Interactive widget showing unit circle coordinates as cosine and sine"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
 
         <h3 class="subsection-title">Unit Circle</h3>
 
-        <p>Let's take a moment to understand the unit circle within the context of a coordinate system, and then we will see how this helps with the interpretation of angles.</p>
+        <p>Understanding the unit circle is central to new interpretation of sine and cosine that we are about to introduce. Let's take a moment to become familiar with it.</p>
 
-        <p>Every point on the circle has both an $x$-coordinate and a $y$-coordinate. As a point moves around the circle, these coordinates change together in a way that preserves the circular path.</p>
+        <p>Every point on the circle has both an $x$ and $y$ coordinate. The value of each coordinate varies as a point moves around the circle.</p>
 
-        <p>A unit circle has a radius of 1.</p>
+        <p>A unit circle has a radius of 1, so the values of each coordinate range from -1 to 1.</p>
 
-        <p>Its coordinates therefore range from $-1$ to $1$ on the $x$- and $y$-axes.</p>
+        <p>We will learn the same coordinate locations as we have done previously for degrees and radians, so the only values you need to remember are:</p>
 
-        <p>The only coordinate values you need to remember are:</p>
-
-        <p class="display-equation equation-left">$$\frac{1}{2}, \quad \frac{\sqrt{2}}{2}, \quad \frac{\sqrt{3}}{2} \qquad \to \qquad 0.5, \quad \approx 0.71, \quad \approx 0.87$$</p>
+        <p class="display-equation">$$\frac{1}{2}, \quad \frac{\sqrt{2}}{2}, \quad \frac{\sqrt{3}}{2} \qquad \to \qquad 0.5, \quad \approx 0.71, \quad \approx 0.87$$</p>
 
         <p>Everything else is just signs and swapping positions.</p>
 
@@ -115,7 +223,7 @@
 
         <p>The signs depend on the quadrant:</p>
 
-        <p class="display-equation equation-left">$$
+        <p class="display-equation equation-plain unit-circle-quadrant-table">$$
 \begin{array}{c|c}
 \text{Quadrant} & \text{Coordinates } (x,y) \\
 \hline

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coupled Coordinates on a Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: transparent;
+    --panel: rgba(31, 27, 23, 0.94);
+    --text: #f1eee7;
+    --dim: rgba(241, 238, 231, 0.62);
+    --rule: rgba(241, 238, 231, 0.14);
+    --axis: rgba(241, 238, 231, 0.58);
+    --circle: rgba(241, 238, 231, 0.78);
+    --x: #f1c66e;
+    --y: #56c7ff;
+    --point: #ef7398;
+    --path: #78c884;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  }
+
+  body {
+    padding: 1rem;
+  }
+
+  .widget {
+    width: min(100%, 920px);
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background:
+      radial-gradient(circle at 28% 22%, rgba(86, 199, 255, 0.08), transparent 32%),
+      linear-gradient(180deg, var(--panel), rgba(22, 19, 16, 0.98));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+  }
+
+  .stage {
+    padding: 1rem 1rem 0.65rem;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .axis,
+  .guide {
+    stroke: var(--axis);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .guide {
+    stroke-dasharray: 6 8;
+    opacity: 0.8;
+  }
+
+  .circle {
+    fill: rgba(232, 161, 59, 0.035);
+    stroke: var(--circle);
+    stroke-width: 2.5;
+  }
+
+  .arc-full {
+    fill: none;
+    stroke: rgba(120, 200, 132, 0.22);
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+
+  .arc-progress {
+    fill: none;
+    stroke: var(--path);
+    stroke-width: 6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 7px rgba(120, 200, 132, 0.28));
+  }
+
+  .x-line,
+  .x-dot {
+    stroke: var(--x);
+    fill: var(--x);
+  }
+
+  .y-line,
+  .y-dot {
+    stroke: var(--y);
+    fill: var(--y);
+  }
+
+  .x-line,
+  .y-line {
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .point {
+    fill: var(--point);
+    stroke: #171411;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.42));
+  }
+
+  .start-end {
+    fill: var(--dim);
+  }
+
+  text {
+    font-family: "JetBrains Mono", monospace;
+    fill: var(--dim);
+    font-size: 14px;
+  }
+
+  .coord-label {
+    fill: var(--text);
+    font-size: 15px;
+  }
+
+  .statement {
+    margin: 0;
+    padding: 0.9rem 1.1rem;
+    border-top: 1px solid var(--rule);
+    color: var(--text);
+    font-size: 1.05rem;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.95rem 1.1rem 1.1rem;
+    border-top: 1px solid var(--rule);
+    background: rgba(0, 0, 0, 0.14);
+  }
+
+  .slider-block {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .readout {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85rem;
+  }
+
+  .readout strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--point);
+  }
+
+  .buttons {
+    display: inline-flex;
+    gap: 0.45rem;
+  }
+
+  button {
+    min-height: 2.25rem;
+    padding: 0 0.85rem;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font: 500 0.85rem "JetBrains Mono", monospace;
+    cursor: pointer;
+  }
+
+  button[aria-pressed="true"] {
+    border-color: var(--path);
+    color: var(--path);
+    box-shadow: 0 0 0 1px rgba(120, 200, 132, 0.18) inset;
+  }
+
+  @media (max-width: 680px) {
+    body { padding: 0.75rem; }
+    .controls { grid-template-columns: 1fr; }
+    .buttons { justify-content: stretch; }
+    button { flex: 1; }
+    text { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+  <main class="widget">
+    <div class="stage">
+      <svg viewBox="0 0 760 430" role="img" aria-label="A point moving from one zero to negative one zero along a circle">
+        <line class="axis" x1="96" y1="215" x2="664" y2="215" />
+        <line class="axis" x1="380" y1="42" x2="380" y2="388" />
+        <circle class="circle" cx="380" cy="215" r="150" />
+        <path id="arcFull" class="arc-full" d="" />
+        <path id="arcProgress" class="arc-progress" d="" />
+        <line id="xProjection" class="x-line" x1="530" y1="215" x2="530" y2="215" />
+        <line id="yProjection" class="y-line" x1="530" y1="215" x2="530" y2="215" />
+        <line id="verticalGuide" class="guide" x1="530" y1="215" x2="530" y2="215" />
+        <circle class="start-end" cx="530" cy="215" r="5" />
+        <circle class="start-end" cx="230" cy="215" r="5" />
+        <circle id="xDot" class="x-dot" cx="530" cy="215" r="4" />
+        <circle id="yDot" class="y-dot" cx="530" cy="215" r="4" />
+        <circle id="point" class="point" cx="530" cy="215" r="9" />
+        <text x="546" y="240">(1, 0)</text>
+        <text x="216" y="240" text-anchor="end">(-1, 0)</text>
+        <text class="coord-label" id="coordText" x="380" y="24" text-anchor="middle"></text>
+        <text id="motionText" x="380" y="410" text-anchor="middle"></text>
+      </svg>
+    </div>
+
+    <p class="statement">While an angle appears to be a single quantity, its motion around a circle can be represented by two coupled quantities.</p>
+
+    <div class="controls">
+      <label class="slider-block">
+        <span class="readout"><span>position along circle</span><strong id="positionText">50%</strong></span>
+        <input id="position" type="range" min="0" max="100" value="50">
+      </label>
+      <div class="buttons" aria-label="Path choice">
+        <button id="upper" type="button" aria-pressed="true">direct</button>
+        <button id="lower" type="button" aria-pressed="false">under</button>
+      </div>
+    </div>
+  </main>
+
+<script>
+  const cx = 380;
+  const cy = 215;
+  const r = 150;
+  const startX = cx + r;
+  const startY = cy;
+  const position = document.getElementById('position');
+  const positionText = document.getElementById('positionText');
+  const coordText = document.getElementById('coordText');
+  const motionText = document.getElementById('motionText');
+  const point = document.getElementById('point');
+  const xProjection = document.getElementById('xProjection');
+  const yProjection = document.getElementById('yProjection');
+  const verticalGuide = document.getElementById('verticalGuide');
+  const xDot = document.getElementById('xDot');
+  const yDot = document.getElementById('yDot');
+  const arcFull = document.getElementById('arcFull');
+  const arcProgress = document.getElementById('arcProgress');
+  const upper = document.getElementById('upper');
+  const lower = document.getElementById('lower');
+  let pathMode = 'upper';
+
+  function polarPoint(t) {
+    const angle = pathMode === 'upper' ? Math.PI * t : -Math.PI * t;
+    const x = cx + r * Math.cos(angle);
+    const y = cy - r * Math.sin(angle);
+    return { x, y, unitX: Math.cos(angle), unitY: Math.sin(angle) };
+  }
+
+  function arcPath(fromT, toT) {
+    const steps = Math.max(2, Math.ceil(Math.abs(toT - fromT) * 72));
+    const points = [];
+    for (let i = 0; i <= steps; i += 1) {
+      const t = fromT + (toT - fromT) * (i / steps);
+      const point = polarPoint(t);
+      points.push(`${i === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`);
+    }
+    return points.join(' ');
+  }
+
+  function directionText(t) {
+    if (t < 0.49) {
+      return pathMode === 'upper' ? 'x decreases while y increases' : 'x decreases while y decreases';
+    }
+    if (t > 0.51) {
+      return pathMode === 'upper' ? 'x decreases while y decreases' : 'x decreases while y increases';
+    }
+    if (pathMode === 'upper') {
+      return 'x continues decreasing while y changes direction';
+    }
+    return 'x continues decreasing while y changes direction';
+  }
+
+  function render() {
+    const t = Number(position.value) / 100;
+    const p = polarPoint(t);
+    positionText.textContent = `${position.value}%`;
+    point.setAttribute('cx', p.x);
+    point.setAttribute('cy', p.y);
+    xProjection.setAttribute('x1', startX);
+    xProjection.setAttribute('y1', startY);
+    xProjection.setAttribute('x2', p.x);
+    xProjection.setAttribute('y2', startY);
+    yProjection.setAttribute('x1', p.x);
+    yProjection.setAttribute('y1', startY);
+    yProjection.setAttribute('x2', p.x);
+    yProjection.setAttribute('y2', p.y);
+    verticalGuide.setAttribute('x1', p.x);
+    verticalGuide.setAttribute('y1', startY);
+    verticalGuide.setAttribute('x2', p.x);
+    verticalGuide.setAttribute('y2', p.y);
+    xDot.setAttribute('cx', p.x);
+    xDot.setAttribute('cy', startY);
+    yDot.setAttribute('cx', p.x);
+    yDot.setAttribute('cy', p.y);
+    arcFull.setAttribute('d', arcPath(0, 1));
+    arcProgress.setAttribute('d', t === 0 ? '' : arcPath(0, t));
+    coordText.textContent = `x = ${p.unitX.toFixed(2)}, y = ${p.unitY.toFixed(2)}`;
+    motionText.textContent = directionText(t);
+  }
+
+  function setPath(mode) {
+    pathMode = mode;
+    upper.setAttribute('aria-pressed', String(mode === 'upper'));
+    lower.setAttribute('aria-pressed', String(mode === 'lower'));
+    render();
+  }
+
+  position.addEventListener('input', render);
+  upper.addEventListener('click', () => setPath('upper'));
+  lower.addEventListener('click', () => setPath('lower'));
+  render();
+</script>
+</body>
+</html>
