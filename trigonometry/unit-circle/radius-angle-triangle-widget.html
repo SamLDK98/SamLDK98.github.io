@@ -115,12 +115,6 @@
       filter: drop-shadow(0 0 8px rgba(239, 115, 152, 0.42));
     }
 
-    .foot-point {
-      fill: var(--base);
-      stroke: #171411;
-      stroke-width: 2.4;
-    }
-
     .label {
       fill: var(--muted);
       font-family: "JetBrains Mono", "Consolas", monospace;
@@ -186,7 +180,6 @@
       <line id="verticalLine" class="triangle-vertical" x1="360" y1="198" x2="360" y2="198" />
       <path id="angleArc" class="angle-arc" d="" />
       <line id="radiusLine" class="radius-line" x1="360" y1="198" x2="510" y2="198" />
-      <circle id="footPoint" class="foot-point" cx="510" cy="198" r="5.5" />
       <circle id="point" class="point" cx="510" cy="198" r="8" />
 
       <text class="label" x="568" y="204">positive x-axis</text>
@@ -210,7 +203,6 @@
     const slider = document.getElementById("angle");
     const readout = document.getElementById("readout");
     const point = document.getElementById("point");
-    const footPoint = document.getElementById("footPoint");
     const radiusLine = document.getElementById("radiusLine");
     const baseLine = document.getElementById("baseLine");
     const verticalLine = document.getElementById("verticalLine");
@@ -241,9 +233,6 @@
 
       point.setAttribute("cx", p.x);
       point.setAttribute("cy", p.y);
-      footPoint.setAttribute("cx", p.x);
-      footPoint.setAttribute("cy", cy);
-
       radiusLine.setAttribute("x2", p.x);
       radiusLine.setAttribute("y2", p.y);
       baseLine.setAttribute("x2", p.x);

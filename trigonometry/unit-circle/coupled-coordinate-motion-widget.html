@@ -17,7 +17,7 @@
     --axis: rgba(241, 238, 231, 0.58);
     --circle: rgba(241, 238, 231, 0.78);
     --x: #f1c66e;
-    --y: #56c7ff;
+    --y: #ef7398;
     --point: #ef7398;
     --path: #78c884;
   }
@@ -64,11 +64,6 @@
     stroke: var(--axis);
     stroke-width: 1.5;
     stroke-linecap: round;
-  }
-
-  .guide {
-    stroke-dasharray: 6 8;
-    opacity: 0.8;
   }
 
   .circle {
@@ -218,7 +213,6 @@
         <path id="arcProgress" class="arc-progress" d="" />
         <line id="xProjection" class="x-line" x1="530" y1="215" x2="530" y2="215" />
         <line id="yProjection" class="y-line" x1="530" y1="215" x2="530" y2="215" />
-        <line id="verticalGuide" class="guide" x1="530" y1="215" x2="530" y2="215" />
         <circle class="start-end" cx="530" cy="215" r="5" />
         <circle class="start-end" cx="230" cy="215" r="5" />
         <circle id="xDot" class="x-dot" cx="530" cy="215" r="4" />
@@ -231,15 +225,13 @@
       </svg>
     </div>
 
-    <p class="statement">While an angle appears to be a single quantity, its motion around a circle can be represented by two coupled quantities.</p>
-
     <div class="controls">
       <label class="slider-block">
         <span class="readout"><span>position along circle</span><strong id="positionText">50%</strong></span>
         <input id="position" type="range" min="0" max="100" value="50">
       </label>
       <div class="buttons" aria-label="Path choice">
-        <button id="upper" type="button" aria-pressed="true">direct</button>
+        <button id="upper" type="button" aria-pressed="true">over</button>
         <button id="lower" type="button" aria-pressed="false">under</button>
       </div>
     </div>
@@ -258,7 +250,6 @@
   const point = document.getElementById('point');
   const xProjection = document.getElementById('xProjection');
   const yProjection = document.getElementById('yProjection');
-  const verticalGuide = document.getElementById('verticalGuide');
   const xDot = document.getElementById('xDot');
   const yDot = document.getElementById('yDot');
   const arcFull = document.getElementById('arcFull');
@@ -312,10 +303,6 @@
     yProjection.setAttribute('y1', startY);
     yProjection.setAttribute('x2', p.x);
     yProjection.setAttribute('y2', p.y);
-    verticalGuide.setAttribute('x1', p.x);
-    verticalGuide.setAttribute('y1', startY);
-    verticalGuide.setAttribute('x2', p.x);
-    verticalGuide.setAttribute('y2', p.y);
     xDot.setAttribute('cx', p.x);
     xDot.setAttribute('cy', startY);
     yDot.setAttribute('cx', p.x);
