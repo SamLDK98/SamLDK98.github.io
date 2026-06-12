@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oscillations | Trigonometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page trigonometry-unit-circle-page trigonometry-oscillations-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Trigonometry</p>
+      <h1 class="essay-title">Oscillations</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h3 class="subsection-title">Coordinates in Circular Motion</h3>
+
+        <p>If we graphed the angle as a point moved around the circle, we would see a straight line. As time increases, the angle increases.</p>
+
+        <iframe
+          class="essay-widget angle-growth-widget"
+          src="trigonometry/unit-circle/angle-growth-widget.html?mode=linear"
+          title="Animated widget plotting angle increasing over time"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>If we reset to $0^\circ$ after each revolution, we would see a repeating sawtooth pattern.</p>
+
+        <iframe
+          class="essay-widget angle-growth-widget"
+          src="trigonometry/unit-circle/angle-growth-widget.html?mode=sawtooth"
+          title="Animated widget plotting angle resetting after each revolution"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>However, what if we tracked the coordinates during a revolution?</p>
+
+        <p>Imagine the point beginning at (1,0). What happens to the $x$ and $y$ values during a counterclockwise lap of the circle? Take a moment to think about that.</p>
+
+        <p>Initially, $x$ decreases as $y$ increases $(\downarrow, \uparrow)$. After the point crosses the $y$-axis, they both decrease $(\downarrow, \downarrow)$, albeit with $x$ now in the negative numbers.</p>
+
+        <p>After passing through the $x$-axis $(-1,0)$, $x$ begins to increase again while $y$ moves down into the negative numbers $(\uparrow, \downarrow)$. Once the point crosses the $y$-axis again, both $x$ and $y$ are then increasing $(\uparrow, \uparrow)$, albeit with $y$ in the negative numbers. Eventually they would reach the starting position again with $x$ at $1$ and $y$ at $0$.</p>
+
+        <p>Thinking through that probably doesn't lead to much standing out; however, look at what happens when we graph it, plotting each coordinate against the angle of rotation.</p>
+
+        <iframe
+          class="essay-widget unit-circle-coordinate-wave-widget"
+          src="trigonometry/unit-circle/coordinate-wave-tracer-widget.html"
+          title="Interactive widget tracing x and y coordinates during circular motion"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>It might seem odd. The angle is changing at a constant rate, yet the coordinates trace out smooth wave patterns.</p>
+
+        <p>In other words, uniform motion around a circle produces oscillatory behaviour when viewed through its coordinates.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="trigonometry-complex-numbers.html">
+            <span>Previous</span>
+            <strong>Complex Numbers</strong>
+          </a>
+          <a class="chapter-nav-link" href="trigonometry-coordinates-on-the-unit-circle.html">
+            <span>Next</span>
+            <strong>Misc</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

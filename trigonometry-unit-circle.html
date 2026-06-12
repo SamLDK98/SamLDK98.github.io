@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Unit Circle | Trigonometry</title>
+  <title>Sine and Cosine as Coordinates | Trigonometry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Trigonometry</p>
-      <h1 class="essay-title">The Unit Circle</h1>
+      <h1 class="essay-title">Sine and Cosine as Coordinates</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -38,7 +38,7 @@
 
         <p>Most types of measurements are linear and are naturally represented on a number line. As they increase in one direction, they decrease in the other.</p>
 
-        <p>Angles, however, are naturally represented by a circle. If we continually increase an angle, we eventually return to where we started.</p>
+        <p>Angles, however, are naturally represented by a circle. If we continually increase an angle, we eventually return to where we started: $0^\circ = 360^\circ = 720^\circ$.</p>
 
         <figure class="trig-figure orientation-measure-figure" aria-label="Temperature as a line compared with degrees as a circle">
           <svg viewBox="0 0 920 330" role="img">
@@ -89,15 +89,13 @@
           </svg>
         </figure>
 
-        <p>It might therefore be misleading to think of angles as represented by one number -- because that would imply the properties of a number line structure.</p>
+        <p>To move along a circle is to move simultaneously left or right AND up or down.</p>
 
-        <p>Let's look at what it means to move along a circle.</p>
+        <p>If we wanted to go from right to left on the $x$-axis -- from $(1,0)$ to $(-1,0)$ -- we can't move purely leftwards. We must also move up or down.</p>
 
-        <p>Say we start at $(1, 0)$ and we want to move horizontally to $(-1, 0)$.</p>
+        <p>So, as one coordinate changes, the other must change in a way that preserves the circular path.</p>
 
-        <p>Notice that we can't move purely horizontally. We must move according to some combination of vertical and horizontal.</p>
-
-        <p>If one coordinate changes, the other must change in a way that preserves the circular path. Sometimes $x$ decreases while $y$ increases, sometimes the reverse, and sometimes they increase or decrease together.</p>
+        <p>Sometimes $x$ decreases while $y$ increases, sometimes the reverse, and sometimes they increase or decrease together.</p>
 
         <iframe
           class="essay-widget unit-circle-coupled-motion-widget"
@@ -107,9 +105,11 @@
           loading="lazy"
         ></iframe>
 
-        <p>Now, let's imagine something similar.</p>
+        <p class="unit-circle-transition-question">So what does this mean for how we think about angles?</p>
 
-        <p>This time there is a line connecting the point to the origin. As the point moves counterclockwise around the circle, an angle is formed between this line and the positive $x$-axis.</p>
+        <h3 class="subsection-title">Angles Determine Coordinates</h3>
+
+        <p>Imagine a line connecting a point on a circle to the origin. As the point moves counterclockwise, an angle ($\theta$) is formed between this radius and the $x$-axis.</p>
 
         <iframe
           class="essay-widget unit-circle-radius-angle-widget"
@@ -119,22 +119,25 @@
           loading="lazy"
         ></iframe>
 
-        <p>Notice that the angle determines the position of the point on the circle.</p>
+        <div class="unit-circle-tight-after-widget">
+          <p>Let's set the radius length to 1 to make a unit circle, so the values of each coordinate range from -1 to 1.</p>
 
-        <ul>
-          <li>If the angle changes, the point moves.</li>
-          <li>If the point moves, its coordinates change.</li>
-        </ul>
+          <p>If the angle changes, the coordinates of the point change.</p>
 
-        <p>This means that a single angle determines a unique pair of coordinates.</p>
+          <p>In fact, every angle determines a unique pair of coordinates.</p>
+        </div>
+
+        <iframe
+          class="essay-widget unit-circle-radius-coordinate-widget"
+          src="trigonometry/unit-circle/radius-angle-coordinate-widget.html"
+          title="Interactive widget showing a radius of length one and the coordinates of its endpoint"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
 
         <p>But how could we work out what those coordinates are?</p>
 
-        <p>At first glance, there seems to be no connection between an angle such as $30^\circ$ and a coordinate such as $(0.87, 0.5)$.</p>
-
-        <p>However, we have actually seen this problem before.</p>
-
-        <p>In the previous chapters we learned how to determine unknown lengths in a right-angled triangle from a known angle.</p>
+        <p>Actually, we have actually seen this problem before. We saw how to determine unknown lengths in a right-angled triangle from a known angle.</p>
 
         <p>What happens if we draw such a triangle inside the circle?</p>
 
@@ -146,318 +149,49 @@
           loading="lazy"
         ></iframe>
 
-        <p>The horizontal distance between the origin and the point's projection onto the $x$-axis is simply the point's $x$-coordinate.</p>
+        <p>The side opposite this angle (green line) has the same $y$-coordinate as the point.</p>
 
-        <p>Likewise, the vertical distance between the $x$-axis and the point is the point's $y$-coordinate.</p>
+        <p class="display-equation">$$\text{opposite side}=y$$</p>
 
-        <p>Because we are working with a unit circle, the line connecting the origin to the point has length $1$.</p>
+        <p>The adjacent side (yellow line) has the same $x$-coordinate as the point.</p>
 
-        <p>In other words, it is the hypotenuse of a right-angled triangle whose other two sides are exactly the point's $x$- and $y$-coordinates.</p>
+        <p class="display-equation">$$\text{adjacent side}= x$$</p>
 
-        <iframe
-          class="essay-widget unit-circle-triangle-labels-widget"
-          src="trigonometry/unit-circle/unit-circle-triangle-labels-widget.html"
-          title="Widget labelling the unit circle triangle sides as x, y, and 1"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
+        <p><strong>The hypotenuse is the radius of the unit circle.</strong></p>
 
-        <p>This should look familiar.</p>
+        <p>We could therefore use the sine and cosine ratios to work out what the $x$ and $y$ coordinates must be for any given angle ($\theta$).</p>
 
-        <p>We already know how to describe the sides of a right-angled triangle relative to a chosen angle.</p>
+        <p>Recall:</p>
 
-        <ul>
-          <li>The horizontal side is <strong>adjacent</strong> to the angle.</li>
-          <li>The vertical side is <strong>opposite</strong> the angle.</li>
-          <li>And the line connecting the origin to the point is the <strong>hypotenuse</strong>.</li>
-        </ul>
+        <p class="display-equation">$$
+\sin(\theta)=\frac{\text{opposite side}}{\text{hypotenuse}}
+\qquad
+\cos(\theta)=\frac{\text{adjacent side}}{\text{hypotenuse}}
+$$</p>
 
-        <p>So from our previous definitions:</p>
+        <p>Notice that our opposite and adjacent sides must range between -1 and 1, because we have seen that they are equal to the $y$ and $x$ coordinates.</p>
 
-        <p class="display-equation">$$\begin{gathered}
-\cos(\theta) = \frac{\text{adjacent}}{\text{hypotenuse}} \\
-\sin(\theta) = \frac{\text{opposite}}{\text{hypotenuse}}
-\end{gathered}$$</p>
+        <p>Further, since the hypotenuse is just 1, we can read out these values directly.</p>
 
-        <p>But the hypotenuse has length $1$. Therefore:</p>
+        <p>This means:</p>
 
-        <p class="display-equation">$$\begin{gathered}
-\cos(\theta) = \frac{x}{1} = x \\
-\sin(\theta) = \frac{y}{1} = y
-\end{gathered}$$</p>
+        <p class="display-equation">$$
+\sin(\theta)=y
+\qquad
+\cos(\theta)=x
+$$</p>
 
         <p>This gives us a completely new way to think about sine and cosine.</p>
 
         <p>They are not just ratios between sides of a triangle. On the unit circle, <strong>they are the coordinates of a point.</strong></p>
 
-        <p class="display-equation">$$(x, y) = (\cos(\theta), \sin(\theta))$$</p>
+        <p class="display-equation unit-circle-equation-before-widget">$$(x, y) = (\cos(\theta), \sin(\theta))$$</p>
 
         <iframe
           class="essay-widget unit-circle-coordinate-sine-cosine-widget"
           src="trigonometry/unit-circle/unit-circle-coordinate-sine-cosine-widget.html"
           title="Interactive widget showing unit circle coordinates as cosine and sine"
           scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <h3 class="subsection-title">Unit Circle</h3>
-
-        <p>Understanding the unit circle is central to new interpretation of sine and cosine that we are about to introduce. Let's take a moment to become familiar with it.</p>
-
-        <p>Every point on the circle has both an $x$ and $y$ coordinate. The value of each coordinate varies as a point moves around the circle.</p>
-
-        <p>A unit circle has a radius of 1, so the values of each coordinate range from -1 to 1.</p>
-
-        <p>We will learn the same coordinate locations as we have done previously for degrees and radians, so the only values you need to remember are:</p>
-
-        <p class="display-equation">$$\frac{1}{2}, \quad \frac{\sqrt{2}}{2}, \quad \frac{\sqrt{3}}{2} \qquad \to \qquad 0.5, \quad \approx 0.71, \quad \approx 0.87$$</p>
-
-        <p>Everything else is just signs and swapping positions.</p>
-
-        <p>For coordinates without a '0':</p>
-
-        <ul class="unit-circle-opening-list">
-          <li>Multiples of $45^\circ$ are combinations of $\Large\pm \frac{\sqrt{2}}{2}$.</li>
-          <li>Multiples of $30^\circ$ are combinations of $\Large \pm \frac{\sqrt{3}}{2}$ and $\large \pm \frac{1}{2}$.</li>
-        </ul>
-
-        <p>The signs depend on the quadrant:</p>
-
-        <p class="display-equation equation-plain unit-circle-quadrant-table">$$
-\begin{array}{c|c}
-\text{Quadrant} & \text{Coordinates } (x,y) \\
-\hline
-\text{I} & (+, +) \\
-\text{II} & (-, +) \\
-\text{III} & (-, -) \\
-\text{IV} & (+, -)
-\end{array}
-$$</p>
-
-        <p>Notice how degrees, radians, and coordinates can be three different ways of describing the same point on a circle?</p>
-
-        <p class="display-equation">$$90^\circ \qquad \frac{\pi}{2} \qquad (0,1)$$</p>
-
-        <p>Make sure you have a good sense of all three before continuing.</p>
-
-        <iframe
-          class="essay-widget unit-circle-point-practice-widget"
-          src="trigonometry/unit-circle/unit-circle-point-practice-widget.html"
-          title="Practice game for selecting unit circle points from degree, radian, or coordinate prompts"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <h3 class="subsection-title">Coordinates in Circular Motion</h3>
-
-        <p>If we graphed the angle as a point moved around the circle, we would see a straight line. As time increases, the angle increases.</p>
-
-        <p>(Unless we reset to $0^\circ$ after each revolution. In that case we would see a repeating sawtooth pattern.)</p>
-
-        <figure class="trig-figure angle-growth-figure" aria-label="Two graphs comparing angle increasing over time with angle resetting each revolution">
-          <svg viewBox="0 0 920 360" role="img">
-            <defs>
-              <marker id="angle-growth-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.58)" />
-              </marker>
-            </defs>
-
-            <g transform="translate(54 48)">
-              <text class="angle-growth-title" x="164" y="-16" text-anchor="middle">Angle increasing</text>
-              <line class="angle-growth-axis" x1="0" y1="238" x2="335" y2="238" marker-end="url(#angle-growth-arrow)" />
-              <line class="angle-growth-axis" x1="0" y1="238" x2="0" y2="12" marker-end="url(#angle-growth-arrow)" />
-              <line class="angle-growth-grid" x1="0" y1="178" x2="315" y2="178" />
-              <line class="angle-growth-grid" x1="0" y1="118" x2="315" y2="118" />
-              <line class="angle-growth-grid" x1="0" y1="58" x2="315" y2="58" />
-              <path class="angle-growth-line" d="M 0 238 L 315 38" />
-              <text class="angle-growth-label" x="315" y="266" text-anchor="end">time</text>
-              <text class="angle-growth-label" x="-8" y="18" text-anchor="end">angle</text>
-            </g>
-
-            <g transform="translate(532 48)">
-              <text class="angle-growth-title" x="164" y="-16" text-anchor="middle">Reset after each revolution</text>
-              <line class="angle-growth-axis" x1="0" y1="238" x2="335" y2="238" marker-end="url(#angle-growth-arrow)" />
-              <line class="angle-growth-axis" x1="0" y1="238" x2="0" y2="12" marker-end="url(#angle-growth-arrow)" />
-              <line class="angle-growth-grid" x1="0" y1="58" x2="315" y2="58" />
-              <text class="angle-growth-label" x="-8" y="62" text-anchor="end">360°</text>
-              <path class="angle-sawtooth-line" d="M 0 238 L 78 58 L 78 238 L 156 58 L 156 238 L 234 58 L 234 238 L 312 58" />
-              <text class="angle-growth-label" x="315" y="266" text-anchor="end">time</text>
-              <text class="angle-growth-label" x="-8" y="18" text-anchor="end">angle</text>
-            </g>
-          </svg>
-        </figure>
-
-        <p>However, what if we tracked the coordinates during a revolution?</p>
-
-        <p>Imagine the point beginning at (1,0). What happens to the $x$ and $y$ values during a counterclockwise lap of the circle? Take a moment to think about that.</p>
-
-        <p>Initially, $x$ decreases as $y$ increases $(\downarrow, \uparrow)$. After the point crosses the $y$-axis, they both decrease $(\downarrow, \downarrow)$, albeit with $x$ now in the negative numbers.</p>
-
-        <p>After passing through the $x$-axis $(-1,0)$, $x$ begins to increase again while $y$ moves down into the negative numbers $(\uparrow, \downarrow)$. Once the point crosses the $y$-axis again, both $x$ and $y$ are then increasing $(\uparrow, \uparrow)$, albeit with $y$ in the negative numbers. Eventually they would reach the starting position again with $x$ at $1$ and $y$ at $0$.</p>
-
-        <p>Thinking through that probably doesn't lead to much standing out; however, look at what happens when we graph it, plotting each coordinate against the angle of rotation.</p>
-
-        <iframe
-          class="essay-widget unit-circle-coordinate-wave-widget"
-          src="trigonometry/unit-circle/coordinate-wave-tracer-widget.html"
-          title="Interactive widget tracing x and y coordinates during circular motion"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>It might seem odd. The angle is changing at a constant rate, yet the coordinates trace out smooth wave patterns.</p>
-
-        <p>In other words, uniform motion around a circle produces oscillatory behaviour when viewed through its coordinates.</p>
-
-        <h3 class="subsection-title">Sine and Cosine</h3>
-
-        <p>We have thought about angles in different ways:</p>
-
-        <ul>
-          <li>With respect to right-angled triangles, and the ratios between their side lengths.</li>
-          <li>With respect to circles, as rotations about a point.</li>
-        </ul>
-
-        <p>It turns out that these are actually the same idea from different perspectives.</p>
-
-        <p>Let's see how:</p>
-
-        <p>Take any point on the unit circle.</p>
-
-        <p>Now draw a vertical line from that point down to the $x$-axis.</p>
-
-        <p>This creates a right-angled triangle inside the circle.</p>
-
-        <figure class="trig-figure trig-figure-bare unit-circle-triangle-figure" aria-label="A unit circle with a right triangle formed by dropping a vertical line from a point to the x-axis">
-          <svg viewBox="0 0 520 360" role="img">
-            <defs>
-              <marker id="unit-circle-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.55)" />
-              </marker>
-            </defs>
-            <g transform="translate(260 185)">
-              <line x1="-190" y1="0" x2="200" y2="0" stroke="rgba(236,226,209,0.35)" stroke-width="1.5" marker-end="url(#unit-circle-axis-arrow)" />
-              <line x1="0" y1="135" x2="0" y2="-145" stroke="rgba(236,226,209,0.2)" stroke-width="1.2" />
-              <circle r="120" fill="none" stroke="rgba(232,161,59,0.82)" stroke-width="2.5" />
-              <path d="M 0 0 L 90 -79 L 90 0 Z" fill="rgba(109,211,196,0.08)" stroke="rgba(236,226,209,0.58)" stroke-width="2" />
-              <line x1="90" y1="-79" x2="90" y2="0" stroke="#6dd3c4" stroke-width="4" />
-              <line x1="0" y1="0" x2="90" y2="0" stroke="#e8a13b" stroke-width="4" />
-              <line x1="0" y1="0" x2="90" y2="-79" stroke="#d4b888" stroke-width="4" />
-              <path d="M 32 0 A 32 32 0 0 0 24 -21" fill="none" stroke="#ef7398" stroke-width="3" />
-              <text x="38" y="-10" fill="#ef7398" font-family="JetBrains Mono, monospace" font-size="18">θ</text>
-              <circle cx="90" cy="-79" r="6" fill="#ef7398" stroke="#ece2d1" stroke-width="2" />
-              <text x="96" y="-88" fill="#ece2d1" font-family="JetBrains Mono, monospace" font-size="14">(x,y)</text>
-            </g>
-          </svg>
-        </figure>
-
-        <p>The hypotenuse of this triangle is a radius of the circle.</p>
-
-        <p>Being a unit circle, the hypotenuse must equal $1$.</p>
-
-        <p>This greatly simplifies our trigonometric ratios.</p>
-
-        <p>Recall:</p>
-
-        <p class="display-equation">$$
-\sin(\theta)=\frac{o}{h}
-\qquad
-\cos(\theta)=\frac{a}{h}
-$$</p>
-
-        <p>Since:</p>
-
-        <p class="display-equation">$$h=1$$</p>
-
-        <p>we obtain:</p>
-
-        <p class="display-equation">$$
-\sin(\theta)=o
-\qquad
-\cos(\theta)=a
-$$</p>
-
-        <p>The trigonometric functions no longer give us ratios.</p>
-
-        <p>They give us side lengths directly.</p>
-
-        <p>But these side lengths are already part of our coordinate system.</p>
-
-        <p>The adjacent side is simply the horizontal distance from the origin.</p>
-
-        <p>In other words:</p>
-
-        <p class="display-equation">$$a=x$$</p>
-
-        <p>Likewise, the opposite side is the vertical distance from the origin:</p>
-
-        <p class="display-equation">$$o=y$$</p>
-
-        <p>So:</p>
-
-        <p class="display-equation">$$\cos(\theta)=x$$</p>
-
-        <p>and:</p>
-
-        <p class="display-equation">$$\sin(\theta)=y$$</p>
-
-        <p>The point on the circle corresponding to an angle $\theta$ can therefore be written as:</p>
-
-        <p class="display-equation">$$
-(x,y) =
-(\cos(\theta),\sin(\theta))
-$$</p>
-
-        <p>Every angle determines a point.</p>
-
-        <p>Every point determines a pair of coordinates.</p>
-
-        <p>And those coordinates are simply the cosine and sine of the angle.</p>
-
-        <iframe
-          class="essay-widget unit-circle-sine-cosine-widget"
-          src="trigonometry/unit-circle/sine-cosine-unit-circle-widget.html"
-          title="Interactive unit circle showing sine and cosine as coordinates"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <iframe
-          class="essay-widget triangle-family-circle-widget"
-          src="trigonometry/unit-circle/triangle-family-circle-widget.html"
-          title="Interactive widget showing the family of right triangles on the unit circle"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <h3 class="subsection-title">Thinking of Sine and Cosine in Terms of $x$- and $y$-Coordinates</h3>
-
-        <p>Imagine a line of length 1 extending from the origin.</p>
-
-        <p>If the line points directly upward, its endpoint has coordinates $(0,1)$, so its height is 1.</p>
-
-        <p>As the line rotates, and becomes slanted, its length remains the same, but its height changes.</p>
-
-        <p>Sine tells us what fraction of the line's maximum possible height remains.</p>
-
-        <p>For example, if:</p>
-
-        <p class="display-equation">$$\sin(\theta)=0.5$$</p>
-
-        <p>then the height of the endpoint is half of what it would be if the line were perfectly vertical.</p>
-
-        <p>Similarly, cosine tells us what fraction of the line's maximum possible horizontal length remains.</p>
-
-        <p>If:</p>
-
-        <p class="display-equation">$$\cos(\theta)=0.75$$</p>
-
-        <p>then the horizontal position of the endpoint is 75% of what it would be if the line were perfectly horizontal.</p>
-
-        <iframe
-          class="essay-widget sine-height-widget"
-          src="trigonometry/computing-sine-cosine/sine-height-widget.html"
-          title="Interactive widget showing sine as the height of a rotating unit line"
           loading="lazy"
         ></iframe>
 

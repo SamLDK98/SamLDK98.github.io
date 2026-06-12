@@ -1462,6 +1462,21 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   padding-left: 2.4rem;
 }
 
+.trigonometry-unit-circle-page .display-equation {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--intro-text);
+}
+
+.trigonometry-unit-circle-page .display-equation mjx-container {
+  color: var(--intro-text);
+}
+
+.trigonometry-unit-circle-page .unit-circle-equation-before-widget {
+  margin-bottom: 0.35rem;
+}
+
 .trigonometry-unit-circle-page .unit-circle-quadrant-table,
 .trigonometry-unit-circle-page .unit-circle-quadrant-table mjx-container[display="true"] {
   color: var(--intro-text);
@@ -1469,51 +1484,26 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   border: 0;
 }
 
-.trigonometry-unit-circle-page .angle-growth-figure {
-  max-width: 920px;
-}
-
-.trigonometry-unit-circle-page .angle-growth-figure svg {
-  min-height: 320px;
-}
-
-.angle-growth-axis {
-  stroke: rgba(236, 226, 209, 0.58);
-  stroke-width: 1.6;
-}
-
-.angle-growth-grid {
-  stroke: rgba(236, 226, 209, 0.1);
-  stroke-width: 1;
-}
-
-.angle-growth-line {
-  fill: none;
-  stroke: #6dd3c4;
-  stroke-width: 4;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba(109, 211, 196, 0.28));
-}
-
-.angle-sawtooth-line {
-  fill: none;
-  stroke: #e8a13b;
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 6px rgba(232, 161, 59, 0.28));
-}
-
-.angle-growth-title {
-  fill: var(--intro-text);
+.trigonometry-unit-circle-page .unit-circle-transition-question {
+  max-width: 760px;
+  margin-top: -1.35rem;
+  margin-bottom: 1.5rem;
+  color: var(--intro-dim);
   font-family: "Fraunces", Georgia, serif;
-  font-size: 20px;
+  font-size: clamp(1.05rem, 1.35vw, 1.22rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: center;
 }
 
-.angle-growth-label {
-  fill: var(--intro-dim);
-  font-family: "JetBrains Mono", monospace;
-  font-size: 13px;
+.trigonometry-unit-circle-page .unit-circle-tight-after-widget {
+  max-width: 860px;
+  margin: -1.6rem auto 1.2rem;
+}
+
+.trigonometry-unit-circle-page .unit-circle-tight-after-widget p {
+  margin-bottom: 0.8em;
 }
 
 .trigonometry-unit-circle-page .orientation-measure-figure {
@@ -2135,12 +2125,22 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 780px;
 }
 
+.trigonometry-unit-circle-page .angle-growth-widget {
+  width: min(100%, 920px);
+  height: 330px;
+}
+
 .intro-linear-algebra-page .unit-circle-coupled-motion-widget {
   width: min(100%, 980px);
   height: 700px;
 }
 
 .intro-linear-algebra-page .unit-circle-radius-angle-widget {
+  width: min(100%, 860px);
+  height: 620px;
+}
+
+.intro-linear-algebra-page .unit-circle-radius-coordinate-widget {
   width: min(100%, 860px);
   height: 620px;
 }
@@ -2178,6 +2178,218 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .intro-linear-algebra-page .complex-rotation-widget {
   width: min(100%, 720px);
   height: 720px;
+}
+
+.intro-linear-algebra-page .wave-types-widget {
+  width: min(100%, 1080px);
+  height: 760px;
+}
+
+.intro-linear-algebra-page .frequency-period-widget {
+  width: min(100%, 1180px);
+  height: 800px;
+}
+
+.intro-linear-algebra-page .amplitude-phase-widget {
+  width: min(100%, 1180px);
+  height: 780px;
+}
+
+.intro-linear-algebra-page .sine-equation-anatomy-widget {
+  width: min(100%, 1080px);
+  height: 880px;
+}
+
+.wave-anatomy-figure {
+  width: min(100%, 760px);
+  margin: 2.2rem auto 2.6rem;
+}
+
+.wave-anatomy-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wave-anatomy-figure .wave-anatomy-axis {
+  stroke: rgba(236, 226, 209, 0.36);
+  stroke-width: 1.4;
+}
+
+.wave-anatomy-figure .wave-anatomy-curve {
+  fill: none;
+  stroke: #6dd3c4;
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(109, 211, 196, 0.35));
+}
+
+.wave-anatomy-figure .wave-anatomy-amp {
+  stroke: #ef7398;
+  stroke-width: 2;
+}
+
+.wave-anatomy-figure .wave-anatomy-period {
+  fill: none;
+  stroke: #d4b888;
+  stroke-width: 1.8;
+}
+
+.wave-anatomy-figure .wave-anatomy-label {
+  font-family: "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 24px;
+}
+
+.wave-anatomy-figure .wave-anatomy-label-pink {
+  fill: #ef7398;
+}
+
+.wave-anatomy-figure .wave-anatomy-label-gold {
+  fill: #d4b888;
+}
+
+.intro-linear-algebra-page .exponential-growth-widget {
+  width: min(100%, 980px);
+  height: 660px;
+}
+
+.intro-linear-algebra-page .compound-interest-widget {
+  width: min(100%, 1080px);
+  height: 760px;
+}
+
+.intro-linear-algebra-page .geometric-series-widget {
+  width: min(100%, 1080px);
+  height: 800px;
+}
+
+.intro-linear-algebra-page .exp-series-widget {
+  width: min(100%, 1080px);
+  height: 860px;
+}
+
+.halving-figure {
+  width: min(100%, 760px);
+  margin: 2.2rem auto 2.6rem;
+}
+
+.halving-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.halving-figure .halving-outline {
+  fill: rgba(0, 0, 0, 0.16);
+  stroke: rgba(214, 196, 168, 0.28);
+  stroke-width: 1.4;
+}
+
+.halving-figure .halving-seg {
+  stroke: #161311;
+  stroke-width: 1.2;
+}
+
+.halving-figure .halving-seg-a {
+  fill: rgba(109, 211, 196, 0.34);
+}
+
+.halving-figure .halving-seg-b {
+  fill: rgba(212, 184, 136, 0.32);
+}
+
+.halving-figure .halving-label {
+  fill: #ece2d1;
+  font-family: "EB Garamond", Georgia, serif;
+  font-size: 24px;
+}
+
+.halving-figure .halving-label-small {
+  font-size: 18px;
+}
+
+.halving-figure .halving-end-label {
+  fill: #ef7398;
+  font-family: "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 21px;
+}
+
+.halving-figure .halving-end-line {
+  stroke: #ef7398;
+  stroke-width: 1.6;
+  stroke-dasharray: 4 4;
+}
+
+.intro-linear-algebra-page .complex-plane-widget {
+  width: min(100%, 980px);
+  height: 760px;
+}
+
+.intro-linear-algebra-page .powers-of-i-widget {
+  width: min(100%, 980px);
+  height: 820px;
+}
+
+.intro-linear-algebra-page .complex-multiplication-widget {
+  width: min(100%, 1080px);
+  height: 800px;
+}
+
+.intro-linear-algebra-page .rotation-projection-widget {
+  width: min(100%, 1180px);
+  height: 740px;
+}
+
+.i-off-line-figure {
+  width: min(100%, 760px);
+  margin: 2.2rem auto 2.4rem;
+}
+
+.i-off-line-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.i-off-line-figure .numline-axis {
+  stroke: rgba(236, 226, 209, 0.4);
+  stroke-width: 1.6;
+}
+
+.i-off-line-figure .numline-ticks line {
+  stroke: rgba(236, 226, 209, 0.4);
+  stroke-width: 1.4;
+}
+
+.i-off-line-figure .numline-ticks text {
+  fill: #a89c87;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+}
+
+.i-off-line-figure .i-floating {
+  fill: #ef7398;
+  font-family: "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 38px;
+}
+
+.i-off-line-figure .i-question {
+  fill: #6f6557;
+  font-family: "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 24px;
+}
+
+.i-off-line-figure .i-dashed-drop {
+  stroke: rgba(239, 115, 152, 0.45);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 5;
 }
 
 .trig-figure-grid {

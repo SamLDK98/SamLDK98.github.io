@@ -239,10 +239,189 @@
           loading="lazy"
         ></iframe>
 
+
+
+        <h3 class="subsection-title">Unit Circle</h3>
+
+        <p>Understanding the unit circle is central to new interpretation of sine and cosine that we are about to introduce. Let's take a moment to become familiar with it.</p>
+
+        <p>Every point on the circle has both an $x$ and $y$ coordinate. The value of each coordinate varies as a point moves around the circle.</p>
+
+        <p>A unit circle has a radius of 1, so the values of each coordinate range from -1 to 1.</p>
+
+        <p>We will learn the same coordinate locations as we have done previously for degrees and radians, so the only values you need to remember are:</p>
+
+        <p class="display-equation">$$\frac{1}{2}, \quad \frac{\sqrt{2}}{2}, \quad \frac{\sqrt{3}}{2} \qquad \to \qquad 0.5, \quad \approx 0.71, \quad \approx 0.87$$</p>
+
+        <p>Everything else is just signs and swapping positions.</p>
+
+        <p>For coordinates without a '0':</p>
+
+        <ul class="unit-circle-opening-list">
+          <li>Multiples of $45^\circ$ are combinations of $\Large\pm \frac{\sqrt{2}}{2}$.</li>
+          <li>Multiples of $30^\circ$ are combinations of $\Large \pm \frac{\sqrt{3}}{2}$ and $\large \pm \frac{1}{2}$.</li>
+        </ul>
+
+        <p>The signs depend on the quadrant:</p>
+
+        <p class="display-equation equation-plain unit-circle-quadrant-table">$$
+\begin{array}{c|c}
+\text{Quadrant} & \text{Coordinates } (x,y) \\
+\hline
+\text{I} & (+, +) \\
+\text{II} & (-, +) \\
+\text{III} & (-, -) \\
+\text{IV} & (+, -)
+\end{array}
+$$</p>
+
+        <p>Notice how degrees, radians, and coordinates can be three different ways of describing the same point on a circle?</p>
+
+        <p class="display-equation">$$90^\circ \qquad \frac{\pi}{2} \qquad (0,1)$$</p>
+
+        <p>Make sure you have a good sense of all three before continuing.</p>
+
+        <iframe
+          class="essay-widget unit-circle-point-practice-widget"
+          src="trigonometry/unit-circle/unit-circle-point-practice-widget.html"
+          title="Practice game for selecting unit circle points from degree, radian, or coordinate prompts"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">Sine and Cosine</h3>
+
+        <p>We have thought about angles in different ways:</p>
+
+        <ul>
+          <li>With respect to right-angled triangles, and the ratios between their side lengths.</li>
+          <li>With respect to circles, as rotations about a point.</li>
+        </ul>
+
+        <p>It turns out that these are actually the same idea from different perspectives.</p>
+
+        <p>Let's see how:</p>
+
+        <p>Take any point on the unit circle.</p>
+
+        <p>Now draw a vertical line from that point down to the $x$-axis.</p>
+
+        <p>This creates a right-angled triangle inside the circle.</p>
+
+        <p>The hypotenuse of this triangle is a radius of the circle.</p>
+
+        <p>Being a unit circle, the hypotenuse must equal $1$.</p>
+
+        <p>This greatly simplifies our trigonometric ratios.</p>
+
+        <p>Recall:</p>
+
+        <p class="display-equation">$$
+\sin(\theta)=\frac{o}{h}
+\qquad
+\cos(\theta)=\frac{a}{h}
+$$</p>
+
+        <p>Since:</p>
+
+        <p class="display-equation">$$h=1$$</p>
+
+        <p>we obtain:</p>
+
+        <p class="display-equation">$$
+\sin(\theta)=o
+\qquad
+\cos(\theta)=a
+$$</p>
+
+        <p>The trigonometric functions no longer give us ratios.</p>
+
+        <p>They give us side lengths directly.</p>
+
+        <p>But these side lengths are already part of our coordinate system.</p>
+
+        <p>The adjacent side is simply the horizontal distance from the origin.</p>
+
+        <p>In other words:</p>
+
+        <p class="display-equation">$$a=x$$</p>
+
+        <p>Likewise, the opposite side is the vertical distance from the origin:</p>
+
+        <p class="display-equation">$$o=y$$</p>
+
+        <p>So:</p>
+
+        <p class="display-equation">$$\cos(\theta)=x$$</p>
+
+        <p>and:</p>
+
+        <p class="display-equation">$$\sin(\theta)=y$$</p>
+
+        <p>The point on the circle corresponding to an angle $\theta$ can therefore be written as:</p>
+
+        <p class="display-equation">$$
+(x,y) =
+(\cos(\theta),\sin(\theta))
+$$</p>
+
+        <p>Every angle determines a point.</p>
+
+        <p>Every point determines a pair of coordinates.</p>
+
+        <p>And those coordinates are simply the cosine and sine of the angle.</p>
+
+        <iframe
+          class="essay-widget unit-circle-sine-cosine-widget"
+          src="trigonometry/unit-circle/sine-cosine-unit-circle-widget.html"
+          title="Interactive unit circle showing sine and cosine as coordinates"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <iframe
+          class="essay-widget triangle-family-circle-widget"
+          src="trigonometry/unit-circle/triangle-family-circle-widget.html"
+          title="Interactive widget showing the family of right triangles on the unit circle"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">Thinking of Sine and Cosine in Terms of $x$- and $y$-Coordinates</h3>
+
+        <p>Imagine a line of length 1 extending from the origin.</p>
+
+        <p>If the line points directly upward, its endpoint has coordinates $(0,1)$, so its height is 1.</p>
+
+        <p>As the line rotates, and becomes slanted, its length remains the same, but its height changes.</p>
+
+        <p>Sine tells us what fraction of the line's maximum possible height remains.</p>
+
+        <p>For example, if:</p>
+
+        <p class="display-equation">$$\sin(\theta)=0.5$$</p>
+
+        <p>then the height of the endpoint is half of what it would be if the line were perfectly vertical.</p>
+
+        <p>Similarly, cosine tells us what fraction of the line's maximum possible horizontal length remains.</p>
+
+        <p>If:</p>
+
+        <p class="display-equation">$$\cos(\theta)=0.75$$</p>
+
+        <p>then the horizontal position of the endpoint is 75% of what it would be if the line were perfectly horizontal.</p>
+
+        <iframe
+          class="essay-widget sine-height-widget"
+          src="trigonometry/computing-sine-cosine/sine-height-widget.html"
+          title="Interactive widget showing sine as the height of a rotating unit line"
+          loading="lazy"
+        ></iframe>
+
         <nav class="chapter-nav" aria-label="Chapter navigation">
-          <a class="chapter-nav-link" href="trigonometry-polar-form.html">
+          <a class="chapter-nav-link" href="trigonometry-oscillations.html">
             <span>Previous</span>
-            <strong>Polar Form</strong>
+            <strong>Oscillations</strong>
           </a>
           <span></span>
         </nav>
