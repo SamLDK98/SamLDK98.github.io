@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Curve Is an Equation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #2f0d08; --bg-elev: #3b1209; --bg-card: #4a160d;
+    --text: #fff1d6; --text-dim: #e7c89c; --text-faint: #a66e48;
+    --rule: rgba(255,214,134,0.2); --accent: #f0b545; --accent-glow: rgba(240,181,69,0.4);
+    --hcol: #ffd95f; --kcol: #df5f08; --rcol: #ff5a4d; --rglow: rgba(255,90,77,0.45);
+    --curve: #f0b545; --curve-glow: rgba(240,181,69,0.45);
+    --axis: rgba(255,241,214,0.42); --grid: rgba(255,241,214,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; padding: 1.5rem 1rem; background-image: radial-gradient(ellipse at top, rgba(240,181,69,0.06), transparent 55%); }
+  .widget { max-width: 760px; margin: 0 auto; background: var(--bg-elev); border: 1px solid var(--rule); position: relative; overflow: hidden; }
+  .widget::before { content:""; position:absolute; inset:0; pointer-events:none;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,241,214,0.014) 2px, rgba(255,241,214,0.014) 3px); }
+  .equation-bar { padding: 0.95rem 1.6rem 0.8rem; border-bottom: 1px solid var(--rule);
+    text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 1.16rem; color: var(--text); }
+  .equation-bar .h { color: var(--hcol); } .equation-bar .k { color: var(--kcol); } .equation-bar .r { color: var(--rcol); }
+  .viz-wrap { padding: 1.1rem 1.25rem 0.6rem; display:flex; align-items:center; justify-content:center; }
+  svg#canvas { width:100%; max-width:560px; height:auto; display:block; }
+  .controls { padding: 1.1rem 1.6rem 1.3rem; border-top: 1px solid var(--rule); background: var(--bg-card);
+    display:flex; flex-direction:column; gap:0.85rem; }
+  .slider-row { display:flex; align-items:center; gap:1rem; }
+  .slider-row label { font-family:'JetBrains Mono', monospace; font-size:0.9rem; width:2.2rem; text-align:right; }
+  .slider-row .lh { color: var(--hcol); } .slider-row .lk { color: var(--kcol); } .slider-row .lr { color: var(--rcol); }
+  .slider-row input[type=range] { flex:1; accent-color: var(--accent); height: 4px; }
+  .slider-row .num { font-family:'JetBrains Mono', monospace; font-size:0.9rem; width:3rem; text-align:left; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .footer { padding: 0.85rem 1.6rem; border-top: 1px solid var(--rule); font-style: italic; font-size: 0.84rem; color: var(--text-faint); text-align: center; }
+  .axis { stroke: var(--axis); stroke-width: 1.3; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 11px; }
+  .circle-curve { fill: rgba(240,181,69,0.08); stroke: var(--curve); stroke-width: 2.5; filter: drop-shadow(0 0 6px var(--curve-glow)); }
+  .center-dot { fill: var(--rcol); stroke: var(--text); stroke-width: 1.5; filter: drop-shadow(0 0 6px var(--rglow)); }
+  .radius-line { stroke: var(--rcol); stroke-width: 2; stroke-dasharray: 5 4; opacity: 0.85; }
+  .r-label { fill: var(--rcol); font-family:'JetBrains Mono', monospace; font-size: 12px; }
+  .c-label { fill: var(--text-dim); font-family:'JetBrains Mono', monospace; font-size: 12px; }
+  .panel-label { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="equation-bar" id="eqn"></div>
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A circle whose centre and radius change with the sliders, with its equation shown above">
+      <defs>
+        <marker id="ax-arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="20" y="22">y</text>
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow2)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow2)" />
+      <g id="ticks"></g>
+      <circle id="curve" class="circle-curve" />
+      <line id="radius-line" class="radius-line" />
+      <text id="r-label" class="r-label"></text>
+      <circle id="center-dot" class="center-dot" r="4" />
+      <text id="c-label" class="c-label"></text>
+    </svg>
+  </div>
+  <div class="controls">
+    <div class="slider-row"><label class="lh">h</label><input id="h" type="range" min="-4" max="4" step="0.5" value="0"><span class="num" id="h-num">0</span></div>
+    <div class="slider-row"><label class="lk">k</label><input id="k" type="range" min="-4" max="4" step="0.5" value="0"><span class="num" id="k-num">0</span></div>
+    <div class="slider-row"><label class="lr">r</label><input id="r" type="range" min="0.5" max="4" step="0.5" value="2.5"><span class="num" id="r-num">2.5</span></div>
+  </div>
+  <div class="footer">
+    Move <span style="color:var(--hcol)">h</span> and <span style="color:var(--kcol)">k</span> to shift the centre; change <span style="color:var(--rcol)">r</span> to resize. The equation and the curve are the same object.
+  </div>
+</div>
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  const CX = 280, CY = 280, UNIT = 48;
+  const px = (x) => CX + x * UNIT;
+  const py = (y) => CY - y * UNIT;
+  const LIM = 5;
+
+  const grid = $('#grid'), ticks = $('#ticks');
+  const xa = $('#x-axis');
+  xa.setAttribute('x1', 16); xa.setAttribute('x2', 548); xa.setAttribute('y1', CY); xa.setAttribute('y2', CY);
+  const ya = $('#y-axis');
+  ya.setAttribute('x1', CX); ya.setAttribute('x2', CX); ya.setAttribute('y1', 548); ya.setAttribute('y2', 14);
+
+  for (let v = -LIM; v <= LIM; v++) {
+    const lx = document.createElementNS(NS, 'line');
+    lx.setAttribute('class', 'grid-line');
+    lx.setAttribute('x1', px(v)); lx.setAttribute('x2', px(v)); lx.setAttribute('y1', py(LIM)); lx.setAttribute('y2', py(-LIM));
+    grid.appendChild(lx);
+    const ly = document.createElementNS(NS, 'line');
+    ly.setAttribute('class', 'grid-line');
+    ly.setAttribute('x1', px(-LIM)); ly.setAttribute('x2', px(LIM)); ly.setAttribute('y1', py(v)); ly.setAttribute('y2', py(v));
+    grid.appendChild(ly);
+    if (v !== 0 && v % 2 === 0) {
+      const tx = document.createElementNS(NS, 'text');
+      tx.setAttribute('class', 'graph-tick'); tx.setAttribute('x', px(v)); tx.setAttribute('y', CY + 16); tx.setAttribute('text-anchor', 'middle');
+      tx.textContent = v; ticks.appendChild(tx);
+      const ty = document.createElementNS(NS, 'text');
+      ty.setAttribute('class', 'graph-tick'); ty.setAttribute('x', CX - 8); ty.setAttribute('y', py(v) + 4); ty.setAttribute('text-anchor', 'end');
+      ty.textContent = v; ticks.appendChild(ty);
+    }
+  }
+
+  function fmt(n) { return Number.isInteger(n) ? String(n) : n.toFixed(1); }
+
+  let h = 0, k = 0, r = 2.5;
+
+  function render() {
+    $('#curve').setAttribute('cx', px(h));
+    $('#curve').setAttribute('cy', py(k));
+    $('#curve').setAttribute('r', r * UNIT);
+    $('#center-dot').setAttribute('cx', px(h));
+    $('#center-dot').setAttribute('cy', py(k));
+    const rl = $('#radius-line');
+    rl.setAttribute('x1', px(h)); rl.setAttribute('y1', py(k));
+    rl.setAttribute('x2', px(h + r)); rl.setAttribute('y2', py(k));
+    $('#r-label').setAttribute('x', px(h + r / 2));
+    $('#r-label').setAttribute('y', py(k) - 7);
+    $('#r-label').setAttribute('text-anchor', 'middle');
+    $('#r-label').textContent = 'r = ' + fmt(r);
+    $('#c-label').setAttribute('x', px(h) + 8);
+    $('#c-label').setAttribute('y', py(k) + 18);
+    $('#c-label').textContent = '(' + fmt(h) + ', ' + fmt(k) + ')';
+
+    $('#eqn').innerHTML =
+      colourTerm('x', 'h', h) + ' + ' + colourTerm('y', 'k', k) +
+      ' = <span class="r">' + fmt(r) + '</span>&sup2;';
+  }
+
+  function colourTerm(v, cls, c) {
+    const sup = '&sup2;';
+    if (Math.abs(c) < 0.001) return '(' + v + ')' + sup;
+    const sign = c > 0 ? '&minus;' : '+';
+    return '(' + v + ' ' + sign + ' <span class="' + cls + '">' + Math.abs(fmt(c)) + '</span>)' + sup;
+  }
+
+  function bind(id, set) {
+    const el = $('#' + id);
+    el.addEventListener('input', () => {
+      set(parseFloat(el.value));
+      $('#' + id + '-num').textContent = fmt(parseFloat(el.value));
+      render();
+    });
+  }
+  bind('h', (v) => h = v);
+  bind('k', (v) => k = v);
+  bind('r', (v) => r = v);
+
+  render();
+})();
+</script>
+</body>
+</html>
+     

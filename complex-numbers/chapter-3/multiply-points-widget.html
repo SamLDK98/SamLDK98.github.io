@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can Points Be Multiplied?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #2f0d08; --bg-elev: #3b1209; --bg-card: #4a160d;
+    --text: #fff1d6; --text-dim: #e7c89c; --text-faint: #a66e48;
+    --rule: rgba(255,214,134,0.2); --accent: #f0b545;
+    --acol: #ffd95f; --aglow: rgba(255,217,95,0.4);
+    --bcol: #ff9d3d; --bglow: rgba(255,157,61,0.4);
+    --pcol: #ff5a4d; --pglow: rgba(255,90,77,0.45);
+    --warn: #ff7a5c;
+    --axis: rgba(255,241,214,0.42); --grid: rgba(255,241,214,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; padding: 1.5rem 1rem; background-image: radial-gradient(ellipse at top, rgba(240,181,69,0.06), transparent 55%); }
+  .widget { max-width: 860px; margin: 0 auto; background: var(--bg-elev); border: 1px solid var(--rule); position: relative; overflow: hidden; }
+  .widget::before { content:""; position:absolute; inset:0; pointer-events:none;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,241,214,0.014) 2px, rgba(255,241,214,0.014) 3px); }
+  .equation-bar { padding: 0.9rem 1.6rem 0.75rem; border-bottom: 1px solid var(--rule);
+    text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 1.08rem; color: var(--text); }
+  .equation-bar .a { color: var(--acol); } .equation-bar .b { color: var(--bcol); } .equation-bar .p { color: var(--pcol); }
+  .layout { display:flex; flex-wrap:wrap; }
+  .viz-wrap { flex: 1 1 360px; padding: 1.1rem 1rem 0.6rem; display:flex; align-items:center; justify-content:center; }
+  svg#canvas { width:100%; max-width:520px; height:auto; display:block; touch-action:none; cursor:crosshair; }
+  .panel { flex: 1 1 220px; padding: 1.2rem 1.4rem; border-left: 1px solid var(--rule); background: var(--bg-card);
+    display:flex; flex-direction:column; gap:0.7rem; justify-content:center; }
+  .panel h4 { font-family:'JetBrains Mono', monospace; font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color: var(--text-faint); font-weight:500; margin-bottom:0.1rem; }
+  .row { display:flex; justify-content:space-between; align-items:baseline; gap:0.6rem; font-family:'JetBrains Mono', monospace; font-size:0.86rem; }
+  .row .lab { color: var(--text-dim); } .row .v { font-variant-numeric: tabular-nums; }
+  .row .v.a { color: var(--acol); } .row .v.b { color: var(--bcol); } .row .v.p { color: var(--pcol); }
+  .divider { height:1px; background: var(--rule); margin:0.35rem 0; }
+  .verdict { font-size:0.82rem; font-style: italic; line-height:1.45; color: var(--text-dim); }
+  .verdict.bad { color: var(--warn); font-style: normal; }
+  .footer { padding: 0.85rem 1.6rem; border-top: 1px solid var(--rule); font-style: italic; font-size: 0.84rem; color: var(--text-faint); text-align: center; }
+  .axis { stroke: var(--axis); stroke-width: 1.3; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 10px; }
+  .arr-a { stroke: var(--acol); stroke-width: 2.2; stroke-linecap: round; opacity:0.85; }
+  .arr-b { stroke: var(--bcol); stroke-width: 2.2; stroke-linecap: round; opacity:0.85; }
+  .arr-p { stroke: var(--pcol); stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 5px var(--pglow)); }
+  .pt-a { fill: var(--acol); stroke: var(--text); stroke-width: 2; cursor: grab; filter: drop-shadow(0 0 6px var(--aglow)); }
+  .pt-b { fill: var(--bcol); stroke: var(--text); stroke-width: 2; cursor: grab; filter: drop-shadow(0 0 6px var(--bglow)); }
+  .pt-p { fill: var(--pcol); stroke: var(--text); stroke-width: 2; filter: drop-shadow(0 0 7px var(--pglow)); }
+  .dot-label { font-family:'JetBrains Mono', monospace; font-size: 13px; font-weight:500; }
+  .dot-label.a { fill: var(--acol); } .dot-label.b { fill: var(--bcol); } .dot-label.p { fill: var(--pcol); }
+  .panel-label { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="equation-bar" id="eqn"></div>
+  <div class="layout">
+    <div class="viz-wrap">
+      <svg id="canvas" viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Two draggable points A and B and their componentwise product P, showing the product ignores the geometry">
+        <defs>
+          <marker id="ax-arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+          </marker>
+        </defs>
+        <g id="grid"></g>
+        <line id="x-axis" class="axis" marker-end="url(#ax-arrow4)" />
+        <line id="y-axis" class="axis" marker-end="url(#ax-arrow4)" />
+        <g id="ticks"></g>
+        <line id="arr-a" class="arr-a" />
+        <line id="arr-b" class="arr-b" />
+        <line id="arr-p" class="arr-p" />
+        <circle id="pt-p" class="pt-p" r="8" />
+        <circle id="pt-a" class="pt-a" r="9" />
+        <circle id="pt-b" class="pt-b" r="9" />
+        <text id="lbl-a" class="dot-label a">A</text>
+        <text id="lbl-b" class="dot-label b">B</text>
+        <text id="lbl-p" class="dot-label p">P</text>
+      </svg>
+    </div>
+    <div class="panel">
+      <h4>The two factors</h4>
+      <div class="row"><span class="lab">A</span><span class="v a" id="a-coord"></span></div>
+      <div class="row"><span class="lab">B</span><span class="v b" id="b-coord"></span></div>
+      <div class="divider"></div>
+      <h4>If multiplication kept length</h4>
+      <div class="row"><span class="lab">|A| &times; |B|</span><span class="v" id="expect-mag"></span></div>
+      <div class="row"><span class="lab">but |P| =</span><span class="v p" id="actual-mag"></span></div>
+      <h4 style="margin-top:0.5rem">If it kept angle</h4>
+      <div class="row"><span class="lab">&ang;A + &ang;B</span><span class="v" id="expect-ang"></span></div>
+      <div class="row"><span class="lab">but &ang;P =</span><span class="v p" id="actual-ang"></span></div>
+      <div class="divider"></div>
+      <div class="verdict" id="verdict"></div>
+    </div>
+  </div>
+  <div class="footer">
+    Drag <span style="color:var(--acol)">A</span> and <span style="color:var(--bcol)">B</span>. The product <span style="color:var(--pcol)">P = (ac, bd)</span> ignores both length and angle &mdash; and can vanish even when neither factor does.
+  </div>
+</div>
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('#canvas');
+  const CX = 260, CY = 260, UNIT = 30;
+  const px = (x) => CX + x * UNIT;
+  const py = (y) => CY - y * UNIT;
+  const LIM = 8;
+
+  const grid = $('#grid'), ticks = $('#ticks');
+  const xa = $('#x-axis'); xa.setAttribute('x1', 10); xa.setAttribute('x2', 510); xa.setAttribute('y1', CY); xa.setAttribute('y2', CY);
+  const ya = $('#y-axis'); ya.setAttribute('x1', CX); ya.setAttribute('x2', CX); ya.setAttribute('y1', 510); ya.setAttribute('y2', 10);
+  for (let v = -LIM; v <= LIM; v++) {
+    const lx = document.createElementNS(NS, 'line'); lx.setAttribute('class','grid-line');
+    lx.setAttribute('x1', px(v)); lx.setAttribute('x2', px(v)); lx.setAttribute('y1', py(LIM)); lx.setAttribute('y2', py(-LIM)); grid.appendChild(lx);
+    const ly = document.createElementNS(NS, 'line'); ly.setAttribute('class','grid-line');
+    ly.setAttribute('x1', px(-LIM)); ly.setAttribute('x2', px(LIM)); ly.setAttribute('y1', py(v)); ly.setAttribute('y2', py(v)); grid.appendChild(ly);
+    if (v !== 0 && v % 2 === 0) {
+      const tx = document.createElementNS(NS,'text'); tx.setAttribute('class','graph-tick');
+      tx.setAttribute('x', px(v)); tx.setAttribute('y', CY + 14); tx.setAttribute('text-anchor','middle'); tx.textContent = v; ticks.appendChild(tx);
+      const ty = document.createElementNS(NS,'text'); ty.setAttribute('class','graph-tick');
+      ty.setAttribute('x', CX - 7); ty.setAttribute('y', py(v) + 4); ty.setAttribute('text-anchor','end'); ty.textContent = v; ticks.appendChild(ty);
+    }
+  }
+
+  let A = { x: 2, y: 3 }, B = { x: 2, y: -1 };
+
+  function fmt(n) { const s = n.toFixed(1); return s === '-0.0' ? '0.0' : s; }
+  function angDeg(p) { let a = Math.atan2(p.y, p.x) * 180 / Math.PI; if (a < 0) a += 360; return a; }
+
+  function drawArrowPoint(arrId, ptId, lblId, p, clampForLabel) {
+    const X = px(p.x), Y = py(p.y);
+    $(arrId).setAttribute('x1', CX); $(arrId).setAttribute('y1', CY);
+    $(arrId).setAttribute('x2', X); $(arrId).setAttribute('y2', Y);
+    $(ptId).setAttribute('cx', X); $(ptId).setAttribute('cy', Y);
+    $(lblId).setAttribute('x', X + (p.x >= 0 ? 11 : -11));
+    $(lblId).setAttribute('y', Y + (p.y >= 0 ? -10 : 18));
+    $(lblId).setAttribute('text-anchor', p.x >= 0 ? 'start' : 'end');
+  }
+
+  function render() {
+    const P = { x: A.x * B.x, y: A.y * B.y };
+    drawArrowPoint('#arr-a', '#pt-a', '#lbl-a', A);
+    drawArrowPoint('#arr-b', '#pt-b', '#lbl-b', B);
+    drawArrowPoint('#arr-p', '#pt-p', '#lbl-p', P);
+
+    const magA = Math.hypot(A.x, A.y), magB = Math.hypot(B.x, B.y), magP = Math.hypot(P.x, P.y);
+    const angA = angDeg(A), angB = angDeg(B), angP = angDeg(P);
+    let angSum = angA + angB; if (angSum >= 360) angSum -= 360;
+
+    $('#eqn').innerHTML =
+      `( <span class="a">${fmt(A.x)}</span>, <span class="a">${fmt(A.y)}</span> ) · ` +
+      `( <span class="b">${fmt(B.x)}</span>, <span class="b">${fmt(B.y)}</span> ) = ` +
+      `( <span class="p">${fmt(P.x)}</span>, <span class="p">${fmt(P.y)}</span> )`;
+    $('#a-coord').textContent = `(${fmt(A.x)}, ${fmt(A.y)})`;
+    $('#b-coord').textContent = `(${fmt(B.x)}, ${fmt(B.y)})`;
+    $('#expect-mag').textContent = (magA * magB).toFixed(2);
+    $('#actual-mag').textContent = magP.toFixed(2);
+    $('#expect-ang').textContent = angSum.toFixed(0) + '°';
+    $('#actual-ang').textContent = angP.toFixed(0) + '°';
+
+    const v = $('#verdict');
+    const bothNonzero = magA > 0.01 && magB > 0.01;
+    if (bothNonzero && magP < 0.01) {
+      v.className = 'verdict bad';
+      v.textContent = 'Both factors are non-zero, yet P = (0, 0). A multiplication that does this has zero divisors — something the real numbers never had.';
+    } else {
+      v.className = 'verdict';
+      v.textContent = 'Neither |P| nor ∠P tracks the factors in any steady way. The rule never looks at the plane it lives in.';
+    }
+  }
+
+  function svgPoint(evt) {
+    const pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+    const m = svg.getScreenCTM(); if (!m) return null; return pt.matrixTransform(m.inverse());
+  }
+  let drag = null;
+  function nearest(p) {
+    const dA = Math.hypot(p.x - px(A.x), p.y - py(A.y));
+    const dB = Math.hypot(p.x - px(B.x), p.y - py(B.y));
+    return dA <= dB ? 'A' : 'B';
+  }
+  function moveTo(evt) {
+    const p = svgPoint(evt); if (!p || !drag) return;
+    let x = Math.max(-3, Math.min(3, (p.x - CX) / UNIT));
+    let y = Math.max(-3, Math.min(3, (CY - p.y) / UNIT));
+    x = Math.round(x * 2) / 2; y = Math.round(y * 2) / 2;
+    if (drag === 'A') A = { x, y }; else B = { x, y };
+    render();
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    const p = svgPoint(e); if (!p) return;
+    drag = nearest(p);
+    try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+    moveTo(e);
+  });
+  svg.addEventListener('pointermove', (e) => { if (drag) moveTo(e); });
+  svg.addEventListener('pointerup', () => { drag = null; });
+  svg.addEventListener('pointercancel', () => { drag = null; });
+
+  render();
+})();
+</script>
+</body>
+</html>
+  

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distance Is Arithmetic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #2f0d08; --bg-elev: #3b1209; --bg-card: #4a160d;
+    --text: #fff1d6; --text-dim: #e7c89c; --text-faint: #a66e48;
+    --rule: rgba(255,214,134,0.2); --accent: #f0b545; --accent-glow: rgba(240,181,69,0.4);
+    --dx: #ffd95f; --dy: #df5f08; --dist: #ff5a4d; --dist-glow: rgba(255,90,77,0.45);
+    --p1: #ffd95f; --p2: #ff9d3d;
+    --axis: rgba(255,241,214,0.42); --grid: rgba(255,241,214,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; padding: 1.5rem 1rem; background-image: radial-gradient(ellipse at top, rgba(240,181,69,0.06), transparent 55%); }
+  .widget { max-width: 880px; margin: 0 auto; background: var(--bg-elev); border: 1px solid var(--rule); position: relative; overflow: hidden; }
+  .widget::before { content:""; position:absolute; inset:0; pointer-events:none;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,241,214,0.014) 2px, rgba(255,241,214,0.014) 3px); }
+  .equation-bar { padding: 0.9rem 1.6rem 0.7rem; border-bottom: 1px solid var(--rule);
+    text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; color: var(--text); line-height: 1.6; }
+  .equation-bar .dx { color: var(--dx); } .equation-bar .dy { color: var(--dy); } .equation-bar .d { color: var(--dist); }
+  .viz-wrap { padding: 1.1rem 1.25rem 0.6rem; display:flex; align-items:center; justify-content:center; }
+  svg#canvas { width:100%; max-width:760px; height:auto; display:block; touch-action:none; cursor:crosshair; }
+  .controls { padding: 0.95rem 1.6rem; border-top: 1px solid var(--rule); background: var(--bg-card);
+    display:flex; justify-content:center; gap:2.2rem; flex-wrap:wrap; }
+  .readout { display:flex; align-items:baseline; gap:0.5rem; }
+  .readout .name { font-style: italic; color: var(--text-dim); font-size:0.9rem; }
+  .readout .value { font-family:'JetBrains Mono', monospace; font-size:0.95rem; font-variant-numeric: tabular-nums; }
+  .readout .value.dx { color: var(--dx); } .readout .value.dy { color: var(--dy); } .readout .value.d { color: var(--dist); }
+  .footer { padding: 0.85rem 1.6rem; border-top: 1px solid var(--rule); font-style: italic; font-size: 0.84rem; color: var(--text-faint); text-align: center; }
+  .axis { stroke: var(--axis); stroke-width: 1.3; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 11px; }
+  .leg-dx { stroke: var(--dx); stroke-width: 3.5; stroke-linecap: round; opacity: 0.9; }
+  .leg-dy { stroke: var(--dy); stroke-width: 3.5; stroke-linecap: round; opacity: 0.9; }
+  .hyp { stroke: var(--dist); stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 5px var(--dist-glow)); }
+  .tri-fill { fill: rgba(255,90,77,0.07); stroke: none; }
+  .pt1 { fill: var(--p1); stroke: var(--text); stroke-width: 2; cursor: grab; filter: drop-shadow(0 0 6px rgba(255,217,95,0.45)); }
+  .pt2 { fill: var(--p2); stroke: var(--text); stroke-width: 2; cursor: grab; filter: drop-shadow(0 0 6px rgba(255,157,61,0.45)); }
+  .pt-label { font-family:'JetBrains Mono', monospace; font-size: 12px; }
+  .pt-label.one { fill: var(--p1); } .pt-label.two { fill: var(--p2); }
+  .leg-label { font-family:'JetBrains Mono', monospace; font-size: 12px; }
+  .leg-label.dx { fill: var(--dx); } .leg-label.dy { fill: var(--dy); } .leg-label.d { fill: var(--dist); }
+  .panel-label { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="equation-bar" id="eqn"></div>
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Two draggable points with the right triangle between them and the distance computed by the Pythagorean theorem">
+      <defs>
+        <marker id="ax-arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow3)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow3)" />
+      <g id="ticks"></g>
+      <polygon id="tri" class="tri-fill" />
+      <line id="leg-dx" class="leg-dx" />
+      <line id="leg-dy" class="leg-dy" />
+      <line id="hyp" class="hyp" />
+      <text id="dx-label" class="leg-label dx"></text>
+      <text id="dy-label" class="leg-label dy"></text>
+      <text id="d-label" class="leg-label d"></text>
+      <circle id="pt1" class="pt1" r="9" />
+      <circle id="pt2" class="pt2" r="9" />
+      <text id="lbl1" class="pt-label one"></text>
+      <text id="lbl2" class="pt-label two"></text>
+    </svg>
+  </div>
+  <div class="controls">
+    <div class="readout"><span class="name">&Delta;x</span><span class="value dx" id="dx-val"></span></div>
+    <div class="readout"><span class="name">&Delta;y</span><span class="value dy" id="dy-val"></span></div>
+    <div class="readout"><span class="name">distance d</span><span class="value d" id="d-val"></span></div>
+  </div>
+  <div class="footer">
+    Drag either endpoint. The two coloured legs are the coordinate gaps; the distance is the hypotenuse Pythagoras builds from them.
+  </div>
+</div>
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('#canvas');
+  const CX = 380, CY = 260, UNIT = 50;
+  const px = (x) => CX + x * UNIT;
+  const py = (y) => CY - y * UNIT;
+  const XMIN = -6, XMAX = 6, YMIN = -4, YMAX = 4;
+
+  const grid = $('#grid'), ticks = $('#ticks');
+  const xa = $('#x-axis'); xa.setAttribute('x1', 16); xa.setAttribute('x2', 744); xa.setAttribute('y1', CY); xa.setAttribute('y2', CY);
+  const ya = $('#y-axis'); ya.setAttribute('x1', CX); ya.setAttribute('x2', CX); ya.setAttribute('y1', 505); ya.setAttribute('y2', 16);
+  for (let v = XMIN; v <= XMAX; v++) {
+    const l = document.createElementNS(NS, 'line'); l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(v)); l.setAttribute('x2', px(v)); l.setAttribute('y1', py(YMAX)); l.setAttribute('y2', py(YMIN)); grid.appendChild(l);
+    if (v !== 0) { const t = document.createElementNS(NS, 'text'); t.setAttribute('class','graph-tick');
+      t.setAttribute('x', px(v)); t.setAttribute('y', CY + 16); t.setAttribute('text-anchor','middle'); t.textContent = v; ticks.appendChild(t); }
+  }
+  for (let v = YMIN; v <= YMAX; v++) {
+    const l = document.createElementNS(NS, 'line'); l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(XMIN)); l.setAttribute('x2', px(XMAX)); l.setAttribute('y1', py(v)); l.setAttribute('y2', py(v)); grid.appendChild(l);
+    if (v !== 0) { const t = document.createElementNS(NS, 'text'); t.setAttribute('class','graph-tick');
+      t.setAttribute('x', CX - 8); t.setAttribute('y', py(v) + 4); t.setAttribute('text-anchor','end'); t.textContent = v; ticks.appendChild(t); }
+  }
+
+  let p1 = { x: -2, y: -1 }, p2 = { x: 3, y: 2 };
+
+  function fmt(n) { const s = n.toFixed(1); return s === '-0.0' ? '0.0' : s; }
+
+  function render() {
+    const X1 = px(p1.x), Y1 = py(p1.y), X2 = px(p2.x), Y2 = py(p2.y);
+    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+
+    // right-angle corner at (p2.x, p1.y)
+    const cornerX = px(p2.x), cornerY = py(p1.y);
+    $('#tri').setAttribute('points', `${X1},${Y1} ${cornerX},${cornerY} ${X2},${Y2}`);
+    $('#leg-dx').setAttribute('x1', X1); $('#leg-dx').setAttribute('y1', Y1);
+    $('#leg-dx').setAttribute('x2', cornerX); $('#leg-dx').setAttribute('y2', cornerY);
+    $('#leg-dy').setAttribute('x1', cornerX); $('#leg-dy').setAttribute('y1', cornerY);
+    $('#leg-dy').setAttribute('x2', X2); $('#leg-dy').setAttribute('y2', Y2);
+    $('#hyp').setAttribute('x1', X1); $('#hyp').setAttribute('y1', Y1);
+    $('#hyp').setAttribute('x2', X2); $('#hyp').setAttribute('y2', Y2);
+
+    $('#pt1').setAttribute('cx', X1); $('#pt1').setAttribute('cy', Y1);
+    $('#pt2').setAttribute('cx', X2); $('#pt2').setAttribute('cy', Y2);
+    $('#lbl1').setAttribute('x', X1 - 12); $('#lbl1').setAttribute('y', Y1 + 22); $('#lbl1').setAttribute('text-anchor','end');
+    $('#lbl1').textContent = `(${fmt(p1.x)}, ${fmt(p1.y)})`;
+    $('#lbl2').setAttribute('x', X2 + 12); $('#lbl2').setAttribute('y', Y2 - 10); $('#lbl2').setAttribute('text-anchor','start');
+    $('#lbl2').textContent = `(${fmt(p2.x)}, ${fmt(p2.y)})`;
+
+    const dxl = $('#dx-label');
+    if (Math.abs(dx) > 0.05) { dxl.style.display='';
+      dxl.setAttribute('x', (X1 + cornerX) / 2); dxl.setAttribute('y', cornerY + (dy >= 0 ? 18 : -8)); dxl.setAttribute('text-anchor','middle');
+      dxl.textContent = 'Δx = ' + fmt(dx); } else dxl.style.display='none';
+    const dyl = $('#dy-label');
+    if (Math.abs(dy) > 0.05) { dyl.style.display='';
+      dyl.setAttribute('x', cornerX + (dx >= 0 ? 10 : -10)); dyl.setAttribute('y', (cornerY + Y2) / 2 + 4); dyl.setAttribute('text-anchor', dx >= 0 ? 'start':'end');
+      dyl.textContent = 'Δy = ' + fmt(dy); } else dyl.style.display='none';
+    const dl = $('#d-label');
+    dl.setAttribute('x', (X1 + X2) / 2 - 8); dl.setAttribute('y', (Y1 + Y2) / 2 - 8); dl.setAttribute('text-anchor','end');
+    dl.textContent = 'd = ' + d.toFixed(2);
+
+    $('#eqn').innerHTML = `d = &radic;( <span class="dx">${fmt(dx)}</span>&sup2; + <span class="dy">${fmt(dy)}</span>&sup2; ) = <span class="d">${d.toFixed(2)}</span>`;
+    $('#dx-val').textContent = fmt(dx);
+    $('#dy-val').textContent = fmt(dy);
+    $('#d-val').textContent = d.toFixed(2);
+  }
+
+  function svgPoint(evt) {
+    const pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+    const m = svg.getScreenCTM(); if (!m) return null; return pt.matrixTransform(m.inverse());
+  }
+  let drag = null;
+  function nearest(p) {
+    const d1 = Math.hypot(p.x - px(p1.x), p.y - py(p1.y));
+    const d2 = Math.hypot(p.x - px(p2.x), p.y - py(p2.y));
+    return d1 <= d2 ? 'p1' : 'p2';
+  }
+  function moveTo(evt) {
+    const p = svgPoint(evt); if (!p || !drag) return;
+    let x = Math.max(XMIN, Math.min(XMAX, (p.x - CX) / UNIT));
+    let y = Math.max(YMIN, Math.min(YMAX, (CY - p.y) / UNIT));
+    x = Math.round(x * 2) / 2; y = Math.round(y * 2) / 2;
+    if (drag === 'p1') { p1 = { x, y }; } else { p2 = { x, y }; }
+    render();
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    const p = svgPoint(e); if (!p) return;
+    drag = nearest(p);
+    try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+    moveTo(e);
+  });
+  svg.addEventListener('pointermove', (e) => { if (drag) moveTo(e); });
+  svg.addEventListener('pointerup', () => { drag = null; });
+  svg.addEventListener('pointercancel', () => { drag = null; });
+
+  render();
+})();
+</script>
+</body>
+</html>
+  

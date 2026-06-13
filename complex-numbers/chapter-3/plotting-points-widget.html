@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Point Is an Address</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #2f0d08; --bg-elev: #3b1209; --bg-card: #4a160d;
+    --text: #fff1d6; --text-dim: #e7c89c; --text-faint: #a66e48;
+    --rule: rgba(255,214,134,0.2); --accent: #f0b545; --accent-glow: rgba(240,181,69,0.4);
+    --xcol: #ffd95f; --xglow: rgba(255,217,95,0.4);
+    --ycol: #df5f08; --yglow: rgba(223,95,8,0.45);
+    --point: #ff5a4d; --point-glow: rgba(255,90,77,0.45);
+    --axis: rgba(255,241,214,0.42); --grid: rgba(255,241,214,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 17px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(240,181,69,0.06), transparent 55%); }
+  .widget { max-width: 980px; margin: 0 auto; background: var(--bg-elev);
+    border: 1px solid var(--rule); position: relative; overflow: hidden; }
+  .widget::before { content:""; position:absolute; inset:0; pointer-events:none;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,241,214,0.014) 2px, rgba(255,241,214,0.014) 3px); }
+  .equation-bar { padding: 0.95rem 1.6rem 0.75rem; border-bottom: 1px solid var(--rule);
+    text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 1.18rem; color: var(--text); }
+  .equation-bar .xp { color: var(--xcol); } .equation-bar .yp { color: var(--ycol); }
+  .viz-wrap { padding: 1.2rem 1.25rem 0.7rem; display:flex; align-items:center; justify-content:center; }
+  svg#canvas { width:100%; max-width:880px; height:auto; display:block; touch-action:none; cursor:crosshair; }
+  .controls { padding: 1.05rem 1.6rem; border-top: 1px solid var(--rule); background: var(--bg-card);
+    display:flex; justify-content:center; align-items:center; gap:1rem; flex-wrap:wrap; }
+  .readouts { display:flex; gap:1.8rem; flex-wrap:wrap; justify-content:center; }
+  .readout { display:flex; align-items:baseline; gap:0.5rem; }
+  .readout .name { font-style: italic; color: var(--text-dim); font-size:0.92rem; }
+  .readout .value { font-family:'JetBrains Mono', monospace; font-size:0.95rem; font-variant-numeric: tabular-nums; }
+  .readout .value.x { color: var(--xcol); } .readout .value.y { color: var(--ycol); }
+  .footer { padding: 0.85rem 1.6rem; border-top: 1px solid var(--rule); font-style: italic;
+    font-size: 0.84rem; color: var(--text-faint); text-align: center; }
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .graph-tick { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 12px; }
+  .axis-name { fill: var(--text-dim); font-style: italic; font-size: 15px; }
+  .x-leg { stroke: var(--xcol); stroke-width: 4; stroke-linecap: round; opacity: 0.9; }
+  .y-leg { stroke: var(--ycol); stroke-width: 4; stroke-linecap: round; opacity: 0.9; }
+  .x-leg.dim, .y-leg.dim { stroke-dasharray: 5 5; opacity: 0.55; }
+  .p-pt { fill: var(--point); stroke: var(--text); stroke-width: 2;
+    filter: drop-shadow(0 0 8px var(--point-glow)); cursor: grab; }
+  .leg-label { font-family:'JetBrains Mono', monospace; font-size: 13px; }
+  .leg-label.x { fill: var(--xcol); } .leg-label.y { fill: var(--ycol); }
+  .panel-label { fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.18em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="equation-bar" id="addr">P = ( <span class="xp">2</span> , <span class="yp">3</span> )</div>
+  <div class="viz-wrap">
+    <svg id="canvas" viewBox="0 0 880 520" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="A draggable point on the Cartesian plane showing its x and y coordinates as a location">
+      <defs>
+        <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+        </marker>
+      </defs>
+      <text class="panel-label" x="36" y="26">The Cartesian plane</text>
+      <g id="grid"></g>
+      <line id="x-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <line id="y-axis" class="axis" marker-end="url(#ax-arrow)" />
+      <g id="ticks"></g>
+      <text class="axis-name" id="x-name">x</text>
+      <text class="axis-name" id="y-name">y</text>
+      <line id="x-leg" class="x-leg" />
+      <line id="y-leg" class="y-leg" />
+      <text id="x-leg-label" class="leg-label x"></text>
+      <text id="y-leg-label" class="leg-label y"></text>
+      <circle id="p-pt" class="p-pt" r="9" />
+    </svg>
+  </div>
+  <div class="controls">
+    <div class="readouts">
+      <div class="readout"><span class="name">x &mdash; steps east</span><span class="value x" id="x-val">2.0</span></div>
+      <div class="readout"><span class="name">y &mdash; steps north</span><span class="value y" id="y-val">3.0</span></div>
+    </div>
+  </div>
+  <div class="footer">
+    Drag the point. Its coordinates are an address: walk <span style="color:var(--xcol)">x</span> along the horizontal axis, then <span style="color:var(--ycol)">y</span> up the vertical one.
+  </div>
+</div>
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('#canvas');
+  const CX = 440, CY = 264, UNIT = 52;
+  const px = (x) => CX + x * UNIT;
+  const py = (y) => CY - y * UNIT;
+  const XMIN = -7, XMAX = 7, YMIN = -4, YMAX = 4;
+
+  const grid = $('#grid'), ticks = $('#ticks');
+  const xAxis = $('#x-axis');
+  xAxis.setAttribute('x1', 24); xAxis.setAttribute('x2', 856);
+  xAxis.setAttribute('y1', CY); xAxis.setAttribute('y2', CY);
+  const yAxis = $('#y-axis');
+  yAxis.setAttribute('x1', CX); yAxis.setAttribute('x2', CX);
+  yAxis.setAttribute('y1', 505); yAxis.setAttribute('y2', 30);
+
+  for (let v = XMIN; v <= XMAX; v++) {
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(v)); l.setAttribute('x2', px(v));
+    l.setAttribute('y1', py(YMAX)); l.setAttribute('y2', py(YMIN));
+    grid.appendChild(l);
+    if (v !== 0) {
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('class', 'graph-tick');
+      t.setAttribute('x', px(v)); t.setAttribute('y', CY + 18);
+      t.setAttribute('text-anchor', 'middle');
+      t.textContent = v;
+      ticks.appendChild(t);
+    }
+  }
+  for (let v = YMIN; v <= YMAX; v++) {
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'grid-line');
+    l.setAttribute('x1', px(XMIN)); l.setAttribute('x2', px(XMAX));
+    l.setAttribute('y1', py(v)); l.setAttribute('y2', py(v));
+    grid.appendChild(l);
+    if (v !== 0) {
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('class', 'graph-tick');
+      t.setAttribute('x', CX - 10); t.setAttribute('y', py(v) + 4);
+      t.setAttribute('text-anchor', 'end');
+      t.textContent = v;
+      ticks.appendChild(t);
+    }
+  }
+  $('#x-name').setAttribute('x', 850); $('#x-name').setAttribute('y', CY - 12); $('#x-name').setAttribute('text-anchor', 'end');
+  $('#y-name').setAttribute('x', CX + 12); $('#y-name').setAttribute('y', 44);
+
+  let x = 2, y = 3;
+
+  function fmt(n) { const s = n.toFixed(1); return s === '-0.0' ? '0.0' : s; }
+
+  function render() {
+    const X = px(x), Y = py(y);
+    const xLeg = $('#x-leg'), yLeg = $('#y-leg');
+    xLeg.setAttribute('x1', CX); xLeg.setAttribute('y1', CY);
+    xLeg.setAttribute('x2', X); xLeg.setAttribute('y2', CY);
+    yLeg.setAttribute('x1', X); yLeg.setAttribute('y1', CY);
+    yLeg.setAttribute('x2', X); yLeg.setAttribute('y2', Y);
+    $('#p-pt').setAttribute('cx', X); $('#p-pt').setAttribute('cy', Y);
+
+    const xl = $('#x-leg-label'), yl = $('#y-leg-label');
+    if (Math.abs(x) > 0.05) {
+      xl.style.display = '';
+      xl.setAttribute('x', (CX + X) / 2);
+      xl.setAttribute('y', CY + (y >= 0 ? 22 : -12));
+      xl.setAttribute('text-anchor', 'middle');
+      xl.textContent = fmt(x);
+    } else xl.style.display = 'none';
+    if (Math.abs(y) > 0.05) {
+      yl.style.display = '';
+      yl.setAttribute('x', X + (x >= 0 ? 12 : -12));
+      yl.setAttribute('y', (CY + Y) / 2 + 4);
+      yl.setAttribute('text-anchor', x >= 0 ? 'start' : 'end');
+      yl.textContent = fmt(y);
+    } else yl.style.display = 'none';
+
+    $('#addr').innerHTML = `P = ( <span class="xp">${fmt(x)}</span> , <span class="yp">${fmt(y)}</span> )`;
+    $('#x-val').textContent = fmt(x);
+    $('#y-val').textContent = fmt(y);
+  }
+
+  function svgPoint(evt) {
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    const m = svg.getScreenCTM();
+    if (!m) return null;
+    return pt.matrixTransform(m.inverse());
+  }
+  let dragging = false;
+  function moveTo(evt) {
+    const p = svgPoint(evt); if (!p) return;
+    x = Math.max(XMIN, Math.min(XMAX, (p.x - CX) / UNIT));
+    y = Math.max(YMIN, Math.min(YMAX, (CY - p.y) / UNIT));
+    x = Math.round(x * 2) / 2; y = Math.round(y * 2) / 2;
+    render();
+  }
+  svg.addEventListener('pointerdown', (e) => { dragging = true; try { svg.setPointerCapture(e.pointerId); } catch (err) {} moveTo(e); });
+  svg.addEventListener('pointermove', (e) => { if (dragging) moveTo(e); });
+  svg.addEventListener('pointerup', () => { dragging = false; });
+  svg.addEventListener('pointercancel', () => { dragging = false; });
+
+  render();
+})();
+</script>
+</body>
+</html>
+     

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Cartesian Plane | Complex Numbers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="complex-numbers.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-chapter-3-page">
+  <header>
+    <div class="header-rule top-rule"></div>
+    <div class="header-inner">
+      <p class="chapter-kicker">Complex Numbers &middot; Chapter 3</p>
+      <h1 class="essay-title">The Cartesian Plane</h1>
+    </div>
+    <div class="header-rule bottom-rule"></div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <p>Before complex numbers could turn the plane into a place where multiplication means rotation, the plane had to exist at all. It did -- for centuries -- as one of the most powerful ideas in mathematics. But it was a plane of <em>points</em>, not a system of <em>numbers</em>.</p>
+
+        <p>This chapter is about that earlier plane: what it could do, and the one thing it could not. Seeing the gap clearly is the whole point. When complex numbers arrive, they should feel less like an invention pulled from nowhere and more like the answer to a question the plane had been quietly asking all along.</p>
+
+        <h3 class="subsection-title">Two Languages, One Picture</h3>
+
+        <p>For most of its history, mathematics spoke two languages that barely talked to each other.</p>
+
+        <p>One was <strong>geometry</strong>: points, lines, circles, triangles, the language of shape and space. The other was <strong>algebra</strong>: symbols, equations, the language of quantity and manipulation. A geometer proved things by drawing and reasoning about figures. An algebraist proved things by pushing symbols around. They were different worlds.</p>
+
+        <p>The Cartesian plane is the bridge between them, and the idea behind it is almost embarrassingly simple. Draw two number lines at right angles. Now every point in the plane can be named by how far along each line it sits:</p>
+
+        <p class="display-equation">$$(x, y)$$</p>
+
+        <p>That pair is the point's <strong>address</strong>. Drag the point below and watch its address change as it moves.</p>
+
+        <iframe
+          class="essay-widget plotting-points-widget"
+          src="complex-numbers/chapter-3/plotting-points-widget.html"
+          title="Interactive Cartesian plane with a draggable point whose coordinates update as it moves, framing the coordinates as a location"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>This looks modest, but it is the move that joined the two languages. A point -- a purely geometric thing -- now carries a pair of numbers. And once points have numbers attached, the door swings the other way too: collections of numbers can be drawn as shapes.</p>
+
+        <h3 class="subsection-title">Curves Become Equations</h3>
+
+        <p>Here is where the bridge starts carrying real traffic.</p>
+
+        <p>Take a circle: every point at a fixed distance $r$ from a centre $(h, k)$. That is a geometric description -- a compass, a pin, a pencil. But with coordinates in hand, the very same circle becomes a single equation:</p>
+
+        <p class="display-equation">$$(x - h)^2 + (y - k)^2 = r^2$$</p>
+
+        <p>The equation does not <em>describe</em> the circle from the outside. It <em>is</em> the circle, written in the language of algebra. A point sits on the curve exactly when its coordinates make the equation true. Change the numbers $h$, $k$, $r$ and the curve moves and grows to match.</p>
+
+        <iframe
+          class="essay-widget curve-equation-widget"
+          src="complex-numbers/chapter-3/curve-equation-widget.html"
+          title="Interactive circle whose centre coordinates h and k and radius r are controlled by sliders, with the equation updating live"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>This is the engine of analytic geometry. A line is an equation. A parabola is an equation. An ellipse, a hyperbola, a spiral -- each shape becomes a relation among coordinates. Questions that once needed clever constructions with straightedge and compass turn into questions about solving equations. <strong>Geometry has been handed to algebra to compute.</strong></p>
+
+        <h3 class="subsection-title">Distance Becomes Arithmetic</h3>
+
+        <p>The traffic runs in both directions, and nowhere more cleanly than with distance.</p>
+
+        <p>Ask how far apart two points are. Geometrically this is a length -- something you would measure with a ruler. But the coordinates already contain the answer. The horizontal gap is $x_2 - x_1$; the vertical gap is $y_2 - y_1$; and Pythagoras closes the triangle:</p>
+
+        <p class="display-equation">$$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$</p>
+
+        <p>A geometric measurement has become an arithmetic recipe. Feed it coordinates, get a number out. Drag either point and watch the right triangle -- and the distance -- respond.</p>
+
+        <iframe
+          class="essay-widget distance-widget"
+          src="complex-numbers/chapter-3/distance-widget.html"
+          title="Interactive widget with two draggable points showing the right triangle between them and the distance computed by the Pythagorean theorem"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>This is the deal the Cartesian plane offers, and it is an extraordinary one. Geometric problems become algebraic ones; algebraic answers become geometric facts. For the first time, you could <em>calculate</em> your way through geometry.</p>
+
+        <h3 class="subsection-title">Coordinates as Positions</h3>
+
+        <p>Notice the quiet assumption running through everything so far. A coordinate pair has been a <strong>location</strong> -- where something sits. $(2, 3)$ is a place. The numbers $2$ and $3$ are instructions for getting there: go two east, then three north.</p>
+
+        <p>This is exactly how the plane was understood. The pair is an address, and the two numbers inside it are bookkeeping for that address. They are used <em>separately</em> -- the first handles east-west, the second handles north-south -- and the operations we have seen respect that separation.</p>
+
+        <p>Some operations on positions are perfectly natural. We can <strong>add a displacement</strong>: starting at $(2, 3)$ and walking $(1, 1)$ lands us at $(3, 4)$. Each coordinate minds its own axis, and the result is again a sensible location. We can <strong>scale</strong>: doubling $(2, 3)$ to $(4, 6)$ pushes the point twice as far from the origin along the same line. We can <strong>measure</strong>, as we just did, and we can <strong>plug coordinates into formulas</strong>. All of this works because each of these operations treats the coordinates as raw material -- ingredients to be fed into a calculation.</p>
+
+        <p>And as long as that is all we ask, the plane never stumbles.</p>
+
+        <h3 class="subsection-title">The Operation With No Meaning</h3>
+
+        <p>So try to ask for one more thing.</p>
+
+        <p>The points of the plane can be added. They can be scaled. Can they be <strong>multiplied</strong> -- not a point by a plain number, but a point by another point? On the number line, multiplication is the operation that makes the reals a genuine number system rather than just a ruler. What is the product of two locations?</p>
+
+        <p class="display-equation">$$(2, 3) \cdot (4, 1) = \;?$$</p>
+
+        <p>Pause on this. It is not a hard question. It is a question with <em>no established answer at all</em>. Adding two locations had an obvious meaning -- stack the displacements. Multiplying two locations has no such picture waiting for it. What would it even mean to multiply "two east, three north" by "four east, one north"?</p>
+
+        <p>The most tempting guess is to do what addition does: handle each axis on its own. Multiply the first coordinates, multiply the second:</p>
+
+        <p class="display-equation">$$(a, b) \cdot (c, d) \overset{?}{=} (ac,\; bd)$$</p>
+
+        <p>It is a definition we are allowed to write down. The trouble is that it is geometrically inert -- it knows nothing about the shape of the plane. Drag the points in the widget and watch how this "multiplication" behaves.</p>
+
+        <iframe
+          class="essay-widget multiply-points-widget"
+          src="complex-numbers/chapter-3/multiply-points-widget.html"
+          title="Interactive widget letting the reader multiply two points coordinate-by-coordinate and observe that the result ignores the plane's geometry"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>The result lurches around with no relationship to the lengths or directions of the points that produced it. Worse, it has a habit real multiplication never had: a point anywhere on the vertical axis, like $(0, 5)$, multiplied by a point anywhere on the horizontal axis, like $(3, 0)$, collapses to $(0, 0)$. Two perfectly good non-zero locations multiply to nothing. On the number line, the only way to get zero from a product is for one of the factors to <em>be</em> zero. Componentwise multiplication throws that away.</p>
+
+        <p>It is, in the end, not really a multiplication of points at all. It is just two separate multiplications running side by side, never speaking to each other -- and never noticing the plane they live in.</p>
+
+        <h3 class="subsection-title">A Plane of Points, Not a System of Numbers</h3>
+
+        <p>Step back and take stock of what we have.</p>
+
+        <p>The Cartesian plane is a triumph of <em>representation</em>. It lets us name every point, draw every curve as an equation, and compute distances and intersections that once demanded ingenuity. It unified geometry and algebra. By any reasonable standard it is one of the great ideas.</p>
+
+        <p>But look at what it is <em>not</em>. The real number line is more than a place to mark positions -- it is a number <strong>system</strong>, with a full arithmetic. You can add its points, and you can multiply them, and both operations mean something and fit together. The plane, so far, has only half of that. It is rich with points and starved of arithmetic. You can add its points like displacements, but multiplication -- the operation that would make these pairs behave like numbers -- has no home here.</p>
+
+        <p><strong>The plane contains points. It does not yet contain numbers.</strong> That is the gap.</p>
+
+        <h3 class="subsection-title">What Would a Good Multiplication Even Look Like?</h3>
+
+        <p>Rather than abandon the question, let us sharpen it. Suppose we <em>insist</em> the points of the plane should multiply, and we are willing to search for the right rule. What should we demand of it?</p>
+
+        <p>A few requirements suggest themselves, just by asking the new operation to be a faithful extension of the arithmetic we already trust:</p>
+
+        <p>It should <strong>agree with ordinary multiplication on the horizontal axis</strong>. The points along the $x$-axis are just the real numbers in disguise; multiplying $(2, 0)$ by $(3, 0)$ had better give $(6, 0)$, exactly as $2 \times 3 = 6$.</p>
+
+        <p>It should <strong>respect the geometry of the plane</strong> -- the lengths and angles that the plane so visibly has, and that componentwise multiplication so completely ignored.</p>
+
+        <p>It should <strong>have no zero divisors</strong>: two non-zero points should never multiply to zero, just as on the number line.</p>
+
+        <p>And it should <strong>follow the ordinary rules of algebra</strong> -- the freedom to expand, factor, and rearrange that makes a number system worth having.</p>
+
+        <p>That is a demanding wish list. It is not at all obvious that any rule can satisfy all of it. The componentwise guess failed almost every line.</p>
+
+        <p>But notice what the requirements are circling. They keep pointing at the plane's geometry -- its lengths and its angles -- and asking the new multiplication to <em>honour</em> them rather than ignore them. A multiplication that took two points and combined their distances from the origin, and combined their directions, in some consistent way, would be respecting the plane instead of treating its two axes as strangers.</p>
+
+        <h3 class="subsection-title">The Question the Plane Was Asking</h3>
+
+        <p>So here is where the classical plane leaves us. It gave geometry a numerical voice and gave algebra a picture to point at. It is a magnificent descriptive framework. But it stops just short of being a number system, because its points cannot be multiplied in any meaningful way -- and every attempt to force the issue either ignores the plane's geometry or breaks the rules of arithmetic.</p>
+
+        <p>The resolution is not to settle for a plane of mere locations. It is to discover that there <em>is</em> a multiplication of points -- exactly one that meets the wish list -- and that finding it transforms the plane completely. Under that rule, multiplying points turns out to combine their lengths and their angles at once. Multiplication becomes <strong>stretching and turning</strong>. Geometry and arithmetic, which the Cartesian plane had merely introduced to each other, become the same thing.</p>
+
+        <p>That rule is what the earlier chapters of this section built. Reread them now with this gap in mind: the Cartesian plane handed us the points, and complex numbers were the multiplication those points had been missing all along.</p>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="complex-numbers-chapter-2.html">
+            <span>Previous</span>
+            <strong>Polar Form</strong>
+          </a>
+          <a class="chapter-nav-link" href="complex-numbers.html">
+            <span>Contents</span>
+            <strong>Complex Numbers</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

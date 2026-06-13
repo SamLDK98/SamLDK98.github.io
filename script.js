@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { href: 'trigonometry-waves.html', kicker: 'Chapter 7', title: 'Waves' },
       { href: 'trigonometry-algebra-branch.html', kicker: 'Chapter 8', title: 'Algebra Branch' },
       { href: 'trigonometry-eulers-formula.html', kicker: 'Chapter 10', title: "Euler's Formula" },
+      { href: 'trigonometry-problems.html', kicker: 'Practice', title: 'Problems' },
       { href: 'trigonometry-coordinates-on-the-unit-circle.html', kicker: 'Archive', title: 'Misc' },
     ];
     const currentPage = window.location.pathname.split('/').pop();
