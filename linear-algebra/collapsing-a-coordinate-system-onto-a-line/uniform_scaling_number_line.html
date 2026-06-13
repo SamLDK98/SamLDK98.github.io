@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uniform scaling on the collapsed number line</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --grid: #ece8df;
+  --green: #16a34a;
+  --purple: #7c3aed;
+  --orange: #d97706;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body {
+  padding: 0 1rem 1rem;
+  color: var(--ink);
+  font-family: Georgia, "Cambria", "Times New Roman", serif;
+}
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible,
+button.is-active {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+button.is-active { box-shadow: inset 0 0 0 1px rgba(26,26,26,0.16); }
+input[type="range"] {
+  width: min(100%, 260px);
+  accent-color: var(--orange);
+}
+.usn { max-width: 760px; margin: 0 auto; padding: 1rem 0; }
+.usn-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.usn-label {
+  margin-bottom: 0.55rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.usn-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.85rem 1rem;
+  align-items: center;
+}
+.usn-equation {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.usn-slider {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+}
+.usn-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.usn-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+}
+.usn-svg { width: 100%; max-width: 720px; height: auto; display: block; }
+.usn-grid { stroke: var(--grid); stroke-width: 0.8; }
+.usn-axis { stroke: var(--ink); stroke-width: 1.1; stroke-opacity: 0.5; }
+.usn-level {
+  stroke: var(--green);
+  stroke-width: 1.65;
+  stroke-opacity: 0.74;
+  stroke-dasharray: 5 4;
+}
+.usn-number-line {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-opacity: 0.72;
+}
+.usn-scaled-line {
+  stroke: var(--orange);
+  stroke-width: 2;
+  stroke-opacity: 0.82;
+}
+.usn-connector {
+  stroke: #9ca3af;
+  stroke-width: 1;
+  stroke-opacity: 0.42;
+  stroke-dasharray: 3 4;
+}
+.usn-tick { stroke: var(--ink); stroke-width: 1.1; stroke-opacity: 0.64; }
+.usn-scaled-tick { stroke: var(--orange); stroke-width: 1.35; stroke-opacity: 0.92; }
+.usn-dot {
+  fill: var(--purple);
+  fill-opacity: 0.78;
+  stroke: #fff;
+  stroke-width: 0.8;
+}
+.usn-text {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.usn-muted {
+  fill: var(--muted);
+  font-family: var(--sans);
+  font-size: 12px;
+}
+.usn-caption {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.usn-caption em { color: var(--ink); font-style: italic; }
+@media (max-width: 560px) {
+  .usn-controls { grid-template-columns: 1fr; }
+  .usn-presets { justify-content: flex-start; }
+  .usn-text { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div class="usn" id="usn-root" role="region" aria-label="Uniform scaling of collapsed number lines">
+  <div class="usn-card">
+    <div class="usn-label">Uniform scaling after collapse</div>
+    <div class="usn-controls">
+      <div>
+        <div class="usn-equation" id="usn-equation">g(x,y) = 1(x - y)</div>
+        <div class="usn-slider">
+          <label for="usn-k">k = <strong id="usn-k-value">1</strong></label>
+          <input id="usn-k" type="range" min="0.25" max="5" step="0.25" value="1">
+        </div>
+      </div>
+      <div class="usn-presets">
+        <button type="button" data-k="1">k = 1</button>
+        <button type="button" data-k="4">k = 4</button>
+        <button type="button" data-k="0.5">k = 0.5</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="usn-wrap">
+    <svg class="usn-svg" viewBox="0 0 820 620" aria-label="Level sets for x minus y and stretched collapsed number lines">
+      <g id="usn-scene"></g>
+    </svg>
+  </div>
+
+  <div class="usn-caption">
+    Uniformly scaling the equation does not change which points collapse together. It only changes the scale of the number line they collapse onto.
+  </div>
+</div>
+
+<script>
+(function(){
+  const VALUES = [-3, -2, -1, 0, 1, 2, 3];
+  const X_MIN = -4, X_MAX = 4, Y_MIN = -4, Y_MAX = 4;
+  const PLANE = { x: 110, y: 34, w: 310, h: 310 };
+  const LINE_LEFT = 55;
+  const LINE_RIGHT = 765;
+  const LINE_CENTER = (LINE_LEFT + LINE_RIGHT) / 2;
+  const UNIT = 24;
+  const REF_Y = 440;
+  const SCALED_Y = 540;
+  const $ = id => document.getElementById(id);
+  const slider = $('usn-k');
+
+  function sx(x){ return PLANE.x + (x - X_MIN) / (X_MAX - X_MIN) * PLANE.w; }
+  function sy(y){ return PLANE.y + (Y_MAX - y) / (Y_MAX - Y_MIN) * PLANE.h; }
+  function nx(value){ return LINE_CENTER + value * UNIT; }
+  function fmt(value){
+    if (Math.abs(value - Math.round(value)) < 1e-9) return String(Math.round(value));
+    return String(value).replace(/0+$/, '').replace(/\.$/, '');
+  }
+  function segmentForDifference(c){
+    const candidates = [
+      { x: X_MIN, y: X_MIN - c },
+      { x: X_MAX, y: X_MAX - c },
+      { x: Y_MIN + c, y: Y_MIN },
+      { x: Y_MAX + c, y: Y_MAX }
+    ].filter(point =>
+      point.x >= X_MIN - 1e-9 &&
+      point.x <= X_MAX + 1e-9 &&
+      point.y >= Y_MIN - 1e-9 &&
+      point.y <= Y_MAX + 1e-9
+    );
+    const unique = [];
+    candidates.forEach(point => {
+      if (!unique.some(other => Math.abs(other.x - point.x) < 1e-9 && Math.abs(other.y - point.y) < 1e-9)) unique.push(point);
+    });
+    return unique.slice(0, 2);
+  }
+  function samplePoint(c){
+    const x = Math.max(-3, Math.min(3, c));
+    return { x, y: x - c };
+  }
+  function plane(){
+    let html = '';
+    for (let x = X_MIN; x <= X_MAX; x++) {
+      html += `<line class="usn-grid" x1="${sx(x)}" y1="${sy(Y_MIN)}" x2="${sx(x)}" y2="${sy(Y_MAX)}"/>`;
+    }
+    for (let y = Y_MIN; y <= Y_MAX; y++) {
+      html += `<line class="usn-grid" x1="${sx(X_MIN)}" y1="${sy(y)}" x2="${sx(X_MAX)}" y2="${sy(y)}"/>`;
+    }
+    html += `<line class="usn-axis" x1="${sx(X_MIN)}" y1="${sy(0)}" x2="${sx(X_MAX)}" y2="${sy(0)}"/>`;
+    html += `<line class="usn-axis" x1="${sx(0)}" y1="${sy(Y_MIN)}" x2="${sx(0)}" y2="${sy(Y_MAX)}"/>`;
+    VALUES.forEach(c => {
+      const segment = segmentForDifference(c);
+      const point = samplePoint(c);
+      const labelPoint = segment[1].x > segment[0].x ? segment[1] : segment[0];
+      html += `<line class="usn-level" x1="${sx(segment[0].x)}" y1="${sy(segment[0].y)}" x2="${sx(segment[1].x)}" y2="${sy(segment[1].y)}"/>`;
+      html += `<circle class="usn-dot" cx="${sx(point.x)}" cy="${sy(point.y)}" r="4.2"/>`;
+      html += `<text class="usn-text" x="${sx(labelPoint.x) + 14}" y="${sy(labelPoint.y) + 4}">${c}</text>`;
+    });
+    html += `<text class="usn-muted" x="${PLANE.x}" y="${PLANE.y + PLANE.h + 34}">Fixed level sets for f(x,y) = x - y</text>`;
+    return html;
+  }
+  function tick(x, y, cls){
+    return `<line class="${cls}" x1="${x}" y1="${y - 7}" x2="${x}" y2="${y + 7}"/>`;
+  }
+  function numberLines(k){
+    let html = '';
+    html += `<text class="usn-muted" x="${LINE_LEFT}" y="${REF_Y - 30}">Reference line: f(x,y) = x - y</text>`;
+    html += `<line class="usn-number-line" x1="${LINE_LEFT}" y1="${REF_Y}" x2="${LINE_RIGHT}" y2="${REF_Y}"/>`;
+    html += `<text class="usn-muted" x="${LINE_LEFT}" y="${SCALED_Y - 30}">Scaled line: g(x,y) = ${fmt(k)}(x - y)</text>`;
+    const scaledStart = nx(VALUES[0] * k);
+    const scaledEnd = nx(VALUES[VALUES.length - 1] * k);
+    html += `<line class="usn-scaled-line" x1="${scaledStart}" y1="${SCALED_Y}" x2="${scaledEnd}" y2="${SCALED_Y}"/>`;
+    VALUES.forEach(c => {
+      const refX = nx(c);
+      const scaledX = nx(c * k);
+      html += `<line class="usn-connector" x1="${refX}" y1="${REF_Y + 12}" x2="${scaledX}" y2="${SCALED_Y - 12}"/>`;
+      html += tick(refX, REF_Y, 'usn-tick');
+      html += `<text class="usn-text" x="${refX}" y="${REF_Y + 30}" text-anchor="middle">${c}</text>`;
+      html += tick(scaledX, SCALED_Y, 'usn-scaled-tick');
+      if (k >= 0.75 || c === -3 || c === 0 || c === 3 || (k === 0.5 && c === 2)) {
+        const labelY = k < 0.75 && c === 0 ? SCALED_Y + 44 : SCALED_Y + 30;
+        html += `<text class="usn-text" x="${scaledX}" y="${labelY}" text-anchor="middle">${fmt(c * k)}</text>`;
+      }
+    });
+    html += `<text class="usn-muted" x="${LINE_CENTER}" y="604" text-anchor="middle">The same diagonal bundle lands at a different spacing when k changes.</text>`;
+    return html;
+  }
+  function update(){
+    const k = Number(slider.value);
+    $('usn-k-value').textContent = fmt(k);
+    $('usn-equation').textContent = `g(x,y) = ${fmt(k)}(x - y)`;
+    document.querySelectorAll('[data-k]').forEach(button => {
+      button.classList.toggle('is-active', Number(button.dataset.k) === k);
+    });
+    $('usn-scene').innerHTML = plane() + numberLines(k);
+    resizeFrame();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('usn-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+
+  slider.addEventListener('input', update);
+  document.querySelectorAll('[data-k]').forEach(button => {
+    button.addEventListener('click', () => {
+      slider.value = button.dataset.k;
+      update();
+    });
+  });
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>

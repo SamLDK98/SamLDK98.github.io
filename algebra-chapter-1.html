@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Unknown | Algebra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Homemade+Apple&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="algebra.css" />
+</head>
+<body class="algebra-page algebra-chapter">
+
+  <!-- paper fibre filter (referenced by the .alg-grain overlay) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="alg-paper-grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise" />
+      <feColorMatrix in="noise" type="matrix"
+        values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.24  0 0 0 0.05 0" />
+    </filter>
+  </svg>
+
+  <header>
+    <p class="alg-kicker">Algebra &middot; Chapter the First</p>
+    <h1 class="alg-title">The Unknown</h1>
+    <p class="alg-epigraph">"When I consider what people generally want in calculating, I found that it always is a number." — al-Khwārizmī</p>
+    <hr class="alg-double-rule" aria-hidden="true" />
+  </header>
+
+  <main>
+    <p class="alg-opening">Before there was an <em>x</em>, there was a thing with no name.</p>
+
+    <p>Merchants knew it well. An inheritance to be divided, a debt to be settled, a plot of land to be measured -- and somewhere in the middle of the problem, a number nobody knew yet. The whole calculation circled around a blank.</p>
+
+    <p>This chapter is about the discovery that the blank could be <strong>treated as a number anyway</strong> -- moved, weighed, balanced against the knowns, and finally cornered until it confessed its value.</p>
+
+    <p>That discovery has an address and a date.</p>
+
+    <h3>The House of Wisdom</h3>
+
+    <figure class="alg-folio" data-ink-scene aria-label="An ink drawing of an astrolabe, the astronomer's instrument of ninth-century Baghdad">
+      <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg" role="img">
+        <!-- suspension ring and throne -->
+        <circle class="ink-stroke ink-fine" cx="280" cy="22" r="9" />
+        <path class="ink-stroke ink-fine" d="M 270 30 L 264 42 L 296 42 L 290 30" style="transition-delay: 0.2s" />
+        <!-- mater: outer rim -->
+        <circle class="ink-stroke" cx="280" cy="162" r="120" style="transition-delay: 0.35s" />
+        <circle class="ink-stroke ink-fine" cx="280" cy="162" r="108" style="transition-delay: 0.65s" />
+        <!-- degree ticks -->
+        <g style="transition-delay: 0.9s">
+          <path class="ink-stroke ink-fine" d="M 280 42 L 280 54" style="transition-delay: 0.9s" />
+          <path class="ink-stroke ink-fine" d="M 340 58 L 334 68" style="transition-delay: 0.95s" />
+          <path class="ink-stroke ink-fine" d="M 384 102 L 374 108" style="transition-delay: 1.0s" />
+          <path class="ink-stroke ink-fine" d="M 400 162 L 388 162" style="transition-delay: 1.05s" />
+          <path class="ink-stroke ink-fine" d="M 384 222 L 374 216" style="transition-delay: 1.1s" />
+          <path class="ink-stroke ink-fine" d="M 340 266 L 334 256" style="transition-delay: 1.15s" />
+          <path class="ink-stroke ink-fine" d="M 280 282 L 280 270" style="transition-delay: 1.2s" />
+          <path class="ink-stroke ink-fine" d="M 220 266 L 226 256" style="transition-delay: 1.25s" />
+          <path class="ink-stroke ink-fine" d="M 176 222 L 186 216" style="transition-delay: 1.3s" />
+          <path class="ink-stroke ink-fine" d="M 160 162 L 172 162" style="transition-delay: 1.35s" />
+          <path class="ink-stroke ink-fine" d="M 176 102 L 186 108" style="transition-delay: 1.4s" />
+          <path class="ink-stroke ink-fine" d="M 220 58 L 226 68" style="transition-delay: 1.45s" />
+        </g>
+        <!-- climate plates -->
+        <circle class="ink-stroke ink-fine" cx="280" cy="162" r="78" style="transition-delay: 1.5s" />
+        <circle class="ink-stroke ink-fine" cx="280" cy="162" r="46" style="transition-delay: 1.7s" />
+        <!-- ecliptic ring of the rete, off-centre -->
+        <circle class="ink-stroke" cx="280" cy="138" r="70" style="transition-delay: 1.9s" />
+        <!-- star pointers -->
+        <path class="ink-stroke ink-fine" d="M 244 86 Q 252 96 248 106" style="transition-delay: 2.2s" />
+        <circle class="ink-stroke ink-fine" cx="248" cy="108" r="2" style="transition-delay: 2.3s" />
+        <path class="ink-stroke ink-fine" d="M 338 116 Q 328 120 322 130" style="transition-delay: 2.35s" />
+        <circle class="ink-stroke ink-fine" cx="321" cy="132" r="2" style="transition-delay: 2.45s" />
+        <path class="ink-stroke ink-fine" d="M 262 196 Q 270 188 280 188" style="transition-delay: 2.5s" />
+        <circle class="ink-stroke ink-fine" cx="282" cy="188" r="2" style="transition-delay: 2.6s" />
+        <!-- alidade and pivot -->
+        <path class="ink-stroke" d="M 196 238 L 364 86" style="transition-delay: 2.7s" />
+        <circle class="ink-stroke" cx="280" cy="162" r="5" style="transition-delay: 2.9s" />
+        <!-- engraver's hatching, lower right of the rim -->
+        <path class="ink-stroke ink-fine" d="M 354 244 L 346 252" style="transition-delay: 3.0s" />
+        <path class="ink-stroke ink-fine" d="M 362 236 L 353 246" style="transition-delay: 3.05s" />
+        <path class="ink-stroke ink-fine" d="M 369 227 L 360 238" style="transition-delay: 3.1s" />
+        <path class="ink-stroke ink-fine" d="M 375 218 L 366 229" style="transition-delay: 3.15s" />
+        <path class="ink-stroke ink-fine" d="M 381 208 L 372 220" style="transition-delay: 3.2s" />
+      </svg>
+      <figcaption class="alg-folio-caption">Baghdad, c. 825 &middot; the House of Wisdom</figcaption>
+    </figure>
+
+    <p>In the early ninth century, the caliph al-Ma'mūn gathered astronomers, translators, and mathematicians into a great library in Baghdad -- the <em>House of Wisdom</em>. Among them was a scholar named <strong>Muḥammad ibn Mūsā al-Khwārizmī</strong>.</p>
+
+    <p>Around the year 820 he wrote a book with a very practical aim: to teach the calculations "people constantly require" -- in inheritance, trade, surveying, and the digging of canals. Its title contained two words that named the method:</p>
+
+    <div data-ink-scene>
+      <span class="alg-quill-line">al-Kitāb al-mukhtaṣar fī ḥisāb al-jabr wa-l-muqābala</span>
+    </div>
+
+    <p class="alg-equation"><em>The Compendious Book on Calculation by Restoration and Balancing</em></p>
+
+    <h3>Restoration and Balancing</h3>
+
+    <p><span class="alg-margin-note">al-jabr — "the restoring of broken parts." In old Spain an algebrista also set broken bones.</span>The first word, <em>al-jabr</em>, means <strong>restoration</strong>: when a quantity is subtracted on one side of an equation, restore it -- make it whole -- by adding it to both sides. A deficit is mended like a broken bone.</p>
+
+    <p><span class="alg-margin-note">al-muqābala — "the facing of two things, one against the other."</span>The second, <em>al-muqābala</em>, means <strong>balancing</strong>: when the same quantity stands on both sides, strike it from each, until nothing is left that appears twice.</p>
+
+    <p>Two moves. Restore what is broken; cancel what is doubled. Every step keeps the two sides in balance, like pans of a scale -- and step by step, the unknown is cornered.</p>
+
+    <p>Centuries later, Europe would take the first of those two words, <em>al-jabr</em>, and wear it down into a name for the whole subject: <strong>algebra</strong>. And when al-Khwārizmī's own name was Latinised -- <em>Algoritmi</em> -- it became our word for a step-by-step procedure: <strong>algorithm</strong>. One man, two words, both still in daily use.</p>
+
+    <h3>An Equation Without Symbols</h3>
+
+    <p>Here is the remarkable part: the book contains <strong>no symbols at all</strong>. No <em>x</em>, no equals sign, no plus. Every problem is a sentence. The most famous reads:</p>
+
+    <p class="alg-equation">"A square and ten roots are equal to thirty-nine dirhams."</p>
+
+    <p>A "square" is the unknown multiplied by itself. A "root" is the unknown. In the symbols we use today -- symbols that would not exist for another eight hundred years --</p>
+
+    <p class="alg-equation"><em>x</em>² + 10<em>x</em> = 39</p>
+
+    <p>And the balance is not a metaphor. It is the whole engine:</p>
+
+    <figure class="alg-folio" data-ink-scene aria-label="An ink drawing of a balance scale weighing a square and ten roots against thirty-nine dirhams">
+      <svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" role="img">
+        <!-- column and base -->
+        <path class="ink-stroke" d="M 280 52 L 280 218" />
+        <path class="ink-stroke" d="M 224 224 Q 280 208 336 224" style="transition-delay: 0.3s" />
+        <path class="ink-stroke ink-fine" d="M 238 232 Q 280 220 322 232" style="transition-delay: 0.45s" />
+        <!-- pointer and beam -->
+        <path class="ink-stroke ink-fine" d="M 280 40 L 288 54 L 272 54 Z" style="transition-delay: 0.55s" />
+        <path class="ink-stroke" d="M 120 58 L 440 58" style="transition-delay: 0.7s" />
+        <!-- left strings and pan -->
+        <path class="ink-stroke ink-fine" d="M 120 60 L 98 124" style="transition-delay: 1.1s" />
+        <path class="ink-stroke ink-fine" d="M 120 60 L 142 124" style="transition-delay: 1.2s" />
+        <path class="ink-stroke" d="M 82 126 A 38 38 0 0 0 158 126" style="transition-delay: 1.3s" />
+        <!-- right strings and pan -->
+        <path class="ink-stroke ink-fine" d="M 440 60 L 418 124" style="transition-delay: 1.1s" />
+        <path class="ink-stroke ink-fine" d="M 440 60 L 462 124" style="transition-delay: 1.2s" />
+        <path class="ink-stroke" d="M 402 126 A 38 38 0 0 0 478 126" style="transition-delay: 1.3s" />
+        <!-- what the pans hold -->
+        <text class="ink-label" x="120" y="112" text-anchor="middle">x² + 10x</text>
+        <text class="ink-label" x="440" y="112" text-anchor="middle">39</text>
+        <text class="ink-label ink-label-small" x="120" y="186" text-anchor="middle">a square &amp; ten roots</text>
+        <text class="ink-label ink-label-small" x="440" y="186" text-anchor="middle">thirty-nine dirhams</text>
+      </svg>
+      <figcaption class="alg-folio-caption">the two sides, held in balance</figcaption>
+    </figure>
+
+    <p>Whatever is done to one pan must be done to the other -- that is the entire law. Restore, balance, and repeat, and the sentence slowly resolves until the square stands alone and its root can be read off. (Al-Khwārizmī's answer: the root is 3 -- and his method for finding it, completing the square, is a story for the next chapter.)</p>
+
+    <h3>The Long Road to <em>x</em></h3>
+
+    <p><span class="alg-margin-note">x, first pressed into this service in Descartes' La Géométrie, 1637.</span>For eight centuries algebra was written in sentences -- rhetorical algebra, problem after problem spelled out in prose. Symbols arrived slowly, and from many hands: signs for plus and minus, a sign for equality, and at last, in 1637, a Frenchman reaching for the last letters of the alphabet to stand for the unknowns.</p>
+
+    <p>The blank in the merchant's problem finally had a name: <em>x</em>.</p>
+
+    <p>But the name is the smallest part. The deep idea is al-Khwārizmī's: <strong>the unknown obeys the same arithmetic as the known.</strong> You can add it, scale it, weigh it in the pans -- without ever knowing what it is. The rest of this treatise is what follows from taking that idea seriously.</p>
+
+    <div class="alg-colophon">
+      <p class="alg-fleuron" aria-hidden="true">❦</p>
+      <nav class="alg-nav" aria-label="Chapter navigation">
+        <a href="algebra.html">Return to the Contents</a>
+      </nav>
+    </div>
+  </main>
+
+  <div class="alg-vignette" aria-hidden="true"></div>
+  <div class="alg-grain" aria-hidden="true"></div>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var strokes = document.querySelectorAll('.ink-stroke');
+      strokes.forEach(function (p) {
+        var len = 300;
+        try { if (p.getTotalLength) len = p.getTotalLength(); } catch (e) {}
+        p.style.strokeDasharray = String(len);
+        p.style.strokeDashoffset = reduce ? '0' : String(len);
+      });
+      var scenes = document.querySelectorAll('[data-ink-scene]');
+      function inkAll() { scenes.forEach(function (s) { s.classList.add('is-inked'); }); }
+      if (reduce || !('IntersectionObserver' in window)) { inkAll(); return; }
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            en.target.classList.add('is-inked');
+            obs.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.35 });
+      scenes.forEach(function (s) { obs.observe(s); });
+    })();
+  </script>
+</body>
+</html>

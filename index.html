@@ -6,50 +6,32 @@
   <title>Interactive Expositions | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="landing-page article-index-page">
-  <header class="article-index-hero">
-    <div class="article-index-rule" aria-hidden="true"></div>
-    <h1>Interactive Expositions</h1>
-  </header>
+  <div class="home-stage">
+    <header class="home-nav" aria-label="Site navigation">
+    </header>
 
-  <main class="article-index-main" aria-label="Interactive Expositions">
-    <section class="article-card-grid">
-      <a class="article-card article-card-featured" href="active-inference.html">
-        <span class="article-tags">Physics | Statistical Mechanics | Active Inference</span>
-        <span class="article-card-title">A Brief History of the Ideas Behind Active Inference</span>
-        <span class="article-card-concepts">Thermodynamics / Statistical Mechanics / Open Systems / Self-Organisation / Dissipative Structures / Homeostasis / Cybernetics / Information Theory / Bayesian Inference / Complexity / Emergence / Autopoiesis / Enactivism / Predictive Coding / Active Inference</span>
-        <span class="article-card-footer">
-          <strong>Read More -></strong>
-        </span>
-      </a>
+    <header class="article-index-hero home-hero">
+      <section class="home-hero-copy" aria-labelledby="home-title">
+        <div class="article-index-rule" aria-hidden="true"></div>
+        <h1 id="home-title">
+          <span>Interactive</span>
+          <span>Expositions</span>
+        </h1>
+      </section>
 
-      <a class="article-card" href="linear-algebra.html">
-        <span class="article-tags">Mathematics | Linear Algebra</span>
-        <span class="article-card-title">Linear Algebra</span>
-        <span class="article-card-footer">
-          <strong>Read More -></strong>
-        </span>
-      </a>
+      <nav class="home-hero-sections" aria-label="Sections">
+        <a href="active-inference.html">Active Inference</a>
+        <a href="linear-algebra.html">Linear Algebra</a>
+        <a href="trigonometry.html">Trigonometry</a>
+        <a href="complex-numbers.html">Complex Numbers</a>
+        <a href="algebra.html">Algebra</a>
+      </nav>
+    </header>
 
-      <a class="article-card" href="trigonometry.html">
-        <span class="article-tags">Mathematics | Trigonometry</span>
-        <span class="article-card-title">Trigonometry</span>
-        <span class="article-card-footer">
-          <strong>Read More -></strong>
-        </span>
-      </a>
-
-      <a class="article-card" href="complex-numbers.html">
-        <span class="article-tags">Mathematics | Complex Numbers</span>
-        <span class="article-card-title">Complex Numbers</span>
-        <span class="article-card-footer">
-          <strong>Read More -></strong>
-        </span>
-      </a>
-    </section>
-  </main>
+  </div>
 </body>
 </html>

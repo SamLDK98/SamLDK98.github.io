@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Algebra | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Homemade+Apple&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="algebra.css" />
+</head>
+<body class="algebra-page algebra-index-page">
+
+  <!-- paper fibre filter (referenced by the .alg-grain overlay) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="alg-paper-grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise" />
+      <feColorMatrix in="noise" type="matrix"
+        values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.24  0 0 0 0.05 0" />
+    </filter>
+  </svg>
+
+  <header class="alg-titlepage">
+    <p class="alg-imprint">An Interactive Treatise</p>
+    <h1>ALGEBRA</h1>
+    <p class="alg-subtitle">or, the art of restoration and balancing; wherein unknown quantities are made known</p>
+    <hr class="alg-double-rule" aria-hidden="true" />
+
+    <figure class="alg-device" data-ink-scene aria-label="A printer's device: a balance scale, drawn in ink">
+      <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg" role="img">
+        <!-- the balance: emblem of al-muqābala -->
+        <!-- column and base -->
+        <path class="ink-stroke" d="M 190 38 L 190 158" />
+        <path class="ink-stroke" d="M 150 162 Q 190 150 230 162" style="transition-delay: 0.25s" />
+        <path class="ink-stroke ink-fine" d="M 160 168 Q 190 158 220 168" style="transition-delay: 0.4s" />
+        <!-- beam -->
+        <path class="ink-stroke" d="M 80 44 L 300 44" style="transition-delay: 0.55s" />
+        <path class="ink-stroke ink-fine" d="M 190 30 L 196 40 L 184 40 Z" style="transition-delay: 0.5s" />
+        <!-- left strings and pan -->
+        <path class="ink-stroke ink-fine" d="M 80 46 L 64 96" style="transition-delay: 0.95s" />
+        <path class="ink-stroke ink-fine" d="M 80 46 L 96 96" style="transition-delay: 1.05s" />
+        <path class="ink-stroke" d="M 52 98 A 28 28 0 0 0 108 98" style="transition-delay: 1.15s" />
+        <!-- right strings and pan -->
+        <path class="ink-stroke ink-fine" d="M 300 46 L 284 96" style="transition-delay: 0.95s" />
+        <path class="ink-stroke ink-fine" d="M 300 46 L 316 96" style="transition-delay: 1.05s" />
+        <path class="ink-stroke" d="M 272 98 A 28 28 0 0 0 328 98" style="transition-delay: 1.15s" />
+        <!-- the rubricated flourish beneath -->
+        <path class="ink-stroke ink-rubric ink-fine" d="M 120 188 C 160 178, 220 198, 260 184" style="transition-delay: 1.6s" />
+      </svg>
+    </figure>
+
+    <p class="alg-fleuron" aria-hidden="true">❦</p>
+  </header>
+
+  <main class="alg-shelf" aria-label="Algebra chapters">
+    <a class="alg-plate-card" href="algebra-chapter-1.html">
+      <span class="alg-plate-number">Chapter the First</span>
+      <span class="alg-plate-title">The Unknown</span>
+      <span class="alg-plate-summary">Concerning a book written in Baghdad eleven centuries ago; the art of restoring and balancing; and how a missing number came to be called x.</span>
+      <span class="alg-plate-fleuron" aria-hidden="true">❧</span>
+    </a>
+  </main>
+
+  <div class="alg-vignette" aria-hidden="true"></div>
+  <div class="alg-grain" aria-hidden="true"></div>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var strokes = document.querySelectorAll('.ink-stroke');
+      strokes.forEach(function (p) {
+        var len = 300;
+        try { if (p.getTotalLength) len = p.getTotalLength(); } catch (e) {}
+        p.style.strokeDasharray = String(len);
+        p.style.strokeDashoffset = reduce ? '0' : String(len);
+      });
+      var scenes = document.querySelectorAll('[data-ink-scene]');
+      function inkAll() { scenes.forEach(function (s) { s.classList.add('is-inked'); }); }
+      if (reduce || !('IntersectionObserver' in window)) { inkAll(); return; }
+      // the title page inks once, shortly after the page settles
+      setTimeout(inkAll, 500);
+    })();
+  </script>
+</body>
+</html>

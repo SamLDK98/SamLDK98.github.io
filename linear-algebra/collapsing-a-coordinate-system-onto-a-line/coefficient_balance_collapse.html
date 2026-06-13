@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coefficient balance and collapse geometry</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #6f6b60;
+  --card: #ffffff;
+  --soft: #f7f5ef;
+  --line: #e5e3dc;
+  --grid: #ece8df;
+  --ref: #2f2f2f;
+  --purple: #7c3aed;
+  --orange: #d97706;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+html, body { margin: 0; padding: 0; background: #fdfcf8; }
+body {
+  padding: 0 1rem 1rem;
+  color: var(--ink);
+  font-family: Georgia, "Cambria", "Times New Roman", serif;
+}
+button {
+  border: 1px solid #d7d3c8;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 0.42rem 0.62rem;
+}
+button:hover,
+button:focus-visible,
+button.is-active {
+  border-color: var(--ink);
+  background: #ffffff;
+}
+button.is-active { box-shadow: inset 0 0 0 1px rgba(26,26,26,0.16); }
+.cbc { max-width: 760px; margin: 0 auto; padding: 1rem 0; }
+.cbc-card {
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 0.95rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+.cbc-label {
+  margin-bottom: 0.55rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cbc-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.cbc-equation {
+  margin-top: 0.7rem;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.cbc-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  background: var(--card);
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+}
+.cbc-svg { width: 100%; max-width: 720px; height: auto; display: block; }
+.cbc-grid { stroke: var(--grid); stroke-width: 0.8; }
+.cbc-axis { stroke: var(--ink); stroke-width: 1.1; stroke-opacity: 0.5; }
+.cbc-ref-line {
+  stroke: var(--ref);
+  stroke-width: 1.25;
+  stroke-opacity: 0.46;
+}
+.cbc-comp-line {
+  stroke: var(--purple);
+  stroke-width: 2;
+  stroke-opacity: 0.78;
+  stroke-dasharray: 6 4;
+}
+.cbc-number-line {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-opacity: 0.72;
+}
+.cbc-comp-number-line {
+  stroke: var(--purple);
+  stroke-width: 2;
+  stroke-opacity: 0.84;
+}
+.cbc-connector {
+  stroke: #9ca3af;
+  stroke-width: 1;
+  stroke-opacity: 0.45;
+  stroke-dasharray: 3 4;
+}
+.cbc-tick { stroke: var(--ink); stroke-width: 1.1; stroke-opacity: 0.64; }
+.cbc-comp-tick { stroke: var(--purple); stroke-width: 1.35; stroke-opacity: 0.92; }
+.cbc-text {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.cbc-comp-text { fill: var(--purple); }
+.cbc-muted {
+  fill: var(--muted);
+  font-family: var(--sans);
+  font-size: 12px;
+}
+.cbc-caption {
+  margin-top: 0.55rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.cbc-caption strong { color: var(--ink); font-weight: 650; }
+@media (max-width: 560px) {
+  .cbc-text { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div class="cbc" id="cbc-root" role="region" aria-label="Comparing how coefficient choices collapse a plane onto a number line">
+  <div class="cbc-card">
+    <div class="cbc-label">Change the coefficients</div>
+    <div class="cbc-controls">
+      <button type="button" data-rule="1,-1">x - y</button>
+      <button type="button" data-rule="4,-1">4x - y</button>
+      <button type="button" data-rule="1,-4">x - 4y</button>
+      <button type="button" data-rule="4,-4">4x - 4y</button>
+    </div>
+    <div class="cbc-equation" id="cbc-equation"></div>
+  </div>
+
+  <div class="cbc-wrap">
+    <svg class="cbc-svg" viewBox="0 0 820 670" aria-label="Reference and comparison level sets with collapsed number lines">
+      <g id="cbc-scene"></g>
+    </svg>
+  </div>
+
+  <div class="cbc-caption" id="cbc-caption"></div>
+</div>
+
+<script>
+(function(){
+  const LEVELS = [-4, -2, 0, 2, 4];
+  const X_MIN = -4, X_MAX = 4, Y_MIN = -4, Y_MAX = 4;
+  const PLANE = { x: 110, y: 36, w: 310, h: 310 };
+  const LINE_LEFT = 55;
+  const LINE_RIGHT = 765;
+  const LINE_CENTER = (LINE_LEFT + LINE_RIGHT) / 2;
+  const UNIT = 24;
+  const REF_Y = 490;
+  const COMP_Y = 590;
+  let rule = { a: 4, b: -1 };
+  const $ = id => document.getElementById(id);
+
+  function sx(x){ return PLANE.x + (x - X_MIN) / (X_MAX - X_MIN) * PLANE.w; }
+  function sy(y){ return PLANE.y + (Y_MAX - y) / (Y_MAX - Y_MIN) * PLANE.h; }
+  function nx(value){ return LINE_CENTER + value * UNIT; }
+  function fmt(value){
+    if (Math.abs(value - Math.round(value)) < 1e-9) return String(Math.round(value));
+    return String(Math.round(value * 100) / 100);
+  }
+  function term(coef, variable, first){
+    const abs = Math.abs(coef);
+    const body = abs === 1 ? variable : `${abs}${variable}`;
+    if (first) return coef < 0 ? `-${body}` : body;
+    return coef < 0 ? ` - ${body}` : ` + ${body}`;
+  }
+  function equation(a, b){
+    return `g(x,y) = ${term(a, 'x', true)}${term(b, 'y', false)}`;
+  }
+  function segmentForRule(a, b, c){
+    const candidates = [];
+    if (Math.abs(b) > 1e-9) {
+      candidates.push({ x: X_MIN, y: (c - a * X_MIN) / b });
+      candidates.push({ x: X_MAX, y: (c - a * X_MAX) / b });
+    }
+    if (Math.abs(a) > 1e-9) {
+      candidates.push({ x: (c - b * Y_MIN) / a, y: Y_MIN });
+      candidates.push({ x: (c - b * Y_MAX) / a, y: Y_MAX });
+    }
+    const inside = candidates.filter(point =>
+      point.x >= X_MIN - 1e-9 &&
+      point.x <= X_MAX + 1e-9 &&
+      point.y >= Y_MIN - 1e-9 &&
+      point.y <= Y_MAX + 1e-9
+    );
+    const unique = [];
+    inside.forEach(point => {
+      if (!unique.some(other => Math.abs(other.x - point.x) < 1e-9 && Math.abs(other.y - point.y) < 1e-9)) unique.push(point);
+    });
+    return unique.slice(0, 2);
+  }
+  function plane(){
+    let html = '';
+    for (let x = X_MIN; x <= X_MAX; x++) {
+      html += `<line class="cbc-grid" x1="${sx(x)}" y1="${sy(Y_MIN)}" x2="${sx(x)}" y2="${sy(Y_MAX)}"/>`;
+    }
+    for (let y = Y_MIN; y <= Y_MAX; y++) {
+      html += `<line class="cbc-grid" x1="${sx(X_MIN)}" y1="${sy(y)}" x2="${sx(X_MAX)}" y2="${sy(y)}"/>`;
+    }
+    html += `<line class="cbc-axis" x1="${sx(X_MIN)}" y1="${sy(0)}" x2="${sx(X_MAX)}" y2="${sy(0)}"/>`;
+    html += `<line class="cbc-axis" x1="${sx(0)}" y1="${sy(Y_MIN)}" x2="${sx(0)}" y2="${sy(Y_MAX)}"/>`;
+    LEVELS.forEach(c => {
+      const ref = segmentForRule(1, -1, c);
+      if (ref.length === 2) {
+        html += `<line class="cbc-ref-line" x1="${sx(ref[0].x)}" y1="${sy(ref[0].y)}" x2="${sx(ref[1].x)}" y2="${sy(ref[1].y)}"/>`;
+      }
+    });
+    LEVELS.forEach(c => {
+      const comp = segmentForRule(rule.a, rule.b, c);
+      if (comp.length !== 2) return;
+      const labelPoint = comp[1].x > comp[0].x ? comp[1] : comp[0];
+      html += `<line class="cbc-comp-line" x1="${sx(comp[0].x)}" y1="${sy(comp[0].y)}" x2="${sx(comp[1].x)}" y2="${sy(comp[1].y)}"/>`;
+      html += `<text class="cbc-text cbc-comp-text" x="${sx(labelPoint.x) + 14}" y="${sy(labelPoint.y) + 4}">${c}</text>`;
+    });
+    html += `<text class="cbc-muted" x="${PLANE.x}" y="${PLANE.y + PLANE.h + 34}">Grey: f(x,y) = x - y. Purple: selected rule.</text>`;
+    return html;
+  }
+  function tick(x, y, cls){
+    return `<line class="${cls}" x1="${x}" y1="${y - 7}" x2="${x}" y2="${y + 7}"/>`;
+  }
+  function comparisonValue(c){
+    if (rule.a === 4 && rule.b === -4) return c * 4;
+    if (rule.a === 1 && rule.b === -1) return c;
+    return c;
+  }
+  function connectorMeaningful(){
+    return (rule.a === 4 && rule.b === -4) || (rule.a === 1 && rule.b === -1);
+  }
+  function numberLines(){
+    let html = '';
+    html += `<text class="cbc-muted" x="${LINE_LEFT}" y="${REF_Y - 30}">Reference line: f(x,y) = x - y</text>`;
+    html += `<line class="cbc-number-line" x1="${LINE_LEFT}" y1="${REF_Y}" x2="${LINE_RIGHT}" y2="${REF_Y}"/>`;
+    html += `<text class="cbc-muted" x="${LINE_LEFT}" y="${COMP_Y - 30}">Comparison line: ${equation(rule.a, rule.b)}</text>`;
+    const compValues = LEVELS.map(comparisonValue);
+    html += `<line class="cbc-comp-number-line" x1="${nx(Math.min(...compValues))}" y1="${COMP_Y}" x2="${nx(Math.max(...compValues))}" y2="${COMP_Y}"/>`;
+    LEVELS.forEach(c => {
+      const refX = nx(c);
+      const compValue = comparisonValue(c);
+      const compX = nx(compValue);
+      if (connectorMeaningful()) {
+        html += `<line class="cbc-connector" x1="${refX}" y1="${REF_Y + 12}" x2="${compX}" y2="${COMP_Y - 12}"/>`;
+      }
+      html += tick(refX, REF_Y, 'cbc-tick');
+      html += `<text class="cbc-text" x="${refX}" y="${REF_Y + 30}" text-anchor="middle">${c}</text>`;
+      html += tick(compX, COMP_Y, 'cbc-comp-tick');
+      html += `<text class="cbc-text cbc-comp-text" x="${compX}" y="${COMP_Y + 30}" text-anchor="middle">${fmt(compValue)}</text>`;
+    });
+    if (!connectorMeaningful()) {
+      html += `<text class="cbc-muted" x="${LINE_CENTER}" y="650" text-anchor="middle">The comparison line is not just a rescaled copy: the plane is grouped differently first.</text>`;
+    }
+    return html;
+  }
+  function caption(){
+    if (rule.a === 4 && rule.b === -4) {
+      return `<strong>This is uniform scaling.</strong> The same points collapse together, but the output number line is stretched.`;
+    }
+    if (rule.a === 4 && rule.b === -1) {
+      return `<strong>Changing only the x coefficient changes the level lines.</strong> The collapse now preserves and discards different directions.`;
+    }
+    if (rule.a === 1 && rule.b === -4) {
+      return `<strong>Changing only the y coefficient changes the level lines in a different way.</strong> The resulting number line represents a different scalar measurement of the plane.`;
+    }
+    return `<strong>This is the reference rule.</strong> The purple lines sit directly on the grey level-line geometry.`;
+  }
+  function update(){
+    document.querySelectorAll('[data-rule]').forEach(button => {
+      const [a, b] = button.dataset.rule.split(',').map(Number);
+      button.classList.toggle('is-active', a === rule.a && b === rule.b);
+    });
+    $('cbc-equation').textContent = equation(rule.a, rule.b);
+    $('cbc-scene').innerHTML = plane() + numberLines();
+    $('cbc-caption').innerHTML = caption();
+    resizeFrame();
+  }
+  function resizeFrame(){
+    if (!window.frameElement) return;
+    const height = Math.ceil($('cbc-root').getBoundingClientRect().bottom + 16);
+    window.frameElement.style.height = `${height + 12}px`;
+  }
+
+  document.querySelectorAll('[data-rule]').forEach(button => {
+    button.addEventListener('click', () => {
+      const [a, b] = button.dataset.rule.split(',').map(Number);
+      rule = { a, b };
+      update();
+    });
+  });
+  update();
+  window.addEventListener('load', resizeFrame);
+  window.addEventListener('resize', resizeFrame);
+})();
+</script>
+</body>
+</html>

@@ -58,6 +58,62 @@
 
         <p>How could we interpret these summed values?</p>
 
+        <p>I'm going to tell you the answer and it won't make sense; I'll then explain a little more about what's going on geometrically and then it will.</p>
+
+        <p>Answer: The summed value represents position along a particular direction.</p>
+
+        <p>Okay. So what's this direction?</p>
+
+        <p>Let's imagine all our summed values on a number line.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize essay-widget-line-collapse"
+          src="linear-algebra/collapsing-a-coordinate-system-onto-a-line/equivalent_lines_to_number_line.html"
+          title="Interactive widget showing equal-sum lines becoming values on a number line"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>Of course, each value on our line could represent any coordinate along one of these diagonal slices of the plane.</p>
+
+        <p>Let's consider the diagonal line showing all the coordinates that sum to 5.</p>
+
+        <p>Notice what happens if we move between two points on this line.</p>
+
+        <p>From $(2,3)$ to $(3,2)$.</p>
+
+        <p>We must move one unit right and one unit down: $(\rightarrow,\ \downarrow)$</p>
+
+        <p>Or to go in the other direction along the diagonal line, from $(3,2)$ to $(2,3)$.</p>
+
+        <p>We must move one unit left and one unit up: $(\leftarrow,\ \uparrow)$</p>
+
+        <p>This movement, which we can represent with chevrons like this:</p>
+
+        <p class="display-equation">$$\langle1,-1\rangle\ \ \ \ \ (\rightarrow,\ \downarrow)$$</p>
+
+        <p class="display-equation">$$\langle-1,1\rangle\ \ \ \ \ (\leftarrow,\ \uparrow)$$</p>
+
+        <p>Which makes sense as adding to one while decreasing the other by the same amount will always preserve the same sum -- it just cancels each other out.</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize essay-widget-uniform-scaling-line"
+          src="linear-algebra/collapsing-a-coordinate-system-onto-a-line/uniform_scaling_number_line.html"
+          title="Interactive widget showing uniform scaling of collapsed number lines"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>So, uniform scaling simply stretches or compresses the resulting number line; however, what happens when we increase/decrease only the $x$ or the $y$ coefficient?</p>
+
+        <iframe
+          class="essay-widget essay-widget-autosize essay-widget-coefficient-balance"
+          src="linear-algebra/collapsing-a-coordinate-system-onto-a-line/coefficient_balance_collapse.html"
+          title="Interactive widget comparing coefficient changes and collapse geometry"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
         <p>We have lost any information about how far our point is from the center of the axis.</p>
 
         <p>For example,</p>
@@ -163,13 +219,6 @@
 
         <p>We can therefore lump all these coordinates together under the same summed value and represent them on a line.</p>
 
-        <iframe
-          class="essay-widget essay-widget-autosize essay-widget-line-collapse"
-          src="linear-algebra/collapsing-a-coordinate-system-onto-a-line/equivalent_lines_to_number_line.html"
-          title="Interactive widget showing equal-sum lines becoming values on a number line"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
       </section>
     </article>
   </main>

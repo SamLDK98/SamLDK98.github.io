@@ -247,116 +247,244 @@
 
 /* ——— Chapter pages: void re-skin of the shared chapter layout ——— */
 
+/* Warm geometric experiment for the Complex Numbers landing page. */
+
+.complex-numbers-page.section-index-page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #5a0505 0%, #df5f08 52%, #f0b545 100%);
+  color: #130807;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.complex-numbers-page.section-index-page::before {
+  display: none;
+}
+
+.complex-numbers-page.section-index-page .cn-index-hero,
+.complex-numbers-page.section-index-page .article-index-main {
+  position: relative;
+  z-index: 1;
+}
+
+.complex-numbers-page.section-index-page .cn-index-hero {
+  max-width: 1180px;
+  min-height: clamp(18rem, 42vh, 24rem);
+  margin: 0 auto;
+  padding: clamp(4.5rem, 10vw, 7.8rem) 1.4rem clamp(2rem, 5vw, 3.6rem);
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.complex-numbers-page.section-index-page .article-index-hero h1 {
+  width: 100%;
+  max-width: 18em;
+  margin: 0 auto;
+  color: #fff5db;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: clamp(1.85rem, 4.4vw, 4.3rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-indent: 0;
+  text-transform: none;
+  text-align: center;
+  text-shadow: none;
+}
+
+.complex-numbers-page.section-index-page .article-index-rule,
+.complex-numbers-page.section-index-page .cn-hero-motif {
+  display: none;
+}
+
+.complex-numbers-page.section-index-page .article-index-main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 1.4rem clamp(4rem, 8vw, 6.2rem);
+}
+
+.complex-numbers-page.section-index-page .cn-chapter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.2vw, 1.5rem);
+}
+
+.complex-numbers-page.section-index-page .cn-chapter-card {
+  position: relative;
+  min-height: clamp(9.5rem, 16vw, 12rem);
+  padding: clamp(1.2rem, 2vw, 1.65rem);
+  overflow: hidden;
+  border: 1px solid rgba(64, 8, 6, 0.22);
+  border-radius: 0;
+  background: rgba(62, 18, 12, 0.82);
+  color: #fff0d1;
+  box-shadow: none;
+}
+
+.complex-numbers-page.section-index-page .cn-chapter-card::before,
+.complex-numbers-page.section-index-page .cn-chapter-card::after {
+  display: none;
+}
+
+.complex-numbers-page.section-index-page .cn-chapter-card:hover,
+.complex-numbers-page.section-index-page .cn-chapter-card:focus-visible {
+  border-color: rgba(64, 8, 6, 0.42);
+  background: rgba(73, 20, 12, 0.9);
+  transform: translateY(-2px);
+  box-shadow: none;
+}
+
+.complex-numbers-page.section-index-page .cn-card-number {
+  color: #ffd95f;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+}
+
+.complex-numbers-page.section-index-page .article-card-title {
+  color: #fff5db;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: clamp(1.45rem, 2.7vw, 2.2rem);
+  font-weight: 600;
+}
+
+.complex-numbers-page.section-index-page .cn-card-glyph {
+  display: none;
+}
+
+.complex-numbers-page.section-index-page .cn-card-summary {
+  color: rgba(255, 239, 205, 0.72);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+.complex-numbers-page.section-index-page .cn-card-glyph .g-stroke {
+  stroke: rgba(255, 216, 95, 0.58);
+}
+
+.complex-numbers-page.section-index-page .cn-card-glyph .g-dot {
+  fill: rgba(255, 125, 0, 0.78);
+}
+
+.complex-numbers-page.section-index-page .cn-chapter-card:hover .cn-card-glyph .g-stroke,
+.complex-numbers-page.section-index-page .cn-chapter-card:focus-visible .cn-card-glyph .g-stroke {
+  stroke: #ffd95f;
+}
+
+.complex-numbers-page.section-index-page .cn-chapter-card:hover .cn-card-glyph .g-dot,
+.complex-numbers-page.section-index-page .cn-chapter-card:focus-visible .cn-card-glyph .g-dot {
+  fill: #ff7d00;
+}
+
 .complex-numbers-chapter.intro-linear-algebra-page {
-  --intro-bg: #0d0c16;
-  --intro-panel: #14131f;
-  --intro-card: #191827;
-  --intro-rule: rgba(168, 154, 255, 0.16);
-  --intro-rule-strong: rgba(168, 154, 255, 0.3);
-  --intro-text: #dcdcea;
-  --intro-dim: #9a98b5;
-  --intro-faint: #5d5b77;
-  --intro-accent: #a89aff;
-  --intro-ihat: #45e0e6;
-  --intro-jhat: #a86bff;
-  background:
-    radial-gradient(ellipse 60% 35% at 10% 0%, rgba(69, 224, 230, 0.045), transparent),
-    radial-gradient(ellipse 55% 40% at 95% 8%, rgba(168, 107, 255, 0.05), transparent),
-    var(--intro-bg);
+  --intro-bg: #2f0d08;
+  --intro-panel: #45150d;
+  --intro-card: #4f190f;
+  --intro-rule: rgba(255, 214, 134, 0.2);
+  --intro-rule-strong: rgba(255, 214, 134, 0.36);
+  --intro-text: #fff1d6;
+  --intro-dim: #e7c89c;
+  --intro-faint: #a66e48;
+  --intro-accent: #f0b545;
+  --intro-ihat: #ffd95f;
+  --intro-jhat: #df5f08;
+  background: linear-gradient(135deg, #2f0d08 0%, #421208 55%, #5a1a0b 100%);
   color: var(--intro-text);
   font-family: "IBM Plex Sans", system-ui, sans-serif;
 }
 
 .complex-numbers-chapter.intro-linear-algebra-page .chapter-kicker {
-  color: #45e0e6;
-  letter-spacing: 0.3em;
-  opacity: 0.8;
+  color: #f0b545;
+  letter-spacing: 0.18em;
+  opacity: 0.9;
 }
 
 .complex-numbers-chapter.intro-linear-algebra-page .essay-title {
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
   font-weight: 500;
-  font-size: clamp(1.7rem, 4.2vw, 3.2rem);
-  letter-spacing: 0.22em;
-  text-indent: 0.22em;
-  text-transform: uppercase;
+  font-size: clamp(1.85rem, 4.3vw, 3.45rem);
+  letter-spacing: 0;
+  text-indent: 0;
+  text-transform: none;
+  color: #fff5db;
 }
 
 .complex-numbers-chapter.intro-linear-algebra-page .subsection-title {
   font-family: "Space Grotesk", system-ui, sans-serif;
   font-weight: 500;
   font-size: clamp(0.95rem, 1.4vw, 1.15rem);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #45e0e6;
+  color: #f0b545;
 }
 
 .complex-numbers-chapter.intro-linear-algebra-page .display-equation {
   border-radius: 0;
-  border-color: rgba(168, 154, 255, 0.18);
-  background: rgba(10, 9, 18, 0.55);
+  border-color: rgba(255, 214, 134, 0.18);
+  background: rgba(63, 17, 9, 0.55);
 }
 
 .complex-numbers-chapter.intro-linear-algebra-page .trig-figure {
   border-radius: 0;
 }
 
-/* chapter nav: pale instrument links, cyan hover (never trig's gold) */
+/* chapter nav: warm matte links */
 
 .complex-numbers-chapter .chapter-nav-link {
-  border: 1px solid rgba(168, 154, 255, 0.22);
+  border: 1px solid rgba(255, 214, 134, 0.24);
   border-radius: 0;
-  color: #dcdcea;
+  color: #fff1d6;
 }
 
 .complex-numbers-chapter .chapter-nav-link span {
-  color: #5d5b77;
+  color: #a66e48;
 }
 
 .complex-numbers-chapter .chapter-nav-link:hover,
 .complex-numbers-chapter .chapter-nav-link:focus-visible,
 .complex-numbers-chapter .chapter-nav-link:active {
-  border-color: #45e0e6;
-  color: #45e0e6;
+  border-color: #f0b545;
+  color: #ffd95f;
 }
 
 .complex-numbers-chapter .chapter-nav-link:hover span,
 .complex-numbers-chapter .chapter-nav-link:focus-visible span,
 .complex-numbers-chapter .chapter-nav-link:active span {
-  color: #45e0e6;
+  color: #ffd95f;
 }
 
-/* the "where does i live?" figure, re-inked for the void */
+/* the "where does i live?" figure, re-inked for the warm theme */
 
 .complex-numbers-chapter .i-off-line-figure .numline-axis {
-  stroke: rgba(220, 220, 234, 0.4);
+  stroke: rgba(255, 241, 214, 0.42);
 }
 
 .complex-numbers-chapter .i-off-line-figure svg marker path {
-  fill: rgba(220, 220, 234, 0.4);
+  fill: rgba(255, 241, 214, 0.42);
 }
 
 .complex-numbers-chapter .i-off-line-figure .numline-ticks line {
-  stroke: rgba(220, 220, 234, 0.4);
+  stroke: rgba(255, 241, 214, 0.42);
 }
 
 .complex-numbers-chapter .i-off-line-figure .numline-ticks text {
-  fill: #9a98b5;
+  fill: #e7c89c;
 }
 
 .complex-numbers-chapter .i-off-line-figure .i-floating {
-  fill: #ff4fa3;
+  fill: #ffd95f;
   font-family: "Space Grotesk", system-ui, sans-serif;
   font-style: italic;
 }
 
 .complex-numbers-chapter .i-off-line-figure .i-question {
-  fill: #5d5b77;
+  fill: #a66e48;
   font-family: "IBM Plex Sans", system-ui, sans-serif;
 }
 
 .complex-numbers-chapter .i-off-line-figure .i-dashed-drop {
-  stroke: rgba(255, 79, 163, 0.45);
+  stroke: rgba(240, 181, 69, 0.5);
 }
 
 /* ——— Responsive ——— */
