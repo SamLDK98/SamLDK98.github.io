@@ -2495,6 +2495,26 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 740px;
 }
 
+.intro-linear-algebra-page .plotting-points-widget {
+  width: min(100%, 980px);
+  height: 820px;
+}
+
+.intro-linear-algebra-page .curve-equation-widget {
+  width: min(100%, 760px);
+  height: 960px;
+}
+
+.intro-linear-algebra-page .distance-widget {
+  width: min(100%, 980px);
+  height: 860px;
+}
+
+.intro-linear-algebra-page .multiply-points-widget {
+  width: min(100%, 1080px);
+  height: 920px;
+}
+
 .i-off-line-figure {
   width: min(100%, 760px);
   margin: 2.2rem auto 2.4rem;
@@ -2561,6 +2581,11 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .intro-linear-algebra-page .rim-walk-widget {
   width: min(100%, 980px);
   height: 880px;
+}
+
+.intro-linear-algebra-page .unit-circle-problems-widget {
+  width: min(100%, 1080px);
+  height: 980px;
 }
 
 .branches-converge-figure {
@@ -3770,6 +3795,14 @@ header {
   .systems-dimension-widget { height: 1180px; }
 
   .systems-elimination-widget { height: 1520px; }
+
+  .intro-linear-algebra-page .plotting-points-widget { height: 980px; }
+
+  .intro-linear-algebra-page .curve-equation-widget { height: 1120px; }
+
+  .intro-linear-algebra-page .distance-widget { height: 1020px; }
+
+  .intro-linear-algebra-page .multiply-points-widget { height: 1180px; }
 
   .essay-widget-balls { height: 500px; }
 
