@@ -1829,6 +1829,26 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
   height: 900px;
 }
 
+.intro-linear-algebra-page .complex-plane-rotate-widget {
+  width: min(100%, 980px);
+  height: 520px;
+}
+
+.intro-linear-algebra-page .complex-plane-scale-widget {
+  width: min(100%, 980px);
+  height: 620px;
+}
+
+.intro-linear-algebra-page .complex-plane-imaginary-sandbox-widget {
+  width: min(100%, 1180px);
+  height: 820px;
+}
+
+.intro-linear-algebra-page .complex-plane-general-sandbox-widget {
+  width: min(100%, 1020px);
+  height: 720px;
+}
+
 .intro-linear-algebra-page .finding-angles-widget {
   width: min(100%, 860px);
   height: 335px;
@@ -2513,6 +2533,18 @@ body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter
 .intro-linear-algebra-page .multiply-points-widget {
   width: min(100%, 1080px);
   height: 920px;
+}
+
+.intro-linear-algebra-page .negative-multiplication-widget {
+  width: min(100%, 980px);
+  height: 430px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.intro-linear-algebra-page .i-quarter-turn-widget {
+  width: min(100%, 980px);
+  height: 640px;
 }
 
 .i-off-line-figure {
@@ -3803,6 +3835,18 @@ header {
   .intro-linear-algebra-page .distance-widget { height: 1020px; }
 
   .intro-linear-algebra-page .multiply-points-widget { height: 1180px; }
+
+  .intro-linear-algebra-page .negative-multiplication-widget { height: 700px; }
+
+  .intro-linear-algebra-page .i-quarter-turn-widget { height: 860px; }
+
+  .intro-linear-algebra-page .complex-plane-rotate-widget { height: 760px; }
+
+  .intro-linear-algebra-page .complex-plane-scale-widget { height: 900px; }
+
+  .intro-linear-algebra-page .complex-plane-imaginary-sandbox-widget { height: 1080px; }
+
+  .intro-linear-algebra-page .complex-plane-general-sandbox-widget { height: 1080px; }
 
   .essay-widget-balls { height: 500px; }
 

@@ -389,7 +389,7 @@
   --intro-accent: #f0b545;
   --intro-ihat: #ffd95f;
   --intro-jhat: #df5f08;
-  background: linear-gradient(135deg, #2f0d08 0%, #421208 55%, #5a1a0b 100%);
+  background: linear-gradient(135deg, #5a1a0b 0%, #421208 55%, #2f0d08 100%);
   color: var(--intro-text);
   font-family: "IBM Plex Sans", system-ui, sans-serif;
 }

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiplication and Direction on the Number Line</title>
+  <style>
+    :root {
+      --text: #fff1d6;
+      --muted: rgba(255, 241, 214, 0.68);
+      --panel: rgba(46, 12, 7, 0.54);
+      --rule: rgba(255, 214, 134, 0.2);
+      --axis: rgba(255, 241, 214, 0.58);
+      --accent: #ffd95f;
+      --bg1: rgba(67, 18, 8, 0.95);
+      --bg2: rgba(47, 13, 8, 0.98);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    }
+
+    .widget {
+      width: min(100%, 980px);
+      padding: clamp(14px, 2.4vw, 24px);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 30% 12%, rgba(255, 217, 95, 0.08), transparent 32%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(230px, 0.72fr);
+      gap: clamp(16px, 3vw, 30px);
+      align-items: center;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      overflow: visible;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    .tick {
+      stroke: rgba(255, 241, 214, 0.42);
+      stroke-width: 1.4;
+    }
+
+    .tick-label {
+      fill: var(--muted);
+      font-family: "JetBrains Mono", "Consolas", monospace;
+      font-size: 12px;
+    }
+
+    .arrow {
+      stroke: var(--accent);
+      stroke-width: 5.4;
+      stroke-linecap: round;
+      marker-end: url(#arrow-main);
+      filter: drop-shadow(0 0 7px rgba(255, 217, 95, 0.3));
+      transform-origin: 380px 160px;
+      transition:
+        x1 700ms ease,
+        x2 700ms ease,
+        transform 1800ms cubic-bezier(0.58, 0.02, 0.18, 1);
+    }
+
+    .origin {
+      fill: var(--text);
+    }
+
+    .readout {
+      padding: 18px;
+      border: 1px solid rgba(255, 214, 134, 0.16);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+
+    .equation {
+      margin: 0 0 14px;
+      color: var(--text);
+      font: 700 clamp(32px, 5vw, 54px)/1.02 "JetBrains Mono", "Consolas", monospace;
+      letter-spacing: -0.02em;
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(14px, 1.6vw, 17px);
+      line-height: 1.45;
+    }
+
+    button {
+      width: 100%;
+      min-height: 42px;
+      margin-top: 18px;
+      border: 1px solid rgba(255, 214, 134, 0.28);
+      border-radius: 6px;
+      background: rgba(255, 217, 95, 0.1);
+      color: var(--text);
+      font: 700 13px/1.2 "JetBrains Mono", "Consolas", monospace;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    button:hover,
+    button:focus-visible {
+      border-color: var(--accent);
+      background: rgba(255, 217, 95, 0.16);
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="layout">
+      <svg id="canvas" viewBox="0 0 760 300" role="img" aria-label="Number line showing multiplication and direction">
+        <defs>
+          <marker id="arrow-main" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#ffd95f" />
+          </marker>
+        </defs>
+        <line class="axis" x1="70" y1="160" x2="690" y2="160" />
+        <g id="ticks"></g>
+        <circle class="origin" cx="380" cy="160" r="4" />
+        <line id="arrow" class="arrow" x1="380" y1="160" x2="380" y2="160" />
+      </svg>
+
+      <div class="readout">
+        <p class="equation" id="equation"></p>
+        <p class="note" id="note"></p>
+        <button id="action" type="button">Multiply</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ticks = document.getElementById('ticks');
+      const arrow = document.getElementById('arrow');
+      const equation = document.getElementById('equation');
+      const note = document.getElementById('note');
+      const action = document.getElementById('action');
+      const cx = 380;
+      const cy = 160;
+      const scale = 46;
+      let step = 0;
+      let multiplied = false;
+
+      const cases = [
+        {
+          expression: '2 x 3',
+          text: 'A positive by a positive increase magnitude but not direction.',
+          start: 2,
+          product: 6,
+          rotate: false
+        },
+        {
+          expression: '2 x -3',
+          text: 'A positive by a negative increases or decreases magnitude, and changes direction via a 180 degree rotation.',
+          start: 2,
+          product: -6,
+          rotate: true,
+          first: 6
+        },
+        {
+          expression: '-2 x -3',
+          text: 'A negative by a negative increases magnitude and changes direction via a rotation.',
+          start: -2,
+          product: 6,
+          rotate: true,
+          first: -6
+        }
+      ];
+
+      function x(value) {
+        return cx + value * scale;
+      }
+
+      for (let n = -6; n <= 6; n += 1) {
+        const tx = x(n);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('class', 'tick');
+        line.setAttribute('x1', tx);
+        line.setAttribute('x2', tx);
+        line.setAttribute('y1', cy - 8);
+        line.setAttribute('y2', cy + 8);
+        ticks.appendChild(line);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('class', 'tick-label');
+        text.setAttribute('x', tx);
+        text.setAttribute('y', cy + 30);
+        text.setAttribute('text-anchor', 'middle');
+        text.textContent = n;
+        ticks.appendChild(text);
+      }
+
+      function setArrow(end, rotation = 0) {
+        arrow.style.transform = `rotate(${rotation}deg)`;
+        arrow.setAttribute('x1', cx);
+        arrow.setAttribute('y1', cy);
+        arrow.setAttribute('x2', x(end));
+        arrow.setAttribute('y2', cy);
+      }
+
+      function resetCase() {
+        const item = cases[step];
+        multiplied = false;
+        equation.textContent = item.expression;
+        note.textContent = item.text;
+        action.textContent = 'Multiply';
+        setArrow(item.start, 0);
+      }
+
+      function multiply() {
+        const item = cases[step];
+        action.disabled = true;
+        setArrow(item.rotate ? item.first : item.product, 0);
+        if (!item.rotate) {
+          setTimeout(() => {
+            multiplied = true;
+            action.disabled = false;
+            action.textContent = 'Next';
+          }, 720);
+          return;
+        }
+        setTimeout(() => {
+          setArrow(item.first, 180);
+          setTimeout(() => {
+            multiplied = true;
+            action.disabled = false;
+            action.textContent = 'Next';
+          }, 720);
+        }, 900);
+      }
+
+      action.addEventListener('click', () => {
+        if (!multiplied) {
+          multiply();
+          return;
+        }
+        step = (step + 1) % cases.length;
+        resetCase();
+      });
+
+      resetCase();
+    })();
+  </script>
+</body>
+</html>

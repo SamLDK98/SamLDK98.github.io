@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repeated Multiplication by i</title>
+  <style>
+    :root {
+      --text: #fff1d6;
+      --muted: rgba(255, 241, 214, 0.66);
+      --panel: rgba(46, 12, 7, 0.54);
+      --rule: rgba(255, 214, 134, 0.2);
+      --axis: rgba(255, 241, 214, 0.58);
+      --grid: rgba(255, 241, 214, 0.05);
+      --circle: rgba(255, 241, 214, 0.68);
+      --accent: #ffd95f;
+      --orange: #df5f08;
+      --red: #ff5a4d;
+      --blue: #56c7ff;
+      --bg1: rgba(67, 18, 8, 0.95);
+      --bg2: rgba(47, 13, 8, 0.98);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    }
+
+    .widget {
+      width: min(100%, 980px);
+      padding: clamp(16px, 3vw, 28px);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 30% 12%, rgba(255, 217, 95, 0.08), transparent 32%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(230px, 0.82fr);
+      gap: clamp(18px, 3vw, 32px);
+      align-items: center;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      overflow: visible;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .unit-circle {
+      fill: rgba(255, 217, 95, 0.025);
+      stroke: var(--circle);
+      stroke-width: 2.4;
+    }
+
+    .turn-path {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 4;
+      stroke-linecap: round;
+      marker-end: url(#turn-arrow);
+    }
+
+    .radius {
+      stroke: var(--accent);
+      stroke-width: 4.6;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 7px rgba(255, 217, 95, 0.28));
+    }
+
+    .point {
+      fill: var(--red);
+      stroke: #2f0d08;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 8px rgba(255, 90, 77, 0.38));
+    }
+
+    .ghost {
+      fill: rgba(255, 241, 214, 0.18);
+    }
+
+    .label {
+      fill: var(--muted);
+      font-family: "JetBrains Mono", "Consolas", monospace;
+      font-size: 14px;
+    }
+
+    .label.active {
+      fill: var(--accent);
+      font-weight: 700;
+    }
+
+    .readout {
+      padding: 18px;
+      border: 1px solid rgba(255, 214, 134, 0.16);
+      border-radius: 6px;
+      background: var(--panel);
+      font-family: "JetBrains Mono", "Consolas", monospace;
+    }
+
+    .value {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: clamp(22px, 3vw, 32px);
+      line-height: 1.15;
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .controls {
+      display: block;
+      margin-top: 18px;
+    }
+
+    button {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid rgba(255, 214, 134, 0.28);
+      border-radius: 6px;
+      background: rgba(255, 217, 95, 0.1);
+      color: var(--text);
+      font: 700 13px/1.2 "JetBrains Mono", "Consolas", monospace;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    button:hover,
+    button:focus-visible {
+      border-color: var(--accent);
+      background: rgba(255, 217, 95, 0.16);
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="layout">
+      <svg id="canvas" viewBox="0 0 560 560" role="img" aria-label="Complex plane showing repeated multiplication by i as quarter turns">
+        <defs>
+          <marker id="turn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#56c7ff" />
+          </marker>
+        </defs>
+        <line class="axis" x1="72" y1="280" x2="488" y2="280" />
+        <line class="axis" x1="280" y1="488" x2="280" y2="72" />
+        <circle class="unit-circle" cx="280" cy="280" r="156" />
+        <g id="ghosts"></g>
+        <path id="turn" class="turn-path" d="" />
+        <line id="radius" class="radius" x1="280" y1="280" x2="436" y2="280" />
+        <circle id="point" class="point" cx="436" cy="280" r="9" />
+        <text id="lab1" class="label" x="448" y="284">1</text>
+        <text id="labi" class="label" x="286" y="112">i</text>
+        <text id="labn1" class="label" x="98" y="284">-1</text>
+        <text id="labni" class="label" x="286" y="462">-i</text>
+      </svg>
+
+      <div>
+        <div class="readout">
+          <p class="value" id="value">1</p>
+          <p class="note" id="note">Start at 1 on the real axis. Each multiplication by i rotates the point one quarter turn counterclockwise.</p>
+        </div>
+        <div class="controls">
+          <button id="rotate" type="button">Rotate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const rotate = document.getElementById('rotate');
+      const value = document.getElementById('value');
+      const note = document.getElementById('note');
+      const radius = document.getElementById('radius');
+      const point = document.getElementById('point');
+      const turn = document.getElementById('turn');
+      const ghosts = document.getElementById('ghosts');
+      const labels = {
+        0: document.getElementById('lab1'),
+        1: document.getElementById('labi'),
+        2: document.getElementById('labn1'),
+        3: document.getElementById('labni')
+      };
+      const cx = 280;
+      const cy = 280;
+      const r = 156;
+      const names = ['1', 'i', '-1', '-i'];
+      const multiplications = [
+        '1 x i = i',
+        'i x i = -1',
+        '-1 x i = -i',
+        '-i x i = 1'
+      ];
+      const positions = [
+        { x: cx + r, y: cy },
+        { x: cx, y: cy - r },
+        { x: cx - r, y: cy },
+        { x: cx, y: cy + r }
+      ];
+
+      positions.forEach((pos) => {
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('class', 'ghost');
+        c.setAttribute('cx', pos.x);
+        c.setAttribute('cy', pos.y);
+        c.setAttribute('r', 5);
+        ghosts.appendChild(c);
+      });
+
+      function arcFor(index) {
+        if (index === 0) return '';
+        const prev = positions[(index + 3) % 4];
+        const current = positions[index];
+        return `M ${prev.x} ${prev.y} A ${r} ${r} 0 0 0 ${current.x} ${current.y}`;
+      }
+
+      let n = 0;
+
+      function draw() {
+        const index = n % 4;
+        const pos = positions[index];
+        radius.setAttribute('x2', pos.x);
+        radius.setAttribute('y2', pos.y);
+        point.setAttribute('cx', pos.x);
+        point.setAttribute('cy', pos.y);
+        turn.setAttribute('d', arcFor(index));
+        value.textContent = n === 0 ? '1' : multiplications[(n - 1) % 4];
+        note.textContent = n === 0
+          ? 'Start at 1 on the real axis. Press Rotate to multiply by i.'
+          : `Multiplying by i rotates one quarter turn counterclockwise, landing at ${names[index]}.`;
+        Object.values(labels).forEach((label) => label.classList.remove('active'));
+        labels[index].classList.add('active');
+      }
+
+      rotate.addEventListener('click', () => {
+        n += 1;
+        draw();
+      });
+
+      draw();
+    })();
+  </script>
+</body>
+</html>

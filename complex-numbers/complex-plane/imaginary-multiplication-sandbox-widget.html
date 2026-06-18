@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Imaginary Multiplication Sandbox</title>
+  <style>
+    :root {
+      --text: #fff1d6;
+      --muted: rgba(255, 241, 214, 0.66);
+      --panel: rgba(46, 12, 7, 0.54);
+      --rule: rgba(255, 214, 134, 0.2);
+      --axis: rgba(255, 241, 214, 0.58);
+      --accent: #ffd95f;
+      --blue: #56c7ff;
+      --green: #a7d984;
+      --red: #ff5a4d;
+      --bg1: rgba(67, 18, 8, 0.95);
+      --bg2: rgba(47, 13, 8, 0.98);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Fraunces", Georgia, serif;
+    }
+
+    .widget {
+      width: min(100%, 1180px);
+      padding: 0.45rem;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 217, 95, 0.1), transparent 32%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 18px 46px rgba(0,0,0,0.2);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+      align-items: stretch;
+    }
+
+    .stage,
+    .panel {
+      border-radius: 6px;
+    }
+
+    .stage {
+      min-height: 585px;
+      padding: 0;
+      background: transparent;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 585px;
+      overflow: visible;
+    }
+
+    .grid-line { stroke: rgba(255, 241, 214, 0.075); stroke-width: 1; }
+    .axis { stroke: var(--axis); stroke-width: 1.8; stroke-linecap: round; }
+    .tick { stroke: rgba(255, 241, 214, 0.16); stroke-width: 1; }
+    .real-vector { stroke: var(--blue); stroke-width: 2.8; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(86, 199, 255, 0.25)); }
+    .multiplier-vector { stroke: rgba(167, 217, 132, 0.72); stroke-width: 2.8; stroke-linecap: round; stroke-dasharray: 7 7; }
+    .product-vector { stroke: var(--accent); stroke-width: 3.2; stroke-linecap: round; filter: drop-shadow(0 0 5px rgba(255, 217, 95, 0.3)); }
+    .rotation-arc { fill: none; stroke: rgba(86, 199, 255, 0.75); stroke-width: 2.2; stroke-linecap: round; }
+
+    .label,
+    .value-label {
+      font-family: "JetBrains Mono", Consolas, monospace;
+    }
+
+    .label { fill: var(--muted); font-size: 13px; }
+    .value-label { fill: var(--text); font-size: 14px; font-weight: 500; }
+
+    .panel {
+      padding: 0.65rem 0.8rem 0.75rem;
+      display: grid;
+      grid-template-columns: minmax(10rem, 0.65fr) minmax(0, 1.1fr);
+      align-items: center;
+      gap: 0.65rem 0.9rem;
+      border: 1px solid rgba(255, 214, 134, 0.13);
+      background: rgba(46, 12, 7, 0.32);
+    }
+
+    .equation {
+      color: var(--accent);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: clamp(0.95rem, 2.6vw, 1.45rem);
+      line-height: 1.3;
+      grid-row: span 2;
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    button {
+      border: 1px solid rgba(255, 217, 95, 0.45);
+      border-radius: 999px;
+      background: rgba(255, 217, 95, 0.08);
+      color: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.68rem;
+      padding: 0.45rem 0.62rem;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: rgba(255, 217, 95, 0.16);
+      outline: none;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+
+    .group {
+      display: grid;
+      gap: 0.55rem;
+      padding: 0.72rem;
+      border: 1px solid rgba(255, 214, 134, 0.12);
+      border-radius: 6px;
+    }
+
+    .group-title {
+      color: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.75rem;
+    }
+
+    label {
+      display: grid;
+      gap: 0.25rem;
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input[type="range"] { accent-color: var(--accent); }
+
+    .legend {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.7rem;
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 0.7rem;
+      height: 0.14rem;
+      margin-right: 0.28rem;
+      vertical-align: middle;
+      background: var(--accent);
+    }
+
+    .legend .real::before { background: var(--blue); }
+    .legend .multiplier::before { background: var(--green); }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.42;
+      grid-column: 2;
+    }
+
+    @media (max-width: 800px) {
+      .panel,
+      .controls { grid-template-columns: 1fr; }
+      .equation,
+      .note { grid-column: auto; grid-row: auto; }
+      .stage { min-height: 420px; }
+      svg { min-height: 400px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" aria-label="Sandbox for multiplying a real number by a multiple of i">
+    <div class="layout">
+      <section class="stage">
+        <svg viewBox="0 0 720 560" role="img" aria-label="Complex plane showing real number multiplied by a multiple of i">
+          <defs>
+            <marker id="arrowYellow" markerWidth="5.5" markerHeight="5.5" refX="4.7" refY="2.75" orient="auto">
+              <path d="M0,0 L5.5,2.75 L0,5.5 Z" fill="#ffd95f" />
+            </marker>
+            <marker id="arrowBlue" markerWidth="5.5" markerHeight="5.5" refX="4.7" refY="2.75" orient="auto">
+              <path d="M0,0 L5.5,2.75 L0,5.5 Z" fill="#56c7ff" />
+            </marker>
+            <marker id="arrowGreen" markerWidth="5.5" markerHeight="5.5" refX="4.7" refY="2.75" orient="auto">
+              <path d="M0,0 L5.5,2.75 L0,5.5 Z" fill="#a7d984" />
+            </marker>
+          </defs>
+          <g id="grid"></g>
+          <line class="axis" x1="70" y1="280" x2="650" y2="280" />
+          <line class="axis" x1="360" y1="500" x2="360" y2="60" />
+          <g id="ticks"></g>
+          <text class="label" x="604" y="262">real</text>
+          <text class="label" x="378" y="76">imaginary</text>
+          <path id="rotationArc" class="rotation-arc" d="" />
+          <line id="realVector" class="real-vector" x1="360" y1="280" x2="360" y2="280" marker-end="url(#arrowBlue)" />
+          <line id="multiplierVector" class="multiplier-vector" x1="360" y1="280" x2="360" y2="280" marker-end="url(#arrowGreen)" />
+          <line id="productVector" class="product-vector" x1="360" y1="280" x2="360" y2="280" marker-end="url(#arrowYellow)" />
+          <text id="realLabel" class="value-label" x="300" y="230">real</text>
+          <text id="multiplierLabel" class="value-label" x="300" y="230">ki</text>
+          <text id="productLabel" class="value-label" x="300" y="230">product</text>
+        </svg>
+      </section>
+
+      <aside class="panel">
+        <div id="equation" class="equation"></div>
+        <div class="presets" aria-label="Example multiplications">
+          <button type="button" data-values="4,1">4 x i</button>
+          <button type="button" data-values="4,3">4 x 3i</button>
+          <button type="button" data-values="-3,2">-3 x 2i</button>
+          <button type="button" data-values="-2,-1">-2 x (-i)</button>
+        </div>
+        <div class="controls">
+          <div class="group">
+            <div class="group-title">Starting number</div>
+            <label>real: <span id="aReadout"></span><input id="aSlider" type="range" min="-4" max="4" step="1" value="4"></label>
+          </div>
+          <div class="group">
+            <div class="group-title">Multiplier</div>
+            <label>imaginary: <span id="bReadout"></span><input id="bSlider" type="range" min="-4" max="4" step="1" value="1"></label>
+          </div>
+        </div>
+        <div class="legend" aria-label="Vector legend">
+          <span class="real">start</span>
+          <span class="multiplier">multiplier</span>
+          <span>product</span>
+        </div>
+        <p id="note" class="note"></p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const origin = { x: 360, y: 280 };
+    const unit = 18;
+    const aSlider = document.getElementById('aSlider');
+    const bSlider = document.getElementById('bSlider');
+    const aReadout = document.getElementById('aReadout');
+    const bReadout = document.getElementById('bReadout');
+    const equation = document.getElementById('equation');
+    const note = document.getElementById('note');
+    const realVector = document.getElementById('realVector');
+    const multiplierVector = document.getElementById('multiplierVector');
+    const productVector = document.getElementById('productVector');
+    const rotationArc = document.getElementById('rotationArc');
+    const realLabel = document.getElementById('realLabel');
+    const multiplierLabel = document.getElementById('multiplierLabel');
+    const productLabel = document.getElementById('productLabel');
+    const ticks = document.getElementById('ticks');
+    const grid = document.getElementById('grid');
+
+    for (let i = -12; i <= 12; i += 2) {
+      if (i === 0) continue;
+      const x = origin.x + i * unit;
+      const y = origin.y - i * unit;
+      grid.insertAdjacentHTML('beforeend', `<line class="grid-line" x1="${x}" y1="68" x2="${x}" y2="492" />`);
+      grid.insertAdjacentHTML('beforeend', `<line class="grid-line" x1="78" y1="${y}" x2="642" y2="${y}" />`);
+      if (i % 4 === 0) {
+        ticks.insertAdjacentHTML('beforeend', `<line class="tick" x1="${x}" y1="276" x2="${x}" y2="284" />`);
+        ticks.insertAdjacentHTML('beforeend', `<line class="tick" x1="356" y1="${y}" x2="364" y2="${y}" />`);
+      }
+    }
+
+    function formatImag(n) {
+      if (n === 0) return '0';
+      if (n === 1) return 'i';
+      if (n === -1) return '-i';
+      return `${n}i`;
+    }
+
+    function point(real, imag) {
+      return { x: origin.x + real * unit, y: origin.y - imag * unit };
+    }
+
+    function setVector(line, real, imag) {
+      const p = point(real, imag);
+      line.setAttribute('x2', p.x);
+      line.setAttribute('y2', p.y);
+      return p;
+    }
+
+    function setLabel(label, text, p, dx = 9, dy = -8) {
+      label.textContent = text;
+      label.setAttribute('x', p.x + dx);
+      label.setAttribute('y', p.y + dy);
+    }
+
+    function arcPath(a, b, product) {
+      if (a === 0 || b === 0 || product === 0) return '';
+      const r = 58;
+      const start = a > 0 ? { x: origin.x + r, y: origin.y } : { x: origin.x - r, y: origin.y };
+      const end = product > 0 ? { x: origin.x, y: origin.y - r } : { x: origin.x, y: origin.y + r };
+      const sweep = b > 0 ? 0 : 1;
+      const large = 0;
+      return `M ${start.x} ${start.y} A ${r} ${r} 0 ${large} ${sweep} ${end.x} ${end.y}`;
+    }
+
+    function draw() {
+      const a = Number(aSlider.value);
+      const b = Number(bSlider.value);
+      const product = a * b;
+      const multiplierLabelText = formatImag(b);
+      const productText = formatImag(product);
+
+      aReadout.textContent = a;
+      bReadout.textContent = multiplierLabelText;
+      equation.textContent = `${a} x ${multiplierLabelText} = ${productText}`;
+
+      const realPoint = setVector(realVector, a, 0);
+      const multiplierPoint = setVector(multiplierVector, 0, b);
+      const productPoint = setVector(productVector, 0, product);
+
+      setLabel(realLabel, String(a), realPoint, a >= 0 ? 9 : -24, 24);
+      setLabel(multiplierLabel, multiplierLabelText, multiplierPoint, 10, b >= 0 ? -10 : 22);
+      setLabel(productLabel, productText, productPoint, 14, product >= 0 ? -10 : 22);
+      rotationArc.setAttribute('d', arcPath(a, b, product));
+
+      if (b > 0) {
+        note.textContent = 'A positive multiple of i rotates by 90 degrees counterclockwise and scales by the multiplier.';
+      } else if (b < 0) {
+        note.textContent = 'A negative multiple of i rotates by 90 degrees clockwise and scales by the multiplier.';
+      } else {
+        note.textContent = 'Multiplying by 0i collapses the result to 0.';
+      }
+    }
+
+    document.querySelectorAll('[data-values]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const [a, b] = button.dataset.values.split(',');
+        aSlider.value = a;
+        bSlider.value = b;
+        draw();
+      });
+    });
+
+    [aSlider, bSlider].forEach((slider) => slider.addEventListener('input', draw));
+    draw();
+  </script>
+</body>
+</html>

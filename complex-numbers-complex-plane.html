@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Complex Plane | Complex Numbers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;700&family=Libre+Baskerville:wght@400;700&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="complex-numbers.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-complex-plane-page">
+  <header>
+    <div class="header-inner">
+      <div class="chapter-kicker">Complex Numbers</div>
+      <h1 class="essay-title">The Complex Plane</h1>
+    </div>
+  </header>
+
+  <main>
+    <article>
+      <section class="essay-section">
+        <h3 class="subsection-title">An Odd Behaviour</h3>
+
+        <p>However, here's one way in which $i$ differs from regular numbers.</p>
+
+        <p>When we repeatedly raise ordinary numbers to higher powers, the result will increase or decrease in one direction on the number line.</p>
+
+        <p>$$2^2 = 4, \qquad 2^3 = 8, \qquad 2^4 = 16$$</p>
+
+        <p>But if:</p>
+
+        <p>$$i^2 = -1$$</p>
+
+        <p>Then:</p>
+
+        <p>$$i^3 = i^2 \cdot i = -i$$</p>
+
+        <p>And:</p>
+
+        <p>$$i^4 = (i^2)^2 = (-1)^2 = 1$$</p>
+
+        <p>And:</p>
+
+        <p>$$i^5 = i^4 \cdot i = i$$</p>
+
+        <p>Have a look at what's happening.</p>
+
+        <p>$$
+\begin{array}{l | l}
+2^1 = 2 & i^1 = i \\
+2^2 = 4 & i^2 = -1 \\
+2^3 = 8 & i^3 = -i \\
+2^4 = 16 & i^4 = 1 \\
+2^5 = 32 & i^5 = i \\
+2^6 = 64 & i^6 = -1 \\
+2^7 = 128 & i^7 = -i \\
+2^8 = 256 & i^8 = 1 \\
+\end{array}
+$$</p>
+
+        <p>Notice that successive powers of $i$ do not continue growing in magnitude. Instead, they cycle through four values:</p>
+
+        <p>$$i, -1, -i, 1$$</p>
+
+        <p>Hm. Almost makes me think about rotations...</p>
+
+        <h3 class="subsection-title">Geometric Interpretation</h3>
+
+        <p>Let's think about multiplication and the number line.</p>
+
+        <p>A positive by a positive increase magnitude but not direction.</p>
+
+        <p>A positive by a negative increases or decreases magnitude, and changes direction via a $180^\circ$ rotation.</p>
+
+        <p>A negative by a negative increases magnitude and changes direction via a $180^\circ$ rotation.</p>
+
+        <iframe
+          class="essay-widget negative-multiplication-widget"
+          src="complex-numbers/imaginary-unit/negative-multiplication-widget.html"
+          title="Interactive widget showing multiplication by negative numbers as a 180 degree rotation on the number line"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>So multiplication by a negative always corresponds to a $180^\circ$ rotation. But could there be a number that performs only a $90^\circ$ rotation?</p>
+
+        <p>At first this seems impossible. A $90^\circ$ rotation would move us off the number line entirely. We need to imagine a second axis.</p>
+
+        <p>Since the number line we have been looking at consists of the real numbers, and this second axis is going to be home to the imaginary numbers, we can call them the real and imaginary axes.</p>
+
+        <p>Now,</p>
+
+        <p>$$i^2 = -1$$</p>
+
+        <p>so two successive multiplications by $i$ must have the same overall effect as one multiplication by $-1$.</p>
+
+        <p>Since multiplication by $-1$ corresponds to a $180^\circ$ rotation, multiplication by $i$ must correspond to a $90^\circ$ rotation.</p>
+
+        <p>Let's consider this in terms of just 1.</p>
+
+        <p>If we multiply 1 by $i$ we rotate up 90 degrees to $i$ on the imaginary axis.</p>
+
+        <p>Multiplying by $i$ again results in $i^2$ or -1.</p>
+
+        <p>Again, gives us $-i$ which is 270 degrees, down in the negatives of the imaginary axis.</p>
+
+        <p>We can then continue, simply rotating around and around.</p>
+
+        <iframe
+          class="essay-widget i-quarter-turn-widget"
+          src="complex-numbers/imaginary-unit/i-quarter-turn-widget.html"
+          title="Interactive widget showing repeated multiplication by i as quarter turns around the complex plane"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>We have seen that multiplying $1$ by $i$ rotates it $90^\circ$ onto the imaginary axis.</p>
+
+        <p>What do you think will happen when we multiply the following numbers?</p>
+
+        <ul>
+          <li>$4 \times i$</li>
+          <li>$4 \times 3i$</li>
+          <li>$-3 \times 2i$</li>
+          <li>$-2 \times (-i)$</li>
+        </ul>
+
+        <iframe
+          class="essay-widget complex-plane-imaginary-sandbox-widget"
+          src="complex-numbers/complex-plane/imaginary-multiplication-sandbox-widget.html"
+          title="Sandbox for multiplying real numbers by imaginary numbers"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <p>What we are seeing is that multiplication is doing two things.</p>
+
+        <p>First, the real-number part changes the distance from the origin.</p>
+
+        <ul>
+          <li>Multiplying by $4$ makes something four times as far from the origin.</li>
+          <li>Multiplying by $-3$ makes something three times as far from the origin and reverses its direction.</li>
+        </ul>
+
+        <p>Second, multiplication by $i$ rotates by $90^\circ$.</p>
+
+        <p>So:</p>
+
+        <p>$$4\times i=4i$$</p>
+
+        <p>This takes $4$ on the real axis and rotates it $90^\circ$ onto the imaginary axis.</p>
+
+        <p>$$4\times 3i=12i$$</p>
+
+        <p>This stretches $4$ by a factor of $3$, then rotates it $90^\circ$, giving $12i$.</p>
+
+        <p>$$-3\times 2i=-6i$$</p>
+
+        <p>This starts from $-3$, stretches it by $2$, and then rotates it $90^\circ$, giving $-6i$.</p>
+
+        <p>$$-2\times(-i)=2i$$</p>
+
+        <p>Multiplying by $-i$ rotates in the opposite direction to multiplying by $i$. So $-2$ rotates down by $90^\circ$, landing at $2i$.</p>
+
+        <p>In each case, multiplication is not just changing the size of a number. It is also changing its direction. This is the first sign that complex multiplication combines two actions:</p>
+
+        <ul>
+          <li><strong>Stretching</strong></li>
+          <li><strong>Rotation</strong></li>
+        </ul>
+
+        <p>So far, every multiplier has been either a real number, an imaginary number, or a combination of the two where the effect was relatively easy to predict.</p>
+
+        <p>But what happens if we multiply by a more general complex number?</p>
+
+        <p>Consider:</p>
+
+        <p>$$3(2+4i)$$</p>
+
+        <p>Before calculating the answer, try to predict what will happen geometrically. Then consider what happens if we multiply a complex number by another complex number.</p>
+
+        <p>For example:</p>
+
+        <ul>
+          <li>$(1+i)(2+3i)$</li>
+          <li>$(3+2i)i$</li>
+          <li>$(2+i)(1-i)$</li>
+        </ul>
+
+        <iframe
+          class="essay-widget complex-plane-general-sandbox-widget"
+          src="complex-numbers/complex-plane/complex-multiplication-sandbox-widget.html"
+          title="Sandbox for multiplying complex numbers by real and imaginary parts"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <hr class="section-divider" />
+
+        <nav class="chapter-nav" aria-label="Chapter navigation">
+          <a class="chapter-nav-link" href="complex-numbers-imaginary-unit.html">
+            <span>Previous</span>
+            <strong>The Imaginary Unit</strong>
+          </a>
+          <a class="chapter-nav-link" href="complex-numbers.html">
+            <span>Contents</span>
+            <strong>Complex Numbers</strong>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

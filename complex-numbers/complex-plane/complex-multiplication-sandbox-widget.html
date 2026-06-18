@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complex Multiplication Sandbox</title>
+  <style>
+    :root {
+      --text: #fff1d6;
+      --muted: rgba(255, 241, 214, 0.66);
+      --panel: rgba(46, 12, 7, 0.54);
+      --rule: rgba(255, 214, 134, 0.2);
+      --axis: rgba(255, 241, 214, 0.58);
+      --accent: #ffd95f;
+      --blue: #56c7ff;
+      --red: #ff5a4d;
+      --green: #a7d984;
+      --bg1: rgba(67, 18, 8, 0.95);
+      --bg2: rgba(47, 13, 8, 0.98);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Fraunces", Georgia, serif;
+    }
+
+    .widget {
+      width: min(100%, 1020px);
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 217, 95, 0.1), transparent 32%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 18px 46px rgba(0,0,0,0.2);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(310px, 0.8fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .stage,
+    .panel {
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+
+    .stage { min-height: 460px; padding: 0.5rem; }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 440px;
+      overflow: visible;
+    }
+
+    .axis { stroke: var(--axis); stroke-width: 2; stroke-linecap: round; }
+    .tick { stroke: rgba(255, 241, 214, 0.12); stroke-width: 1; }
+    .grid-line { stroke: rgba(255, 241, 214, 0.05); stroke-width: 1; }
+    .z-vector { stroke: var(--blue); stroke-width: 2.2; stroke-linecap: round; }
+    .w-vector { stroke: rgba(167, 217, 132, 0.85); stroke-width: 2.2; stroke-linecap: round; }
+    .product-vector { stroke: var(--accent); stroke-width: 2.8; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(255, 217, 95, 0.35)); }
+    .move-vector { stroke: var(--accent); stroke-width: 2.8; stroke-linecap: round; opacity: 0.95; }
+    .angle-arc { fill: none; stroke: rgba(255, 217, 95, 0.55); stroke-width: 2; }
+    .dot { fill: var(--accent); }
+
+    .label,
+    .value-label {
+      font-family: "JetBrains Mono", Consolas, monospace;
+    }
+
+    .label { fill: var(--muted); font-size: 13px; }
+    .value-label { fill: var(--text); font-size: 15px; font-weight: 500; }
+    #zLabel { fill: var(--blue); }
+    #wLabel { fill: var(--green); }
+    #productLabel { fill: var(--accent); }
+
+    .panel {
+      padding: 1rem;
+      display: grid;
+      align-content: center;
+      gap: 0.78rem;
+    }
+
+    .equation {
+      color: var(--accent);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: clamp(0.95rem, 2.6vw, 1.4rem);
+      line-height: 1.3;
+      min-height: 1.4em;
+    }
+
+    .polar {
+      display: grid;
+      gap: 0.5rem;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.78rem;
+    }
+    .polar .rule {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: baseline;
+      gap: 0.6rem;
+      color: var(--text);
+    }
+    .polar .tag {
+      color: var(--muted);
+      font-size: 0.6rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .polar .hl { color: var(--accent); font-weight: 500; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+    }
+
+    .group {
+      display: grid;
+      gap: 0.5rem;
+      padding: 0.7rem;
+      border: 1px solid rgba(255, 214, 134, 0.14);
+      border-radius: 6px;
+    }
+
+    .group-title {
+      color: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.75rem;
+    }
+
+    label {
+      display: grid;
+      gap: 0.22rem;
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input[type="range"] { accent-color: var(--accent); width: 100%; }
+
+    .presets, .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    button {
+      border: 1px solid rgba(255, 217, 95, 0.45);
+      border-radius: 999px;
+      background: rgba(255, 217, 95, 0.08);
+      color: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.68rem;
+      padding: 0.45rem 0.62rem;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: rgba(255, 217, 95, 0.16);
+      outline: none;
+    }
+
+    .replay { border-color: rgba(86, 199, 255, 0.5); background: rgba(86, 199, 255, 0.1); }
+    .replay:hover { background: rgba(86, 199, 255, 0.2); }
+
+    .legend {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.7rem;
+    }
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 0.8rem;
+      height: 0.16rem;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+      background: var(--accent);
+    }
+    .legend .z::before { background: var(--blue); }
+    .legend .w::before { background: var(--green); }
+
+    @media (max-width: 800px) {
+      .layout,
+      .controls { grid-template-columns: 1fr; }
+      .stage { min-height: 360px; }
+      svg { min-height: 340px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" aria-label="Complex multiplication sandbox">
+    <div class="layout">
+      <section class="stage">
+        <svg viewBox="0 0 600 480" role="img" aria-label="Complex plane showing two factors and their product">
+          <defs>
+            <marker id="arrowYellow" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="9" refX="9" refY="4.5" orient="auto">
+              <path d="M0,0.5 L10,4.5 L0,8.5 Z" fill="#ffd95f" />
+            </marker>
+            <marker id="arrowBlue" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="9" refX="9" refY="4.5" orient="auto">
+              <path d="M0,0.5 L10,4.5 L0,8.5 Z" fill="#56c7ff" />
+            </marker>
+            <marker id="arrowGreen" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="9" refX="9" refY="4.5" orient="auto">
+              <path d="M0,0.5 L10,4.5 L0,8.5 Z" fill="#a7d984" />
+            </marker>
+          </defs>
+          <g id="grid"></g>
+          <line class="axis" x1="60" y1="240" x2="540" y2="240" />
+          <line class="axis" x1="300" y1="450" x2="300" y2="30" />
+          <g id="ticks"></g>
+          <text class="label" x="498" y="260">real</text>
+          <text class="label" x="312" y="44">imaginary</text>
+          <path id="angleArc" class="angle-arc" d="" />
+          <line id="wVector" class="w-vector" x1="300" y1="240" x2="300" y2="240" marker-end="url(#arrowGreen)" />
+          <line id="zVector" class="z-vector" x1="300" y1="240" x2="300" y2="240" marker-end="url(#arrowBlue)" />
+          <line id="moveVector" class="move-vector" x1="300" y1="240" x2="300" y2="240" marker-end="url(#arrowYellow)" />
+          <text id="zLabel" class="value-label" x="300" y="240">z</text>
+          <text id="wLabel" class="value-label" x="300" y="240">w</text>
+          <text id="productLabel" class="value-label" x="300" y="240">zw</text>
+        </svg>
+      </section>
+
+      <aside class="panel">
+        <div id="equation" class="equation"></div>
+        <div id="polar" class="polar"></div>
+        <div class="presets" aria-label="Example complex multiplications">
+          <button type="button" data-values="3,0,2,4">3(2+4i)</button>
+          <button type="button" data-values="1,1,2,3">(1+i)(2+3i)</button>
+          <button type="button" data-values="3,2,0,1">(3+2i)i</button>
+          <button type="button" data-values="2,1,1,-1">(2+i)(1-i)</button>
+        </div>
+        <div class="controls">
+          <div class="group">
+            <div class="group-title">First number z</div>
+            <label>real: <span id="aReadout"></span><input id="aSlider" type="range" min="-2" max="3" step="1" value="1"></label>
+            <label>imag: <span id="bReadout"></span><input id="bSlider" type="range" min="-2" max="3" step="1" value="1"></label>
+          </div>
+          <div class="group">
+            <div class="group-title">Multiplier w</div>
+            <label>real: <span id="cReadout"></span><input id="cSlider" type="range" min="-2" max="3" step="1" value="2"></label>
+            <label>imag: <span id="dReadout"></span><input id="dSlider" type="range" min="-2" max="3" step="1" value="3"></label>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" id="replayBtn" class="replay">&#9654; play multiplication</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const origin = { x: 300, y: 240 };
+    const unit = 14;
+    const el = (id) => document.getElementById(id);
+    const sliders = { a: el('aSlider'), b: el('bSlider'), c: el('cSlider'), d: el('dSlider') };
+    const readouts = { a: el('aReadout'), b: el('bReadout'), c: el('cReadout'), d: el('dReadout') };
+    const equation = el('equation'), polar = el('polar');
+    const zVector = el('zVector'), wVector = el('wVector'), moveVector = el('moveVector');
+    const angleArc = el('angleArc');
+    const zLabel = el('zLabel'), wLabel = el('wLabel'), productLabel = el('productLabel');
+    const ticks = el('ticks'), grid = el('grid'), replayBtn = el('replayBtn');
+
+    for (let i = -14; i <= 14; i += 2) {
+      if (i === 0) continue;
+      const x = origin.x + i * unit;
+      const y = origin.y - i * unit;
+      if (x > 60 && x < 540) {
+        ticks.insertAdjacentHTML('beforeend', `<line class="tick" x1="${x}" y1="236" x2="${x}" y2="244" />`);
+        grid.insertAdjacentHTML('beforeend', `<line class="grid-line" x1="${x}" y1="30" x2="${x}" y2="450" />`);
+      }
+      if (y > 30 && y < 450) {
+        ticks.insertAdjacentHTML('beforeend', `<line class="tick" x1="296" y1="${y}" x2="304" y2="${y}" />`);
+        grid.insertAdjacentHTML('beforeend', `<line class="grid-line" x1="60" y1="${y}" x2="540" y2="${y}" />`);
+      }
+    }
+
+    function P(re, im) { return { x: origin.x + re * unit, y: origin.y - im * unit }; }
+
+    function formatComplex(real, imag) {
+      if (imag === 0) return `${real}`;
+      if (real === 0) {
+        if (imag === 1) return 'i';
+        if (imag === -1) return '-i';
+        return `${imag}i`;
+      }
+      const sign = imag > 0 ? '+' : '-';
+      const abs = Math.abs(imag);
+      return `${real}${sign}${abs === 1 ? 'i' : `${abs}i`}`;
+    }
+
+    function setVec(line, re, im) {
+      const p = P(re, im);
+      line.setAttribute('x2', p.x);
+      line.setAttribute('y2', p.y);
+      return p;
+    }
+    function setLabel(node, text, re, im) {
+      const p = P(re, im);
+      node.textContent = text;
+      node.setAttribute('x', p.x + (re >= 0 ? 9 : -9));
+      node.setAttribute('y', p.y - 8);
+      node.setAttribute('text-anchor', re >= 0 ? 'start' : 'end');
+    }
+
+    let animId = null;
+
+    // Internal state is the source of truth. Manual sliders are capped at -2..2,
+    // but the preset examples use larger values, so we keep them in state and let
+    // the slider thumbs sit at their limit while the readouts show the real numbers.
+    const state = { a: 1, b: 1, c: 2, d: 3 };
+
+    function vals() { return { ...state }; }
+
+    function syncSliders() {
+      Object.entries(sliders).forEach(([key, s]) => { s.value = state[key]; });
+    }
+
+    function drawStatic() {
+      const { a, b, c, d } = vals();
+      const real = a * c - b * d;
+      const imag = a * d + b * c;
+      Object.keys(sliders).forEach((k) => { readouts[k].textContent = vals()[k]; });
+
+      equation.textContent = `(${formatComplex(a, b)})(${formatComplex(c, d)}) = ${formatComplex(real, imag)}`;
+
+      setLabel(zLabel, 'z', a, b);
+      setLabel(wLabel, 'w', c, d);
+      setVec(zVector, a, b);
+      setVec(wVector, c, d);
+      setVec(moveVector, real, imag);
+      setLabel(productLabel, 'zw', real, imag);
+      productLabel.textContent = 'zw';
+      angleArc.setAttribute('d', '');
+
+      const magZ = Math.hypot(a, b), magW = Math.hypot(c, d), magP = Math.hypot(real, imag);
+      const fmt = (x) => (Math.round(x * 100) / 100);
+      const deg = (x) => Math.round(x * 180 / Math.PI);
+      const angZ = deg(Math.atan2(b, a)), angW = deg(Math.atan2(d, c));
+      polar.innerHTML =
+        `<div class="rule"><span class="tag">lengths&nbsp;multiply</span><span>${fmt(magZ)} × ${fmt(magW)} = <span class="hl">${fmt(magP)}</span></span></div>` +
+        `<div class="rule"><span class="tag">angles&nbsp;add</span><span>${angZ}° + ${angW}° = <span class="hl">${angZ + angW}°</span></span></div>`;
+    }
+
+    function animate() {
+      cancelAnimationFrame(animId);
+      const { a, b, c, d } = vals();
+      const real = a * c - b * d, imag = a * d + b * c;
+      drawStatic();
+
+      const magZ = Math.hypot(a, b), magP = Math.hypot(real, imag);
+      const magW = Math.hypot(c, d);
+      if (magZ < 0.001 || magW < 0.001) { drawStatic(); return; }
+
+      const angZ = Math.atan2(b, a);
+      let dAng = Math.atan2(d, c); // angle to rotate by (arg w)
+
+      const dur = 1500;
+      let start = null;
+      function step(ts) {
+        if (start === null) start = ts;
+        const t = Math.min(1, (ts - start) / dur);
+        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const mag = magZ + (magP - magZ) * ease;
+        const ang = angZ + dAng * ease;
+        const re = mag * Math.cos(ang);
+        const im = mag * Math.sin(ang);
+        setVec(moveVector, re, im);
+        productLabel.textContent = t >= 0.999 ? 'zw' : '';
+
+        // sweep arc near the origin showing the angle opening from z's direction by w's angle.
+        // Sampled as a polyline so the sweep direction is always exactly right.
+        const rArc = 42;
+        if (Math.abs(ang - angZ) > 0.01) {
+          const steps = 28;
+          let d = '';
+          for (let i = 0; i <= steps; i++) {
+            const ai = angZ + (ang - angZ) * (i / steps);
+            const x = origin.x + rArc * Math.cos(ai);
+            const y = origin.y - rArc * Math.sin(ai);
+            d += `${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)} `;
+          }
+          angleArc.setAttribute('d', d.trim());
+        } else {
+          angleArc.setAttribute('d', '');
+        }
+
+        if (t < 1) { animId = requestAnimationFrame(step); }
+        else { drawStatic(); }
+      }
+      animId = requestAnimationFrame(step);
+    }
+
+    document.querySelectorAll('[data-values]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const [a, b, c, d] = button.dataset.values.split(',').map(Number);
+        state.a = a; state.b = b; state.c = c; state.d = d;
+        syncSliders();
+        animate();
+      });
+    });
+
+    Object.entries(sliders).forEach(([key, s]) => s.addEventListener('input', () => {
+      state[key] = Number(s.value);
+      cancelAnimationFrame(animId);
+      drawStatic();
+    }));
+    replayBtn.addEventListener('click', animate);
+
+    syncSliders();
+    animate();
+  </script>
+</body>
+</html>
