@@ -6,135 +6,495 @@
   <title>Complex Numbers | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="complex-numbers.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:      #05060c;
+      --text:     #eaf2ff;
+      --muted:    rgba(234, 242, 255, 0.62);
+      --faint:    rgba(234, 242, 255, 0.34);
+      --cyan:     #34f5ff;
+      --magenta:  #ff45e6;
+      --violet:   #9b7bff;
+      --lime:     #b6ff5a;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+
+    body {
+      min-height: 100vh;
+      background: var(--ink);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ---------- fractal background ---------- */
+    #fractal {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      filter: saturate(1.45) contrast(1.04);
+      image-rendering: auto;
+    }
+
+    /* legibility + depth veil over the canvas */
+    .veil {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(135% 105% at 50% 42%, transparent 0%, rgba(5,6,12,0.12) 62%, rgba(5,6,12,0.5) 100%),
+        linear-gradient(180deg, rgba(5,6,12,0.28) 0%, transparent 26%, transparent 64%, rgba(5,6,12,0.42) 100%);
+    }
+
+    /* ---------- hero content ---------- */
+    .wrap {
+      position: relative;
+      z-index: 3;
+      min-height: 100vh;
+    }
+
+    h1.title {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      line-height: 1.0;
+      letter-spacing: 0.01em;
+      margin: 0;
+      position: absolute;
+      top: clamp(1.1rem, 3vw, 2rem);
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      z-index: 4;
+      background: linear-gradient(120deg, var(--cyan), var(--violet) 42%, var(--magenta) 78%, var(--lime));
+      background-size: 280% 280%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 24px rgba(155, 123, 255, 0.45)) drop-shadow(0 0 60px rgba(255, 69, 230, 0.25));
+      animation: hue 14s ease-in-out infinite;
+    }
+    @keyframes hue {
+      0%,100% { background-position: 0% 50%; }
+      50%     { background-position: 100% 50%; }
+    }
+
+    /* ---------- chapter cards ---------- */
+    .rail {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: clamp(166px, 19vw, 234px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: clamp(0.7rem, 1.6vw, 1.1rem);
+      padding: clamp(1rem, 2vw, 1.7rem);
+      z-index: 3;
+    }
+    .rail.left { left: 0; }
+    .rail.right { right: 0; }
+
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      padding: 1.15rem 1.2rem 1.25rem;
+      text-align: left;
+      text-decoration: none;
+      color: var(--text);
+      border-radius: 16px;
+      border: 1px solid rgba(234, 242, 255, 0.14);
+      background: linear-gradient(160deg, rgba(20, 24, 44, 0.55), rgba(8, 10, 22, 0.42));
+      backdrop-filter: blur(9px) saturate(1.1);
+      -webkit-backdrop-filter: blur(9px) saturate(1.1);
+      box-shadow: 0 10px 34px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden;
+      transition: transform 0.28s cubic-bezier(.2,.7,.2,1), border-color 0.28s ease, box-shadow 0.28s ease;
+      --hue: var(--cyan);
+    }
+    /* neon top edge */
+    .card::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 2px;
+      background: var(--hue);
+      opacity: 0.55;
+      box-shadow: 0 0 14px var(--hue);
+      transition: opacity 0.28s ease;
+    }
+    /* glow wash that blooms on hover */
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(80% 60% at 50% -10%, var(--hue), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.32s ease;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-6px);
+      border-color: var(--hue);
+      box-shadow: 0 18px 46px rgba(0,0,0,0.55), 0 0 28px -6px var(--hue);
+      outline: none;
+    }
+    .card:hover::after,
+    .card:focus-visible::after { opacity: 0.16; }
+    .card:hover::before,
+    .card:focus-visible::before { opacity: 1; }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-num {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      color: var(--hue);
+      text-shadow: 0 0 10px var(--hue);
+    }
+    .card-glyph { width: 30px; height: 30px; opacity: 0.85; }
+    .card-glyph .g { fill: none; stroke: var(--hue); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .card-glyph .gd { fill: var(--hue); }
+
+    .card-title {
+      font-family: "Syne", sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+      line-height: 1.08;
+    }
+    .card-sub {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--faint);
+      letter-spacing: 0.04em;
+    }
+
+    .card.c1, .card.c2, .card.c3 { --hue: var(--lime); }
+
+    /* supplements (right rail) */
+    .card.supp { --hue: #ffd45a; }
+    .card.supp .card-title { font-size: clamp(0.98rem, 2vw, 1.12rem); }
+    .card.supp .badge {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--hue);
+      border: 1px solid var(--hue);
+      border-radius: 999px;
+      padding: 0.18rem 0.5rem;
+      opacity: 0.8;
+      white-space: nowrap;
+    }
+
+    footer.tag {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      padding: 0 1rem 2.4rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--faint);
+    }
+    footer.tag b { color: var(--cyan); font-weight: 500; }
+
+    @media (max-width: 820px) {
+      .wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.2rem 1rem 2rem; min-height: auto; }
+      h1.title { position: static; transform: none; margin: 0.4rem 0 0.2rem; }
+      .rail { position: static; width: 100%; max-width: 460px; padding: 0; gap: 0.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      h1.title { animation: none; }
+    }
+  </style>
 </head>
-<body class="complex-numbers-page section-index-page">
-  <header class="article-index-hero article-index-hero-left cn-index-hero">
-    <h1>Complex Numbers</h1>
-    <div class="article-index-rule" aria-hidden="true"></div>
-    <figure class="cn-hero-motif" aria-hidden="true">
-      <svg viewBox="0 0 900 215" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-        <!-- static chart: the powers of a single number z, spiralling inward -->
-        <line class="cn-chart-axis" x1="40" y1="96" x2="860" y2="96" />
-        <line class="cn-chart-axis" x1="450" y1="6" x2="450" y2="186" />
-        <line class="cn-chart-tick" x1="536" y1="92" x2="536" y2="100" />
-        <line class="cn-chart-tick" x1="364" y1="92" x2="364" y2="100" />
-        <circle class="cn-chart-circle" cx="450" cy="96" r="86" />
+<body>
+  <canvas id="fractal" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
 
-        <polyline class="cn-chart-trail" points="523.0,63.4 499.6,40.6 471.2,30.1 443.0,32.1 419.8,44.4 404.8,63.6 399.3,85.6 403.0,106.4 414.1,122.7 429.6,132.3 446.4,134.5 461.6,130.1 472.8,120.6 478.6,108.2 479.0,95.5 474.4,84.6 466.4,77.1 456.7,73.7 447.3,74.5 439.5,78.8 434.6,85.3" />
+  <main class="wrap">
+    <h1 class="title">Complex Numbers</h1>
 
-        <circle class="cn-chart-dot-z" cx="523.0" cy="63.4" r="4.6" />
-        <circle class="cn-chart-dot" cx="499.6" cy="40.6" r="3.6" opacity="0.95" />
-        <circle class="cn-chart-dot" cx="471.2" cy="30.1" r="3.3" opacity="0.85" />
-        <circle class="cn-chart-dot" cx="443.0" cy="32.1" r="3.0" opacity="0.75" />
-        <circle class="cn-chart-dot" cx="419.8" cy="44.4" r="2.8" opacity="0.66" />
-        <circle class="cn-chart-dot" cx="404.8" cy="63.6" r="2.6" opacity="0.58" />
-        <circle class="cn-chart-dot" cx="399.3" cy="85.6" r="2.4" opacity="0.51" />
-        <circle class="cn-chart-dot" cx="403.0" cy="106.4" r="2.2" opacity="0.45" />
-        <circle class="cn-chart-dot" cx="414.1" cy="122.7" r="2.1" opacity="0.4" />
-        <circle class="cn-chart-dot" cx="429.6" cy="132.3" r="2.0" opacity="0.36" />
-        <circle class="cn-chart-dot" cx="446.4" cy="134.5" r="1.9" opacity="0.32" />
-        <circle class="cn-chart-dot" cx="461.6" cy="130.1" r="1.8" opacity="0.29" />
-        <circle class="cn-chart-dot" cx="472.8" cy="120.6" r="1.7" opacity="0.26" />
-        <circle class="cn-chart-dot" cx="478.6" cy="108.2" r="1.6" opacity="0.24" />
-        <circle class="cn-chart-dot" cx="479.0" cy="95.5" r="1.5" opacity="0.22" />
-        <circle class="cn-chart-dot" cx="474.4" cy="84.6" r="1.4" opacity="0.2" />
-        <circle class="cn-chart-dot" cx="466.4" cy="77.1" r="1.3" opacity="0.18" />
-        <circle class="cn-chart-dot" cx="456.7" cy="73.7" r="1.2" opacity="0.16" />
-        <circle class="cn-chart-dot" cx="447.3" cy="74.5" r="1.1" opacity="0.14" />
-        <circle class="cn-chart-dot" cx="439.5" cy="78.8" r="1.0" opacity="0.12" />
-        <circle class="cn-chart-dot" cx="434.6" cy="85.3" r="1.0" opacity="0.1" />
-
-        <text class="cn-chart-label" x="534" y="60">z</text>
-        <text class="cn-chart-label" x="508" y="34">z²</text>
-        <text class="cn-chart-label" x="474" y="20">z³</text>
-
-        <text class="cn-chart-caption" x="40" y="208">z, z², z³, … — repeated multiplication, plotted</text>
-      </svg>
-    </figure>
-  </header>
-
-  <main class="article-index-main" aria-label="Complex Numbers chapters">
-    <section class="article-card-grid chapter-card-grid cn-chapter-grid">
-      <a class="article-card chapter-card cn-chapter-card" href="complex-numbers-chapter-1.html" style="--card-delay: 45ms">
-        <span class="cn-card-head">
-          <span class="cn-card-number">Chapter 01</span>
-          <span class="cn-card-glyph" aria-hidden="true">
-            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-              <path class="g-stroke" d="M6 20 H34" />
-              <path class="g-stroke" d="M20 34 V6" />
-              <path class="g-stroke" d="M20 20 L31 11" />
-              <path class="g-stroke" d="M26 20 A6 6 0 0 0 24 15" />
-              <circle class="g-dot" cx="31" cy="11" r="2.4" />
-            </svg>
-          </span>
+    <nav class="rail left" aria-label="Complex Numbers chapters">
+      <a class="card c1" href="complex-numbers-chapter-1.html">
+        <span class="card-top">
+          <span class="card-num">01</span>
+          <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
+            <path class="g" d="M6 20H34M20 34V6"/>
+            <path class="g" d="M20 20L30 11"/>
+            <circle class="gd" cx="30" cy="11" r="2.6"/>
+          </svg>
         </span>
-        <span class="article-card-title">Complex Numbers</span>
+        <span class="card-title">Complex Numbers</span>
+        <span class="card-sub">a + bi</span>
       </a>
 
-      <a class="article-card chapter-card cn-chapter-card" href="complex-numbers-chapter-2.html" style="--card-delay: 90ms">
-        <span class="cn-card-head">
-          <span class="cn-card-number">Chapter 02</span>
-          <span class="cn-card-glyph" aria-hidden="true">
-            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-              <circle class="g-stroke" cx="20" cy="20" r="13" />
-              <path class="g-stroke" d="M20 20 L31 13" />
-              <path class="g-stroke" d="M25 20 A5 5 0 0 0 23 16" />
-              <circle class="g-dot" cx="31" cy="13" r="2.4" />
-            </svg>
-          </span>
+      <a class="card c2" href="complex-numbers-chapter-2.html">
+        <span class="card-top">
+          <span class="card-num">02</span>
+          <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
+            <circle class="g" cx="20" cy="20" r="13"/>
+            <path class="g" d="M20 20L31 13"/>
+            <circle class="gd" cx="31" cy="13" r="2.6"/>
+          </svg>
         </span>
-        <span class="article-card-title">Polar Form</span>
+        <span class="card-title">Polar Form</span>
+        <span class="card-sub">r · e^(iθ)</span>
       </a>
 
-      <a class="article-card chapter-card cn-chapter-card" href="complex-numbers-chapter-3.html" style="--card-delay: 135ms">
-        <span class="cn-card-head">
-          <span class="cn-card-number">Chapter 03</span>
-          <span class="cn-card-glyph" aria-hidden="true">
-            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-              <path class="g-stroke" d="M6 20 H34" />
-              <path class="g-stroke" d="M20 34 V6" />
-              <circle class="g-dot" cx="27" cy="13" r="2.4" />
-            </svg>
-          </span>
+      <a class="card c3" href="complex-numbers-chapter-3.html">
+        <span class="card-top">
+          <span class="card-num">03</span>
+          <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
+            <path class="g" d="M7 20H33M20 33V7"/>
+            <circle class="gd" cx="27" cy="13" r="2.6"/>
+            <path class="g" d="M27 13V20M27 13H20" opacity="0.6"/>
+          </svg>
         </span>
-        <span class="article-card-title">The Cartesian Plane</span>
+        <span class="card-title">The Cartesian Plane</span>
+        <span class="card-sub">(x, y) ↔ x + iy</span>
       </a>
+    </nav>
 
-      <a class="article-card chapter-card cn-chapter-card" href="complex-numbers-imaginary-unit.html" style="--card-delay: 180ms">
-        <span class="cn-card-head">
-          <span class="cn-card-number">Supplement</span>
-          <span class="cn-card-glyph" aria-hidden="true">
-            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-              <path class="g-stroke" d="M8 20 H32" />
-              <path class="g-stroke" d="M20 8 V32" />
-              <path class="g-stroke" d="M20 20 L20 8" />
-              <circle class="g-dot" cx="20" cy="8" r="2.4" />
-            </svg>
-          </span>
-        </span>
-        <span class="article-card-title">The Imaginary Unit</span>
-      </a>
-
-      <a class="article-card chapter-card cn-chapter-card" href="complex-numbers-complex-plane.html" style="--card-delay: 225ms">
-        <span class="cn-card-head">
-          <span class="cn-card-number">Supplement</span>
-          <span class="cn-card-glyph" aria-hidden="true">
-            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-              <path class="g-stroke" d="M7 20 H33" />
-              <path class="g-stroke" d="M20 33 V7" />
-              <path class="g-stroke" d="M20 20 L20 8" />
-              <path class="g-stroke" d="M27 20 A7 7 0 0 0 20 13" />
-              <circle class="g-dot" cx="20" cy="8" r="2.4" />
-            </svg>
-          </span>
-        </span>
-        <span class="article-card-title">The Complex Plane</span>
-      </a>
-
-    </section>
+    <nav class="rail right" aria-label="Complex Numbers supplements">
+        <a class="card supp s1" href="complex-numbers-imaginary-unit.html">
+          <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
+            <path class="g" d="M8 20H32M20 8V32"/>
+            <path class="g" d="M20 20V8"/>
+            <circle class="gd" cx="20" cy="8" r="2.6"/>
+          </svg>
+          <span class="card-title">The Imaginary Unit</span>
+          <span class="badge">supplement</span>
+        </a>
+        <a class="card supp s2" href="complex-numbers-complex-plane.html">
+          <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
+            <path class="g" d="M7 20H33M20 33V7"/>
+            <path class="g" d="M27 20A7 7 0 0 0 20 13"/>
+            <circle class="gd" cx="20" cy="8" r="2.6"/>
+          </svg>
+          <span class="card-title">The Complex Plane</span>
+          <span class="badge">supplement</span>
+        </a>
+    </nav>
   </main>
+
+  <footer class="tag">behind everything: the roots of <b>x² + bx + c = 0</b> — when no real solution exists, they lift off the line as a complex conjugate pair</footer>
+
+  <script>
+    (function () {
+      // ---- Finding the roots of a quadratic, by reflect-and-rotate ----
+      // One hero quadratic x² + c slowly raises and lowers. When it floats clear
+      // of the real axis (no real roots) we REFLECT it about its vertex so it dips
+      // through the axis at ±√c, then ROTATE those two crossings 90° about the
+      // origin — they swing up and down onto the imaginary axis, landing exactly on
+      // the complex conjugate roots ±i√c.
+      const canvas = document.getElementById('fractal');
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const CYAN = { r: 52, g: 245, b: 255 };
+      const rgba = (c, a) => `rgba(${c.r|0},${c.g|0},${c.b|0},${a})`;
+
+      let W = 0, H = 0, cx = 0, cy = 0, unit = 80, hunit = 100, bg = null;
+      function resize() {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        W = window.innerWidth; H = window.innerHeight;
+        canvas.width = Math.floor(W * dpr);
+        canvas.height = Math.floor(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        cx = W / 2; cy = H * 0.46;       // real axis sits in the open central band
+        unit = Math.min(W, H) / 9;
+        hunit = Math.min(W, H) / 7;      // hero quadratic gets a larger scale
+        bg = ctx.createLinearGradient(0, 0, 0, H);
+        bg.addColorStop(0, '#080a18');
+        bg.addColorStop(1, '#040510');
+      }
+      resize();
+      let rt;
+      window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 150); });
+
+      const HERO_SPEED = 0.5, HERO_AMP = 3.0;
+      let heroPrevC = 0;
+      const flashes = [];
+
+      function drawGlow(x, y, color, radius, peak) {
+        const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        g.addColorStop(0, rgba(color, peak));
+        g.addColorStop(0.35, rgba(color, peak * 0.45));
+        g.addColorStop(1, rgba(color, 0));
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawAxesAndGrid() {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(120,150,220,0.05)';
+        for (let gx = cx % unit; gx < W; gx += unit) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+        for (let gy = cy % unit; gy < H; gy += unit) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+        // imaginary axis
+        ctx.strokeStyle = 'rgba(155,123,255,0.28)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+        // real axis (bright)
+        const ay = cy;
+        const lg = ctx.createLinearGradient(0, ay, W, ay);
+        lg.addColorStop(0, 'rgba(52,245,255,0)');
+        lg.addColorStop(0.5, 'rgba(52,245,255,0.72)');
+        lg.addColorStop(1, 'rgba(52,245,255,0)');
+        ctx.strokeStyle = lg;
+        ctx.lineWidth = 2.6;
+        ctx.shadowColor = 'rgba(52,245,255,0.7)';
+        ctx.shadowBlur = 16;
+        ctx.beginPath(); ctx.moveTo(0, ay); ctx.lineTo(W, ay); ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // a parabola y = a(x-vx)^2 + vy plotted at scale `u`
+      function parabola(a, vx, vy, u, color, alpha, width, dashed) {
+        ctx.strokeStyle = rgba(color, alpha);
+        ctx.lineWidth = width;
+        ctx.setLineDash(dashed ? [6, 6] : []);
+        ctx.beginPath();
+        let started = false;
+        for (let x = vx - 3.4; x <= vx + 3.4; x += 0.12) {
+          const y = a * (x - vx) * (x - vx) + vy;
+          const px = cx + x * u, py = cy - y * u;
+          if (py < -60 || py > H + 60) { started = false; continue; }
+          if (!started) { ctx.moveTo(px, py); started = true; } else { ctx.lineTo(px, py); }
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      function drawHero(time) {
+        const c = HERO_AMP * Math.sin(time * HERO_SPEED);   // b = 0, vertex at (0, c)
+        const D = -4 * c;
+        const u = hunit;
+
+        // burst at the moment real <-> complex
+        if ((heroPrevC > 0) !== (c > 0)) flashes.push({ x: cx, y: cy, age: 0, color: CYAN });
+        heroPrevC = c;
+
+        if (D >= 0) {
+          // the quadratic only shows while it actually crosses the real axis
+          parabola(1, 0, c, u, CYAN, 0.55, 2.4, false);
+          // two real roots, on the axis where the parabola crosses
+          const s = Math.sqrt(-c);
+          for (const xr of [-s, s]) {
+            const px = cx + xr * u, py = cy;
+            drawGlow(px, py, CYAN, 18, 0.95);
+            ctx.fillStyle = rgba(CYAN, 0.98);
+            ctx.beginPath(); ctx.arc(px, py, 2.4, 0, 6.2832); ctx.fill();
+          }
+          ctx.font = '500 13px "JetBrains Mono", monospace';
+          ctx.fillStyle = rgba(CYAN, 0.85);
+          ctx.fillText(`x = ±${s.toFixed(2)}`, cx + s * u + 12, cy - 12);
+        } else {
+          const s = Math.sqrt(c);  // = √(-D)/2 since b=0
+
+          // 1) reflected parabola (opens down about the vertex) — dips through the axis
+          parabola(-1, 0, c, u, CYAN, 0.3, 1.6, true);
+
+          // 2) its real crossings R± = (±s, 0)
+          for (const xr of [-s, s]) {
+            const px = cx + xr * u, py = cy;
+            ctx.fillStyle = rgba(CYAN, 0.4);
+            ctx.beginPath(); ctx.arc(px, py, 2.2, 0, 6.2832); ctx.fill();
+          }
+
+          // 3) rotate those crossings 90° about the origin -> quarter-circle arcs
+          const R = s * u;
+          ctx.strokeStyle = rgba(CYAN, 0.5);
+          ctx.lineWidth = 1.4;
+          // upper arc: (s,0) -> (0, s)
+          ctx.beginPath();
+          for (let a = 0; a <= Math.PI / 2 + 0.001; a += 0.08) ctx.lineTo(cx + R * Math.cos(a), cy - R * Math.sin(a));
+          ctx.stroke();
+          // lower arc: (-s,0) -> (0, -s)
+          ctx.beginPath();
+          for (let a = Math.PI; a <= 1.5 * Math.PI + 0.001; a += 0.08) ctx.lineTo(cx + R * Math.cos(a), cy - R * Math.sin(a));
+          ctx.stroke();
+
+          // faint spokes from the origin to each complex root
+          ctx.strokeStyle = rgba(CYAN, 0.22);
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - R); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy + R); ctx.stroke();
+
+          // 4) the complex conjugate roots, landed on the imaginary axis
+          const top = { x: cx, y: cy - R }, bot = { x: cx, y: cy + R };
+          for (const p of [top, bot]) {
+            drawGlow(p.x, p.y, CYAN, 20, 1.0);
+            ctx.fillStyle = rgba(CYAN, 1);
+            ctx.beginPath(); ctx.arc(p.x, p.y, 2.6, 0, 6.2832); ctx.fill();
+          }
+          ctx.font = '500 13px "JetBrains Mono", monospace';
+          ctx.fillStyle = rgba(CYAN, 0.92);
+          ctx.fillText(`+${s.toFixed(2)} i`, top.x + 12, top.y - 8);
+          ctx.fillText(`−${s.toFixed(2)} i`, bot.x + 12, bot.y + 16);
+        }
+      }
+
+      function frame(time) {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+        drawAxesAndGrid();
+
+        ctx.globalCompositeOperation = 'lighter';
+        drawHero(time);
+
+        // expanding bursts at each real<->complex transition
+        for (let i = flashes.length - 1; i >= 0; i--) {
+          const f = flashes[i];
+          f.age += 0.03;
+          if (f.age >= 1) { flashes.splice(i, 1); continue; }
+          ctx.strokeStyle = rgba(f.color, (1 - f.age) * 0.5);
+          ctx.lineWidth = 2 * (1 - f.age);
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.age * 52, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      if (reduce) { frame((Math.PI / 2) / HERO_SPEED); return; }   // a frame in the complex state
+
+      let running = true, last = 0, t = 0;
+      document.addEventListener('visibilitychange', () => {
+        running = !document.hidden;
+        if (running) requestAnimationFrame(loop);
+      });
+
+      function loop(ts) {
+        if (!running) return;
+        requestAnimationFrame(loop);
+        const dt = Math.min(0.05, (ts - last) / 1000) || 0.016;
+        last = ts;
+        t += dt;
+        frame(t);
+      }
+      requestAnimationFrame(loop);
+    })();
+  </script>
 </body>
 </html>

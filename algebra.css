@@ -212,6 +212,95 @@
 
 /* ——— Chapter pages ——— */
 
+/* Matte black experiment for the Algebra landing page only. */
+
+.algebra-index-page {
+  background:
+    radial-gradient(ellipse at 50% 24%, rgba(255, 255, 255, 0.055), transparent 42%),
+    linear-gradient(180deg, #070707 0%, #000 100%);
+  color: #f6f3eb;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.algebra-index-page .alg-vignette {
+  background:
+    radial-gradient(ellipse at 50% 32%, transparent 46%, rgba(0, 0, 0, 0.68) 118%);
+}
+
+.algebra-index-page .alg-grain {
+  opacity: 0.18;
+  filter: none;
+  background-image:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.12) 0 0.7px, transparent 0.8px);
+  background-size: 7px 7px;
+}
+
+.algebra-index-page .alg-imprint {
+  font-family: Arial, Helvetica, sans-serif;
+  color: rgba(246, 243, 235, 0.62);
+}
+
+.algebra-index-page h1 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: none;
+}
+
+.algebra-index-page .alg-subtitle {
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: normal;
+  color: rgba(246, 243, 235, 0.72);
+}
+
+.algebra-index-page .alg-double-rule {
+  border-top-color: rgba(246, 243, 235, 0.58);
+}
+
+.algebra-index-page .alg-double-rule::after {
+  border-top-color: rgba(246, 243, 235, 0.3);
+}
+
+.algebra-index-page .alg-fleuron,
+.algebra-index-page .alg-plate-fleuron {
+  color: rgba(246, 243, 235, 0.7);
+}
+
+.algebra-index-page .ink-stroke {
+  stroke: rgba(246, 243, 235, 0.9);
+}
+
+.algebra-index-page .ink-rubric {
+  stroke: rgba(246, 243, 235, 0.62);
+}
+
+.algebra-index-page .alg-plate-card {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(246, 243, 235, 0.42);
+  outline-color: rgba(246, 243, 235, 0.18);
+  color: #f6f3eb;
+  box-shadow: none;
+}
+
+.algebra-index-page .alg-plate-card:hover,
+.algebra-index-page .alg-plate-card:focus-visible {
+  outline-color: rgba(246, 243, 235, 0.5);
+  box-shadow: none;
+}
+
+.algebra-index-page .alg-plate-number,
+.algebra-index-page .alg-plate-summary {
+  font-family: Arial, Helvetica, sans-serif;
+  color: rgba(246, 243, 235, 0.64);
+}
+
+.algebra-index-page .alg-plate-title {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  color: #fff;
+}
+
 .algebra-chapter {
   position: relative;
 }
