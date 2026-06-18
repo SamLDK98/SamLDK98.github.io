@@ -9,6 +9,83 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="complex-numbers.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ---- Imaginary Unit: dark / neon retheme (page-scoped) ---- */
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page {
+      --intro-bg: #06070e;
+      --intro-panel: #0c1020;
+      --intro-card: #10142200;
+      --intro-rule: rgba(234, 242, 255, 0.12);
+      --intro-rule-strong: rgba(234, 242, 255, 0.26);
+      --intro-text: #eaf2ff;
+      --intro-dim: rgba(234, 242, 255, 0.62);
+      --intro-faint: rgba(234, 242, 255, 0.4);
+      --intro-accent: #b6ff5a;   /* green */
+      --intro-ihat: #ffd45a;     /* orange */
+      --intro-jhat: #b6ff5a;
+      --cn-green: #b6ff5a;
+      --cn-orange: #ffd45a;
+      background:
+        radial-gradient(120% 90% at 18% 0%, rgba(182, 255, 90, 0.07), transparent 55%),
+        radial-gradient(120% 90% at 85% 100%, rgba(255, 212, 90, 0.06), transparent 55%),
+        linear-gradient(160deg, #0a0c16, #06070e 60%, #050609);
+      color: var(--intro-text);
+    }
+
+    body.complex-numbers-imaginary-unit-page header {
+      border-bottom-color: var(--intro-rule);
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .chapter-kicker {
+      color: var(--cn-orange);
+    }
+
+    /* gradient title, echoing the landing page */
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .essay-title {
+      color: var(--cn-green);
+      background: linear-gradient(110deg, var(--cn-green) 8%, #d8ff8c 40%, var(--cn-orange) 92%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .subsection-title {
+      color: var(--cn-green);
+    }
+
+    /* emphasis + definitions in warm orange so it's not all green */
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section em {
+      color: var(--cn-orange);
+      font-style: italic;
+    }
+
+    body.complex-numbers-imaginary-unit-page .section-divider {
+      background: linear-gradient(90deg, transparent, var(--intro-rule-strong), transparent);
+      border: 0;
+    }
+
+    /* chapter nav, re-inked green/orange */
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link {
+      border-color: var(--intro-rule);
+      color: var(--intro-text);
+    }
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link span {
+      color: var(--intro-faint);
+    }
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:hover,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:focus-visible,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:active {
+      border-color: var(--cn-green);
+      color: var(--cn-green);
+      box-shadow: 0 0 22px -8px var(--cn-green);
+    }
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:hover span,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:focus-visible span,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:active span {
+      color: var(--cn-orange);
+    }
+  </style>
   <script>
     window.MathJax = {
       tex: {
@@ -78,6 +155,15 @@
         <p>$$4 \div 8 = \frac{1}{2}$$</p>
 
         <p>While it was not yet known, the same fate would follow with $\sqrt{-9} = \ ?$.</p>
+
+        <iframe
+          class="essay-widget"
+          src="complex-numbers/imaginary-unit/number-system-extension-widget.html"
+          title="Interactive: extending the number system, step by step"
+          style="height: 560px;"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
 
         <p>At first, a new number was created, defined by a single property: this is the number that, when multiplied by itself, gives -1.</p>
 
@@ -195,7 +281,7 @@ $$</p>
           <li>An imaginary part ($bi$)</li>
         </ul>
 
-        <p>Now, if this seems awkward to you, the idea of a single number having independent "parts", you would be in the company of many of the leading mathematicians of the seventeenth and eighteenth centuries.</p>
+        <p>Now, if this seems awkward to you&mdash;the idea of a single number having independent "parts"&mdash;you would be in the company of many of the leading mathematicians of the seventeenth and eighteenth centuries.</p>
 
         <p>However, we will soon see how a two-dimensional number system actually makes a great deal of sense.</p>
 
