@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Special Real Powers</title>
+  <style>
+    :root {
+      --text: #f4f6ff;
+      --muted: rgba(244, 246, 255, 0.68);
+      --gold: #e0be68;
+      --green: #b6ff5a;
+      --axis: rgba(244, 246, 255, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+    }
+
+    .widget {
+      width: min(760px, calc(100vw - 20px));
+      border: 1px solid rgba(224, 190, 104, 0.24);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(11, 13, 8, 0.94), rgba(0, 0, 0, 0.94));
+      padding: 22px;
+    }
+
+    .readout {
+      color: var(--gold);
+      font-size: clamp(1.45rem, 4vw, 2.4rem);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(182, 255, 90, 0.55);
+      border-radius: 999px;
+      background: rgba(182, 255, 90, 0.08);
+      color: var(--text);
+      padding: 0.65rem 1rem;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button.active, button:hover { border-color: var(--green); color: var(--green); }
+
+    svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .axis { stroke: var(--axis); stroke-width: 2; }
+    .tick { stroke: rgba(244, 246, 255, 0.35); stroke-width: 1.6; }
+    .label { fill: var(--muted); font-size: 14px; }
+    .point { fill: var(--green); filter: drop-shadow(0 0 8px rgba(182, 255, 90, 0.72)); transition: cx 420ms ease; }
+    .path { stroke: rgba(224, 190, 104, 0.72); stroke-width: 3; fill: none; stroke-linecap: round; stroke-dasharray: 6 8; }
+  </style>
+</head>
+<body>
+  <main class="widget">
+    <div class="readout" id="readout">(-1)<sup>1</sup> = -1</div>
+    <div class="controls">
+      <button id="one" type="button">1<sup>n</sup></button>
+      <button id="neg" class="active" type="button">(-1)<sup>n</sup></button>
+      <button id="next" type="button">Next power</button>
+    </div>
+    <svg viewBox="0 0 720 210" role="img" aria-label="One stays fixed while negative one cycles between negative and positive one">
+      <line class="axis" x1="120" y1="110" x2="600" y2="110" />
+      <line class="tick" x1="210" y1="94" x2="210" y2="126" />
+      <line class="tick" x1="360" y1="94" x2="360" y2="126" />
+      <line class="tick" x1="510" y1="94" x2="510" y2="126" />
+      <text class="label" x="210" y="154" text-anchor="middle">-1</text>
+      <text class="label" x="360" y="154" text-anchor="middle">0</text>
+      <text class="label" x="510" y="154" text-anchor="middle">1</text>
+      <path id="path" class="path" d="M210 70 C285 35 435 35 510 70" />
+      <circle id="point" class="point" cx="210" cy="110" r="10" />
+    </svg>
+  </main>
+  <script>
+    const readout = document.getElementById('readout');
+    const point = document.getElementById('point');
+    const path = document.getElementById('path');
+    const one = document.getElementById('one');
+    const neg = document.getElementById('neg');
+    const next = document.getElementById('next');
+    let mode = 'neg';
+    let n = 1;
+
+    function render() {
+      const value = mode === 'one' ? 1 : (n % 2 === 0 ? 1 : -1);
+      point.setAttribute('cx', value === 1 ? 510 : 210);
+      path.style.opacity = mode === 'one' ? '0.15' : '1';
+      readout.innerHTML = mode === 'one'
+        ? `1<sup>${n}</sup> = 1`
+        : `(-1)<sup>${n}</sup> = ${value}`;
+      one.classList.toggle('active', mode === 'one');
+      neg.classList.toggle('active', mode === 'neg');
+    }
+
+    one.addEventListener('click', () => { mode = 'one'; n = 1; render(); });
+    neg.addEventListener('click', () => { mode = 'neg'; n = 1; render(); });
+    next.addEventListener('click', () => { n = n >= 8 ? 1 : n + 1; render(); });
+    render();
+  </script>
+</body>
+</html>

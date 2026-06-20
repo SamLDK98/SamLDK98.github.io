@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real Powers</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #0b0d08;
+      --text: #f4f6ff;
+      --muted: rgba(244, 246, 255, 0.66);
+      --gold: #e0be68;
+      --green: #b6ff5a;
+      --line: rgba(244, 246, 255, 0.36);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+    }
+
+    .widget {
+      width: min(760px, calc(100vw - 20px));
+      border: 1px solid rgba(224, 190, 104, 0.24);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(11, 13, 8, 0.94), rgba(0, 0, 0, 0.94));
+      padding: 22px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .formula {
+      color: var(--gold);
+      font-size: clamp(1.6rem, 5vw, 2.8rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(182, 255, 90, 0.55);
+      border-radius: 999px;
+      background: rgba(182, 255, 90, 0.08);
+      color: var(--text);
+      padding: 0.7rem 1.1rem;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: var(--green); color: var(--green); }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .axis { stroke: var(--line); stroke-width: 2; }
+    .tick { stroke: rgba(244, 246, 255, 0.24); stroke-width: 1.5; }
+    .label { fill: var(--muted); font-size: 12px; }
+    .bar { fill: rgba(182, 255, 90, 0.16); stroke: var(--green); stroke-width: 2; }
+    .bar.alt { fill: rgba(224, 190, 104, 0.18); stroke: var(--gold); }
+    .value { fill: var(--text); font-size: 14px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main class="widget">
+    <div class="top">
+      <div class="formula" id="formula">2<sup>1</sup> = 2</div>
+      <button id="next" type="button">Next power</button>
+    </div>
+    <svg viewBox="0 0 720 250" role="img" aria-label="Successive powers of real numbers growing or shrinking">
+      <line class="axis" x1="70" y1="190" x2="660" y2="190" />
+      <g id="ticks"></g>
+      <rect id="growBar" class="bar" x="92" y="150" width="60" height="40" rx="6" />
+      <rect id="shrinkBar" class="bar alt" x="92" y="90" width="120" height="40" rx="6" />
+      <text id="growText" class="value" x="122" y="176" text-anchor="middle">2</text>
+      <text id="shrinkText" class="value" x="152" y="116" text-anchor="middle">1/2</text>
+      <text class="label" x="70" y="222">growth: 2, 4, 8, 16...</text>
+      <text class="label" x="420" y="222">shrinkage: 1/2, 1/4, 1/8...</text>
+    </svg>
+  </main>
+  <script>
+    const formula = document.getElementById('formula');
+    const next = document.getElementById('next');
+    const growBar = document.getElementById('growBar');
+    const shrinkBar = document.getElementById('shrinkBar');
+    const growText = document.getElementById('growText');
+    const shrinkText = document.getElementById('shrinkText');
+    const ticks = document.getElementById('ticks');
+    let n = 1;
+
+    for (let i = 0; i <= 8; i++) {
+      const x = 92 + i * 60;
+      ticks.insertAdjacentHTML('beforeend', `<line class="tick" x1="${x}" y1="184" x2="${x}" y2="196" />`);
+      ticks.insertAdjacentHTML('beforeend', `<text class="label" x="${x}" y="212" text-anchor="middle">${i}</text>`);
+    }
+
+    function render() {
+      const grow = Math.pow(2, n);
+      const shrinkDenom = Math.pow(2, n);
+      const growWidth = Math.min(500, 30 * grow);
+      const shrinkWidth = Math.max(8, 240 / shrinkDenom);
+      growBar.setAttribute('width', growWidth);
+      shrinkBar.setAttribute('width', shrinkWidth);
+      growText.setAttribute('x', 92 + growWidth / 2);
+      shrinkText.setAttribute('x', 92 + shrinkWidth / 2);
+      growText.textContent = grow;
+      shrinkText.textContent = `1/${shrinkDenom}`;
+      formula.innerHTML = `2<sup>${n}</sup> = ${grow}`;
+    }
+
+    next.addEventListener('click', () => {
+      n = n >= 8 ? 1 : n + 1;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -3,12 +3,178 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Complex Numbers | Chapter 1</title>
+  <title>The Imaginary Unit | Complex Numbers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="complex-numbers.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ---- Imaginary Unit: dark / neon retheme (page-scoped) ---- */
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page {
+      --intro-bg: #000000;
+      --intro-panel: #050505;
+      --intro-card: #10142200;
+      --intro-rule: rgba(224, 190, 104, 0.35);
+      --intro-rule-strong: rgba(224, 190, 104, 0.62);
+      --intro-text: #f4f6ff;
+      --intro-dim: rgba(244, 246, 255, 0.72);
+      --intro-faint: rgba(224, 190, 104, 0.54);
+      --intro-accent: #b6ff5a;   /* green */
+      --intro-ihat: #e0be68;     /* gold */
+      --intro-jhat: #b6ff5a;
+      --cn-green: #b6ff5a;
+      --cn-orange: #e0be68;
+      background: #000000;
+      color: var(--intro-text);
+    }
+
+    body.complex-numbers-imaginary-unit-page header {
+      border-bottom-color: transparent;
+    }
+
+    body.complex-numbers-imaginary-unit-page .header-inner {
+      max-width: var(--col-width);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 0;
+      padding-right: 0;
+      text-align: left;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .chapter-kicker {
+      color: var(--cn-green);
+      opacity: 0.85;
+    }
+
+    /* gradient title, echoing the landing page */
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .essay-title {
+      color: var(--cn-orange);
+      background: none;
+      -webkit-text-fill-color: currentColor;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: clamp(1.85rem, 4.3vw, 3.2rem);
+      font-weight: 600;
+      line-height: 1.12;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      text-align: left;
+      margin-bottom: 0;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .subsection-title {
+      color: var(--cn-orange);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: clamp(1rem, 1.6vw, 1.25rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      position: relative;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.65rem;
+      text-align: left;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .subsection-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: min(16rem, 70vw);
+      height: 3px;
+      background: linear-gradient(90deg, rgba(182, 255, 90, 0.85), rgba(182, 255, 90, 0.42), transparent);
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section p,
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section li {
+      color: var(--intro-text);
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section a {
+      color: var(--cn-green);
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .notation-details {
+      max-width: 860px;
+      margin: 0.9rem auto 1.25rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .notation-details summary {
+      width: fit-content;
+      max-width: 100%;
+      color: var(--intro-text);
+      font-family: inherit;
+      font-size: clamp(1.03rem, 1.25vw, 1.18rem);
+      line-height: 1.72;
+      list-style-position: outside;
+      text-decoration: underline;
+      text-decoration-color: rgba(182, 255, 90, 0.58);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .notation-details summary::marker {
+      color: var(--cn-green);
+      font-size: 0.78em;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .notation-details[open] {
+      margin-bottom: 1.6rem;
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .notation-details[open] summary {
+      margin-bottom: 0.8rem;
+      color: var(--cn-green);
+    }
+
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .notation-details > :not(summary) {
+      margin-left: 1.35rem;
+    }
+
+    /* emphasis + definitions in warm orange so it's not all green */
+    body.complex-numbers-imaginary-unit-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section em {
+      color: var(--cn-orange);
+      font-style: italic;
+    }
+
+    body.complex-numbers-imaginary-unit-page .section-divider {
+      background: linear-gradient(90deg, transparent, rgba(224, 190, 104, 0.58), rgba(182, 255, 90, 0.62), rgba(224, 190, 104, 0.58), transparent);
+      border: 0;
+    }
+
+    /* chapter nav, re-inked green/orange */
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link {
+      border-color: var(--intro-rule);
+      color: var(--intro-text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link span {
+      color: var(--intro-faint);
+    }
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:hover,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:focus-visible,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:active {
+      border-color: var(--cn-green);
+      color: var(--cn-green);
+      box-shadow: 0 0 22px -8px var(--cn-green);
+    }
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:hover span,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:focus-visible span,
+    body.complex-numbers-imaginary-unit-page .chapter-nav-link:active span {
+      color: var(--cn-orange);
+    }
+
+    body.complex-numbers-imaginary-unit-page .number-systems-diagram {
+      width: min(100%, 720px);
+      margin: 1.8rem 0 2.1rem;
+      display: block;
+      border-radius: 14px;
+    }
+  </style>
   <script>
     window.MathJax = {
       tex: {
@@ -22,12 +188,12 @@
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-chapter-1-page">
+<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-imaginary-unit-page complex-numbers-chapter-1-page">
   <header>
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Complex Numbers &middot; Chapter 1</p>
-      <h1 class="essay-title">Complex Numbers</h1>
+      <h1 class="essay-title">The Imaginary Unit</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -35,295 +201,129 @@
   <main>
     <article>
       <section class="essay-section">
-        <p>We now have two completed stories.</p>
+        <h3 class="subsection-title">The Problem of Negative Square Roots</h3>
 
-        <p>The geometric branch gave us circles, sine and cosine as coordinates, and the discovery that rotation produces oscillation.</p>
+        <p>$\large \sqrt{-9}$</p>
 
-        <p>The algebra branch gave us exponents, continuous growth, the number $e$, and an infinite series for $e^x$.</p>
+        <p>A square root of a number is a value that, when multiplied by itself, gives that number.</p>
 
-        <p>These stories appear to have nothing in common. One is about turning; the other is about growing.</p>
+        <p>$\large x^2 = -9$</p>
 
-        <p>This chapter builds the bridge between them. The bridge is made of a new kind of number.</p>
+        <p>But what could $x$ be here?</p>
 
-        <h3 class="subsection-title">Numbers That Answer Impossible Questions</h3>
+        <p>Nothing on the real number line works because:</p>
 
-        <p>The number system has been stretched before. Each time, the stretching was provoked by a question the existing numbers could not answer.</p>
+        <p>$(+) \cdot (+) = +$</p>
 
-        <p>What is $3 - 5$? No counting number answers that. The negatives were invented -- and dismissed by many mathematicians of the time as absurd.</p>
+        <p>$(-) \cdot (-) = +$</p>
 
-        <p>What is $3 \div 5$? No whole number answers that. Fractions were admitted.</p>
+        <p>While we need:</p>
 
-        <p>Each new layer seemed suspicious at first, then became indispensable.</p>
+        <p>$(x) \cdot (x) = -$</p>
 
-        <p>Here is the question that provoked the next stretch:</p>
+        <p>You might be thinking:</p>
 
-        <p class="display-equation">$$x^2 = -1$$</p>
+        <p>$$3 \cdot (-3) = -9$$</p>
 
-        <p>What number, multiplied by itself, gives $-1$?</p>
+        <p>But:</p>
 
-        <p>A positive times a positive is positive. A negative times a negative is also positive. Zero gives zero. Every number on the number line fails.</p>
+        <p>$$3 \neq -3$$</p>
 
-        <p>The historical response was the same move as before: rather than declaring the question impossible, <em>invent</em> a number that answers it, and see whether arithmetic survives.</p>
+        <p>Yikes...</p>
 
-        <p>The new number is written $i$, and it is defined by one property alone:</p>
+        <h3 class="subsection-title">Extending the Number Line</h3>
 
-        <p class="display-equation">$$i^2 = -1$$</p>
+        <p>Throughout history, the number line has repeatedly been extended whenever existing numbers were not enough to solve a new kind of problem.</p>
 
-        <p>Arithmetic survives. Everything works. The only casualty was the name: sceptics called $i$ "imaginary", and the insult stuck as terminology.</p>
+        <p>At first, we had the natural numbers, $\mathbb{N}$:</p>
 
-        <p>For now, $i^2 = -1$ has to be taken on faith as a rule of the game. By the middle of this chapter, you will <em>see</em> why it is true.</p>
+        <p>$$1, 2, 3, 4, 5, \dots$$</p>
 
-        <h3 class="subsection-title">A Number With Two Parts</h3>
+        <p>These allowed us to count quantities. But subtraction quickly creates a problem:</p>
 
-        <p>Once $i$ exists, it starts combining with ordinary numbers. We can scale it ($2i$, $-\frac{1}{2}i$) and add it to ordinary numbers:</p>
+        <p>$$3 - 5 = \ ?$$</p>
 
-        <p class="display-equation">$$z = 3 + 2i$$</p>
+        <p>There is no natural number that answers this. To make this operation possible, the number line was extended to include negative numbers:</p>
 
-        <p>Notice that this sum cannot be simplified any further. Three of one thing plus two of another -- like 3 apples and 2 oranges -- the parts stay separate.</p>
+        <p>$$3 - 5 = -2$$</p>
 
-        <p>So this new kind of number permanently carries <strong>two independent components</strong>: an ordinary part and an $i$ part. Numbers like this are called <em>complex</em> numbers -- "complex" in the old sense of <em>composed of parts</em>, not in the sense of complicated.</p>
+        <p>This gives us the integers, $\mathbb{Z}$:</p>
 
-        <p>But this raises a question. Ordinary numbers live on the number line. Every position is already taken.</p>
+        <p>$$\dots, -3, -2, -1, 0, 1, 2, 3, \dots$$</p>
 
-        <p>Where does $i$ live?</p>
+        <p>But division creates another problem:</p>
 
-        <figure class="trig-figure trig-figure-bare i-off-line-figure" aria-label="The real number line with every position occupied, and the number i hovering off the line with nowhere to sit">
-          <svg viewBox="0 0 860 220" role="img" aria-labelledby="i-off-line-title" xmlns="http://www.w3.org/2000/svg">
-            <title id="i-off-line-title">A number line from minus three to three, with the number i floating above it, off the line</title>
-            <defs>
-              <marker id="numline-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
-              </marker>
-            </defs>
-            <g transform="translate(40 0)">
-              <line class="numline-axis" x1="0" y1="160" x2="770" y2="160" marker-end="url(#numline-arrow)" />
-              <g class="numline-ticks">
-                <line x1="65"  y1="152" x2="65"  y2="168" /><text x="65"  y="192" text-anchor="middle">−3</text>
-                <line x1="175" y1="152" x2="175" y2="168" /><text x="175" y="192" text-anchor="middle">−2</text>
-                <line x1="285" y1="152" x2="285" y2="168" /><text x="285" y="192" text-anchor="middle">−1</text>
-                <line x1="395" y1="152" x2="395" y2="168" /><text x="395" y="192" text-anchor="middle">0</text>
-                <line x1="505" y1="152" x2="505" y2="168" /><text x="505" y="192" text-anchor="middle">1</text>
-                <line x1="615" y1="152" x2="615" y2="168" /><text x="615" y="192" text-anchor="middle">2</text>
-                <line x1="725" y1="152" x2="725" y2="168" /><text x="725" y="192" text-anchor="middle">3</text>
-              </g>
-              <text class="i-floating" x="395" y="58" text-anchor="middle">i</text>
-              <text class="i-question" x="445" y="52">?</text>
-              <line class="i-dashed-drop" x1="395" y1="72" x2="395" y2="148" />
-            </g>
-          </svg>
-        </figure>
+        <p>$$4 \div 8 = \ ?$$</p>
 
-        <p>Not at 0 -- it isn't nothing. Not at 1 or $-1$ -- squaring those gives $+1$. There is no room anywhere on the line.</p>
+        <p>There is no integer that answers this. To make this operation possible, the number line was extended again to include fractions:</p>
 
-        <p>So it lives <em>off</em> the line.</p>
+        <p>$$4 \div 8 = \frac{1}{2}$$</p>
 
-        <p>Give the imaginary numbers their own axis, perpendicular to the real one, crossing at zero. The real numbers run east-west; the imaginary numbers run north-south.</p>
+        <p>This gives us the rational numbers, $\mathbb{Q}$: numbers that can be written as a ratio of two integers.</p>
 
-        <p>And now every complex number $a + bi$ has a home: walk $a$ along the real axis, then $b$ up the imaginary one.</p>
+        <p>Then square roots reveal another limitation:</p>
 
-        <p><strong>A complex number is a point in a plane.</strong></p>
+        <p>$$\sqrt{2} = \ ?$$</p>
 
-        <p>Or, often more usefully: an arrow from the origin to that point.</p>
+        <p>There is no rational number whose square is exactly $2$. To include numbers like this, the number line was extended to include irrational numbers: numbers whose decimal expansions continue forever without repeating.</p>
 
-        <iframe
-          class="essay-widget complex-plane-widget"
-          src="complex-numbers/chapter-1/complex-plane-widget.html"
-          title="Interactive complex plane with a draggable point showing real and imaginary parts, magnitude, and angle"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
+        <p>$$\sqrt{2} = 1.4142135\dots$$</p>
 
-        <h3 class="subsection-title">Length and Direction</h3>
+        <p>Together, the rational and irrational numbers form the real numbers, $\mathbb{R}$. This gives us the full real number line.</p>
 
-        <p>If a complex number is an arrow, then it has the two properties every arrow has: a <strong>length</strong> and a <strong>direction</strong>.</p>
+        <p>So while no real number can be the square root of a negative number, perhaps the number line could be extended once again?</p>
 
-        <p>These should feel familiar. They are exactly the quantities we spent the geometric branch studying.</p>
+        <p>$$\sqrt{ -1 }= \ ?$$</p>
 
-        <p>The length comes from Pythagoras -- the real and imaginary parts are the legs of a right triangle:</p>
+        <p>This number would be simply defined by the property that it squares to $-1$.</p>
 
-        <p class="display-equation">$$r = \sqrt{a^2+b^2}$$</p>
+        <p>$$(x) \cdot (x) = -$$</p>
 
-        <p>The direction is an angle $\theta$, measured anticlockwise from the positive real axis.</p>
+        <p>However, while negative numbers are understood through ideas like debt, and fractions are understood the moment you need to feed a family with one loaf of bread, the interpretation of a number that squares to a negative is far less clear.</p>
 
-        <p>And from the geometric branch, we know how to recover the legs from $r$ and $\theta$:</p>
+        <p>In fact, mathematicians initially viewed this as no more than an algebraic trick. Reflecting this early skepticism, it became known as an imaginary number, and later denoted by the letter $i$.</p>
 
-        <p class="display-equation">$$a = r\cos\theta \qquad b = r\sin\theta$$</p>
+        <p>$$i= \sqrt{ -1 }$$</p>
 
-        <p>Substituting these into $z = a + bi$ and factoring out the $r$:</p>
+        <p>$$i^2= -1$$</p>
 
-        <p class="display-equation">$$z = r(\cos\theta + i\sin\theta)$$</p>
+        <img
+          class="number-systems-diagram"
+          src="images/nested-number-systems.png"
+          alt="Nested number systems diagram showing natural numbers inside whole numbers, integers, rationals, and real numbers"
+        />
 
-        <p>We derived this expression at the end of the Polar Form chapter, where it may have felt like a curiosity. Look who is standing inside it now: <strong>cosine and sine, the coordinates of a point on a circle</strong>, living in the middle of a number.</p>
+        <h3 class="subsection-title">Expressing Negative Square Roots in Terms of $i$</h3>
 
-        <p>Every complex number can be described in two interchangeable ways: by its parts $(a, b)$, or by its length and direction $(r, \theta)$. Toggle between them in the widget above.</p>
+        <p>If:</p>
 
-        <h3 class="subsection-title">What Multiplication Does</h3>
+        <p>$$i^2 = -1$$</p>
 
-        <p>Adding complex numbers is unremarkable: add the real parts, add the imaginary parts.</p>
+        <p>Then multiplying $i$ by a real number should produce a number that when squared gives a negative.</p>
 
-        <p>Multiplication is where the magic is. Let's sneak up on it by multiplying the simplest things we can.</p>
+        <p>For example, to answer our earlier question: $\large x^2 = -9$.</p>
 
-        <p>Start with the number 1: an arrow of length 1 pointing east. Multiply it by $i$:</p>
+        <p>$$(3i)^2 = 3^2 i^2$$</p>
 
-        <p class="display-equation">$$1 \cdot i = i$$</p>
+        <p>$$3^2 i^2= 9\cdot-1$$</p>
 
-        <p>The arrow now points <em>north</em>. Multiplying by $i$ turned it a quarter-circle anticlockwise.</p>
+        <p>$$= -9$$</p>
 
-        <p>Multiply by $i$ again:</p>
+        <p>So $3i$ is a number whose square is $-9$.</p>
 
-        <p class="display-equation">$$i \cdot i = i^2 = -1$$</p>
+        <p>Therefore,</p>
 
-        <p>North has become <em>west</em>. Another quarter-turn.</p>
+        <p>$$\sqrt{-9} = 3i$$</p>
 
-        <p>Again: $-1 \cdot i = -i$. West to <em>south</em>. Again: $-i \cdot i = -i^2 = 1$. South back to <em>east</em>. Home.</p>
+        <p>This was important because it meant mathematicians did not need a different new symbol for every negative square root:</p>
 
-        <p><strong>Multiplying by $i$ is a $90^\circ$ rotation.</strong></p>
+        <p>$$\sqrt{-1}, \quad \sqrt{-2}, \quad \sqrt{-3}, \quad \sqrt{-4}, \dots$$</p>
 
-        <iframe
-          class="essay-widget powers-of-i-widget"
-          src="complex-numbers/chapter-1/powers-of-i-widget.html"
-          title="Interactive widget where each press of times-i rotates an arrow a quarter turn around the complex plane"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
+        <p>A single new quantity, $i$, was enough to express them all:</p>
 
-        <p>And now $i^2 = -1$ stops being mysterious.</p>
+        <p>$$\sqrt{-a} = \sqrt{a}i$$</p>
 
-        <p>Multiplying by $-1$ flips a number to the opposite side of zero -- it points the arrow backwards. Pointing backwards is a $180^\circ$ rotation.</p>
-
-        <p>So the question "what number squares to $-1$?" is really asking:</p>
-
-        <p><em>"What operation, done twice, makes a half-turn?"</em></p>
-
-        <p>A quarter-turn. $i$ is not a strange quantity hiding somewhere on the number line. <strong>It is the halfway point of a flip</strong> -- and it was invisible for centuries because everyone was looking <em>on</em> the line, where no halfway point exists.</p>
-
-        <p>Notice also what the widget shows about repetition: each press of "$\times\, i$" adds another quarter-turn. <strong>Repeated multiplication is repeated rotation.</strong> Four turns bring you home, which is why the powers of $i$ cycle forever:</p>
-
-        <p class="display-equation">$$i^1 = i \qquad i^2 = -1 \qquad i^3 = -i \qquad i^4 = 1 \qquad i^5 = i \;\; \ldots$$</p>
-
-        <h3 class="subsection-title">Multiplying Any Two Complex Numbers</h3>
-
-        <p>Multiplying by $i$ rotates by $90^\circ$ exactly. What about multiplying by a general complex number $w$?</p>
-
-        <p>Here is the claim, and it is the most important fact in this chapter:</p>
-
-        <p>Multiplying by $w$ does two things at once. It <strong>rotates by $w$'s angle</strong>, and it <strong>scales by $w$'s length</strong>.</p>
-
-        <p>Why should that be? Think about what $w = r(\cos\theta + i\sin\theta)$ is made of. The real part says "keep some of the original direction". The imaginary part says "mix in some of the quarter-turned version". Blending an arrow with its own quarter-turned copy tilts it part-way -- a rotation by something <em>between</em> $0^\circ$ and $90^\circ$. The proportions of the blend set the tilt; the overall size of $w$ sets the stretch.</p>
-
-        <p>Let's verify it on an example where we can check both ways. Take $z = 1 + i$ and square it.</p>
-
-        <p>The algebraic way -- expand, and use $i^2 = -1$:</p>
-
-        <p class="display-equation">$$(1+i)(1+i) = 1 + i + i + i^2 = 1 + 2i - 1 = 2i$$</p>
-
-        <p>The geometric way: $1+i$ sits at $45^\circ$ with length $\sqrt{2}$. Multiplying it by itself should rotate $45^\circ$ by another $45^\circ$ (giving $90^\circ$) and scale $\sqrt{2}$ by another $\sqrt{2}$ (giving 2).</p>
-
-        <p>An arrow of length 2 pointing straight up is... $2i$. The two answers agree.</p>
-
-        <p>The algebra grinds it out symbol by symbol. The geometry <em>sees</em> it. Drag the arrows below and watch the rule hold everywhere:</p>
-
-        <iframe
-          class="essay-widget complex-multiplication-widget"
-          src="complex-numbers/chapter-1/complex-multiplication-widget.html"
-          title="Interactive widget with two draggable complex numbers showing that their product's angle is the sum of their angles and its magnitude the product of their magnitudes"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>In summary, when complex numbers multiply:</p>
-
-        <p class="display-equation">$$\text{angles } \textbf{add} \qquad \text{magnitudes } \textbf{multiply}$$</p>
-
-        <h3 class="subsection-title">An Echo From the Algebra Branch</h3>
-
-        <p>Read that summary line again, slowly. Multiplying the numbers... <em>adds</em> the angles.</p>
-
-        <p>We have met behaviour like this before. It was the very first thing we learned in the algebra branch:</p>
-
-        <p class="display-equation">$$a^m \cdot a^n = a^{m+n}$$</p>
-
-        <p>Multiplying powers adds the exponents. Exponents turn multiplication into addition.</p>
-
-        <p>And here, on the complex plane: multiplying rotations adds the angles. <strong>Angles are behaving exactly like exponents.</strong></p>
-
-        <p>Hold that thought. It is the loose thread the final chapter will pull.</p>
-
-        <h3 class="subsection-title">The Circle, Packaged Into a Number</h3>
-
-        <p>Among all complex numbers, the ones with length exactly 1 deserve special attention. Multiplying by them doesn't stretch anything -- it <em>only rotates</em>.</p>
-
-        <p>Where do they live? At distance 1 from the origin: <strong>on the unit circle</strong>.</p>
-
-        <p>Our old friend has reappeared, and in this setting every point on it is a pure rotation, waiting to be applied:</p>
-
-        <p class="display-equation">$$\cos\theta + i\sin\theta$$</p>
-
-        <p>This is worth pausing on. In the geometric branch, a point on the unit circle was a <em>pair</em> of coordinates, $(\cos\theta, \sin\theta)$, and rotating it meant fussy bookkeeping with two components.</p>
-
-        <p>Now the pair has been packaged into a single number -- and rotation has become ordinary multiplication. Because angles add, rotating by $\theta$ and then by $\varphi$ is one clean statement:</p>
-
-        <p class="display-equation">$$(\cos\theta + i\sin\theta)(\cos\varphi + i\sin\varphi) = \cos(\theta+\varphi) + i\sin(\theta+\varphi)$$</p>
-
-        <p>No triangle diagrams, no coordinate juggling. The arithmetic of complex numbers does the geometry <em>for us</em>. This is why they are so useful: they are the natural language of rotation.</p>
-
-        <h3 class="subsection-title">Oscillation, Revisited</h3>
-
-        <p>In the Waves chapter, a point circling at $f$ revolutions per second had coordinates that oscillated: the $x$-coordinate traced a cosine wave, the $y$-coordinate a sine wave.</p>
-
-        <p>In our new language, that circling point is a single rotating complex number:</p>
-
-        <p class="display-equation">$$z(t) = \cos(2\pi f t) + i\sin(2\pi f t)$$</p>
-
-        <p>Its real part is the cosine wave. Its imaginary part is the sine wave.</p>
-
-        <p>Think of the rotating arrow casting shadows: one onto the real axis, one onto the imaginary axis. Each shadow bobs back and forth as the arrow turns.</p>
-
-        <p><strong>An oscillation is the shadow of a rotation.</strong></p>
-
-        <iframe
-          class="essay-widget rotation-projection-widget"
-          src="complex-numbers/chapter-1/rotation-projection-widget.html"
-          title="Interactive widget showing a rotating complex number whose real and imaginary shadows trace cosine and sine waves over time"
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-
-        <p>This is more than a pretty picture. The wave -- the thing we measure in sound, light, and current -- is one component of something simpler: steady, uniform rotation. Working with the rotation and taking the shadow at the end is often far easier than wrestling with the wave itself. This single idea underlies a large share of physics and engineering.</p>
-
-        <h3 class="subsection-title">A Suspicious Resemblance</h3>
-
-        <p>Let's gather the clues this chapter has produced.</p>
-
-        <p>Rotations compose by <em>adding angles</em>. Powers compose by <em>adding exponents</em>. So if rotation by $\theta$ could be written as a power -- some base raised to $\theta$ -- the bookkeeping would match perfectly:</p>
-
-        <p class="display-equation">$$R^{\theta_1} \cdot R^{\theta_2} = R^{\theta_1+\theta_2}$$</p>
-
-        <p>But raised to <em>what base</em>? For that, recall the algebra branch.</p>
-
-        <p>$e^x$ is continuous growth: at every instant, the quantity grows in proportion to itself -- it grows <em>in the direction it already points</em>, which is why it races off along the number line.</p>
-
-        <p>Now ask a strange question. What if, at every instant, the growth were turned <strong>sideways</strong> -- pushed at $90^\circ$ to the direction the arrow currently points?</p>
-
-        <p>Pushing sideways never lengthens an arrow. It only changes where it points. An arrow forever nudged at right angles to itself doesn't grow at all -- <strong>it travels in a circle</strong>.</p>
-
-        <p>And we have just spent a chapter with the number whose entire job is to turn things $90^\circ$: the number $i$.</p>
-
-        <p>So here is a daring guess. Continuous growth is $e^x$. Continuous growth <em>turned sideways</em> -- growth in the $i$ direction -- ought to be:</p>
-
-        <p class="display-equation">$$e^{i\theta}$$</p>
-
-        <p>If the guess is right, $e^{i\theta}$ doesn't grow at all. It rotates. After turning through an angle $\theta$, it should be sitting on the unit circle at exactly the point we have learned to call:</p>
-
-        <p class="display-equation">$$\cos\theta + i\sin\theta$$</p>
-
-        <p>Which would mean that these two expressions -- one from the algebra branch, one from the geometric branch -- are <em>the same thing</em>.</p>
-
-        <p>That is an extraordinary claim, and we have not earned it yet. A guess built on intuition needs to survive contact with something solid.</p>
-
-        <p>Fortunately, we own something solid: an infinite series for $e^x$ -- powers over factorials -- that works for <em>every</em> input. Nothing stops us from feeding it $i\theta$ and grinding out what comes back.</p>
-
-        <p>That calculation is the next chapter. The two branches are about to meet.</p>
+        <p>for any positive real number $a$.</p>
 
         <hr class="section-divider" />
 
@@ -334,7 +334,7 @@
           </a>
           <a class="chapter-nav-link" href="complex-numbers-chapter-2.html">
             <span>Next</span>
-            <strong>Polar Form</strong>
+            <strong>The Complex Plane</strong>
           </a>
         </nav>
       </section>

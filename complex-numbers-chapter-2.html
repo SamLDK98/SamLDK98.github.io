@@ -3,31 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Polar Form | Complex Numbers</title>
+  <title>The Complex Plane | Complex Numbers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="complex-numbers.css" />
+  <style>
+    .complex-plane-offline-figure {
+      width: min(100%, 700px);
+      margin: 1.4rem 0 2rem;
+      display: block;
+    }
+
+    .complex-plane-offline-figure .axis {
+      stroke: rgba(244, 246, 255, 0.48);
+      stroke-width: 2;
+    }
+
+    .complex-plane-offline-figure .turn {
+      fill: none;
+      stroke: #b6ff5a;
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .complex-plane-offline-figure .ray {
+      stroke: #e0be68;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .complex-plane-offline-figure .ghost {
+      stroke: rgba(224, 190, 104, 0.42);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 7 9;
+    }
+
+    .complex-plane-offline-figure .label {
+      fill: #f4f6ff;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: 18px;
+    }
+
+    .complex-plane-offline-figure .question {
+      fill: #b6ff5a;
+      font-size: 34px;
+      font-weight: 600;
+    }
+  </style>
   <script>
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
         displayMath: [['$$', '$$'], ['\\[', '\\]']]
       },
-      svg: {
-        fontCache: 'global'
-      }
+      svg: { fontCache: 'global' }
     };
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-chapter-2-page">
+<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-complex-plane-page complex-numbers-chapter-2-page">
   <header>
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
       <p class="chapter-kicker">Complex Numbers &middot; Chapter 2</p>
-      <h1 class="essay-title">Polar Form</h1>
+      <h1 class="essay-title">The Complex Plane</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
   </header>
@@ -35,261 +77,216 @@
   <main>
     <article>
       <section class="essay-section">
-        <h3 class="subsection-title">Polar Form</h3>
+        <h3 class="subsection-title">Powers of $i$</h3>
 
-        <p>Any position in a two-dimensional space can be represented using $(x,y)$ coordinates.</p>
-
-        <figure class="trig-figure trig-figure-bare polar-cartesian-figure" aria-label="Cartesian coordinate plane">
-          <svg viewBox="0 0 760 360" role="img">
-            <defs>
-              <marker id="polar-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <g class="polar-grid">
-              <line x1="80" y1="60" x2="80" y2="300" />
-              <line x1="140" y1="60" x2="140" y2="300" />
-              <line x1="200" y1="60" x2="200" y2="300" />
-              <line x1="260" y1="60" x2="260" y2="300" />
-              <line x1="320" y1="60" x2="320" y2="300" />
-              <line x1="380" y1="60" x2="380" y2="300" />
-              <line x1="440" y1="60" x2="440" y2="300" />
-              <line x1="500" y1="60" x2="500" y2="300" />
-              <line x1="560" y1="60" x2="560" y2="300" />
-              <line x1="620" y1="60" x2="620" y2="300" />
-              <line x1="680" y1="60" x2="680" y2="300" />
-              <line x1="80" y1="60" x2="680" y2="60" />
-              <line x1="80" y1="120" x2="680" y2="120" />
-              <line x1="80" y1="180" x2="680" y2="180" />
-              <line x1="80" y1="240" x2="680" y2="240" />
-              <line x1="80" y1="300" x2="680" y2="300" />
-            </g>
-            <line class="polar-axis" x1="80" y1="180" x2="690" y2="180" marker-end="url(#polar-axis-arrow)" />
-            <line class="polar-axis" x1="380" y1="310" x2="380" y2="50" marker-end="url(#polar-axis-arrow)" />
-            <circle class="polar-point" cx="560" cy="120" r="7" />
-            <line class="polar-guide polar-guide-x" x1="380" y1="120" x2="560" y2="120" />
-            <line class="polar-guide polar-guide-y" x1="560" y1="180" x2="560" y2="120" />
-            <text class="polar-label" x="696" y="173">x</text>
-            <text class="polar-label" x="392" y="55">y</text>
-            <text class="polar-coordinate" x="572" y="112">(x, y)</text>
-          </svg>
-        </figure>
-
-        <p>Any position on the unit circle can also be represented by an angle $\theta$, because the functions sine and cosine map that angle to its corresponding $x$- and $y$-coordinates:</p>
-
-        <p class="display-equation">$$(\cos\theta,\sin\theta)$$</p>
-
-        <p>As $\theta$ varies, these coordinates trace out every point on the unit circle.</p>
-
-        <p>The unit circle has a radius of $1$. To reach points elsewhere in the plane, we keep the same angle but extend or shrink the radius.</p>
-
-        <p>This can be thought of as first moving around the unit circle to choose a direction, and then moving further away from or closer to the origin along that direction.</p>
-
-        <p>If the radius is $r$, then both coordinates scale proportionally:</p>
-
-        <p class="display-equation">$$x=r\cos\theta \qquad y=r\sin\theta$$</p>
-
-        <p>So any point can be represented as:</p>
-
-        <p class="display-equation">$$(r\cos\theta, r\sin\theta)$$</p>
+        <p>Most real numbers, when raised to successive powers, either grow larger in magnitude or shrink towards zero.</p>
 
         <iframe
-          class="essay-widget polar-form-widget"
-          src="complex-numbers/chapter-2/polar-form-widget.html"
-          title="Interactive polar form widget showing radius and angle as coordinates"
+          class="essay-widget"
+          src="complex-numbers/complex-plane/real-powers-widget.html"
+          title="Interactive widget showing ordinary real powers growing or shrinking"
+          style="height: 360px;"
+          scrolling="no"
           loading="lazy"
         ></iframe>
 
-        <p>In other words, every point in the plane can be described either by its coordinates $(x,y)$, or by a distance $r$ from the origin and an angle $\theta$.</p>
+        <p>There are, however, two real numbers that exhibit a different behaviour.</p>
 
-        <p>This is known as polar form.</p>
+        <p>$1^n$ always remains $1$.</p>
 
-        <h3 class="subsection-title">Complex Numbers</h3>
-
-        <p>Negative numbers have an interesting geometric interpretation.</p>
-
-        <p>Multiplying a number by $-1$ changes its sign. On the number line, this can be visualised as a rotation of $180^\circ$ about the origin.</p>
-
-        <figure class="trig-figure trig-figure-bare complex-half-turn-figure" aria-label="Three rotating to negative three by a half turn around the origin">
-          <svg viewBox="0 0 760 260" role="img">
-            <defs>
-              <marker id="half-turn-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <line class="complex-axis" x1="120" y1="150" x2="640" y2="150" marker-end="url(#half-turn-axis-arrow)" />
-            <line class="complex-tick" x1="210" y1="140" x2="210" y2="160" />
-            <line class="complex-tick" x1="380" y1="138" x2="380" y2="162" />
-            <line class="complex-tick" x1="550" y1="140" x2="550" y2="160" />
-            <path class="complex-rotation-arc" d="M 550 150 A 170 92 0 0 0 210 150" />
-            <circle class="complex-point-start" cx="550" cy="150" r="7" />
-            <circle class="complex-point-end" cx="210" cy="150" r="7" />
-            <text class="complex-label" x="550" y="185" text-anchor="middle">3</text>
-            <text class="complex-label" x="210" y="185" text-anchor="middle">-3</text>
-            <text class="complex-label complex-label-faint" x="380" y="185" text-anchor="middle">0</text>
-            <text class="complex-label complex-label-pink" x="380" y="52" text-anchor="middle">180°</text>
-          </svg>
-        </figure>
-
-        <p>This raises an interesting question.</p>
-
-        <p>If $-1$ corresponds to a rotation of $180^\circ$, might there exist a number corresponding to a rotation of $90^\circ$?</p>
-
-        <p>Mathematicians had already encountered a mysterious quantity while solving equations:</p>
-
-        <p class="display-equation">$$i=\sqrt{-1}$$</p>
-
-        <p>Since</p>
-
-        <p class="display-equation">$$i^2=-1,$$</p>
-
-        <p>multiplying by $i$ twice has the same effect as multiplying by $-1$: a rotation of $180^\circ$.</p>
-
-        <p>This suggests that a single multiplication by $i$ can be interpreted as a rotation of $90^\circ$.</p>
-
-        <figure class="trig-figure trig-figure-bare complex-unit-cycle-figure" aria-label="The powers of i rotating around the unit circle">
-          <svg viewBox="0 0 760 430" role="img">
-            <defs>
-              <marker id="complex-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <line class="complex-axis" x1="170" y1="215" x2="590" y2="215" marker-end="url(#complex-axis-arrow)" />
-            <line class="complex-axis" x1="380" y1="370" x2="380" y2="50" marker-end="url(#complex-axis-arrow)" />
-            <circle class="complex-circle" cx="380" cy="215" r="128" />
-            <path class="complex-cycle-arc" d="M 508 215 A 128 128 0 0 0 380 87 A 128 128 0 0 0 252 215 A 128 128 0 0 0 380 343 A 128 128 0 0 0 508 215" />
-            <circle class="complex-point-start" cx="508" cy="215" r="7" />
-            <circle class="complex-point-end" cx="380" cy="87" r="7" />
-            <circle class="complex-point-end" cx="252" cy="215" r="7" />
-            <circle class="complex-point-end" cx="380" cy="343" r="7" />
-            <text class="complex-label" x="525" y="221">1</text>
-            <text class="complex-label" x="392" y="82">i</text>
-            <text class="complex-label" x="215" y="221">-1</text>
-            <text class="complex-label" x="392" y="351">-i</text>
-          </svg>
-        </figure>
+        <p>$(-1)^n$ cycles repeatedly between $-1$ and $1$.</p>
 
         <iframe
-          class="essay-widget complex-rotation-widget"
-          src="complex-numbers/chapter-2/complex-rotation-widget.html"
-          title="Interactive widget showing multiplication by i as rotation"
+          class="essay-widget"
+          src="complex-numbers/complex-plane/special-real-powers-widget.html"
+          title="Interactive widget showing powers of one and negative one"
+          style="height: 350px;"
+          scrolling="no"
           loading="lazy"
         ></iframe>
 
-        <p>Under this interpretation, multiplying by $i$ rotates numbers off the number line and into a second dimension.</p>
+        <p>What do you think happens to $i$?</p>
 
-        <p>This looks very similar to the Cartesian plane. However, when working with complex numbers we use different terminology:</p>
+        <p>If:</p>
 
-        <ul>
-          <li>horizontal axis $\rightarrow$ real axis</li>
-          <li>vertical axis $\rightarrow$ imaginary axis</li>
-        </ul>
+        <p>$$i^2 = -1$$</p>
 
-        <p>A complex number is written as</p>
+        <p>Then:</p>
 
-        <p class="display-equation">$$z=a+bi$$</p>
+        <p>$$i^3 = i^2 \cdot i = -i$$</p>
 
-        <p>where:</p>
+        <p>And:</p>
 
-        <ul>
-          <li>$a$ is the real part</li>
-          <li>$b$ is the imaginary part</li>
-        </ul>
+        <p>$$i^4 = (i^2)^2 = (-1)^2 = 1$$</p>
 
-        <p>Just as the coordinate pair $(a,b)$ identifies a point in the plane, the complex number $a+bi$ identifies the same point in the complex plane.</p>
+        <p>And:</p>
 
-        <h3 class="subsection-title">Polar Form</h3>
+        <p>$$i^5 = i^4 \cdot i = i$$</p>
 
-        <p>We can also describe a complex number using a distance and an angle.</p>
+        <p>Have a look at what's happening.</p>
 
-        <p>If we draw a line from the origin to the point $z=a+bi$, it forms the hypotenuse of a right-angled triangle.</p>
+        <p>$$
+\begin{array}{l | l}
+2^1 = 2 & i^1 = i \\
+2^2 = 4 & i^2 = -1 \\
+2^3 = 8 & i^3 = -i \\
+2^4 = 16 & i^4 = 1 \\
+2^5 = 32 & i^5 = i \\
+2^6 = 64 & i^6 = -1 \\
+2^7 = 128 & i^7 = -i \\
+2^8 = 256 & i^8 = 1 \\
+\end{array}
+$$</p>
 
-        <figure class="trig-figure trig-figure-bare complex-point-triangle-figure" aria-label="A complex number plotted with a right triangle">
-          <svg viewBox="0 0 760 380" role="img">
-            <defs>
-              <marker id="complex-plane-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <g class="polar-grid">
-              <line x1="120" y1="70" x2="120" y2="310" />
-              <line x1="180" y1="70" x2="180" y2="310" />
-              <line x1="240" y1="70" x2="240" y2="310" />
-              <line x1="300" y1="70" x2="300" y2="310" />
-              <line x1="360" y1="70" x2="360" y2="310" />
-              <line x1="420" y1="70" x2="420" y2="310" />
-              <line x1="480" y1="70" x2="480" y2="310" />
-              <line x1="540" y1="70" x2="540" y2="310" />
-              <line x1="600" y1="70" x2="600" y2="310" />
-              <line x1="120" y1="70" x2="600" y2="70" />
-              <line x1="120" y1="130" x2="600" y2="130" />
-              <line x1="120" y1="190" x2="600" y2="190" />
-              <line x1="120" y1="250" x2="600" y2="250" />
-              <line x1="120" y1="310" x2="600" y2="310" />
-            </g>
-            <line class="complex-axis" x1="120" y1="250" x2="620" y2="250" marker-end="url(#complex-plane-arrow)" />
-            <line class="complex-axis" x1="240" y1="320" x2="240" y2="60" marker-end="url(#complex-plane-arrow)" />
-            <path class="opposite-fill" d="M 240 250 L 480 250 L 480 130 Z" />
-            <line class="polar-guide polar-guide-x" x1="240" y1="250" x2="480" y2="250" />
-            <line class="polar-guide polar-guide-y" x1="480" y1="250" x2="480" y2="130" />
-            <line class="complex-radius" x1="240" y1="250" x2="480" y2="130" />
-            <path class="complex-angle" d="M 306 250 A 66 66 0 0 0 299 221" />
-            <circle class="complex-point-start" cx="480" cy="130" r="7" />
-            <text class="complex-label" x="492" y="123">z = a + bi</text>
-            <text class="complex-label complex-label-orange" x="360" y="277" text-anchor="middle">a</text>
-            <text class="complex-label complex-label-teal" x="500" y="190">b</text>
-            <text class="complex-label complex-label-gold" x="368" y="176">r</text>
-            <text class="complex-label complex-label-pink" x="314" y="226">θ</text>
-            <text class="complex-label complex-label-faint" x="622" y="243">real</text>
-            <text class="complex-label complex-label-faint" x="255" y="66">imaginary</text>
-          </svg>
-        </figure>
+        <p>Similar to $(-1)^n$, we see cyclical behaviour. This time, however, it cycles between four values:</p>
 
-        <p>Using Pythagoras' theorem, the length of this hypotenuse is</p>
+        <p>$$i, -1, -i, 1$$</p>
 
-        <p class="display-equation">$$r=\sqrt{a^2+b^2}.$$</p>
+        <h3 class="subsection-title">Rotation on the Number Line</h3>
 
-        <p>In the context of complex numbers, this distance from the origin is called the <strong>modulus</strong>.</p>
-
-        <p>We can also describe the point using the angle $\theta$ measured from the positive real axis.</p>
-
-        <p>Thus every complex number can be described by:</p>
+        <p>Let's think about multiplication and the number line.</p>
 
         <ul>
-          <li>a modulus $r$</li>
-          <li>an angle $\theta$</li>
+          <li>Multiplying by a positive number changes magnitude but preserves direction.</li>
+          <li>Multiplying by a negative number changes magnitude and direction.</li>
+          <li>Multiplying by $-1$ reverses direction on the number line, but preserves magnitude.</li>
         </ul>
 
-        <p>This is directly analogous to polar coordinates.</p>
+        <p>Geometrically, multiplying by $-1$ can be thought of as a $180^\circ$ rotation about the origin of the number line.</p>
 
-        <p>So we could describe $z = a+bi$ as $z=r(\cos\theta+i\sin\theta)$.</p>
+        <iframe
+          class="essay-widget negative-multiplication-widget"
+          src="complex-numbers/imaginary-unit/negative-multiplication-widget.html"
+          title="Interactive widget showing multiplication by positive and negative numbers on the number line"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
 
-        <p>How?</p>
+        <p>So multiplication by $-1$ corresponds to a $180^\circ$ rotation. But could there be a number that performs only a $90^\circ$ rotation?</p>
 
-        <p>The real and imaginary parts can be expressed as:</p>
+        <p>Well,</p>
 
-        <p class="display-equation">$$a=r\cos\theta \qquad \text{and} \qquad b=r\sin\theta$$</p>
+        <p>$$i^2=-1$$</p>
 
-        <p>Substitute these expressions into $z = a +bi$:</p>
+        <p>Therefore, two successive multiplications by $i$ must have the same overall effect as one multiplication by $-1$.</p>
 
-        <p class="display-equation">$$z=r\cos\theta+i(r\sin\theta)$$</p>
+        <p>Since multiplication by $-1$ corresponds to a $180^\circ$ rotation, multiplication by $i$ must correspond to half of that: a $90^\circ$ rotation.</p>
 
-        <p>Factor out the $r$:</p>
+        <p>But there is a problem. A $90^\circ$ rotation would move us off the number line entirely.</p>
 
-        <p class="display-equation">$$z=r(\cos\theta+i\sin\theta)$$</p>
+        <svg class="complex-plane-offline-figure" viewBox="0 0 700 360" role="img" aria-label="A ninety degree rotation leaving the number line">
+          <defs>
+            <marker id="complex-plane-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(244, 246, 255, 0.48)" />
+            </marker>
+          </defs>
+          <line class="axis" x1="90" y1="230" x2="610" y2="230" marker-end="url(#complex-plane-axis-arrow)" />
+          <line class="axis" x1="350" y1="300" x2="350" y2="66" marker-end="url(#complex-plane-axis-arrow)" opacity="0.2" />
+          <line class="ray" x1="350" y1="230" x2="500" y2="230" />
+          <line class="ghost" x1="350" y1="230" x2="350" y2="80" />
+          <path class="turn" d="M 500 230 A 150 150 0 0 0 350 80" />
+          <text class="label" x="506" y="256">1</text>
+          <text class="question" x="365" y="92">?</text>
+          <text class="label" x="214" y="260">real number line</text>
+        </svg>
 
-        <p>This is known as the <strong>polar form</strong> of a complex number.</p>
+        <p>To represent such a rotation, we need a second axis.</p>
+
+        <p>We can let our number line be the horizontal axis. It contains the real numbers, so let's call it the real axis.</p>
+
+        <p>This new vertical axis we will call the imaginary axis.</p>
+
+        <p>Starting at $1$:</p>
+
+        <p>$$1 \xrightarrow{\times i} i$$</p>
+
+        <p>A second multiplication gives:</p>
+
+        <p>$$i^2=-1$$</p>
+
+        <p>A third gives:</p>
+
+        <p>$$i^3=-i$$</p>
+
+        <p>A fourth gives:</p>
+
+        <p>$$i^4=1$$</p>
+
+        <p>Each multiplication by $i$ rotates the number by a quarter-turn:</p>
+
+        <p>$$1 \rightarrow i \rightarrow -1 \rightarrow -i \rightarrow 1$$</p>
+
+        <iframe
+          class="essay-widget i-quarter-turn-widget"
+          src="complex-numbers/imaginary-unit/i-quarter-turn-widget.html"
+          title="Interactive widget showing repeated multiplication by i as quarter turns around the complex plane"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">The Complex Plane</h3>
+
+        <p>So $i$ is not somewhere further left or right on the number line&mdash;it points in a new direction.</p>
+
+        <p>This plane, comprised of the real and imaginary axes, is called the complex plane.</p>
+
+        <p>We can describe a number by saying how far it moves in each direction.</p>
+
+        <p>For example:</p>
+
+        <p>$$3 + 5i$$</p>
+
+        <p>means:</p>
+
+        <ul>
+          <li>move $3$ units in the real direction</li>
+          <li>move $5$ units in the imaginary direction</li>
+        </ul>
+
+        <p>This gives us a new kind of number with two components:</p>
+
+        <p>$$z=a + bi$$</p>
+
+        <p>Numbers of this form are called complex numbers.</p>
+
+        <p>Here, complex is used in its older sense of <em>composed of parts</em>:</p>
+
+        <ul>
+          <li>A real part ($a$)</li>
+          <li>An imaginary part ($b$)</li>
+          <li>An imaginary component ($bi$)</li>
+        </ul>
+
+        <h3 class="subsection-title">Recap</h3>
+
+        <p>We have introduced a new number $i$, defined by this strange property that it squares to $-1$.</p>
+
+        <p>Then we saw that we could combine it with real numbers to produce the square root of any negative number. These are called imaginary numbers.</p>
+
+        <p>$$3i=\sqrt{ -9 } \qquad 5i = \sqrt{ -25 } \qquad 12i=\sqrt{ -144 }$$</p>
+
+        <p>Addition, however, appears to break down: we can't add $i$ to a real number. The expression cannot be simplified into a single real number. The real part and imaginary part are unlike terms, just like in the expression $3 +5x$.</p>
+
+        <p>$$3 + 5i$$</p>
+
+        <p>However, the key realisation is that we are not simply extending the number line, but creating a two-dimensional number system. The fact that the real and imaginary parts can't be added actually becomes a feature.</p>
+
+        <p>We can consider each part to represent movement along an independent axis. Together they form the complex plane.</p>
 
         <hr class="section-divider" />
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
           <a class="chapter-nav-link" href="complex-numbers-chapter-1.html">
             <span>Previous</span>
+            <strong>The Imaginary Unit</strong>
+          </a>
+          <a class="chapter-nav-link" href="complex-numbers.html">
+            <span>Contents</span>
             <strong>Complex Numbers</strong>
           </a>
-          <a class="chapter-nav-link" href="complex-numbers-chapter-3.html">
-            <span>Next</span>
-            <strong>The Cartesian Plane</strong>
+          <a class="chapter-nav-link" href="complex-numbers-polar-form.html">
+            <span>Supplement</span>
+            <strong>Polar Form</strong>
           </a>
         </nav>
       </section>

@@ -24,7 +24,7 @@
 
     body {
       min-height: 100vh;
-      background: var(--ink);
+      background: #000000;
       color: var(--text);
       font-family: "Space Grotesk", system-ui, sans-serif;
       overflow-x: hidden;
@@ -37,8 +37,10 @@
       width: 100%;
       height: 100%;
       z-index: 0;
-      filter: saturate(1.45) contrast(1.04);
+      filter: saturate(1.08) contrast(1.02);
       image-rendering: auto;
+      mix-blend-mode: screen;
+      opacity: 0.82;
     }
 
     /* legibility + depth veil over the canvas */
@@ -48,8 +50,8 @@
       z-index: 1;
       pointer-events: none;
       background:
-        radial-gradient(135% 105% at 50% 42%, transparent 0%, rgba(5,6,12,0.12) 62%, rgba(5,6,12,0.5) 100%),
-        linear-gradient(180deg, rgba(5,6,12,0.28) 0%, transparent 26%, transparent 64%, rgba(5,6,12,0.42) 100%);
+        radial-gradient(135% 105% at 50% 42%, transparent 0%, rgba(0,0,0,0.1) 62%, rgba(0,0,0,0.48) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.18) 0%, transparent 26%, transparent 64%, rgba(0,0,0,0.46) 100%);
     }
 
     /* ---------- hero content ---------- */
@@ -174,7 +176,8 @@
       font-family: "Syne", sans-serif;
       font-weight: 700;
       font-size: clamp(1.15rem, 2.4vw, 1.4rem);
-      line-height: 1.08;
+      line-height: 1.38;
+      padding: 0.08em 0 0.14em;
     }
     .card-sub {
       font-family: "JetBrains Mono", monospace;
@@ -183,7 +186,7 @@
       letter-spacing: 0.04em;
     }
 
-    .card.c1, .card.c2, .card.c3 { --hue: var(--lime); }
+    .card.c1, .card.c2, .card.c3 { --hue: #ffd45a; }
 
     /* supplements (right rail) */
     .card.supp { --hue: #ffd45a; }
@@ -229,57 +232,48 @@
   <div class="veil" aria-hidden="true"></div>
 
   <main class="wrap">
-    <h1 class="title">Complex Numbers</h1>
-
     <nav class="rail left" aria-label="Complex Numbers chapters">
       <a class="card c1" href="complex-numbers-chapter-1.html">
         <span class="card-top">
           <span class="card-num">01</span>
-          <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
-            <path class="g" d="M6 20H34M20 34V6"/>
-            <path class="g" d="M20 20L30 11"/>
-            <circle class="gd" cx="30" cy="11" r="2.6"/>
-          </svg>
         </span>
-        <span class="card-title">Complex Numbers</span>
-        <span class="card-sub">a + bi</span>
+        <span class="card-title">The Imaginary Unit</span>
       </a>
-
       <a class="card c2" href="complex-numbers-chapter-2.html">
         <span class="card-top">
           <span class="card-num">02</span>
+        </span>
+        <span class="card-title">The Complex Plane</span>
+      </a>
+
+    </nav>
+
+    <nav class="rail right" aria-label="Complex Numbers supplements">
+        <a class="card supp s3" href="complex-numbers-polar-form.html">
           <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
             <circle class="g" cx="20" cy="20" r="13"/>
             <path class="g" d="M20 20L31 13"/>
             <circle class="gd" cx="31" cy="13" r="2.6"/>
           </svg>
-        </span>
-        <span class="card-title">Polar Form</span>
-        <span class="card-sub">r · e^(iθ)</span>
-      </a>
-
-      <a class="card c3" href="complex-numbers-chapter-3.html">
-        <span class="card-top">
-          <span class="card-num">03</span>
+          <span class="card-title">Polar Form</span>
+          <span class="badge">supplement</span>
+        </a>
+        <a class="card supp s4" href="complex-numbers-chapter-3.html">
           <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
             <path class="g" d="M7 20H33M20 33V7"/>
             <circle class="gd" cx="27" cy="13" r="2.6"/>
             <path class="g" d="M27 13V20M27 13H20" opacity="0.6"/>
           </svg>
-        </span>
-        <span class="card-title">The Cartesian Plane</span>
-        <span class="card-sub">(x, y) ↔ x + iy</span>
-      </a>
-    </nav>
-
-    <nav class="rail right" aria-label="Complex Numbers supplements">
+          <span class="card-title">The Cartesian Plane</span>
+          <span class="badge">supplement</span>
+        </a>
         <a class="card supp s1" href="complex-numbers-imaginary-unit.html">
           <svg class="card-glyph" viewBox="0 0 40 40" aria-hidden="true">
             <path class="g" d="M8 20H32M20 8V32"/>
             <path class="g" d="M20 20V8"/>
             <circle class="gd" cx="20" cy="8" r="2.6"/>
           </svg>
-          <span class="card-title">The Imaginary Unit</span>
+          <span class="card-title">Misc</span>
           <span class="badge">supplement</span>
         </a>
         <a class="card supp s2" href="complex-numbers-complex-plane.html">
@@ -288,7 +282,7 @@
             <path class="g" d="M27 20A7 7 0 0 0 20 13"/>
             <circle class="gd" cx="20" cy="8" r="2.6"/>
           </svg>
-          <span class="card-title">The Complex Plane</span>
+          <span class="card-title">Bonus</span>
           <span class="badge">supplement</span>
         </a>
     </nav>
@@ -305,10 +299,10 @@
       // origin — they swing up and down onto the imaginary axis, landing exactly on
       // the complex conjugate roots ±i√c.
       const canvas = document.getElementById('fractal');
-      const ctx = canvas.getContext('2d', { alpha: false });
+      const ctx = canvas.getContext('2d', { alpha: true });
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const CYAN = { r: 52, g: 245, b: 255 };
+      const CYAN = { r: 182, g: 255, b: 90 };
       const rgba = (c, a) => `rgba(${c.r|0},${c.g|0},${c.b|0},${a})`;
 
       let W = 0, H = 0, cx = 0, cy = 0, unit = 80, hunit = 100, bg = null;
@@ -322,8 +316,8 @@
         unit = Math.min(W, H) / 9;
         hunit = Math.min(W, H) / 7;      // hero quadratic gets a larger scale
         bg = ctx.createLinearGradient(0, 0, 0, H);
-        bg.addColorStop(0, '#080a18');
-        bg.addColorStop(1, '#040510');
+        bg.addColorStop(0, '#000000');
+        bg.addColorStop(1, '#000000');
       }
       resize();
       let rt;
@@ -346,22 +340,22 @@
 
       function drawAxesAndGrid() {
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(120,150,220,0.05)';
+        ctx.strokeStyle = 'rgba(182,255,90,0.04)';
         for (let gx = cx % unit; gx < W; gx += unit) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
         for (let gy = cy % unit; gy < H; gy += unit) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
         // imaginary axis
-        ctx.strokeStyle = 'rgba(155,123,255,0.28)';
+        ctx.strokeStyle = 'rgba(182,255,90,0.16)';
         ctx.lineWidth = 1.4;
         ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
         // real axis (bright)
         const ay = cy;
         const lg = ctx.createLinearGradient(0, ay, W, ay);
-        lg.addColorStop(0, 'rgba(52,245,255,0)');
-        lg.addColorStop(0.5, 'rgba(52,245,255,0.72)');
-        lg.addColorStop(1, 'rgba(52,245,255,0)');
+        lg.addColorStop(0, 'rgba(182,255,90,0)');
+        lg.addColorStop(0.5, 'rgba(182,255,90,0.72)');
+        lg.addColorStop(1, 'rgba(182,255,90,0)');
         ctx.strokeStyle = lg;
         ctx.lineWidth = 2.6;
-        ctx.shadowColor = 'rgba(52,245,255,0.7)';
+        ctx.shadowColor = 'rgba(182,255,90,0.7)';
         ctx.shadowBlur = 16;
         ctx.beginPath(); ctx.moveTo(0, ay); ctx.lineTo(W, ay); ctx.stroke();
         ctx.shadowBlur = 0;
@@ -455,8 +449,7 @@
 
       function frame(time) {
         ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, W, H);
+        ctx.clearRect(0, 0, W, H);
         drawAxesAndGrid();
 
         ctx.globalCompositeOperation = 'lighter';

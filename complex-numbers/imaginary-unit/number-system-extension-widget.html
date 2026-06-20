@@ -13,7 +13,7 @@
       --text:   #eaf2ff;
       --muted:  rgba(234, 242, 255, 0.6);
       --faint:  rgba(234, 242, 255, 0.32);
-      --line:   rgba(234, 242, 255, 0.5);
+      --line:   rgba(255, 255, 255, 0.88);
       --accent: #b6ff5a;
     }
     * { box-sizing: border-box; }
@@ -44,7 +44,7 @@
     .head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 1rem;
       margin-bottom: 0.6rem;
     }
@@ -75,26 +75,32 @@
       margin: 0.3rem 0 0.1rem;
       min-height: 1.3em;
     }
-    .equation .ans {
+    .equation .ans,
+    .equation .unknown {
       color: var(--accent);
       text-shadow: 0 0 16px var(--accent);
+    }
+    .equation .ans {
       opacity: 0;
       transition: opacity 0.5s ease;
     }
     .equation .ans.show { opacity: 1; }
 
-    .stage { width: 100%; cursor: pointer; }
+    .stage { width: 100%; }
     svg { display: block; width: 100%; height: auto; overflow: visible; }
 
-    .nl { stroke: var(--line); stroke-width: 2; stroke-linecap: round; }
+    .nl { stroke: var(--line); stroke-width: 2.3; stroke-linecap: round; }
     .nl.new { stroke: var(--accent); }
-    .tk { stroke: rgba(234,242,255,0.3); stroke-width: 1.5; stroke-linecap: round; }
+    .nl.continuous { stroke: #ffd45a; filter: drop-shadow(0 0 8px rgba(255, 212, 90, 0.72)); }
+    .tk { stroke: rgba(255,255,255,0.58); stroke-width: 1.4; stroke-linecap: round; }
     .tk.minor { stroke: rgba(234,242,255,0.16); }
     .tk.acc { stroke: var(--accent); }
-    .tklab { fill: var(--faint); font-family: "JetBrains Mono", monospace; font-size: 13px; text-anchor: middle; }
+    .tklab { fill: rgba(234,242,255,0.74); font-family: "JetBrains Mono", monospace; font-size: 13px; text-anchor: middle; }
 
     .rev { opacity: 0; transition: opacity 0.7s ease; }
     .rev.show { opacity: 1; }
+    .hide-line-on-reveal { transition: opacity 0.45s ease; }
+    .hide-line-on-reveal.hidden { opacity: 0; }
 
     .band rect { fill: var(--accent); }
     .tag {
@@ -109,11 +115,6 @@
     .marker { transition: transform 0.95s cubic-bezier(.3,.85,.25,1); }
     .marker circle { fill: var(--accent); filter: drop-shadow(0 0 8px var(--accent)); }
     .marker text { fill: var(--text); font-family: "JetBrains Mono", monospace; font-size: 14px; font-weight: 500; text-anchor: middle; }
-
-    .vax { stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
-    .lift { transition: transform 0.9s cubic-bezier(.3,.85,.25,1), opacity 0.6s ease; }
-    .lift circle { fill: var(--accent); filter: drop-shadow(0 0 10px var(--accent)); }
-    .lift text { fill: var(--text); font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 600; text-anchor: middle; }
 
     .foot {
       display: flex;
@@ -130,6 +131,10 @@
       min-height: 2.6em;
     }
     .caption b { color: var(--text); font-weight: 500; }
+    .caption .system-focus {
+      color: #ffd45a;
+      text-shadow: 0 0 14px rgba(255, 212, 90, 0.78);
+    }
     .nav { display: flex; gap: 0.5rem; flex-shrink: 0; }
     .nav button {
       font-family: "JetBrains Mono", monospace;
@@ -146,6 +151,15 @@
     .nav button:hover:not(:disabled) { border-color: var(--accent); box-shadow: 0 0 16px -4px var(--accent); }
     .nav button:disabled { opacity: 0.35; cursor: default; }
 
+    .nav .action {
+      color: #06070e;
+      background: var(--accent);
+      border-color: var(--accent);
+      font-weight: 600;
+      box-shadow: 0 0 18px -4px var(--accent);
+    }
+    .nav .action:hover:not(:disabled) { filter: brightness(1.08); box-shadow: 0 0 22px -2px var(--accent); }
+
     @media (max-width: 620px) {
       .foot { flex-direction: column-reverse; align-items: stretch; }
       .nav { justify-content: space-between; }
@@ -155,14 +169,13 @@
 <body>
   <main class="widget" aria-label="Extending the number system">
     <div class="head">
-      <span class="kicker">Extending the number system</span>
       <div class="dots" id="dots" role="tablist"></div>
     </div>
 
     <div class="equation" id="equation"></div>
 
-    <div class="stage" id="stage" title="click to replay">
-      <svg viewBox="0 0 900 340" role="img" aria-label="A number line that extends with each new kind of number">
+    <div class="stage" id="stage">
+      <svg viewBox="0 0 900 190" role="img" aria-label="A number line that extends with each new kind of number">
         <g id="dyn"></g>
       </svg>
     </div>
@@ -170,8 +183,7 @@
     <div class="foot">
       <p class="caption" id="caption"></p>
       <div class="nav">
-        <button id="prev" type="button">‹ back</button>
-        <button id="next" type="button">next ›</button>
+        <button id="action" class="action" type="button">Include negative numbers</button>
       </div>
     </div>
   </main>
@@ -180,54 +192,58 @@
     const NS = 'http://www.w3.org/2000/svg';
     const el = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
 
-    const ox = 450, oy = 250, ppu = 60;
+    const ox = 450, oy = 105, ppu = 82;
+    const lineMin = -4.35;
+    const lineMax = 4.35;
     const xOf = (u) => ox + u * ppu;
 
     const dyn = document.getElementById('dyn');
     const equationEl = document.getElementById('equation');
     const captionEl = document.getElementById('caption');
     const dotsEl = document.getElementById('dots');
-    const prevBtn = document.getElementById('prev');
-    const nextBtn = document.getElementById('next');
     const stage = document.getElementById('stage');
 
     const steps = [
       {
         accent: '#b6ff5a',
         kind: 'extend-left',
+        action: 'Include negative numbers',
         problemHTML: '3 − 5 = <span class="ans" id="ansSpan">−2</span>',
-        problemPlain: '3 − 5 = ?',
-        pose: 'Start with the counting numbers. Step back 5 from 3 and you run off the end of the line…',
-        reveal: 'So the line grows the other way. <b>Negative numbers</b> let 3 − 5 = −2.',
-        baseInts: [0, 6], newInts: [-6, -1],
-        markerStart: 3, markerEnd: -2,
-        band: [-6, 0], tag: 'negatives'
-      },
-      {
-        accent: '#ffd45a',
-        kind: 'subdivide',
-        problemHTML: '4 ÷ 8 = <span class="ans" id="ansSpan">1/2</span>',
-        problemPlain: '4 ÷ 8 = ?',
-        pose: 'Now the whole integers. But 4 ÷ 8 lands between 0 and 1 — and no integer lives there…',
-        reveal: 'So the gaps fill in. <b>Fractions</b> let 4 ÷ 8 = 1/2.',
-        baseInts: [-6, 6],
-        markerStart: 1, markerEnd: 0.5,
-        band: [0, 1], tag: 'fractions'
+        problemPlain: '3 &minus; 5 = <span class="unknown">?</span>',
+        pose: '<span class="system-focus">&#8469;</span> &rarr; &#8484;',
+        reveal: '&#8469; &rarr; <span class="system-focus">&#8484;</span>',
+        baseInts: [0, 4], newInts: [-4, -1],
+        markerStart: 3, markerEnd: -2
       },
       {
         accent: '#b6ff5a',
-        kind: 'lift-off',
-        problemHTML: '√−9 = <span class="ans" id="ansSpan">?</span>',
-        problemPlain: '√−9 = ?',
-        pose: 'Now every rational number. We need a value that squares to −9 — but every point on the line squares to something positive…',
-        reveal: 'This time the line itself is not enough. The answer <b>lifts off it</b>, into a new direction.',
-        baseInts: [-6, 6], dense: true,
-        liftHeight: 3, liftLabel: '?', tag: 'a new direction'
+        kind: 'subdivide',
+        action: 'Include fractions',
+        problemHTML: '4 ÷ 8 = <span class="ans" id="ansSpan">1/2</span>',
+        problemPlain: '4 &divide; 8 = <span class="unknown">?</span>',
+        pose: '<span class="system-focus">&#8484;</span> &rarr; &#8474;',
+        reveal: '&#8484; &rarr; <span class="system-focus">&#8474;</span>',
+        baseInts: [-4, 4],
+        markerStart: 1, markerEnd: 0.5
+      },
+      {
+        accent: '#b6ff5a',
+        kind: 'fill-line',
+        action: 'Include irrational numbers',
+        problemHTML: '&pi; = <span class="ans" id="ansSpan">3.14159&hellip;</span>',
+        problemPlain: '&pi; = <span class="unknown">?</span>',
+        pose: '<span class="system-focus">&#8474;</span> &rarr; &#8477;',
+        reveal: '&#8474; &rarr; <span class="system-focus">&#8477;</span>',
+        baseInts: [-4, 4],
+        markerValue: Math.PI,
+        markerLabel: 'π',
+        tag: 'all real numbers'
       }
     ];
 
     let cur = 0;
-    let revealTimer = null;
+    let revealed = false;
+    const actionBtn = document.getElementById('action');
 
     // build dots
     steps.forEach((_, i) => {
@@ -241,7 +257,7 @@
 
     function tick(u, cls, label) {
       const x = xOf(u);
-      const big = Number.isInteger(u);
+      const big = Number.isInteger(u) || cls.includes('halfTick');
       const h = big ? 9 : 6;
       const g = el('g', { class: cls });
       g.appendChild(el('line', { class: 'tk' + (big ? '' : ' minor') + (cls.includes('accTick') ? ' acc' : ''), x1: x, y1: oy - h, x2: x, y2: oy + h }));
@@ -254,7 +270,6 @@
     }
 
     function render(i) {
-      clearTimeout(revealTimer);
       const s = steps[i];
       document.documentElement.style.setProperty('--accent', s.accent);
       dyn.innerHTML = '';
@@ -262,38 +277,53 @@
       // step dots
       [...dotsEl.children].forEach((d, k) => d.classList.toggle('active', k === i));
 
-      // equation (posed)
-      equationEl.innerHTML = s.problemHTML;
+      // equation starts unsolved
+      equationEl.innerHTML = s.problemPlain;
       captionEl.innerHTML = s.pose;
 
       // ----- base number line -----
       if (s.kind === 'extend-left') {
-        dyn.appendChild(el('line', { class: 'nl', x1: xOf(0), y1: oy, x2: xOf(6.4), y2: oy }));
+        dyn.appendChild(el('line', { class: 'nl', x1: xOf(0), y1: oy, x2: xOf(lineMax), y2: oy }));
         // new (negative) segment, revealable
-        const seg = el('line', { class: 'nl new rev', x1: xOf(0), y1: oy, x2: xOf(-6.4), y2: oy });
+        const seg = el('line', { class: 'nl rev', x1: xOf(0), y1: oy, x2: xOf(lineMin), y2: oy });
         dyn.appendChild(seg);
       } else {
-        dyn.appendChild(el('line', { class: 'nl', x1: xOf(-6.4), y1: oy, x2: xOf(6.4), y2: oy }));
+        dyn.appendChild(el('line', { class: 'nl', x1: xOf(lineMin), y1: oy, x2: xOf(lineMax), y2: oy }));
       }
 
       // ----- ticks -----
       if (s.kind === 'extend-left') {
-        for (let u = s.baseInts[0]; u <= s.baseInts[1]; u++) dyn.appendChild(tick(u, 'base', (u === 0 || u === 3 || u === 6) ? String(u) : undefined));
+        for (let u = s.baseInts[0]; u <= s.baseInts[1]; u++) dyn.appendChild(tick(u, 'base', String(u)));
         // negatives revealable
         for (let u = s.newInts[0]; u <= s.newInts[1]; u++) {
-          dyn.appendChild(tick(u, 'rev', (u === -2) ? '−2' : (u % 3 === 0 ? String(u) : undefined)));
+          dyn.appendChild(tick(u, 'rev', fmt(u)));
         }
       } else if (s.kind === 'subdivide') {
-        for (let u = s.baseInts[0]; u <= s.baseInts[1]; u++) dyn.appendChild(tick(u, 'base', (u === 0 || u === 1) ? String(u) : (u % 3 === 0 ? String(u) : undefined)));
-        // halves revealable
-        for (let u = s.baseInts[0]; u <= s.baseInts[1] - 1; u++) {
-          const hv = u + 0.5;
-          const isHalf = Math.abs(hv - 0.5) < 1e-9;
-          dyn.appendChild(tick(hv, 'rev' + (isHalf ? ' accTick' : ''), isHalf ? '1/2' : undefined));
+        for (let u = s.baseInts[0]; u <= s.baseInts[1]; u++) dyn.appendChild(tick(u, 'base', fmt(u)));
+        // fractional subdivisions revealable
+        for (let u = s.baseInts[0]; u < s.baseInts[1]; u++) {
+          const half = u + 0.5;
+          dyn.appendChild(tick(half, 'rev halfTick' + (half === 0.5 ? ' accTick' : ''), half === 0.5 ? '1/2' : undefined));
         }
-      } else { // lift-off
-        for (let u = s.baseInts[0]; u <= s.baseInts[1]; u++) dyn.appendChild(tick(u, 'base', (u % 3 === 0) ? String(u) : undefined));
-        if (s.dense) for (let u = s.baseInts[0]; u <= s.baseInts[1] - 1; u++) dyn.appendChild(tick(u + 0.5, 'base'));
+      } else { // fill-line
+        for (let u = s.baseInts[0]; u <= s.baseInts[1]; u++) {
+          const g = tick(u, 'base', fmt(u));
+          const line = g.querySelector('line');
+          if (line) line.classList.add('hide-line-on-reveal');
+          dyn.appendChild(g);
+        }
+        if (s.kind === 'fill-line') {
+          const full = el('line', { class: 'nl continuous rev', x1: xOf(lineMin), y1: oy, x2: xOf(lineMax), y2: oy });
+          full.setAttribute('stroke-width', '5');
+          dyn.appendChild(full);
+
+          const piMarker = el('g', { class: 'rev marker' });
+          piMarker.appendChild(el('circle', { cx: xOf(s.markerValue), cy: oy, r: 7 }));
+          const piText = el('text', { x: xOf(s.markerValue), y: oy - 16 });
+          piText.textContent = s.markerLabel;
+          piMarker.appendChild(piText);
+          dyn.appendChild(piMarker);
+        }
       }
 
       // ----- highlight band + tag (revealable) -----
@@ -314,70 +344,33 @@
       }
 
       // ----- marker (horizontal steps) -----
-      if (s.kind !== 'lift-off') {
-        const m = el('g', { class: 'marker', id: 'marker' });
-        m.style.transform = 'translateX(' + xOf(s.markerStart) + 'px)';
+      if (s.kind !== 'fill-line') {
+        const m = el('g', { class: 'marker rev', id: 'marker' });
+        m.style.transform = 'translateX(' + xOf(s.markerEnd) + 'px)';
         m.appendChild(el('circle', { cx: 0, cy: oy, r: 7 }));
         const vt = el('text', { x: 0, y: oy - 16, id: 'mval' });
-        vt.textContent = fmt(s.markerStart);
+        vt.textContent = fmt(s.markerEnd);
         m.appendChild(vt);
         dyn.appendChild(m);
       }
 
-      // ----- lift-off apparatus (revealable) -----
-      if (s.kind === 'lift-off') {
-        const topY = oy - s.liftHeight * ppu;
-        const vline = el('line', { class: 'vax', x1: xOf(0), y1: oy, x2: xOf(0), y2: topY, id: 'vax' });
-        const len = s.liftHeight * ppu;
-        vline.style.strokeDasharray = len;
-        vline.style.strokeDashoffset = len;
-        vline.style.transition = 'stroke-dashoffset 0.9s ease';
-        dyn.appendChild(vline);
-
-        const tg = el('text', { class: 'tag rev', x: xOf(0) + 64, y: (oy + topY) / 2 });
-        tg.textContent = s.tag;
-        dyn.appendChild(tg);
-
-        const lift = el('g', { class: 'lift', id: 'lift', opacity: 0 });
-        lift.style.transform = 'translateY(0px)';
-        lift.appendChild(el('circle', { cx: xOf(0), cy: oy, r: 7 }));
-        const lt = el('text', { x: xOf(0) + 18, y: oy + 5 });
-        lt.textContent = s.liftLabel;
-        lift.appendChild(lt);
-        dyn.appendChild(lift);
-      }
-
-      // nav state
-      prevBtn.disabled = i === 0;
-      nextBtn.disabled = i === steps.length - 1;
-
-      // schedule the reveal
-      revealTimer = setTimeout(() => reveal(i), 750);
+      // arm the action button — the reveal waits for a click
+      revealed = false;
+      actionBtn.textContent = s.action;
     }
 
     function reveal(i) {
       const s = steps[i];
+      revealed = true;
       dyn.querySelectorAll('.rev').forEach((n) => n.classList.add('show'));
+      actionBtn.textContent = i < steps.length - 1 ? 'Next' : 'Reset';
+      if (s.kind === 'fill-line') dyn.querySelectorAll('.hide-line-on-reveal').forEach((n) => n.classList.add('hidden'));
+      // swap the equation to its solved form and glow the answer in
+      equationEl.innerHTML = s.problemHTML;
       const ans = document.getElementById('ansSpan');
-      if (ans) ans.classList.add('show');
+      if (ans) requestAnimationFrame(() => ans.classList.add('show'));
       captionEl.innerHTML = s.reveal;
 
-      if (s.kind !== 'lift-off') {
-        const m = document.getElementById('marker');
-        const mval = document.getElementById('mval');
-        if (m) m.style.transform = 'translateX(' + xOf(s.markerEnd) + 'px)';
-        if (mval) setTimeout(() => { mval.textContent = fmt(s.markerEnd); }, 500);
-      } else {
-        const vax = document.getElementById('vax');
-        const lift = document.getElementById('lift');
-        if (vax) vax.style.strokeDashoffset = '0';
-        if (lift) {
-          setTimeout(() => {
-            lift.style.transform = 'translateY(' + (-s.liftHeight * ppu) + 'px)';
-            lift.setAttribute('opacity', 1);
-          }, 350);
-        }
-      }
     }
 
     function fmt(u) {
@@ -391,9 +384,15 @@
       render(cur);
     }
 
-    prevBtn.addEventListener('click', () => go(cur - 1));
-    nextBtn.addEventListener('click', () => go(cur + 1));
-    stage.addEventListener('click', () => render(cur)); // replay
+    actionBtn.addEventListener('click', () => {
+      if (!revealed) {
+        reveal(cur);
+      } else if (cur < steps.length - 1) {
+        go(cur + 1);
+      } else {
+        go(0);
+      }
+    });
 
     go(0);
   </script>
