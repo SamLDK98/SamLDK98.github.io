@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiplication Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #c4ff74;
+      --orange: #ecc873;
+      --text: #ffffff;
+      --dim: rgba(255, 255, 255, 0.86);
+      --faint: rgba(255, 255, 255, 0.58);
+      --red: #ff6a5e;
+      --blue: #6cd0ff;
+      --hair: rgba(255, 255, 255, 0.16);
+      --rule-soft: rgba(236, 200, 115, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0.4rem;
+      background: transparent;
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+    }
+
+    .widget {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 1.4rem 1.5rem 1.5rem;
+      border: 1px solid rgba(236, 200, 115, 0.18);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 88% 0%, rgba(196, 255, 116, 0.05), transparent 42%),
+        #070707;
+    }
+
+    .titlebar { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; }
+    .title {
+      margin: 0;
+      color: var(--orange);
+      font-size: clamp(1.3rem, 3vw, 1.75rem);
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .counter { color: var(--faint); font-family: "JetBrains Mono", monospace; font-size: 0.72rem; white-space: nowrap; }
+    .track { margin-top: 0.85rem; height: 2px; background: rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden; }
+    .track > i { display: block; height: 100%; background: var(--green); transition: width 420ms cubic-bezier(.2,.72,.16,1); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr);
+      gap: 1.6rem;
+      align-items: start;
+      margin-top: 1.25rem;
+    }
+
+    svg.plane { display: block; width: 100%; height: auto; min-height: 380px; overflow: visible; cursor: crosshair; touch-action: none; }
+
+    .axis { stroke: rgba(255, 255, 255, 0.72); stroke-width: 1.4; stroke-linecap: round; }
+    .grid-line { stroke: rgba(255, 255, 255, 0.09); stroke-width: 1; }
+    .tick { stroke: rgba(255, 255, 255, 0.26); stroke-width: 1; }
+    .tick-num { fill: var(--faint); font-family: "JetBrains Mono", monospace; font-size: 10px; }
+    .axis-label { fill: var(--dim); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+    .target-ring { fill: none; stroke: var(--orange); stroke-width: 1.8; stroke-dasharray: 3 4; animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    .tri-fill { fill: rgba(255, 255, 255, 0.06); stroke: none; }
+    .tri-leg { stroke: rgba(255, 255, 255, 0.6); stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .tri-label { fill: var(--text); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+    .angle-arc { fill: none; stroke: var(--orange); stroke-width: 1.8; }
+
+    .vec { stroke-width: 2.6; stroke-linecap: round; }
+    .vec-dot { stroke: #070707; stroke-width: 1.5; }
+    .vec-label { font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 500; }
+
+    .panel { display: flex; flex-direction: column; gap: 0.85rem; min-width: 0; }
+    .panel-prompt { margin: 0; color: var(--orange); font-size: clamp(1.02rem, 2vw, 1.25rem); font-weight: 600; letter-spacing: 0.01em; }
+    .hint { margin: 0; color: var(--dim); font-size: 0.9rem; line-height: 1.55; }
+    .hint .mj { color: var(--text); }
+    .note { margin: 0.1rem 0 0; color: var(--faint); font-size: 0.78rem; line-height: 1.5; }
+    .status { margin: 0; font-family: "JetBrains Mono", monospace; font-size: 0.82rem; }
+    .status.bad { color: var(--red); }
+
+    .measure { display: flex; flex-direction: column; gap: 1rem; }
+    .m-row { display: flex; flex-direction: column; gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--hair); }
+    .m-row:last-child { padding-bottom: 0; border-bottom: 0; }
+    .m-label { color: var(--faint); font-family: "JetBrains Mono", monospace; font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    .m-line { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-family: "JetBrains Mono", monospace; font-size: 0.96rem; color: var(--text); }
+
+    .arctan { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
+    .frac { display: inline-flex; flex-direction: column; align-items: center; }
+    .frac .bar { width: 100%; height: 1px; background: var(--dim); margin: 1px 0; }
+    .miniin {
+      width: 2.7rem; background: transparent; border: 0; border-bottom: 1px solid var(--rule-soft);
+      color: var(--text); font-family: "JetBrains Mono", monospace; font-size: 0.85rem; padding: 0.12rem 0.2rem; text-align: center;
+    }
+    .miniin:focus { outline: none; border-bottom-color: var(--orange); }
+
+    .record {
+      border: 1px solid var(--rule-soft); border-radius: 999px; background: transparent;
+      color: var(--green); font-family: "JetBrains Mono", monospace; font-size: 0.88rem;
+      padding: 0.18rem 0.6rem; cursor: pointer; transition: background 140ms ease, border-color 140ms ease;
+    }
+    .record:hover, .record:focus-visible { background: rgba(196, 255, 116, 0.14); outline: none; }
+    .record.done { border-color: var(--green); cursor: default; }
+
+    .scratchpad {
+      width: 100%; min-height: 78px; resize: vertical;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--hair); border-radius: 6px;
+      color: var(--text); font-family: "JetBrains Mono", monospace; font-size: 0.88rem; line-height: 1.7; padding: 0.55rem 0.6rem;
+    }
+    .scratchpad:focus { outline: none; border-color: var(--rule-soft); }
+    .scratchpad::placeholder { color: rgba(255, 255, 255, 0.32); }
+
+    details.scratch > summary {
+      cursor: pointer; list-style: none; color: var(--orange);
+      font-family: "JetBrains Mono", monospace; font-size: 0.74rem; letter-spacing: 0.04em;
+    }
+    details.scratch > summary::-webkit-details-marker { display: none; }
+    details.scratch > summary::before { content: "+ "; }
+    details.scratch[open] > summary::before { content: "– "; }
+    .solution { margin-top: 0.55rem; color: var(--dim); line-height: 1.7; font-size: 0.88rem; }
+    .solution .mj { color: var(--green); }
+
+    .startover {
+      align-self: flex-start; margin-top: 0.3rem; border: 0; background: none; padding: 0;
+      color: var(--faint); font-family: "JetBrains Mono", monospace; font-size: 0.68rem;
+      cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+    }
+    .startover:hover { color: var(--text); }
+
+    .tablewrap { margin-top: 1.5rem; overflow-x: auto; }
+    table.findings { width: 100%; border-collapse: collapse; font-family: "JetBrains Mono", monospace; font-size: 0.8rem; min-width: 660px; }
+    table.findings th { color: var(--faint); font-weight: 400; font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.45rem 0.4rem; text-align: center; border-bottom: 1px solid var(--rule-soft); }
+    table.findings td { padding: 0.5rem 0.4rem; text-align: center; }
+    table.findings td.problemcell { text-align: left; color: var(--orange); white-space: nowrap; }
+    table.findings input.cell {
+      width: 100%; min-width: 56px; background: transparent; border: 0; border-bottom: 1px solid var(--hair);
+      color: var(--text); font-family: "JetBrains Mono", monospace; font-size: 0.82rem; padding: 0.28rem 0.2rem; text-align: center;
+    }
+    table.findings input.cell::placeholder { color: rgba(255, 255, 255, 0.3); }
+    table.findings input.cell:focus { outline: none; border-bottom-color: var(--orange); }
+    table.findings input.cell:disabled { -webkit-text-fill-color: currentColor; opacity: 1; cursor: default; }
+    table.findings input.cell.active { border-bottom: 1.5px solid var(--orange); }
+    table.findings input.cell.correct { color: var(--green); border-bottom-color: var(--green); }
+    table.findings input.cell.wrong { color: var(--red); border-bottom-color: var(--red); }
+
+    @media (max-width: 760px) {
+      .widget { padding: 1.1rem 1.1rem 1.2rem; }
+      .layout { grid-template-columns: 1fr; gap: 1.2rem; }
+      svg.plane { min-height: 320px; }
+    }
+  </style>
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'local' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/jsx-source" id="app-source">
+    const { useState, useRef, useEffect } = React;
+
+    const VB_W = 540, VB_H = 470, PAD = 44;
+    const round2 = (x) => Math.round(x * 100) / 100;
+    const deg = (r) => r * 180 / Math.PI;
+
+    const C = { blue: '#6cd0ff', green: '#c4ff74', orange: '#ecc873', red: '#ff6a5e' };
+    const MARK = { '#6cd0ff': 'arrBlue', '#c4ff74': 'arrGreen', '#ecc873': 'arrOrange', '#ff6a5e': 'arrRed' };
+    const FIELDS = ['result', 'angle1', 'angle2', 'angleR', 'dist1', 'dist2', 'distR'];
+
+    function fmtComplex(re, im) {
+      if (im === 0) return `${re}`;
+      const ip = im === 1 ? 'i' : im === -1 ? '-i' : `${im}i`;
+      if (re === 0) return ip;
+      return `${re}${im > 0 ? '+' : '-'}${Math.abs(im) === 1 ? 'i' : Math.abs(im) + 'i'}`;
+    }
+    const fmt = (p) => fmtComplex(p.re, p.im);
+    const fmtFactor = (p) => (p.re !== 0 && p.im !== 0) ? `(${fmt(p)})` : fmt(p);
+    function mult(a, b) { return { re: a.re * b.re - a.im * b.im, im: a.re * b.im + a.im * b.re }; }
+    function magOf(p) { return round2(Math.hypot(p.re, p.im)); }
+    function argOf(p) { let a = deg(Math.atan2(p.im, p.re)); if (a < 0) a += 360; return round2(a); }
+
+    function rangeFor(f1, f2, result) {
+      const pts = [{ re: 0, im: 0 }, f1, f2, result];
+      const xs = pts.map((q) => q.re), ys = pts.map((q) => q.im);
+      return { xmin: Math.min(...xs) - 2, xmax: Math.max(...xs) + 2, ymin: Math.min(...ys) - 2, ymax: Math.max(...ys) + 2 };
+    }
+    function expectFor(f1, f2, result) {
+      return {
+        result: { kind: 'complex', re: result.re, im: result.im },
+        dist1: { kind: 'num', value: magOf(f1), tol: 0.12 },
+        dist2: { kind: 'num', value: magOf(f2), tol: 0.12 },
+        distR: { kind: 'num', value: magOf(result), tol: 0.12 },
+        angle1: { kind: 'num', value: argOf(f1), tol: 1.2 },
+        angle2: { kind: 'num', value: argOf(f2), tol: 1.2 },
+        angleR: { kind: 'num', value: argOf(result), tol: 1.2 },
+      };
+    }
+
+    /* Each problem is defined by its two factors plus a worked solution.
+       Everything else (product, label, plane range, expected values) is derived. */
+    const RAW = [
+      { f1: { re: 4, im: 3 }, f2: { re: 0, im: 1 }, solution: '$(4+3i)\\cdot i = 4i + 3i^2 = 4i - 3 = -3 + 4i$' },
+      { f1: { re: 4, im: 3 }, f2: { re: 0, im: 2 }, solution: '$(4+3i)\\cdot 2i = 8i + 6i^2 = 8i - 6 = -6 + 8i$' },
+      { f1: { re: 4, im: 3 }, f2: { re: 4, im: 3 }, solution: '$(4+3i)(4+3i) = 16 + 12i + 12i + 9i^2 = 16 + 24i - 9 = 7 + 24i$' },
+      { f1: { re: 2, im: 1 }, f2: { re: 1, im: 2 }, solution: '$(2+i)(1+2i) = 2 + 4i + i + 2i^2 = 2 + 5i - 2 = 5i$' },
+    ];
+    const PROBLEMS = RAW.map((r) => {
+      const result = mult(r.f1, r.f2);
+      return { ...r, result, label: `${fmtFactor(r.f1)}·${fmtFactor(r.f2)}`, range: rangeFor(r.f1, r.f2, result), expect: expectFor(r.f1, r.f2, result) };
+    });
+
+    function stepsFor(p) {
+      return [
+        { kind: 'plot', slot: 'f1', target: p.f1, prompt: 'Plot $' + fmt(p.f1) + '$' },
+        { kind: 'measure', vec: p.f1, distCell: 'dist1', angleCell: 'angle1', prompt: 'Measure $' + fmt(p.f1) + '$' },
+        { kind: 'plot', slot: 'f2', target: p.f2, prompt: 'Plot $' + fmt(p.f2) + '$' },
+        { kind: 'measure', vec: p.f2, distCell: 'dist2', angleCell: 'angle2', prompt: 'Measure $' + fmt(p.f2) + '$' },
+        { kind: 'multiply', slot: 'res', target: p.result, cell: 'result', prompt: 'Multiply, then plot the result' },
+        { kind: 'measure', vec: p.result, distCell: 'distR', angleCell: 'angleR', prompt: 'Measure the result' },
+      ];
+    }
+    const LAST_STEP = 5;
+
+    function makeGeom(range) {
+      const { xmin, xmax, ymin, ymax } = range;
+      const spanX = xmax - xmin, spanY = ymax - ymin;
+      const UNIT = Math.min((VB_W - 2 * PAD) / spanX, (VB_H - 2 * PAD) / spanY);
+      const offX = (VB_W - spanX * UNIT) / 2, offY = (VB_H - spanY * UNIT) / 2;
+      return { xmin, xmax, ymin, ymax, UNIT, ORIGIN: { x: offX - xmin * UNIT, y: offY + ymax * UNIT } };
+    }
+
+    function parseComplex(raw) {
+      if (raw == null) return null;
+      let s = String(raw).toLowerCase().replace(/\s+/g, '').replace(/−/g, '-').replace(/j/g, 'i');
+      if (s === '') return null;
+      let im = 0, re = 0, foundI = false;
+      const m = s.match(/([+-]?\d*\.?\d*)i/);
+      if (m) {
+        foundI = true;
+        let c = m[1];
+        if (c === '' || c === '+') c = '1'; else if (c === '-') c = '-1';
+        im = parseFloat(c);
+        if (Number.isNaN(im)) return null;
+        s = s.replace(m[0], '');
+      }
+      if (s !== '') { const r = parseFloat(s); if (Number.isNaN(r)) return null; re = r; }
+      if (!foundI && s === '') return null;
+      return { re, im };
+    }
+
+    function checkCell(field, raw, expect) {
+      if (raw == null || String(raw).trim() === '') return 'empty';
+      const exp = expect[field];
+      if (exp.kind === 'complex') {
+        const p = parseComplex(raw);
+        return p && p.re === exp.re && p.im === exp.im ? 'correct' : 'wrong';
+      }
+      const v = parseFloat(String(raw).replace(/[°\sdeg]/gi, '').replace(/−/g, '-'));
+      if (Number.isNaN(v)) return 'wrong';
+      const near = (a) => Math.abs(v - a) <= exp.tol;
+      return near(exp.value) || near(exp.value - 360) || near(exp.value + 360) ? 'correct' : 'wrong';
+    }
+
+    function quadrantAngle(vec, n, d) {
+      if (Number.isNaN(n) || Number.isNaN(d)) return null;
+      if (d === 0) return n === 0 ? null : (vec.im >= 0 ? 90 : 270);
+      const raw = deg(Math.atan(Math.abs(n / d)));
+      if (vec.re < 0 && vec.im >= 0) return round2(180 - raw);
+      if (vec.re < 0 && vec.im < 0) return round2(180 + raw);
+      if (vec.re >= 0 && vec.im < 0) return round2(360 - raw);
+      return round2(raw);
+    }
+
+    function typeset(node, tries) {
+      if (!node) return;
+      tries = tries || 0;
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        try { window.MathJax.typesetClear([node]); window.MathJax.typesetPromise([node]); } catch (e) {}
+      } else if (tries < 40) {
+        setTimeout(() => typeset(node, tries + 1), 100);
+      }
+    }
+
+    const emptyRow = () => ({ result: '', angle1: '', angle2: '', angleR: '', dist1: '', dist2: '', distR: '' });
+
+    function App() {
+      const svgRef = useRef(null);
+      const panelRef = useRef(null);
+      const [pi, setPi] = useState(0);
+      const [step, setStep] = useState(0);
+      const [done, setDone] = useState(false);
+      const [points, setPoints] = useState({});
+      const [atanN, setAtanN] = useState('');
+      const [atanD, setAtanD] = useState('');
+      const [scratch, setScratch] = useState('');
+      const [hint, setHint] = useState(null);
+      const [rows, setRows] = useState(PROBLEMS.map(emptyRow));
+
+      const p = PROBLEMS[pi];
+      const steps = stepsFor(p);
+      const s = done ? null : steps[step];
+      const geom = makeGeom(p.range);
+      const toPx = (re, im) => ({ x: geom.ORIGIN.x + re * geom.UNIT, y: geom.ORIGIN.y - im * geom.UNIT });
+
+      const setCell = (field, val) => setRows((rs) => rs.map((row, i) => i === pi ? { ...row, [field]: val } : row));
+
+      useEffect(() => { typeset(panelRef.current); }, [pi, step, hint, done]);
+      useEffect(() => { setAtanN(''); setAtanD(''); setHint(null); }, [pi, step]);
+
+      useEffect(() => {
+        if (done || !s) return;
+        let ok = false;
+        if (s.kind === 'plot' || s.kind === 'multiply') {
+          const pt = points[s.slot];
+          ok = pt && pt.re === s.target.re && pt.im === s.target.im;
+        } else if (s.kind === 'measure') {
+          ok = checkCell(s.distCell, rows[pi][s.distCell], p.expect) === 'correct' &&
+               checkCell(s.angleCell, rows[pi][s.angleCell], p.expect) === 'correct';
+        }
+        if (!ok) return;
+        const t = setTimeout(() => {
+          if (step < LAST_STEP) { setStep(step + 1); }
+          else if (pi < PROBLEMS.length - 1) { setPi(pi + 1); setStep(0); setPoints({}); setScratch(''); }
+          else { setDone(true); }
+        }, 540);
+        return () => clearTimeout(t);
+      }, [pi, step, points, rows, done]);
+
+      const clientToComplex = (evt) => {
+        const svg = svgRef.current, pt = svg.createSVGPoint();
+        pt.x = evt.clientX; pt.y = evt.clientY;
+        const ctm = svg.getScreenCTM(); if (!ctm) return null;
+        const loc = pt.matrixTransform(ctm.inverse());
+        let re = Math.round((loc.x - geom.ORIGIN.x) / geom.UNIT), im = Math.round((geom.ORIGIN.y - loc.y) / geom.UNIT);
+        re = Math.max(geom.xmin, Math.min(geom.xmax, re)); im = Math.max(geom.ymin, Math.min(geom.ymax, im));
+        return { re, im };
+      };
+
+      const handlePlaneClick = (evt) => {
+        if (!s || (s.kind !== 'plot' && s.kind !== 'multiply')) return;
+        const c = clientToComplex(evt); if (!c) return;
+        const correct = c.re === s.target.re && c.im === s.target.im;
+        setPoints((prev) => ({ ...prev, [s.slot]: { re: c.re, im: c.im, correct } }));
+        if (correct) { setHint(null); if (s.kind === 'multiply') setCell('result', fmt(p.result)); }
+        else setHint(`Not ${fmtComplex(c.re, c.im)} — try again.`);
+      };
+
+      /* ---------- plane ---------- */
+      const gridLines = [];
+      for (let i = geom.xmin; i <= geom.xmax; i++) { const x = geom.ORIGIN.x + i * geom.UNIT; gridLines.push(<line key={'gv'+i} className="grid-line" x1={x} y1={toPx(0,geom.ymax).y} x2={x} y2={toPx(0,geom.ymin).y} />); }
+      for (let j = geom.ymin; j <= geom.ymax; j++) { const y = geom.ORIGIN.y - j * geom.UNIT; gridLines.push(<line key={'gh'+j} className="grid-line" x1={toPx(geom.xmin,0).x} y1={y} x2={toPx(geom.xmax,0).x} y2={y} />); }
+      const ticks = [];
+      for (let i = geom.xmin; i <= geom.xmax; i++) { if (i === 0) continue; const x = geom.ORIGIN.x + i*geom.UNIT; ticks.push(<line key={'tx'+i} className="tick" x1={x} y1={geom.ORIGIN.y-4} x2={x} y2={geom.ORIGIN.y+4} />); if (i%2===0) ticks.push(<text key={'txn'+i} className="tick-num" x={x} y={geom.ORIGIN.y+16} textAnchor="middle">{i}</text>); }
+      for (let j = geom.ymin; j <= geom.ymax; j++) { if (j === 0) continue; const y = geom.ORIGIN.y - j*geom.UNIT; ticks.push(<line key={'ty'+j} className="tick" x1={geom.ORIGIN.x-4} y1={y} x2={geom.ORIGIN.x+4} y2={y} />); if (j%2===0) ticks.push(<text key={'tyn'+j} className="tick-num" x={geom.ORIGIN.x-10} y={y+4} textAnchor="end">{j}i</text>); }
+
+      let ring = null;
+      if (s && s.kind === 'plot' && !(points[s.slot] && points[s.slot].correct)) {
+        const t = toPx(s.target.re, s.target.im);
+        ring = <circle className="target-ring" cx={t.x} cy={t.y} r="9" />;
+      }
+
+      let overlay = null;
+      if (s && s.kind === 'measure') {
+        const v = s.vec, o = toPx(0,0), corner = toPx(v.re,0), tip = toPx(v.re,v.im);
+        const a1 = Math.atan2(v.im, v.re), rArc = 28, n = 24; let arcD = '';
+        for (let i=0;i<=n;i++){ const ai=a1*(i/n), px=o.x+rArc*Math.cos(ai), py=o.y-rArc*Math.sin(ai); arcD+=`${i===0?'M':'L'} ${px.toFixed(2)} ${py.toFixed(2)} `; }
+        overlay = (
+          <g>
+            <polygon className="tri-fill" points={`${o.x},${o.y} ${corner.x},${corner.y} ${tip.x},${tip.y}`} />
+            <line className="tri-leg" x1={o.x} y1={o.y} x2={corner.x} y2={corner.y} />
+            <line className="tri-leg" x1={corner.x} y1={corner.y} x2={tip.x} y2={tip.y} />
+            {v.re !== 0 && <text className="tri-label" x={(o.x+corner.x)/2} y={o.y+16} textAnchor="middle">{Math.abs(v.re)}</text>}
+            {v.im !== 0 && <text className="tri-label" x={corner.x+(v.re>=0?8:-8)} y={(corner.y+tip.y)/2} textAnchor={v.re>=0?'start':'end'}>{Math.abs(v.im)}</text>}
+            <path className="angle-arc" d={arcD.trim()} />
+          </g>
+        );
+      }
+
+      const vectors = Object.entries(points).map(([slot, pt]) => {
+        const tip = toPx(pt.re, pt.im);
+        const color = pt.correct ? (slot === 'f1' ? C.blue : C.green) : C.red;
+        return (
+          <g key={slot}>
+            <line className="vec" x1={geom.ORIGIN.x} y1={geom.ORIGIN.y} x2={tip.x} y2={tip.y} stroke={color} markerEnd={`url(#${MARK[color]})`} />
+            <circle className="vec-dot" cx={tip.x} cy={tip.y} r="4" fill={color} />
+            <text className="vec-label" x={tip.x + (pt.re>=0?11:-11)} y={tip.y-8} textAnchor={pt.re>=0?'start':'end'} fill={color}>{fmtComplex(pt.re,pt.im)}</text>
+          </g>
+        );
+      });
+
+      /* ---------- panel ---------- */
+      let body = null;
+      if (done) {
+        body = null;
+      } else if (s.kind === 'plot') {
+        body = (
+          <>
+            <p className="hint">Click <span className="mj">{`$${fmt(s.target)}$`}</span> on the plane.</p>
+            {hint && <p className="status bad">{hint}</p>}
+          </>
+        );
+      } else if (s.kind === 'measure') {
+        const a = Math.abs(s.vec.re), b = Math.abs(s.vec.im);
+        const mag = round2(Math.hypot(s.vec.re, s.vec.im));
+        const distDone = checkCell(s.distCell, rows[pi][s.distCell], p.expect) === 'correct';
+        const angleDone = checkCell(s.angleCell, rows[pi][s.angleCell], p.expect) === 'correct';
+        const ang = quadrantAngle(s.vec, parseFloat(atanN), parseFloat(atanD));
+        body = (
+          <div className="measure">
+            <div className="m-row">
+              <span className="m-label">distance</span>
+              <div className="m-line">
+                <span>√({a}² + {b}²) = </span>
+                <button type="button" className={'record' + (distDone ? ' done' : '')} onClick={() => setCell(s.distCell, String(mag))}>{mag}{distDone ? ' ✓' : ''}</button>
+              </div>
+            </div>
+            <div className="m-row">
+              <span className="m-label">angle</span>
+              <div className="m-line arctan">
+                <span>tan⁻¹(</span>
+                <span className="frac">
+                  <input className="miniin" value={atanN} placeholder="opp" onChange={(e)=>setAtanN(e.target.value)} />
+                  <span className="bar"></span>
+                  <input className="miniin" value={atanD} placeholder="adj" onChange={(e)=>setAtanD(e.target.value)} />
+                </span>
+                <span>)</span>
+                {ang != null && <span>=</span>}
+                {ang != null && <button type="button" className={'record' + (angleDone ? ' done' : '')} onClick={() => setCell(s.angleCell, String(ang))}>{ang}°{angleDone ? ' ✓' : ''}</button>}
+              </div>
+              {(s.vec.re < 0 || s.vec.im < 0) && <p className="note">This vector isn't in the first quadrant — read the angle round from the positive real axis (anticlockwise).</p>}
+            </div>
+          </div>
+        );
+      } else if (s.kind === 'multiply') {
+        body = (
+          <>
+            <p className="hint">Work the algebra here, then plot your answer on the plane.</p>
+            <textarea className="scratchpad" value={scratch} onChange={(e)=>setScratch(e.target.value)}
+              placeholder={p.label + '\n=\n='} spellCheck="false" />
+            <details className="scratch">
+              <summary>solution</summary>
+              <div className="solution mj">{p.solution}</div>
+            </details>
+            {hint && <p className="status bad">{hint}</p>}
+          </>
+        );
+      }
+
+      const cellClass = (ri, f) => {
+        const st = checkCell(f, rows[ri][f], PROBLEMS[ri].expect);
+        const activeRow = ri === pi && !done;
+        const active = activeRow && s && ((s.cell === f) || (s.kind === 'measure' && (s.distCell === f || s.angleCell === f)));
+        return 'cell' + (st === 'correct' ? ' correct' : st === 'wrong' ? ' wrong' : '') + (active ? ' active' : '');
+      };
+
+      const total = PROBLEMS.length * (LAST_STEP + 1);
+      const pct = done ? 100 : Math.round((pi * (LAST_STEP + 1) + step) / total * 100);
+      const visibleRows = done ? PROBLEMS.length : pi + 1;
+      const reset = () => { setPi(0); setStep(0); setDone(false); setPoints({}); setAtanN(''); setAtanD(''); setScratch(''); setHint(null); setRows(PROBLEMS.map(emptyRow)); };
+
+      return (
+        <div className="widget">
+          <div className="titlebar">
+            <p className="title">{p.label}</p>
+            <span className="counter">problem {Math.min(pi + 1, PROBLEMS.length)} / {PROBLEMS.length}</span>
+          </div>
+          <div className="track"><i style={{ width: pct + '%' }}></i></div>
+
+          <div className="layout">
+            <svg ref={svgRef} className="plane" viewBox={`0 0 ${VB_W} ${VB_H}`} onClick={handlePlaneClick} role="img" aria-label="Clickable complex plane">
+              <defs>
+                {Object.entries(MARK).map(([color, id]) => (
+                  <marker key={id} id={id} markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="9" refX="8.5" refY="4.5" orient="auto">
+                    <path d="M0,0.5 L10,4.5 L0,8.5 Z" fill={color} />
+                  </marker>
+                ))}
+              </defs>
+              {gridLines}
+              <line className="axis" x1={toPx(geom.xmin,0).x} y1={geom.ORIGIN.y} x2={toPx(geom.xmax,0).x} y2={geom.ORIGIN.y} />
+              <line className="axis" x1={geom.ORIGIN.x} y1={toPx(0,geom.ymin).y} x2={geom.ORIGIN.x} y2={toPx(0,geom.ymax).y} />
+              {ticks}
+              <text className="axis-label" x={toPx(geom.xmax,0).x-4} y={geom.ORIGIN.y-8} textAnchor="end">real</text>
+              <text className="axis-label" x={geom.ORIGIN.x+8} y={toPx(0,geom.ymax).y+4}>imaginary</text>
+              {overlay}
+              {ring}
+              {vectors}
+            </svg>
+
+            <aside className="panel" ref={panelRef}>
+              <p className="panel-prompt">{done ? 'Done — see any patterns?' : s.prompt}</p>
+              {body}
+              {(pi > 0 || step > 0 || done) && <button type="button" className="startover" onClick={reset}>start over</button>}
+            </aside>
+          </div>
+
+          <div className="tablewrap">
+            <table className="findings">
+              <thead>
+                <tr>
+                  <th>Problem</th><th>Result</th><th>Angle 1</th><th>Angle 2</th><th>Result angle</th><th>Distance 1</th><th>Distance 2</th><th>Result distance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PROBLEMS.slice(0, visibleRows).map((prob, ri) => (
+                  <tr key={ri}>
+                    <td className="problemcell">{prob.label}</td>
+                    {FIELDS.map((f) => {
+                      const editable = ri === pi && !done;
+                      return (
+                        <td key={f}>
+                          <input className={cellClass(ri, f)} value={rows[ri][f]} disabled={!editable}
+                            onChange={editable ? (e)=>setCell(f, e.target.value) : undefined}
+                            placeholder={editable ? (f === 'result' ? 'a+bi' : '…') : ''} />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+
+  <script>
+    (function () {
+      var src = document.getElementById('app-source').textContent;
+      var out = Babel.transform(src, { presets: [['react', { runtime: 'classic' }]] }).code;
+      var runner = document.createElement('script');
+      runner.textContent = out;
+      document.body.appendChild(runner);
+    })();
+
+    (function () {
+      var frame = window.frameElement;
+      if (!frame) return;
+      var last = 0;
+      var apply = function () {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        if (h !== last) { last = h; frame.style.height = (h + 4) + 'px'; }
+      };
+      if (window.ResizeObserver) { try { new ResizeObserver(apply).observe(document.documentElement); } catch (e) {} }
+      window.addEventListener('load', apply);
+      // Poll as a reliable fallback: the table grows a row per problem, and
+      // ResizeObserver isn't dependable across all embedding contexts.
+      setInterval(apply, 300);
+    })();
+  </script>
+</body>
+</html>
