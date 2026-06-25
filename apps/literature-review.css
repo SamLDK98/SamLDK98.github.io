@@ -82,23 +82,82 @@ a {
 
 .review-card-header {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.55rem;
 }
 
-.review-eyebrow {
+.review-import-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.review-import-row .secondary-button {
+  min-height: 2.25rem;
+  padding: 0 1rem;
+}
+
+.import-panel {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: #fbf7ef;
+}
+
+.import-panel[hidden] {
+  display: none;
+}
+
+.import-instructions {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.import-instructions p {
   margin: 0;
-  color: var(--accent);
-  font-size: 0.72rem;
+}
+
+.import-instructions code,
+.import-instructions pre {
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+}
+
+.import-instructions pre {
+  margin: 0.2rem 0 0;
+  padding: 0.55rem;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #fffaf1;
+}
+
+.file-picker {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--ink);
+  font-size: 0.86rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
-.review-card h1 {
+.file-picker input {
+  width: 100%;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.import-status {
+  min-height: 1.25rem;
   margin: 0;
-  font-size: clamp(1.45rem, 8vw, 2.4rem);
-  line-height: 1.05;
-  letter-spacing: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.import-status.error {
+  color: var(--reject);
 }
 
 .review-progress-row {

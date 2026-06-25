@@ -18,8 +18,19 @@
 
     <section class="review-card" aria-labelledby="paper-title">
       <div class="review-card-header">
-        <p class="review-eyebrow">Literature Review</p>
-        <h1>Keep or Reject</h1>
+        <div class="review-import-row">
+          <button id="importToggleButton" class="secondary-button" type="button" aria-expanded="false" aria-controls="importPanel">Import</button>
+        </div>
+        <section id="importPanel" class="import-panel" aria-label="Import papers" hidden>
+          <div class="import-instructions">
+            <p>Fields: <code>id</code>/<code>doi</code>/<code>pmid</code> (at least one), <code>title</code>, <code>journal</code>, <code>year</code>, <code>abstract</code>.</p>
+          </div>
+          <label class="file-picker">
+            <span>JSON/CSV</span>
+            <input id="importFileInput" type="file" accept=".json,.csv,application/json,text/csv" />
+          </label>
+          <p id="importStatus" class="import-status" role="status"></p>
+        </section>
         <div class="review-progress-row">
           <span id="progressText">0 / 0</span>
           <span id="decisionSummary">No decisions yet</span>
