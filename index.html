@@ -3,35 +3,401 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive Expositions | Sam Kirwan</title>
+  <title>Interactive Explanations | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #070605;
+      --text:  rgba(255,248,240,0.94);
+      --dim:   rgba(255,239,224,0.30);
+      --glow:  255, 128, 42;   /* candle orange */
+      --mx: 50vw;
+      --my: 50vh;
+    }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    .desk-bg,
+    .desk-reveal,
+    .desk-shade,
+    .ambient,
+    .cursor-glow,
+    .dust-field {
+      position: fixed; inset: 0;
+      z-index: 0; pointer-events: none;
+    }
+
+    .desk-bg,
+    .desk-reveal {
+      background-image: url("images/study-desk-carvings.png");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .desk-bg {
+      opacity: 0.52;
+      filter: brightness(0.18) contrast(1.12) saturate(0.72);
+    }
+
+    .desk-reveal {
+      opacity: 0.95;
+      filter: brightness(0.9) contrast(1.22) saturate(1.34) sepia(0.34);
+      mix-blend-mode: screen;
+      -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my),
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.9) 7%,
+        rgba(0,0,0,0.38) 19%,
+        transparent 34%);
+      mask-image: radial-gradient(circle at var(--mx) var(--my),
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.9) 7%,
+        rgba(0,0,0,0.38) 19%,
+        transparent 34%);
+      transition: -webkit-mask-image 0.18s ease, mask-image 0.18s ease;
+      animation: revealFlicker 7.6s ease-in-out infinite;
+    }
+
+    .desk-shade {
+      background:
+        radial-gradient(circle at var(--mx) var(--my),
+          rgba(255, 148, 54, 0.22) 0%,
+          rgba(var(--glow), 0.13) 11%,
+          rgba(155, 53, 16, 0.1) 21%,
+          transparent 30%),
+        radial-gradient(ellipse at 50% 48%, transparent 30%, rgba(0,0,0,0.78) 86%),
+        linear-gradient(90deg, rgba(0,0,0,0.48), transparent 35%, transparent 62%, rgba(0,0,0,0.6)),
+        rgba(0,0,0,0.46);
+    }
+
+    .desk-shade::before,
+    .desk-shade::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .desk-shade::before {
+      background:
+        radial-gradient(circle at calc(var(--mx) + 112px) calc(var(--my) - 44px),
+          rgba(255, 154, 62, 0.18),
+          rgba(177, 58, 18, 0.08) 15%,
+          transparent 28%);
+      animation: rightFlameLobe 6.4s ease-in-out infinite;
+    }
+
+    .desk-shade::after {
+      background:
+        radial-gradient(circle at calc(var(--mx) - 58px) calc(var(--my) + 116px),
+          rgba(255, 119, 35, 0.16),
+          rgba(142, 42, 12, 0.08) 16%,
+          transparent 30%);
+      animation: lowerFlameLobe 8.1s ease-in-out infinite;
+    }
+
+    /* slow breathing warm pool, gathered around the masthead */
+    .ambient {
+      transform-origin: 50% 50%;
+      background: radial-gradient(circle at 50% 50%,
+        rgba(var(--glow), 0.12) 0%,
+        rgba(var(--glow), 0.05) 24%,
+        transparent 56%);
+      animation: breathe 11s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.06); }
+    }
+
+    /* warm glow that follows the cursor */
+    .cursor-glow {
+      inset: auto;
+      left: -255px; top: -255px;
+      width: 510px; height: 510px;
+      transform: translate(var(--mx), var(--my));
+      background: radial-gradient(circle at center,
+        rgba(255, 182, 82, 0.28) 0%,
+        rgba(var(--glow), 0.2) 17%,
+        rgba(160, 49, 13, 0.08) 32%,
+        transparent 54%);
+      transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+      animation: candleFlicker 7.4s ease-in-out infinite;
+    }
+
+    .cursor-glow::before,
+    .cursor-glow::after {
+      content: "";
+      position: absolute;
+      inset: -8%;
+      border-radius: 50%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .cursor-glow::before {
+      background: radial-gradient(circle at 63% 42%,
+        rgba(255, 151, 48, 0.16),
+        rgba(194, 65, 18, 0.09) 18%,
+        transparent 43%);
+      animation: cursorRightLobe 6.4s ease-in-out infinite;
+    }
+
+    .cursor-glow::after {
+      background: radial-gradient(circle at 42% 66%,
+        rgba(255, 103, 26, 0.14),
+        rgba(140, 39, 12, 0.08) 19%,
+        transparent 45%);
+      animation: cursorLowerLobe 8.1s ease-in-out infinite;
+    }
+
+    .dust-field {
+      overflow: hidden;
+      mix-blend-mode: screen;
+    }
+
+    .dust-speck {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--size, 2px);
+      height: var(--size, 2px);
+      border-radius: 50%;
+      background: rgba(255, 183, 95, 0.55);
+      box-shadow: 0 0 8px rgba(255, 136, 42, 0.38);
+      opacity: 0;
+      transform: translate3d(var(--x), var(--y), 0) scale(0.35);
+      animation: dustDrift var(--life, 1.8s) ease-out forwards;
+    }
+
+    @keyframes candleFlicker {
+      0%, 100% { opacity: 0.8;  filter: blur(0.6px) brightness(0.98); }
+      17%      { opacity: 0.86; filter: blur(0.4px) brightness(1.04); }
+      43%      { opacity: 0.79; filter: blur(0.9px) brightness(0.96); }
+      71%      { opacity: 0.88; filter: blur(0.3px) brightness(1.06); }
+    }
+
+    @keyframes rightFlameLobe {
+      0%, 100% { opacity: 0.34; transform: translate(0, 0) scale(1); }
+      12%      { opacity: 0.62; transform: translate(14px, -8px) scale(1.05); }
+      37%      { opacity: 0.22; transform: translate(-6px, 4px) scale(0.96); }
+      58%      { opacity: 0.76; transform: translate(18px, 7px) scale(1.08); }
+      83%      { opacity: 0.4;  transform: translate(2px, -11px) scale(1.01); }
+    }
+
+    @keyframes lowerFlameLobe {
+      0%, 100% { opacity: 0.26; transform: translate(0, 0) scale(1); }
+      19%      { opacity: 0.48; transform: translate(-10px, 12px) scale(1.04); }
+      41%      { opacity: 0.2;  transform: translate(8px, -5px) scale(0.98); }
+      64%      { opacity: 0.66; transform: translate(-16px, 15px) scale(1.07); }
+      91%      { opacity: 0.31; transform: translate(6px, 3px) scale(1.02); }
+    }
+
+    @keyframes cursorRightLobe {
+      0%, 100% { opacity: 0.32; transform: translate(0, 0) scale(1); }
+      12%      { opacity: 0.72; transform: translate(20px, -10px) scale(1.08); }
+      37%      { opacity: 0.18; transform: translate(-8px, 4px) scale(0.95); }
+      58%      { opacity: 0.84; transform: translate(24px, 8px) scale(1.12); }
+      83%      { opacity: 0.38; transform: translate(4px, -14px) scale(1.02); }
+    }
+
+    @keyframes cursorLowerLobe {
+      0%, 100% { opacity: 0.24; transform: translate(0, 0) scale(1); }
+      19%      { opacity: 0.5;  transform: translate(-12px, 16px) scale(1.05); }
+      41%      { opacity: 0.16; transform: translate(9px, -7px) scale(0.97); }
+      64%      { opacity: 0.7;  transform: translate(-20px, 20px) scale(1.1); }
+      91%      { opacity: 0.3;  transform: translate(7px, 5px) scale(1.03); }
+    }
+
+    @keyframes revealFlicker {
+      0%, 100% { opacity: 0.86; }
+      13%      { opacity: 0.92; }
+      28%      { opacity: 0.8; }
+      43%      { opacity: 0.95; }
+      67%      { opacity: 0.84; }
+      81%      { opacity: 0.9; }
+    }
+
+    @keyframes dustDrift {
+      0% {
+        opacity: 0;
+        transform: translate3d(var(--x), var(--y), 0) scale(0.35);
+      }
+      14% {
+        opacity: var(--alpha, 0.55);
+      }
+      100% {
+        opacity: 0;
+        transform:
+          translate3d(
+            calc(var(--x) + var(--dx)),
+            calc(var(--y) + var(--dy)),
+            0
+          )
+          scale(1);
+      }
+    }
+
+    main {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(2rem, 8vw, 7rem);
+      padding: clamp(1.5rem, 5vh, 3rem) clamp(2rem, 8vw, 7rem);
+      text-align: left;
+    }
+    @media (max-width: 680px) {
+      main { flex-direction: column; align-items: flex-start; justify-content: center; }
+      nav { transform: none; }
+    }
+
+    .title {
+      font-weight: 500;
+      font-size: clamp(2.6rem, 7vw, 5.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.015em;
+      color: rgba(255, 250, 244, 0.96);
+      margin-bottom: 0;
+      text-shadow:
+        0 0 22px rgba(var(--glow), 0.45),
+        0 0 60px rgba(var(--glow), 0.30),
+        0 0 120px rgba(var(--glow), 0.18);
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.45rem, 1.9vh, 1rem);
+      transform: translateX(clamp(-4.5rem, -5vw, -2rem));
+    }
+
+    nav a {
+      display: inline-block;
+      align-self: flex-start;
+      text-decoration: none;
+      color: var(--dim);
+      font-weight: 500;
+      font-size: clamp(1.15rem, 2.5vw, 1.75rem);
+      letter-spacing: 0.005em;
+      line-height: 1.1;
+      transition: color 0.45s ease, text-shadow 0.45s ease, opacity 0.45s ease, transform 0.45s cubic-bezier(0.2,0.7,0.2,1);
+      will-change: transform;
+    }
+    nav a:hover, nav a:focus-visible {
+      outline: none;
+      color: #fff6ec;
+      transform: translateX(4px);
+      text-shadow:
+        0 0 14px rgba(var(--glow), 0.6),
+        0 0 38px rgba(var(--glow), 0.45),
+        0 0 90px rgba(var(--glow), 0.30);
+    }
+    /* spotlight: dim the others while one is hovered */
+    nav:hover a:not(:hover),
+    nav:focus-within a:not(:focus-visible):not(:hover) { opacity: 0.3; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ambient { animation: none; }
+      .cursor-glow,
+      .cursor-glow::before,
+      .cursor-glow::after,
+      .desk-shade::before,
+      .desk-shade::after,
+      .desk-reveal,
+      .dust-speck {
+        animation: none;
+        transition: none;
+      }
+      nav a { transition: color 0.2s ease, text-shadow 0.2s ease, opacity 0.2s ease; }
+    }
+  </style>
 </head>
-<body class="landing-page article-index-page">
-  <div class="home-stage">
-    <header class="home-nav" aria-label="Site navigation">
-    </header>
+<body>
+  <div class="desk-bg" aria-hidden="true"></div>
+  <div class="desk-reveal" aria-hidden="true"></div>
+  <div class="desk-shade" aria-hidden="true"></div>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="dust-field" id="dustField" aria-hidden="true"></div>
 
-    <header class="article-index-hero home-hero">
-      <section class="home-hero-copy" aria-labelledby="home-title">
-        <div class="article-index-rule" aria-hidden="true"></div>
-        <h1 id="home-title">
-          <span>Interactive</span>
-          <span>Expositions</span>
-        </h1>
-      </section>
+  <main>
+    <h1 class="title">Interactive<br>Explanations</h1>
+    <nav aria-label="Sections">
+      <a href="trigonometry.html">Trigonometry</a>
+      <a href="complex-numbers.html">Complex Numbers</a>
+      <a href="algebra.html">Algebra</a>
+      <a href="linear-algebra.html">Linear Algebra</a>
+      <a href="active-inference.html">Active Inference</a>
+      <a href="apps.html">Apps</a>
+    </nav>
+  </main>
 
-      <nav class="home-hero-sections" aria-label="Sections">
-        <a href="active-inference.html">Active Inference</a>
-        <a href="linear-algebra.html">Linear Algebra</a>
-        <a href="trigonometry.html">Trigonometry</a>
-        <a href="complex-numbers.html">Complex Numbers</a>
-        <a href="algebra.html">Algebra</a>
-      </nav>
-    </header>
+  <script>
+    (function () {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const dustField = document.getElementById('dustField');
+      let raf = 0, x = innerWidth / 2, y = innerHeight / 2;
+      let lastDust = 0, lastX = x, lastY = y;
 
-  </div>
+      function spawnDust(now) {
+        const vx = x - lastX;
+        const vy = y - lastY;
+        const speed = Math.hypot(vx, vy);
+        if (speed < 3 || now - lastDust < 30) return;
+
+        lastDust = now;
+        lastX = x;
+        lastY = y;
+
+        const count = Math.min(8, 3 + Math.floor(speed / 22));
+        for (let i = 0; i < count; i += 1) {
+          const speck = document.createElement('span');
+          speck.className = 'dust-speck';
+
+          const angle = Math.atan2(vy, vx) + Math.PI + (Math.random() - 0.5) * 1.8;
+          const startRadius = 18 + Math.random() * 72;
+          const drift = 24 + Math.random() * 58 + Math.min(speed, 90) * 0.42;
+          const px = x + Math.cos(angle) * startRadius + (Math.random() - 0.5) * 26;
+          const py = y + Math.sin(angle) * startRadius + (Math.random() - 0.5) * 26;
+          const dx = Math.cos(angle) * drift + (Math.random() - 0.5) * 28;
+          const dy = Math.sin(angle) * drift - 10 - Math.random() * 32;
+
+          speck.style.setProperty('--x', px + 'px');
+          speck.style.setProperty('--y', py + 'px');
+          speck.style.setProperty('--dx', dx + 'px');
+          speck.style.setProperty('--dy', dy + 'px');
+          speck.style.setProperty('--size', (1.2 + Math.random() * 2.6) + 'px');
+          speck.style.setProperty('--alpha', (0.3 + Math.random() * 0.42).toFixed(2));
+          speck.style.setProperty('--life', (1.1 + Math.random() * 1.2).toFixed(2) + 's');
+
+          dustField.appendChild(speck);
+          speck.addEventListener('animationend', () => speck.remove(), { once: true });
+        }
+      }
+
+      addEventListener('pointermove', (e) => {
+        x = e.clientX; y = e.clientY;
+        if (!raf) raf = requestAnimationFrame(() => {
+          const now = performance.now();
+          document.documentElement.style.setProperty('--mx', x + 'px');
+          document.documentElement.style.setProperty('--my', y + 'px');
+          spawnDust(now);
+          raf = 0;
+        });
+      }, { passive: true });
+    })();
+  </script>
 </body>
 </html>

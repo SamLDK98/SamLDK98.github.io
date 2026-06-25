@@ -1,0 +1,264 @@
+:root {
+  --bg: #f4f1ea;
+  --card: #fffdf8;
+  --ink: #20201d;
+  --muted: #68665f;
+  --rule: #ddd6ca;
+  --track: #e8e0d3;
+  --accent: #2f5f54;
+  --accent-dark: #21473f;
+  --maybe: #9a6a18;
+  --reject: #94322d;
+  --shadow: 0 24px 70px rgba(49, 42, 31, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  font-size: 16px;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(135deg, rgba(47, 95, 84, 0.12), transparent 34%),
+    linear-gradient(225deg, rgba(148, 50, 45, 0.1), transparent 36%),
+    var(--bg);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+.review-shell {
+  width: min(100%, 880px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0.85rem;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.85rem;
+}
+
+.review-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.review-topbar a {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.review-topbar a:hover,
+.review-topbar a:focus-visible {
+  color: var(--ink);
+}
+
+.review-card {
+  align-self: center;
+  width: 100%;
+  max-height: calc(100vh - 4rem);
+  padding: clamp(1rem, 3vw, 1.45rem);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 1rem;
+  border: 1px solid rgba(32, 32, 29, 0.1);
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.review-card-header {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.review-eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.review-card h1 {
+  margin: 0;
+  font-size: clamp(1.45rem, 8vw, 2.4rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.review-progress-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.review-progress-track {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--track);
+}
+
+.review-progress-track span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #8f7b41);
+  transition: width 180ms ease;
+}
+
+.paper-panel {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 0.7rem;
+}
+
+.paper-panel h2 {
+  margin: 0;
+  font-size: clamp(1.08rem, 5vw, 1.55rem);
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+
+.paper-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.abstract-box {
+  min-height: 13rem;
+  max-height: 42vh;
+  padding: 0.95rem;
+  overflow: auto;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: #fbf7ef;
+  color: #36342f;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.review-secondary-actions,
+.review-decision-actions {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.review-secondary-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.review-decision-actions {
+  grid-template-columns: 1fr;
+}
+
+button {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 3px solid rgba(47, 95, 84, 0.34);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.secondary-button {
+  border: 1px solid var(--rule);
+  background: #fffaf1;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.secondary-button:hover:not(:disabled),
+.secondary-button:focus-visible:not(:disabled) {
+  color: var(--ink);
+  border-color: rgba(32, 32, 29, 0.28);
+}
+
+.danger-button {
+  color: var(--reject);
+}
+
+.decision-button {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.keep-button {
+  background: var(--accent);
+}
+
+.keep-button:hover:not(:disabled),
+.keep-button:focus-visible:not(:disabled) {
+  background: var(--accent-dark);
+}
+
+.maybe-button {
+  background: var(--maybe);
+}
+
+.reject-button {
+  background: var(--reject);
+}
+
+.empty-state {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+  .review-shell {
+    padding: 1.35rem;
+  }
+
+  .review-card {
+    min-height: min(760px, calc(100vh - 5rem));
+  }
+
+  .review-decision-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 390px) {
+  .review-secondary-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .review-progress-row {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}

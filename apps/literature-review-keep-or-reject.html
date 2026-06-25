@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Literature Review Keep or Reject | Apps | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="literature-review.css" />
+</head>
+<body>
+  <main class="review-shell">
+    <nav class="review-topbar" aria-label="App navigation">
+      <a href="../apps.html">Apps</a>
+      <a href="../index.html">Home</a>
+    </nav>
+
+    <section class="review-card" aria-labelledby="paper-title">
+      <div class="review-card-header">
+        <p class="review-eyebrow">Literature Review</p>
+        <h1>Keep or Reject</h1>
+        <div class="review-progress-row">
+          <span id="progressText">0 / 0</span>
+          <span id="decisionSummary">No decisions yet</span>
+        </div>
+        <div class="review-progress-track" aria-hidden="true">
+          <span id="progressBar"></span>
+        </div>
+      </div>
+
+      <article class="paper-panel">
+        <h2 id="paper-title">Loading papers...</h2>
+        <p id="paperMeta" class="paper-meta"></p>
+        <div id="abstractBox" class="abstract-box" tabindex="0"></div>
+      </article>
+
+      <div class="review-secondary-actions">
+        <button id="undoButton" class="secondary-button" type="button">Back / Undo</button>
+        <button id="exportButton" class="secondary-button" type="button">Export CSV</button>
+        <button id="resetButton" class="secondary-button danger-button" type="button">Reset</button>
+      </div>
+
+      <div class="review-decision-actions" aria-label="Screening decisions">
+        <button id="keepButton" class="decision-button keep-button" type="button">Keep</button>
+        <button id="maybeButton" class="decision-button maybe-button" type="button">Maybe</button>
+        <button id="rejectButton" class="decision-button reject-button" type="button">Reject</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="literature-review-data.js"></script>
+  <script src="literature-review-app.js"></script>
+</body>
+</html>
