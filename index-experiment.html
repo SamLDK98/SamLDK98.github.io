@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — Fractal | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --void:  #07060a;
+      --cream: #efe7da;
+      --ember: #d9743f;
+      --rose:  #d98a9a;
+      --teal:  #6f93a3;
+      --accent:#c8102e;
+      --font-body: 'EB Garamond', Georgia, serif;
+      --font-head: 'Libre Baskerville', Georgia, serif;
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-body);
+      background: var(--void);
+      color: var(--cream);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    #scene { position: fixed; inset: 0; }
+
+    /* fractal smoke canvas */
+    .canvas-wrap {
+      position: absolute;
+      inset: 0;
+      transition: transform 1.4s cubic-bezier(0.6, 0.02, 0.3, 1), filter 1.4s ease;
+      transform: scale(1);
+      will-change: transform;
+    }
+    body.in-realm .canvas-wrap { transform: scale(1.18); }
+    canvas { display: block; width: 100%; height: 100%; }
+
+    /* film grain */
+    .grain {
+      position: fixed; inset: -50%;
+      width: 200%; height: 200%;
+      pointer-events: none; z-index: 40;
+      opacity: 0.4; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.6s steps(4) infinite;
+    }
+    @keyframes grain {
+      0%{transform:translate(0,0)} 25%{transform:translate(-3%,2%)}
+      50%{transform:translate(2%,-3%)} 75%{transform:translate(-2%,-2%)} 100%{transform:translate(3%,3%)}
+    }
+
+    /* layers */
+    .layer {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+      transition: opacity 0.9s ease, transform 1.3s cubic-bezier(0.6,0.02,0.3,1);
+    }
+    .layer.hidden { opacity: 0; pointer-events: none; }
+
+    /* ── start layer ── */
+    #start.zoomed { transform: scale(2.4); opacity: 0; }
+    .eyebrow {
+      font-style: italic; letter-spacing: 0.04em;
+      color: rgba(239,231,218,0.55);
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+      margin-bottom: 2.4rem;
+    }
+    .choices { display: flex; gap: clamp(2.5rem, 9vw, 7rem); }
+    .choice {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-head); color: var(--cream);
+      font-size: clamp(2.6rem, 9vw, 6.5rem); font-weight: 400;
+      letter-spacing: 0.03em; text-transform: uppercase;
+      position: relative; padding: 0.3rem 0.6rem;
+      text-shadow: 0 0 26px rgba(217,116,63,0.25), 0 0 70px rgba(111,147,163,0.18);
+      transition: transform 0.5s ease, text-shadow 0.5s ease, color 0.5s ease;
+    }
+    .choice:hover, .choice:focus-visible {
+      outline: none; transform: scale(1.05);
+      color: #fff;
+      text-shadow: 0 0 30px rgba(217,138,154,0.6), 0 0 90px rgba(111,147,163,0.4);
+    }
+    .choice .sub {
+      display: block; margin-top: 0.6rem;
+      font-family: var(--font-body); font-style: italic;
+      font-size: clamp(0.7rem, 1.1vw, 0.85rem); letter-spacing: 0.02em;
+      text-transform: none; color: rgba(239,231,218,0.45);
+    }
+
+    /* ── realm layer ── */
+    #realm { gap: 0; }
+    #realm.entering { transform: scale(0.86); }
+    .realm-title {
+      font-family: var(--font-head); font-weight: 400;
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+      text-transform: uppercase; letter-spacing: 0.34em;
+      color: rgba(239,231,218,0.5);
+      margin-bottom: clamp(2rem, 6vh, 3.6rem);
+    }
+    .links { display: flex; flex-direction: column; gap: clamp(1rem, 3.2vh, 2rem); }
+    .links a {
+      font-family: var(--font-head); font-weight: 400;
+      font-size: clamp(1.5rem, 4.2vw, 3rem);
+      color: var(--cream); text-decoration: none; position: relative;
+      opacity: 0; transform: translateY(14px);
+      text-shadow: 0 0 22px rgba(217,116,63,0.22), 0 0 60px rgba(111,147,163,0.16);
+      transition: color 0.4s ease, text-shadow 0.4s ease;
+    }
+    body.in-realm .links a { animation: rise 1s cubic-bezier(0.2,0.7,0.3,1) forwards; }
+    body.in-realm .links a:nth-child(1){ animation-delay: 0.35s; }
+    body.in-realm .links a:nth-child(2){ animation-delay: 0.5s; }
+    body.in-realm .links a:nth-child(3){ animation-delay: 0.65s; }
+    body.in-realm .links a:nth-child(4){ animation-delay: 0.8s; }
+    @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+    .links a::after {
+      content: ""; position: absolute; left: 50%; bottom: -0.3rem;
+      width: 0; height: 1px; transform: translateX(-50%);
+      background: linear-gradient(90deg, var(--ember), var(--rose), var(--teal));
+      transition: width 0.45s ease;
+    }
+    .links a:hover, .links a:focus-visible {
+      color: #fff; outline: none;
+      text-shadow: 0 0 26px rgba(217,138,154,0.55), 0 0 80px rgba(111,147,163,0.4);
+    }
+    .links a:hover::after, .links a:focus-visible::after { width: 100%; }
+
+    .back {
+      position: absolute; top: clamp(1.2rem, 3vh, 2rem); left: clamp(1.2rem, 3vw, 2rem);
+      z-index: 30; background: none; border: none; cursor: pointer;
+      font-family: var(--font-body); font-style: italic;
+      font-size: 1rem; letter-spacing: 0.04em;
+      color: rgba(239,231,218,0.55);
+      transition: color 0.4s ease;
+    }
+    .back:hover, .back:focus-visible { color: var(--cream); outline: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .canvas-wrap, .layer, .links a { transition: none; animation: none; }
+      .links a { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="scene">
+    <div class="canvas-wrap"><canvas id="smoke"></canvas></div>
+
+    <section class="layer" id="start">
+      <p class="eyebrow">Interactive Expositions</p>
+      <div class="choices">
+        <button class="choice" data-section="math">Math<span class="sub">enter the field</span></button>
+        <button class="choice" data-section="other">Other<span class="sub">enter the field</span></button>
+      </div>
+    </section>
+
+    <section class="layer hidden" id="realm" aria-hidden="true">
+      <button class="back" id="back">&larr; back</button>
+      <p class="realm-title" id="realm-title">Math</p>
+      <nav class="links" id="links" aria-label="Topics"></nav>
+    </section>
+  </div>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <script>
+  (function () {
+    /* ── improved Perlin noise (3D) ── */
+    const perm = new Uint8Array(512);
+    (function seed() {
+      const p = Array.from({length:256}, (_,i)=>i);
+      for (let i=255;i>0;i--){ const j=(Math.random()*(i+1))|0; [p[i],p[j]]=[p[j],p[i]]; }
+      for (let i=0;i<512;i++) perm[i]=p[i&255];
+    })();
+    function fade(t){ return t*t*t*(t*(t*6-15)+10); }
+    function lerp(a,b,t){ return a+t*(b-a); }
+    function grad(h,x,y,z){
+      h&=15; const u=h<8?x:y, v=h<4?y:(h===12||h===14?x:z);
+      return ((h&1)?-u:u)+((h&2)?-v:v);
+    }
+    function noise(x,y,z){
+      const X=Math.floor(x)&255, Y=Math.floor(y)&255, Z=Math.floor(z)&255;
+      x-=Math.floor(x); y-=Math.floor(y); z-=Math.floor(z);
+      const u=fade(x), v=fade(y), w=fade(z);
+      const A=perm[X]+Y, AA=perm[A]+Z, AB=perm[A+1]+Z;
+      const B=perm[X+1]+Y, BA=perm[B]+Z, BB=perm[B+1]+Z;
+      return lerp(
+        lerp(lerp(grad(perm[AA],x,y,z),   grad(perm[BA],x-1,y,z),u),
+             lerp(grad(perm[AB],x,y-1,z), grad(perm[BB],x-1,y-1,z),u),v),
+        lerp(lerp(grad(perm[AA+1],x,y,z-1),   grad(perm[BA+1],x-1,y,z-1),u),
+             lerp(grad(perm[AB+1],x,y-1,z-1), grad(perm[BB+1],x-1,y-1,z-1),u),v), w);
+    }
+    function fbm(x,y,z){ /* fractal Brownian motion — the fractal field */
+      let v=0, a=0.5, f=1;
+      for (let i=0;i<4;i++){ v+=a*noise(x*f,y*f,z*f); f*=2; a*=0.5; }
+      return v;
+    }
+
+    const canvas = document.getElementById('smoke');
+    const ctx = canvas.getContext('2d');
+    let W, H, DPR, particles = [], running = false, t = 0, raf = 0;
+
+    const PALETTE = [
+      [217,116,63],   // ember
+      [217,138,154],  // rose
+      [111,147,163],  // teal
+      [239,231,218],  // pale
+    ];
+    const SCALE = 0.0016;     // spatial frequency of the fractal field
+    const SPEED = 1.7;        // particle step
+    const COUNT_BASE = 2400;  // particles per megapixel-ish
+
+    function resize() {
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = canvas.width = Math.floor(innerWidth * DPR);
+      H = canvas.height = Math.floor(innerHeight * DPR);
+      ctx.fillStyle = '#07060a';
+      ctx.fillRect(0,0,W,H);
+      spawn();
+    }
+    function rand(a,b){ return a + Math.random()*(b-a); }
+    function makeP() {
+      const c = PALETTE[(Math.random()*PALETTE.length)|0];
+      return { x:rand(0,W), y:rand(0,H), px:0, py:0, life:rand(60,260), age:0,
+               c, a:rand(0.12,0.42), w:rand(0.6,1.6)*DPR };
+    }
+    function spawn() {
+      const target = Math.round((W*H)/(DPR*DPR) / 1e6 * COUNT_BASE);
+      particles = Array.from({length: Math.max(500, target)}, makeP);
+    }
+
+    function step(loop) {
+      t += 0.0016;
+      // smoky fade — let trails linger
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(7,6,10,0.055)';
+      ctx.fillRect(0,0,W,H);
+
+      ctx.globalCompositeOperation = 'lighter';
+      for (const p of particles) {
+        const ang = fbm(p.x*SCALE, p.y*SCALE, t) * Math.PI * 4;
+        p.px = p.x; p.py = p.y;
+        p.x += Math.cos(ang) * SPEED * DPR;
+        p.y += Math.sin(ang) * SPEED * DPR;
+        p.age++;
+        // soft alpha envelope over life
+        const env = Math.sin(Math.min(p.age/p.life,1)*Math.PI);
+        ctx.strokeStyle = `rgba(${p.c[0]},${p.c[1]},${p.c[2]},${p.a*env})`;
+        ctx.lineWidth = p.w;
+        ctx.beginPath();
+        ctx.moveTo(p.px, p.py);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        if (p.age>p.life || p.x<0||p.x>W||p.y<0||p.y>H) Object.assign(p, makeP());
+      }
+      if (loop !== false) raf = requestAnimationFrame(()=>step(true));
+    }
+    function start(){ if(!running){ running=true; raf=requestAnimationFrame(()=>step(true));} }
+    function stop(){ running=false; cancelAnimationFrame(raf); }
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    addEventListener('resize', resize);
+    resize();
+    if (reduce) { for(let i=0;i<240;i++) step(false); /* render a static smoky field */ }
+    else start();
+
+    /* ── navigation between start and realm ── */
+    const SECTIONS = {
+      math:  { title:'Math',  links:[
+        ['Linear Algebra','linear-algebra.html'],
+        ['Trigonometry','trigonometry.html'],
+        ['Complex Numbers','complex-numbers.html'],
+        ['Algebra','algebra.html'],
+      ]},
+      other: { title:'Other', links:[
+        ['Active Inference','active-inference.html'],
+      ]},
+    };
+    const startLayer = document.getElementById('start');
+    const realm = document.getElementById('realm');
+    const realmTitle = document.getElementById('realm-title');
+    const linksEl = document.getElementById('links');
+
+    function enter(section) {
+      const data = SECTIONS[section];
+      realmTitle.textContent = data.title;
+      linksEl.innerHTML = '';
+      data.links.forEach(([label,href]) => {
+        const a = document.createElement('a');
+        a.href = href; a.textContent = label;
+        linksEl.appendChild(a);
+      });
+      startLayer.classList.add('zoomed');
+      setTimeout(()=> startLayer.classList.add('hidden'), 700);
+      realm.classList.remove('hidden');
+      realm.classList.add('entering');
+      realm.setAttribute('aria-hidden','false');
+      requestAnimationFrame(()=> requestAnimationFrame(()=> {
+        document.body.classList.add('in-realm');
+        realm.classList.remove('entering');
+      }));
+    }
+    function back() {
+      document.body.classList.remove('in-realm');
+      realm.classList.add('hidden');
+      realm.setAttribute('aria-hidden','true');
+      startLayer.classList.remove('hidden');
+      requestAnimationFrame(()=> requestAnimationFrame(()=> startLayer.classList.remove('zoomed')));
+    }
+
+    document.querySelectorAll('.choice').forEach(btn =>
+      btn.addEventListener('click', ()=> enter(btn.dataset.section)));
+    document.getElementById('back').addEventListener('click', back);
+    addEventListener('keydown', e=>{ if(e.key==='Escape' && document.body.classList.contains('in-realm')) back(); });
+  })();
+  </script>
+</body>
+</html>

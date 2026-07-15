@@ -169,10 +169,35 @@
     }
 
     body.complex-numbers-imaginary-unit-page .number-systems-diagram {
-      width: min(100%, 720px);
-      margin: 1.8rem 0 2.1rem;
+      width: min(72%, 700px);
+      aspect-ratio: 1.28;
+      object-fit: cover;
+      object-position: 56% 50%;
+      float: right;
+      margin: 0.2rem 0 1.2rem 0.25rem;
       display: block;
       border-radius: 14px;
+    }
+
+    body.complex-numbers-imaginary-unit-page .number-systems-clear {
+      clear: both;
+    }
+
+    body.complex-numbers-imaginary-unit-page .neon-green-math {
+      color: var(--cn-green);
+      text-shadow: 0 0 10px rgba(182, 255, 90, 0.45);
+    }
+
+    @media (max-width: 820px) {
+      body.complex-numbers-imaginary-unit-page .number-systems-diagram {
+        float: none;
+        width: min(100%, 520px);
+        margin: 1.2rem 0 1.6rem;
+      }
+
+      body.complex-numbers-imaginary-unit-page .number-systems-clear {
+        clear: none;
+      }
     }
   </style>
   <script>
@@ -233,65 +258,69 @@
 
         <h3 class="subsection-title">Extending the Number Line</h3>
 
-        <p>Throughout history, the number line has repeatedly been extended whenever existing numbers were not enough to solve a new kind of problem.</p>
+        <p>Throughout history, the number line has repeatedly been extended when existing numbers were not enough to solve a problem.</p>
 
-        <p>At first, we had the natural numbers, $\mathbb{N}$:</p>
+        <p>At first, we only had the natural numbers, $\mathbb{N}$:</p>
 
-        <p>$$1, 2, 3, 4, 5, \dots$$</p>
+        <p>$1, 2, 3, 4, 5, \dots$</p>
 
-        <p>These allowed us to count quantities. But subtraction quickly creates a problem:</p>
-
-        <p>$$3 - 5 = \ ?$$</p>
-
-        <p>There is no natural number that answers this. To make this operation possible, the number line was extended to include negative numbers:</p>
-
-        <p>$$3 - 5 = -2$$</p>
-
-        <p>This gives us the integers, $\mathbb{Z}$:</p>
-
-        <p>$$\dots, -3, -2, -1, 0, 1, 2, 3, \dots$$</p>
-
-        <p>But division creates another problem:</p>
-
-        <p>$$4 \div 8 = \ ?$$</p>
-
-        <p>There is no integer that answers this. To make this operation possible, the number line was extended again to include fractions:</p>
-
-        <p>$$4 \div 8 = \frac{1}{2}$$</p>
-
-        <p>This gives us the rational numbers, $\mathbb{Q}$: numbers that can be written as a ratio of two integers.</p>
-
-        <p>Then square roots reveal another limitation:</p>
-
-        <p>$$\sqrt{2} = \ ?$$</p>
-
-        <p>There is no rational number whose square is exactly $2$. To include numbers like this, the number line was extended to include irrational numbers: numbers whose decimal expansions continue forever without repeating.</p>
-
-        <p>$$\sqrt{2} = 1.4142135\dots$$</p>
-
-        <p>Together, the rational and irrational numbers form the real numbers, $\mathbb{R}$. This gives us the full real number line.</p>
-
-        <p>So while no real number can be the square root of a negative number, perhaps the number line could be extended once again?</p>
-
-        <p>$$\sqrt{ -1 }= \ ?$$</p>
-
-        <p>This number would be simply defined by the property that it squares to $-1$.</p>
-
-        <p>$$(x) \cdot (x) = -$$</p>
-
-        <p>However, while negative numbers are understood through ideas like debt, and fractions are understood the moment you need to feed a family with one loaf of bread, the interpretation of a number that squares to a negative is far less clear.</p>
-
-        <p>In fact, mathematicians initially viewed this as no more than an algebraic trick. Reflecting this early skepticism, it became known as an imaginary number, and later denoted by the letter $i$.</p>
-
-        <p>$$i= \sqrt{ -1 }$$</p>
-
-        <p>$$i^2= -1$$</p>
+        <p>But subtraction creates an impossible solution: $3 - 5 = \ ?$</p>
 
         <img
           class="number-systems-diagram"
           src="images/nested-number-systems.png"
           alt="Nested number systems diagram showing natural numbers inside whole numbers, integers, rationals, and real numbers"
         />
+
+        <p>The number line was extended to include negative numbers, allowing:</p>
+
+        <p>$3 - 5 = -2$</p>
+
+        <p>This gave us $\mathbb{Z}$, the integers:</p>
+
+        <p>$\dots, -3, -2, -1, 0, 1, 2, 3, \dots$</p>
+
+        <p>Division also created an impossible solution:</p>
+
+        <p>$4 \div 8 = \ ?$</p>
+
+        <p>We needed to include fractions:</p>
+
+        <p>$4 \div 8 = \frac{1}{2}$</p>
+
+        <p>This gave us the rational numbers, $\mathbb{Q}$:</p>
+
+        <p>$\dots, \frac{1}{8},\frac{1}{4},\frac{1}{2},\frac{3}{4}, \frac{7}{8} \dots$</p>
+
+        <p>However, there are certain numbers that cannot be written as a ratio between two numbers.</p>
+
+        <p>$\sqrt{2} = \ ?$</p>
+
+        <p>We needed to include irrational numbers, whose decimal expansions continue forever without repeating.</p>
+
+        <p>$\sqrt{2} = 1.4142135\dots$</p>
+
+        <p>And finally, we had arrived at the real numbers, $\mathbb{R}$.</p>
+
+        <p>Yet, as we have just discussed, the square root of a negative number cannot be expressed as a number within this system.</p>
+
+        <p>$\sqrt{ -1 }= \ ?$</p>
+
+        <p>So perhaps the number line could be extended once again?</p>
+
+        <p>This new number type was proposed and simply defined by the property of squaring to $-1$.</p>
+
+        <p><span class="neon-green-math">$(x) \cdot (x) = -1$</span></p>
+
+        <p>However, while negative numbers are understood through ideas like debt, and fractions are understood the moment you need to feed a family with one loaf of bread, the interpretation of a number that squares to a negative is far less clear.</p>
+
+        <p>In fact, mathematicians initially viewed this as no more than an algebraic trick, and reflecting this early skepticism, it became known as an imaginary number, denoted by the letter $i$.</p>
+
+        <p>$i= \sqrt{ -1 }$</p>
+
+        <p>$i^2= -1$</p>
+
+        <div class="number-systems-clear"></div>
 
         <h3 class="subsection-title">Expressing Negative Square Roots in Terms of $i$</h3>
 

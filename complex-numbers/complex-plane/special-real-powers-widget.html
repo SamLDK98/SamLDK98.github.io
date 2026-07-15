@@ -7,13 +7,15 @@
   <style>
     :root {
       --text: #f4f6ff;
-      --muted: rgba(244, 246, 255, 0.68);
+      --muted: rgba(244, 246, 255, 0.72);
       --gold: #e0be68;
       --green: #b6ff5a;
-      --axis: rgba(244, 246, 255, 0.42);
+      --axis: rgba(255, 255, 255, 0.9);
+      --tick: rgba(255, 255, 255, 0.72);
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -25,92 +27,111 @@
     }
 
     .widget {
-      width: min(760px, calc(100vw - 20px));
-      border: 1px solid rgba(224, 190, 104, 0.24);
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(11, 13, 8, 0.94), rgba(0, 0, 0, 0.94));
-      padding: 22px;
+      width: min(760px, 100vw);
+      padding: 8px 4px 0;
+      background: transparent;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
     }
 
     .readout {
       color: var(--gold);
       font-size: clamp(1.45rem, 4vw, 2.4rem);
       font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
     }
 
     button {
       appearance: none;
-      border: 1px solid rgba(182, 255, 90, 0.55);
+      border: 1px solid rgba(182, 255, 90, 0.5);
       border-radius: 999px;
-      background: rgba(182, 255, 90, 0.08);
+      background: rgba(182, 255, 90, 0.06);
       color: var(--text);
-      padding: 0.65rem 1rem;
+      padding: 0.58rem 0.9rem;
       font: inherit;
       cursor: pointer;
     }
 
-    button.active, button:hover { border-color: var(--green); color: var(--green); }
+    button:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
 
-    svg { width: 100%; height: auto; display: block; overflow: visible; }
-    .axis { stroke: var(--axis); stroke-width: 2; }
-    .tick { stroke: rgba(244, 246, 255, 0.35); stroke-width: 1.6; }
-    .label { fill: var(--muted); font-size: 14px; }
-    .point { fill: var(--green); filter: drop-shadow(0 0 8px rgba(182, 255, 90, 0.72)); transition: cx 420ms ease; }
-    .path { stroke: rgba(224, 190, 104, 0.72); stroke-width: 3; fill: none; stroke-linecap: round; stroke-dasharray: 6 8; }
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .tick {
+      stroke: var(--tick);
+      stroke-width: 2;
+    }
+
+    .label {
+      fill: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .point {
+      fill: var(--green);
+      filter: drop-shadow(0 0 10px rgba(182, 255, 90, 0.74));
+      transition: cx 420ms ease;
+    }
+
+    @media (max-width: 620px) {
+      .top { align-items: flex-start; flex-direction: column; }
+    }
   </style>
 </head>
 <body>
   <main class="widget">
-    <div class="readout" id="readout">(-1)<sup>1</sup> = -1</div>
-    <div class="controls">
-      <button id="one" type="button">1<sup>n</sup></button>
-      <button id="neg" class="active" type="button">(-1)<sup>n</sup></button>
+    <div class="top">
+      <div class="readout" id="readout">(-1)<sup>1</sup> = -1</div>
       <button id="next" type="button">Next power</button>
     </div>
-    <svg viewBox="0 0 720 210" role="img" aria-label="One stays fixed while negative one cycles between negative and positive one">
-      <line class="axis" x1="120" y1="110" x2="600" y2="110" />
-      <line class="tick" x1="210" y1="94" x2="210" y2="126" />
-      <line class="tick" x1="360" y1="94" x2="360" y2="126" />
-      <line class="tick" x1="510" y1="94" x2="510" y2="126" />
-      <text class="label" x="210" y="154" text-anchor="middle">-1</text>
-      <text class="label" x="360" y="154" text-anchor="middle">0</text>
-      <text class="label" x="510" y="154" text-anchor="middle">1</text>
-      <path id="path" class="path" d="M210 70 C285 35 435 35 510 70" />
-      <circle id="point" class="point" cx="210" cy="110" r="10" />
+    <svg viewBox="0 0 720 150" role="img" aria-label="Negative one cycles between negative and positive one as powers increase">
+      <line class="axis" x1="120" y1="76" x2="600" y2="76" />
+      <line class="tick" x1="210" y1="62" x2="210" y2="90" />
+      <line class="tick" x1="360" y1="62" x2="360" y2="90" />
+      <line class="tick" x1="510" y1="62" x2="510" y2="90" />
+      <text class="label" x="210" y="120" text-anchor="middle">-1</text>
+      <text class="label" x="360" y="120" text-anchor="middle">0</text>
+      <text class="label" x="510" y="120" text-anchor="middle">1</text>
+      <circle id="point" class="point" cx="210" cy="76" r="9" />
     </svg>
   </main>
   <script>
     const readout = document.getElementById('readout');
     const point = document.getElementById('point');
-    const path = document.getElementById('path');
-    const one = document.getElementById('one');
-    const neg = document.getElementById('neg');
     const next = document.getElementById('next');
-    let mode = 'neg';
     let n = 1;
 
     function render() {
-      const value = mode === 'one' ? 1 : (n % 2 === 0 ? 1 : -1);
+      const value = n % 2 === 0 ? 1 : -1;
       point.setAttribute('cx', value === 1 ? 510 : 210);
-      path.style.opacity = mode === 'one' ? '0.15' : '1';
-      readout.innerHTML = mode === 'one'
-        ? `1<sup>${n}</sup> = 1`
-        : `(-1)<sup>${n}</sup> = ${value}`;
-      one.classList.toggle('active', mode === 'one');
-      neg.classList.toggle('active', mode === 'neg');
+      readout.innerHTML = `(-1)<sup>${n}</sup> = ${value}`;
+      next.textContent = n >= 8 ? 'Reset' : 'Next power';
     }
 
-    one.addEventListener('click', () => { mode = 'one'; n = 1; render(); });
-    neg.addEventListener('click', () => { mode = 'neg'; n = 1; render(); });
-    next.addEventListener('click', () => { n = n >= 8 ? 1 : n + 1; render(); });
+    next.addEventListener('click', () => {
+      n = n >= 8 ? 1 : n + 1;
+      render();
+    });
+
     render();
   </script>
 </body>

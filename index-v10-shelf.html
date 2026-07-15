@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — The Shelf | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg1: #0c0c14; --bg2: #060509;
+      --ink: #f3eee6; --muted: rgba(243,238,230,0.62);
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "Space Grotesk", system-ui, sans-serif;
+      --mono: "JetBrains Mono", monospace;
+      --w: 170px;   /* cover width  */
+      --t: 40px;    /* book depth (spine width) */
+      --shelf: #79b0ff;  /* the implied shelf's light colour */
+    }
+    html, body { height: 100%; }
+    body {
+      background:
+        radial-gradient(120% 90% at 50% 8%, var(--bg1), var(--bg2) 70%);
+      color: var(--ink); font-family: var(--sans);
+      -webkit-font-smoothing: antialiased; overflow: hidden;
+    }
+    /* faint tech grid in the void */
+    body::before {
+      content:""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(120,160,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120,160,255,0.05) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(80% 70% at 50% 50%, #000 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(80% 70% at 50% 50%, #000 30%, transparent 80%);
+    }
+
+    .scene {
+      position: relative; z-index: 1; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: clamp(2rem, 6vh, 4rem); padding: 2rem 1rem 1rem;
+    }
+    .head { text-align: center; }
+    .head .kick {
+      font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .head h1 {
+      font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em;
+      font-size: clamp(1.9rem, 5vw, 3.1rem); line-height: 1; margin-top: 0.5rem;
+    }
+    .head .sub { margin-top: 0.55rem; font-size: 0.95rem; color: var(--muted); min-height: 1.3em; }
+
+    /* ── the shelf ── */
+    .shelf {
+      position: relative;
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: clamp(8px, 1.6vw, 20px);
+      padding: 0 clamp(1rem, 6vw, 5rem) 64px;
+      min-height: 340px;
+    }
+    /* implied futuristic shelf: a glowing light bar + soft pool of light */
+    .shelf__bar {
+      position: absolute; left: 6%; right: 6%; bottom: 56px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--shelf) 18%, var(--shelf) 82%, transparent);
+      box-shadow: 0 0 22px 2px color-mix(in srgb, var(--shelf) 55%, transparent);
+      border-radius: 2px;
+    }
+    .shelf__pool {
+      position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
+      width: 78%; height: 60px;
+      background: radial-gradient(ellipse at center, color-mix(in srgb, var(--shelf) 22%, transparent), transparent 70%);
+      filter: blur(8px); pointer-events: none;
+    }
+
+    .book {
+      position: relative; width: var(--t); height: var(--h);
+      perspective: 1500px; cursor: pointer;
+      transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1), opacity 0.4s, filter 0.4s;
+      z-index: 2;
+    }
+    .book:focus-visible { outline: none; }
+    .book__box {
+      position: absolute; bottom: 0; left: 50%; margin-left: calc(var(--w) / -2);
+      width: var(--w); height: var(--h);
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.2,0.8,0.2,1);
+      transform: rotateY(90deg);            /* shelved: spine faces us */
+    }
+
+    /* hover = ease the book up off the shelf and turn it */
+    .shelf:not(.has-open) .book:hover,
+    .shelf:not(.has-open) .book:focus-visible { transform: translateY(-24px) scale(1.04); z-index: 6; }
+    .shelf:not(.has-open) .book:hover .book__box,
+    .shelf:not(.has-open) .book:focus-visible .book__box { transform: rotateY(54deg); }
+
+    /* open = held up, facing you */
+    .book.open { transform: translateY(-14px) scale(1.18); z-index: 30; cursor: default; }
+    .book.open .book__box { transform: rotateY(0deg); }
+    .book.open.flipped .book__box { transform: rotateY(180deg); }
+    .book.dim { opacity: 0.32; filter: saturate(0.6) brightness(0.7); }
+
+    .glowpad {
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      width: 70px; height: 24px; pointer-events: none; z-index: -1;
+      background: radial-gradient(ellipse at center, color-mix(in srgb, var(--c) 65%, transparent), transparent 72%);
+      filter: blur(7px); opacity: 0.55; transition: opacity 0.4s, width 0.4s;
+    }
+    .book:hover .glowpad, .book.open .glowpad { opacity: 1; width: 120px; }
+
+    /* ── faces of the book ── */
+    .face {
+      position: absolute; left: 50%; top: 50%;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      overflow: hidden; border-radius: 5px;
+    }
+    .spine {
+      width: var(--t); height: var(--h);
+      transform: translate(-50%,-50%) rotateY(-90deg) translateZ(calc(var(--w) / 2));
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      padding: 0.7rem 0.25rem;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--c) 26%, #15141d), #0b0a11 88%);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: inset 2px 0 0 color-mix(in srgb, var(--c) 65%, transparent),
+                  inset -3px 0 8px rgba(0,0,0,0.6),
+                  0 0 18px color-mix(in srgb, var(--c) 26%, transparent);
+    }
+    .s-no { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em; color: var(--c); }
+    .s-title {
+      writing-mode: vertical-rl; text-orientation: mixed;
+      font-family: var(--serif); font-weight: 600; letter-spacing: 0.02em;
+      font-size: clamp(0.78rem, 1.5vw, 0.92rem); color: var(--ink); white-space: nowrap;
+    }
+    .s-glyph { font-size: 1.05rem; color: var(--c); text-shadow: 0 0 10px var(--c); }
+
+    .cover {
+      width: var(--w); height: var(--h); padding: 1rem;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 22px 46px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .front {
+      transform: translate(-50%,-50%) translateZ(calc(var(--t) / 2));
+      background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--c) 42%, transparent), transparent 70%),
+                  linear-gradient(160deg, #1c1b26, #121119);
+      color: var(--ink);
+    }
+    .back {
+      transform: translate(-50%,-50%) rotateY(180deg) translateZ(calc(var(--t) / 2));
+      background: radial-gradient(120% 90% at 50% 110%, color-mix(in srgb, var(--c) 34%, transparent), transparent 65%),
+                  linear-gradient(160deg, #191822, #100f17);
+      justify-content: flex-start; gap: 0.6rem;
+    }
+    .foredge {
+      width: var(--t); height: var(--h);
+      transform: translate(-50%,-50%) rotateY(90deg) translateZ(calc(var(--w) / 2));
+      background: repeating-linear-gradient(180deg, #e9e5d9 0 1px, #c8c3b5 1px 3px);
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.4);
+    }
+    .corner { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; color: var(--c); }
+    .corner.br { align-self: flex-end; transform: rotate(180deg); }
+    .glyph {
+      flex: 1; display: grid; place-items: center;
+      font-size: clamp(2.6rem, 7vw, 3.8rem); color: var(--c);
+      text-shadow: 0 0 26px color-mix(in srgb, var(--c) 55%, transparent);
+    }
+    .ctitle {
+      font-family: var(--serif); font-weight: 600;
+      font-size: 1.02rem; line-height: 1.08; text-wrap: balance;
+    }
+    .b-no { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.08em; color: var(--c); white-space: nowrap; }
+    .b-title { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; line-height: 1.05; }
+    .b-blurb { font-size: 0.8rem; line-height: 1.38; color: var(--muted); flex: 1; }
+    .b-enter {
+      display: inline-flex; align-items: center; gap: 0.5rem; align-self: flex-start;
+      text-decoration: none; color: #0c0b12; background: var(--c);
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.55rem 0.95rem; border-radius: 999px; transition: transform 0.18s, filter 0.18s;
+    }
+    .b-enter:hover { transform: translateX(3px); filter: brightness(1.08); }
+
+    .scrim {
+      position: fixed; inset: 0; z-index: 5; background: rgba(5,5,10,0.66);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+      opacity: 0; pointer-events: none; transition: opacity 0.4s;
+    }
+    .scrim.show { opacity: 1; pointer-events: auto; }
+    .closeb {
+      position: fixed; top: 1.3rem; right: 1.3rem; z-index: 40;
+      width: 2.6rem; height: 2.6rem; border-radius: 999px; cursor: pointer;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+      color: var(--ink); font-size: 1.1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .closeb.show { opacity: 1; pointer-events: auto; }
+    .hint {
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(243,238,230,0.4); text-align: center;
+    }
+    .noscript-list a { color: #8db4ff; display:block; margin:.3rem 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .book, .book__box { transition: none; }
+    }
+    @media (max-width: 640px) {
+      :root { --w: 120px; --t: 34px; }
+      .head h1 { font-size: 7.5vw; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <noscript>
+    <div style="padding:2rem;font-family:Georgia,serif">
+      <h1>Interactive Expositions — Sam Kirwan</h1>
+      <div class="noscript-list">
+        <a href="complex-numbers.html">Complex Numbers</a>
+        <a href="linear-algebra.html">Linear Algebra</a>
+        <a href="trigonometry.html">Trigonometry</a>
+        <a href="algebra.html">Algebra</a>
+        <a href="active-inference.html">Active Inference</a>
+      </div>
+    </div>
+  </noscript>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel-src" id="app">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    const TOPICS = [
+      { id:'complex', no:'01', title:'Complex Numbers', href:'complex-numbers.html', glyph:'ℂ', color:'#34f5ff', h:252,
+        blurb:'Rotation, waves, and the hidden geometry of the plane.' },
+      { id:'linear', no:'02', title:'Linear Algebra', href:'linear-algebra.html', glyph:'⟶', color:'#9b7bff', h:272,
+        blurb:'Vectors, transformations, and the shape of a solution.' },
+      { id:'trig', no:'03', title:'Trigonometry', href:'trigonometry.html', glyph:'∿', color:'#15d39a', h:248,
+        blurb:'Angles, ratios, and the unit circle unrolled into motion.' },
+      { id:'algebra', no:'04', title:'Algebra', href:'algebra.html', glyph:'𝑥', color:'#ffb43a', h:262,
+        blurb:'Symbols, balance, and the machinery of solving.' },
+      { id:'active', no:'05', title:'Active Inference', href:'active-inference.html', glyph:'∇', color:'#ff5ca8', h:248,
+        blurb:'Prediction, surprise, and the free-energy story of life.' },
+    ];
+
+    function App() {
+      const [open, setOpen] = useState(null);
+      const [flipped, setFlipped] = useState(false);
+      const [focus, setFocus] = useState(0);
+      const refs = useRef([]);
+      const n = TOPICS.length;
+
+      const close = useCallback(() => { setOpen(null); setFlipped(false); }, []);
+      const click = useCallback((k) => {
+        if (open === null) { setOpen(k); setFlipped(false); }
+        else if (open === k) { setFlipped(f => !f); }
+      }, [open]);
+
+      const onKey = useCallback((e) => {
+        if (e.key === 'Escape') { close(); return; }
+        if (open !== null) {
+          if (e.key === 'Enter') window.location.href = TOPICS[open].href;
+          return;
+        }
+        if (e.key === 'ArrowRight') { e.preventDefault(); setFocus(f => Math.min(n - 1, f + 1)); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); setFocus(f => Math.max(0, f - 1)); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(focus); setFlipped(false); }
+      }, [open, focus, close, n]);
+
+      useEffect(() => {
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [onKey]);
+      useEffect(() => {
+        if (open === null && refs.current[focus]) refs.current[focus].focus();
+      }, [focus, open]);
+
+      const sub = open === null
+        ? 'Hover to lift a book — click to take it down'
+        : (flipped ? TOPICS[open].title + ' — turn back, or enter' : 'Click again to read the back · Enter to open');
+
+      return (
+        <div className="scene">
+          <header className="head">
+            <p className="kick">Interactive Expositions · Sam Kirwan</p>
+            <h1>The Shelf</h1>
+            <p className="sub">{sub}</p>
+          </header>
+
+          <div className={'shelf' + (open !== null ? ' has-open' : '')}>
+            <span className="shelf__pool" aria-hidden="true"></span>
+            {TOPICS.map((t, k) => {
+              const isOpen = open === k;
+              const isDim = open !== null && !isOpen;
+              const cls = 'book' + (isOpen ? ' open' : '') + (isDim ? ' dim' : '') + (isOpen && flipped ? ' flipped' : '');
+              return (
+                <div key={t.id} ref={el => refs.current[k] = el}
+                  className={cls} style={{ '--c': t.color, '--h': t.h + 'px' }}
+                  tabIndex={open === null ? 0 : -1} role="button" aria-label={t.title}
+                  onClick={(e) => { e.stopPropagation(); click(k); }}>
+                  <span className="glowpad" aria-hidden="true"></span>
+                  <div className="book__box">
+                    <div className="face spine">
+                      <span className="s-no">{t.no}</span>
+                      <span className="s-title">{t.title}</span>
+                      <span className="s-glyph" aria-hidden="true">{t.glyph}</span>
+                    </div>
+                    <div className="face foredge" aria-hidden="true"></div>
+                    <div className="face cover front">
+                      <span className="corner">{t.no}</span>
+                      <span className="glyph" aria-hidden="true">{t.glyph}</span>
+                      <span className="ctitle">{t.title}</span>
+                    </div>
+                    <div className="face cover back">
+                      <span className="b-no">{t.no} — Exposition</span>
+                      <span className="b-title">{t.title}</span>
+                      <span className="b-blurb">{t.blurb}</span>
+                      <a className="b-enter" href={t.href} onClick={e => e.stopPropagation()}>Enter chapter →</a>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <span className="shelf__bar" aria-hidden="true"></span>
+          </div>
+
+          <p className="hint">← → to browse · enter to take down · esc to shelve</p>
+
+          <div className={'scrim' + (open !== null ? ' show' : '')} onClick={close}></div>
+          <button className={'closeb' + (open !== null ? ' show' : '')} onClick={close} aria-label="Back to shelf">✕</button>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+
+  <script>
+    (function () {
+      var src = document.getElementById('app').textContent;
+      var out = Babel.transform(src, { presets: [['react', { runtime: 'classic' }]] }).code;
+      (0, eval)(out);
+    })();
+  </script>
+</body>
+</html>

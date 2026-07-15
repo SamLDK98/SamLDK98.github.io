@@ -10,47 +10,209 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="complex-numbers.css" />
   <style>
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page {
+      --intro-bg: #000000;
+      --intro-panel: #050505;
+      --intro-card: #10142200;
+      --intro-rule: rgba(224, 190, 104, 0.35);
+      --intro-rule-strong: rgba(224, 190, 104, 0.62);
+      --intro-text: #f4f6ff;
+      --intro-dim: rgba(244, 246, 255, 0.72);
+      --intro-faint: rgba(224, 190, 104, 0.54);
+      --intro-accent: #b6ff5a;
+      --intro-ihat: #e0be68;
+      --intro-jhat: #b6ff5a;
+      --cn-green: #b6ff5a;
+      --cn-orange: #e0be68;
+      background: #000000;
+      color: var(--intro-text);
+    }
+
+    body.complex-numbers-chapter-2-page header {
+      border-bottom-color: transparent;
+    }
+
+    body.complex-numbers-chapter-2-page .header-inner {
+      max-width: var(--col-width);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 0;
+      padding-right: 0;
+      text-align: left;
+    }
+
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .chapter-kicker {
+      color: var(--cn-green);
+      opacity: 0.85;
+    }
+
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .essay-title {
+      color: var(--cn-orange);
+      background: none;
+      -webkit-text-fill-color: currentColor;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: clamp(1.85rem, 4.3vw, 3.2rem);
+      font-weight: 600;
+      line-height: 1.12;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      text-align: left;
+      margin-bottom: 0;
+    }
+
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .subsection-title {
+      color: var(--cn-orange);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: clamp(1rem, 1.6vw, 1.25rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      position: relative;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.65rem;
+      text-align: left;
+    }
+
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .subsection-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: min(16rem, 70vw);
+      height: 3px;
+      background: linear-gradient(90deg, rgba(182, 255, 90, 0.85), rgba(182, 255, 90, 0.42), transparent);
+    }
+
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section p,
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section li {
+      color: var(--intro-text);
+    }
+
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section a {
+      color: var(--cn-green);
+    }
+
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section em,
+    body.complex-numbers-chapter-2-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section strong {
+      color: var(--cn-orange);
+    }
+
+    body.complex-numbers-chapter-2-page .section-divider {
+      background: linear-gradient(90deg, transparent, rgba(224, 190, 104, 0.58), rgba(182, 255, 90, 0.62), rgba(224, 190, 104, 0.58), transparent);
+      border: 0;
+    }
+
+    body.complex-numbers-chapter-2-page .chapter-nav-link {
+      border-color: var(--intro-rule);
+      color: var(--intro-text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    body.complex-numbers-chapter-2-page .chapter-nav-link span {
+      color: var(--intro-faint);
+    }
+
+    body.complex-numbers-chapter-2-page .chapter-nav-link:hover,
+    body.complex-numbers-chapter-2-page .chapter-nav-link:focus-visible,
+    body.complex-numbers-chapter-2-page .chapter-nav-link:active {
+      border-color: var(--cn-green);
+      color: var(--cn-green);
+      box-shadow: 0 0 22px -8px var(--cn-green);
+    }
+
+    body.complex-numbers-chapter-2-page .chapter-nav-link:hover span,
+    body.complex-numbers-chapter-2-page .chapter-nav-link:focus-visible span,
+    body.complex-numbers-chapter-2-page .chapter-nav-link:active span {
+      color: var(--cn-orange);
+    }
+
+    body.complex-numbers-chapter-2-page .essay-widget {
+      border-color: rgba(224, 190, 104, 0.22);
+      background: rgba(0, 0, 0, 0.38);
+      box-shadow: 0 0 30px rgba(182, 255, 90, 0.04);
+    }
+
+    body.complex-numbers-chapter-2-page .real-powers-widget-frame {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      margin-top: 0.5rem;
+      margin-bottom: 1.1rem;
+    }
+
+    body.complex-numbers-chapter-2-page .special-real-powers-widget-frame {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      margin-top: 0.5rem;
+      margin-bottom: 1.1rem;
+    }
+
+    body.complex-numbers-chapter-2-page .negative-multiplication-widget {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      margin-top: 0.5rem;
+      margin-bottom: 1.1rem;
+    }
+
+    body.complex-numbers-chapter-2-page .i-quarter-turn-widget {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      margin-top: 0.5rem;
+      margin-bottom: 1.1rem;
+    }
+
+    body.complex-numbers-chapter-2-page .complex-address-widget {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      margin-top: 0.7rem;
+      margin-bottom: 1.3rem;
+    }
+
     .complex-plane-offline-figure {
-      width: min(100%, 700px);
-      margin: 1.4rem 0 2rem;
+      width: min(100%, 640px);
+      margin: 1.1rem auto 1.8rem;
       display: block;
     }
 
     .complex-plane-offline-figure .axis {
-      stroke: rgba(244, 246, 255, 0.48);
-      stroke-width: 2;
+      stroke: rgba(255, 255, 255, 0.86);
+      stroke-width: 3;
+      stroke-linecap: round;
     }
 
     .complex-plane-offline-figure .turn {
       fill: none;
       stroke: #b6ff5a;
-      stroke-width: 3;
+      stroke-width: 2.6;
       stroke-linecap: round;
-    }
-
-    .complex-plane-offline-figure .ray {
-      stroke: #e0be68;
-      stroke-width: 4;
-      stroke-linecap: round;
-    }
-
-    .complex-plane-offline-figure .ghost {
-      stroke: rgba(224, 190, 104, 0.42);
-      stroke-width: 4;
-      stroke-linecap: round;
-      stroke-dasharray: 7 9;
     }
 
     .complex-plane-offline-figure .label {
       fill: #f4f6ff;
       font-family: "Space Grotesk", system-ui, sans-serif;
-      font-size: 18px;
+      font-size: 17px;
+    }
+
+    .complex-plane-offline-figure .axis-label {
+      fill: rgba(244, 246, 255, 0.62);
+      font-size: 14px;
     }
 
     .complex-plane-offline-figure .question {
       fill: #b6ff5a;
-      font-size: 34px;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: 32px;
       font-weight: 600;
+      filter: drop-shadow(0 0 9px rgba(182, 255, 90, 0.5));
+    }
+
+    .complex-plane-offline-figure .point {
+      fill: #b6ff5a;
+      filter: drop-shadow(0 0 10px rgba(182, 255, 90, 0.55));
     }
   </style>
   <script>
@@ -79,13 +241,13 @@
       <section class="essay-section">
         <h3 class="subsection-title">Powers of $i$</h3>
 
-        <p>Most real numbers, when raised to successive powers, either grow larger in magnitude or shrink towards zero.</p>
+        <p>Most real numbers, when raised to successive powers, either grow in magnitude or shrink towards zero.</p>
 
         <iframe
-          class="essay-widget"
+          class="essay-widget real-powers-widget-frame"
           src="complex-numbers/complex-plane/real-powers-widget.html"
           title="Interactive widget showing ordinary real powers growing or shrinking"
-          style="height: 360px;"
+          style="height: 270px;"
           scrolling="no"
           loading="lazy"
         ></iframe>
@@ -97,10 +259,10 @@
         <p>$(-1)^n$ cycles repeatedly between $-1$ and $1$.</p>
 
         <iframe
-          class="essay-widget"
+          class="essay-widget special-real-powers-widget-frame"
           src="complex-numbers/complex-plane/special-real-powers-widget.html"
           title="Interactive widget showing powers of one and negative one"
-          style="height: 350px;"
+          style="height: 250px;"
           scrolling="no"
           loading="lazy"
         ></iframe>
@@ -174,20 +336,20 @@ $$</p>
 
         <p>But there is a problem. A $90^\circ$ rotation would move us off the number line entirely.</p>
 
-        <svg class="complex-plane-offline-figure" viewBox="0 0 700 360" role="img" aria-label="A ninety degree rotation leaving the number line">
+        <svg class="complex-plane-offline-figure" viewBox="0 0 700 320" role="img" aria-label="A ninety degree rotation leaving the number line">
           <defs>
             <marker id="complex-plane-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-              <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(244, 246, 255, 0.48)" />
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(255, 255, 255, 0.86)" />
+            </marker>
+            <marker id="complex-plane-turn-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="#b6ff5a" />
             </marker>
           </defs>
-          <line class="axis" x1="90" y1="230" x2="610" y2="230" marker-end="url(#complex-plane-axis-arrow)" />
-          <line class="axis" x1="350" y1="300" x2="350" y2="66" marker-end="url(#complex-plane-axis-arrow)" opacity="0.2" />
-          <line class="ray" x1="350" y1="230" x2="500" y2="230" />
-          <line class="ghost" x1="350" y1="230" x2="350" y2="80" />
-          <path class="turn" d="M 500 230 A 150 150 0 0 0 350 80" />
-          <text class="label" x="506" y="256">1</text>
-          <text class="question" x="365" y="92">?</text>
-          <text class="label" x="214" y="260">real number line</text>
+          <line class="axis" x1="88" y1="218" x2="612" y2="218" marker-end="url(#complex-plane-axis-arrow)" />
+          <path class="turn" d="M 500 218 A 150 150 0 0 0 350 68" marker-end="url(#complex-plane-turn-arrow)" />
+          <circle class="point" cx="500" cy="218" r="6" />
+          <text class="label" x="502" y="248">1</text>
+          <text class="question" x="326" y="88">?</text>
         </svg>
 
         <p>To represent such a rotation, we need a second axis.</p>
@@ -232,24 +394,11 @@ $$</p>
 
         <p>We can describe a number by saying how far it moves in each direction.</p>
 
-        <p>For example:</p>
+        <p>A number that consists of both a real and imaginary part, and thus exists in a location off the real axis, takes the form:</p>
 
-        <p>$$3 + 5i$$</p>
+        <p>$$z=a+bi$$</p>
 
-        <p>means:</p>
-
-        <ul>
-          <li>move $3$ units in the real direction</li>
-          <li>move $5$ units in the imaginary direction</li>
-        </ul>
-
-        <p>This gives us a new kind of number with two components:</p>
-
-        <p>$$z=a + bi$$</p>
-
-        <p>Numbers of this form are called complex numbers.</p>
-
-        <p>Here, complex is used in its older sense of <em>composed of parts</em>:</p>
+        <p>We call these numbers "complex", as in, composed of parts:</p>
 
         <ul>
           <li>A real part ($a$)</li>
@@ -257,9 +406,44 @@ $$</p>
           <li>An imaginary component ($bi$)</li>
         </ul>
 
+        <p>So, just as we can read the coordinate $(2,4)$ to mean:</p>
+
+        <p>"Move 2 units along one axis and four units along a perpendicular axis"</p>
+
+        <p>The complex number $3 +5i$ can be read as:</p>
+
+        <p>"Move 3 units along the real number line and 5 units along the perpendicular imaginary number line."</p>
+
+        <p><strong>But how should we read the '+' as different from the ','?</strong></p>
+
+        <p>Notice that in a typical 2D Cartesian plane axes are arbitrary.</p>
+
+        <p>Whereas the complex plane represents an actual number system. A point is a single quantity, rather than two independent coordinates.</p>
+
+        <p>The '+' indicates that the number itself has two components.</p>
+
+        <p>It might help to think of the real numbers as scaling the unit basis of each number line.</p>
+
+        <p>$$3+5i$$</p>
+
+        <p>can be thought of as:</p>
+
+        <p>$$3(1)+5(i)$$</p>
+
+        <p>Where $1$ is the unit of the real numbers and $i$ is the unit of the imaginary numbers.</p>
+
+        <iframe
+          class="essay-widget complex-address-widget"
+          src="complex-numbers/complex-plane/complex-address-widget.html"
+          title="Interactive complex plane showing a complex number as real and imaginary components"
+          style="height: 640px;"
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+
         <h3 class="subsection-title">Recap</h3>
 
-        <p>We have introduced a new number $i$, defined by this strange property that it squares to $-1$.</p>
+        <p>We introduced a new number $i$, defined by this strange property that it squares to $-1$.</p>
 
         <p>Then we saw that we could combine it with real numbers to produce the square root of any negative number. These are called imaginary numbers.</p>
 
@@ -269,7 +453,7 @@ $$</p>
 
         <p>$$3 + 5i$$</p>
 
-        <p>However, the key realisation is that we are not simply extending the number line, but creating a two-dimensional number system. The fact that the real and imaginary parts can't be added actually becomes a feature.</p>
+        <p>However, the key realisation is that we are not simply extending the number line, but creating a two-dimensional number system. The fact that the real and imaginary parts can't be added actually becomes the main feature.</p>
 
         <p>We can consider each part to represent movement along an independent axis. Together they form the complex plane.</p>
 
@@ -284,9 +468,9 @@ $$</p>
             <span>Contents</span>
             <strong>Complex Numbers</strong>
           </a>
-          <a class="chapter-nav-link" href="complex-numbers-polar-form.html">
-            <span>Supplement</span>
-            <strong>Polar Form</strong>
+          <a class="chapter-nav-link" href="complex-numbers-chapter-3.html">
+            <span>Next</span>
+            <strong>Complex Multiplication</strong>
           </a>
         </nav>
       </section>

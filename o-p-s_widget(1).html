@@ -1,0 +1,159 @@
+
+<style>
+  .stepper { max-width: 620px; margin: 0 auto; padding: 1rem 0; font-size: 15px; }
+  .progress { display: flex; gap: 5px; margin-bottom: 1.2rem; flex-wrap: wrap; align-items: center; }
+  .dot { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--color-border-secondary); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 500; color: var(--color-text-tertiary); cursor: pointer; transition: all .2s; flex-shrink: 0; }
+  .dot.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+  .dot.visited { border-color: var(--color-text-secondary); color: var(--color-text-secondary); }
+  .dot-connector { width: 12px; height: 1px; background: var(--color-border-secondary); flex-shrink: 0; }
+  .card { border: 1px solid var(--color-border-tertiary); border-radius: 12px; overflow: hidden; }
+  .card-header { padding: 12px 16px 10px; border-bottom: 1px solid var(--color-border-tertiary); display: flex; align-items: baseline; gap: 10px; }
+  .card-letter { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .05em; }
+  .card-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); }
+  .card-thinker { font-size: 12px; color: var(--color-text-tertiary); margin-left: auto; white-space: nowrap; }
+  .band { padding: 13px 16px; border-bottom: 1px solid var(--color-border-tertiary); }
+  .band:last-child { border-bottom: none; }
+  .band-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
+  .band-text { font-size: 14px; line-height: 1.65; color: var(--color-text-primary); }
+  .band-obs .band-label { color: var(--color-text-secondary); }
+  .band-sol { background: color-mix(in srgb, #5DCAA5 8%, transparent); }
+  .band-sol .band-label { color: #0F6E56; }
+  .band-prob { background: color-mix(in srgb, #EF9F27 8%, transparent); }
+  .band-prob .band-label { color: #854F0B; }
+  .band-end { background: color-mix(in srgb, #7F77DD 8%, transparent); }
+  .band-end .band-label { color: #534AB7; }
+  @media (prefers-color-scheme: dark) {
+    .band-sol { background: color-mix(in srgb, #085041 30%, transparent); }
+    .band-sol .band-label { color: #5DCAA5; }
+    .band-prob { background: color-mix(in srgb, #633806 30%, transparent); }
+    .band-prob .band-label { color: #EF9F27; }
+    .band-end { background: color-mix(in srgb, #3C3489 30%, transparent); }
+    .band-end .band-label { color: #AFA9EC; }
+  }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+  .nav-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity .15s; }
+  .nav-btn:disabled { opacity: .3; cursor: default; }
+  .nav-count { font-size: 12px; color: var(--color-text-tertiary); }
+  .chain-hint { font-size: 12px; color: var(--color-text-tertiary); margin-top: 10px; text-align: center; padding: 6px; border-top: 1px solid var(--color-border-tertiary); }
+</style>
+
+<div class="stepper">
+  <div class="progress" id="progress"></div>
+  <div class="card" id="card"></div>
+  <div class="nav">
+    <button class="nav-btn" id="prev" onclick="move(-1)">← Previous</button>
+    <span class="nav-count" id="count"></span>
+    <button class="nav-btn" id="next" onclick="move(1)">Next →</button>
+  </div>
+  <div class="chain-hint" id="hint"></div>
+</div>
+
+<script>
+const steps = [
+  {
+    letter: "c",
+    title: "Open systems and free energy",
+    thinkers: "Schrödinger, Prigogine",
+    obs: "Entropy predicts that all organized structure should decay toward disorder. Yet living organisms maintain highly complex, ordered states — often for decades. This seems to directly contradict the second law of thermodynamics.",
+    sol: "Organisms are open systems, not closed ones. By continuously importing free energy from their environment and exporting waste and heat, they are able to locally decrease entropy — not by defying thermodynamics, but by exploiting it. Prigogine showed that far-from-equilibrium conditions can even spontaneously generate new structure through the very process of dissipation.",
+    prob: "This tells us that organisms need energy to maintain order, but it doesn't explain what directs that energy. A whirlpool also maintains structure through energy flow — yet it doesn't survive, adapt, or heal. What organizing principle distinguishes living systems?",
+  },
+  {
+    letter: "d",
+    title: "Homeostasis",
+    thinkers: "Bernard, Cannon",
+    obs: "Organisms don't merely persist — they actively maintain specific, precise internal states: body temperature, blood pH, glucose concentration. These variables are held within narrow ranges despite large fluctuations in the external environment.",
+    sol: "Claude Bernard identified the milieu intérieur — the stable internal environment that organisms defend. Walter Cannon named this homeostasis and showed it was an active process. The organism is not passive; it detects deviations from a target state and produces corrective responses. The organizing principle is the maintenance of specific variables.",
+    prob: "Homeostasis names the phenomenon and identifies what is being maintained, but not the mechanism that achieves it. How does an organism detect a deviation, and how does it know which response to produce?",
+  },
+  {
+    letter: "e",
+    title: "Cybernetics and feedback",
+    thinkers: "Wiener, Ashby",
+    obs: "Homeostasis requires something that monitors internal states, compares them to a target, and triggers corrective action. The mechanism behind this active regulation is not yet explained.",
+    sol: "The answer is negative feedback. A system continuously measures the gap between its current state and a reference value, then acts to reduce that gap. Crucially, this produces goal-directed behaviour without requiring any central planner or homunculus — the goal is implicit in the structure of the feedback loop itself. Stability emerges from circular causation rather than linear command.",
+    prob: "Feedback loops work well for regulating a fixed variable against a fixed target. But organisms don't face a fixed environment — they navigate vast, novel, unpredictable worlds. A thermostat cannot learn. How do organisms adapt their behaviour to situations they have never encountered before?",
+  },
+  {
+    letter: "f",
+    title: "Information theory",
+    thinkers: "Shannon, Wiener",
+    obs: "Adaptive behaviour requires more than energy and feedback — it requires the organism to respond differently to different environmental conditions. Something must carry the distinction between one state of the world and another.",
+    sol: "Shannon formalized information as the reduction of uncertainty. A signal carries information to the extent that it rules out possible states of the world. This gave a rigorous, substrate-independent language for talking about how organisms respond to their environments — not just in terms of energy, but in terms of what they can distinguish, detect, and act upon. The nervous system is now understood as an information-processing system.",
+    prob: "Information theory is purely syntactic — it tells us how much uncertainty a signal reduces, but not what it means to the receiver. A thermometer reading of 42°C carries the same number of bits whether it indicates the weather or a fever. How does an organism interpret a signal — assign meaning to it — in a way that guides appropriate action?",
+  },
+  {
+    letter: "g",
+    title: "Internal models and Bayesian inference",
+    thinkers: "Helmholtz, Craik, Dayan",
+    obs: "Interpretation requires something to interpret against. To assign meaning to a signal, the organism must already have expectations about what signals typically mean — a model of how the world works.",
+    sol: "Helmholtz proposed that perception is unconscious inference: the brain constructs the most probable explanation for its sensory inputs, drawing on prior experience. This was later formalized through Bayesian probability — the brain maintains probabilistic beliefs about the state of the world and updates them in proportion to how much new evidence deviates from expectation. Perception is not a readout of the world, but a hypothesis about it.",
+    prob: "A Bayesian model describes how beliefs are updated in response to evidence. But this is still a passive, observational account. Organisms don't only update their beliefs — they act. And the act of seeking certain information rather than waiting for it to arrive seems to be doing something that pure belief-updating doesn't capture. How does action enter the picture?",
+  },
+  {
+    letter: "h",
+    title: "Predictive coding",
+    thinkers: "Rao, Ballard, Friston",
+    obs: "If the brain maintains a generative model of the world and updates it with sensory input, there must be a concrete computational mechanism for how this works across the brain's layered architecture.",
+    sol: "Predictive coding proposes that the brain is organized as a hierarchy of generative models. Each level predicts the activity of the level below it. Only prediction errors — the difference between prediction and actual signal — are passed upward. This is computationally efficient: the brain doesn't relay raw sensory data, only surprises. Perception becomes the process of minimizing prediction error by updating the internal model until predictions and signals align.",
+    prob: "Predictive coding handles perception and belief updating elegantly. But action is still treated separately — as something triggered once beliefs are in place. And there is a deeper question: why should minimizing prediction error be the organizing principle of life at all? What connects it to survival?",
+  },
+  {
+    letter: "i",
+    title: "Active inference and the free energy principle",
+    thinkers: "Friston",
+    obs: "Predictive coding explains how organisms update their internal models when surprised. But this leaves action disconnected from the core inferential process — and leaves unanswered the question of why prediction-error minimization should matter for a living system.",
+    sol: "Friston's insight is that prediction errors can be minimized in two ways: update the model to better fit the world (perception and learning), or change the world to better fit the model (action). Both are expressions of the same underlying process — minimizing free energy, a measure of the gap between the organism's model and its sensory states. Organisms survive by actively keeping themselves within the narrow range of states their model predicts — states compatible with life. Perception, learning, and action are no longer three separate things; they are three faces of a single imperative: resist surprise in order to persist.",
+    prob: null,
+  }
+];
+
+let current = 0;
+const visited = new Set([0]);
+
+function render() {
+  const s = steps[current];
+  document.getElementById('count').textContent = `${current + 1} of ${steps.length}`;
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === steps.length - 1;
+
+  const isLast = current === steps.length - 1;
+  document.getElementById('hint').textContent = isLast
+    ? '↑ All prior developments converge here'
+    : '↓ The remaining problem makes the next section necessary';
+
+  document.getElementById('card').innerHTML = `
+    <div class="card-header">
+      <span class="card-letter">${s.letter}</span>
+      <span class="card-title">${s.title}</span>
+      <span class="card-thinker">${s.thinkers}</span>
+    </div>
+    <div class="band band-obs"><div class="band-label">Context / observation</div><div class="band-text">${s.obs}</div></div>
+    <div class="band band-sol"><div class="band-label">Solution arrived at</div><div class="band-text">${s.sol}</div></div>
+    ${s.prob
+      ? `<div class="band band-prob"><div class="band-label">Problem that remains</div><div class="band-text">${s.prob}</div></div>`
+      : `<div class="band band-end"><div class="band-label">Synthesis</div><div class="band-text">This is the terminus of the progression — the point where the organizing questions of thermodynamics, homeostasis, feedback, information, and inference resolve into a single framework.</div></div>`
+    }
+  `;
+
+  const prog = document.getElementById('progress');
+  prog.innerHTML = steps.map((st, i) => {
+    const dotHtml = `<div class="dot ${i === current ? 'active' : visited.has(i) ? 'visited' : ''}" onclick="goto(${i})" title="${st.title}">${st.letter}</div>`;
+    return i < steps.length - 1 ? dotHtml + `<div class="dot-connector"></div>` : dotHtml;
+  }).join('');
+}
+
+function move(dir) {
+  current = Math.max(0, Math.min(steps.length - 1, current + dir));
+  visited.add(current);
+  render();
+}
+
+function goto(i) {
+  current = i;
+  visited.add(i);
+  render();
+}
+
+render();
+</script>

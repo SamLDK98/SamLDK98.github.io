@@ -9,6 +9,120 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="complex-numbers.css" />
+  <style>
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page {
+      --intro-bg: #000000;
+      --intro-panel: #050505;
+      --intro-card: #10142200;
+      --intro-rule: rgba(224, 190, 104, 0.35);
+      --intro-rule-strong: rgba(224, 190, 104, 0.62);
+      --intro-text: #f4f6ff;
+      --intro-dim: rgba(244, 246, 255, 0.72);
+      --intro-faint: rgba(224, 190, 104, 0.54);
+      --intro-accent: #b6ff5a;
+      --cn-green: #b6ff5a;
+      --cn-orange: #e0be68;
+      background: #000000;
+      color: var(--intro-text);
+    }
+
+    body.complex-numbers-polar-form-page header {
+      border-bottom-color: transparent;
+    }
+
+    body.complex-numbers-polar-form-page .header-inner {
+      max-width: var(--col-width);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 0;
+      padding-right: 0;
+      text-align: left;
+    }
+
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page .chapter-kicker {
+      color: var(--cn-green);
+      opacity: 0.85;
+    }
+
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page .essay-title {
+      color: var(--cn-orange);
+      background: none;
+      -webkit-text-fill-color: currentColor;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: clamp(1.85rem, 4.3vw, 3.2rem);
+      font-weight: 600;
+      line-height: 1.12;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      text-align: center;
+      margin-bottom: 0;
+    }
+
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section p,
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section li {
+      color: var(--intro-text);
+    }
+
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section em,
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section strong {
+      color: var(--cn-orange);
+    }
+
+    body.complex-numbers-polar-form-page.complex-numbers-chapter.intro-linear-algebra-page .essay-section .subsection-title,
+    body.complex-numbers-polar-form-page .essay-section h3 {
+      max-width: 860px;
+      margin: 3.2rem auto 1.1rem;
+      color: var(--cn-orange);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: clamp(1.35rem, 2.8vw, 2rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: none;
+    }
+
+    body.complex-numbers-polar-form-page .essay-section h4 {
+      max-width: var(--col-width);
+      margin: 1.8rem auto 0.65rem;
+      color: var(--cn-green);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.25rem);
+      font-weight: 500;
+      letter-spacing: 0.015em;
+    }
+
+    body.complex-numbers-polar-form-page .section-divider {
+      background: linear-gradient(90deg, transparent, rgba(224, 190, 104, 0.58), rgba(182, 255, 90, 0.62), rgba(224, 190, 104, 0.58), transparent);
+      border: 0;
+    }
+
+    body.complex-numbers-polar-form-page .chapter-nav-link {
+      border-color: var(--intro-rule);
+      color: var(--intro-text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    body.complex-numbers-polar-form-page .chapter-nav-link span {
+      color: var(--intro-faint);
+    }
+
+    body.complex-numbers-polar-form-page .chapter-nav-link:hover,
+    body.complex-numbers-polar-form-page .chapter-nav-link:focus-visible,
+    body.complex-numbers-polar-form-page .chapter-nav-link:active {
+      border-color: var(--cn-green);
+      color: var(--cn-green);
+      box-shadow: 0 0 22px -8px var(--cn-green);
+    }
+
+    body.complex-numbers-polar-form-page .chapter-nav-link:hover span,
+    body.complex-numbers-polar-form-page .chapter-nav-link:focus-visible span,
+    body.complex-numbers-polar-form-page .chapter-nav-link:active span {
+      color: var(--cn-orange);
+    }
+
+    body.complex-numbers-polar-form-page .polar-intro-widget {
+      height: 430px;
+    }
+  </style>
   <script>
     window.MathJax = {
       tex: {
@@ -22,11 +136,11 @@
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-polar-form-page">
+<body class="chapter-page intro-linear-algebra-page complex-numbers-chapter complex-numbers-polar-form-page complex-numbers-chapter-4-page">
   <header>
     <div class="header-rule top-rule"></div>
     <div class="header-inner">
-      <p class="chapter-kicker">Complex Numbers &middot; Supplement</p>
+      <p class="chapter-kicker">Complex Numbers &middot; Chapter 4</p>
       <h1 class="essay-title">Polar Form</h1>
     </div>
     <div class="header-rule bottom-rule"></div>
@@ -35,63 +149,108 @@
   <main>
     <article>
       <section class="essay-section">
+        <h3 class="subsection-title">Two Ways to Describe Points in a Plane</h3>
+
+        <h4>Cartesian Coordinate System</h4>
+
+        <p>As you already know, we can describe points in terms of how far we need to move along the $x$-axis and how far along the $y$-axis.</p>
+
+        <h4>Polar Form</h4>
+
+        <p>However, there is an alternative.</p>
+
+        <p>We could describe any point in a plane in terms of the angle we need to take and the distance we then need to extend out.</p>
+
+        <iframe
+          class="essay-widget polar-intro-widget"
+          src="complex-numbers/chapter-2/polar-intro-widget.html"
+          title="Minimal interactive plane showing a point described by angle and distance"
+          loading="lazy"
+          scrolling="no"
+        ></iframe>
+
         <h3 class="subsection-title">Polar Form</h3>
 
-        <p>Any position in a two-dimensional space can be represented using $(x,y)$ coordinates.</p>
+        <p>Multiplication on the real number line affects a number's distance from the origin (magnitude).</p>
 
-        <figure class="trig-figure trig-figure-bare polar-cartesian-figure" aria-label="Cartesian coordinate plane">
-          <svg viewBox="0 0 760 360" role="img">
-            <defs>
-              <marker id="polar-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <g class="polar-grid">
-              <line x1="80" y1="60" x2="80" y2="300" />
-              <line x1="140" y1="60" x2="140" y2="300" />
-              <line x1="200" y1="60" x2="200" y2="300" />
-              <line x1="260" y1="60" x2="260" y2="300" />
-              <line x1="320" y1="60" x2="320" y2="300" />
-              <line x1="380" y1="60" x2="380" y2="300" />
-              <line x1="440" y1="60" x2="440" y2="300" />
-              <line x1="500" y1="60" x2="500" y2="300" />
-              <line x1="560" y1="60" x2="560" y2="300" />
-              <line x1="620" y1="60" x2="620" y2="300" />
-              <line x1="680" y1="60" x2="680" y2="300" />
-              <line x1="80" y1="60" x2="680" y2="60" />
-              <line x1="80" y1="120" x2="680" y2="120" />
-              <line x1="80" y1="180" x2="680" y2="180" />
-              <line x1="80" y1="240" x2="680" y2="240" />
-              <line x1="80" y1="300" x2="680" y2="300" />
-            </g>
-            <line class="polar-axis" x1="80" y1="180" x2="690" y2="180" marker-end="url(#polar-axis-arrow)" />
-            <line class="polar-axis" x1="380" y1="310" x2="380" y2="50" marker-end="url(#polar-axis-arrow)" />
-            <circle class="polar-point" cx="560" cy="120" r="7" />
-            <line class="polar-guide polar-guide-x" x1="380" y1="120" x2="560" y2="120" />
-            <line class="polar-guide polar-guide-y" x1="560" y1="180" x2="560" y2="120" />
-            <text class="polar-label" x="696" y="173">x</text>
-            <text class="polar-label" x="392" y="55">y</text>
-            <text class="polar-coordinate" x="572" y="112">(x, y)</text>
-          </svg>
-        </figure>
+        <p>For example, multiplying by $3$ triples the distance from the origin:</p>
 
-        <p>Any position on the unit circle can also be represented by an angle $\theta$, because the functions sine and cosine map that angle to its corresponding $x$- and $y$-coordinates:</p>
+        <p class="display-equation">$$2 \rightarrow 6$$</p>
 
-        <p class="display-equation">$$(\cos\theta,\sin\theta)$$</p>
+        <p>Complex multiplication affects both <strong>distance</strong> and <strong>direction</strong> from the origin.</p>
 
-        <p>As $\theta$ varies, these coordinates trace out every point on the unit circle.</p>
+        <p>The distance of a complex number from the origin is called its modulus, written as:</p>
 
-        <p>The unit circle has a radius of $1$. To reach points elsewhere in the plane, we keep the same angle but extend or shrink the radius.</p>
+        <p class="display-equation">$$|z|$$</p>
+
+        <p>When describing complex numbers geometrically, we often call this distance $r$.</p>
+
+        <p>The direction is captured by the angle between the positive real axis and the line from the origin to the point. This angle is often called the argument of the complex number.</p>
+
+        <p>So instead of describing a complex number by its real and imaginary components, we can describe it by its distance and direction:</p>
+
+        <p class="display-equation">$$a + bi=(r,\theta)$$</p>
+
+        <p>These are called polar coordinates.</p>
+
+        <p>Converting from complex to polar form is straightforward; however, converting from polar to complex form can be more challenging.</p>
+
+        <h3 class="subsection-title">From $a + bi$ to $(r, \theta)$</h3>
+
+        <p>Suppose we begin with: $3+4i$.</p>
+
+        <p>The real and imaginary parts tell us that the point lies at: $(3,4)$.</p>
+
+        <p>The distance from the origin is: $r=\sqrt{3^2+4^2}=5$.</p>
+
+        <p>The angle can be found from the right triangle:</p>
+
+        <p class="display-equation">$$\tan\theta=\frac{4}{3}$$</p>
+
+        <p>So:</p>
+
+        <p class="display-equation">$$\theta=\tan^{-1}\left(\frac{4}{3}\right)$$</p>
+
+        <p>Therefore:</p>
+
+        <p class="display-equation">$$\theta \approx 53.1^\circ$$</p>
+
+        <p>So the complex number:</p>
+
+        <p class="display-equation">$$3+4i$$</p>
+
+        <p>can also be described in polar form as:</p>
+
+        <p class="display-equation">$$(5,53.1^\circ)$$</p>
+
+        <iframe
+          class="essay-widget complex-plane-widget"
+          src="complex-numbers/chapter-1/complex-plane-widget.html"
+          title="Interactive complex plane showing a plus bi, radius, and theta simultaneously"
+          loading="lazy"
+        ></iframe>
+
+        <h3 class="subsection-title">From $(r, \theta)$ to $a + bi$</h3>
+
+        <p>Now suppose we know $(r, \theta)$ is $(5, 53.1^\circ)$.</p>
+
+        <p>How do we convert from $(r, \theta)$ to $a + bi$?</p>
+
+        <p>This is exactly the problem solved earlier by trigonometry.</p>
+
+        <p>Remember that any position on the unit circle can also be represented by an angle $\theta$, because the functions sine and cosine map that angle to its corresponding $x$- and $y$-coordinates: $(\cos\theta, \sin\theta)$.</p>
+
+        <p>The unit circle has a radius of 1. To reach points elsewhere in the plane, we keep the same angle but extend or shrink the radius.</p>
 
         <p>This can be thought of as first moving around the unit circle to choose a direction, and then moving further away from or closer to the origin along that direction.</p>
 
         <p>If the radius is $r$, then both coordinates scale proportionally:</p>
 
-        <p class="display-equation">$$x=r\cos\theta \qquad y=r\sin\theta$$</p>
+        <p class="display-equation">$$x = r \cos \theta \quad y = r \sin \theta$$</p>
 
         <p>So any point can be represented as:</p>
 
-        <p class="display-equation">$$(r\cos\theta, r\sin\theta)$$</p>
+        <p class="display-equation">$$(r \cos \theta, r \sin \theta)$$</p>
 
         <iframe
           class="essay-widget polar-form-widget"
@@ -100,200 +259,50 @@
           loading="lazy"
         ></iframe>
 
-        <p>In other words, every point in the plane can be described either by its coordinates $(x,y)$, or by a distance $r$ from the origin and an angle $\theta$.</p>
+        <p>The point, the real axis, and the radius form a right triangle.</p>
 
-        <p>This is known as polar form.</p>
-
-        <h3 class="subsection-title">Complex Numbers</h3>
-
-        <p>Negative numbers have an interesting geometric interpretation.</p>
-
-        <p>Multiplying a number by $-1$ changes its sign. On the number line, this can be visualised as a rotation of $180^\circ$ about the origin.</p>
-
-        <figure class="trig-figure trig-figure-bare complex-half-turn-figure" aria-label="Three rotating to negative three by a half turn around the origin">
-          <svg viewBox="0 0 760 260" role="img">
-            <defs>
-              <marker id="half-turn-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <line class="complex-axis" x1="120" y1="150" x2="640" y2="150" marker-end="url(#half-turn-axis-arrow)" />
-            <line class="complex-tick" x1="210" y1="140" x2="210" y2="160" />
-            <line class="complex-tick" x1="380" y1="138" x2="380" y2="162" />
-            <line class="complex-tick" x1="550" y1="140" x2="550" y2="160" />
-            <path class="complex-rotation-arc" d="M 550 150 A 170 92 0 0 0 210 150" />
-            <circle class="complex-point-start" cx="550" cy="150" r="7" />
-            <circle class="complex-point-end" cx="210" cy="150" r="7" />
-            <text class="complex-label" x="550" y="185" text-anchor="middle">3</text>
-            <text class="complex-label" x="210" y="185" text-anchor="middle">-3</text>
-            <text class="complex-label complex-label-faint" x="380" y="185" text-anchor="middle">0</text>
-            <text class="complex-label complex-label-pink" x="380" y="52" text-anchor="middle">180°</text>
-          </svg>
-        </figure>
-
-        <p>This raises an interesting question.</p>
-
-        <p>If $-1$ corresponds to a rotation of $180^\circ$, might there exist a number corresponding to a rotation of $90^\circ$?</p>
-
-        <p>Mathematicians had already encountered a mysterious quantity while solving equations:</p>
-
-        <p class="display-equation">$$i=\sqrt{-1}$$</p>
-
-        <p>Since</p>
-
-        <p class="display-equation">$$i^2=-1,$$</p>
-
-        <p>multiplying by $i$ twice has the same effect as multiplying by $-1$: a rotation of $180^\circ$.</p>
-
-        <p>This suggests that a single multiplication by $i$ can be interpreted as a rotation of $90^\circ$.</p>
-
-        <figure class="trig-figure trig-figure-bare complex-unit-cycle-figure" aria-label="The powers of i rotating around the unit circle">
-          <svg viewBox="0 0 760 430" role="img">
-            <defs>
-              <marker id="complex-axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <line class="complex-axis" x1="170" y1="215" x2="590" y2="215" marker-end="url(#complex-axis-arrow)" />
-            <line class="complex-axis" x1="380" y1="370" x2="380" y2="50" marker-end="url(#complex-axis-arrow)" />
-            <circle class="complex-circle" cx="380" cy="215" r="128" />
-            <path class="complex-cycle-arc" d="M 508 215 A 128 128 0 0 0 380 87 A 128 128 0 0 0 252 215 A 128 128 0 0 0 380 343 A 128 128 0 0 0 508 215" />
-            <circle class="complex-point-start" cx="508" cy="215" r="7" />
-            <circle class="complex-point-end" cx="380" cy="87" r="7" />
-            <circle class="complex-point-end" cx="252" cy="215" r="7" />
-            <circle class="complex-point-end" cx="380" cy="343" r="7" />
-            <text class="complex-label" x="525" y="221">1</text>
-            <text class="complex-label" x="392" y="82">i</text>
-            <text class="complex-label" x="215" y="221">-1</text>
-            <text class="complex-label" x="392" y="351">-i</text>
-          </svg>
-        </figure>
-
-        <iframe
-          class="essay-widget complex-rotation-widget"
-          src="complex-numbers/chapter-2/complex-rotation-widget.html"
-          title="Interactive widget showing multiplication by i as rotation"
-          loading="lazy"
-        ></iframe>
-
-        <p>Under this interpretation, multiplying by $i$ rotates numbers off the number line and into a second dimension.</p>
-
-        <p>This looks very similar to the Cartesian plane. However, when working with complex numbers we use different terminology:</p>
+        <p>From the unit circle we know:</p>
 
         <ul>
-          <li>horizontal axis $\rightarrow$ real axis</li>
-          <li>vertical axis $\rightarrow$ imaginary axis</li>
+          <li>$x=r\cos\theta$</li>
+          <li>$y=r\sin\theta$</li>
         </ul>
 
-        <p>A complex number is written as</p>
-
-        <p class="display-equation">$$z=a+bi$$</p>
-
-        <p>where:</p>
+        <p>Therefore:</p>
 
         <ul>
-          <li>$a$ is the real part</li>
-          <li>$b$ is the imaginary part</li>
+          <li>$a=r\cos\theta$</li>
+          <li>$b=r\sin\theta$.</li>
         </ul>
 
-        <p>Just as the coordinate pair $(a,b)$ identifies a point in the plane, the complex number $a+bi$ identifies the same point in the complex plane.</p>
+        <p>Substituting these into $a+bi$ gives: $z = r\cos\theta + ri\sin\theta$</p>
 
-        <h3 class="subsection-title">Polar Form</h3>
+        <p>Factoring out $r$: $z=r(\cos\theta+i\sin\theta)$</p>
 
-        <p>We can also describe a complex number using a distance and an angle.</p>
+        <h3 class="subsection-title">Multiplying Complex Numbers in Polar Form</h3>
 
-        <p>If we draw a line from the origin to the point $z=a+bi$, it forms the hypotenuse of a right-angled triangle.</p>
+        <p class="display-equation">$$z_1 = r_1(\cos\theta_1 + i\sin\theta_1)$$</p>
 
-        <figure class="trig-figure trig-figure-bare complex-point-triangle-figure" aria-label="A complex number plotted with a right triangle">
-          <svg viewBox="0 0 760 380" role="img">
-            <defs>
-              <marker id="complex-plane-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 Z" class="polar-axis-arrow" />
-              </marker>
-            </defs>
-            <g class="polar-grid">
-              <line x1="120" y1="70" x2="120" y2="310" />
-              <line x1="180" y1="70" x2="180" y2="310" />
-              <line x1="240" y1="70" x2="240" y2="310" />
-              <line x1="300" y1="70" x2="300" y2="310" />
-              <line x1="360" y1="70" x2="360" y2="310" />
-              <line x1="420" y1="70" x2="420" y2="310" />
-              <line x1="480" y1="70" x2="480" y2="310" />
-              <line x1="540" y1="70" x2="540" y2="310" />
-              <line x1="600" y1="70" x2="600" y2="310" />
-              <line x1="120" y1="70" x2="600" y2="70" />
-              <line x1="120" y1="130" x2="600" y2="130" />
-              <line x1="120" y1="190" x2="600" y2="190" />
-              <line x1="120" y1="250" x2="600" y2="250" />
-              <line x1="120" y1="310" x2="600" y2="310" />
-            </g>
-            <line class="complex-axis" x1="120" y1="250" x2="620" y2="250" marker-end="url(#complex-plane-arrow)" />
-            <line class="complex-axis" x1="240" y1="320" x2="240" y2="60" marker-end="url(#complex-plane-arrow)" />
-            <path class="opposite-fill" d="M 240 250 L 480 250 L 480 130 Z" />
-            <line class="polar-guide polar-guide-x" x1="240" y1="250" x2="480" y2="250" />
-            <line class="polar-guide polar-guide-y" x1="480" y1="250" x2="480" y2="130" />
-            <line class="complex-radius" x1="240" y1="250" x2="480" y2="130" />
-            <path class="complex-angle" d="M 306 250 A 66 66 0 0 0 299 221" />
-            <circle class="complex-point-start" cx="480" cy="130" r="7" />
-            <text class="complex-label" x="492" y="123">z = a + bi</text>
-            <text class="complex-label complex-label-orange" x="360" y="277" text-anchor="middle">a</text>
-            <text class="complex-label complex-label-teal" x="500" y="190">b</text>
-            <text class="complex-label complex-label-gold" x="368" y="176">r</text>
-            <text class="complex-label complex-label-pink" x="314" y="226">θ</text>
-            <text class="complex-label complex-label-faint" x="622" y="243">real</text>
-            <text class="complex-label complex-label-faint" x="255" y="66">imaginary</text>
-          </svg>
-        </figure>
+        <p class="display-equation">$$z_2 = r_2(\cos\theta_2 + i\sin\theta_2)$$</p>
 
-        <p>Using Pythagoras' theorem, the length of this hypotenuse is</p>
-
-        <p class="display-equation">$$r=\sqrt{a^2+b^2}.$$</p>
-
-        <p>In the context of complex numbers, this distance from the origin is called the <strong>modulus</strong>.</p>
-
-        <p>We can also describe the point using the angle $\theta$ measured from the positive real axis.</p>
-
-        <p>Thus every complex number can be described by:</p>
+        <p>When multiplied together:</p>
 
         <ul>
-          <li>a modulus $r$</li>
-          <li>an angle $\theta$</li>
+          <li>The distances from the origin (magnitudes) multiply: $r_1r_2$.</li>
+          <li>The angles add: $\theta_1 + \theta_2$.</li>
         </ul>
 
-        <p>This is directly analogous to polar coordinates.</p>
-
-        <p>So we could describe $z = a+bi$ as $z=r(\cos\theta+i\sin\theta)$.</p>
-
-        <p>How?</p>
-
-        <p>The real and imaginary parts can be expressed as:</p>
-
-        <p class="display-equation">$$a=r\cos\theta \qquad \text{and} \qquad b=r\sin\theta$$</p>
-
-        <p>Substitute these expressions into $z = a +bi$:</p>
-
-        <p class="display-equation">$$z=r\cos\theta+i(r\sin\theta)$$</p>
-
-        <p>Factor out the $r$:</p>
-
-        <p class="display-equation">$$z=r(\cos\theta+i\sin\theta)$$</p>
-
-        <p>This is known as the <strong>polar form</strong> of a complex number.</p>
-
+        <p>Multiplying by a complex number stretches by a certain amount and rotates by a certain angle.</p>
         <hr class="section-divider" />
 
         <nav class="chapter-nav" aria-label="Chapter navigation">
-          <a class="chapter-nav-link" href="complex-numbers-chapter-2.html">
+          <a class="chapter-nav-link" href="complex-numbers-chapter-3.html">
             <span>Previous</span>
-            <strong>The Complex Plane</strong>
+            <strong>Complex Multiplication</strong>
           </a>
           <a class="chapter-nav-link" href="complex-numbers.html">
             <span>Contents</span>
             <strong>Complex Numbers</strong>
-          </a>
-          <a class="chapter-nav-link" href="complex-numbers-chapter-3.html">
-            <span>Next</span>
-            <strong>The Cartesian Plane</strong>
           </a>
         </nav>
       </section>

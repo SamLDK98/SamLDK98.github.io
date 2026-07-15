@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — The Atelier | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:   #efe7d6;
+      --paper-2: #e7ddc7;
+      --ink:     #2a2118;
+      --ink-soft:#6a5d49;
+      --rule:    #b6a685;
+      --accent:  #8a2b22;       /* iron-oxide red */
+      --gold:    #97772e;
+      --serif:   'EB Garamond', Georgia, serif;
+      --display: 'Libre Baskerville', Georgia, serif;
+    }
+
+    html { font-size: 20px; }
+    body {
+      min-height: 100vh;
+      font-family: var(--serif);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 50% 28%, rgba(255,248,228,0.55), transparent 60%),
+        radial-gradient(ellipse at center, transparent 52%, rgba(60,42,20,0.30) 128%),
+        var(--paper);
+      -webkit-font-smoothing: antialiased;
+      font-variant-numeric: oldstyle-nums;
+      display: flex;
+      justify-content: center;
+      padding: clamp(1.5rem, 5vw, 4rem);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* paper fibre grain */
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      opacity: 0.5; mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.26 0 0 0 0 0.20 0 0 0 0 0.10 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .plate {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 760px;
+      padding: clamp(2.2rem, 6vw, 5rem) clamp(1.6rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+      background:
+        linear-gradient(180deg, rgba(255,252,242,0.35), rgba(231,221,199,0.15));
+      border: 1px solid var(--rule);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.25) inset,
+        0 1.4rem 3rem rgba(42,33,24,0.18);
+    }
+    /* engraver's double rule, drawn inside the plate */
+    .plate::after {
+      content: "";
+      position: absolute; inset: 10px;
+      border: 1px solid var(--rule);
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    .masthead { text-align: center; }
+    .colophon {
+      font-style: italic;
+      letter-spacing: 0.02em;
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+      margin-bottom: 1.1rem;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-weight: 400;
+      line-height: 1.04;
+      font-size: clamp(2.4rem, 8.5vw, 4.2rem);
+      letter-spacing: 0.01em;
+    }
+    h1 .amp {
+      display: block;
+      font-style: italic;
+      color: var(--accent);
+      font-size: 0.42em;
+      margin: 0.35rem 0;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    /* self-drawing ornamental rule */
+    .ornament {
+      display: block;
+      margin: 1.6rem auto 0.4rem;
+      width: min(280px, 70%);
+      overflow: visible;
+    }
+    .ornament path, .ornament line {
+      stroke: var(--accent);
+      stroke-width: 1.4;
+      fill: none;
+      stroke-dasharray: 320;
+      stroke-dashoffset: 320;
+      animation: ink 2s cubic-bezier(0.4,0,0.3,1) 0.3s forwards;
+    }
+    .ornament circle {
+      fill: var(--accent);
+      opacity: 0;
+      animation: dot 0.5s ease 2s forwards;
+    }
+    @keyframes ink { to { stroke-dashoffset: 0; } }
+    @keyframes dot { to { opacity: 1; } }
+
+    .dek {
+      text-align: center;
+      max-width: 30rem;
+      margin: 0.9rem auto 0;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.55;
+    }
+
+    .toc-head {
+      margin: clamp(2.4rem, 6vw, 3.6rem) 0 0.4rem;
+      text-align: center;
+      font-family: var(--display);
+      font-size: 0.72rem;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    nav ol { list-style: none; counter-reset: item; }
+    nav li { border-top: 1px solid var(--rule); }
+    nav li:last-child { border-bottom: 1px solid var(--rule); }
+
+    nav a {
+      counter-increment: item;
+      display: flex;
+      align-items: baseline;
+      gap: clamp(0.8rem, 3vw, 1.6rem);
+      padding: clamp(0.85rem, 2.6vw, 1.2rem) 0.4rem;
+      text-decoration: none;
+      color: var(--ink);
+      position: relative;
+      transition: padding-left 0.4s cubic-bezier(0.2,0.7,0.2,1), color 0.3s ease;
+    }
+    nav a::before {
+      content: counter(item, decimal-leading-zero);
+      font-family: var(--display);
+      font-size: 0.8rem;
+      color: var(--gold);
+      min-width: 2ch;
+      letter-spacing: 0.05em;
+    }
+    .entry-title {
+      font-family: var(--display);
+      font-size: clamp(1.25rem, 4.6vw, 1.8rem);
+      font-weight: 400;
+      line-height: 1.1;
+      flex: 0 0 auto;
+      transition: color 0.3s ease;
+    }
+    .entry-dek {
+      font-style: italic;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+      margin-left: auto;
+      text-align: right;
+      max-width: 16rem;
+      opacity: 0.85;
+      transition: opacity 0.3s ease;
+    }
+    /* leader dots that grow on hover */
+    nav a .arrow {
+      position: absolute;
+      right: 0.4rem; bottom: 0.55rem;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      font-size: 1.1rem;
+    }
+    nav a:hover, nav a:focus-visible {
+      outline: none;
+      padding-left: clamp(0.8rem, 3vw, 1.6rem);
+      color: var(--accent);
+      background:
+        linear-gradient(90deg, rgba(138,43,34,0.06), transparent 70%);
+    }
+    nav a:hover .entry-title, nav a:focus-visible .entry-title { color: var(--accent); }
+    nav a:hover .arrow, nav a:focus-visible .arrow { opacity: 1; transform: translateX(0); }
+
+    footer {
+      margin-top: clamp(2.2rem, 6vw, 3.4rem);
+      text-align: center;
+      font-style: italic;
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+      letter-spacing: 0.02em;
+    }
+    footer .sig {
+      font-family: var(--display);
+      font-style: normal;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+    }
+
+    @media (max-width: 540px) {
+      nav a { flex-wrap: wrap; }
+      .entry-dek { margin-left: 2.8ch; text-align: left; font-size: 0.88rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ornament path, .ornament line { animation: none; stroke-dashoffset: 0; }
+      .ornament circle { animation: none; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="plate">
+    <header class="masthead">
+      <p class="colophon">Sam Kirwan · a workshop of figures in motion</p>
+      <h1>Interactive<span class="amp">Expositions</span></h1>
+
+      <svg class="ornament" viewBox="0 0 280 24" aria-hidden="true">
+        <line x1="20" y1="12" x2="120" y2="12" />
+        <path d="M120 12 q20 -10 40 0 q20 10 40 0" />
+        <line x1="200" y1="12" x2="260" y2="12" transform="translate(-40,0)"/>
+        <circle cx="140" cy="12" r="2.4" />
+      </svg>
+
+      <p class="dek">Essays you can take apart with your hands — each idea built from
+        figures that move, respond, and let you see the mathematics happen.</p>
+    </header>
+
+    <p class="toc-head">Table of Contents</p>
+    <nav aria-label="Topics">
+      <ol>
+        <li><a href="complex-numbers.html">
+          <span class="entry-title">Complex Numbers</span>
+          <span class="entry-dek">Numbers that answer impossible questions</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a></li>
+        <li><a href="linear-algebra.html">
+          <span class="entry-title">Linear Algebra</span>
+          <span class="entry-dek">Equations as motion through space</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a></li>
+        <li><a href="trigonometry.html">
+          <span class="entry-title">Trigonometry</span>
+          <span class="entry-dek">The circle hidden in every wave</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a></li>
+        <li><a href="algebra.html">
+          <span class="entry-title">Algebra</span>
+          <span class="entry-dek">The grammar of the unknown</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a></li>
+        <li><a href="active-inference.html">
+          <span class="entry-title">Active Inference</span>
+          <span class="entry-dek">How a mind holds back the tide of entropy</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a></li>
+      </ol>
+    </nav>
+
+    <footer>
+      Set in Garamond &amp; Baskerville — <span class="sig">Sam Kirwan</span>, MMXXVI
+    </footer>
+  </main>
+</body>
+</html>

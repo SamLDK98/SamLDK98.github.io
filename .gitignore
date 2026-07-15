@@ -1,0 +1,12 @@
+# Machine-local assistant settings
+.claude/settings.local.json
+
+# Python-generated cache files
+__pycache__/
+*.py[cod]
+
+# Re-downloadable literature PDFs
+apps/downloaded_pdfs/*.pdf
+
+# Local transfer/archive bundles
+*.zip

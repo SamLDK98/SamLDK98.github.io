@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — Feature | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:   #0d0c0b;
+      --ink:  #f4efe4;
+      --muted: rgba(244,239,228,0.6);
+      --faint: rgba(244,239,228,0.32);
+      --line:  rgba(244,239,228,0.14);
+      --serif: "Fraunces", Georgia, serif;
+      --sans:  "Space Grotesk", system-ui, sans-serif;
+      --mono:  "JetBrains Mono", monospace;
+      --accent: #34f5ff;
+    }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg); color: var(--ink); font-family: var(--sans);
+      -webkit-font-smoothing: antialiased; overflow: hidden;
+    }
+    /* accent wash that tints toward the active topic */
+    .wash {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(70% 90% at 78% 30%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 60%);
+      transition: background 0.7s ease;
+    }
+    .frame {
+      position: relative; z-index: 1; height: 100vh;
+      display: grid; grid-template-rows: auto 1fr auto;
+      padding: clamp(1.3rem, 3.4vw, 2.6rem) clamp(1.4rem, 4vw, 3.6rem);
+    }
+    .top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .top .by { color: var(--faint); }
+
+    .body {
+      display: grid; grid-template-columns: minmax(0,1.45fr) minmax(16rem, 0.85fr);
+      gap: clamp(1.5rem, 5vw, 5rem); align-items: center; min-height: 0;
+    }
+
+    /* ---- feature panel (left) ---- */
+    .feature { position: relative; min-width: 0; }
+    .feat-no {
+      position: absolute; right: 0; top: -8%; z-index: 0;
+      font-family: var(--serif); font-weight: 500; line-height: 0.7;
+      font-size: clamp(10rem, 26vw, 24rem); color: rgba(244,239,228,0.05);
+      user-select: none; pointer-events: none;
+    }
+    .eyebrow {
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 1.1rem;
+    }
+    .feat-title {
+      font-family: var(--serif); font-weight: 600; letter-spacing: -0.015em;
+      font-size: clamp(2.6rem, 7.5vw, 5.6rem); line-height: 0.96; max-width: 14ch;
+    }
+    .feat-blurb {
+      margin-top: 1.2rem; max-width: 34rem; color: var(--muted);
+      font-size: clamp(1.02rem, 1.5vw, 1.25rem); line-height: 1.6;
+    }
+    .feat-meta {
+      margin-top: 1.4rem; display: flex; gap: 1.4rem; flex-wrap: wrap;
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--faint);
+    }
+    .cta {
+      margin-top: 2rem; display: inline-flex; align-items: center; gap: 0.7rem;
+      text-decoration: none; color: var(--bg); background: var(--accent);
+      font-family: var(--mono); font-weight: 500; font-size: 0.82rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.85rem 1.5rem; border-radius: 999px;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.5s;
+    }
+    .cta:hover { transform: translateY(-2px); box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 40%, transparent); }
+    .cta .arr { transition: transform 0.2s; }
+    .cta:hover .arr { transform: translateX(4px); }
+
+    /* fade/slide animation on change */
+    .swap { animation: rise 0.55s cubic-bezier(0.2,0.7,0.2,1) both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+    .motif-wrap { position: relative; z-index: 1; display: grid; place-items: center; }
+    .motif { width: min(20rem, 60%); aspect-ratio: 1; }
+    .motif * { vector-effect: non-scaling-stroke; }
+    .ms { fill: none; stroke: var(--accent); stroke-width: 1.4; }
+    .mf { fill: var(--accent); }
+    .spin  { transform-box: fill-box; transform-origin: center; animation: spin 16s linear infinite; }
+    .orbit { transform-box: fill-box; transform-origin: center; animation: spin 10s linear infinite; }
+    .wv path { animation: wv 5s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes wv { 0%,100%{ transform: translateX(0) } 50%{ transform: translateX(-14px) } }
+
+    /* ---- index list (right) ---- */
+    .index { display: flex; flex-direction: column; gap: 0.2rem; border-left: 1px solid var(--line); }
+    .item {
+      position: relative; display: grid; grid-template-columns: 2.2rem 1fr; align-items: baseline;
+      gap: 0.9rem; padding: 0.95rem 0.6rem 0.95rem 1.3rem;
+      background: none; border: none; text-align: left; cursor: pointer;
+      color: var(--faint); font-family: var(--sans);
+      transition: color 0.25s, padding-left 0.3s;
+    }
+    .item::before {
+      content:""; position: absolute; left: -1px; top: 50%; height: 0; width: 2px;
+      background: var(--ic); transform: translateY(-50%);
+      transition: height 0.3s; box-shadow: 0 0 10px var(--ic);
+    }
+    .item .inum { font-family: var(--mono); font-size: 0.72rem; }
+    .item .ilabel { font-size: 1.15rem; font-weight: 500; line-height: 1.1; transition: color 0.25s; }
+    .item.on { color: var(--ink); padding-left: 1.7rem; }
+    .item.on::before { height: 62%; }
+    .item.on .ilabel { color: var(--ic); }
+    .item:hover { color: var(--ink); }
+
+    /* auto-advance progress */
+    .progress { grid-column: 1 / -1; height: 2px; margin-top: 0.5rem; background: var(--line); border-radius: 2px; overflow: hidden; }
+    .progress i { display: block; height: 100%; width: 0; background: var(--accent); }
+    .progress i.run { animation: fillbar var(--dur,6s) linear forwards; }
+    @keyframes fillbar { from { width: 0 } to { width: 100% } }
+
+    .bottom {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem;
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--faint);
+    }
+    .dots { display: flex; gap: 0.5rem; }
+    .dots button { width: 8px; height: 8px; border-radius: 50%; border: none; cursor: pointer;
+      background: var(--line); padding: 0; transition: background 0.25s, transform 0.25s; }
+    .dots button.on { background: var(--accent); transform: scale(1.3); }
+
+    @media (max-width: 820px) {
+      .body { grid-template-columns: 1fr; gap: 1.2rem; align-content: center; }
+      .motif-wrap { display: none; }
+      .feat-title { font-size: clamp(2.4rem, 11vw, 3.6rem); }
+    }
+    .noscript-list a { color: #8db4ff; display:block; margin: .3rem 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .swap, .spin, .orbit, .wv path, .progress i.run { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wash" id="wash" aria-hidden="true"></div>
+  <div id="root"></div>
+  <noscript>
+    <div style="padding:2rem;font-family:Georgia,serif">
+      <h1>Interactive Expositions — Sam Kirwan</h1>
+      <div class="noscript-list">
+        <a href="complex-numbers.html">Complex Numbers</a>
+        <a href="linear-algebra.html">Linear Algebra</a>
+        <a href="trigonometry.html">Trigonometry</a>
+        <a href="algebra.html">Algebra</a>
+        <a href="active-inference.html">Active Inference</a>
+      </div>
+    </div>
+  </noscript>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel-src" id="app">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    const TOPICS = [
+      { id:'complex', no:'01', title:'Complex Numbers', href:'complex-numbers.html', color:'#34f5ff',
+        eyebrow:'The plane', blurb:'Numbers that answer impossible questions — rotation, waves, and the secret geometry of the plane, explored with figures you can turn in your hands.',
+        meta:['Chapter 01','Interactive figures','~ 40 min'] },
+      { id:'linear', no:'02', title:'Linear Algebra', href:'linear-algebra.html', color:'#9b7bff',
+        eyebrow:'Vector space', blurb:'Equations as motion through space — vectors, transformations, and the shape of a solution, built up one moving picture at a time.',
+        meta:['Chapter 02','Interactive figures','~ 55 min'] },
+      { id:'trig', no:'03', title:'Trigonometry', href:'trigonometry.html', color:'#15d39a',
+        eyebrow:'The unit circle', blurb:'The circle hidden in every wave — angles, ratios, and the unit circle unrolled into the rhythm of sine and cosine.',
+        meta:['Chapter 03','Interactive figures','~ 35 min'] },
+      { id:'algebra', no:'04', title:'Algebra', href:'algebra.html', color:'#ffb43a',
+        eyebrow:'First principles', blurb:'The grammar of the unknown — symbols, balance, and the quiet machinery of solving, rebuilt from the ground up.',
+        meta:['Chapter 04','Interactive figures','~ 30 min'] },
+      { id:'active', no:'05', title:'Active Inference', href:'active-inference.html', color:'#ff5ca8',
+        eyebrow:'Free energy', blurb:'How a mind holds back the tide of entropy — prediction, surprise, and the free-energy story of living things.',
+        meta:['Essay 05','Interactive figures','~ 50 min'] },
+    ];
+    const AUTO_MS = 6000;
+
+    function Motif({ id }) {
+      switch (id) {
+        case 'complex': return (
+          <svg className="motif" viewBox="0 0 200 200" aria-hidden="true">
+            <line className="ms" x1="20" y1="100" x2="180" y2="100"/>
+            <line className="ms" x1="100" y1="20" x2="100" y2="180"/>
+            <circle className="ms" cx="100" cy="100" r="60" opacity="0.5"/>
+            <g className="orbit"><line className="ms" x1="100" y1="100" x2="100" y2="40"/><circle className="mf" cx="100" cy="40" r="8"/></g>
+          </svg>);
+        case 'linear': return (
+          <svg className="motif" viewBox="0 0 200 200" aria-hidden="true">
+            <line className="ms" x1="30" y1="170" x2="170" y2="170" opacity="0.35"/>
+            <line className="ms" x1="30" y1="170" x2="30" y2="30" opacity="0.35"/>
+            <line className="ms" x1="30" y1="170" x2="150" y2="64"/><polygon className="mf" points="150,64 131,68 140,82"/>
+            <line className="ms" x1="30" y1="170" x2="84" y2="58"/><polygon className="mf" points="84,58 72,71 86,75"/>
+          </svg>);
+        case 'trig': return (
+          <svg className="motif" viewBox="0 0 200 200" aria-hidden="true">
+            <circle className="ms" cx="62" cy="100" r="44" opacity="0.55"/>
+            <g className="wv"><path className="ms" d="M62 100 Q 94 32 126 100 T 190 100"/></g>
+            <line className="ms" x1="62" y1="100" x2="62" y2="56" opacity="0.6"/><circle className="mf" cx="62" cy="56" r="7"/>
+          </svg>);
+        case 'algebra': return (
+          <svg className="motif" viewBox="0 0 200 200" aria-hidden="true">
+            <line className="ms" x1="34" y1="128" x2="166" y2="128"/>
+            <polygon className="ms" points="100,128 74,82 126,82"/>
+            <circle className="mf" cx="60" cy="64" r="12"/><rect className="ms" x="128" y="48" width="26" height="26" rx="3"/>
+          </svg>);
+        case 'active': return (
+          <svg className="motif" viewBox="0 0 200 200" aria-hidden="true">
+            <circle className="ms" cx="100" cy="100" r="20"/>
+            <g className="spin"><circle className="ms" cx="100" cy="100" r="46" opacity="0.5" strokeDasharray="6 9"/><circle className="mf" cx="146" cy="100" r="7"/></g>
+            <circle className="ms" cx="100" cy="100" r="72" opacity="0.3" strokeDasharray="3 11"/>
+          </svg>);
+        default: return null;
+      }
+    }
+
+    function App() {
+      const [i, setI] = useState(0);
+      const [paused, setPaused] = useState(false);
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const t = TOPICS[i];
+
+      // tint the global wash + accent
+      useEffect(() => {
+        document.documentElement.style.setProperty('--accent', t.color);
+        document.getElementById('wash').style.setProperty('--accent', t.color);
+      }, [i]);
+
+      // auto-advance
+      useEffect(() => {
+        if (paused || reduce) return;
+        const id = setTimeout(() => setI(p => (p + 1) % TOPICS.length), AUTO_MS);
+        return () => clearTimeout(id);
+      }, [i, paused, reduce]);
+
+      const onKey = useCallback((e) => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); setI(p => (p + 1) % TOPICS.length); }
+        else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); setI(p => (p - 1 + TOPICS.length) % TOPICS.length); }
+        else if (e.key === 'Enter') { window.location.href = t.href; }
+      }, [t]);
+      useEffect(() => {
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [onKey]);
+
+      return (
+        <div className="frame"
+          onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
+          onFocusCapture={() => setPaused(true)} onBlurCapture={() => setPaused(false)}>
+          <div className="top">
+            <span>Interactive Expositions</span>
+            <span className="by">Sam Kirwan · selected works</span>
+          </div>
+
+          <div className="body">
+            <div className="feature">
+              <div className="feat-no" key={'n'+i}>{t.no}</div>
+              <div className="swap" key={t.id}>
+                <p className="eyebrow">{t.no} — {t.eyebrow}</p>
+                <h1 className="feat-title">{t.title}</h1>
+                <p className="feat-blurb">{t.blurb}</p>
+                <div className="feat-meta">{t.meta.map(m => <span key={m}>{m}</span>)}</div>
+                <a className="cta" href={t.href}>Read the chapter <span className="arr">→</span></a>
+              </div>
+            </div>
+
+            <div className="motif-wrap" key={'m'+t.id}><Motif id={t.id} /></div>
+          </div>
+
+          <nav className="index" aria-label="Expositions">
+            {TOPICS.map((tp, k) => (
+              <button key={tp.id} className={'item' + (k === i ? ' on' : '')}
+                style={{ '--ic': tp.color }}
+                onMouseEnter={() => setI(k)} onFocus={() => setI(k)}
+                onClick={() => window.location.href = tp.href}
+                aria-current={k === i}>
+                <span className="inum">{tp.no}</span>
+                <span className="ilabel">{tp.title}</span>
+                {k === i && (
+                  <span className="progress"><i className={(!paused && !reduce) ? 'run' : ''}
+                    style={{ '--dur': AUTO_MS + 'ms' }} key={'p'+i+paused} /></span>
+                )}
+              </button>
+            ))}
+          </nav>
+
+          <div className="bottom">
+            <span>{String(i+1).padStart(2,'0')} / {String(TOPICS.length).padStart(2,'0')}</span>
+            <div className="dots">
+              {TOPICS.map((tp, k) => (
+                <button key={tp.id} className={k === i ? 'on' : ''} aria-label={tp.title}
+                  onClick={() => setI(k)} />
+              ))}
+            </div>
+            <span>↑ ↓ to browse · enter to open</span>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+
+  <script>
+    (function () {
+      var src = document.getElementById('app').textContent;
+      var out = Babel.transform(src, { presets: [['react', { runtime: 'classic' }]] }).code;
+      (0, eval)(out);
+    })();
+  </script>
+</body>
+</html>

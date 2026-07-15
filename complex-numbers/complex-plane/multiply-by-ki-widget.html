@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiplying by a Multiple of i</title>
+  <style>
+    :root {
+      --text: #fff1d6;
+      --muted: rgba(255, 241, 214, 0.66);
+      --panel: rgba(46, 12, 7, 0.54);
+      --rule: rgba(255, 214, 134, 0.2);
+      --axis: rgba(255, 241, 214, 0.58);
+      --accent: #ffd95f;
+      --blue: #56c7ff;
+      --red: #ff5a4d;
+      --bg1: rgba(67, 18, 8, 0.95);
+      --bg2: rgba(47, 13, 8, 0.98);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Fraunces", Georgia, serif;
+    }
+
+    .widget {
+      width: min(100%, 940px);
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 217, 95, 0.1), transparent 32%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 18px 46px rgba(0,0,0,0.2);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .stage,
+    .panel {
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+
+    .stage {
+      min-height: 390px;
+      padding: 0.5rem;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 370px;
+      overflow: visible;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .tick {
+      stroke: rgba(255, 241, 214, 0.18);
+      stroke-width: 1;
+    }
+
+    .label {
+      fill: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .value-label {
+      fill: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .start-vector {
+      stroke: rgba(255, 217, 95, 0.36);
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .vector {
+      stroke: var(--accent);
+      stroke-width: 5;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 7px rgba(255, 217, 95, 0.35));
+      transition: x2 520ms ease, y2 520ms ease;
+    }
+
+    .arc {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 3;
+      stroke-linecap: round;
+      opacity: 0;
+      transition: opacity 250ms ease;
+    }
+
+    .arc.visible { opacity: 0.9; }
+
+    .scale-guide {
+      stroke: rgba(86, 199, 255, 0.36);
+      stroke-width: 2;
+      stroke-dasharray: 5 7;
+      opacity: 0;
+      transition: opacity 250ms ease;
+    }
+
+    .scale-guide.visible { opacity: 1; }
+
+    .panel {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.9rem;
+    }
+
+    .equation {
+      color: var(--accent);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: clamp(1.15rem, 3.2vw, 1.75rem);
+      line-height: 1.2;
+    }
+
+    .controls {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    label {
+      display: grid;
+      gap: 0.35rem;
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input[type="range"] {
+      accent-color: var(--accent);
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .chip {
+      border: 1px solid rgba(255, 214, 134, 0.22);
+      border-radius: 999px;
+      padding: 0.28rem 0.55rem;
+      color: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.72rem;
+    }
+
+    button {
+      width: fit-content;
+      border: 1px solid rgba(255, 217, 95, 0.58);
+      border-radius: 999px;
+      background: rgba(255, 217, 95, 0.08);
+      color: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.62rem 0.9rem;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: rgba(255, 217, 95, 0.16);
+      outline: none;
+    }
+
+    @media (max-width: 740px) {
+      .layout { grid-template-columns: 1fr; }
+      .stage { min-height: 330px; }
+      svg { min-height: 310px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" aria-label="Multiplication by a multiple of i rotates and scales a number">
+    <div class="layout">
+      <section class="stage">
+        <svg id="plane" viewBox="0 0 560 420" role="img" aria-label="Complex plane showing multiplication by k i">
+          <defs>
+            <marker id="arrow" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+              <path d="M0,0 L9,4.5 L0,9 Z" fill="#ffd95f" />
+            </marker>
+          </defs>
+
+          <line class="axis" x1="62" y1="210" x2="498" y2="210" />
+          <line class="axis" x1="280" y1="372" x2="280" y2="48" />
+          <text class="label" x="457" y="193">real</text>
+          <text class="label" x="296" y="62">imaginary</text>
+
+          <g id="ticks"></g>
+          <path id="arc" class="arc" d="M 340 210 A 60 60 0 0 0 280 150" />
+          <line id="startVector" class="start-vector" x1="280" y1="210" x2="340" y2="210" />
+          <line id="scaleGuide" class="scale-guide" x1="280" y1="210" x2="280" y2="30" />
+          <line id="vector" class="vector" x1="280" y1="210" x2="340" y2="210" marker-end="url(#arrow)" />
+          <text id="startLabel" class="value-label" x="346" y="235">4</text>
+          <text id="endLabel" class="value-label" x="294" y="36" opacity="0">12i</text>
+        </svg>
+      </section>
+
+      <aside class="panel">
+        <div id="equation" class="equation">4 x 3i = 12i</div>
+        <div class="controls">
+          <label>
+            Starting number: <span id="aValue">4</span>
+            <input id="aSlider" type="range" min="1" max="6" step="1" value="4">
+          </label>
+          <label>
+            Imaginary multiplier: <span id="kValue">3i</span>
+            <input id="kSlider" type="range" min="1" max="4" step="1" value="3">
+          </label>
+        </div>
+        <button id="multiplyBtn" type="button">Multiply</button>
+        <div class="chips" aria-label="Operation summary">
+          <span class="chip">rotate 90°</span>
+          <span id="scaleChip" class="chip">scale x3</span>
+        </div>
+        <p id="note" class="note">Multiplication by i rotates; the real coefficient scales the magnitude.</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const origin = { x: 280, y: 210 };
+    const unit = 8.5;
+    const aSlider = document.getElementById('aSlider');
+    const kSlider = document.getElementById('kSlider');
+    const aValue = document.getElementById('aValue');
+    const kValue = document.getElementById('kValue');
+    const equation = document.getElementById('equation');
+    const scaleChip = document.getElementById('scaleChip');
+    const note = document.getElementById('note');
+    const btn = document.getElementById('multiplyBtn');
+    const vector = document.getElementById('vector');
+    const startVector = document.getElementById('startVector');
+    const scaleGuide = document.getElementById('scaleGuide');
+    const arc = document.getElementById('arc');
+    const startLabel = document.getElementById('startLabel');
+    const endLabel = document.getElementById('endLabel');
+    const ticks = document.getElementById('ticks');
+    let multiplied = false;
+
+    for (let i = -12; i <= 12; i += 4) {
+      if (i === 0) continue;
+      const x = origin.x + i * unit;
+      const y = origin.y - i * unit;
+      ticks.insertAdjacentHTML('beforeend', `<line class="tick" x1="${x}" y1="206" x2="${x}" y2="214" />`);
+      ticks.insertAdjacentHTML('beforeend', `<line class="tick" x1="276" y1="${y}" x2="284" y2="${y}" />`);
+    }
+
+    function values() {
+      const a = Number(aSlider.value);
+      const k = Number(kSlider.value);
+      return { a, k, product: a * k };
+    }
+
+    function draw() {
+      const { a, k, product } = values();
+      const startX = origin.x + a * unit;
+      const endY = origin.y - product * unit;
+
+      aValue.textContent = a;
+      kValue.textContent = `${k}i`;
+      equation.textContent = `${a} x ${k}i = ${product}i`;
+      scaleChip.textContent = `scale x${k}`;
+
+      startVector.setAttribute('x2', startX);
+      vector.setAttribute('x2', multiplied ? origin.x : startX);
+      vector.setAttribute('y2', multiplied ? endY : origin.y);
+      scaleGuide.setAttribute('y2', endY);
+      startLabel.setAttribute('x', startX + 6);
+      startLabel.textContent = a;
+      startLabel.setAttribute('opacity', multiplied ? '0.35' : '1');
+      endLabel.setAttribute('x', origin.x + 14);
+      endLabel.setAttribute('y', Math.max(24, endY + 5));
+      endLabel.textContent = `${product}i`;
+      endLabel.setAttribute('opacity', multiplied ? '1' : '0');
+      arc.classList.toggle('visible', multiplied);
+      scaleGuide.classList.toggle('visible', multiplied);
+      btn.textContent = multiplied ? 'Reset' : 'Multiply';
+      note.textContent = multiplied
+        ? `The number rotated 90° and stretched from ${a} to ${product}.`
+        : 'Multiplication by i rotates; the real coefficient scales the magnitude.';
+    }
+
+    btn.addEventListener('click', () => {
+      multiplied = !multiplied;
+      draw();
+    });
+
+    [aSlider, kSlider].forEach((slider) => {
+      slider.addEventListener('input', () => {
+        multiplied = false;
+        draw();
+      });
+    });
+
+    draw();
+  </script>
+</body>
+</html>

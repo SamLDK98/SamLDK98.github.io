@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Explanations | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #070605;
+      --text:  rgba(255,248,240,0.94);
+      --dim:   rgba(255,239,224,0.30);
+      --glow:  255, 168, 96;   /* warm amber */
+    }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    /* slow breathing warm pool, gathered around the masthead */
+    .ambient {
+      position: fixed; inset: 0;
+      transform-origin: 50% 50%;
+      background: radial-gradient(circle at 50% 50%,
+        rgba(var(--glow), 0.12) 0%,
+        rgba(var(--glow), 0.05) 24%,
+        transparent 56%);
+      z-index: 0; pointer-events: none;
+      animation: breathe 11s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.06); }
+    }
+
+    /* warm glow that follows the cursor */
+    .cursor-glow {
+      position: fixed; left: -380px; top: -380px;
+      width: 760px; height: 760px;
+      transform: translate(var(--mx, 50vw), var(--my, 50vh));
+      background: radial-gradient(circle at center, rgba(var(--glow), 0.10), transparent 62%);
+      z-index: 0; pointer-events: none;
+      transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    main {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(2rem, 8vw, 7rem);
+      padding: clamp(1.5rem, 5vh, 3rem) clamp(2rem, 8vw, 7rem);
+      text-align: left;
+    }
+    @media (max-width: 680px) {
+      main { flex-direction: column; align-items: flex-start; justify-content: center; }
+    }
+
+    .title {
+      font-weight: 500;
+      font-size: clamp(2.6rem, 7vw, 5.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.015em;
+      color: rgba(255, 250, 244, 0.96);
+      margin-bottom: 0;
+      text-shadow:
+        0 0 22px rgba(var(--glow), 0.45),
+        0 0 60px rgba(var(--glow), 0.30),
+        0 0 120px rgba(var(--glow), 0.18);
+    }
+
+    nav { display: flex; flex-direction: column; gap: clamp(0.45rem, 1.9vh, 1rem); }
+
+    nav a {
+      display: inline-block;
+      align-self: flex-start;
+      text-decoration: none;
+      color: var(--dim);
+      font-weight: 500;
+      font-size: clamp(1.15rem, 2.5vw, 1.75rem);
+      letter-spacing: 0.005em;
+      line-height: 1.1;
+      transition: color 0.45s ease, text-shadow 0.45s ease, opacity 0.45s ease, transform 0.45s cubic-bezier(0.2,0.7,0.2,1);
+      will-change: transform;
+    }
+    nav a:hover, nav a:focus-visible {
+      outline: none;
+      color: #fff6ec;
+      transform: translateX(4px);
+      text-shadow:
+        0 0 14px rgba(var(--glow), 0.6),
+        0 0 38px rgba(var(--glow), 0.45),
+        0 0 90px rgba(var(--glow), 0.30);
+    }
+    /* spotlight: dim the others while one is hovered */
+    nav:hover a:not(:hover),
+    nav:focus-within a:not(:focus-visible):not(:hover) { opacity: 0.3; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ambient { animation: none; }
+      .cursor-glow { transition: none; }
+      nav a { transition: color 0.2s ease, text-shadow 0.2s ease, opacity 0.2s ease; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <main>
+    <h1 class="title">Interactive<br>Explanations</h1>
+    <nav aria-label="Sections">
+      <a href="complex-numbers.html">Complex Numbers</a>
+      <a href="linear-algebra.html">Linear Algebra</a>
+      <a href="trigonometry.html">Trigonometry</a>
+      <a href="algebra.html">Algebra</a>
+      <a href="active-inference.html">Active Inference</a>
+    </nav>
+  </main>
+
+  <script>
+    (function () {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const glow = document.getElementById('cursorGlow');
+      let raf = 0, x = innerWidth / 2, y = innerHeight / 2;
+      addEventListener('pointermove', (e) => {
+        x = e.clientX; y = e.clientY;
+        if (!raf) raf = requestAnimationFrame(() => {
+          glow.style.setProperty('--mx', x + 'px');
+          glow.style.setProperty('--my', y + 'px');
+          raf = 0;
+        });
+      }, { passive: true });
+    })();
+  </script>
+</body>
+</html>

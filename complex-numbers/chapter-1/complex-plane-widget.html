@@ -9,24 +9,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0c16;
-    --bg-elev: #14131f;
-    --bg-card: #191827;
-    --text: #dcdcea;
-    --text-dim: #9a98b5;
-    --text-faint: #5d5b77;
-    --rule: rgba(168, 154, 255, 0.12);
-    --rule-strong: rgba(168, 154, 255, 0.4);
-    --accent: #a89aff;
-    --accent-glow: rgba(168, 154, 255, 0.4);
-    --sin: #a86bff;
-    --sin-glow: rgba(168, 107, 255, 0.4);
-    --cos: #45e0e6;
-    --cos-glow: rgba(69, 224, 230, 0.4);
-    --point: #ff4fa3;
-    --point-glow: rgba(255, 79, 163, 0.45);
-    --axis: rgba(220, 220, 234, 0.4);
-    --grid: rgba(220, 220, 234, 0.045);
+    --bg: transparent;
+    --bg-elev: #050505;
+    --bg-card: rgba(255, 255, 255, 0.028);
+    --text: #f4f6ff;
+    --text-dim: rgba(244, 246, 255, 0.72);
+    --text-faint: rgba(244, 246, 255, 0.45);
+    --rule: rgba(224, 190, 104, 0.28);
+    --rule-strong: rgba(182, 255, 90, 0.44);
+    --accent: #e0be68;
+    --accent-glow: rgba(224, 190, 104, 0.42);
+    --sin: #b6ff5a;
+    --sin-glow: rgba(182, 255, 90, 0.34);
+    --cos: #e0be68;
+    --cos-glow: rgba(224, 190, 104, 0.34);
+    --point: #b6ff5a;
+    --point-glow: rgba(182, 255, 90, 0.48);
+    --axis: rgba(244, 246, 255, 0.62);
+    --grid: rgba(182, 255, 90, 0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -39,21 +39,28 @@
   }
   body {
     min-height: 100vh;
-    padding: 1.5rem 1rem;
-    background-image: radial-gradient(ellipse at top, rgba(168, 154, 255, 0.04), transparent 55%);
+    padding: 0.4rem;
+    background:
+      radial-gradient(circle at 10% 6%, rgba(182, 255, 90, 0.06), transparent 35%),
+      radial-gradient(circle at 90% 3%, rgba(224, 190, 104, 0.07), transparent 36%),
+      transparent;
   }
   .widget {
     max-width: 980px;
     margin: 0 auto;
-    background: var(--bg-elev);
+    background:
+      radial-gradient(circle at 12% 8%, rgba(182, 255, 90, 0.055), transparent 38%),
+      radial-gradient(circle at 92% 4%, rgba(224, 190, 104, 0.07), transparent 40%),
+      var(--bg-elev);
     border: 1px solid var(--rule);
-    border-radius: 0;
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 50px rgba(0, 0, 0, 0.45);
   }
   .widget::before {
     content: ""; position: absolute; inset: 0;
-    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(220, 220, 234, 0.012) 2px, rgba(220, 220, 234, 0.012) 3px);
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(244, 246, 255, 0.01) 2px, rgba(244, 246, 255, 0.01) 3px);
     pointer-events: none;
   }
   .equation-bar {
@@ -63,6 +70,7 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.18rem;
     color: var(--text);
+    background: rgba(255, 255, 255, 0.012);
   }
   .equation-bar .re-part { color: var(--cos); }
   .equation-bar .im-part { color: var(--sin); }
@@ -96,18 +104,19 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.18em;
-    color: var(--text-faint);
+    color: var(--accent);
     text-transform: uppercase;
   }
   .toggle-pill {
     display: inline-flex;
     border: 1px solid var(--rule);
-    border-radius: 0;
+    border-radius: 999px;
     overflow: hidden;
+    background: rgba(0, 0, 0, 0.28);
   }
   .toggle-pill button {
     padding: 0.45rem 0.8rem;
-    background: rgba(168, 154, 255, 0.06);
+    background: transparent;
     color: var(--text-dim);
     border: 0;
     cursor: pointer;
@@ -116,8 +125,8 @@
   }
   .toggle-pill button + button { border-left: 1px solid var(--rule); }
   .toggle-pill button.active {
-    background: rgba(168, 154, 255, 0.14);
-    color: var(--accent);
+    background: rgba(182, 255, 90, 0.12);
+    color: var(--sin);
   }
   .readouts {
     display: flex;
@@ -146,7 +155,7 @@
     font-family: 'IBM Plex Sans', sans-serif;
     font-style: italic;
     font-size: 0.84rem;
-    color: var(--text-faint);
+    color: var(--text-dim);
     text-align: center;
   }
 
@@ -183,7 +192,7 @@
   }
   .z-pt {
     fill: var(--point);
-    stroke: var(--text);
+    stroke: #050505;
     stroke-width: 2;
     filter: drop-shadow(0 0 8px var(--point-glow));
     cursor: grab;
@@ -223,7 +232,7 @@
          aria-label="A draggable point on the complex plane showing its real and imaginary parts, with an optional magnitude and angle view">
       <defs>
         <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(244,246,255,0.62)" />
         </marker>
       </defs>
       <text class="panel-label" x="36" y="26">The complex plane</text>

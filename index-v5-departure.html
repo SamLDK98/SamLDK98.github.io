@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — Departures | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:     #0a0a09;
+      --board:  #111110;
+      --flap:   #1a1a17;
+      --flap-2: #131311;
+      --amber:  #f4b21b;
+      --cream:  #ece6d6;
+      --muted:  #8a8472;
+      --green:  #4fd17a;
+      --mono: "JetBrains Mono", monospace;
+    }
+    html, body { height: 100%; }
+    body {
+      background:
+        radial-gradient(circle at 50% -10%, #1b1b18 0%, var(--bg) 65%);
+      color: var(--cream);
+      font-family: var(--mono);
+      display: grid; place-items: center;
+      padding: clamp(0.8rem, 3vw, 2.4rem);
+      min-height: 100vh;
+    }
+
+    .board {
+      width: min(900px, 100%);
+      background: linear-gradient(180deg, var(--board), #0c0c0b);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: clamp(1rem, 3vw, 2rem);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .board-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      flex-wrap: wrap; gap: 0.5rem 1rem;
+      padding-bottom: 1rem; margin-bottom: 1rem;
+      border-bottom: 1px dashed rgba(236,230,214,0.18);
+    }
+    .board-head h1 {
+      font-size: clamp(1rem, 3.2vw, 1.5rem); font-weight: 700;
+      letter-spacing: 0.24em; text-transform: uppercase; color: var(--amber);
+    }
+    .board-head .clock {
+      font-size: clamp(1rem, 3.2vw, 1.5rem); font-weight: 700; color: var(--cream);
+      letter-spacing: 0.1em; font-variant-numeric: tabular-nums;
+    }
+    .board-head .sub {
+      width: 100%; font-size: 0.66rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--muted);
+    }
+
+    .col-head {
+      display: grid; grid-template-columns: 2.2rem 1fr; gap: 0.9rem;
+      font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--muted); padding: 0 0.5rem 0.5rem;
+    }
+    .col-head .r { display: grid; grid-template-columns: 1fr auto; gap: 1rem; }
+
+    .rows { display: flex; flex-direction: column; gap: 6px; }
+
+    .row {
+      display: grid; grid-template-columns: 2.2rem 1fr; gap: 0.9rem;
+      align-items: center;
+      padding: 0.7rem 0.5rem;
+      text-decoration: none; color: inherit;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .row:hover, .row:focus-visible {
+      outline: none; background: rgba(244,178,27,0.06);
+    }
+    .row .no { color: var(--muted); font-size: 0.85rem; }
+    .row .main { display: grid; grid-template-columns: 1fr auto; gap: 0.6rem 1rem; align-items: center; }
+    .dest-line { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .via { font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+
+    /* split-flap cells */
+    .flaps { display: flex; gap: 3px; flex-wrap: wrap; }
+    .flap {
+      display: inline-grid; place-items: center;
+      width: clamp(0.78rem, 2.6vw, 1.15rem);
+      height: clamp(1.15rem, 4vw, 1.7rem);
+      font-weight: 700; line-height: 1;
+      font-size: clamp(0.7rem, 2.4vw, 1.05rem);
+      color: var(--cream);
+      background: linear-gradient(180deg, var(--flap) 0 50%, var(--flap-2) 50% 100%);
+      border-radius: 3px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.03);
+      position: relative;
+    }
+    /* the split hinge line */
+    .flap::after {
+      content:""; position: absolute; left: 0; right: 0; top: 50%;
+      height: 1px; transform: translateY(-0.5px);
+      background: rgba(0,0,0,0.65);
+    }
+    .flap.flip { animation: flip 0.12s ease; }
+    @keyframes flip {
+      0% { transform: rotateX(0); }
+      50% { transform: rotateX(-22deg); filter: brightness(0.7); }
+      100% { transform: rotateX(0); }
+    }
+
+    .dest .flap { color: var(--amber); width: clamp(0.86rem, 2.9vw, 1.3rem); }
+    .status { justify-self: end; }
+    .status .flap { color: var(--green); background: linear-gradient(180deg,#15201a 0 50%,#101813 50% 100%); width: clamp(0.7rem, 2.4vw, 1.05rem); }
+    .row.boarding .status .flap { color: var(--amber); background: linear-gradient(180deg,#221c0e 0 50%,#191407 50% 100%); }
+
+    .board-foot {
+      margin-top: 1.2rem; padding-top: 0.9rem;
+      border-top: 1px dashed rgba(236,230,214,0.18);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+      font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+    }
+
+    @media (max-width: 560px) {
+      .row .main { grid-template-columns: 1fr; }
+      .status { justify-self: start; }
+      .col-head .r { grid-template-columns: 1fr; }
+      .col-head .r span:last-child { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .flap.flip { animation: none; } }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <div class="board-head">
+      <h1>Departures</h1>
+      <span class="clock" id="clock">--:--:--</span>
+      <span class="sub">Interactive Expositions · Sam Kirwan · all platforms now open</span>
+    </div>
+
+    <div class="col-head">
+      <span>No.</span>
+      <div class="r"><span>Destination</span><span>Status</span></div>
+    </div>
+
+    <div class="rows" id="rows"></div>
+
+    <div class="board-foot">
+      <span>5 services departing · select a row to board</span>
+      <span id="tz">Local time</span>
+    </div>
+  </main>
+
+  <script>
+  (function () {
+    const TOPICS = [
+      { no:'01', dest:'COMPLEX NUMBERS',  via:'via the complex plane', status:'BOARDING', href:'complex-numbers.html' },
+      { no:'02', dest:'LINEAR ALGEBRA',   via:'via vector space',       status:'ON TIME',  href:'linear-algebra.html' },
+      { no:'03', dest:'TRIGONOMETRY',     via:'via the unit circle',    status:'ON TIME',  href:'trigonometry.html' },
+      { no:'04', dest:'ALGEBRA',          via:'via first principles',   status:'ON TIME',  href:'algebra.html' },
+      { no:'05', dest:'ACTIVE INFERENCE', via:'via free energy',        status:'BOARDING', href:'active-inference.html' },
+    ];
+    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .→';
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const rnd = () => CHARS[(Math.random() * (CHARS.length - 1)) | 0];
+
+    // a self-contained split-flap field
+    function makeField(parent, cls, len) {
+      const wrap = document.createElement('span');
+      wrap.className = 'flaps ' + cls;
+      const cells = [];
+      for (let i = 0; i < len; i++) {
+        const c = document.createElement('span');
+        c.className = 'flap'; c.textContent = ' ';
+        wrap.appendChild(c); cells.push(c);
+      }
+      parent.appendChild(wrap);
+      return { wrap, cells };
+    }
+    function flap(field, text, { delay = 0, spin = 360, step = 55 } = {}) {
+      text = text.toUpperCase().slice(0, field.cells.length).padEnd(field.cells.length, ' ');
+      if (reduce) {
+        field.cells.forEach((c, i) => c.textContent = text[i] === ' ' ? ' ' : text[i]);
+        return;
+      }
+      const t0 = performance.now();
+      field.cells.forEach((c, i) => {
+        const settle = delay + spin + i * step;
+        let last = 0;
+        function frame(now) {
+          if (now - t0 < settle) {
+            if (now - last > 45) {
+              c.textContent = rnd();
+              c.classList.remove('flip'); void c.offsetWidth; c.classList.add('flip');
+              last = now;
+            }
+            requestAnimationFrame(frame);
+          } else {
+            c.textContent = text[i] === ' ' ? ' ' : text[i];
+            c.classList.remove('flip'); void c.offsetWidth; c.classList.add('flip');
+          }
+        }
+        requestAnimationFrame(frame);
+      });
+    }
+
+    const rowsEl = document.getElementById('rows');
+    const longest = Math.max(...TOPICS.map(t => t.dest.length));
+    const STATUS_LEN = 9; // fits BOARDING / ON TIME / DEPARTS →
+
+    TOPICS.forEach((tp, r) => {
+      const a = document.createElement('a');
+      a.className = 'row' + (tp.status === 'BOARDING' ? ' boarding' : '');
+      a.href = tp.href;
+      a.setAttribute('aria-label', `${tp.dest}, ${tp.via}`);
+
+      const no = document.createElement('span');
+      no.className = 'no'; no.textContent = tp.no;
+
+      const main = document.createElement('div'); main.className = 'main';
+      const destLine = document.createElement('div'); destLine.className = 'dest-line';
+      const destField = makeField(destLine, 'dest', longest);
+      const via = document.createElement('span'); via.className = 'via'; via.textContent = tp.via;
+      destLine.appendChild(via);
+
+      const statusBox = document.createElement('div'); statusBox.className = 'status';
+      const statusField = makeField(statusBox, 'st', STATUS_LEN);
+
+      main.appendChild(destLine); main.appendChild(statusBox);
+      a.appendChild(no); a.appendChild(main);
+      rowsEl.appendChild(a);
+
+      // staggered arrival flip on load
+      const rowDelay = 250 + r * 260;
+      flap(destField, tp.dest, { delay: rowDelay, step: 38 });
+      flap(statusField, tp.status, { delay: rowDelay + 250, step: 40 });
+
+      // hover -> "DEPARTS →"
+      let hovered = false;
+      const toDepart = () => { if (!hovered) { hovered = true; flap(statusField, 'DEPARTS →', { spin: 180, step: 30 }); } };
+      const toRest = () => { if (hovered) { hovered = false; flap(statusField, tp.status, { spin: 180, step: 30 }); } };
+      a.addEventListener('mouseenter', toDepart);
+      a.addEventListener('mouseleave', toRest);
+      a.addEventListener('focus', toDepart);
+      a.addEventListener('blur', toRest);
+    });
+
+    // clock
+    const clock = document.getElementById('clock');
+    function tick() {
+      const d = new Date();
+      const p = n => String(n).padStart(2, '0');
+      clock.textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    }
+    tick(); setInterval(tick, 1000);
+  })();
+  </script>
+</body>
+</html>

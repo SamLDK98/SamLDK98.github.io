@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two-dimensional position</title>
+  <style>
+    :root {
+      --bg: #17130f;
+      --panel: #221d19;
+      --rule: rgba(214, 190, 154, 0.22);
+      --text: #efe7d8;
+      --muted: #a89980;
+      --line: #f0ddba;
+      --salmon: #ef7398;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Fraunces", Georgia, serif;
+    }
+
+    .dimension-widget {
+      width: min(760px, calc(100vw - 24px));
+      padding: 1.25rem clamp(1rem, 4vw, 2rem) 1.45rem;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      background: var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255, 244, 220, 0.05), 0 18px 54px rgba(0, 0, 0, 0.24);
+    }
+
+    .plane {
+      position: relative;
+      height: 320px;
+      border: 1px solid rgba(240, 221, 186, 0.16);
+      border-radius: 5px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(240, 221, 186, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(240, 221, 186, 0.055) 1px, transparent 1px);
+      background-size: 34px 34px;
+      touch-action: none;
+    }
+
+    .axis {
+      position: absolute;
+      background: var(--line);
+      opacity: 0.9;
+      box-shadow: 0 0 16px rgba(240, 221, 186, 0.14);
+      pointer-events: none;
+    }
+
+    .axis-x {
+      left: 8%;
+      right: 8%;
+      top: 50%;
+      height: 3px;
+      transform: translateY(-50%);
+    }
+
+    .axis-y {
+      top: 8%;
+      bottom: 8%;
+      left: 50%;
+      width: 3px;
+      transform: translateX(-50%);
+    }
+
+    .origin {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: var(--line);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 14px rgba(240, 221, 186, 0.28);
+      pointer-events: none;
+    }
+
+    .hat {
+      position: absolute;
+      left: var(--hat-x, 50%);
+      top: var(--hat-y, 50%);
+      width: 58px;
+      height: 58px;
+      border: 0;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 42% 36%, rgba(255, 226, 216, 0.62), transparent 0 12%, rgba(255, 226, 216, 0.18) 13%, transparent 28%),
+        radial-gradient(circle, #f08ca8 0 39%, #d7567c 40% 54%, #7f273d 55% 60%, transparent 61%);
+      box-shadow: 0 0 0 1px rgba(255, 213, 220, 0.5), 0 0 22px rgba(239, 115, 152, 0.2);
+      cursor: grab;
+      transform: translate(-50%, -50%);
+      touch-action: none;
+    }
+
+    .hat::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 2px solid rgba(65, 24, 34, 0.34);
+      border-radius: 999px;
+      box-shadow: inset 0 0 10px rgba(255, 240, 232, 0.18);
+    }
+
+    .hat:active {
+      cursor: grabbing;
+    }
+
+    .readout {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--rule);
+      margin-top: 1rem;
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .readout strong {
+      color: var(--text);
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(1.35rem, 4vw, 2.05rem);
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    @media (max-width: 560px) {
+      .dimension-widget {
+        padding: 1rem 0.8rem 1.15rem;
+      }
+
+      .plane {
+        height: 280px;
+      }
+
+      .hat {
+        width: 50px;
+        height: 50px;
+      }
+
+      .readout {
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="dimension-widget" aria-label="Two-dimensional movement widget">
+    <div class="plane" id="plane">
+      <span class="axis axis-x" aria-hidden="true"></span>
+      <span class="axis axis-y" aria-hidden="true"></span>
+      <span class="origin" aria-hidden="true"></span>
+      <button class="hat" id="hat" type="button" aria-label="Move the cowboy hat in the plane"></button>
+    </div>
+    <div class="readout" aria-live="polite">
+      <span>Position</span>
+      <strong id="positionText">(0, 0)</strong>
+    </div>
+  </main>
+
+  <script>
+    const plane = document.getElementById('plane');
+    const hat = document.getElementById('hat');
+    const positionText = document.getElementById('positionText');
+
+    let x = 0;
+    let y = 0;
+    let dragging = false;
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    function render() {
+      const percentX = ((x + 1) / 2) * 100;
+      const percentY = ((1 - y) / 2) * 100;
+      plane.style.setProperty('--hat-x', `${percentX}%`);
+      plane.style.setProperty('--hat-y', `${percentY}%`);
+      positionText.textContent = `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+    }
+
+    function setFromPoint(clientX, clientY) {
+      const rect = plane.getBoundingClientRect();
+      x = clamp(((clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
+      y = clamp(1 - ((clientY - rect.top) / rect.height) * 2, -1, 1);
+      render();
+    }
+
+    hat.addEventListener('pointerdown', (event) => {
+      dragging = true;
+      hat.setPointerCapture(event.pointerId);
+      setFromPoint(event.clientX, event.clientY);
+    });
+
+    hat.addEventListener('pointermove', (event) => {
+      if (!dragging) return;
+      setFromPoint(event.clientX, event.clientY);
+    });
+
+    hat.addEventListener('pointerup', () => {
+      dragging = false;
+    });
+
+    plane.addEventListener('pointerdown', (event) => {
+      setFromPoint(event.clientX, event.clientY);
+    });
+
+    hat.addEventListener('keydown', (event) => {
+      const step = event.shiftKey ? 0.1 : 0.04;
+      if (event.key === 'ArrowLeft') x -= step;
+      else if (event.key === 'ArrowRight') x += step;
+      else if (event.key === 'ArrowUp') y += step;
+      else if (event.key === 'ArrowDown') y -= step;
+      else return;
+
+      event.preventDefault();
+      x = clamp(x, -1, 1);
+      y = clamp(y, -1, 1);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

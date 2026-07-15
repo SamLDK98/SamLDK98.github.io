@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angle and Distance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: transparent;
+    --panel: #050505;
+    --text: #f4f6ff;
+    --dim: rgba(244, 246, 255, 0.64);
+    --faint: rgba(244, 246, 255, 0.34);
+    --rule: rgba(224, 190, 104, 0.28);
+    --accent: #e0be68;
+    --green: #b6ff5a;
+    --gold-glow: rgba(224, 190, 104, 0.36);
+    --green-glow: rgba(182, 255, 90, 0.42);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html,
+  body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    padding: 0.25rem;
+    overflow: hidden;
+  }
+
+  .widget {
+    max-width: 520px;
+    margin: 0 auto;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 14% 10%, rgba(182, 255, 90, 0.045), transparent 38%),
+      radial-gradient(circle at 88% 4%, rgba(224, 190, 104, 0.07), transparent 40%),
+      var(--panel);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 50px rgba(0, 0, 0, 0.45);
+  }
+
+  .stage {
+    padding: 0.35rem 0.45rem 0.05rem;
+  }
+
+  svg {
+    width: 100%;
+    display: block;
+    touch-action: none;
+    cursor: grab;
+  }
+
+  svg:active {
+    cursor: grabbing;
+  }
+
+  .panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+    padding: 0.25rem 1rem 0.75rem;
+  }
+
+  .readout {
+    border: 1px solid rgba(224, 190, 104, 0.18);
+    border-radius: 8px;
+    padding: 0.58rem 0.72rem;
+    background: rgba(255, 255, 255, 0.018);
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  .tag {
+    margin-bottom: 0.24rem;
+    color: var(--faint);
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .value {
+    color: var(--text);
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .theta { color: var(--green); }
+  .radius-value { color: var(--accent); }
+
+  .axis { stroke: rgba(244, 246, 255, 0.48); stroke-width: 1.2; }
+  .axis-tip { fill: rgba(244, 246, 255, 0.48); }
+  .unit { fill: none; stroke: rgba(224, 190, 104, 0.34); stroke-width: 1.25; stroke-dasharray: 3 5; }
+  .ray { stroke: rgba(244, 246, 255, 0.22); stroke-width: 1; stroke-dasharray: 2 6; }
+  .radius { stroke: var(--accent); stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 7px var(--gold-glow)); }
+  .angle { fill: none; stroke: var(--green); stroke-width: 2.4; stroke-linecap: round; filter: drop-shadow(0 0 5px var(--green-glow)); }
+  .point { fill: var(--green); stroke: var(--panel); stroke-width: 2; filter: drop-shadow(0 0 9px var(--green-glow)); }
+  .label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .label-axis { fill: var(--faint); font-size: 10px; }
+
+  @media (max-width: 420px) {
+    .panel { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="stage">
+    <svg id="plane" viewBox="0 0 480 320" role="img" aria-label="A point described by an angle and a distance from the origin."></svg>
+  </div>
+  <div class="panel" aria-live="polite">
+    <div class="readout">
+      <div class="tag">angle</div>
+      <div class="value theta" id="thetaRead">42&deg;</div>
+    </div>
+    <div class="readout">
+      <div class="tag">distance</div>
+      <div class="value radius-value" id="radiusRead">1.70</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var svg = document.getElementById('plane');
+  var thetaRead = document.getElementById('thetaRead');
+  var radiusRead = document.getElementById('radiusRead');
+  var NS = 'http://www.w3.org/2000/svg';
+  var CX = 240, CY = 172, RANGE = 3.05, SCALE = 145 / RANGE, R_MAX = 3;
+  var thetaDeg = 42, radius = 2.1;
+
+  function add(tag, attrs, parent) {
+    var el = document.createElementNS(NS, tag);
+    Object.keys(attrs).forEach(function (key) { el.setAttribute(key, attrs[key]); });
+    (parent || svg).appendChild(el);
+    return el;
+  }
+
+  function sx(x) { return CX + x * SCALE; }
+  function sy(y) { return CY - y * SCALE; }
+
+  var staticLayer = add('g', {});
+  var dynamicLayer = add('g', {});
+
+  add('line', { class: 'axis', x1: sx(-RANGE), y1: sy(0), x2: sx(RANGE), y2: sy(0) }, staticLayer);
+  add('line', { class: 'axis', x1: sx(0), y1: sy(-RANGE), x2: sx(0), y2: sy(RANGE) }, staticLayer);
+  add('path', { class: 'axis-tip', d: 'M ' + sx(RANGE) + ' ' + sy(0) + ' l -8 -4 l 0 8 z' }, staticLayer);
+  add('path', { class: 'axis-tip', d: 'M ' + sx(0) + ' ' + sy(RANGE) + ' l -4 8 l 8 0 z' }, staticLayer);
+  add('circle', { class: 'unit', cx: sx(0), cy: sy(0), r: SCALE }, staticLayer);
+  add('text', { class: 'label label-axis', x: sx(RANGE) - 12, y: sy(0) + 22, 'text-anchor': 'end' }, staticLayer).textContent = 'x';
+  add('text', { class: 'label label-axis', x: sx(0) + 12, y: sy(RANGE) + 13 }, staticLayer).textContent = 'y';
+
+  function angleArc(theta, arcRadius) {
+    var points = [];
+    var steps = Math.max(4, Math.round(Math.abs(theta) / (Math.PI / 80)));
+    for (var i = 0; i <= steps; i += 1) {
+      var a = theta * i / steps;
+      points.push(sx(arcRadius * Math.cos(a)) + ',' + sy(arcRadius * Math.sin(a)));
+    }
+    return points.join(' ');
+  }
+
+  function render() {
+    while (dynamicLayer.firstChild) dynamicLayer.removeChild(dynamicLayer.firstChild);
+
+    var theta = thetaDeg * Math.PI / 180;
+    var ct = Math.cos(theta);
+    var st = Math.sin(theta);
+    var px = sx(radius * ct);
+    var py = sy(radius * st);
+
+    add('line', { class: 'ray', x1: sx(-RANGE * ct), y1: sy(-RANGE * st), x2: sx(RANGE * ct), y2: sy(RANGE * st) }, dynamicLayer);
+    add('polyline', { class: 'angle', points: angleArc(theta, 0.48), fill: 'none' }, dynamicLayer);
+    add('line', { class: 'radius', x1: sx(0), y1: sy(0), x2: px, y2: py }, dynamicLayer);
+    add('circle', { class: 'point', cx: px, cy: py, r: 7 }, dynamicLayer);
+
+    thetaRead.innerHTML = thetaDeg + '&deg;';
+    radiusRead.textContent = radius.toFixed(2);
+  }
+
+  function fromPointer(event) {
+    var pt = svg.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+    var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    var wx = (p.x - CX) / SCALE;
+    var wy = (CY - p.y) / SCALE;
+
+    radius = Math.min(R_MAX, Math.max(0.2, Math.hypot(wx, wy)));
+    thetaDeg = Math.round(Math.atan2(wy, wx) * 180 / Math.PI);
+    if (thetaDeg < 0) thetaDeg += 360;
+    render();
+  }
+
+  var dragging = false;
+  svg.addEventListener('pointerdown', function (event) {
+    dragging = true;
+    svg.setPointerCapture(event.pointerId);
+    fromPointer(event);
+  });
+  svg.addEventListener('pointermove', function (event) {
+    if (dragging) fromPointer(event);
+  });
+  svg.addEventListener('pointerup', function (event) {
+    dragging = false;
+    try { svg.releasePointerCapture(event.pointerId); } catch (err) {}
+  });
+  svg.addEventListener('pointercancel', function () { dragging = false; });
+
+  render();
+})();
+</script>
+</body>
+</html>

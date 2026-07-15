@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiplication by i</title>
+  <style>
+    :root {
+      --text: #fff1d6;
+      --muted: rgba(255, 241, 214, 0.66);
+      --panel: rgba(46, 12, 7, 0.54);
+      --rule: rgba(255, 214, 134, 0.2);
+      --axis: rgba(255, 241, 214, 0.58);
+      --accent: #ffd95f;
+      --red: #ff5a4d;
+      --blue: #56c7ff;
+      --bg1: rgba(67, 18, 8, 0.95);
+      --bg2: rgba(47, 13, 8, 0.98);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--text);
+      font-family: "Fraunces", Georgia, serif;
+    }
+
+    .widget {
+      width: min(100%, 920px);
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 217, 95, 0.1), transparent 32%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 18px 46px rgba(0,0,0,0.2);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.65fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .stage,
+    .panel {
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+
+    .stage {
+      min-height: 350px;
+      padding: 0.5rem;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 330px;
+      overflow: visible;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .grid {
+      stroke: rgba(255, 241, 214, 0.1);
+      stroke-width: 1;
+    }
+
+    .label {
+      fill: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .value-label {
+      fill: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .vector {
+      stroke: var(--accent);
+      stroke-width: 5;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 7px rgba(255, 217, 95, 0.35));
+      transform-box: view-box;
+      transform-origin: 260px 180px;
+      transition: transform 900ms cubic-bezier(.2,.72,.16,1);
+    }
+
+    .vector.rotated {
+      transform: rotate(-90deg);
+    }
+
+    .arc {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 3;
+      stroke-linecap: round;
+      opacity: 0;
+      transition: opacity 250ms ease;
+    }
+
+    .arc.visible {
+      opacity: 0.9;
+    }
+
+    .panel {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.85rem;
+    }
+
+    .equation {
+      color: var(--accent);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: clamp(1.25rem, 4vw, 2rem);
+      line-height: 1.2;
+    }
+
+    .explain {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    button {
+      width: fit-content;
+      border: 1px solid rgba(255, 217, 95, 0.58);
+      border-radius: 999px;
+      background: rgba(255, 217, 95, 0.08);
+      color: var(--text);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.62rem 0.9rem;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: rgba(255, 217, 95, 0.16);
+      outline: none;
+    }
+
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; }
+      .stage { min-height: 300px; }
+      svg { min-height: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" aria-label="Multiplication by i rotates a real number onto the imaginary axis">
+    <div class="layout">
+      <section class="stage">
+        <svg viewBox="0 0 520 360" role="img" aria-label="Complex plane showing 4 rotating to 4i">
+          <defs>
+            <marker id="arrow" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+              <path d="M0,0 L9,4.5 L0,9 Z" fill="#ffd95f" />
+            </marker>
+          </defs>
+
+          <line class="grid" x1="260" y1="40" x2="260" y2="320" />
+          <line class="grid" x1="70" y1="180" x2="450" y2="180" />
+          <line class="axis" x1="58" y1="180" x2="462" y2="180" />
+          <line class="axis" x1="260" y1="318" x2="260" y2="42" />
+          <text class="label" x="427" y="164">real</text>
+          <text class="label" x="274" y="56">imaginary</text>
+
+          <path id="arc" class="arc" d="M 360 180 A 100 100 0 0 0 260 80" />
+          <text id="realLabel" class="value-label" x="352" y="207">4</text>
+          <text id="imagLabel" class="value-label" x="275" y="84" opacity="0">4i</text>
+          <line id="vector" class="vector" x1="260" y1="180" x2="380" y2="180" marker-end="url(#arrow)" />
+        </svg>
+      </section>
+
+      <aside class="panel">
+        <div id="equation" class="equation">4</div>
+        <p id="copy" class="explain">Start with the real number 4 on the number line.</p>
+        <button id="rotateBtn" type="button">Multiply by i</button>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const btn = document.getElementById('rotateBtn');
+    const vector = document.getElementById('vector');
+    const arc = document.getElementById('arc');
+    const equation = document.getElementById('equation');
+    const copy = document.getElementById('copy');
+    const realLabel = document.getElementById('realLabel');
+    const imagLabel = document.getElementById('imagLabel');
+    let rotated = false;
+
+    btn.addEventListener('click', () => {
+      rotated = !rotated;
+      vector.classList.toggle('rotated', rotated);
+      arc.classList.toggle('visible', rotated);
+      equation.textContent = rotated ? '4 x i = 4i' : '4';
+      copy.textContent = rotated
+        ? 'Multiplication by i rotates 4 onto the imaginary axis.'
+        : 'Start with the real number 4 on the number line.';
+      btn.textContent = rotated ? 'Reset' : 'Multiply by i';
+      realLabel.setAttribute('opacity', rotated ? '0.35' : '1');
+      imagLabel.setAttribute('opacity', rotated ? '1' : '0');
+    });
+  </script>
+</body>
+</html>

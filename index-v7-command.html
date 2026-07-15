@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — Command | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #07080d;
+      --panel: rgba(20,22,32,0.72);
+      --line:  rgba(255,255,255,0.09);
+      --text:  #eef1f8;
+      --muted: rgba(238,241,248,0.55);
+      --faint: rgba(238,241,248,0.3);
+      --mono: "JetBrains Mono", monospace;
+      --sans: "Space Grotesk", system-ui, sans-serif;
+    }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+    /* slow aurora behind the palette */
+    .aurora { position: fixed; inset: -20%; z-index: 0; filter: blur(80px); opacity: 0.5; }
+    .aurora span { position: absolute; border-radius: 50%; mix-blend-mode: screen; }
+    .a1 { width: 46vw; height: 46vw; left: 8%; top: 6%; background: #2b6cff; animation: drift1 22s ease-in-out infinite; }
+    .a2 { width: 40vw; height: 40vw; right: 6%; top: 18%; background: #ff45a8; animation: drift2 26s ease-in-out infinite; }
+    .a3 { width: 38vw; height: 38vw; left: 32%; bottom: 2%; background: #15d39a; animation: drift1 30s ease-in-out infinite reverse; }
+    @keyframes drift1 { 0%,100%{ transform: translate(0,0) scale(1) } 50%{ transform: translate(6%,-5%) scale(1.12) } }
+    @keyframes drift2 { 0%,100%{ transform: translate(0,0) scale(1.05) } 50%{ transform: translate(-7%,4%) scale(0.92) } }
+
+    .stage {
+      position: relative; z-index: 1;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1.4rem;
+      padding: 1.4rem;
+    }
+    .brandline {
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--muted); text-align: center;
+    }
+    .brandline b { color: var(--text); font-weight: 500; }
+
+    .palette {
+      width: min(640px, 100%);
+      background: var(--panel);
+      backdrop-filter: blur(22px) saturate(1.3);
+      -webkit-backdrop-filter: blur(22px) saturate(1.3);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    .search {
+      display: flex; align-items: center; gap: 0.85rem;
+      padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--line);
+    }
+    .search svg { flex: none; opacity: 0.6; }
+    .search input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text); font-family: var(--sans);
+      font-size: 1.15rem; letter-spacing: 0.01em;
+    }
+    .search input::placeholder { color: var(--faint); }
+    .count {
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.1em;
+      color: var(--faint); white-space: nowrap;
+    }
+
+    .results { max-height: 56vh; overflow-y: auto; padding: 0.5rem; }
+    .section-label {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--faint);
+      padding: 0.6rem 0.85rem 0.3rem;
+    }
+    .row {
+      display: flex; align-items: center; gap: 0.95rem;
+      padding: 0.7rem 0.85rem; border-radius: 12px; cursor: pointer;
+      position: relative; transition: background 0.12s;
+    }
+    .row.active { background: rgba(255,255,255,0.07); }
+    .row.active::before {
+      content:""; position: absolute; left: 0; top: 16%; bottom: 16%; width: 3px;
+      border-radius: 3px; background: var(--rc); box-shadow: 0 0 12px var(--rc);
+    }
+    .icon {
+      flex: none; width: 2.4rem; height: 2.4rem; border-radius: 10px;
+      display: grid; place-items: center;
+      font-size: 1.25rem; font-weight: 600;
+      color: var(--rc);
+      background: color-mix(in srgb, var(--rc) 16%, transparent);
+      border: 1px solid color-mix(in srgb, var(--rc) 35%, transparent);
+    }
+    .rtext { flex: 1; min-width: 0; }
+    .rtitle { font-size: 1.02rem; font-weight: 500; line-height: 1.2; }
+    .rtitle mark { background: none; color: var(--rc); font-weight: 700; }
+    .rsub { font-size: 0.84rem; color: var(--muted); line-height: 1.3; margin-top: 1px; }
+    .enterhint {
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em;
+      color: var(--muted); opacity: 0; transition: opacity 0.12s; white-space: nowrap;
+    }
+    .row.active .enterhint { opacity: 1; }
+    .empty { padding: 2.2rem 1rem; text-align: center; color: var(--muted); }
+    .empty button {
+      margin-top: 0.8rem; background: none; border: 1px solid var(--line);
+      color: var(--text); border-radius: 8px; padding: 0.4rem 0.9rem; cursor: pointer;
+      font-family: var(--mono); font-size: 0.72rem;
+    }
+
+    .foot {
+      display: flex; gap: 1.4rem; flex-wrap: wrap; justify-content: center;
+      padding: 0.8rem 1.1rem; border-top: 1px solid var(--line);
+      font-family: var(--mono); font-size: 0.64rem; color: var(--faint);
+    }
+    .foot kbd {
+      border: 1px solid var(--line); border-radius: 5px; padding: 0.05rem 0.4rem;
+      color: var(--muted); margin-right: 0.35rem;
+    }
+    .noscript-list a { color: #8db4ff; display: block; margin: 0.3rem 0; }
+    @media (prefers-reduced-motion: reduce) { .aurora span { animation: none; } }
+  </style>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+  <div id="root"></div>
+  <noscript>
+    <div class="stage"><div class="palette" style="padding:1.5rem">
+      <p class="brandline">Interactive Expositions — Sam Kirwan</p>
+      <div class="noscript-list">
+        <a href="complex-numbers.html">Complex Numbers</a>
+        <a href="linear-algebra.html">Linear Algebra</a>
+        <a href="trigonometry.html">Trigonometry</a>
+        <a href="algebra.html">Algebra</a>
+        <a href="active-inference.html">Active Inference</a>
+      </div>
+    </div></div>
+  </noscript>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel-src" id="app">
+    const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+    const TOPICS = [
+      { id:'complex', no:'01', title:'Complex Numbers', href:'complex-numbers.html', glyph:'ℂ', color:'#34f5ff',
+        sub:'Numbers that answer impossible questions', tags:'imaginary i plane rotation argand waves geometry euler' },
+      { id:'linear',  no:'02', title:'Linear Algebra',  href:'linear-algebra.html',  glyph:'⟶', color:'#9b7bff',
+        sub:'Equations as motion through space', tags:'vectors matrices transformation span determinant systems' },
+      { id:'trig',    no:'03', title:'Trigonometry',    href:'trigonometry.html',    glyph:'∿', color:'#15d39a',
+        sub:'The circle hidden in every wave', tags:'sine cosine circle angles radians unit waves' },
+      { id:'algebra', no:'04', title:'Algebra',         href:'algebra.html',         glyph:'𝑥', color:'#ffb43a',
+        sub:'The grammar of the unknown', tags:'equations unknown balance solve symbols polynomial' },
+      { id:'active',  no:'05', title:'Active Inference', href:'active-inference.html', glyph:'∇', color:'#ff5ca8',
+        sub:'How a mind holds back the tide of entropy', tags:'free energy entropy prediction surprise brain mind thermodynamics' },
+    ];
+
+    // subsequence match against the title; returns matched indices or null
+    function matchTitle(title, q) {
+      const t = title.toLowerCase(); const out = [];
+      let i = 0;
+      for (let c of q) { i = t.indexOf(c, i); if (i === -1) return null; out.push(i); i++; }
+      return out;
+    }
+    function score(topic, raw) {
+      const q = raw.trim().toLowerCase();
+      if (!q) return { s: 1, hl: null };
+      const title = topic.title.toLowerCase();
+      const hay = (topic.title + ' ' + topic.tags).toLowerCase();
+      const hl = matchTitle(topic.title, q);
+      if (title.startsWith(q)) return { s: 1000 - title.length, hl };
+      if (title.includes(q))   return { s: 600, hl };
+      if (hl)                  return { s: 400 - hl[hl.length-1], hl };
+      if (hay.includes(q))     return { s: 200, hl: null };
+      // loose: every query word appears somewhere
+      if (q.split(/\s+/).every(w => hay.includes(w))) return { s: 100, hl: null };
+      return null;
+    }
+    function Highlight({ text, hl }) {
+      if (!hl) return text;
+      const set = new Set(hl);
+      return text.split('').map((ch, i) => set.has(i) ? <mark key={i}>{ch}</mark> : <span key={i}>{ch}</span>);
+    }
+
+    function App() {
+      const [q, setQ] = useState('');
+      const [active, setActive] = useState(0);
+      const inputRef = useRef(null);
+      const listRef = useRef(null);
+
+      const results = useMemo(() => {
+        return TOPICS
+          .map(t => ({ t, ...score(t, q) }))
+          .filter(r => r.s != null)
+          .sort((a, b) => b.s - a.s);
+      }, [q]);
+
+      useEffect(() => { setActive(0); }, [q]);
+      useEffect(() => { inputRef.current && inputRef.current.focus(); }, []);
+
+      const open = useCallback((r) => { if (r) window.location.href = r.t.href; }, []);
+
+      const onKey = useCallback((e) => {
+        if (e.key === 'ArrowDown') { e.preventDefault(); setActive(a => Math.min(results.length - 1, a + 1)); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(a => Math.max(0, a - 1)); }
+        else if (e.key === 'Enter') { e.preventDefault(); open(results[active]); }
+        else if (e.key === 'Escape') { setQ(''); }
+      }, [results, active, open]);
+
+      // keep active row in view
+      useEffect(() => {
+        const el = listRef.current && listRef.current.querySelector('.row.active');
+        if (el) el.scrollIntoView({ block: 'nearest' });
+      }, [active, results]);
+
+      return (
+        <div className="stage">
+          <p className="brandline"><b>Interactive Expositions</b> — a workshop by Sam Kirwan</p>
+          <div className="palette" role="combobox" aria-expanded="true" aria-haspopup="listbox">
+            <div className="search">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                ref={inputRef} value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey}
+                placeholder="Search the expositions…" aria-label="Search expositions"
+                autoComplete="off" spellCheck="false" />
+              <span className="count">{results.length}/{TOPICS.length}</span>
+            </div>
+
+            <div className="results" ref={listRef} role="listbox">
+              <p className="section-label">{q.trim() ? 'Results' : 'All expositions'}</p>
+              {results.length === 0 && (
+                <div className="empty">
+                  No exposition matches <b>“{q}”</b>.
+                  <br/><button onClick={() => setQ('')}>Clear search</button>
+                </div>
+              )}
+              {results.map((r, i) => (
+                <div key={r.t.id}
+                  className={'row' + (i === active ? ' active' : '')}
+                  style={{ '--rc': r.t.color }}
+                  role="option" aria-selected={i === active}
+                  onMouseEnter={() => setActive(i)}
+                  onClick={() => open(r)}>
+                  <span className="icon" aria-hidden="true">{r.t.glyph}</span>
+                  <span className="rtext">
+                    <span className="rtitle"><Highlight text={r.t.title} hl={r.hl} /></span>
+                    <span className="rsub">{r.t.sub}</span>
+                  </span>
+                  <span className="enterhint">↵ enter</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="foot">
+              <span><kbd>↑</kbd><kbd>↓</kbd>navigate</span>
+              <span><kbd>↵</kbd>open</span>
+              <span><kbd>esc</kbd>clear</span>
+              <span>type to filter</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+
+  <script>
+    (function () {
+      var src = document.getElementById('app').textContent;
+      var out = Babel.transform(src, { presets: [['react', { runtime: 'classic' }]] }).code;
+      (0, eval)(out);
+    })();
+  </script>
+</body>
+</html>

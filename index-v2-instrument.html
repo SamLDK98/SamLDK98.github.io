@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — The Instrument | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --void:    #04050a;
+      --text:    #eaf2ff;
+      --muted:   rgba(234,242,255,0.6);
+      --faint:   rgba(234,242,255,0.34);
+      --cyan:    #34f5ff;
+      --magenta: #ff45e6;
+      --violet:  #9b7bff;
+      --lime:    #b6ff5a;
+      --amber:   #ffb14a;
+    }
+
+    html, body { height: 100%; }
+    body {
+      background: radial-gradient(circle at 50% 40%, #0a0e1d 0%, #04050a 70%);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    #sky { position: fixed; inset: 0; display: block; z-index: 0; }
+
+    .veil {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background:
+        radial-gradient(130% 100% at 50% 45%, transparent 40%, rgba(0,0,0,0.55) 100%);
+    }
+
+    .frame {
+      position: fixed; inset: 0; z-index: 3;
+      display: flex; flex-direction: column;
+      padding: clamp(1.4rem, 4vw, 3rem);
+      pointer-events: none;
+    }
+    .frame > * { pointer-events: auto; }
+
+    .topbar {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--faint);
+    }
+    .topbar .live::before {
+      content: ""; display: inline-block;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--lime); margin-right: 0.5rem;
+      box-shadow: 0 0 10px var(--lime);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    .hero {
+      margin: auto 0 0;
+      max-width: 40rem;
+    }
+    .kicker {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 0.9rem;
+    }
+    h1 {
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.6rem, 9vw, 6rem);
+      line-height: 0.94;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(100deg, var(--cyan), var(--violet) 45%, var(--magenta));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .lede {
+      margin-top: 1.1rem; max-width: 30rem;
+      color: var(--muted); font-size: 1.05rem; line-height: 1.55;
+    }
+    .hint {
+      margin-top: 1.4rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.74rem; letter-spacing: 0.06em; color: var(--faint);
+    }
+    .hint kbd {
+      border: 1px solid var(--faint); border-radius: 4px;
+      padding: 0.05rem 0.4rem; font-size: 0.72rem; color: var(--muted);
+    }
+
+    /* readout for the focused node */
+    .readout {
+      position: fixed; z-index: 4;
+      right: clamp(1.4rem, 4vw, 3rem);
+      bottom: clamp(1.4rem, 4vw, 3rem);
+      width: min(20rem, 70vw);
+      padding: 1rem 1.15rem;
+      border: 1px solid rgba(234,242,255,0.16);
+      background: rgba(8,11,22,0.72);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+    .readout.show { opacity: 1; transform: translateY(0); }
+    .readout .idx {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem; letter-spacing: 0.2em; color: var(--faint);
+    }
+    .readout h2 {
+      font-family: "Syne", sans-serif; font-weight: 700;
+      font-size: 1.35rem; margin: 0.2rem 0 0.35rem;
+    }
+    .readout p { color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+
+    @media (max-width: 720px) {
+      .readout { left: clamp(1.4rem,4vw,3rem); width: auto; }
+      .hint { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .topbar .live::before { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="veil"></div>
+
+  <div class="frame">
+    <div class="topbar">
+      <span>Sam Kirwan / Interactive Expositions</span>
+      <span class="live">field active</span>
+    </div>
+
+    <div class="hero">
+      <p class="kicker">A map of moving ideas</p>
+      <h1>Mathematics you can <em>steer</em>.</h1>
+      <p class="lede">Each star is a world of interactive figures. Drift the field,
+        find a constellation, and step inside.</p>
+      <p class="hint">Hover a node to read it · <kbd>click</kbd> to enter</p>
+    </div>
+  </div>
+
+  <aside class="readout" id="readout" aria-live="polite">
+    <p class="idx" id="ro-idx">NODE</p>
+    <h2 id="ro-title">—</h2>
+    <p id="ro-desc">—</p>
+  </aside>
+
+  <script>
+  (function () {
+    const canvas = document.getElementById('sky');
+    const ctx = canvas.getContext('2d');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const NODES = [
+      { id:'01', label:'Complex Numbers',  href:'complex-numbers.html',
+        desc:'Numbers that answer impossible questions — rotation, waves and the geometry of the plane.',
+        color:'#34f5ff', x:0.30, y:0.34 },
+      { id:'02', label:'Linear Algebra',   href:'linear-algebra.html',
+        desc:'Equations as motion through space — vectors, transformations and the shape of a solution.',
+        color:'#9b7bff', x:0.62, y:0.26 },
+      { id:'03', label:'Trigonometry',     href:'trigonometry.html',
+        desc:'The circle hidden in every wave — angles, ratios and the unit circle unrolled.',
+        color:'#ff45e6', x:0.74, y:0.56 },
+      { id:'04', label:'Algebra',          href:'algebra.html',
+        desc:'The grammar of the unknown — symbols, balance and the machinery of solving.',
+        color:'#b6ff5a', x:0.44, y:0.62 },
+      { id:'05', label:'Active Inference', href:'active-inference.html',
+        desc:'How a mind holds back the tide of entropy — prediction, surprise and the free-energy story.',
+        color:'#ffb14a', x:0.20, y:0.66 },
+    ];
+    // edges connecting the constellation
+    const EDGES = [[0,1],[1,2],[2,3],[3,4],[4,0],[1,3]];
+
+    let W, H, DPR, stars = [], t = 0, mouse = {x:-1e4, y:-1e4}, hover = -1, raf;
+
+    function resize() {
+      DPR = Math.min(devicePixelRatio || 1, 2);
+      W = canvas.width  = Math.floor(innerWidth  * DPR);
+      H = canvas.height = Math.floor(innerHeight * DPR);
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
+      // background star dust
+      stars = Array.from({length: Math.round(innerWidth*innerHeight/9000)}, () => ({
+        x: Math.random()*W, y: Math.random()*H,
+        z: Math.random()*0.8 + 0.2,
+        tw: Math.random()*Math.PI*2,
+      }));
+    }
+    function np(n){ return { x: n.x*W, y: n.y*H }; }
+
+    function draw() {
+      t += 0.006;
+      ctx.clearRect(0,0,W,H);
+
+      // dust
+      for (const s of stars) {
+        const a = (0.25 + 0.55*(0.5+0.5*Math.sin(t*1.5 + s.tw))) * s.z;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.z*1.3*DPR, 0, 7);
+        ctx.fillStyle = `rgba(180,200,255,${a*0.5})`;
+        ctx.fill();
+      }
+
+      // node positions with gentle drift
+      const pos = NODES.map((n,i) => {
+        const p = np(n);
+        const dx = Math.sin(t*0.7 + i*1.3) * 9 * DPR;
+        const dy = Math.cos(t*0.6 + i*2.1) * 9 * DPR;
+        return { x: p.x + dx, y: p.y + dy };
+      });
+
+      // edges
+      for (const [a,b] of EDGES) {
+        const pa = pos[a], pb = pos[b];
+        const lit = hover === a || hover === b;
+        const g = ctx.createLinearGradient(pa.x,pa.y,pb.x,pb.y);
+        g.addColorStop(0, NODES[a].color); g.addColorStop(1, NODES[b].color);
+        ctx.strokeStyle = g;
+        ctx.globalAlpha = lit ? 0.85 : 0.18;
+        ctx.lineWidth = (lit ? 1.6 : 0.8) * DPR;
+        ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // hover detection
+      hover = -1;
+      let best = (34*DPR)**2;
+      pos.forEach((p,i) => {
+        const d = (p.x-mouse.x)**2 + (p.y-mouse.y)**2;
+        if (d < best) { best = d; hover = i; }
+      });
+      canvas.style.cursor = hover >= 0 ? 'pointer' : 'default';
+
+      // nodes
+      pos.forEach((p,i) => {
+        const n = NODES[i];
+        const lit = hover === i;
+        const pr = (lit ? 9 : 5.5) * DPR + Math.sin(t*2 + i)*0.8*DPR;
+        // glow
+        const halo = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y, pr*4.5);
+        halo.addColorStop(0, n.color + 'cc');
+        halo.addColorStop(1, n.color + '00');
+        ctx.globalAlpha = lit ? 0.9 : 0.5;
+        ctx.fillStyle = halo;
+        ctx.beginPath(); ctx.arc(p.x,p.y,pr*4.5,0,7); ctx.fill();
+        // core
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(p.x,p.y,pr,0,7); ctx.fill();
+        ctx.fillStyle = n.color;
+        ctx.beginPath(); ctx.arc(p.x,p.y,pr*0.55,0,7); ctx.fill();
+
+        // ring on hover
+        if (lit) {
+          ctx.strokeStyle = n.color; ctx.lineWidth = 1.4*DPR; ctx.globalAlpha = 0.8;
+          ctx.beginPath(); ctx.arc(p.x,p.y, pr+8*DPR, 0, 7); ctx.stroke();
+        }
+
+        // label
+        ctx.globalAlpha = lit ? 1 : 0.72;
+        ctx.fillStyle = '#eaf2ff';
+        ctx.font = `${(lit?16:13)*DPR}px "Space Grotesk", sans-serif`;
+        ctx.textBaseline = 'middle';
+        ctx.fillText(n.label, p.x + (pr+12*DPR), p.y);
+        ctx.font = `${10*DPR}px "JetBrains Mono", monospace`;
+        ctx.fillStyle = n.color; ctx.globalAlpha = lit ? 0.9 : 0.5;
+        ctx.fillText(n.id, p.x + (pr+12*DPR), p.y - 16*DPR);
+        ctx.globalAlpha = 1;
+      });
+
+      updateReadout();
+      if (!reduce) raf = requestAnimationFrame(draw);
+    }
+
+    const readout = document.getElementById('readout');
+    const roIdx = document.getElementById('ro-idx');
+    const roTitle = document.getElementById('ro-title');
+    const roDesc = document.getElementById('ro-desc');
+    let lastHover = -2;
+    function updateReadout() {
+      if (hover === lastHover) return;
+      lastHover = hover;
+      if (hover >= 0) {
+        const n = NODES[hover];
+        roIdx.textContent = 'NODE ' + n.id;
+        roTitle.textContent = n.label;
+        roDesc.textContent = n.desc;
+        roTitle.style.color = n.color;
+        readout.classList.add('show');
+      } else {
+        readout.classList.remove('show');
+      }
+    }
+
+    canvas.addEventListener('mousemove', e => {
+      mouse.x = e.clientX * DPR; mouse.y = e.clientY * DPR;
+      if (reduce) draw();
+    });
+    canvas.addEventListener('mouseleave', () => { mouse.x = mouse.y = -1e4; if (reduce) draw(); });
+    canvas.addEventListener('click', () => { if (hover >= 0) location.href = NODES[hover].href; });
+    // touch: tap a node to enter, tap elsewhere to peek
+    canvas.addEventListener('touchstart', e => {
+      const tch = e.touches[0];
+      mouse.x = tch.clientX * DPR; mouse.y = tch.clientY * DPR;
+      if (reduce) draw();
+    }, {passive:true});
+
+    addEventListener('resize', () => { resize(); if (reduce) draw(); });
+    resize();
+    draw();
+  })();
+  </script>
+</body>
+</html>

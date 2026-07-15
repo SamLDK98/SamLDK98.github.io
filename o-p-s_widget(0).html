@@ -1,0 +1,165 @@
+
+<style>
+  .stepper { max-width: 620px; margin: 0 auto; padding: 1rem 0; font-size: 15px; }
+  .progress { display: flex; gap: 5px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .dot { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--color-border-secondary); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 500; color: var(--color-text-tertiary); cursor: pointer; transition: all .2s; flex-shrink: 0; }
+  .dot.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+  .dot.visited { border-color: var(--color-text-secondary); color: var(--color-text-secondary); }
+  .card { border: 1px solid var(--color-border-tertiary); border-radius: 12px; overflow: hidden; }
+  .card-header { padding: 12px 16px 10px; border-bottom: 1px solid var(--color-border-tertiary); display: flex; align-items: baseline; gap: 10px; }
+  .card-letter { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .05em; }
+  .card-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); }
+  .band { padding: 13px 16px; border-bottom: 1px solid var(--color-border-tertiary); }
+  .band:last-child { border-bottom: none; }
+  .band-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
+  .band-text { font-size: 14px; line-height: 1.6; color: var(--color-text-primary); }
+  .band-obs .band-label { color: var(--color-text-secondary); }
+  .band-sol { background: color-mix(in srgb, #5DCAA5 8%, transparent); }
+  .band-sol .band-label { color: #0F6E56; }
+  .band-prob { background: color-mix(in srgb, #EF9F27 8%, transparent); }
+  .band-prob .band-label { color: #854F0B; }
+  @media (prefers-color-scheme: dark) {
+    .band-sol { background: color-mix(in srgb, #085041 30%, transparent); }
+    .band-sol .band-label { color: #5DCAA5; }
+    .band-prob { background: color-mix(in srgb, #633806 30%, transparent); }
+    .band-prob .band-label { color: #EF9F27; }
+  }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+  .nav-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity .15s; }
+  .nav-btn:disabled { opacity: .3; cursor: default; }
+  .nav-count { font-size: 12px; color: var(--color-text-tertiary); }
+  .arrow-hint { font-size: 12px; color: var(--color-text-tertiary); margin-top: 8px; text-align: center; display: none; }
+  .arrow-hint.show { display: block; }
+</style>
+
+<div class="stepper">
+  <div class="progress" id="progress"></div>
+  <div class="card" id="card"></div>
+  <div class="nav">
+    <button class="nav-btn" id="prev" onclick="move(-1)">← Previous</button>
+    <span class="nav-count" id="count"></span>
+    <button class="nav-btn" id="next" onclick="move(1)">Next →</button>
+  </div>
+  <div class="arrow-hint" id="hint">↓ The remaining problem feeds into the next section</div>
+</div>
+
+<script>
+const steps = [
+  {
+    letter: "a",
+    title: "Irreversibility",
+    obs: "Newton's laws treat time as symmetric — any process should be equally possible in reverse. Yet in practice, heat always flows from hot to cold, and this appears to have a direction.",
+    sol: null,
+    prob: "If the microscopic laws of motion are reversible, why do large-scale physical processes — like heat transfer — appear irreversible?",
+  },
+  {
+    letter: "b",
+    title: "Statistical mechanics",
+    obs: "Heat appears to flow irreversibly, but the underlying particle motion is symmetric. This contradiction demands a new explanation.",
+    sol: "Rather than track individual particles, treat their collective behaviour statistically. Disordered states vastly outnumber ordered ones, so systems naturally drift toward equilibrium — not because irreversibility is fundamental, but because it is overwhelmingly probable. Boltzmann called this tendency entropy.",
+    prob: "If entropy drives systems toward disorder and equilibrium, why do living things not fall apart?",
+  },
+  {
+    letter: "c",
+    title: "Open vs closed systems",
+    obs: "Entropy predicts a gradual collapse of all structure. Yet living organisms maintain highly ordered states over long periods.",
+    sol: "Organisms are not closed systems. They continuously import energy and matter, transform them internally, and export waste. Life resists equilibrium not by violating thermodynamics, but through continual exchange with the environment.",
+    prob: "This explains roughly how structure can persist — but how does an organism actively regulate itself and adapt to its surroundings?",
+  },
+  {
+    letter: "d",
+    title: "Cybernetics",
+    obs: "Knowing that organisms exchange energy with their environment doesn't explain the mechanisms of internal regulation and adaptive response.",
+    sol: "The key insight is feedback. A system continuously compares its current state against a target and adjusts behaviour accordingly. Stability emerges not through rigidity, but through continual correction. Behaviour is no longer a linear chain of causes, but a circular process.",
+    prob: "Feedback explains how systems regulate themselves — but how does organized structure emerge in the first place?",
+  },
+  {
+    letter: "e",
+    title: "Dissipative structures",
+    obs: "Cybernetics explains self-regulation, but not self-organisation. Where does complex structure originally come from?",
+    sol: "Under far-from-equilibrium conditions, systems can spontaneously generate structure through the very process of energy dissipation. Crucially, stability exists as a pattern while matter and energy continuously flow through it — the whirlpool persists, but its water molecules do not. Structure and process are the same thing.",
+    prob: "Non-living systems like whirlpools also self-organise. What specifically makes living systems different — they repair, reproduce, and maintain their own boundaries?",
+  },
+  {
+    letter: "f",
+    title: "Complexity science",
+    obs: "Dissipative structures show that order can emerge spontaneously, but the broader question of how highly organized behaviour arises without a designer remains open.",
+    sol: "Complex, large-scale organization can emerge from the local interactions of many simple components without any central control. Ant colonies, flocking birds, ecosystems, and brains all exhibit this principle: global order from local interaction.",
+    prob: "This applies to many non-living systems too. What is it that specifically distinguishes living systems from other self-organising systems?",
+  },
+  {
+    letter: "g",
+    title: "Autopoiesis",
+    obs: "A whirlpool maintains structure through flow but doesn't repair itself or reproduce. Living systems appear to possess a fundamentally different kind of organisation.",
+    sol: "Living organisms are networks of processes that continuously regenerate their own components — including their own boundary with the environment. Life is less like a static object and more like an ongoing process of self-construction. Cognition itself begins to be seen as rooted in these self-organising dynamics, not confined to brains.",
+    prob: "How do organisms actually process and respond to signals from their environment? What is the nature of information in living systems?",
+  },
+  {
+    letter: "h",
+    title: "Information theory",
+    obs: "Thermostats, pheromone trails, and nervous systems all depend not just on physical interaction, but on the transmission and interpretation of signals.",
+    sol: "Shannon proposed that information can be understood as reduction of uncertainty. This gave a common language for understanding communication, regulation, and adaptation across biology, machines, and social systems. Organisms now appeared to inhabit informational environments as much as physical ones.",
+    prob: "How does the brain construct perception? Is it a passive receiver of sensory information, or something more active?",
+  },
+  {
+    letter: "i",
+    title: "Predictive coding",
+    obs: "Traditional models treat perception as passive — the brain receives and processes incoming data. But this doesn't explain how organisms respond so efficiently to uncertainty.",
+    sol: "The brain continuously generates predictions about its sensory inputs. Perception becomes a process of comparing those predictions against incoming signals. The difference — the prediction error — drives updates to the internal model or to behaviour itself. Cognition is fundamentally anticipatory.",
+    prob: "How do living systems maintain stable organisation within unpredictable, constantly changing environments across time?",
+  },
+  {
+    letter: "j",
+    title: "Dynamical systems",
+    obs: "The components of a system matter less than the changing relationships between them. A new mathematical language is needed to describe systems evolving through time.",
+    sol: "Dynamical systems theory focuses on how systems change state over time. Key features include nonlinearity (small inputs, large effects), feedback loops, and attractors — relatively stable modes of behaviour that systems tend toward. Nature is interconnected processes, not isolated objects.",
+    prob: "How do self-organising systems actually persist — maintain their identity and internal states — within unpredictable environments?",
+  },
+  {
+    letter: "k",
+    title: "Free energy principle",
+    obs: "All previous frameworks converge on this question: how do living systems maintain their organisation in the face of constant uncertainty, noise, and entropy?",
+    sol: "Friston's free energy principle proposes that self-organising systems maintain themselves by minimising uncertainty about the states they are likely to encounter. Perception updates the internal model; action reshapes the environment to match expectation. These are two sides of the same process. Cognition is inseparable from the broader dynamics of self-maintenance.",
+    prob: null,
+  }
+];
+
+let current = 0;
+const visited = new Set([0]);
+
+function render() {
+  const s = steps[current];
+  document.getElementById('count').textContent = `${current + 1} of ${steps.length}`;
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === steps.length - 1;
+  document.getElementById('hint').className = 'arrow-hint' + (s.prob && current < steps.length - 1 ? ' show' : '');
+
+  document.getElementById('card').innerHTML = `
+    <div class="card-header">
+      <span class="card-letter">${s.letter}</span>
+      <span class="card-title">${s.title}</span>
+    </div>
+    ${s.obs ? `<div class="band band-obs"><div class="band-label">Context / observation</div><div class="band-text">${s.obs}</div></div>` : ''}
+    ${s.sol ? `<div class="band band-sol"><div class="band-label">Solution arrived at</div><div class="band-text">${s.sol}</div></div>` : ''}
+    ${s.prob ? `<div class="band band-prob"><div class="band-label">Problem that remains</div><div class="band-text">${s.prob}</div></div>` : ''}
+    ${!s.prob ? `<div class="band band-sol"><div class="band-label">No remaining problem</div><div class="band-text" style="color:var(--color-text-secondary)">This is where the essay's historical arc concludes — at the synthesis of all prior frameworks.</div></div>` : ''}
+  `;
+
+  const prog = document.getElementById('progress');
+  prog.innerHTML = steps.map((st, i) => `<div class="dot ${i === current ? 'active' : visited.has(i) ? 'visited' : ''}" onclick="goto(${i})" title="${st.title}">${st.letter}</div>`).join('');
+}
+
+function move(dir) {
+  current = Math.max(0, Math.min(steps.length - 1, current + dir));
+  visited.add(current);
+  render();
+}
+
+function goto(i) {
+  current = i;
+  visited.add(i);
+  render();
+}
+
+render();
+</script>

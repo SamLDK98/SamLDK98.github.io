@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — The Deck | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg1: #14131c; --bg2: #0a0910;
+      --ink: #f3eee6; --muted: rgba(243,238,230,0.6);
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "Space Grotesk", system-ui, sans-serif;
+      --mono: "JetBrains Mono", monospace;
+    }
+    html, body { height: 100%; }
+    body {
+      background: radial-gradient(circle at 50% 18%, var(--bg1), var(--bg2) 70%);
+      color: var(--ink); font-family: var(--sans);
+      -webkit-font-smoothing: antialiased; overflow: hidden;
+    }
+    .head {
+      position: fixed; top: clamp(1.3rem,4vw,2.6rem); left: 0; right: 0; z-index: 5;
+      text-align: center; pointer-events: none; padding: 0 1rem;
+    }
+    .head .kick { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--muted); }
+    .head h1 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em;
+      font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1; margin-top: 0.5rem; }
+    .head .sub { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); }
+
+    .table {
+      position: relative; height: 100vh; width: 100%;
+      perspective: 1600px; display: grid; place-items: end center;
+    }
+    /* backdrop dim when a card is open */
+    .scrim {
+      position: fixed; inset: 0; z-index: 3; background: rgba(6,5,10,0.55);
+      backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity 0.4s;
+    }
+    .scrim.show { opacity: 1; pointer-events: auto; }
+
+    .fan { position: relative; width: min(880px, 92vw); height: 64vh; max-height: 540px;
+      margin-bottom: 4vh; transform-style: preserve-3d; }
+
+    .card {
+      position: absolute; left: 50%; bottom: 0;
+      width: clamp(150px, 21vw, 215px); height: clamp(220px, 31vw, 320px);
+      margin-left: calc(clamp(150px, 21vw, 215px) / -2);
+      transform-origin: 50% 135%;
+      transform: rotate(var(--ang)) translateY(0);
+      transition: transform 0.55s cubic-bezier(0.2,0.8,0.2,1), filter 0.4s, opacity 0.4s;
+      cursor: pointer; transform-style: preserve-3d; z-index: var(--z);
+      border-radius: 16px;
+    }
+    .card:focus-visible { outline: none; }
+    .card:focus-visible .inner { box-shadow: 0 0 0 2px var(--c), 0 30px 60px rgba(0,0,0,0.5); }
+
+    /* fan hover: lift the hovered card, nudge neighbours */
+    .fan:not(.has-open) .card:hover { transform: rotate(var(--ang)) translateY(-46px) scale(1.05); z-index: 50; }
+
+    /* open (selected) card: float to centre + flip */
+    .card.open {
+      transform: translateY(-46%) rotate(0deg) scale(1.12); z-index: 60; cursor: default;
+    }
+    .card.dim { filter: brightness(0.5) saturate(0.7); opacity: 0.45; }
+    .card.dim:hover { transform: rotate(var(--ang)); }
+
+    .inner {
+      position: relative; width: 100%; height: 100%;
+      transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4,0.1,0.2,1);
+      border-radius: 16px;
+    }
+    .card.open .inner { transform: rotateY(180deg); }
+
+    .face {
+      position: absolute; inset: 0; border-radius: 16px;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      overflow: hidden; padding: 1.1rem;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    /* ---- front ---- */
+    .front {
+      background:
+        radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--c) 42%, transparent), transparent 70%),
+        linear-gradient(160deg, #1c1b26, #121119);
+      color: var(--ink);
+    }
+    .corner { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; color: var(--c); }
+    .corner.br { align-self: flex-end; transform: rotate(180deg); }
+    .glyph {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      font-size: clamp(3.2rem, 8vw, 5rem); color: var(--c);
+      text-shadow: 0 0 28px color-mix(in srgb, var(--c) 55%, transparent);
+    }
+    .ctitle {
+      position: relative; z-index: 1; font-family: var(--serif); font-weight: 600;
+      font-size: clamp(1.05rem, 2.2vw, 1.3rem); line-height: 1.05;
+    }
+    /* ---- back ---- */
+    .back {
+      transform: rotateY(180deg);
+      background:
+        radial-gradient(120% 90% at 50% 110%, color-mix(in srgb, var(--c) 34%, transparent), transparent 65%),
+        linear-gradient(160deg, #191822, #100f17);
+      justify-content: flex-start; gap: 0.7rem;
+    }
+    .back .b-no { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em; color: var(--c); }
+    .back .b-title { font-family: var(--serif); font-weight: 600; font-size: 1.2rem; line-height: 1.05; }
+    .back .b-blurb { font-size: 0.86rem; line-height: 1.45; color: var(--muted); flex: 1; }
+    .back .b-enter {
+      display: inline-flex; align-items: center; gap: 0.5rem; align-self: flex-start;
+      text-decoration: none; color: #0c0b12; background: var(--c);
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.6rem 1rem; border-radius: 999px; transition: transform 0.18s, filter 0.18s;
+    }
+    .back .b-enter:hover { transform: translateX(3px); filter: brightness(1.08); }
+
+    .close {
+      position: fixed; top: 1.3rem; right: 1.3rem; z-index: 70;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+      color: var(--ink); border-radius: 999px; width: 2.6rem; height: 2.6rem;
+      font-size: 1.1rem; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .close.show { opacity: 1; pointer-events: auto; }
+
+    .hint {
+      position: fixed; bottom: 1.2rem; left: 0; right: 0; z-index: 5; text-align: center;
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(243,238,230,0.4); transition: opacity 0.3s;
+    }
+    .noscript-list a { color: #8db4ff; display:block; margin: .3rem 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .card, .inner { transition: none; }
+    }
+    @media (max-width: 560px) {
+      .fan { height: 58vh; }
+      .head h1 { font-size: 7vw; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <noscript>
+    <div style="padding:2rem;font-family:Georgia,serif">
+      <h1>Interactive Expositions — Sam Kirwan</h1>
+      <div class="noscript-list">
+        <a href="complex-numbers.html">Complex Numbers</a>
+        <a href="linear-algebra.html">Linear Algebra</a>
+        <a href="trigonometry.html">Trigonometry</a>
+        <a href="algebra.html">Algebra</a>
+        <a href="active-inference.html">Active Inference</a>
+      </div>
+    </div>
+  </noscript>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel-src" id="app">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    const TOPICS = [
+      { id:'complex', no:'01', title:'Complex Numbers', href:'complex-numbers.html', glyph:'ℂ', color:'#34f5ff',
+        blurb:'Numbers that answer impossible questions — rotation, waves, and the secret geometry of the plane.' },
+      { id:'linear', no:'02', title:'Linear Algebra', href:'linear-algebra.html', glyph:'⟶', color:'#9b7bff',
+        blurb:'Equations as motion through space — vectors, transformations, and the shape of a solution.' },
+      { id:'trig', no:'03', title:'Trigonometry', href:'trigonometry.html', glyph:'∿', color:'#15d39a',
+        blurb:'The circle hidden in every wave — angles, ratios, and the unit circle unrolled into motion.' },
+      { id:'algebra', no:'04', title:'Algebra', href:'algebra.html', glyph:'𝑥', color:'#ffb43a',
+        blurb:'The grammar of the unknown — symbols, balance, and the quiet machinery of solving.' },
+      { id:'active', no:'05', title:'Active Inference', href:'active-inference.html', glyph:'∇', color:'#ff5ca8',
+        blurb:'How a mind holds back the tide of entropy — prediction, surprise, and the free-energy story.' },
+    ];
+
+    function App() {
+      const [open, setOpen] = useState(null);   // index of selected card or null
+      const [focus, setFocus] = useState(0);
+      const cardRefs = useRef([]);
+      const n = TOPICS.length;
+      const SPREAD = 13; // degrees between cards
+
+      const select = useCallback((k) => setOpen(k), []);
+      const close = useCallback(() => setOpen(null), []);
+
+      const onKey = useCallback((e) => {
+        if (e.key === 'Escape') { close(); return; }
+        if (open !== null) {
+          if (e.key === 'Enter') window.location.href = TOPICS[open].href;
+          return;
+        }
+        if (e.key === 'ArrowRight') { e.preventDefault(); setFocus(f => Math.min(n-1, f+1)); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); setFocus(f => Math.max(0, f-1)); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(focus); }
+      }, [open, focus, close]);
+
+      useEffect(() => {
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [onKey]);
+
+      useEffect(() => {
+        if (open === null && cardRefs.current[focus]) cardRefs.current[focus].focus();
+      }, [focus, open]);
+
+      return (
+        <div className="table">
+          <header className="head">
+            <p className="kick">Interactive Expositions · Sam Kirwan</p>
+            <h1>Pick a card.</h1>
+            <p className="sub">{open === null ? 'Hover to lift · click to turn it over' : TOPICS[open].title}</p>
+          </header>
+
+          <div className={'scrim' + (open !== null ? ' show' : '')} onClick={close} />
+
+          <div className={'fan' + (open !== null ? ' has-open' : '')}>
+            {TOPICS.map((t, k) => {
+              const ang = (k - (n - 1) / 2) * SPREAD;
+              const isOpen = open === k;
+              const isDim = open !== null && !isOpen;
+              const cls = 'card' + (isOpen ? ' open' : '') + (isDim ? ' dim' : '');
+              return (
+                <div key={t.id} ref={el => cardRefs.current[k] = el}
+                  className={cls}
+                  style={{ '--ang': ang + 'deg', '--z': 10 + k, '--c': t.color }}
+                  tabIndex={open === null ? 0 : -1}
+                  role="button" aria-label={t.title}
+                  onClick={(e) => { e.stopPropagation(); if (open === null) select(k); }}>
+                  <div className="inner">
+                    <div className="face front">
+                      <span className="corner">{t.no}</span>
+                      <span className="glyph" aria-hidden="true">{t.glyph}</span>
+                      <span className="ctitle">{t.title}</span>
+                      <span className="corner br">{t.no}</span>
+                    </div>
+                    <div className="face back">
+                      <span className="b-no">{t.no} — Exposition</span>
+                      <span className="b-title">{t.title}</span>
+                      <span className="b-blurb">{t.blurb}</span>
+                      <a className="b-enter" href={t.href} onClick={e => e.stopPropagation()}>Enter chapter →</a>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <button className={'close' + (open !== null ? ' show' : '')} onClick={close} aria-label="Close card">✕</button>
+          <p className="hint" style={{ opacity: open !== null ? 0 : 1 }}>← → to move · enter to turn · esc to close</p>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+
+  <script>
+    (function () {
+      var src = document.getElementById('app').textContent;
+      var out = Babel.transform(src, { presets: [['react', { runtime: 'classic' }]] }).code;
+      (0, eval)(out);
+    })();
+  </script>
+</body>
+</html>

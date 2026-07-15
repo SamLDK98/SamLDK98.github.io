@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problems: The Unit Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #161311;
+    --bg-elev: #1e1a17;
+    --bg-card: #221d1a;
+    --text: #ece2d1;
+    --text-dim: #a89c87;
+    --text-faint: #6f6557;
+    --rule: rgba(214, 196, 168, 0.12);
+    --rule-strong: rgba(214, 196, 168, 0.22);
+    --accent: #d4b888;
+    --accent-glow: rgba(212, 184, 136, 0.4);
+    --sin: #6dd3c4;
+    --sin-glow: rgba(109, 211, 196, 0.4);
+    --cos: #e8a13b;
+    --cos-glow: rgba(232, 161, 59, 0.4);
+    --point: #ef7398;
+    --point-glow: rgba(239, 115, 152, 0.45);
+    --green: #57c884;
+    --red: #ef6a5b;
+    --axis: rgba(236, 226, 209, 0.4);
+    --circle: rgba(236, 226, 209, 0.68);
+    --grid: rgba(236, 226, 209, 0.045);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    background-image: radial-gradient(ellipse at top, rgba(212, 184, 136, 0.04), transparent 55%);
+  }
+  .widget {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.005) 2px, rgba(255,255,255,0.005) 3px);
+    pointer-events: none;
+  }
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-card);
+  }
+  .tabs button {
+    flex: 1;
+    padding: 0.85rem 0.6rem;
+    background: transparent;
+    color: var(--text-dim);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .tabs button + button { border-left: 1px solid var(--rule); }
+  .tabs button:hover { color: var(--accent); }
+  .tabs button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(212, 184, 136, 0.06);
+  }
+  .tabs button .done-mark { color: var(--green); margin-left: 0.3rem; }
+
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  .prompt {
+    padding: 1.05rem 1.6rem 0.4rem;
+    font-size: 1.02rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .prompt strong { color: var(--text); font-weight: 400; }
+
+  /* ——— Problem 1: triangles ——— */
+  .tri-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+  @media (max-width: 800px) { .tri-grid { grid-template-columns: 1fr; } }
+  .tri-panel {
+    padding: 0.9rem 1.2rem 1.3rem;
+  }
+  .tri-panel + .tri-panel { border-left: 1px solid var(--rule); }
+  @media (max-width: 800px) { .tri-panel + .tri-panel { border-left: 0; border-top: 1px solid var(--rule); } }
+  .tri-panel h4 {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+  .tri-panel svg { display: block; width: min(100%, 330px); height: auto; margin: 0 auto; }
+
+  .slot-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+  .slot-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    min-width: 4.4rem;
+    text-align: right;
+  }
+  .chip {
+    min-width: 2.9rem;
+    padding: 0.38rem 0.55rem;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.1s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.right {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(87, 200, 132, 0.1);
+    cursor: default;
+  }
+  .chip.wrong {
+    border-color: var(--red);
+    color: var(--red);
+    animation: shake 0.35s ease;
+  }
+  .chip:disabled { opacity: 0.45; cursor: default; }
+  .chip.right:disabled { opacity: 1; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .reveal {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.7s ease;
+    border-top: 1px solid transparent;
+  }
+  .reveal.open {
+    max-height: 270px;
+    border-top: 1px solid var(--rule);
+    transition: max-height 0.7s ease, border-color 0.3s;
+  }
+  .reveal-inner {
+    padding: 1rem 1.6rem 1.2rem;
+    font-size: 0.98rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .reveal-inner em { color: var(--text); }
+
+  /* ——— Problem 2: evaluation ——— */
+  .angle-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.85rem 1.2rem 0.2rem;
+  }
+  .angle-tab {
+    padding: 0.42rem 0.8rem;
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text-dim);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .angle-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .angle-tab.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(212, 184, 136, 0.1);
+  }
+  .angle-tab.solved { color: var(--green); }
+  .angle-tab.solved.active { border-color: var(--green); background: rgba(87, 200, 132, 0.08); }
+
+  .eval-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    gap: 0.6rem;
+    align-items: center;
+    padding: 0.5rem 1.2rem 0.6rem;
+  }
+  @media (max-width: 860px) { .eval-layout { grid-template-columns: 1fr; } }
+  .circle-stage svg { display: block; width: min(100%, 400px); height: auto; margin: 0 auto; }
+
+  .answer-rows { display: flex; flex-direction: column; gap: 0.7rem; }
+  .answer-row { }
+  .answer-row .row-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.35rem;
+  }
+  .row-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--text);
+    min-width: 7.2rem;
+  }
+  .row-name .fn-cos { color: var(--cos); }
+  .row-name .fn-sin { color: var(--sin); }
+  .row-name .fn-tan { color: var(--point); }
+  .row-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-faint);
+  }
+  .row-status.solved { color: var(--green); }
+  .chip-rail { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .chip-rail .chip { min-width: 2.5rem; padding: 0.3rem 0.45rem; font-size: 0.84rem; }
+
+  .angle-note {
+    min-height: 3.1rem;
+    padding: 0.55rem 1.6rem 0.8rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--text-dim);
+  }
+  .angle-note.celebrate { color: var(--green); font-style: normal; }
+
+  .footer {
+    padding: 0.85rem 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  /* SVG shared */
+  .axis { stroke: var(--axis); stroke-width: 1.4; }
+  .circle-outline { stroke: var(--circle); stroke-width: 2.2; fill: rgba(0, 0, 0, 0.06); }
+  .graph-tick { fill: var(--text-faint); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .tri-fill { fill: rgba(212, 184, 136, 0.07); }
+  .tri-side { stroke: var(--text); stroke-width: 2; stroke-linecap: round; fill: none; opacity: 0.8; }
+  .tri-side.known { stroke: var(--sin); opacity: 1; }
+  .tri-side.hyp { stroke: var(--accent); }
+  .tri-right-angle { stroke: var(--axis); stroke-width: 1.4; fill: none; }
+  .tri-arc { stroke: var(--point); stroke-width: 1.6; fill: none; opacity: 0.85; }
+  .tri-label { fill: var(--text); font-family: 'EB Garamond', serif; font-style: italic; font-size: 17px; }
+  .tri-side-label { fill: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+  .tri-side-label.pending { fill: var(--text-faint); }
+  .tri-side-label.solved-label { fill: var(--green); }
+  .tri-angle-label { fill: var(--point); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .radius { stroke: var(--accent); stroke-width: 2.4; stroke-linecap: round; filter: drop-shadow(0 0 5px var(--accent-glow)); }
+  .pt-circle { fill: var(--point); stroke: var(--text); stroke-width: 2; filter: drop-shadow(0 0 8px var(--point-glow)); }
+  .cos-leg { stroke: var(--cos); stroke-width: 4; stroke-linecap: round; opacity: 0.85; }
+  .sin-leg { stroke: var(--sin); stroke-width: 4; stroke-linecap: round; opacity: 0.85; }
+  .angle-arc-path { stroke: var(--point); stroke-width: 2; fill: none; opacity: 0.85; }
+  .coord-label { fill: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 14.5px; }
+  .coord-label .pending-part { fill: var(--text-faint); }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="tabs" id="main-tabs">
+    <button data-pane="p1" class="active">Problem 2.1 &middot; Two Special Triangles<span class="done-mark" id="p1-mark"></span></button>
+    <button data-pane="p2">Problem 2.2 &middot; Evaluate<span class="done-mark" id="p2-mark"></span></button>
+  </div>
+
+  <!-- ——————————— Problem 2.1 ——————————— -->
+  <div class="pane active" id="pane-p1">
+    <p class="prompt">Each triangle has one side of length 1. Work out the other two — <strong>click a value for each side</strong>.</p>
+
+    <div class="tri-grid">
+      <!-- (a) 45-45-90 -->
+      <div class="tri-panel">
+        <h4>(a) 45&ndash;45&ndash;90</h4>
+        <svg viewBox="0 0 330 270" aria-label="A right triangle with two 45 degree angles; leg BC has length 1">
+          <polygon class="tri-fill" points="60,230 270,230 270,20" />
+          <path class="tri-right-angle" d="M 248 230 L 248 208 L 270 208" />
+          <path class="tri-arc" d="M 102 230 A 42 42 0 0 0 90 201" />
+          <path class="tri-arc" d="M 270 62 A 42 42 0 0 0 241 50" />
+          <line class="tri-side known" x1="60" y1="230" x2="270" y2="230" />
+          <line class="tri-side" id="side-AC" x1="270" y1="230" x2="270" y2="20" />
+          <line class="tri-side hyp" id="side-AB" x1="60" y1="230" x2="270" y2="20" />
+          <text class="tri-label" x="276" y="14">A</text>
+          <text class="tri-label" x="42" y="244">B</text>
+          <text class="tri-label" x="276" y="246">C</text>
+          <text class="tri-angle-label" x="106" y="222">45&deg;</text>
+          <text class="tri-angle-label" x="230" y="74">45&deg;</text>
+          <text class="tri-side-label" x="165" y="252" text-anchor="middle">BC = 1</text>
+          <text class="tri-side-label pending" id="label-AC" x="282" y="140">AC = ?</text>
+          <text class="tri-side-label pending" id="label-AB" x="130" y="125" text-anchor="end">AB = ?</text>
+        </svg>
+        <div class="slot-row" data-slot="AB"><span class="slot-name">AB =</span></div>
+        <div class="slot-row" data-slot="AC"><span class="slot-name">AC =</span></div>
+      </div>
+
+      <!-- (b) 30-60-90 -->
+      <div class="tri-panel">
+        <h4>(b) 30&ndash;60&ndash;90</h4>
+        <svg viewBox="0 0 330 270" aria-label="A right triangle with angles 30, 60 and 90 degrees; side YZ has length 1">
+          <polygon class="tri-fill" points="110,240 240,240 240,28" />
+          <path class="tri-right-angle" d="M 218 240 L 218 218 L 240 218" />
+          <path class="tri-arc" d="M 148 240 A 38 38 0 0 0 138 215" />
+          <path class="tri-arc" d="M 240 80 A 52 52 0 0 0 213 71" />
+          <line class="tri-side known" x1="110" y1="240" x2="240" y2="240" />
+          <line class="tri-side" id="side-XZ" x1="240" y1="240" x2="240" y2="28" />
+          <line class="tri-side hyp" id="side-XY" x1="110" y1="240" x2="240" y2="28" />
+          <text class="tri-label" x="246" y="22">X</text>
+          <text class="tri-label" x="92" y="254">Y</text>
+          <text class="tri-label" x="246" y="256">Z</text>
+          <text class="tri-angle-label" x="152" y="232">60&deg;</text>
+          <text class="tri-angle-label" x="208" y="96">30&deg;</text>
+          <text class="tri-side-label" x="175" y="262" text-anchor="middle">YZ = 1</text>
+          <text class="tri-side-label pending" id="label-XZ" x="252" y="140">XZ = ?</text>
+          <text class="tri-side-label pending" id="label-XY" x="158" y="122" text-anchor="end">XY = ?</text>
+        </svg>
+        <div class="slot-row" data-slot="XY"><span class="slot-name">XY =</span></div>
+        <div class="slot-row" data-slot="XZ"><span class="slot-name">XZ =</span></div>
+      </div>
+    </div>
+
+    <div class="reveal" id="p1-reveal">
+      <div class="reveal-inner">
+        <p>(a) The two 45&deg; angles make the legs equal, so <em>AC = BC = 1</em>. Pythagoras gives the hypotenuse: <em>AB&sup2; = 1&sup2; + 1&sup2; = 2</em>, so <em>AB = &radic;2</em>.</p>
+        <p style="margin-top:0.5rem">(b) Mirror the triangle across XZ and the two 60&deg; corners build an equilateral triangle &mdash; so the hypotenuse is twice the short leg: <em>XY = 2</em>. Pythagoras then gives <em>XZ&sup2; = 2&sup2; &minus; 1&sup2; = 3</em>, so <em>XZ = &radic;3</em>.</p>
+        <p style="margin-top:0.5rem"><em>Keep these two triangles in hand &mdash; they are about to generate most of Problem 2.2.</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ——————————— Problem 2.2 ——————————— -->
+  <div class="pane" id="pane-p2">
+    <p class="prompt">For each angle, read the terminal point off the unit circle: <strong>cos&thinsp;&theta; is its x-coordinate, sin&thinsp;&theta; its y-coordinate, tan&thinsp;&theta; the ratio y/x</strong>.</p>
+
+    <div class="angle-tabs" id="angle-tabs"></div>
+
+    <div class="eval-layout">
+      <div class="circle-stage">
+        <svg viewBox="0 0 400 400" aria-label="The unit circle with the terminal point of the chosen angle marked">
+          <defs>
+            <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(236,226,209,0.4)" />
+            </marker>
+          </defs>
+          <line class="axis" x1="18" y1="200" x2="384" y2="200" marker-end="url(#ax-arrow)" />
+          <line class="axis" x1="200" y1="384" x2="200" y2="18" marker-end="url(#ax-arrow)" />
+          <circle class="circle-outline" cx="200" cy="200" r="150" />
+          <text class="graph-tick" x="356" y="218">1</text>
+          <text class="graph-tick" x="34" y="218">&minus;1</text>
+          <text class="graph-tick" x="208" y="44">1</text>
+          <text class="graph-tick" x="208" y="372">&minus;1</text>
+          <line id="cos-leg" class="cos-leg" />
+          <line id="sin-leg" class="sin-leg" />
+          <path id="angle-arc" class="angle-arc-path" />
+          <line id="radius" class="radius" x1="200" y1="200" />
+          <circle id="terminal-pt" class="pt-circle" r="7.5" />
+          <text id="coord-label" class="coord-label"></text>
+        </svg>
+      </div>
+
+      <div class="answer-rows">
+        <div class="answer-row" data-fn="cos">
+          <div class="row-head"><span class="row-name"><span class="fn-cos">cos</span> <span class="row-angle">0&deg;</span> = ?</span><span class="row-status">&middot;</span></div>
+          <div class="chip-rail"></div>
+        </div>
+        <div class="answer-row" data-fn="sin">
+          <div class="row-head"><span class="row-name"><span class="fn-sin">sin</span> <span class="row-angle">0&deg;</span> = ?</span><span class="row-status">&middot;</span></div>
+          <div class="chip-rail"></div>
+        </div>
+        <div class="answer-row" data-fn="tan">
+          <div class="row-head"><span class="row-name"><span class="fn-tan">tan</span> <span class="row-angle">0&deg;</span> = ?</span><span class="row-status">&middot;</span></div>
+          <div class="chip-rail"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="angle-note" id="angle-note"></div>
+  </div>
+
+  <div class="footer" id="footer-line">
+    Problems adapted from a classic unit-circle exercise. No calculator required — only the two triangles and the circle.
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+
+  /* ═══════════ Problem 2.1 ═══════════ */
+
+  const TRI_OPTIONS = ['1', '√2', '√3', '2', '√2/2'];
+  const TRI_ANSWERS = { AB: '√2', AC: '1', XY: '2', XZ: '√3' };
+  const triSolved = { AB: false, AC: false, XY: false, XZ: false };
+
+  document.querySelectorAll('.slot-row').forEach((row) => {
+    const slot = row.dataset.slot;
+    TRI_OPTIONS.forEach((opt) => {
+      const b = document.createElement('button');
+      b.className = 'chip';
+      b.textContent = opt;
+      b.addEventListener('click', () => {
+        if (triSolved[slot]) return;
+        if (opt === TRI_ANSWERS[slot]) {
+          triSolved[slot] = true;
+          row.querySelectorAll('.chip').forEach(c => { c.disabled = true; });
+          b.classList.add('right');
+          const lbl = document.getElementById('label-' + slot);
+          lbl.textContent = slot + ' = ' + opt;
+          lbl.classList.remove('pending');
+          lbl.classList.add('solved-label');
+          checkP1Done();
+        } else {
+          b.classList.add('wrong');
+          setTimeout(() => b.classList.remove('wrong'), 450);
+        }
+      });
+      row.appendChild(b);
+    });
+  });
+
+  function checkP1Done() {
+    if (Object.values(triSolved).every(Boolean)) {
+      $('#p1-reveal').classList.add('open');
+      $('#p1-mark').textContent = '✓';
+      updateFooter();
+    }
+  }
+
+  /* ═══════════ Problem 2.2 ═══════════ */
+
+  const ANGLES = [
+    { letter: 'a', deg: 0,   cos: '1',    sin: '0',    tan: '0',
+      note: 'No turning at all: the terminal point is still (1, 0), sitting on the x-axis.' },
+    { letter: 'b', deg: 90,  cos: '0',    sin: '1',    tan: 'undef',
+      note: 'A quarter turn lands on (0, 1). And y/x means dividing by zero — a vertical line has no slope, so tan 90° is undefined.' },
+    { letter: 'c', deg: 45,  cos: '√2/2', sin: '√2/2', tan: '1',
+      note: 'The 45–45–90 triangle from Problem 2.1, shrunk so its hypotenuse is 1: each leg becomes 1/√2 = √2/2. Equal legs make the slope exactly 1.' },
+    { letter: 'd', deg: 30,  cos: '√3/2', sin: '1/2',  tan: '√3/3',
+      note: 'The 30–60–90 triangle, shrunk so its hypotenuse is 1: sides 2, √3, 1 become 1, √3/2, 1/2. The short side is vertical here.' },
+    { letter: 'e', deg: 60,  cos: '1/2',  sin: '√3/2', tan: '√3',
+      note: 'The same triangle stood on its other leg: 30° and 60° simply swap the two coordinates.' },
+    { letter: 'f', deg: 270, cos: '0',    sin: '−1',   tan: 'undef',
+      note: 'Three quarter-turns reach (0, −1), the bottom of the circle. The x-coordinate is 0 again, so the tangent is again undefined.' }
+  ];
+
+  const COS_SIN_CHIPS = ['−1', '−√3/2', '−√2/2', '−1/2', '0', '1/2', '√2/2', '√3/2', '1'];
+  const TAN_CHIPS = ['−√3', '−1', '−√3/3', '0', '√3/3', '1', '√3', 'undef'];
+
+  // progress[i] = { cos: bool, sin: bool, tan: bool }
+  const progress = ANGLES.map(() => ({ cos: false, sin: false, tan: false }));
+  let current = 0;
+
+  // — angle tabs —
+  const tabsHost = $('#angle-tabs');
+  const tabEls = ANGLES.map((a, i) => {
+    const b = document.createElement('button');
+    b.className = 'angle-tab' + (i === 0 ? ' active' : '');
+    b.textContent = '(' + a.letter + ') ' + a.deg + '°';
+    b.addEventListener('click', () => { current = i; renderAngle(); });
+    tabsHost.appendChild(b);
+    return b;
+  });
+
+  // — circle drawing —
+  const C = { cx: 200, cy: 200, r: 150 };
+  function drawCircle() {
+    const a = ANGLES[current];
+    const th = a.deg * Math.PI / 180;
+    const x = C.cx + C.r * Math.cos(th);
+    const y = C.cy - C.r * Math.sin(th);
+
+    const radius = $('#radius');
+    radius.setAttribute('x2', x.toFixed(1));
+    radius.setAttribute('y2', y.toFixed(1));
+    radius.setAttribute('y1', C.cy);
+    const pt = $('#terminal-pt');
+    pt.setAttribute('cx', x.toFixed(1));
+    pt.setAttribute('cy', y.toFixed(1));
+
+    const cosLeg = $('#cos-leg'), sinLeg = $('#sin-leg');
+    cosLeg.setAttribute('x1', C.cx); cosLeg.setAttribute('y1', C.cy);
+    cosLeg.setAttribute('x2', x.toFixed(1)); cosLeg.setAttribute('y2', C.cy);
+    sinLeg.setAttribute('x1', x.toFixed(1)); sinLeg.setAttribute('y1', C.cy);
+    sinLeg.setAttribute('x2', x.toFixed(1)); sinLeg.setAttribute('y2', y.toFixed(1));
+
+    const arc = $('#angle-arc');
+    if (a.deg > 6) {
+      const aR = 34;
+      const ex = C.cx + aR * Math.cos(th), ey = C.cy - aR * Math.sin(th);
+      const large = a.deg > 180 ? 1 : 0;
+      arc.setAttribute('d', `M ${C.cx + aR} ${C.cy} A ${aR} ${aR} 0 ${large} 0 ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+      arc.style.display = '';
+    } else {
+      arc.style.display = 'none';
+    }
+
+    // coordinate label: filled in only once answered
+    const p = progress[current];
+    const cosTxt = p.cos ? a.cos : '?';
+    const sinTxt = p.sin ? a.sin : '?';
+    const lbl = $('#coord-label');
+    lbl.textContent = '(' + cosTxt + ', ' + sinTxt + ')';
+    // place label away from the point, biased outward
+    const offX = Math.cos(th) >= 0 ? 14 : -14;
+    const anchor = Math.cos(th) >= -0.05 ? 'start' : 'end';
+    lbl.setAttribute('x', (x + offX).toFixed(1));
+    lbl.setAttribute('y', (y - 14 * (Math.sin(th) >= 0 ? 1 : -1) + (Math.sin(th) >= 0 ? 0 : 24)).toFixed(1));
+    lbl.setAttribute('text-anchor', anchor);
+  }
+
+  // — answer rows —
+  function buildRails() {
+    document.querySelectorAll('.answer-row').forEach((row) => {
+      const fn = row.dataset.fn;
+      const rail = row.querySelector('.chip-rail');
+      rail.innerHTML = '';
+      const chips = (fn === 'tan') ? TAN_CHIPS : COS_SIN_CHIPS;
+      chips.forEach((opt) => {
+        const b = document.createElement('button');
+        b.className = 'chip';
+        b.textContent = opt;
+        b.addEventListener('click', () => answer(fn, opt, b, row));
+        rail.appendChild(b);
+      });
+    });
+  }
+
+  function answer(fn, opt, chipEl, row) {
+    const a = ANGLES[current];
+    const p = progress[current];
+    if (p[fn]) return;
+    if (opt === a[fn]) {
+      p[fn] = true;
+      row.querySelectorAll('.chip').forEach(c => { c.disabled = true; });
+      chipEl.classList.add('right');
+      row.querySelector('.row-name').innerHTML = rowNameHTML(fn, a, opt);
+      const st = row.querySelector('.row-status');
+      st.textContent = '✓';
+      st.classList.add('solved');
+      drawCircle();
+      checkAngleDone();
+    } else {
+      chipEl.classList.add('wrong');
+      setTimeout(() => chipEl.classList.remove('wrong'), 450);
+    }
+  }
+
+  function rowNameHTML(fn, a, solvedValue) {
+    const cls = 'fn-' + fn;
+    const val = solvedValue !== undefined ? (solvedValue === 'undef' ? 'undefined' : solvedValue) : '?';
+    return '<span class="' + cls + '">' + fn + '</span> <span class="row-angle">' + a.deg + '°</span> = ' + val;
+  }
+
+  function checkAngleDone() {
+    const p = progress[current];
+    if (p.cos && p.sin && p.tan) {
+      tabEls[current].classList.add('solved');
+      tabEls[current].textContent = '(' + ANGLES[current].letter + ') ' + ANGLES[current].deg + '° ✓';
+      const note = $('#angle-note');
+      note.textContent = ANGLES[current].note;
+      note.classList.remove('celebrate');
+      if (progress.every(q => q.cos && q.sin && q.tan)) {
+        $('#p2-mark').textContent = '✓';
+        updateFooter();
+      }
+    }
+  }
+
+  function renderAngle() {
+    const a = ANGLES[current];
+    const p = progress[current];
+    tabEls.forEach((t, i) => t.classList.toggle('active', i === current));
+
+    document.querySelectorAll('.answer-row').forEach((row) => {
+      const fn = row.dataset.fn;
+      row.querySelector('.row-name').innerHTML = p[fn] ? rowNameHTML(fn, a, a[fn]) : rowNameHTML(fn, a);
+      const st = row.querySelector('.row-status');
+      st.textContent = p[fn] ? '✓' : '·';
+      st.classList.toggle('solved', p[fn]);
+      row.querySelectorAll('.chip').forEach((c) => {
+        c.disabled = p[fn];
+        c.classList.toggle('right', p[fn] && c.textContent === a[fn]);
+        c.classList.remove('wrong');
+      });
+    });
+
+    const note = $('#angle-note');
+    if (p.cos && p.sin && p.tan) {
+      note.textContent = a.note;
+      note.classList.remove('celebrate');
+    } else {
+      note.textContent = '';
+    }
+    drawCircle();
+  }
+
+  function updateFooter() {
+    const p1 = Object.values(triSolved).every(Boolean);
+    const p2 = progress.every(q => q.cos && q.sin && q.tan);
+    if (p1 && p2) {
+      $('#footer-line').textContent = 'Both problems solved — eighteen values, two triangles, one circle. Well done.';
+    } else if (p2) {
+      $('#angle-note').textContent = 'All six angles complete. The whole table came from two triangles and three points on the axes.';
+      $('#angle-note').classList.add('celebrate');
+    }
+  }
+
+  /* ═══════════ main tabs ═══════════ */
+
+  $('#main-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    document.querySelectorAll('#main-tabs button').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+    $('#pane-' + btn.dataset.pane).classList.add('active');
+  });
+
+  // Init
+  buildRails();
+  renderAngle();
+})();
+</script>
+
+</body>
+</html>

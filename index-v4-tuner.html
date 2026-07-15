@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — The Tuner | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --case:   #1b1c20;
+      --face:   #26282e;
+      --slot:   #0c0d10;
+      --text:   #f2efe6;
+      --muted:  rgba(242,239,230,0.55);
+      --faint:  rgba(242,239,230,0.28);
+      --amber:  #ffb43a;
+      --accent: var(--amber);
+      --mono: "JetBrains Mono", monospace;
+    }
+    html, body { height: 100%; }
+    body {
+      background:
+        radial-gradient(circle at 50% 0%, #2a2c33 0%, #131418 70%);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      display: grid; place-items: center;
+      padding: clamp(1rem, 4vw, 2.5rem);
+      overflow: hidden;
+    }
+
+    .receiver {
+      width: min(760px, 100%);
+      background: linear-gradient(180deg, var(--face), var(--case));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: clamp(1.2rem, 3.5vw, 2.2rem);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .face-top {
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--faint); margin-bottom: 1.2rem;
+    }
+    .face-top .brand { color: var(--muted); }
+    .power { display: inline-flex; align-items: center; gap: 0.5rem; }
+    .power::before {
+      content:""; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 10px var(--accent);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    /* dial slot */
+    .dial {
+      position: relative;
+      height: clamp(82px, 16vw, 104px);
+      background: linear-gradient(180deg, #06070a, var(--slot));
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.6);
+      box-shadow: inset 0 6px 16px rgba(0,0,0,0.7);
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+    .dial.dragging { cursor: grabbing; }
+    /* warm backlight glow */
+    .dial::before {
+      content:""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+      background: radial-gradient(60% 120% at 50% 50%, rgba(255,180,58,0.12), transparent 70%);
+    }
+
+    .strip { position: absolute; top: 0; bottom: 0; left: 50%; will-change: transform; }
+    .tick { position: absolute; bottom: 14px; width: 1px; background: var(--faint); }
+    .tick.major { background: var(--muted); }
+    .tick-num {
+      position: absolute; bottom: 0; transform: translateX(-50%);
+      font-family: var(--mono); font-size: 0.62rem; color: var(--faint);
+    }
+    .station {
+      position: absolute; top: 12px; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      white-space: nowrap;
+    }
+    .station .pip { width: 2px; height: 22px; background: var(--muted); transition: background 0.2s, box-shadow 0.2s; }
+    .station .nm {
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted); transition: color 0.2s;
+    }
+    .station.active .pip { background: var(--scolor); box-shadow: 0 0 12px var(--scolor); height: 30px; }
+    .station.active .nm { color: var(--text); }
+
+    /* needle */
+    .needle {
+      position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; z-index: 3;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, var(--accent), rgba(255,180,58,0.2));
+      box-shadow: 0 0 14px var(--accent);
+    }
+    .needle::before {
+      content:""; position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      border-left: 6px solid transparent; border-right: 6px solid transparent;
+      border-top: 8px solid var(--accent);
+    }
+    /* static noise between stations */
+    .static {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      opacity: 0; mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+      animation: jitter 0.18s steps(3) infinite;
+    }
+    @keyframes jitter { 0%{transform:translate(0,0)} 33%{transform:translate(-4%,3%)} 66%{transform:translate(3%,-4%)} 100%{transform:translate(-2%,2%)} }
+
+    /* readout */
+    .readout { margin-top: 1.4rem; display: grid; grid-template-columns: auto 1fr; gap: 0 1.4rem; align-items: end; }
+    .freq {
+      font-family: var(--mono); font-weight: 700;
+      font-size: clamp(2.2rem, 8vw, 3.4rem); line-height: 1; color: var(--accent);
+      text-shadow: 0 0 24px rgba(255,180,58,0.35);
+    }
+    .freq small { font-size: 0.32em; letter-spacing: 0.1em; color: var(--muted); margin-left: 0.3rem; }
+    .now {
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--faint); margin-bottom: 0.3rem;
+    }
+    .title {
+      font-family: "Syne", sans-serif; font-weight: 800;
+      font-size: clamp(1.5rem, 5vw, 2.4rem); line-height: 1; letter-spacing: -0.01em;
+      color: var(--scolor); transition: color 0.25s;
+    }
+    .desc { color: var(--muted); margin-top: 0.4rem; font-size: 0.96rem; min-height: 1.4em; }
+
+    /* controls */
+    .controls { margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .meter { display: flex; gap: 3px; align-items: flex-end; height: 26px; }
+    .meter i {
+      width: 5px; background: var(--faint); border-radius: 1px;
+      transition: background 0.1s, height 0.1s;
+    }
+    .tune {
+      font-family: var(--mono); font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; font-size: 0.82rem;
+      color: var(--case); background: var(--accent);
+      border: none; border-radius: 8px; padding: 0.7rem 1.3rem; cursor: pointer;
+      transition: transform 0.15s, filter 0.15s, opacity 0.2s;
+    }
+    .tune:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .tune:active { transform: translateY(0); }
+    .tune[disabled] { opacity: 0.4; cursor: default; filter: grayscale(0.6); }
+
+    .hint {
+      margin-top: 1.1rem; text-align: center;
+      font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--faint);
+    }
+    .hint kbd { border: 1px solid var(--faint); border-radius: 4px; padding: 0 0.35rem; }
+
+    @media (prefers-reduced-motion: reduce) { .static { animation: none; } }
+  </style>
+</head>
+<body>
+  <main class="receiver">
+    <div class="face-top">
+      <span class="brand">Sam Kirwan · Receiver</span>
+      <span class="power">Interactive Expositions</span>
+    </div>
+
+    <div class="dial" id="dial" role="slider" tabindex="0"
+         aria-label="Tuning dial" aria-valuemin="88" aria-valuemax="108">
+      <div class="strip" id="strip"></div>
+      <div class="static" id="static"></div>
+      <div class="needle"></div>
+    </div>
+
+    <div class="readout">
+      <div class="freq"><span id="freq">100.1</span><small>MHz</small></div>
+      <div>
+        <p class="now">Now tuned</p>
+        <h1 class="title" id="title">Trigonometry</h1>
+        <p class="desc" id="desc">The circle hidden in every wave.</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="meter" id="meter" aria-hidden="true"></div>
+      <button class="tune" id="tune">Tune in →</button>
+    </div>
+
+    <p class="hint">drag the dial · scroll to hop stations · <kbd>←</kbd> <kbd>→</kbd> · <kbd>enter</kbd> to tune in</p>
+  </main>
+
+  <script>
+  (function () {
+    const TOPICS = [
+      { name:'Complex Numbers',  href:'complex-numbers.html', freq:91.5, color:'#34f5ff',
+        desc:'Numbers that answer impossible questions.' },
+      { name:'Linear Algebra',   href:'linear-algebra.html',  freq:95.3, color:'#9b7bff',
+        desc:'Equations as motion through space.' },
+      { name:'Trigonometry',     href:'trigonometry.html',    freq:99.7, color:'#15d39a',
+        desc:'The circle hidden in every wave.' },
+      { name:'Algebra',          href:'algebra.html',         freq:103.1, color:'#ffb43a',
+        desc:'The grammar of the unknown.' },
+      { name:'Active Inference', href:'active-inference.html', freq:106.9, color:'#ff5ca8',
+        desc:'How a mind holds back the tide of entropy.' },
+    ];
+    const FMIN = 88, FMAX = 108, PXM = 64, LOCK = 0.45;
+    const strip = document.getElementById('strip');
+    const dial = document.getElementById('dial');
+    const stat = document.getElementById('static');
+    const freqEl = document.getElementById('freq');
+    const titleEl = document.getElementById('title');
+    const descEl = document.getElementById('desc');
+    const meterEl = document.getElementById('meter');
+    const tuneBtn = document.getElementById('tune');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // build strip: ticks + station markers
+    const x = f => (f - FMIN) * PXM;
+    strip.style.width = (FMAX - FMIN) * PXM + 'px';
+    for (let f = FMIN; f <= FMAX + 0.001; f += 0.5) {
+      const major = Math.abs(f % 2) < 0.01;
+      const t = document.createElement('div');
+      t.className = 'tick' + (major ? ' major' : '');
+      t.style.left = x(f) + 'px';
+      t.style.height = major ? '20px' : '11px';
+      strip.appendChild(t);
+      if (major) {
+        const n = document.createElement('div');
+        n.className = 'tick-num'; n.style.left = x(f) + 'px';
+        n.textContent = f.toFixed(0);
+        strip.appendChild(n);
+      }
+    }
+    const markers = TOPICS.map((tp, i) => {
+      const m = document.createElement('div');
+      m.className = 'station';
+      m.style.left = x(tp.freq) + 'px';
+      m.style.setProperty('--scolor', tp.color);
+      m.innerHTML = `<span class="nm">${tp.name}</span><span class="pip"></span>`;
+      m.addEventListener('click', e => { e.stopPropagation(); snapTo(tp.freq); });
+      strip.appendChild(m);
+      return m;
+    });
+    // build meter bars
+    const BARS = 16;
+    const bars = Array.from({length: BARS}, () => {
+      const b = document.createElement('i'); b.style.height = '3px';
+      meterEl.appendChild(b); return b;
+    });
+
+    let freq = 99.7, current = TOPICS[2];
+    const clamp = v => Math.max(FMIN, Math.min(FMAX, v));
+    function nearest() {
+      let best = TOPICS[0], d = 1e9;
+      for (const t of TOPICS) { const dd = Math.abs(t.freq - freq); if (dd < d) { d = dd; best = t; } }
+      return { t: best, d };
+    }
+
+    function render() {
+      freq = clamp(freq);
+      strip.style.transform = `translateX(${-x(freq)}px)`;
+      const { t, d } = nearest();
+      current = t;
+      freqEl.textContent = freq.toFixed(1);
+      const locked = d < LOCK;
+      const sig = Math.max(0, 1 - d / 2.2);
+
+      titleEl.textContent = t.name;
+      titleEl.style.setProperty('--scolor', locked ? t.color : 'rgba(242,239,230,0.5)');
+      descEl.textContent = t.desc;
+      descEl.style.opacity = locked ? 1 : 0.5;
+
+      stat.style.opacity = reduce ? 0 : (1 - sig) * 0.55;
+      document.documentElement.style.setProperty('--accent', locked ? t.color : 'var(--amber)');
+      dial.setAttribute('aria-valuenow', freq.toFixed(1));
+      dial.setAttribute('aria-valuetext', `${freq.toFixed(1)} megahertz, ${locked ? t.name : 'tuning'}`);
+
+      const lit = Math.round(sig * BARS);
+      bars.forEach((b, i) => {
+        const on = i < lit;
+        b.style.height = on ? (6 + i * 1.2) + 'px' : '3px';
+        b.style.background = on ? (locked ? t.color : 'var(--amber)') : 'var(--faint)';
+      });
+      markers.forEach((m, i) => m.classList.toggle('active', locked && TOPICS[i] === t));
+
+      tuneBtn.disabled = !locked;
+      tuneBtn.textContent = locked ? `Tune in: ${t.name} →` : 'Keep tuning…';
+    }
+
+    // smooth snap
+    let rafId;
+    function snapTo(target) {
+      cancelAnimationFrame(rafId);
+      const start = freq, t0 = performance.now(), dur = 420;
+      (function step(now) {
+        const k = Math.min(1, (now - t0) / dur);
+        const e = 1 - Math.pow(1 - k, 3);
+        freq = start + (target - start) * e;
+        render();
+        if (k < 1) rafId = requestAnimationFrame(step);
+      })(t0);
+    }
+    function hop(dir) {
+      const idx = TOPICS.indexOf(nearest().t);
+      const next = Math.max(0, Math.min(TOPICS.length - 1, idx + dir));
+      snapTo(TOPICS[next].freq);
+    }
+    function go() { location.href = current.href; }
+
+    // drag to tune
+    let dragging = false, lastX = 0;
+    dial.addEventListener('pointerdown', e => {
+      dragging = true; lastX = e.clientX; dial.classList.add('dragging');
+      dial.setPointerCapture(e.pointerId); cancelAnimationFrame(rafId);
+    });
+    dial.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      freq -= (e.clientX - lastX) / PXM; lastX = e.clientX; render();
+    });
+    function release() {
+      if (!dragging) return;
+      dragging = false; dial.classList.remove('dragging');
+      snapTo(nearest().t.freq);
+    }
+    dial.addEventListener('pointerup', release);
+    dial.addEventListener('pointercancel', release);
+
+    dial.addEventListener('wheel', e => { e.preventDefault(); hop(e.deltaY > 0 ? 1 : -1); }, { passive:false });
+    dial.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); hop(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); hop(-1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+    });
+    tuneBtn.addEventListener('click', go);
+    addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement !== dial) go(); });
+
+    render();
+  })();
+  </script>
+</body>
+</html>

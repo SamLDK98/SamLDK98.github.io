@@ -1,0 +1,2415 @@
+/* ─── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --ink:        #1a1a18;
+  --ink-light:  #4a4a45;
+  --rule:       #1a1a18;
+  --bg:         #f9f6f0;
+  --accent:     #c8102e;
+  --col-width:  680px;
+  --font-body:  'EB Garamond', Georgia, serif;
+  --font-head:  'Libre Baskerville', Georgia, serif;
+}
+
+html {
+  font-size: 20px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.75;
+}
+
+.landing-page {
+  min-height: 100vh;
+  background: #f5f5f4;
+  overflow-x: hidden;
+}
+
+.linear-algebra-page {
+  min-height: 100vh;
+  background: #f5f5f4;
+}
+
+.article-index-hero {
+  max-width: none;
+  margin: 0;
+  padding: 1.35rem 1.4rem 0.9rem;
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) minmax(0, auto);
+  gap: 1.2rem;
+  align-items: end;
+  text-align: left;
+}
+
+.article-index-rule {
+  height: clamp(0.85rem, 1.7vw, 1.55rem);
+  margin-bottom: clamp(0.65rem, 1.45vw, 1rem);
+  background: #292621;
+}
+
+.article-index-hero h1 {
+  color: #292621;
+  font-family: var(--font-head);
+  font-size: clamp(2.1rem, 5.2vw, 4.6rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: right;
+}
+
+.article-index-hero-left {
+  grid-template-columns: auto minmax(80px, 1fr);
+}
+
+.article-index-hero-left h1 {
+  text-align: left;
+}
+
+.section-index-page .article-index-hero h1 {
+  font-size: clamp(1.75rem, 3.4vw, 3.1rem);
+}
+
+.article-index-main {
+  max-width: none;
+  margin: 0;
+  padding: 0.45rem 1.4rem 2rem;
+}
+
+.article-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.article-card {
+  position: relative;
+  min-height: clamp(15rem, 28vw, 20rem);
+  padding: 1.55rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e0e0dd;
+  border-radius: 10px;
+  background: #f7f7f6;
+  color: #292621;
+  text-decoration: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.48);
+  transition: border-color 150ms ease, background-color 150ms ease, transform 150ms ease;
+}
+
+.article-card:hover,
+.article-card:focus-visible {
+  border-color: #292621;
+  background: #ffffff;
+  transform: translateY(-3px);
+}
+
+.article-card-featured {
+  grid-column: span 2;
+}
+
+.chapter-card-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.chapter-card {
+  min-height: clamp(13rem, 22vw, 17rem);
+}
+
+.chapter-card-corner-image {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  width: min(58%, 13rem);
+  max-height: 72%;
+  object-fit: contain;
+  object-position: left bottom;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.active-inference-chapter-1-card .chapter-card-corner-image {
+  width: min(42%, 8.5rem);
+  max-height: 58%;
+}
+
+.active-inference-chapter-1-card .article-card-title,
+.active-inference-chapter-1-card .article-card-footer,
+.active-inference-chapter-2-card .article-card-title,
+.active-inference-chapter-2-card .article-card-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.active-inference-chapter-1-card .article-card-footer,
+.active-inference-chapter-2-card .article-card-footer {
+  margin-left: auto;
+}
+
+.article-kicker,
+.article-tags,
+.article-card-footer {
+  display: block;
+  color: #66645f;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.article-tags {
+  margin-bottom: 0.9rem;
+}
+
+.article-card-title {
+  display: block;
+  max-width: 15.5em;
+  color: #292621;
+  font-family: var(--font-body);
+  font-size: clamp(1.6rem, 2.7vw, 2.35rem);
+  line-height: 1.08;
+}
+
+.article-card-concepts {
+  display: block;
+  max-width: 42rem;
+  margin-top: 1rem;
+  color: #77746c;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.article-card-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.article-card-footer strong {
+  color: #292621;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.trigonometry-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(33, 28, 24, 0.96) 0%, rgba(22, 19, 17, 1) 46%, rgba(18, 16, 14, 1) 100%);
+  color: #efe7d8;
+}
+
+.trigonometry-page .trig-index-hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(2.6rem, 6vw, 4.8rem) 1.4rem 1.1rem;
+  display: block;
+  text-align: center;
+}
+
+.trigonometry-page .trig-index-kicker {
+  margin-bottom: 0.55rem;
+  color: #b9a989;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.trigonometry-page .article-index-hero h1 {
+  color: #f3eadb;
+  font-family: "Fraunces", var(--font-head);
+  font-size: clamp(2.7rem, 8vw, 6.2rem);
+  font-weight: 500;
+  line-height: 0.96;
+  text-align: center;
+}
+
+.trigonometry-page .trig-index-intro {
+  max-width: 34rem;
+  margin: 0.95rem auto 0;
+  color: #bfb29a;
+  font-size: clamp(1.05rem, 1.9vw, 1.28rem);
+  line-height: 1.45;
+}
+
+.trigonometry-page .article-index-rule {
+  width: min(100%, 44rem);
+  height: 1px;
+  margin: 1.55rem auto 0;
+  background: linear-gradient(90deg, transparent, rgba(232, 161, 59, 0.74), rgba(109, 211, 196, 0.62), transparent);
+}
+
+.trigonometry-page .article-index-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.55rem 1.4rem 5rem;
+}
+
+.trigonometry-page .trig-chapter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.trigonometry-page .trig-chapter-card {
+  min-height: 13.5rem;
+  padding: 1.15rem 1.2rem 1.05rem;
+  border: 1px solid rgba(211, 190, 157, 0.22);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(34, 29, 25, 0.95), rgba(25, 22, 19, 0.98));
+  color: #efe7d8;
+  box-shadow: inset 0 1px 0 rgba(255, 244, 220, 0.06), 0 18px 50px rgba(0, 0, 0, 0.18);
+}
+
+.trigonometry-page .trig-chapter-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #e8a13b, #6dd3c4);
+  opacity: 0.82;
+}
+
+.trigonometry-page .trig-chapter-card:nth-child(2)::before {
+  background: linear-gradient(90deg, #6dd3c4, #ef7398);
+}
+
+.trigonometry-page .trig-chapter-card:nth-child(3)::before {
+  background: linear-gradient(90deg, #ef7398, #f1c66e);
+}
+
+.trigonometry-page .trig-chapter-card:nth-child(4)::before {
+  background: linear-gradient(90deg, #f1c66e, #8bc6ff);
+}
+
+.trigonometry-page .trig-chapter-card-archive {
+  min-height: 11.5rem;
+}
+
+.trigonometry-page .trig-chapter-card:hover,
+.trigonometry-page .trig-chapter-card:focus-visible {
+  border-color: rgba(232, 202, 151, 0.62);
+  background:
+    linear-gradient(180deg, rgba(42, 36, 31, 0.98), rgba(29, 25, 22, 1));
+  transform: translateY(-3px);
+}
+
+.trigonometry-page .trig-card-number {
+  display: block;
+  margin-bottom: 0.78rem;
+  color: #a89980;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.trigonometry-page .article-card-title {
+  max-width: 12.5em;
+  color: #f2e8d8;
+  font-family: "Fraunces", var(--font-body);
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.03;
+}
+
+.trigonometry-page .trig-card-summary {
+  display: block;
+  max-width: 26rem;
+  margin-top: 0.82rem;
+  color: #b7aa93;
+  font-size: 0.94rem;
+  line-height: 1.38;
+}
+
+.trigonometry-page .article-card-footer {
+  color: #b9a989;
+  font-family: "JetBrains Mono", Consolas, monospace;
+}
+
+.trigonometry-page .article-card-footer strong {
+  color: #e8c986;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.landing-box,
+.corner-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 9rem;
+  padding: 1.25rem;
+  border: 2px solid #2a1710;
+  background: #a97854;
+  color: #1f120c;
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+}
+
+.landing-box {
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.landing-box:hover,
+.landing-box:focus-visible {
+  background: #bd8961;
+  transform: translateY(-2px);
+}
+
+.linear-algebra-main {
+  min-height: 100vh;
+  max-width: none;
+  margin: 0;
+  padding: 1rem;
+}
+
+.corner-box {
+  width: 9rem;
+  min-height: 5rem;
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+header {
+  max-width: var(--col-width);
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.header-rule {
+  height: 3px;
+  background: var(--rule);
+  margin-bottom: 0;
+}
+
+.top-rule {
+  margin-bottom: 1.5rem;
+}
+
+.bottom-rule {
+  margin-top: 1.5rem;
+}
+
+.header-inner {
+  padding: 0 0.5rem;
+}
+
+.publication-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 1.2rem;
+}
+
+.chapter-kicker {
+  margin-bottom: 0.8rem;
+  color: var(--ink-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.essay-title {
+  font-family: var(--font-head);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.essay-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+  margin-bottom: 1.4rem;
+  text-align: center;
+}
+
+.byline-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.byline-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-light);
+  opacity: 0.4;
+  max-width: 80px;
+}
+
+.byline {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  white-space: nowrap;
+}
+
+/* ─── Main / Article ────────────────────────────────────────── */
+main {
+  max-width: var(--col-width);
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+article {
+  padding-top: 2.5rem;
+}
+
+body.chapter-page header {
+  padding-bottom: 1.4rem;
+}
+
+body.chapter-page article {
+  padding-top: 1.35rem;
+}
+
+/* ─── Part Label ────────────────────────────────────────────── */
+.essay-part {
+  margin-bottom: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+.part-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+/* ─── Sections ──────────────────────────────────────────────── */
+.essay-section {
+  margin-bottom: 2.8rem;
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(26,26,24,0.15);
+}
+
+.subsection-title {
+  font-family: var(--font-head);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 2.2rem 0 0.75rem;
+}
+
+/* ─── Body Text ─────────────────────────────────────────────── */
+p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--ink);
+  margin-bottom: 1.2em;
+  text-align: justify;
+  hyphens: none;
+  -webkit-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+ul {
+  margin: 0 0 1.2em 1.2rem;
+}
+
+li {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--ink);
+  padding-left: 0.25rem;
+  hyphens: none;
+  -webkit-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.table-wrap {
+  margin: 1.4rem 0 1.8rem;
+  overflow-x: auto;
+}
+
+.macrostate-table th,
+.macrostate-table td {
+  white-space: nowrap;
+}
+
+.macrostate-table {
+  width: auto;
+  min-width: min(100%, 31rem);
+  table-layout: auto;
+}
+
+.macrostate-table th,
+.macrostate-table td {
+  text-align: center;
+}
+
+.macrostate-table th:nth-child(3),
+.macrostate-table td:nth-child(3) {
+  width: 9rem;
+}
+
+.macrostate-table th:nth-child(4),
+.macrostate-table td:nth-child(4) {
+  width: 6.5rem;
+}
+
+.macrostate-table .compact-col {
+  width: 5.4rem;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+th,
+td {
+  border-bottom: 1px solid rgba(26,26,24,0.16);
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  color: var(--ink);
+  background: rgba(26,26,24,0.035);
+}
+
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.math {
+  white-space: nowrap;
+}
+
+.display-equation,
+.equation-stack p {
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.equation-stack {
+  margin: 1.4rem 0 1.8rem;
+}
+
+.equation-stack p {
+  margin-bottom: 0.65rem;
+}
+
+.system-card {
+  margin: 1.6rem 0 2rem;
+  padding: 1rem 1.1rem 1.05rem;
+  border: 1px solid rgba(26,26,24,0.18);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.34);
+}
+
+.system-card-label {
+  margin-bottom: 0.75rem;
+  color: var(--ink-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.system-card .equation-stack {
+  margin: 0;
+}
+
+.system-card .system-equations {
+  margin: 0;
+  overflow-x: auto;
+  font-size: 1.18rem;
+}
+
+.side-note-box {
+  margin: 1.7rem 0 2rem;
+  padding: 1rem 1.1rem 1.05rem;
+  border: 1px solid rgba(26,26,24,0.2);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.38);
+}
+
+.side-note-box h4 {
+  margin: 0 0 0.65rem;
+  color: var(--ink);
+  font-family: var(--font-head);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.side-note-box ul {
+  margin-bottom: 0;
+}
+
+.system-card .equation-stack p {
+  margin-bottom: 0.35rem;
+  font-size: 1.22rem;
+}
+
+.system-card .equation-stack p:last-child {
+  margin-bottom: 0;
+}
+
+/* Drop cap on first paragraph of first section */
+body:not(.chapter-page) .essay-section:first-of-type p:first-child::first-letter {
+  font-family: var(--font-head);
+  font-size: 4.2rem;
+  font-weight: 700;
+  float: left;
+  line-height: 0.82;
+  margin-right: 0.08em;
+  margin-top: 0.06em;
+  color: var(--ink);
+}
+
+/* ─── Footer ────────────────────────────────────────────────── */
+.essay-figure {
+  margin: 2.4rem 0;
+}
+
+.essay-figure:first-child {
+  margin-top: 0;
+}
+
+.essay-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.newton-figure {
+  max-width: 88%;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.state-diagram {
+  font-family: var(--font-body);
+  padding: 1.25rem;
+  border: 1px solid rgba(26,26,24,0.22);
+  background:
+    linear-gradient(rgba(255,255,255,0.54), rgba(255,255,255,0.54)),
+    var(--bg);
+}
+
+.state-diagram-main {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.78fr) minmax(0, 1.42fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.diagram-title {
+  width: fit-content;
+  margin: 0 auto 0.9rem;
+  padding: 0.22rem 1rem 0.28rem;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: rgba(249,246,240,0.9);
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.diagram-title-blue {
+  border-color: rgba(31,68,115,0.7);
+  background: rgba(218,231,245,0.82);
+}
+
+.microstate-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.microstate-group {
+  position: relative;
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+}
+
+.microstate-group::after {
+  content: "}";
+  position: absolute;
+  top: 50%;
+  right: -0.68rem;
+  transform: translateY(-50%);
+  font-size: 5.4rem;
+  line-height: 1;
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+
+.mini-grid,
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  background:
+    linear-gradient(to right, rgba(26,26,24,0.72) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(26,26,24,0.72) 1px, transparent 1px);
+  background-size: 25% 25%;
+  border-right: 1px solid rgba(26,26,24,0.72);
+  border-bottom: 1px solid rgba(26,26,24,0.72);
+}
+
+.mini-grid {
+  width: min(100%, 8.9rem);
+  aspect-ratio: 1;
+  padding: 0.22rem;
+}
+
+.dot {
+  grid-row: var(--row);
+  grid-column: var(--col);
+  align-self: center;
+  justify-self: center;
+  width: 0.64rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: #ff3b12;
+  box-shadow: 0 0.03rem 0.05rem rgba(26,26,24,0.25);
+}
+
+.macrostate-panel {
+  min-width: 0;
+}
+
+.macro-card {
+  display: grid;
+  grid-template-columns: minmax(4.4rem, 0.36fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(26,26,24,0.16);
+  border-radius: 6px;
+}
+
+.macro-card-blue {
+  background: rgba(232,240,246,0.78);
+}
+
+.macro-card-gold {
+  background: rgba(255,245,224,0.82);
+}
+
+.heat-bar {
+  width: 100%;
+  max-width: 5.1rem;
+  min-height: 5.6rem;
+  justify-self: center;
+  border: 2px solid var(--ink);
+}
+
+.heat-bar-split {
+  display: grid;
+  grid-template-columns: 7fr 1fr;
+}
+
+.heat-bar-split span:first-child {
+  background: #f24a24;
+}
+
+.heat-bar-split span:last-child {
+  background: #226cab;
+  border-left: 1px solid var(--ink);
+}
+
+.heat-bar-uniform {
+  background: #f79a23;
+}
+
+.macro-copy p,
+.diagram-definitions p,
+.diagram-legend p {
+  margin-bottom: 0;
+  text-align: left;
+  hyphens: none;
+}
+
+.macro-copy {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.macro-copy p {
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.diagram-rule {
+  margin: 1.1rem 0 0.85rem;
+  border: 0;
+  border-top: 2px solid rgba(26,26,24,0.82);
+}
+
+.diagram-definitions {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.diagram-definitions p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.diagram-legend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid var(--ink);
+  border-radius: 5px;
+  background: rgba(255,255,255,0.38);
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: center;
+  min-width: 0;
+  padding: 0.65rem;
+}
+
+.legend-item + .legend-item {
+  border-left: 1px solid rgba(26,26,24,0.55);
+}
+
+.legend-grid {
+  width: 2.2rem;
+  aspect-ratio: 1;
+}
+
+.legend-grid-large {
+  width: 2.9rem;
+}
+
+.legend-dots {
+  display: grid;
+  grid-template-columns: repeat(4, 0.52rem);
+  gap: 0.32rem;
+}
+
+.legend-dots span,
+.legend-single-dot {
+  display: block;
+  width: 0.52rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: #ff3b12;
+}
+
+.legend-single-dot {
+  width: 0.66rem;
+}
+
+.diagram-legend p {
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.essay-widget {
+  display: block;
+  width: 100%;
+  height: 520px;
+  margin: 2.4rem 0;
+  border: 0;
+}
+
+.essay-widget-balls {
+  height: 430px;
+}
+
+.essay-widget-chart {
+  height: 500px;
+}
+
+.essay-widget-microstates {
+  height: 1040px;
+  margin-top: 1.2rem;
+  margin-bottom: 1.1rem;
+}
+
+.essay-widget-available-moves {
+  height: 560px;
+}
+
+.essay-widget-tight-after {
+  margin-bottom: 1rem;
+}
+
+.essay-widget-tall {
+  height: 560px;
+}
+
+.essay-widget-collapse-line {
+  height: 760px;
+}
+
+.essay-widget-constant-line {
+  height: 760px;
+}
+
+.essay-widget-input-output {
+  height: 900px;
+}
+
+.essay-widget-coordinate-sum {
+  height: 760px;
+}
+
+.essay-widget-output-spacing {
+  height: 620px;
+}
+
+.essay-widget-collapse-change {
+  height: 760px;
+}
+
+.essay-widget-balance-number-line {
+  height: 660px;
+}
+
+.essay-widget-coordinate-collapse {
+  height: 680px;
+}
+
+.essay-widget-constant-sum-line {
+  height: 680px;
+}
+
+.essay-widget-direction-sum {
+  height: 660px;
+}
+
+.essay-widget-line-collapse {
+  height: 660px;
+}
+
+.essay-widget-uniform-scaling-line {
+  height: 760px;
+}
+
+.essay-widget-coefficient-balance {
+  height: 820px;
+}
+
+/* Intro to Linear Algebra: dark, wide layout */
+.intro-linear-algebra-page {
+  --intro-bg: #161311;
+  --intro-panel: #1e1a17;
+  --intro-card: #221d1a;
+  --intro-rule: rgba(214, 196, 168, 0.14);
+  --intro-rule-strong: rgba(214, 196, 168, 0.28);
+  --intro-text: #ece2d1;
+  --intro-dim: #a89c87;
+  --intro-faint: #6f6557;
+  --intro-accent: #d4b888;
+  --intro-ihat: #e8a13b;
+  --intro-jhat: #6dd3c4;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at top left, rgba(212, 184, 136, 0.055), transparent 52%),
+    radial-gradient(ellipse at bottom right, rgba(109, 211, 196, 0.04), transparent 50%),
+    var(--intro-bg);
+  color: var(--intro-text);
+}
+
+.intro-linear-algebra-page header {
+  max-width: none;
+  margin: 0;
+  padding: 1.6rem clamp(1rem, 3vw, 2.6rem) 1.1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--intro-rule);
+}
+
+.intro-linear-algebra-page .header-rule {
+  display: none;
+}
+
+.intro-linear-algebra-page .header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.intro-linear-algebra-page .chapter-kicker {
+  margin-bottom: 0.35rem;
+  color: var(--intro-faint);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+}
+
+.intro-linear-algebra-page .essay-title {
+  margin: 0;
+  color: var(--intro-text);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(2.1rem, 5vw, 4.6rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.intro-linear-algebra-page main {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.intro-linear-algebra-page article {
+  max-width: none;
+  padding: 0;
+}
+
+.intro-linear-algebra-page .essay-section {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 2.4rem) clamp(1rem, 3vw, 2.6rem) 4rem;
+}
+
+.intro-linear-algebra-page .essay-section > p,
+.intro-linear-algebra-page .essay-section > ul,
+.intro-linear-algebra-page .essay-section > ol,
+.intro-linear-algebra-page .essay-section > blockquote {
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.intro-linear-algebra-page .section-title {
+  max-width: 860px;
+  margin: 0 auto 1.15rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--intro-rule);
+  color: var(--intro-accent);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.45rem, 2.4vw, 2.1rem);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.intro-linear-algebra-page .subsection-title {
+  max-width: 860px;
+  margin: 2.6rem auto 0.9rem;
+  color: var(--intro-accent);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+  font-weight: 400;
+}
+
+.intro-linear-algebra-page .essay-section > .subsection-title:first-child {
+  margin-top: 0.4rem;
+}
+
+.intro-linear-algebra-page .subsection-subtitle {
+  max-width: 860px;
+  margin: 1.8rem auto 0.8rem;
+  color: var(--intro-dim);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+  font-weight: 400;
+}
+
+.intro-linear-algebra-page .notation-details {
+  max-width: 860px;
+  margin: 1.4rem auto 2.2rem;
+  padding: 0.95rem 1.1rem 0.4rem;
+  border: 1px solid var(--intro-rule);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.intro-linear-algebra-page .notation-details summary {
+  cursor: pointer;
+  color: var(--intro-accent);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  list-style-position: outside;
+}
+
+.intro-linear-algebra-page .notation-details[open] summary {
+  margin-bottom: 1rem;
+}
+
+.intro-linear-algebra-page .inline-definition {
+  display: inline;
+  margin: 0;
+  padding: 0 0.12rem 0.08rem;
+  border: 0;
+  border-bottom: 1px solid var(--intro-accent);
+  background: transparent;
+  color: var(--intro-accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.intro-linear-algebra-page .inline-definition:hover,
+.intro-linear-algebra-page .inline-definition[aria-expanded="true"] {
+  color: var(--intro-text);
+  border-bottom-color: var(--intro-text);
+}
+
+.intro-linear-algebra-page .inline-definition-text {
+  max-width: 860px;
+  margin: -0.2rem auto 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--intro-rule);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--intro-dim);
+  font-style: italic;
+}
+
+.intro-linear-algebra-page p,
+.intro-linear-algebra-page li {
+  color: var(--intro-text);
+}
+
+.intro-linear-algebra-page p {
+  font-size: clamp(1.03rem, 1.25vw, 1.18rem);
+  line-height: 1.72;
+  text-align: left;
+}
+
+.intro-linear-algebra-page .display-equation {
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1.1rem;
+  margin-bottom: 1.6rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--intro-rule);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--intro-accent);
+  font-size: clamp(1.05rem, 1.5vw, 1.28rem);
+  text-align: center;
+}
+
+.intro-linear-algebra-page .display-equation.equation-left,
+.intro-linear-algebra-page .display-equation.equation-left mjx-container[display="true"] {
+  text-align: left !important;
+}
+
+.trigonometry-unit-circle-page .unit-circle-opening-list {
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2.4rem;
+}
+
+.trigonometry-unit-circle-page .angle-growth-figure {
+  max-width: 920px;
+}
+
+.trigonometry-unit-circle-page .angle-growth-figure svg {
+  min-height: 320px;
+}
+
+.angle-growth-axis {
+  stroke: rgba(236, 226, 209, 0.58);
+  stroke-width: 1.6;
+}
+
+.angle-growth-grid {
+  stroke: rgba(236, 226, 209, 0.1);
+  stroke-width: 1;
+}
+
+.angle-growth-line {
+  fill: none;
+  stroke: #6dd3c4;
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(109, 211, 196, 0.28));
+}
+
+.angle-sawtooth-line {
+  fill: none;
+  stroke: #e8a13b;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(232, 161, 59, 0.28));
+}
+
+.angle-growth-title {
+  fill: var(--intro-text);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 20px;
+}
+
+.angle-growth-label {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
+.trigonometry-unit-circle-page .orientation-measure-figure {
+  max-width: 920px;
+}
+
+.trigonometry-unit-circle-page .orientation-measure-figure svg {
+  min-height: 300px;
+}
+
+.orientation-measure-title {
+  fill: var(--intro-text);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 22px;
+}
+
+.orientation-measure-label,
+.orientation-measure-value {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
+.orientation-measure-value {
+  fill: var(--intro-accent);
+}
+
+.temperature-line {
+  stroke: rgba(236, 226, 209, 0.62);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.orientation-measure-circle {
+  fill: rgba(0, 0, 0, 0.08);
+  stroke: rgba(236, 226, 209, 0.58);
+  stroke-width: 2.4;
+}
+
+.orientation-loop {
+  fill: none;
+  stroke: #e8a13b;
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(232, 161, 59, 0.28));
+}
+
+.intro-linear-algebra-page blockquote {
+  margin-top: 1rem;
+  margin-bottom: 1.6rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 2px solid var(--intro-accent);
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--intro-text);
+}
+
+.intro-linear-algebra-page blockquote p {
+  margin-bottom: 0;
+  color: var(--intro-dim);
+  font-style: italic;
+}
+
+.intro-linear-algebra-page .concept-note {
+  max-width: 760px;
+  margin: 1.25rem auto 1.8rem;
+  padding: 1rem 1.15rem 1.05rem;
+  border: 1px solid var(--intro-rule);
+  border-top: 3px solid var(--intro-ihat);
+  border-left: 0;
+  border-radius: 4px;
+  background: rgba(232, 161, 59, 0.055);
+  box-shadow: inset 0 1px 0 rgba(236, 226, 209, 0.035);
+}
+
+.intro-linear-algebra-page .concept-note::before {
+  content: "Clarification";
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--intro-ihat);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.intro-linear-algebra-page .concept-note p {
+  color: var(--intro-text);
+  font-style: normal;
+}
+
+.intro-linear-algebra-page table {
+  width: min(100%, 760px);
+  margin: 1.4rem auto 2rem;
+  border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.14);
+  color: var(--intro-text);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.intro-linear-algebra-page th,
+.intro-linear-algebra-page td {
+  border-bottom: 1px solid var(--intro-rule);
+  padding: 0.42rem 0.5rem;
+  color: var(--intro-text);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.intro-linear-algebra-page th {
+  background: rgba(212, 184, 136, 0.1);
+  color: var(--intro-accent);
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+}
+
+.intro-linear-algebra-page .essay-widget {
+  width: min(100%, 1280px);
+  margin: 2.2rem auto 3rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.intro-linear-algebra-page .essay-section > p + .essay-widget {
+  margin-top: 1.7rem;
+}
+
+.intro-linear-algebra-page .intro-output-widget {
+  height: 400px;
+}
+
+.intro-linear-algebra-page .intro-basis-widget {
+  height: 850px;
+}
+
+.intro-linear-algebra-page .intro-weighted-widget {
+  height: 740px;
+}
+
+.intro-linear-algebra-page .intro-transform-widget {
+  height: 980px;
+}
+
+.intro-linear-algebra-page .intro-reversal-widget {
+  height: 980px;
+}
+
+.intro-linear-algebra-page .span-widget {
+  height: 940px;
+}
+
+.intro-linear-algebra-page .determinant-widget {
+  height: 720px;
+}
+
+.intro-linear-algebra-page .trig-ratios-widget {
+  height: 900px;
+}
+
+.intro-linear-algebra-page .finding-angles-widget {
+  width: min(100%, 860px);
+  height: 335px;
+}
+
+.intro-linear-algebra-page .fixed-triangle-widget {
+  width: min(100%, 860px);
+  height: 500px;
+}
+
+.intro-linear-algebra-page .sliding-third-side-widget {
+  width: min(100%, 860px);
+  height: 515px;
+}
+
+.intro-linear-algebra-page .proportional-triangle-widget {
+  width: min(100%, 860px);
+  height: 500px;
+}
+
+.intro-linear-algebra-page .right-angle-widget {
+  width: min(100%, 860px);
+  height: 330px;
+}
+
+.intro-linear-algebra-page .cowboy-orientation-widget {
+  width: min(100%, 980px);
+  height: 690px;
+}
+
+.intro-linear-algebra-page .constrained-movement-widget {
+  width: min(100%, 980px);
+  height: 700px;
+}
+
+.intro-linear-algebra-page .right-angle-ratios-widget {
+  height: 540px;
+}
+
+.intro-linear-algebra-page .trig-function-game-widget {
+  height: 1120px;
+}
+
+.intro-linear-algebra-page .sine-cosine-ratio-builder-widget {
+  width: min(100%, 1060px);
+  height: 760px;
+}
+
+.intro-linear-algebra-page .angle-interest-widget {
+  width: min(100%, 980px);
+  height: 680px;
+}
+
+.intro-linear-algebra-page .degree-circle-widget {
+  height: 720px;
+}
+
+.intro-linear-algebra-page .radian-wrap-widget {
+  height: 760px;
+}
+
+.intro-linear-algebra-page .pi-fraction-circle-widget {
+  height: 760px;
+}
+
+.intro-linear-algebra-page .angle-practice-widget {
+  height: 780px;
+}
+
+.intro-linear-algebra-page .unit-circle-distance-widget {
+  height: 720px;
+}
+
+.intro-linear-algebra-page .unit-circle-coordinate-widget {
+  height: 760px;
+}
+
+.intro-linear-algebra-page .unit-circle-conversion-game-widget {
+  width: min(100%, 860px);
+  height: 560px;
+}
+
+.intro-linear-algebra-page .unit-circle-point-practice-widget {
+  width: min(100%, 980px);
+  height: 780px;
+}
+
+.intro-linear-algebra-page .unit-circle-coordinate-wave-widget {
+  width: min(100%, 1180px);
+  height: 780px;
+}
+
+.intro-linear-algebra-page .unit-circle-sine-cosine-widget {
+  width: min(100%, 980px);
+  height: 720px;
+}
+
+.trig-figure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 980px;
+  margin: 1.4rem auto 2rem;
+}
+
+.trig-figure {
+  margin: 1.4rem auto 2rem;
+  max-width: 980px;
+  border: 1px solid var(--intro-rule);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+
+.trig-figure-grid .trig-figure {
+  margin: 0;
+}
+
+.trig-figure-bare {
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.trig-figure svg {
+  display: block;
+  width: 100%;
+  min-height: 260px;
+}
+
+.trig-figure figcaption {
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid var(--intro-rule);
+  color: var(--intro-dim);
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.direction-figure {
+  max-width: 900px;
+  border: 0;
+  background: transparent;
+}
+
+.direction-figure svg {
+  min-height: auto;
+}
+
+.compact-direction-figure {
+  max-width: 760px;
+}
+
+.direction-figure-label {
+  fill: var(--intro-accent);
+  font-family: var(--mono);
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.angle-arc-figure {
+  max-width: 620px;
+  margin-top: 0.85rem;
+  margin-bottom: 0.9rem;
+}
+
+.angle-column-figure {
+  max-width: 680px;
+}
+
+.unit-circle-triangle-figure {
+  max-width: 520px;
+  margin-top: 1rem;
+  margin-bottom: 1.15rem;
+}
+
+.section-divider {
+  width: min(100%, 860px);
+  height: 1px;
+  margin: 2.2rem auto;
+  border: 0;
+  background: var(--intro-rule);
+}
+
+.trig-figure-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1rem 1rem;
+}
+
+.trig-figure-actions button {
+  min-height: 2.35rem;
+  padding: 0 1rem;
+  border: 1px solid var(--intro-rule);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--intro-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.trig-figure-actions button:hover {
+  border-color: var(--intro-accent);
+  color: var(--intro-accent);
+}
+
+.trig-triangle-figure {
+  max-width: 760px;
+}
+
+.trig-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 6;
+}
+
+.trig-line-accent {
+  stroke: var(--intro-text);
+}
+
+.trig-line-muted {
+  stroke: rgba(168, 154, 132, 0.58);
+  stroke-dasharray: 9 10;
+}
+
+.trig-line-cyan {
+  stroke: var(--intro-jhat);
+}
+
+.trig-line-adjacent {
+  stroke: #78c884;
+}
+
+.trig-line-gold {
+  stroke: #e7c84f;
+}
+
+.trig-circle {
+  fill: none;
+  stroke: rgba(242, 176, 68, 0.72);
+  stroke-width: 4;
+}
+
+.trig-sector {
+  fill: rgba(100, 216, 207, 0.22);
+}
+
+.trig-angle-arc,
+.trig-right-angle {
+  fill: none;
+  stroke: var(--intro-accent);
+  stroke-linecap: round;
+  stroke-width: 4;
+}
+
+.trig-triangle-fill {
+  fill: rgba(109, 211, 196, 0.08);
+  stroke: none;
+}
+
+.trig-label {
+  fill: var(--intro-accent);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 30px;
+}
+
+.trig-small-label {
+  fill: var(--intro-dim);
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+}
+
+.trig-opposite-text {
+  color: var(--intro-jhat);
+  fill: var(--intro-jhat);
+}
+
+.trig-adjacent-text {
+  color: #78c884;
+  fill: #78c884;
+}
+
+.trig-hypotenuse-text {
+  color: #e7c84f;
+  fill: #e7c84f;
+}
+
+.trig-ratio-equations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem 1.4rem;
+  width: min(100%, 860px);
+}
+
+.trig-ratio-equations > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.indented-list {
+  padding-left: 2.75rem;
+}
+
+.trig-fraction {
+  display: inline-grid;
+  grid-template-rows: auto 1px auto;
+  min-width: 1.6rem;
+  align-items: center;
+  justify-items: center;
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.trig-bar {
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+}
+
+.intro-linear-algebra-page a {
+  color: var(--intro-accent);
+}
+
+.question-carousel {
+  margin: -0.7rem 0 2.4rem;
+}
+
+.question-carousel-track {
+  position: relative;
+  min-height: 20rem;
+  overflow: hidden;
+  perspective: 1200px;
+}
+
+.question-card {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateX(105%);
+  transition: opacity 180ms ease, transform 220ms ease;
+  pointer-events: none;
+}
+
+.question-card.is-active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.question-card.is-before {
+  transform: translateX(-105%);
+}
+
+.question-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 420ms ease;
+}
+
+.question-card.is-flipped .question-card-inner {
+  transform: rotateY(180deg);
+}
+
+.question-card-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1.05rem 1.1rem;
+  border: 1px solid rgba(26,26,24,0.22);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.38);
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.question-card-front {
+  align-items: center;
+  font-family: var(--font-head);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.question-card.is-flipped .question-card-front {
+  visibility: hidden;
+}
+
+.question-card-back {
+  overflow-y: auto;
+  transform: rotateY(180deg);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.52;
+  text-align: left;
+  visibility: hidden;
+}
+
+.question-card.is-flipped .question-card-back {
+  visibility: visible;
+}
+
+.question-card-back span {
+  display: block;
+}
+
+.question-card-face:focus-visible,
+.question-carousel-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.question-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.8rem;
+}
+
+.question-carousel-btn {
+  min-width: 5.2rem;
+  padding: 0.34rem 0.7rem 0.38rem;
+  border: 1px solid rgba(26,26,24,0.35);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.38);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.64rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.question-carousel-btn:hover {
+  border-color: var(--ink);
+  background: rgba(255,255,255,0.62);
+}
+
+.question-carousel-status {
+  color: var(--ink-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.64rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+}
+
+.line-constraint-widget {
+  height: 900px;
+}
+
+.equation-adder-widget {
+  height: 760px;
+}
+
+.scaled-equation-mixer-widget {
+  height: 650px;
+}
+
+.equation-multiple-sum-widget {
+  height: 660px;
+}
+
+.systems-dimension-widget {
+  height: 610px;
+}
+
+.systems-elimination-widget {
+  height: 1120px;
+}
+
+.chapter-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 4rem auto 0;
+  max-width: var(--col-width);
+}
+
+.chapter-nav-link {
+  display: flex;
+  min-height: 5.5rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.chapter-nav-link:last-child {
+  text-align: right;
+}
+
+.chapter-nav-link span {
+  color: var(--ink-light);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.chapter-nav-link strong {
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-weight: 600;
+}
+
+.chapter-nav-link:hover,
+.chapter-nav-link:focus-visible,
+.chapter-nav-link:active {
+  border-color: #e8a13b;
+  color: #e8a13b;
+}
+
+.chapter-nav-link:hover span,
+.chapter-nav-link:focus-visible span,
+.chapter-nav-link:active span {
+  color: #e8a13b;
+}
+
+footer {
+  max-width: var(--col-width);
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.footer-rule {
+  height: 3px;
+  background: var(--rule);
+  margin-bottom: 1rem;
+}
+
+.footer-text {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  text-align: center;
+}
+
+/* ─── Fade-in on load ───────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+header {
+  animation: fadeUp 0.7s ease both;
+}
+
+.essay-section {
+  opacity: 1;
+  animation: fadeUp 0.6s ease forwards;
+}
+
+.js .essay-section {
+  opacity: 0;
+  animation-play-state: paused;
+}
+
+.js .essay-section.is-visible {
+  animation-play-state: running;
+}
+
+.js body.chapter-page .essay-section {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  html { font-size: 18px; }
+
+  .article-index-hero {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+    padding: 1rem 0.9rem 0.2rem;
+  }
+
+  .article-index-rule {
+    height: 0.7rem;
+    margin-bottom: 0;
+  }
+
+  .article-index-hero h1 {
+    font-size: clamp(2.1rem, 10vw, 3.7rem);
+    text-align: left;
+  }
+
+  .article-index-hero-left {
+    grid-template-columns: 1fr;
+  }
+
+  .article-index-main {
+    padding: 0.75rem 0.9rem 2rem;
+  }
+
+  .article-card-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .trigonometry-page .trig-index-hero {
+    padding-top: 2.35rem;
+    text-align: left;
+  }
+
+  .trigonometry-page .article-index-hero h1,
+  .trigonometry-page .trig-index-intro {
+    text-align: left;
+  }
+
+  .trigonometry-page .trig-index-intro {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .trigonometry-page .article-index-rule {
+    margin-left: 0;
+  }
+
+  .trigonometry-page .trig-chapter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .article-card,
+  .article-card-featured {
+    grid-column: auto;
+    min-height: 14rem;
+    padding: 1.25rem;
+  }
+
+  .article-card-title {
+    font-size: clamp(1.75rem, 9vw, 2.45rem);
+  }
+
+  .trigonometry-page .trig-chapter-card {
+    min-height: 11rem;
+  }
+
+  .trig-figure-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .essay-title { font-size: 1.85rem; }
+
+  p { text-align: left; hyphens: none; }
+
+  table { font-size: 0.78rem; }
+
+  th,
+  td { padding: 0.4rem 0.45rem; }
+
+  .state-diagram {
+    padding: 0.8rem;
+  }
+
+  .state-diagram-main {
+    grid-template-columns: 1fr;
+  }
+
+  .microstate-stack {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+
+  .microstate-group::after {
+    display: none;
+  }
+
+  .mini-grid {
+    max-width: 7.2rem;
+  }
+
+  .macro-card {
+    grid-template-columns: minmax(3.7rem, 0.3fr) minmax(0, 1fr);
+    padding: 0.75rem;
+  }
+
+  .diagram-legend {
+    grid-template-columns: 1fr;
+  }
+
+  .legend-item + .legend-item {
+    border-left: 0;
+    border-top: 1px solid rgba(26,26,24,0.55);
+  }
+
+  .essay-widget,
+  .essay-widget-chart,
+  .essay-widget-tall { height: 620px; }
+
+  .essay-widget-collapse-line { height: 820px; }
+
+  .essay-widget-constant-line { height: 820px; }
+
+  .essay-widget-input-output { height: 1120px; }
+
+  .essay-widget-coordinate-sum { height: 900px; }
+
+  .essay-widget-output-spacing { height: 760px; }
+
+  .essay-widget-collapse-change { height: 940px; }
+
+  .essay-widget-balance-number-line { height: 820px; }
+
+  .essay-widget-coordinate-collapse { height: 820px; }
+
+  .essay-widget-constant-sum-line { height: 840px; }
+
+  .essay-widget-direction-sum { height: 820px; }
+
+  .essay-widget-line-collapse { height: 820px; }
+
+  .essay-widget-uniform-scaling-line { height: 900px; }
+
+  .essay-widget-coefficient-balance { height: 960px; }
+
+  .question-carousel-track { min-height: 26rem; }
+
+  .question-card-front {
+    font-size: 0.88rem;
+  }
+
+  .question-card-face {
+    padding: 0.9rem;
+  }
+
+  .line-constraint-widget { height: 1120px; }
+
+  .equation-adder-widget { height: 1380px; }
+
+  .scaled-equation-mixer-widget { height: 1240px; }
+
+  .equation-multiple-sum-widget { height: 1260px; }
+
+  .systems-dimension-widget { height: 1180px; }
+
+  .systems-elimination-widget { height: 1520px; }
+
+  .essay-widget-balls { height: 500px; }
+
+  .essay-widget-microstates { height: 1420px; }
+
+  .essay-widget-available-moves { height: 640px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TRIGONOMETRY INDEX — LANDING ENHANCEMENTS
+   Scoped to .trigonometry-page + new classes; additive only.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* —— Ambient background: faint spotlight + graph-paper dots —— */
+.trigonometry-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 50% 10%, rgba(212, 184, 136, 0.07), transparent 45%),
+    radial-gradient(rgba(236, 226, 209, 0.022) 1px, transparent 1.4px);
+  background-size: auto, 30px 30px;
+  background-position: center top, center;
+}
+.trigonometry-page .trig-index-hero,
+.trigonometry-page .article-index-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* —— Hero motif: the unit circle generating its sine wave —— */
+.trig-hero-motif {
+  width: min(100%, 840px);
+  margin: 1.85rem auto 0.1rem;
+}
+.trig-hero-motif svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.motif-axis      { stroke: rgba(236, 226, 209, 0.13); stroke-width: 1; }
+.motif-circle    { fill: none; stroke: rgba(212, 184, 136, 0.42); stroke-width: 1.5; }
+.motif-arc       { fill: none; stroke: rgba(239, 115, 152, 0.55); stroke-width: 1.6; stroke-linecap: round; }
+.motif-radius    { stroke: rgba(232, 161, 59, 0.85); stroke-width: 1.8; stroke-linecap: round; }
+.motif-connector { stroke: rgba(236, 226, 209, 0.30); stroke-width: 1; stroke-dasharray: 2.5 5; stroke-linecap: round; }
+.motif-wave {
+  fill: none;
+  stroke: rgba(109, 211, 196, 0.60);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.motif-dot     { fill: #ef7398; filter: drop-shadow(0 0 7px rgba(239, 115, 152, 0.55)); }
+.motif-dot-sin { fill: #6dd3c4; filter: drop-shadow(0 0 7px rgba(109, 211, 196, 0.60)); }
+
+/* —— Card head: chapter number + topic glyph on one line —— */
+.trigonometry-page .trig-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.7rem;
+}
+.trigonometry-page .trig-card-head .trig-card-number { margin-bottom: 0; }
+
+/* —— Topic glyphs (thin line art that previews each chapter) —— */
+.trig-card-glyph { display: inline-flex; }
+.trig-card-glyph svg { width: 2rem; height: 2rem; display: block; }
+.trig-card-glyph .g-stroke {
+  fill: none;
+  stroke: rgba(212, 184, 136, 0.48);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s ease;
+}
+.trig-card-glyph .g-dot {
+  fill: rgba(212, 184, 136, 0.68);
+  transition: fill 0.3s ease;
+}
+.trigonometry-page .trig-chapter-card:hover .trig-card-glyph .g-stroke,
+.trigonometry-page .trig-chapter-card:focus-visible .trig-card-glyph .g-stroke { stroke: #e8c986; }
+.trigonometry-page .trig-chapter-card:hover .trig-card-glyph .g-dot,
+.trigonometry-page .trig-chapter-card:focus-visible .trig-card-glyph .g-dot { fill: #ef7398; }
+
+/* Ch4 wave glyph: redraws itself on hover */
+.g-wave { stroke-dasharray: 72; stroke-dashoffset: 0; }
+
+/* Ch3 unit-circle glyph: the radius orbits on hover */
+.trig-card-glyph-orbit .g-orbit { transform-origin: 20px 20px; }
+
+/* —— Footer arrow slides on hover —— */
+.trigonometry-page .trig-chapter-card .article-card-footer {
+  gap: 0.5rem;
+  align-items: center;
+}
+.trigonometry-page .trig-arrow {
+  display: inline-block;
+  margin-left: 0.05rem;
+  color: #e8c986;
+  transition: transform 0.28s ease;
+}
+.trigonometry-page .trig-chapter-card:hover .trig-arrow,
+.trigonometry-page .trig-chapter-card:focus-visible .trig-arrow { transform: translateX(5px); }
+
+/* —— Richer card hover: deeper lift, glow, growing accent bar —— */
+.trigonometry-page .trig-chapter-card {
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    transform 0.24s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.24s ease;
+}
+.trigonometry-page .trig-chapter-card::before {
+  transition: height 0.25s ease, opacity 0.25s ease;
+}
+.trigonometry-page .trig-chapter-card:hover,
+.trigonometry-page .trig-chapter-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: inset 0 1px 0 rgba(255, 244, 220, 0.08), 0 24px 60px rgba(0, 0, 0, 0.32);
+}
+.trigonometry-page .trig-chapter-card:hover::before,
+.trigonometry-page .trig-chapter-card:focus-visible::before {
+  height: 4px;
+  opacity: 1;
+}
+.trigonometry-page .trig-chapter-card:focus-visible {
+  outline: 1px solid rgba(232, 202, 151, 0.7);
+  outline-offset: 3px;
+}
+
+/* —— Motion: staggered entrance + glyph hover animations —— */
+@media (prefers-reduced-motion: no-preference) {
+  .trigonometry-page .trig-index-kicker,
+  .trigonometry-page .trig-index-title,
+  .trigonometry-page .trig-index-intro,
+  .trigonometry-page .trig-hero-motif {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: trig-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+  .trigonometry-page .trig-index-title { animation-delay: 0.06s; }
+  .trigonometry-page .trig-index-intro { animation-delay: 0.14s; }
+  .trigonometry-page .trig-hero-motif  { animation-delay: 0.24s; }
+
+  .trigonometry-page .trig-chapter-card {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: trig-rise 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    animation-delay: calc(0.32s + var(--card-delay, 0ms));
+  }
+
+  @keyframes trig-rise { to { opacity: 1; transform: none; } }
+
+  .trigonometry-page .trig-chapter-card:hover .trig-card-glyph-orbit .g-orbit,
+  .trigonometry-page .trig-chapter-card:focus-visible .trig-card-glyph-orbit .g-orbit {
+    animation: glyph-orbit 2.6s linear infinite;
+  }
+  @keyframes glyph-orbit { to { transform: rotate(360deg); } }
+
+  .trigonometry-page .trig-chapter-card:hover .g-wave,
+  .trigonometry-page .trig-chapter-card:focus-visible .g-wave {
+    animation: wave-draw 1.1s ease forwards;
+  }
+  @keyframes wave-draw {
+    from { stroke-dashoffset: 72; }
+    to   { stroke-dashoffset: 0; }
+  }
+}
+
+/* —— Responsive —— */
+@media (max-width: 720px) {
+  .trig-hero-motif { width: 100%; margin-top: 1.4rem; }
+  .trigonometry-page .trig-card-glyph svg { width: 1.75rem; height: 1.75rem; }
+}

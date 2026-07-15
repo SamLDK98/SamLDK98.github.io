@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Expositions — The Descent | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --mono: "JetBrains Mono", monospace;
+      --sans: "Space Grotesk", system-ui, sans-serif;
+      --serif: "Fraunces", Georgia, serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); color: #f3efe6; background: #04060a; }
+
+    /* ---- fixed depth gauge (left rail) ---- */
+    .gauge {
+      position: fixed; left: clamp(0.8rem, 3vw, 2rem); top: 0; bottom: 0;
+      width: 3.4rem; z-index: 20;
+      display: flex; flex-direction: column; justify-content: center;
+      pointer-events: none;
+    }
+    .gauge .axis {
+      position: absolute; left: 1.1rem; top: 14%; bottom: 14%;
+      width: 1px; background: rgba(243,239,230,0.2);
+    }
+    .gauge .fill {
+      position: absolute; left: 1.1rem; top: 14%; width: 1px;
+      background: #fff; height: 0; box-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+    .marks { position: relative; height: 72%; pointer-events: auto; }
+    .mark {
+      position: absolute; left: 0; transform: translateY(-50%);
+      display: flex; align-items: center; gap: 0.6rem;
+      text-decoration: none; color: rgba(243,239,230,0.5);
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em;
+      transition: color 0.3s;
+    }
+    .mark .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      border: 1px solid rgba(243,239,230,0.5);
+      background: #04060a; transition: all 0.3s; flex: none;
+    }
+    .mark .lbl { opacity: 0; transform: translateX(-4px); transition: all 0.3s; white-space: nowrap; }
+    .mark:hover .lbl, .mark.active .lbl { opacity: 1; transform: translateX(0); }
+    .mark.active { color: #fff; }
+    .mark.active .dot { background: var(--mc); border-color: var(--mc); box-shadow: 0 0 12px var(--mc); transform: scale(1.3); }
+
+    /* ---- fixed HUD ---- */
+    .hud {
+      position: fixed; top: clamp(1rem,3vw,1.8rem); right: clamp(1rem,3vw,2.2rem);
+      z-index: 20; text-align: right; font-family: var(--mono);
+    }
+    .hud .name { font-size: 0.64rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(243,239,230,0.55); }
+    .hud .depth { font-size: clamp(1.4rem,4vw,2rem); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .hud .depth small { font-size: 0.42em; color: rgba(243,239,230,0.55); margin-left: 0.3rem; }
+
+    .scrollcue {
+      position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%);
+      z-index: 20; font-family: var(--mono); font-size: 0.64rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(243,239,230,0.6);
+      transition: opacity 0.4s; text-align: center;
+    }
+    .scrollcue .chev { display: block; margin-top: 0.3rem; animation: bob 1.8s ease-in-out infinite; }
+    @keyframes bob { 0%,100%{ transform: translateY(0); opacity:0.5 } 50%{ transform: translateY(5px); opacity:1 } }
+
+    /* ---- strata ---- */
+    .stratum {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      padding: clamp(2rem,8vw,6rem) clamp(4rem,12vw,12rem);
+      overflow: hidden;
+    }
+    .stratum .ghost {
+      position: absolute; right: 4vw; top: 50%; z-index: 0;
+      font-family: var(--serif); font-weight: 600;
+      font-size: clamp(14rem, 42vw, 40rem); line-height: 0.7;
+      color: rgba(255,255,255,0.05); will-change: transform;
+      user-select: none; pointer-events: none;
+    }
+    .stratum .motif {
+      position: absolute; right: 8vw; top: 50%;
+      width: clamp(200px, 34vw, 460px); height: clamp(200px, 34vw, 460px);
+      transform: translateY(-50%); z-index: 1; opacity: 0.85;
+      will-change: transform;
+    }
+    .motif * { vector-effect: non-scaling-stroke; }
+    .ms { fill: none; stroke: var(--mc); stroke-width: 1.5; }
+    .mf { fill: var(--mc); }
+
+    .content { position: relative; z-index: 2; max-width: 30rem; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--mc); margin-bottom: 1rem;
+    }
+    .stratum h2 {
+      font-family: var(--serif); font-weight: 600;
+      font-size: clamp(2.4rem, 7vw, 4.4rem); line-height: 0.98; letter-spacing: -0.01em;
+    }
+    .stratum p.blurb {
+      margin-top: 1.1rem; color: rgba(243,239,230,0.78);
+      font-size: clamp(1rem,1.4vw,1.18rem); line-height: 1.6; max-width: 26rem;
+    }
+    .enter {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      margin-top: 1.8rem; text-decoration: none; color: #f3efe6;
+      font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.7rem 1.2rem; border: 1px solid rgba(243,239,230,0.3); border-radius: 999px;
+      transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.2s;
+    }
+    .enter:hover { background: var(--mc); border-color: var(--mc); color: #04060a; transform: translateY(-2px); }
+    .depth-tag {
+      position: absolute; left: clamp(4rem,12vw,12rem); bottom: clamp(1.5rem,4vw,3rem);
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.18em;
+      color: rgba(243,239,230,0.4);
+    }
+
+    .masthead { position: absolute; top: clamp(1.5rem,5vw,3rem); font-family: var(--mono);
+      font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(243,239,230,0.55); }
+
+    @media (max-width: 720px) {
+      .gauge { display: none; }
+      .stratum { padding: 4rem 1.6rem; }
+      .stratum .ghost { font-size: 40vw; right: -2vw; }
+      .stratum .motif { opacity: 0.3; right: -6vw; }
+      .depth-tag { left: 1.6rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .scrollcue .chev { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- depth gauge -->
+  <div class="gauge" aria-hidden="true">
+    <div class="axis"></div>
+    <div class="fill" id="fill"></div>
+    <div class="marks" id="marks"></div>
+  </div>
+
+  <div class="hud">
+    <div class="name">Interactive Expositions</div>
+    <div class="depth"><span id="depth">0</span><small>m</small></div>
+  </div>
+
+  <div class="scrollcue" id="cue">Scroll to descend<span class="chev">↓</span></div>
+
+  <main id="main">
+    <!-- 01 Complex Numbers -->
+    <section class="stratum" id="s0" data-name="Complex Numbers" data-depth="0"
+      style="--mc:#34f5ff; background:linear-gradient(180deg,#071c22,#03161c 60%,#021014);">
+      <span class="masthead">Sam Kirwan · a vertical reading</span>
+      <span class="ghost">01</span>
+      <svg class="motif" viewBox="0 0 200 200" aria-hidden="true">
+        <line class="ms" x1="20" y1="100" x2="180" y2="100"/>
+        <line class="ms" x1="100" y1="20" x2="100" y2="180"/>
+        <circle class="ms" cx="100" cy="100" r="62" opacity="0.5"/>
+        <line class="ms" x1="100" y1="100" x2="144" y2="56"/>
+        <circle class="mf" cx="144" cy="56" r="7"/>
+      </svg>
+      <div class="content">
+        <p class="eyebrow">Layer 01 · the plane</p>
+        <h2>Complex Numbers</h2>
+        <p class="blurb">Numbers that answer impossible questions — rotation, waves, and the secret geometry of the plane.</p>
+        <a class="enter" href="complex-numbers.html">Enter the chapter →</a>
+      </div>
+      <span class="depth-tag">— 120 m · sunlit zone —</span>
+    </section>
+
+    <!-- 02 Linear Algebra -->
+    <section class="stratum" id="s1" data-name="Linear Algebra" data-depth="120"
+      style="--mc:#9b7bff; background:linear-gradient(180deg,#151033,#0d0a24 60%,#080617);">
+      <span class="ghost">02</span>
+      <svg class="motif" viewBox="0 0 200 200" aria-hidden="true">
+        <line class="ms" x1="30" y1="170" x2="170" y2="170" opacity="0.4"/>
+        <line class="ms" x1="30" y1="170" x2="30" y2="30" opacity="0.4"/>
+        <line class="ms" x1="30" y1="170" x2="150" y2="70"/>
+        <polygon class="mf" points="150,70 132,74 140,88"/>
+        <line class="ms" x1="30" y1="170" x2="86" y2="60"/>
+        <polygon class="mf" points="86,60 74,72 88,76"/>
+      </svg>
+      <div class="content">
+        <p class="eyebrow">Layer 02 · vector space</p>
+        <h2>Linear Algebra</h2>
+        <p class="blurb">Equations as motion through space — vectors, transformations, and the shape of a solution.</p>
+        <a class="enter" href="linear-algebra.html">Enter the chapter →</a>
+      </div>
+      <span class="depth-tag">— 640 m · twilight zone —</span>
+    </section>
+
+    <!-- 03 Trigonometry -->
+    <section class="stratum" id="s2" data-name="Trigonometry" data-depth="640"
+      style="--mc:#15d39a; background:linear-gradient(180deg,#06241c,#031a14 60%,#021310);">
+      <span class="ghost">03</span>
+      <svg class="motif" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="ms" cx="64" cy="100" r="44" opacity="0.55"/>
+        <path class="ms" d="M64 100 Q 96 34 128 100 T 192 100"/>
+        <line class="ms" x1="64" y1="100" x2="64" y2="56" opacity="0.6"/>
+        <circle class="mf" cx="64" cy="56" r="7"/>
+      </svg>
+      <div class="content">
+        <p class="eyebrow">Layer 03 · the unit circle</p>
+        <h2>Trigonometry</h2>
+        <p class="blurb">The circle hidden in every wave — angles, ratios, and the unit circle unrolled into motion.</p>
+        <a class="enter" href="trigonometry.html">Enter the chapter →</a>
+      </div>
+      <span class="depth-tag">— 1 480 m · midnight zone —</span>
+    </section>
+
+    <!-- 04 Algebra -->
+    <section class="stratum" id="s3" data-name="Algebra" data-depth="1480"
+      style="--mc:#ffb43a; background:linear-gradient(180deg,#241a06,#191204 60%,#120d03);">
+      <span class="ghost">04</span>
+      <svg class="motif" viewBox="0 0 200 200" aria-hidden="true">
+        <line class="ms" x1="36" y1="128" x2="164" y2="128"/>
+        <polygon class="ms" points="100,128 74,84 126,84"/>
+        <circle class="mf" cx="62" cy="68" r="11"/>
+        <rect class="ms" x="128" y="52" width="26" height="26" rx="3"/>
+      </svg>
+      <div class="content">
+        <p class="eyebrow">Layer 04 · first principles</p>
+        <h2>Algebra</h2>
+        <p class="blurb">The grammar of the unknown — symbols, balance, and the quiet machinery of solving.</p>
+        <a class="enter" href="algebra.html">Enter the chapter →</a>
+      </div>
+      <span class="depth-tag">— 2 960 m · the abyss —</span>
+    </section>
+
+    <!-- 05 Active Inference -->
+    <section class="stratum" id="s4" data-name="Active Inference" data-depth="2960"
+      style="--mc:#ff5ca8; background:linear-gradient(180deg,#260a1a,#1a0712 60%,#0d040a);">
+      <span class="ghost">05</span>
+      <svg class="motif" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="ms" cx="100" cy="100" r="22"/>
+        <circle class="ms" cx="100" cy="100" r="48" opacity="0.5" stroke-dasharray="6 9"/>
+        <circle class="ms" cx="100" cy="100" r="74" opacity="0.3" stroke-dasharray="3 11"/>
+        <circle class="mf" cx="148" cy="100" r="7"/>
+      </svg>
+      <div class="content">
+        <p class="eyebrow">Layer 05 · free energy</p>
+        <h2>Active Inference</h2>
+        <p class="blurb">How a mind holds back the tide of entropy — prediction, surprise, and the free-energy story.</p>
+        <a class="enter" href="active-inference.html">Enter the chapter →</a>
+      </div>
+      <span class="depth-tag">— 4 200 m · the floor —</span>
+    </section>
+  </main>
+
+  <script>
+  (function () {
+    const sections = Array.from(document.querySelectorAll('.stratum'));
+    const marks = document.getElementById('marks');
+    const fill = document.getElementById('fill');
+    const depthEl = document.getElementById('depth');
+    const cue = document.getElementById('cue');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const MAX_DEPTH = 4200;
+
+    // build gauge marks
+    const markEls = sections.map((s, i) => {
+      const a = document.createElement('a');
+      a.className = 'mark'; a.href = '#' + s.id;
+      a.style.top = (i / (sections.length - 1)) * 100 + '%';
+      a.style.setProperty('--mc', s.style.getPropertyValue('--mc'));
+      a.innerHTML = `<span class="dot"></span><span class="lbl">${s.dataset.name}</span>`;
+      marks.appendChild(a);
+      return a;
+    });
+
+    // active section via IntersectionObserver
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const i = sections.indexOf(e.target);
+          markEls.forEach((m, j) => m.classList.toggle('active', j === i));
+        }
+      });
+    }, { threshold: 0.5 });
+    sections.forEach(s => io.observe(s));
+
+    // depth readout + fill + parallax on scroll
+    let ticking = false;
+    function onScroll() {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const prog = max > 0 ? Math.min(1, scrollY / max) : 0;
+      depthEl.textContent = Math.round(prog * MAX_DEPTH).toLocaleString();
+      fill.style.height = (prog * 72) + '%';
+      cue.style.opacity = prog > 0.02 ? 0 : 1;
+
+      if (!reduce) {
+        const vh = innerHeight;
+        sections.forEach(s => {
+          const r = s.getBoundingClientRect();
+          if (r.bottom < -vh || r.top > vh * 2) return;
+          const off = (r.top + r.height / 2 - vh / 2);
+          const ghost = s.querySelector('.ghost');
+          const motif = s.querySelector('.motif');
+          if (ghost) ghost.style.transform = `translateY(${-50 + off * -0.04}%)`;
+          if (motif) motif.style.transform = `translateY(calc(-50% + ${off * -0.06}px))`;
+        });
+      }
+      ticking = false;
+    }
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+    }, { passive: true });
+    addEventListener('resize', onScroll);
+    onScroll();
+  })();
+  </script>
+</body>
+</html>

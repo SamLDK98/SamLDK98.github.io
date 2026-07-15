@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complex Number as a Point</title>
+  <style>
+    :root {
+      --text: #f4f6ff;
+      --muted: rgba(244, 246, 255, 0.72);
+      --gold: #e0be68;
+      --green: #b6ff5a;
+      --real: #e0be68;
+      --imag: #b6ff5a;
+      --point: #b6ff5a;
+      --axis: rgba(255, 255, 255, 0.86);
+      --grid: rgba(182, 255, 90, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html,
+    body {
+      background: transparent;
+      color: var(--text);
+      font-family: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 4px;
+    }
+
+    .widget {
+      width: min(900px, 100vw);
+      background: transparent;
+    }
+
+    .equation-bar {
+      margin: 0 0 0.6rem;
+      font-size: clamp(1.45rem, 4vw, 2.3rem);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .real-part { color: var(--real); }
+    .imag-part { color: var(--imag); }
+
+    .viz-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    svg#canvas {
+      width: 100%;
+      max-width: 840px;
+      height: auto;
+      display: block;
+      touch-action: none;
+      cursor: crosshair;
+      overflow: visible;
+    }
+
+    .axis {
+      stroke: var(--axis);
+      stroke-width: 2.4;
+      stroke-linecap: round;
+    }
+
+    .grid-line {
+      stroke: var(--grid);
+      stroke-width: 1;
+    }
+
+    .graph-tick {
+      fill: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .axis-name {
+      fill: var(--muted);
+      font-size: 15px;
+      font-style: italic;
+    }
+
+    .real-leg,
+    .imag-leg {
+      stroke-width: 5;
+      stroke-linecap: round;
+      opacity: 0.96;
+    }
+
+    .real-leg {
+      stroke: var(--real);
+      filter: drop-shadow(0 0 7px rgba(224, 190, 104, 0.35));
+    }
+
+    .imag-leg {
+      stroke: var(--imag);
+      filter: drop-shadow(0 0 8px rgba(182, 255, 90, 0.38));
+    }
+
+    .p-pt {
+      fill: var(--point);
+      stroke: #050505;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 10px rgba(182, 255, 90, 0.72));
+      cursor: grab;
+    }
+
+    .leg-label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .leg-label.real { fill: var(--real); }
+    .leg-label.imag { fill: var(--imag); }
+
+    .readouts {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 1.4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .readout strong {
+      font-weight: 600;
+    }
+
+    @media (max-width: 620px) {
+      .equation-bar { font-size: 1.35rem; }
+      .readouts { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="widget">
+    <div class="equation-bar" id="addr">z = <span class="real-part">3</span> + <span class="imag-part">5i</span></div>
+    <div class="viz-wrap">
+      <svg id="canvas" viewBox="0 0 880 520" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="A draggable complex number on the complex plane showing real and imaginary parts">
+        <defs>
+          <marker id="ax-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="rgba(255,255,255,0.86)" />
+          </marker>
+        </defs>
+        <g id="grid"></g>
+        <line id="real-axis" class="axis" marker-end="url(#ax-arrow)" />
+        <line id="imag-axis" class="axis" marker-end="url(#ax-arrow)" />
+        <g id="ticks"></g>
+        <text class="axis-name" id="real-name">real</text>
+        <text class="axis-name" id="imag-name">imaginary</text>
+        <line id="real-leg" class="real-leg" />
+        <line id="imag-leg" class="imag-leg" />
+        <text id="real-leg-label" class="leg-label real"></text>
+        <text id="imag-leg-label" class="leg-label imag"></text>
+        <circle id="p-pt" class="p-pt" r="9" />
+      </svg>
+    </div>
+    <div class="readouts">
+      <span><strong class="real-part">a</strong> = <span id="real-val">3.0</span></span>
+      <span><strong class="imag-part">b</strong> = <span id="imag-val">5.0</span></span>
+    </div>
+  </main>
+  <script>
+    (function () {
+      const $ = (selector) => document.querySelector(selector);
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = $('#canvas');
+      const CX = 440;
+      const CY = 264;
+      const UNIT = 44;
+      const XMIN = -8;
+      const XMAX = 8;
+      const YMIN = -5;
+      const YMAX = 5;
+      const px = (x) => CX + x * UNIT;
+      const py = (y) => CY - y * UNIT;
+
+      const grid = $('#grid');
+      const ticks = $('#ticks');
+      const realAxis = $('#real-axis');
+      const imagAxis = $('#imag-axis');
+
+      realAxis.setAttribute('x1', 30);
+      realAxis.setAttribute('x2', 850);
+      realAxis.setAttribute('y1', CY);
+      realAxis.setAttribute('y2', CY);
+      imagAxis.setAttribute('x1', CX);
+      imagAxis.setAttribute('x2', CX);
+      imagAxis.setAttribute('y1', 500);
+      imagAxis.setAttribute('y2', 28);
+
+      for (let v = XMIN; v <= XMAX; v += 1) {
+        const line = document.createElementNS(NS, 'line');
+        line.setAttribute('class', 'grid-line');
+        line.setAttribute('x1', px(v));
+        line.setAttribute('x2', px(v));
+        line.setAttribute('y1', py(YMAX));
+        line.setAttribute('y2', py(YMIN));
+        grid.appendChild(line);
+
+        if (v !== 0) {
+          const text = document.createElementNS(NS, 'text');
+          text.setAttribute('class', 'graph-tick');
+          text.setAttribute('x', px(v));
+          text.setAttribute('y', CY + 18);
+          text.setAttribute('text-anchor', 'middle');
+          text.textContent = v;
+          ticks.appendChild(text);
+        }
+      }
+
+      for (let v = YMIN; v <= YMAX; v += 1) {
+        const line = document.createElementNS(NS, 'line');
+        line.setAttribute('class', 'grid-line');
+        line.setAttribute('x1', px(XMIN));
+        line.setAttribute('x2', px(XMAX));
+        line.setAttribute('y1', py(v));
+        line.setAttribute('y2', py(v));
+        grid.appendChild(line);
+
+        if (v !== 0) {
+          const text = document.createElementNS(NS, 'text');
+          text.setAttribute('class', 'graph-tick');
+          text.setAttribute('x', CX - 10);
+          text.setAttribute('y', py(v) + 4);
+          text.setAttribute('text-anchor', 'end');
+          text.textContent = v;
+          ticks.appendChild(text);
+        }
+      }
+
+      $('#real-name').setAttribute('x', 842);
+      $('#real-name').setAttribute('y', CY - 12);
+      $('#real-name').setAttribute('text-anchor', 'end');
+      $('#imag-name').setAttribute('x', CX + 12);
+      $('#imag-name').setAttribute('y', 42);
+
+      let a = 3;
+      let b = 5;
+
+      function fmt(value) {
+        const rounded = Math.round(value * 10) / 10;
+        const fixed = rounded.toFixed(1);
+        return fixed === '-0.0' ? '0.0' : fixed;
+      }
+
+      function signedImag(value) {
+        const amount = Math.abs(value);
+        const text = Number.isInteger(amount) ? String(amount) : fmt(amount);
+        return value < 0 ? `- ${text}i` : `+ ${text}i`;
+      }
+
+      function render() {
+        const X = px(a);
+        const Y = py(b);
+        const realLeg = $('#real-leg');
+        const imagLeg = $('#imag-leg');
+        realLeg.setAttribute('x1', CX);
+        realLeg.setAttribute('y1', CY);
+        realLeg.setAttribute('x2', X);
+        realLeg.setAttribute('y2', CY);
+        imagLeg.setAttribute('x1', X);
+        imagLeg.setAttribute('y1', CY);
+        imagLeg.setAttribute('x2', X);
+        imagLeg.setAttribute('y2', Y);
+        $('#p-pt').setAttribute('cx', X);
+        $('#p-pt').setAttribute('cy', Y);
+
+        const realLabel = $('#real-leg-label');
+        const imagLabel = $('#imag-leg-label');
+        if (Math.abs(a) > 0.05) {
+          realLabel.style.display = '';
+          realLabel.setAttribute('x', (CX + X) / 2);
+          realLabel.setAttribute('y', CY + (b >= 0 ? 24 : -13));
+          realLabel.setAttribute('text-anchor', 'middle');
+          realLabel.textContent = fmt(a);
+        } else {
+          realLabel.style.display = 'none';
+        }
+
+        if (Math.abs(b) > 0.05) {
+          imagLabel.style.display = '';
+          imagLabel.setAttribute('x', X + (a >= 0 ? 12 : -12));
+          imagLabel.setAttribute('y', (CY + Y) / 2 + 4);
+          imagLabel.setAttribute('text-anchor', a >= 0 ? 'start' : 'end');
+          imagLabel.textContent = `${fmt(b)}i`;
+        } else {
+          imagLabel.style.display = 'none';
+        }
+
+        $('#addr').innerHTML = `z = <span class="real-part">${fmt(a)}</span> <span class="imag-part">${signedImag(b)}</span>`;
+        $('#real-val').textContent = fmt(a);
+        $('#imag-val').textContent = fmt(b);
+      }
+
+      function svgPoint(evt) {
+        const pt = svg.createSVGPoint();
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        const matrix = svg.getScreenCTM();
+        if (!matrix) return null;
+        return pt.matrixTransform(matrix.inverse());
+      }
+
+      let dragging = false;
+
+      function moveTo(evt) {
+        const p = svgPoint(evt);
+        if (!p) return;
+        a = Math.max(XMIN, Math.min(XMAX, (p.x - CX) / UNIT));
+        b = Math.max(YMIN, Math.min(YMAX, (CY - p.y) / UNIT));
+        a = Math.round(a * 2) / 2;
+        b = Math.round(b * 2) / 2;
+        render();
+      }
+
+      svg.addEventListener('pointerdown', (evt) => {
+        dragging = true;
+        try { svg.setPointerCapture(evt.pointerId); } catch (err) {}
+        moveTo(evt);
+      });
+      svg.addEventListener('pointermove', (evt) => { if (dragging) moveTo(evt); });
+      svg.addEventListener('pointerup', () => { dragging = false; });
+      svg.addEventListener('pointercancel', () => { dragging = false; });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
