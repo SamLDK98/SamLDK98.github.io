@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hodgkin–Huxley current-clamp bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper:   #f2efe6;
+    --paper-2: #eae6db;
+    --ink:     #23211c;
+    --ink-2:   rgba(35, 33, 28, 0.62);
+    --ink-3:   rgba(35, 33, 28, 0.34);
+    --rule:    rgba(35, 33, 28, 0.14);
+    --rule-2:  rgba(35, 33, 28, 0.07);
+
+    --na:      #b8442a;   /* iron oxide — sodium */
+    --k:       #2c6486;   /* prussian blue — potassium */
+    --leak:    #6f7466;   /* olive grey — leak */
+    --stim:    #9a7513;   /* ochre — injected current */
+    --trace:   #17181c;   /* near-black — membrane potential */
+  }
+
+  html, body { background: var(--paper); }
+
+  body {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    color: var(--ink);
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bench {
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(var(--rule-2) 1px, transparent 1px) 0 0 / 100% 22px,
+      var(--paper);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 258px;
+  }
+
+  /* ---------------- scope ---------------- */
+
+  .scope {
+    position: relative;
+    padding: 14px 6px 10px 14px;
+    min-width: 0;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 470px;
+    touch-action: none;
+  }
+
+  .scope-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 8px 10px 2px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 8px;
+  }
+
+  .scope-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .readout {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    display: flex;
+    gap: 1.1rem;
+    flex-wrap: wrap;
+    color: var(--ink-2);
+  }
+  .readout b {
+    font-weight: 600;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------------- control column ---------------- */
+
+  .rack {
+    border-left: 1px solid var(--rule);
+    background: var(--paper-2);
+    padding: 14px 15px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    min-width: 0;
+  }
+
+  .rack h3 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .group { display: flex; flex-direction: column; gap: 9px; }
+
+  .field { display: flex; flex-direction: column; gap: 4px; }
+
+  .field-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.74rem;
+    color: var(--ink-2);
+    gap: 0.5rem;
+  }
+  .field-label .val {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 15px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px;
+    background: rgba(35, 33, 28, 0.26);
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px;
+    background: rgba(35, 33, 28, 0.26);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px; height: 13px;
+    margin-top: -5.5px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+  }
+  input[type="range"]:focus-visible { outline: 2px solid var(--stim); outline-offset: 3px; }
+
+  button {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid rgba(35, 33, 28, 0.3);
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.06s ease;
+  }
+  button:hover { background: #fffdf7; border-color: var(--ink); }
+  button:active { transform: translateY(1px); }
+  button:focus-visible { outline: 2px solid var(--stim); outline-offset: 2px; }
+
+  .btn-fire {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+    letter-spacing: 0.04em;
+  }
+  .btn-fire:hover { background: #000; color: #fff; }
+  .btn-fire .hint {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    opacity: 0.62;
+    margin-top: 2px;
+  }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+  .toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    cursor: pointer;
+    line-height: 1.32;
+  }
+  .toggle input { margin-top: 2px; accent-color: var(--na); cursor: pointer; }
+  .toggle.k input { accent-color: var(--k); }
+  .toggle .t { color: var(--ink); font-weight: 500; }
+  .toggle .d {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--ink-3);
+  }
+
+  .speed { display: flex; gap: 0; }
+  .speed button {
+    flex: 1;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    padding: 6px 2px;
+    border-right-width: 0;
+  }
+  .speed button:last-child { border-right-width: 1px; }
+  .speed button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .note {
+    font-size: 0.68rem;
+    line-height: 1.44;
+    color: var(--ink-3);
+    border-top: 1px solid var(--rule);
+    padding-top: 9px;
+    margin-top: auto;
+  }
+  .note code {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 760px) {
+    .bench { grid-template-columns: minmax(0, 1fr); }
+    .rack { border-left: 0; border-top: 1px solid var(--rule); }
+    canvas { height: 400px; }
+    .note { margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bench">
+  <div class="scope">
+    <div class="scope-head">
+      <span class="scope-title">Current clamp — squid giant axon, 6.3 °C</span>
+      <span class="readout">
+        <span>V <b id="ro-v">−65.0</b> mV</span>
+        <span>spikes <b id="ro-n">0</b></span>
+        <span>rate <b id="ro-rate">—</b></span>
+      </span>
+    </div>
+    <canvas id="scope" aria-label="Scrolling chart of membrane potential, sodium and potassium conductances, gating variables and injected current"></canvas>
+  </div>
+
+  <div class="rack">
+    <div class="group">
+      <h3>Stimulus</h3>
+      <button class="btn-fire" id="fire" type="button">
+        Inject pulse
+        <span class="hint">SPACE</span>
+      </button>
+      <div class="field">
+        <label class="field-label" for="amp">
+          <span>Pulse amplitude</span>
+          <span class="val"><span id="amp-v">12</span> µA/cm²</span>
+        </label>
+        <input type="range" id="amp" min="0" max="50" step="0.5" value="12" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="dur">
+          <span>Pulse duration</span>
+          <span class="val"><span id="dur-v">1.0</span> ms</span>
+        </label>
+        <input type="range" id="dur" min="0.1" max="5" step="0.1" value="1" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="hold">
+          <span>Holding current</span>
+          <span class="val"><span id="hold-v">0.0</span> µA/cm²</span>
+        </label>
+        <input type="range" id="hold" min="0" max="20" step="0.1" value="0" />
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Channel blockers</h3>
+      <label class="toggle">
+        <input type="checkbox" id="ttx" />
+        <span>
+          <span class="t">TTX</span>
+          <span class="d">Tetrodotoxin — blocks Na⁺</span>
+        </span>
+      </label>
+      <label class="toggle k">
+        <input type="checkbox" id="tea" />
+        <span>
+          <span class="t">TEA</span>
+          <span class="d">Tetraethylammonium — blocks K⁺</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="group">
+      <h3>Playback</h3>
+      <div class="speed" id="speed" role="group" aria-label="Playback speed">
+        <button type="button" data-slow="5"   aria-pressed="false">1/5×</button>
+        <button type="button" data-slow="20"  aria-pressed="true">1/20×</button>
+        <button type="button" data-slow="100" aria-pressed="false">1/100×</button>
+      </div>
+      <div class="row">
+        <button type="button" id="pause">Pause</button>
+        <button type="button" id="reset">Reset</button>
+      </div>
+    </div>
+
+    <p class="note">
+      Forward Euler, <code>dt = 0.01 ms</code>. Standard parameters:
+      <code>C<sub>m</sub> 1</code> µF/cm²,
+      <code>ḡ<sub>Na</sub> 120</code>,
+      <code>ḡ<sub>K</sub> 36</code>,
+      <code>ḡ<sub>L</sub> 0.3</code> mS/cm²;
+      <code>E<sub>Na</sub> +50</code>,
+      <code>E<sub>K</sub> −77</code>,
+      <code>E<sub>L</sub> −54.4</code> mV.
+    </p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------
+  // Model. Modern sign convention, resting potential at −65 mV.
+  // ---------------------------------------------------------------
+
+  const C_M   = 1.0;      // µF/cm²
+  const G_NA  = 120.0;    // mS/cm²
+  const G_K   = 36.0;
+  const G_L   = 0.3;
+  const E_NA  = 50.0;     // mV
+  const E_K   = -77.0;
+  const E_L   = -54.387;  // chosen so V rests exactly at −65 mV
+  const V_REST = -65.0;
+
+  const DT = 0.01;        // ms — fixed integration step, independent of frame rate
+
+  // Each α/β below is the textbook expression. Two of them, α_n and α_m, are
+  // 0/0 at V = −55 and V = −40; the ratio has a finite limit there, so we take
+  // it analytically rather than letting the division produce NaN.
+  const expm = (x) => Math.exp(x);
+
+  function alphaN(V) {
+    const d = V + 55;
+    if (Math.abs(d) < 1e-6) return 0.1;              // limit of 0.01d/(1−e^(−d/10))
+    return 0.01 * d / (1 - expm(-d / 10));
+  }
+  const betaN  = (V) => 0.125 * expm(-(V + 65) / 80);
+
+  function alphaM(V) {
+    const d = V + 40;
+    if (Math.abs(d) < 1e-6) return 1.0;              // limit of 0.1d/(1−e^(−d/10))
+    return 0.1 * d / (1 - expm(-d / 10));
+  }
+  const betaM  = (V) => 4.0 * expm(-(V + 65) / 18);
+
+  const alphaH = (V) => 0.07 * expm(-(V + 65) / 20);
+  const betaH  = (V) => 1.0 / (1 + expm(-(V + 35) / 10));
+
+  const steady = (a, b) => a / (a + b);
+
+  const state = { t: 0, V: V_REST, m: 0, h: 0, n: 0 };
+
+  function resetState() {
+    state.t = 0;
+    state.V = V_REST;
+    state.m = steady(alphaM(V_REST), betaM(V_REST));
+    state.h = steady(alphaH(V_REST), betaH(V_REST));
+    state.n = steady(alphaN(V_REST), betaN(V_REST));
+  }
+
+  // ---------------------------------------------------------------
+  // Controls
+  // ---------------------------------------------------------------
+
+  const ui = {
+    amp:   document.getElementById('amp'),
+    dur:   document.getElementById('dur'),
+    hold:  document.getElementById('hold'),
+    ttx:   document.getElementById('ttx'),
+    tea:   document.getElementById('tea'),
+    fire:  document.getElementById('fire'),
+    pause: document.getElementById('pause'),
+    reset: document.getElementById('reset'),
+    speed: document.getElementById('speed'),
+    ampV:  document.getElementById('amp-v'),
+    durV:  document.getElementById('dur-v'),
+    holdV: document.getElementById('hold-v'),
+    roV:    document.getElementById('ro-v'),
+    roN:    document.getElementById('ro-n'),
+    roRate: document.getElementById('ro-rate')
+  };
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let slowdown = 20;      // real-time seconds per simulated second
+  let running  = !reduceMotion;   // start held if the reader asked for less motion
+  let pulseEnd = -1;      // sim time at which the current pulse stops
+  let spikeCount = 0;
+  let lastSpikeT = null;
+  let firingRate = null;  // Hz
+  let armed = true;       // spike detector hysteresis
+
+  const gNaMax = () => (ui.ttx.checked ? 0 : G_NA);
+  const gKMax  = () => (ui.tea.checked ? 0 : G_K);
+
+  function injectedCurrent(t) {
+    const hold = parseFloat(ui.hold.value);
+    const pulse = t < pulseEnd ? parseFloat(ui.amp.value) : 0;
+    return hold + pulse;
+  }
+
+  function firePulse() {
+    pulseEnd = state.t + parseFloat(ui.dur.value);
+  }
+
+  // ---------------------------------------------------------------
+  // History ring — one sample every RECORD_MS of simulated time
+  // ---------------------------------------------------------------
+
+  const WINDOW_MS = 100;    // width of the visible time axis
+  const RECORD_MS = 0.05;
+  const history = [];
+  let nextRecord = 0;
+
+  function record() {
+    const gNa = gNaMax() * state.m * state.m * state.m * state.h;
+    const gK  = gKMax()  * state.n * state.n * state.n * state.n;
+    history.push({
+      t: state.t, V: state.V,
+      m: state.m, h: state.h, n: state.n,
+      gNa, gK, I: injectedCurrent(state.t)
+    });
+    const cutoff = state.t - WINDOW_MS * 1.15;
+    let drop = 0;
+    while (drop < history.length && history[drop].t < cutoff) drop += 1;
+    if (drop > 0) history.splice(0, drop);
+  }
+
+  // ---------------------------------------------------------------
+  // Integration
+  // ---------------------------------------------------------------
+
+  function step() {
+    const V = state.V;
+
+    const gNa = gNaMax() * state.m * state.m * state.m * state.h;
+    const gK  = gKMax()  * state.n * state.n * state.n * state.n;
+
+    const iNa = gNa * (V - E_NA);
+    const iK  = gK  * (V - E_K);
+    const iL  = G_L * (V - E_L);
+
+    const dV = (injectedCurrent(state.t) - iNa - iK - iL) / C_M;
+
+    const dm = alphaM(V) * (1 - state.m) - betaM(V) * state.m;
+    const dh = alphaH(V) * (1 - state.h) - betaH(V) * state.h;
+    const dn = alphaN(V) * (1 - state.n) - betaN(V) * state.n;
+
+    state.V += dV * DT;
+    state.m += dm * DT;
+    state.h += dh * DT;
+    state.n += dn * DT;
+
+    // Gating variables are probabilities; rounding can nudge them a hair outside.
+    state.m = Math.min(1, Math.max(0, state.m));
+    state.h = Math.min(1, Math.max(0, state.h));
+    state.n = Math.min(1, Math.max(0, state.n));
+
+    state.t += DT;
+
+    // Spike detector: upward crossing of 0 mV, re-armed below −40 mV.
+    if (armed && state.V > 0) {
+      armed = false;
+      spikeCount += 1;
+      if (lastSpikeT !== null) {
+        const isi = state.t - lastSpikeT;
+        firingRate = isi > 0 ? 1000 / isi : null;
+      }
+      lastSpikeT = state.t;
+    } else if (!armed && state.V < -40) {
+      armed = true;
+    }
+
+    if (state.t >= nextRecord) {
+      record();
+      nextRecord = state.t + RECORD_MS;
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Drawing
+  // ---------------------------------------------------------------
+
+  const canvas = document.getElementById('scope');
+  const ctx = canvas.getContext('2d');
+  const css = getComputedStyle(document.documentElement);
+  const col = (name) => css.getPropertyValue(name).trim();
+
+  const COL = {
+    ink:   col('--ink'),
+    ink2:  col('--ink-2'),
+    ink3:  col('--ink-3'),
+    rule:  col('--rule'),
+    rule2: col('--rule-2'),
+    na:    col('--na'),
+    k:     col('--k'),
+    stim:  col('--stim'),
+    trace: col('--trace'),
+    paper: col('--paper')
+  };
+
+  let W = 0, H = 0;
+  const PAD_L = 46, PAD_R = 12, PAD_T = 6, PAD_B = 22;
+
+  // Stacked panels, as fractions of the plotting height.
+  const PANELS = [
+    { key: 'V',    frac: 0.42, lo: -90, hi: 55 },
+    { key: 'G',    frac: 0.23, lo: 0,   hi: 40 },
+    { key: 'GATE', frac: 0.23, lo: 0,   hi: 1  },
+    { key: 'I',    frac: 0.12, lo: 0,   hi: 15 }
+  ];
+
+  function layout() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const rect = canvas.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const usable = H - PAD_T - PAD_B;
+    const gap = 13;
+    const totalGap = gap * (PANELS.length - 1);
+    let y = PAD_T;
+    for (const p of PANELS) {
+      p.y = y;
+      p.h = (usable - totalGap) * p.frac;
+      y += p.h + gap;
+    }
+  }
+
+  const plotW = () => W - PAD_L - PAD_R;
+  const xAt = (t, tMin) => PAD_L + ((t - tMin) / WINDOW_MS) * plotW();
+  const yAt = (p, v) => p.y + p.h * (1 - (v - p.lo) / (p.hi - p.lo));
+
+  function panelFrame(p, label, ticks) {
+    ctx.strokeStyle = COL.rule;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(PAD_L + 0.5, p.y + 0.5, plotW() - 1, p.h - 1);
+
+    ctx.font = '500 9.5px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+
+    for (const tk of ticks) {
+      const y = yAt(p, tk.v);
+      if (y < p.y - 1 || y > p.y + p.h + 1) continue;
+      ctx.strokeStyle = tk.strong ? COL.rule : COL.rule2;
+      ctx.setLineDash(tk.dash ? [3, 4] : []);
+      ctx.beginPath();
+      ctx.moveTo(PAD_L, y);
+      ctx.lineTo(W - PAD_R, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = tk.color || COL.ink3;
+      ctx.fillText(tk.label, PAD_L - 6, y);
+    }
+
+    ctx.save();
+    ctx.translate(11, p.y + p.h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = COL.ink3;
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.fillText(label.toUpperCase(), 0, 0);
+    ctx.restore();
+  }
+
+  function trace(p, tMin, pick, colour, width, fill) {
+    if (history.length < 2) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD_L, p.y, plotW(), p.h);
+    ctx.clip();
+
+    ctx.beginPath();
+    for (let i = 0; i < history.length; i += 1) {
+      const s = history[i];
+      const x = xAt(s.t, tMin);
+      const y = yAt(p, pick(s));
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+
+    if (fill) {
+      const last = history[history.length - 1];
+      ctx.lineTo(xAt(last.t, tMin), yAt(p, p.lo));
+      ctx.lineTo(xAt(history[0].t, tMin), yAt(p, p.lo));
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+    } else {
+      ctx.strokeStyle = colour;
+      ctx.lineWidth = width;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function legend(p, items) {
+    ctx.font = '500 9.5px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    let x = PAD_L + 8;
+    const y = p.y + 6;
+    for (const it of items) {
+      ctx.strokeStyle = it.colour;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y + 5.5);
+      ctx.lineTo(x + 13, y + 5.5);
+      ctx.stroke();
+      ctx.fillStyle = COL.ink2;
+      ctx.fillText(it.label, x + 17, y);
+      x += 17 + ctx.measureText(it.label).width + 13;
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    const tMax = Math.max(state.t, WINDOW_MS);
+    const tMin = tMax - WINDOW_MS;
+
+    const [pV, pG, pGate, pI] = PANELS;
+
+    // Injected-current panel autoscales to whatever the sliders are set to.
+    const iCeil = Math.max(15, parseFloat(ui.hold.value) + parseFloat(ui.amp.value));
+    pI.hi = Math.ceil(iCeil / 5) * 5;
+
+    // --- membrane potential ---
+    panelFrame(pV, 'mV', [
+      { v: E_NA,   label: 'E' + ' Na', strong: false, dash: true, color: COL.na },
+      { v: 0,      label: '0',    strong: true },
+      { v: V_REST, label: '−65',  strong: false, dash: true },
+      { v: E_K,    label: 'E' + ' K',  strong: false, dash: true, color: COL.k }
+    ]);
+    trace(pV, tMin, (s) => s.V, COL.trace, 1.7);
+
+    // --- conductances ---
+    panelFrame(pG, 'mS/cm²', [
+      { v: 0,  label: '0',  strong: true },
+      { v: 20, label: '20', strong: false },
+      { v: 40, label: '40', strong: false }
+    ]);
+    trace(pG, tMin, (s) => s.gNa, COL.na, 1.5);
+    trace(pG, tMin, (s) => s.gK,  COL.k,  1.5);
+    legend(pG, [
+      { label: 'g_Na = 120 m³h', colour: COL.na },
+      { label: 'g_K = 36 n⁴',    colour: COL.k }
+    ]);
+
+    // --- gating variables ---
+    panelFrame(pGate, 'gates', [
+      { v: 0,   label: '0',   strong: true },
+      { v: 0.5, label: '0.5', strong: false },
+      { v: 1,   label: '1',   strong: false }
+    ]);
+    trace(pGate, tMin, (s) => s.m, COL.na, 1.5);
+    trace(pGate, tMin, (s) => s.h, COL.na, 1.5);
+    // h is drawn dashed so it reads apart from m in the same colour family
+    ctx.save();
+    ctx.beginPath(); ctx.rect(PAD_L, pGate.y, plotW(), pGate.h); ctx.clip();
+    ctx.setLineDash([4, 3]);
+    ctx.strokeStyle = COL.paper;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let i = 0; i < history.length; i += 1) {
+      const s = history[i];
+      const x = xAt(s.t, tMin), y = yAt(pGate, s.h);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    trace(pGate, tMin, (s) => s.n, COL.k, 1.5);
+    legend(pGate, [
+      { label: 'm', colour: COL.na },
+      { label: 'h (dashed)', colour: COL.na },
+      { label: 'n', colour: COL.k }
+    ]);
+
+    // --- injected current ---
+    panelFrame(pI, 'µA/cm²', [
+      { v: 0,      label: '0', strong: true },
+      { v: pI.hi,  label: String(pI.hi), strong: false }
+    ]);
+    trace(pI, tMin, (s) => s.I, COL.stim, 1.4, 'rgba(154, 117, 19, 0.22)');
+    trace(pI, tMin, (s) => s.I, COL.stim, 1.4);
+
+    // --- time axis ---
+    ctx.font = '500 9.5px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = COL.ink3;
+    const axisY = pI.y + pI.h + 6;
+    const firstTick = Math.ceil(tMin / 20) * 20;
+    for (let t = firstTick; t <= tMax; t += 20) {
+      const x = xAt(t, tMin);
+      ctx.fillText(t.toFixed(0), x, axisY);
+    }
+    ctx.textAlign = 'right';
+    ctx.fillText('ms', W - PAD_R, axisY);
+  }
+
+  function updateReadout() {
+    ui.roV.textContent = state.V.toFixed(1).replace('-', '−');
+    ui.roN.textContent = String(spikeCount);
+    ui.roRate.textContent = firingRate === null ? '—' : firingRate.toFixed(0) + ' Hz';
+  }
+
+  // ---------------------------------------------------------------
+  // Loop — sim time advances at a fixed rate, never at the frame rate
+  // ---------------------------------------------------------------
+
+  let lastFrame = 0;
+
+  function frame(ts) {
+    requestAnimationFrame(frame);
+
+    const elapsed = lastFrame ? Math.min(50, ts - lastFrame) : 16.7;  // ms of real time
+    lastFrame = ts;
+
+    if (running) {
+      const simMs = elapsed / slowdown;
+      const steps = Math.round(simMs / DT);
+      for (let i = 0; i < steps; i += 1) step();
+    }
+
+    draw();
+    updateReadout();
+  }
+
+  // ---------------------------------------------------------------
+  // Wiring
+  // ---------------------------------------------------------------
+
+  const fmt = (el, out, digits) => { out.textContent = parseFloat(el.value).toFixed(digits); };
+
+  ui.amp.addEventListener('input',  () => fmt(ui.amp,  ui.ampV,  ui.amp.value % 1 === 0 ? 0 : 1));
+  ui.dur.addEventListener('input',  () => fmt(ui.dur,  ui.durV,  1));
+  ui.hold.addEventListener('input', () => fmt(ui.hold, ui.holdV, 1));
+
+  ui.fire.addEventListener('click', firePulse);
+
+  ui.pause.addEventListener('click', () => {
+    running = !running;
+    ui.pause.textContent = running ? 'Pause' : 'Resume';
+  });
+
+  ui.reset.addEventListener('click', () => {
+    resetState();
+    history.length = 0;
+    nextRecord = 0;
+    pulseEnd = -1;
+    spikeCount = 0;
+    lastSpikeT = null;
+    firingRate = null;
+    armed = true;
+  });
+
+  ui.speed.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-slow]');
+    if (!btn) return;
+    slowdown = parseFloat(btn.dataset.slow);
+    for (const b of ui.speed.querySelectorAll('button')) {
+      b.setAttribute('aria-pressed', String(b === btn));
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    // Space activates a focused button or checkbox — leave those alone. A focused
+    // slider does nothing with space, so firing from there is the useful behaviour.
+    const el = document.activeElement;
+    if (el && (el.tagName === 'BUTTON' || (el.tagName === 'INPUT' && el.type === 'checkbox'))) return;
+    e.preventDefault();
+    firePulse();
+  });
+
+  // When embedded, the host page forwards space presses to us — otherwise the key
+  // never reaches this document until the reader has clicked inside the frame.
+  window.addEventListener('message', (e) => {
+    if (e.source !== window.parent) return;
+    if (e.data && e.data.type === 'hh-widget-fire') firePulse();
+  });
+
+  window.addEventListener('resize', () => { layout(); });
+
+  // Report our height to the host page so the iframe can size itself.
+  function postHeight() {
+    const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'hh-widget-height', height: h }, '*');
+    }
+  }
+  if (window.ResizeObserver) {
+    new ResizeObserver(postHeight).observe(document.documentElement);
+  }
+  window.addEventListener('load', postHeight);
+
+  resetState();
+  layout();
+  record();
+  if (!running) ui.pause.textContent = 'Resume';
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

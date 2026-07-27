@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Hodgkin&#8211;Huxley Model | Neurophysiology | Sam Kirwan</title>
+  <meta name="description" content="An interactive current clamp for the Hodgkin-Huxley model: find the threshold, break the refractory period, and block channels with TTX and TEA." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:   #f2efe6;
+      --paper-2: #eae6db;
+      --ink:     #23211c;
+      --ink-2:   rgba(35, 33, 28, 0.68);
+      --ink-3:   rgba(35, 33, 28, 0.36);
+      --rule:    rgba(35, 33, 28, 0.16);
+      --na:      #b8442a;
+      --k:       #2c6486;
+      --stim:    #9a7513;
+      --leak:    #6f7466;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background:
+        linear-gradient(rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 100% 26px,
+        linear-gradient(90deg, rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 26px 100%,
+        var(--paper);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1080px, 100% - 2.5rem);
+      margin: 0 auto;
+      border-left: 1px solid var(--rule);
+      border-right: 1px solid var(--rule);
+      background: rgba(242, 239, 230, 0.75);
+      padding: 0 clamp(1.2rem, 4vw, 3.4rem) 0;
+    }
+
+    /* prose keeps a comfortable measure even though the sheet is wide */
+    .col { max-width: 62ch; }
+
+    /* ---------- masthead ---------- */
+
+    header { padding: clamp(1.8rem, 5vh, 3rem) 0 0; }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      text-decoration: none;
+      display: inline-block;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin: clamp(1.8rem, 5vh, 2.8rem) 0 0.75rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.8rem, 6.4vw, 3.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.018em;
+      max-width: 18ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.2rem);
+      line-height: 1.62;
+      color: var(--ink-2);
+      max-width: 50ch;
+      margin-top: 1.15rem;
+      padding-bottom: clamp(1.6rem, 4vh, 2.4rem);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* ---------- prose ---------- */
+
+    main { padding-bottom: 1rem; }
+
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(1.4rem, 3.2vw, 1.85rem);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      color: var(--ink-3);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600;
+      font-size: 0.96rem;
+      letter-spacing: 0.005em;
+      margin: 1.9rem 0 0.55rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.075rem);
+      line-height: 1.68;
+      color: var(--ink);
+    }
+    p + p { margin-top: 0.95rem; }
+
+    ul, ol { margin: 0.9rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.5rem; }
+    li::marker { color: var(--ink-3); }
+
+    em { font-style: italic; }
+    strong { font-weight: 600; }
+
+    a.inline {
+      color: inherit;
+      text-decoration-color: var(--ink-3);
+      text-underline-offset: 3px;
+    }
+    a.inline:hover { text-decoration-color: var(--ink); }
+
+    /* variables and small chemistry, set apart from the serif prose */
+    .v {
+      font-family: "Spectral", Georgia, serif;
+      font-style: italic;
+    }
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .lk { color: var(--leak); }
+
+    /* ---------- equations ---------- */
+
+    .eq {
+      margin: 1.5rem 0;
+      padding: 1.15rem 1.3rem;
+      border-left: 2px solid var(--rule);
+      background: rgba(234, 230, 219, 0.6);
+      overflow-x: auto;
+    }
+    .eq-line {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.2vw, 1.2rem);
+      line-height: 2;
+      white-space: nowrap;
+    }
+    .eq-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+      color: var(--ink-3);
+      margin-top: 0.7rem;
+      white-space: normal;
+    }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      margin: 0 0.18em;
+      line-height: 1.15;
+      font-size: 0.86em;
+    }
+    .frac .num { border-bottom: 1px solid var(--ink-2); padding: 0 0.25em 0.08em; }
+    .frac .den { padding: 0.08em 0.25em 0; }
+
+    /* ---------- the widget ---------- */
+
+    .lab {
+      margin: clamp(1.8rem, 5vh, 2.6rem) 0 0;
+      /* the bench is wider than the prose column */
+      width: 100%;
+    }
+    .lab-cap {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block;
+      width: 100%;
+      height: 646px;      /* fallback; the widget posts its real height */
+      border: 0;
+      background: var(--paper);
+    }
+    /* The bench stacks its controls when the *frame* drops below 760px, which happens
+       at roughly this page width. Keeping the fallback in step avoids a jump before
+       the widget reports its real height. */
+    @media (max-width: 884px) {
+      iframe.bench { height: 964px; }
+    }
+
+    /* ---------- try-this cards ---------- */
+
+    .tries {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      margin-top: 1.3rem;
+    }
+    .try {
+      background: var(--paper);
+      padding: 1.05rem 1.1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .try-head {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent, var(--ink-3));
+    }
+    .try-title {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600;
+      font-size: 0.92rem;
+      line-height: 1.28;
+    }
+    .try p {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-size: 0.83rem;
+      line-height: 1.55;
+      color: var(--ink-2);
+    }
+    .try.a { --accent: var(--stim); }
+    .try.b { --accent: var(--ink-3); }
+    .try.c { --accent: var(--k); }
+    .try.d { --accent: var(--na); }
+
+    /* ---------- parameter table ---------- */
+
+    .params {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.2rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.74rem;
+    }
+    .params th, .params td {
+      text-align: left;
+      padding: 0.55rem 0.7rem 0.55rem 0;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: baseline;
+    }
+    .params th {
+      font-weight: 500;
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .params td:first-child { color: var(--ink); white-space: nowrap; }
+    .params td:nth-child(2) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .params td:last-child {
+      font-family: "IBM Plex Sans", sans-serif;
+      color: var(--ink-2);
+      width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+
+    .foot-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--rule);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.6rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="neurophysiology.html">Neurophysiology</a>
+      <p class="kicker">01 &nbsp;·&nbsp; Cellular</p>
+      <h1>The Hodgkin&#8211;Huxley Model</h1>
+      <p class="standfirst">
+        In 1952 Alan Hodgkin and Andrew Huxley wrote down four coupled differential
+        equations that reproduce the action potential from first principles. Here is
+        the current clamp they used. See what the axon will do.
+      </p>
+    </header>
+
+    <main>
+      <section class="col">
+        <h2><span class="n">The setup</span>A wire made of seawater</h2>
+
+        <p>
+          A neuron is a terrible cable. Its interior is salty water, which conducts
+          electricity roughly ten million times worse than copper, wrapped in a leaky
+          membrane. A voltage injected at one end of a long axon should fade to nothing
+          within a few millimetres.
+        </p>
+
+        <p>
+          It does not. Signals travel a metre down your leg without losing amplitude,
+          because the axon does not passively carry the signal &mdash; it
+          <em>regenerates</em> it, over and over, using energy stored in the ion
+          gradients across its own membrane. The question Hodgkin and Huxley set
+          themselves was how.
+        </p>
+
+        <p>
+          They worked on the giant axon of the squid, which at up to a millimetre across
+          is fat enough to push a wire down. That let them <em>clamp</em> the membrane at
+          a chosen voltage and measure the current that flowed in response &mdash; and,
+          crucially, to swap the seawater outside for solutions with different sodium
+          concentrations, isolating one ion at a time.
+        </p>
+
+        <h2><span class="n">The idea</span>The membrane is a circuit</h2>
+
+        <p>
+          Their central move was to stop thinking about biology and start thinking about
+          electronics. A patch of membrane is a capacitor: a thin insulating lipid layer
+          with charge piled up on either side. In parallel with it sit three conductances
+          &mdash; one for <span class="na">sodium</span>, one for
+          <span class="k">potassium</span>, and a small constant <span class="lk">leak</span>
+          for everything else.
+        </p>
+
+        <p>
+          Each conductance has its own battery: the equilibrium potential at which that
+          ion stops moving, set by its concentration gradient. Sodium is concentrated
+          outside the cell, so <span class="v">E</span><sub class="na">Na</sub> sits high,
+          around <span class="na">+50 mV</span>. Potassium is concentrated inside, so
+          <span class="v">E</span><sub class="k">K</sub> sits low, around
+          <span class="k">&minus;77 mV</span>. Current through each branch is just Ohm's
+          law, and the whole thing is Kirchhoff's current law:
+        </p>
+
+        <div class="eq">
+          <div class="eq-line">
+            <span class="v">C</span><sub>m</sub>
+            <span class="frac"><span class="num">d<span class="v">V</span></span><span class="den">d<span class="v">t</span></span></span>
+            = <span class="v">I</span> &minus;
+            <span class="na">ḡ<sub>Na</sub> <span class="v">m</span><sup>3</sup><span class="v">h</span> (<span class="v">V</span> &minus; <span class="v">E</span><sub>Na</sub>)</span> &minus;
+            <span class="k">ḡ<sub>K</sub> <span class="v">n</span><sup>4</sup> (<span class="v">V</span> &minus; <span class="v">E</span><sub>K</sub>)</span> &minus;
+            <span class="lk">ḡ<sub>L</sub> (<span class="v">V</span> &minus; <span class="v">E</span><sub>L</sub>)</span>
+          </div>
+          <p class="eq-note">
+            the rate the membrane charges = injected current, minus everything leaking back out through the three conductances
+          </p>
+        </div>
+
+        <p>
+          Everything interesting is hiding in those conductances. If
+          <span class="na">ḡ<sub>Na</sub></span> and <span class="k">ḡ<sub>K</sub></span>
+          were constants, this would be a dull leaky capacitor and nothing would ever
+          spike. The whole phenomenon lives in the fact that the conductances
+          <em>depend on the voltage they help produce</em>.
+        </p>
+
+        <h2><span class="n">The gates</span>Three knobs, turning at different speeds</h2>
+
+        <p>
+          Hodgkin and Huxley had no idea ion channels existed &mdash; the structures
+          would not be seen for another thirty years. So they did something bolder than
+          guessing: they described the conductances phenomenologically, as if each were
+          controlled by a number of independent gates, each flipping between open and
+          shut with voltage-dependent rates.
+        </p>
+
+        <p>
+          Three variables do all the work. Each is a probability between 0 and 1, and
+          each obeys the same simple form &mdash; relaxing toward a voltage-dependent
+          target with a voltage-dependent time constant:
+        </p>
+
+        <div class="eq">
+          <div class="eq-line">
+            <span class="frac"><span class="num">d<span class="v">x</span></span><span class="den">d<span class="v">t</span></span></span>
+            = &alpha;<sub><span class="v">x</span></sub>(<span class="v">V</span>) (1 &minus; <span class="v">x</span>)
+            &minus; &beta;<sub><span class="v">x</span></sub>(<span class="v">V</span>) <span class="v">x</span>
+            &nbsp;&nbsp;&nbsp; for <span class="v">x</span> = <span class="na">m</span>, <span class="na">h</span>, <span class="k">n</span>
+          </div>
+          <p class="eq-note">
+            α is the rate of opening, β the rate of closing; both are functions of voltage alone
+          </p>
+        </div>
+
+        <p>
+          The exponents are the trick. Sodium conductance goes as
+          <span class="na"><span class="v">m</span><sup>3</sup><span class="v">h</span></span>
+          and potassium as <span class="k"><span class="v">n</span><sup>4</sup></span>,
+          because the data demanded curves with a delayed, S-shaped onset, which is what
+          you get when several independent gates must <em>all</em> be open at once. That
+          was a fitting decision. It turned out to be very nearly a structural prediction:
+          the potassium channel really does have four subunits.
+        </p>
+
+        <h3>What each gate does</h3>
+
+        <ul>
+          <li>
+            <strong class="na">m &mdash; sodium activation.</strong> Very fast. Opens
+            within a fraction of a millisecond when the membrane depolarises. This is the
+            positive feedback loop: depolarisation opens <span class="v">m</span>, sodium
+            rushes in, which depolarises further, which opens more <span class="v">m</span>.
+            Once it starts it cannot be stopped.
+          </li>
+          <li>
+            <strong class="na">h &mdash; sodium inactivation.</strong> Slow, and runs
+            <em>backwards</em>: depolarisation makes it close. It is the brake that was
+            already being applied before the accelerator was pressed. Within a millisecond
+            or two it shuts the sodium conductance down regardless of voltage.
+          </li>
+          <li>
+            <strong class="k">n &mdash; potassium activation.</strong> Slow to open.
+            Potassium flows outward, dragging the membrane back down &mdash; and because
+            <span class="v">n</span> is also slow to <em>close</em>, it overshoots past
+            rest, which is the after-hyperpolarisation.
+          </li>
+        </ul>
+
+        <p>
+          An action potential is what those three timescales produce when you let them
+          interact: a fast one that fires, a slow one that stops it, and another slow one
+          that resets it.
+        </p>
+      </section>
+
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 1 &mdash; current clamp</span>
+          <span>drag the sliders · press space to fire</span>
+        </div>
+        <iframe
+          class="bench"
+          src="neurophysiology/hodgkin-huxley/hodgkin-huxley-widget.html"
+          title="Interactive Hodgkin-Huxley current clamp: inject current and watch the membrane potential, conductances and gating variables"
+          loading="lazy"
+        ></iframe>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">Experiments</span>Four things worth doing</h2>
+
+        <p>
+          The panels are stacked so you can read causes above effects: membrane potential
+          on top, the two conductances beneath it, the gates that set those conductances
+          below that, and the current you are injecting at the bottom.
+        </p>
+
+        <div class="tries">
+          <div class="try a">
+            <span class="try-head">01 &mdash; threshold</span>
+            <span class="try-title">Find the all-or-none point</span>
+            <p>
+              Set the pulse to 1 ms and start at 5 µA/cm². Nothing &mdash; a small passive
+              bump. Creep upward. Between 6.7 and 7.0 the response stops growing gradually
+              and jumps to a full 100 mV spike. There is nothing in between, and pushing
+              to 40 barely makes the spike bigger.
+            </p>
+          </div>
+          <div class="try b">
+            <span class="try-head">02 &mdash; refractoriness</span>
+            <span class="try-title">Try to fire twice</span>
+            <p>
+              Fire a spike, then hammer the button. At the default 12 µA/cm² you need to
+              wait about 14 ms before a second one will go; a 20 µA/cm² pulse gets in at
+              11, but nothing gets in before 10. Watch the <span class="na">h</span>
+              trace: it has collapsed toward zero and has to climb back before sodium can
+              conduct again. That recovery is what caps a neuron's firing rate.
+            </p>
+          </div>
+          <div class="try c">
+            <span class="try-head">03 &mdash; repetitive firing</span>
+            <span class="try-title">Hold the current on</span>
+            <p>
+              Raise the holding current slowly from zero. Below about 6 µA/cm² the cell
+              sits still; just above it you get a burst that dies out. By 6.5 it fires
+              forever &mdash; and not fading in from 0 Hz, but switching on abruptly at
+              roughly 55 Hz and climbing from there. Rate codes intensity, but only over
+              that window.
+            </p>
+          </div>
+          <div class="try d">
+            <span class="try-head">04 &mdash; blockers</span>
+            <span class="try-title">Poison the channels</span>
+            <p>
+              TTX, the pufferfish toxin, plugs the sodium channel: spikes vanish entirely
+              and you are left with a passive membrane. TEA blocks potassium instead
+              &mdash; the cell fires, then cannot get back down, and sticks near 0 mV.
+              Repolarisation is not automatic; it is actively done by potassium.
+            </p>
+          </div>
+        </div>
+
+        <h2><span class="n">The parameters</span>What the numbers are</h2>
+
+        <p>
+          These are the standard values, in the modern sign convention where the resting
+          potential is <span class="v">&minus;65 mV</span> and depolarisation is positive.
+          Hodgkin and Huxley's original paper used the opposite convention, measuring
+          displacement from rest with inward current positive, which is why their figures
+          look upside down next to a modern textbook's.
+        </p>
+
+        <table class="params">
+          <thead>
+            <tr><th>Symbol</th><th>Value</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="v">C</span><sub>m</sub></td><td>1.0 µF/cm²</td><td>Membrane capacitance</td></tr>
+            <tr><td class="na">ḡ<sub>Na</sub></td><td>120 mS/cm²</td><td>Maximum sodium conductance, all gates open</td></tr>
+            <tr><td class="k">ḡ<sub>K</sub></td><td>36 mS/cm²</td><td>Maximum potassium conductance</td></tr>
+            <tr><td class="lk">ḡ<sub>L</sub></td><td>0.3 mS/cm²</td><td>Leak conductance, voltage-independent</td></tr>
+            <tr><td class="na"><span class="v">E</span><sub>Na</sub></td><td>+50 mV</td><td>Sodium equilibrium potential</td></tr>
+            <tr><td class="k"><span class="v">E</span><sub>K</sub></td><td>&minus;77 mV</td><td>Potassium equilibrium potential</td></tr>
+            <tr><td class="lk"><span class="v">E</span><sub>L</sub></td><td>&minus;54.4 mV</td><td>Leak reversal, set so the cell rests at &minus;65 mV</td></tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top:1.2rem">
+          At rest the gates settle at <span class="na"><span class="v">m</span> = 0.053</span>,
+          <span class="na"><span class="v">h</span> = 0.596</span> and
+          <span class="k"><span class="v">n</span> = 0.318</span>. Sodium is almost fully
+          shut but ready; the brake is more than half off; potassium is partly open. The
+          three currents cancel to within a rounding error, which is what makes rest an
+          equilibrium rather than a resting place.
+        </p>
+
+        <p>
+          The simulation integrates with forward Euler at a fixed 0.01 ms step,
+          independent of your screen's frame rate. That step size matters: the upstroke of
+          a spike is fast enough that a coarser step visibly distorts it, and a much
+          coarser one diverges outright.
+        </p>
+
+        <h2><span class="n">Why it mattered</span>A model that predicted its own mechanism</h2>
+
+        <p>
+          Hodgkin and Huxley fitted their equations by hand, then integrated them on a
+          mechanical calculator &mdash; a process that took about three weeks per spike.
+          What came out was not just a curve that matched their data. It reproduced the
+          conduction velocity of the axon, the threshold, the refractory period, and the
+          after-hyperpolarisation, none of which had been fitted for.
+        </p>
+
+        <p>
+          They were careful to say the gates were a description, not a claim about
+          machinery. But the description was constraining enough that when ion channels
+          were finally isolated, they looked remarkably like what the equations required:
+          discrete, voltage-sensitive, multi-subunit, with separate activation and
+          inactivation. The Nobel came in 1963. The equations are still what anyone means
+          by <em>a neuron</em> when they sit down to simulate one.
+        </p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="neurophysiology.html">← All Neurophysiology</a>
+        <a href="index.html">Interactive Explanations →</a>
+      </nav>
+    </main>
+  </div>
+
+  <script>
+    // The bench reports its own height so the frame never scrolls internally.
+    (function () {
+      const frame = document.querySelector('iframe.bench');
+      if (!frame) return;
+      window.addEventListener('message', (e) => {
+        if (e.source !== frame.contentWindow) return;
+        const d = e.data;
+        if (!d || d.type !== 'hh-widget-height') return;
+        const h = Number(d.height);
+        if (Number.isFinite(h) && h > 200 && h < 4000) frame.style.height = h + 'px';
+      });
+
+      // Keystrokes go to this document until the reader clicks inside the frame, so
+      // the advertised space-to-fire has to be forwarded while the bench is on screen.
+      document.addEventListener('keydown', (e) => {
+        if (e.code !== 'Space') return;
+        const el = document.activeElement;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ||
+                   el.tagName === 'BUTTON' || el.tagName === 'SELECT' ||
+                   el.isContentEditable)) return;
+        const r = frame.getBoundingClientRect();
+        const onScreen = r.top < window.innerHeight * 0.8 && r.bottom > window.innerHeight * 0.2;
+        if (!onScreen) return;
+        e.preventDefault();
+        frame.contentWindow.postMessage({ type: 'hh-widget-fire' }, '*');
+      });
+    })();
+  </script>
+</body>
+</html>

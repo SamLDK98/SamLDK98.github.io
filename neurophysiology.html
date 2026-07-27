@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neurophysiology | Sam Kirwan</title>
+  <meta name="description" content="Interactive explanations of how neurons work, from ion channels to circuits." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:   #f2efe6;
+      --paper-2: #eae6db;
+      --ink:     #23211c;
+      --ink-2:   rgba(35, 33, 28, 0.66);
+      --ink-3:   rgba(35, 33, 28, 0.36);
+      --rule:    rgba(35, 33, 28, 0.16);
+      --na:      #b8442a;
+      --k:       #2c6486;
+      --stim:    #9a7513;
+    }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 100% 26px,
+        linear-gradient(90deg, rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 26px 100%,
+        var(--paper);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sheet {
+      width: min(880px, 100% - 2.5rem);
+      margin: 0 auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--rule);
+      border-right: 1px solid var(--rule);
+      background: rgba(242, 239, 230, 0.72);
+      padding: 0 clamp(1.2rem, 4vw, 3.2rem);
+    }
+
+    /* ---------- masthead ---------- */
+
+    header { padding: clamp(2rem, 6vh, 3.6rem) 0 0; }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: clamp(1.6rem, 5vh, 2.6rem);
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .crumb::before { content: "← "; }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.9rem, 8vw, 4.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.018em;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2.1vw, 1.16rem);
+      line-height: 1.62;
+      color: var(--ink-2);
+      max-width: 46ch;
+      margin-top: 1.1rem;
+    }
+
+    /* ---------- the chart-recorder rule ---------- */
+
+    .recorder {
+      margin: clamp(1.8rem, 5vh, 2.8rem) 0 clamp(1.4rem, 4vh, 2.2rem);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 0;
+    }
+    /* the caption sits above the trace so it can never collide with the pen */
+    .recorder-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.9rem;
+      padding: 0.5rem 2px 0.45rem;
+      border-bottom: 1px solid var(--rule);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .recorder canvas {
+      display: block;
+      width: 100%;
+      height: 74px;
+    }
+
+    /* ---------- index of pages ---------- */
+
+    .index-label {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 0.4rem;
+    }
+
+    nav.contents { display: flex; flex-direction: column; }
+
+    .entry {
+      display: grid;
+      grid-template-columns: 3.1rem minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 0 1rem;
+      padding: 1.35rem 0.6rem 1.35rem 0.2rem;
+      border-top: 1px solid var(--rule);
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      transition: background 0.22s ease, padding-left 0.22s ease;
+    }
+    .entry:last-of-type { border-bottom: 1px solid var(--rule); }
+
+    /* the accent bar that slides out on hover */
+    .entry::before {
+      content: "";
+      position: absolute;
+      left: 0; top: -1px; bottom: -1px;
+      width: 2px;
+      background: var(--na);
+      transform: scaleY(0);
+      transform-origin: 50% 0;
+      transition: transform 0.26s cubic-bezier(0.22, 0.7, 0.2, 1);
+    }
+    .entry:hover, .entry:focus-visible {
+      background: rgba(35, 33, 28, 0.035);
+      padding-left: 0.85rem;
+      outline: none;
+    }
+    .entry:hover::before, .entry:focus-visible::before { transform: scaleY(1); }
+
+    .entry-num {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--ink-3);
+      letter-spacing: 0.06em;
+    }
+    .entry-body { min-width: 0; }
+    .entry-title {
+      display: block;
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.24rem, 3vw, 1.62rem);
+      font-weight: 500;
+      line-height: 1.16;
+      letter-spacing: -0.008em;
+    }
+    .entry-sub {
+      display: block;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      color: var(--ink-2);
+      margin-top: 0.4rem;
+      max-width: 52ch;
+    }
+    .entry-meta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      white-space: nowrap;
+      align-self: center;
+    }
+    .entry-meta .arrow {
+      display: inline-block;
+      transition: transform 0.26s cubic-bezier(0.22, 0.7, 0.2, 1);
+    }
+    .entry:hover .arrow, .entry:focus-visible .arrow { transform: translateX(5px); }
+
+    @media (max-width: 560px) {
+      .entry { grid-template-columns: 2.4rem minmax(0, 1fr); }
+      .entry-meta { grid-column: 2; margin-top: 0.6rem; align-self: start; }
+    }
+
+    /* ---------- footer ---------- */
+
+    footer {
+      margin-top: auto;
+      padding: clamp(2.4rem, 7vh, 4rem) 0 2.4rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem;
+      line-height: 1.7;
+      letter-spacing: 0.04em;
+      color: var(--ink-3);
+    }
+    footer .na { color: var(--na); }
+    footer .k  { color: var(--k); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .entry, .entry::before, .entry-meta .arrow { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="index.html">Interactive Explanations</a>
+      <h1>Neurophysiology</h1>
+      <p class="standfirst">
+        How nervous systems actually work, from the charge across a single patch of
+        membrane up to the circuits it wires together. Built to be played with rather
+        than read.
+      </p>
+    </header>
+
+    <div class="recorder">
+      <div class="recorder-head">
+        <span>membrane potential</span>
+        <span>20 mV / div</span>
+      </div>
+      <canvas id="recorder" aria-hidden="true"></canvas>
+    </div>
+
+    <p class="index-label">Contents</p>
+    <nav class="contents" aria-label="Neurophysiology pages">
+      <a class="entry" href="neurophysiology-hodgkin-huxley.html">
+        <span class="entry-num">01</span>
+        <span class="entry-body">
+          <span class="entry-title">Hodgkin&#8211;Huxley Model</span>
+          <span class="entry-sub">
+            Four coupled differential equations, fitted to a squid axon in 1952, that
+            still explain every action potential you have ever had. Take the controls
+            of a current clamp and find the threshold yourself.
+          </span>
+        </span>
+        <span class="entry-meta">Interactive <span class="arrow">&#8594;</span></span>
+      </a>
+    </nav>
+
+    <footer>
+      the membrane is a capacitor in parallel with three conductances &mdash;
+      <span class="na">sodium in</span>, <span class="k">potassium out</span>, leak always leaking
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    // A hairline chart-recorder trace along the masthead: the same Hodgkin-Huxley
+    // system that runs inside chapter 01, driven by a steady current so it fires
+    // repetitively, scrolling slowly right to left.
+    const canvas = document.getElementById('recorder');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const C_M = 1, G_NA = 120, G_K = 36, G_L = 0.3;
+    const E_NA = 50, E_K = -77, E_L = -54.387, V_REST = -65;
+    const DT = 0.01, I_HOLD = 9;
+
+    const aN = (V) => { const d = V + 55; return Math.abs(d) < 1e-6 ? 0.1 : 0.01 * d / (1 - Math.exp(-d / 10)); };
+    const bN = (V) => 0.125 * Math.exp(-(V + 65) / 80);
+    const aM = (V) => { const d = V + 40; return Math.abs(d) < 1e-6 ? 1.0 : 0.1 * d / (1 - Math.exp(-d / 10)); };
+    const bM = (V) => 4 * Math.exp(-(V + 65) / 18);
+    const aH = (V) => 0.07 * Math.exp(-(V + 65) / 20);
+    const bH = (V) => 1 / (1 + Math.exp(-(V + 35) / 10));
+    const ss = (a, b) => a / (a + b);
+
+    const s = {
+      V: V_REST,
+      m: ss(aM(V_REST), bM(V_REST)),
+      h: ss(aH(V_REST), bH(V_REST)),
+      n: ss(aN(V_REST), bN(V_REST))
+    };
+
+    function step() {
+      const V = s.V;
+      const gNa = G_NA * s.m * s.m * s.m * s.h;
+      const gK = G_K * s.n * s.n * s.n * s.n;
+      const dV = (I_HOLD - gNa * (V - E_NA) - gK * (V - E_K) - G_L * (V - E_L)) / C_M;
+      const dm = aM(V) * (1 - s.m) - bM(V) * s.m;
+      const dh = aH(V) * (1 - s.h) - bH(V) * s.h;
+      const dn = aN(V) * (1 - s.n) - bN(V) * s.n;
+      s.V += dV * DT; s.m += dm * DT; s.h += dh * DT; s.n += dn * DT;
+    }
+
+    const SAMPLE_MS = 0.25;          // one plotted sample per 0.25 ms of model time
+    const samples = [];
+    let capacity = 400;
+
+    function fill(n) {
+      for (let i = 0; i < n; i += 1) {
+        for (let k = 0; k < SAMPLE_MS / DT; k += 1) step();
+        samples.push(s.V);
+      }
+      while (samples.length > capacity) samples.shift();
+    }
+
+    let W = 0, H = 0;
+    function layout() {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      capacity = Math.max(120, Math.round(W / 1.6));
+      while (samples.length > capacity) samples.shift();
+      if (samples.length < capacity) fill(capacity - samples.length);
+    }
+
+    const LO = -85, HI = 45;
+    const yAt = (v) => H - 5 - ((v - LO) / (HI - LO)) * (H - 10);
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // faint divisions, 20 mV apart
+      ctx.strokeStyle = 'rgba(35, 33, 28, 0.08)';
+      ctx.lineWidth = 1;
+      for (let v = -80; v <= 40; v += 20) {
+        const y = Math.round(yAt(v)) + 0.5;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+      if (samples.length < 2) return;
+      const dx = W / (samples.length - 1);
+      ctx.strokeStyle = '#23211c';
+      ctx.lineWidth = 1.3;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      for (let i = 0; i < samples.length; i += 1) {
+        const x = i * dx, y = yAt(samples[i]);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // the writing head
+      const yEnd = yAt(samples[samples.length - 1]);
+      ctx.fillStyle = '#b8442a';
+      ctx.beginPath(); ctx.arc(W - 1, yEnd, 2.2, 0, Math.PI * 2); ctx.fill();
+    }
+
+    layout();
+    let rt;
+    window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { layout(); draw(); }, 150); });
+
+    if (reduce) { draw(); return; }
+
+    let running = true;
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running) requestAnimationFrame(loop);
+    });
+
+    let last = 0;
+    function loop(ts) {
+      if (!running) return;
+      requestAnimationFrame(loop);
+      const dtReal = last ? Math.min(50, ts - last) : 16.7;
+      last = ts;
+      // 1 s of real time carries ~30 ms of model time
+      fill(Math.max(1, Math.round((dtReal * 0.03) / SAMPLE_MS)));
+      draw();
+    }
+    requestAnimationFrame(loop);
+  })();
+  </script>
+</body>
+</html>
