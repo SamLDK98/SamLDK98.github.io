@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Synaptic transmission bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper:   #f2efe6;
+    --paper-2: #eae6db;
+    --ink:     #23211c;
+    --ink-2:   rgba(35, 33, 28, 0.62);
+    --ink-3:   rgba(35, 33, 28, 0.34);
+    --rule:    rgba(35, 33, 28, 0.14);
+    --rule-2:  rgba(35, 33, 28, 0.07);
+
+    --na:      #b8442a;   /* sodium / calcium — warm */
+    --k:       #2c6486;   /* potassium — cool */
+    --nt:      #7a5cb8;   /* neurotransmitter — violet */
+    --gaba:    #2f7d5f;   /* inhibitory — green */
+    --stim:    #9a7513;   /* ochre */
+    --trace:   #17181c;
+  }
+
+  html, body { background: var(--paper); }
+  body {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bench {
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(var(--rule-2) 1px, transparent 1px) 0 0 / 100% 22px,
+      var(--paper);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 262px;
+  }
+
+  /* ---------------- left: scene + trace ---------------- */
+
+  .stage { padding: 12px 6px 10px 12px; min-width: 0; }
+
+  .stage-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 6px 9px 2px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 9px;
+  }
+  .stage-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .readout {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: var(--ink-2);
+  }
+  .readout b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .scene-wrap {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 50% 18%, #fbf9f4 0%, var(--paper) 62%, #e7e3d7 100%);
+    border: 1px solid var(--rule);
+  }
+  .scene-wrap canvas { display: block; width: 100%; height: 100%; }
+
+  /* projected labels */
+  .label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.56rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    background: rgba(242, 239, 230, 0.82);
+    padding: 2px 5px;
+    border: 1px solid var(--rule);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .label.on { opacity: 1; }
+  .label.na { color: var(--na); border-color: rgba(184, 68, 42, 0.4); }
+  .label.nt { color: var(--nt); border-color: rgba(122, 92, 184, 0.4); }
+  .label.k  { color: var(--k);  border-color: rgba(44, 100, 134, 0.4); }
+
+  .view-hint {
+    position: absolute;
+    right: 7px; bottom: 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    pointer-events: none;
+  }
+
+  canvas.trace {
+    display: block;
+    width: 100%;
+    height: 150px;
+    margin-top: 9px;
+  }
+
+  /* ---------------- right: controls ---------------- */
+
+  .rack {
+    border-left: 1px solid var(--rule);
+    background: var(--paper-2);
+    padding: 12px 14px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .rack h3 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .group { display: flex; flex-direction: column; gap: 8px; }
+
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 0.73rem; color: var(--ink-2); gap: 0.5rem;
+  }
+  .field-label .val {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.71rem; font-weight: 500; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 15px; background: transparent; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: rgba(35,33,28,0.26); }
+  input[type="range"]::-moz-range-track { height: 2px; background: rgba(35,33,28,0.26); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 13px; height: 13px; margin-top: -5.5px;
+    border-radius: 50%; background: var(--paper); border: 1.5px solid var(--ink);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--paper); border: 1.5px solid var(--ink);
+  }
+  input[type="range"]:focus-visible { outline: 2px solid var(--stim); outline-offset: 3px; }
+
+  button {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.77rem; font-weight: 500; color: var(--ink);
+    background: var(--paper); border: 1px solid rgba(35,33,28,0.3);
+    padding: 7px 9px; cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.06s ease;
+  }
+  button:hover { background: #fffdf7; border-color: var(--ink); }
+  button:active { transform: translateY(1px); }
+  button:focus-visible { outline: 2px solid var(--stim); outline-offset: 2px; }
+
+  .btn-fire {
+    background: var(--ink); color: var(--paper); border-color: var(--ink);
+    letter-spacing: 0.04em; padding: 9px;
+  }
+  .btn-fire:hover { background: #000; color: #fff; }
+  .btn-fire .hint {
+    display: block; font-family: "IBM Plex Mono", monospace;
+    font-size: 0.56rem; letter-spacing: 0.14em; opacity: 0.6; margin-top: 2px;
+  }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  .seg { display: flex; }
+  .seg button {
+    flex: 1; font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem; padding: 6px 2px; border-right-width: 0;
+  }
+  .seg button:last-child { border-right-width: 1px; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .seg.nt button[aria-pressed="true"] { background: var(--nt); border-color: var(--nt); }
+  .seg.gaba button[aria-pressed="true"] { background: var(--gaba); border-color: var(--gaba); }
+
+  .toggle {
+    display: flex; align-items: flex-start; gap: 7px;
+    font-size: 0.73rem; color: var(--ink-2); cursor: pointer; line-height: 1.3;
+  }
+  .toggle input { margin-top: 2px; accent-color: var(--na); cursor: pointer; }
+  .toggle .t { color: var(--ink); font-weight: 500; }
+  .toggle .d { display: block; font-size: 0.66rem; color: var(--ink-3); }
+
+  /* step tracker */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: grid;
+    grid-template-columns: 1.35rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 3.5px 0;
+    font-size: 0.71rem;
+    color: var(--ink-3);
+    border-left: 2px solid transparent;
+    padding-left: 6px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .step .num { font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; }
+  .step.on { color: var(--ink); border-left-color: var(--na); font-weight: 500; }
+  .step.done { color: var(--ink-2); }
+
+  .note {
+    font-size: 0.66rem; line-height: 1.45; color: var(--ink-3);
+    border-top: 1px solid var(--rule); padding-top: 8px; margin-top: auto;
+  }
+  .note code { font-family: "IBM Plex Mono", monospace; color: var(--ink-2); }
+
+  .fallback {
+    padding: 2rem 1.5rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-align: center;
+  }
+
+  @media (max-width: 780px) {
+    .bench { grid-template-columns: minmax(0, 1fr); }
+    .rack { border-left: 0; border-top: 1px solid var(--rule); }
+    .scene-wrap { height: 280px; }
+    .note { margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bench">
+  <div class="stage">
+    <div class="stage-head">
+      <span class="stage-title">Synapse — glutamatergic bouton</span>
+      <span class="readout">
+        <span>V<sub>post</sub> <b id="ro-v">−65.0</b> mV</span>
+        <span>cleft <b id="ro-c">0.00</b></span>
+        <span>bound <b id="ro-b">0%</b></span>
+        <span>spikes <b id="ro-n">0</b></span>
+      </span>
+    </div>
+
+    <div class="scene-wrap" id="sceneWrap">
+      <div class="view-hint">drag to tilt</div>
+    </div>
+
+    <canvas class="trace" id="trace" aria-label="Postsynaptic membrane potential over time"></canvas>
+  </div>
+
+  <div class="rack">
+    <div class="group">
+      <h3>Presynaptic</h3>
+      <button class="btn-fire" id="fire" type="button">
+        Fire action potential
+        <span class="hint">SPACE</span>
+      </button>
+      <div class="field">
+        <label class="field-label" for="ca">
+          <span>Ca²⁺ influx</span>
+          <span class="val"><span id="ca-v">4</span> vesicles</span>
+        </label>
+        <input type="range" id="ca" min="0" max="10" step="1" value="4" />
+      </div>
+      <div class="seg nt" id="ntType" role="group" aria-label="Neurotransmitter">
+        <button type="button" data-nt="glu" aria-pressed="true">Glutamate</button>
+        <button type="button" data-nt="gaba" aria-pressed="false">GABA</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Pharmacology</h3>
+      <label class="toggle">
+        <input type="checkbox" id="blockR" />
+        <span>
+          <span class="t">Block receptors</span>
+          <span class="d">Postsynaptic channels shut</span>
+        </span>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="blockU" />
+        <span>
+          <span class="t">Block reuptake</span>
+          <span class="d">Transmitter lingers in the cleft</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="group">
+      <h3>Sequence</h3>
+      <div class="steps" id="steps">
+        <div class="step" data-step="0"><span class="num">01</span><span>Action potential arrives</span></div>
+        <div class="step" data-step="1"><span class="num">02</span><span>Ca²⁺ channels open</span></div>
+        <div class="step" data-step="2"><span class="num">03</span><span>Vesicles fuse</span></div>
+        <div class="step" data-step="3"><span class="num">04</span><span>Transmitter crosses cleft</span></div>
+        <div class="step" data-step="4"><span class="num">05</span><span>Receptors bind and open</span></div>
+        <div class="step" data-step="5"><span class="num">06</span><span>Ions flow, membrane responds</span></div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Playback</h3>
+      <div class="seg" id="speed" role="group" aria-label="Playback speed">
+        <button type="button" data-slow="20"  aria-pressed="false">1/20×</button>
+        <button type="button" data-slow="60"  aria-pressed="true">1/60×</button>
+        <button type="button" data-slow="200" aria-pressed="false">1/200×</button>
+      </div>
+      <div class="row">
+        <button type="button" id="pause">Pause</button>
+        <button type="button" id="reset">Reset</button>
+      </div>
+      <button type="button" id="view">Reset view</button>
+    </div>
+
+    <p class="note">
+      Postsynaptic cell is the same Hodgkin–Huxley membrane as chapter 01, with one
+      extra current <code>I<sub>syn</sub> = g<sub>syn</sub>(V − E<sub>syn</sub>)</code>.
+      <code>E<sub>syn</sub></code> is <code>0 mV</code> for glutamate,
+      <code>−75 mV</code> for GABA.
+    </p>
+  </div>
+</div>
+
+<script src="../../lib/three.min.js"></script>
+<script src="../../lib/OrbitControls.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  const wrap = document.getElementById('sceneWrap');
+
+  if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') {
+    wrap.innerHTML = '<p class="fallback">This visualisation needs three.js, which failed to load.</p>';
+    return;
+  }
+
+  // =================================================================
+  // 1. The model. Everything the voltage does comes from here; the 3D
+  //    particles are driven by the same rate constants but are only
+  //    decoration — they never feed back into the simulation.
+  // =================================================================
+
+  // Hodgkin–Huxley, identical to chapter 01
+  const C_M = 1.0, G_NA = 120.0, G_K = 36.0, G_L = 0.3;
+  const E_NA = 50.0, E_K = -77.0, E_L = -54.387, V_REST = -65.0;
+  const DT = 0.01;
+
+  // Synapse — every value below was tuned numerically so that a single release
+  // is graded and subthreshold up to 4 vesicles, and fires at 5.
+  const K_ON = 0.08;        // receptor binding, per transmitter unit per ms
+  const K_OFF = 0.05;       // unbinding — sets how long the response lasts
+  const K_CLEAR = 1.2;      // clearance from the cleft (reuptake + diffusion)
+  const K_CLEAR_BLOCKED = 0.18;
+  const G_MAX = 0.16;       // mS/cm² at full receptor occupancy
+  const E_EXC = 0.0;        // mV — glutamate / AMPA
+  const E_INH = -75.0;      // mV — GABA_A
+
+  const ex = Math.exp;
+  function alphaN(V) { const d = V + 55; return Math.abs(d) < 1e-6 ? 0.1 : 0.01 * d / (1 - ex(-d / 10)); }
+  const betaN  = (V) => 0.125 * ex(-(V + 65) / 80);
+  function alphaM(V) { const d = V + 40; return Math.abs(d) < 1e-6 ? 1.0 : 0.1 * d / (1 - ex(-d / 10)); }
+  const betaM  = (V) => 4.0 * ex(-(V + 65) / 18);
+  const alphaH = (V) => 0.07 * ex(-(V + 65) / 20);
+  const betaH  = (V) => 1.0 / (1 + ex(-(V + 35) / 10));
+  const steady = (a, b) => a / (a + b);
+
+  const S = { t: 0, V: V_REST, m: 0, h: 0, n: 0, C: 0, B: 0 };
+
+  function resetModel() {
+    S.t = 0; S.V = V_REST;
+    S.m = steady(alphaM(V_REST), betaM(V_REST));
+    S.h = steady(alphaH(V_REST), betaH(V_REST));
+    S.n = steady(alphaN(V_REST), betaN(V_REST));
+    S.C = 0; S.B = 0;
+  }
+
+  const ui = {
+    ca: document.getElementById('ca'), caV: document.getElementById('ca-v'),
+    ntType: document.getElementById('ntType'),
+    blockR: document.getElementById('blockR'), blockU: document.getElementById('blockU'),
+    fire: document.getElementById('fire'), pause: document.getElementById('pause'),
+    reset: document.getElementById('reset'), view: document.getElementById('view'),
+    speed: document.getElementById('speed'), steps: document.getElementById('steps'),
+    roV: document.getElementById('ro-v'), roC: document.getElementById('ro-c'),
+    roB: document.getElementById('ro-b'), roN: document.getElementById('ro-n')
+  };
+
+  let ntKind = 'glu';
+  const eSyn = () => (ntKind === 'glu' ? E_EXC : E_INH);
+  const gMax = () => (ui.blockR.checked ? 0 : G_MAX);
+  const kClear = () => (ui.blockU.checked ? K_CLEAR_BLOCKED : K_CLEAR);
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let slowdown = 60;
+  let running = !reduceMotion;
+  let spikeCount = 0, armed = true;
+
+  // presynaptic action potential: a scripted waveform at the terminal, since the
+  // interesting physics here is downstream of it
+  let apT = -1;                    // sim time the AP was triggered
+  const AP_DUR = 2.0;              // ms — terminal depolarisation
+  const CA_DELAY = 0.4;            // ms — channels open shortly after
+  const FUSE_DELAY = 0.9;          // ms — fusion lags calcium entry
+
+  let pendingFusion = -1, pendingVes = 0;
+
+  function fireAP() {
+    apT = S.t;
+    pendingVes = parseInt(ui.ca.value, 10);
+    pendingFusion = S.t + FUSE_DELAY;
+    stageMark(0, S.t);
+    if (pendingVes > 0) stageMark(1, S.t + CA_DELAY);
+  }
+
+  // stage tracker: each step lights up when it happens and fades after
+  const stageAt = [-1, -1, -1, -1, -1, -1];
+  function stageMark(i, t) { stageAt[i] = t; }
+
+  function step() {
+    const V = S.V;
+
+    if (pendingFusion >= 0 && S.t >= pendingFusion) {
+      S.C += pendingVes * 1.0;
+      if (pendingVes > 0) { stageMark(2, S.t); releaseVesicles(pendingVes); }
+      pendingFusion = -1;
+    }
+
+    const gSyn = gMax() * S.B;
+    const iSyn = gSyn * (V - eSyn());
+
+    const gNa = G_NA * S.m * S.m * S.m * S.h;
+    const gK  = G_K  * S.n * S.n * S.n * S.n;
+    const dV = (-gNa * (V - E_NA) - gK * (V - E_K) - G_L * (V - E_L) - iSyn) / C_M;
+
+    const dm = alphaM(V) * (1 - S.m) - betaM(V) * S.m;
+    const dh = alphaH(V) * (1 - S.h) - betaH(V) * S.h;
+    const dn = alphaN(V) * (1 - S.n) - betaN(V) * S.n;
+    const dC = -kClear() * S.C;
+    const dB = K_ON * S.C * (1 - S.B) - K_OFF * S.B;
+
+    S.V += dV * DT;
+    S.m += dm * DT; S.h += dh * DT; S.n += dn * DT;
+    S.C = Math.max(0, S.C + dC * DT);
+    S.B = Math.min(1, Math.max(0, S.B + dB * DT));
+
+    S.m = Math.min(1, Math.max(0, S.m));
+    S.h = Math.min(1, Math.max(0, S.h));
+    S.n = Math.min(1, Math.max(0, S.n));
+
+    if (S.C > 0.05) stageMark(3, S.t);
+    if (S.B > 0.02) stageMark(4, S.t);
+    if (Math.abs(S.V - V_REST) > 0.5) stageMark(5, S.t);
+
+    S.t += DT;
+
+    if (armed && S.V > 0) { armed = false; spikeCount += 1; }
+    else if (!armed && S.V < -40) { armed = true; }
+
+    if (S.t >= nextRecord) { record(); nextRecord = S.t + REC_MS; }
+  }
+
+  // ---- history for the trace ----
+  const WINDOW_MS = 60, REC_MS = 0.05;
+  const hist = [];
+  let nextRecord = 0;
+
+  function record() {
+    hist.push({ t: S.t, V: S.V, C: S.C, B: S.B });
+    const cut = S.t - WINDOW_MS * 1.15;
+    let d = 0;
+    while (d < hist.length && hist[d].t < cut) d += 1;
+    if (d) hist.splice(0, d);
+  }
+
+  // =================================================================
+  // 2. The scene
+  // =================================================================
+
+  const COL = {
+    membrane:  0xb9a9d6,
+    membraneD: 0x9c8bc4,
+    post:      0xc9bcdd,
+    vesicle:   0xd8cdee,
+    nt:        0x7a5cb8,
+    gaba:      0x2f7d5f,
+    ca:        0xb8442a,
+    receptor:  0x2c6486,
+    receptorOn:0x4fa3d1,
+    channel:   0xc4643f,
+    ion:       0xd4762c
+  };
+
+  const scene = new THREE.Scene();
+  scene.background = null;
+
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
+  const HOME = new THREE.Vector3(0, 3.0, 15.5);
+  const TARGET = new THREE.Vector3(0, 2.1, 0);
+  camera.position.copy(HOME);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setClearColor(0x000000, 0);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  wrap.insertBefore(renderer.domElement, wrap.firstChild);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.copy(TARGET);
+  controls.enablePan = false;
+  controls.enableZoom = true;
+  controls.minDistance = 11;
+  controls.maxDistance = 21;
+  // a narrow band around the canonical cross-section: tilting a specimen,
+  // not flying a camera
+  controls.minPolarAngle = Math.PI * 0.30;
+  controls.maxPolarAngle = Math.PI * 0.62;
+  controls.minAzimuthAngle = -Math.PI * 0.22;
+  controls.maxAzimuthAngle = Math.PI * 0.22;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.update();
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xcfc7b4, 0.85));
+  const key = new THREE.DirectionalLight(0xffffff, 0.72);
+  key.position.set(4, 9, 8);
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0xffe6c8, 0.3);
+  rim.position.set(-6, 3, -5);
+  scene.add(rim);
+
+  // ---- presynaptic terminal ----
+  const boutonGeo = new THREE.SphereGeometry(2.5, 48, 36);
+  const boutonMat = new THREE.MeshStandardMaterial({
+    color: COL.membrane, transparent: true, opacity: 0.40,
+    roughness: 0.55, metalness: 0.0, depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  const bouton = new THREE.Mesh(boutonGeo, boutonMat);
+  bouton.position.set(0, 4.0, 0);
+  bouton.scale.set(1.5, 1.12, 1.25);
+  scene.add(bouton);
+
+  const CLEFT_TOP = 4.0 - 2.5 * 1.12;   // 1.2 — underside of the bouton
+  const CLEFT_BOT = 0.0;
+
+  // axon feeding in from upper left
+  const axon = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.62, 0.9, 5.4, 28, 1, true),
+    boutonMat
+  );
+  axon.position.set(-3.1, 7.2, -0.3);
+  axon.rotation.z = Math.PI * 0.30;
+  scene.add(axon);
+
+  // the travelling action potential, a bright band on the axon
+  const apBand = new THREE.Mesh(
+    new THREE.TorusGeometry(0.78, 0.13, 10, 28),
+    new THREE.MeshBasicMaterial({ color: 0xe8a13a, transparent: true, opacity: 0 })
+  );
+  scene.add(apBand);
+
+  // ---- postsynaptic membrane ----
+  const postMat = new THREE.MeshStandardMaterial({
+    color: COL.post, roughness: 0.62, metalness: 0.0,
+    transparent: true, opacity: 0.94
+  });
+  const post = new THREE.Mesh(new THREE.BoxGeometry(11, 0.7, 6), postMat);
+  post.position.set(0, -0.35, 0);
+  scene.add(post);
+
+  // ---- calcium channels on the bouton underside ----
+  const chanGeo = new THREE.CylinderGeometry(0.19, 0.19, 0.75, 14);
+  const chanMat = new THREE.MeshStandardMaterial({ color: COL.channel, roughness: 0.5 });
+  const channels = [];
+  [-2.55, -2.05, 2.05, 2.55].forEach((x) => {
+    const c = new THREE.Mesh(chanGeo, chanMat.clone());
+    c.position.set(x, CLEFT_TOP + 0.15, 0);
+    scene.add(c);
+    channels.push(c);
+  });
+
+  // ---- receptors on the postsynaptic membrane ----
+  const RECEPTORS = [];
+  const recGeo = new THREE.CylinderGeometry(0.2, 0.26, 0.8, 14);
+  for (let i = 0; i < 14; i += 1) {
+    const col = i % 7, row = Math.floor(i / 7);
+    const x = -2.7 + col * 0.9;
+    const z = row === 0 ? -0.55 : 0.55;
+    const mat = new THREE.MeshStandardMaterial({ color: COL.receptor, roughness: 0.45 });
+    const r = new THREE.Mesh(recGeo, mat);
+    r.position.set(x, 0.1, z);
+    scene.add(r);
+    RECEPTORS.push({ mesh: r, mat, bound: false, openness: 0 });
+  }
+
+  // ---- transporters (reuptake) on the presynaptic side ----
+  const transGeo = new THREE.CylinderGeometry(0.17, 0.17, 0.7, 12);
+  const transMat = new THREE.MeshStandardMaterial({ color: 0x6f7466, roughness: 0.5 });
+  const TRANSPORTERS = [];
+  [-3.3, 3.3].forEach((x) => {
+    const tr = new THREE.Mesh(transGeo, transMat);
+    tr.position.set(x, CLEFT_TOP + 0.1, 0);
+    scene.add(tr);
+    TRANSPORTERS.push(tr);
+  });
+
+  // ---- instanced particles ----
+  const MAX_VES = 14, MAX_NT = 260, MAX_CA = 90, MAX_ION = 70;
+  const dummy = new THREE.Object3D();
+
+  function makeInstanced(geo, mat, count) {
+    const m = new THREE.InstancedMesh(geo, mat, count);
+    m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    m.count = 0;
+    scene.add(m);
+    return m;
+  }
+
+  const vesMesh = makeInstanced(
+    new THREE.SphereGeometry(0.42, 18, 14),
+    new THREE.MeshStandardMaterial({ color: COL.vesicle, roughness: 0.4,
+      transparent: true, opacity: 0.92 }), MAX_VES);
+
+  const ntMat = new THREE.MeshStandardMaterial({ color: COL.nt, roughness: 0.35 });
+  const ntMesh = makeInstanced(new THREE.SphereGeometry(0.115, 10, 8), ntMat, MAX_NT);
+
+  const caMesh = makeInstanced(
+    new THREE.SphereGeometry(0.1, 8, 6),
+    new THREE.MeshStandardMaterial({ color: COL.ca, roughness: 0.3 }), MAX_CA);
+
+  const ionMesh = makeInstanced(
+    new THREE.SphereGeometry(0.1, 8, 6),
+    new THREE.MeshStandardMaterial({ color: COL.ion, roughness: 0.3 }), MAX_ION);
+
+  // ---- particle agents ----
+  let vesicles = [], ntParts = [], caParts = [], ionParts = [];
+
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  function seedVesiclePool() {
+    vesicles = [];
+    for (let i = 0; i < 7; i += 1) {
+      vesicles.push({
+        state: 'pool',
+        x: rnd(-2.2, 2.2), y: rnd(2.9, 5.2), z: rnd(-1.1, 1.1),
+        tx: 0, ty: 0, tz: 0, prog: 0
+      });
+    }
+  }
+
+  function releaseVesicles(n) {
+    const pool = vesicles.filter((v) => v.state === 'pool');
+    for (let i = 0; i < Math.min(n, pool.length); i += 1) {
+      const v = pool[i];
+      v.state = 'docking';
+      v.tx = rnd(-1.7, 1.7); v.ty = CLEFT_TOP + 0.25; v.tz = rnd(-0.7, 0.7);
+      v.prog = 0;
+      v.sx = v.x; v.sy = v.y; v.sz = v.z;
+    }
+    // calcium enters through the channels
+    for (let i = 0; i < Math.min(n * 5, MAX_CA - caParts.length); i += 1) {
+      const ch = channels[(Math.random() * channels.length) | 0];
+      caParts.push({
+        x: ch.position.x + rnd(-0.1, 0.1), y: CLEFT_TOP + rnd(-0.3, 0.1), z: rnd(-0.2, 0.2),
+        vx: rnd(-0.02, 0.02), vy: rnd(0.02, 0.06), vz: rnd(-0.02, 0.02),
+        life: rnd(1.4, 3.0)
+      });
+    }
+  }
+
+  function spawnNT(x, y, z, n) {
+    for (let i = 0; i < n && ntParts.length < MAX_NT; i += 1) {
+      ntParts.push({
+        state: 'free',
+        x: x + rnd(-0.28, 0.28), y: y + rnd(-0.12, 0.05), z: z + rnd(-0.28, 0.28),
+        vx: rnd(-0.05, 0.05), vy: rnd(-0.10, -0.03), vz: rnd(-0.04, 0.04),
+        rec: -1, life: 0
+      });
+    }
+  }
+
+  function spawnIons(n) {
+    for (let i = 0; i < n && ionParts.length < MAX_ION; i += 1) {
+      const r = RECEPTORS[(Math.random() * RECEPTORS.length) | 0];
+      if (!r.bound) continue;
+      ionParts.push({
+        x: r.mesh.position.x + rnd(-0.1, 0.1), y: rnd(0.6, 1.1), z: r.mesh.position.z + rnd(-0.1, 0.1),
+        vy: rnd(-0.05, -0.025), life: rnd(0.8, 1.6)
+      });
+    }
+  }
+
+  // Particle stepping runs on wall-clock frames, not simulation steps: it is
+  // decoration, and tying it to dt would make it crawl at 1/200x.
+  function stepParticles(dtSec) {
+    const k = dtSec * 60;   // normalise to 60 fps
+
+    for (const v of vesicles) {
+      if (v.state === 'docking') {
+        v.prog = Math.min(1, v.prog + 0.035 * k);
+        const e = v.prog * v.prog * (3 - 2 * v.prog);
+        v.x = v.sx + (v.tx - v.sx) * e;
+        v.y = v.sy + (v.ty - v.sy) * e;
+        v.z = v.sz + (v.tz - v.sz) * e;
+        if (v.prog >= 1) {
+          v.state = 'fusing';
+          v.prog = 0;
+          spawnNT(v.x, CLEFT_TOP - 0.1, v.z, 9);
+        }
+      } else if (v.state === 'fusing') {
+        v.prog += 0.05 * k;
+        if (v.prog >= 1) {
+          // recycle back into the pool
+          v.state = 'pool';
+          v.x = rnd(-2.2, 2.2); v.y = rnd(2.9, 5.2); v.z = rnd(-1.1, 1.1);
+        }
+      } else {
+        v.x += Math.sin(perf * 0.0004 + v.y * 3) * 0.004 * k;
+        v.y += Math.cos(perf * 0.0005 + v.x * 3) * 0.004 * k;
+      }
+    }
+
+    // neurotransmitter agents use the same rate constants as the model
+    const pOn = 1 - Math.exp(-K_ON * 6 * dtSec * 1000 / slowdown);
+    const pOff = 1 - Math.exp(-K_OFF * dtSec * 1000 / slowdown);
+    const pClear = 1 - Math.exp(-kClear() * 0.25 * dtSec * 1000 / slowdown);
+
+    for (let i = ntParts.length - 1; i >= 0; i -= 1) {
+      const p = ntParts[i];
+      if (p.state === 'free') {
+        p.x += p.vx * k; p.y += p.vy * k; p.z += p.vz * k;
+        p.vx += rnd(-0.012, 0.012) * k;
+        p.vz += rnd(-0.012, 0.012) * k;
+        p.vy += rnd(-0.006, 0.004) * k;
+        p.vy = Math.max(-0.16, Math.min(0.06, p.vy));
+        if (p.y < 0.62) { p.y = 0.62; p.vy = Math.abs(p.vy) * 0.3; }
+        if (p.y > CLEFT_TOP - 0.12) { p.y = CLEFT_TOP - 0.12; p.vy = -Math.abs(p.vy); }
+        if (Math.abs(p.x) > 4.2) p.vx *= -1;
+        if (Math.abs(p.z) > 1.6) p.vz *= -1;
+
+        if (!ui.blockR.checked && p.y < 1.15 && Math.random() < pOn) {
+          const free = RECEPTORS.filter((r) => !r.bound);
+          if (free.length) {
+            const r = free[(Math.random() * free.length) | 0];
+            r.bound = true;
+            p.state = 'bound';
+            p.rec = RECEPTORS.indexOf(r);
+          }
+        } else if (Math.abs(p.x) > 2.6 && Math.random() < pClear) {
+          p.state = 'clearing';
+          const tr = TRANSPORTERS[p.x < 0 ? 0 : 1];
+          p.tx = tr.position.x; p.ty = tr.position.y; p.tz = tr.position.z;
+          p.prog = 0; p.sx = p.x; p.sy = p.y; p.sz = p.z;
+        }
+      } else if (p.state === 'bound') {
+        const r = RECEPTORS[p.rec];
+        p.x = r.mesh.position.x; p.y = 0.62; p.z = r.mesh.position.z;
+        if (Math.random() < pOff) {
+          r.bound = false;
+          p.state = 'free';
+          p.rec = -1;
+          p.vy = 0.05; p.vx = rnd(-0.04, 0.04); p.vz = rnd(-0.04, 0.04);
+        }
+      } else if (p.state === 'clearing') {
+        p.prog = Math.min(1, p.prog + 0.045 * k);
+        p.x = p.sx + (p.tx - p.sx) * p.prog;
+        p.y = p.sy + (p.ty - p.sy) * p.prog;
+        p.z = p.sz + (p.tz - p.sz) * p.prog;
+        if (p.prog >= 1) {
+          if (p.rec >= 0 && RECEPTORS[p.rec]) RECEPTORS[p.rec].bound = false;
+          ntParts.splice(i, 1);
+        }
+      }
+    }
+
+    // if the model says the cleft is empty, drain any stragglers
+    if (S.C < 0.01 && ntParts.length) {
+      for (let i = ntParts.length - 1; i >= 0; i -= 1) {
+        if (ntParts[i].state === 'free' && Math.random() < 0.03 * k) {
+          ntParts.splice(i, 1);
+        }
+      }
+    }
+
+    for (let i = caParts.length - 1; i >= 0; i -= 1) {
+      const p = caParts[i];
+      p.x += p.vx * k; p.y += p.vy * k; p.z += p.vz * k;
+      p.life -= dtSec;
+      if (p.life <= 0) caParts.splice(i, 1);
+    }
+
+    for (let i = ionParts.length - 1; i >= 0; i -= 1) {
+      const p = ionParts[i];
+      p.y += p.vy * k;
+      p.life -= dtSec;
+      if (p.life <= 0 || p.y < -0.5) ionParts.splice(i, 1);
+    }
+
+    // receptors ease open/shut
+    for (const r of RECEPTORS) {
+      const target = r.bound ? 1 : 0;
+      r.openness += (target - r.openness) * Math.min(1, 0.12 * k);
+      r.mat.color.setHex(r.openness > 0.5 ? COL.receptorOn : COL.receptor);
+      r.mesh.scale.y = 1 + r.openness * 0.32;
+      r.mesh.position.y = 0.1 + r.openness * 0.06;
+    }
+
+    // ion flow while receptors are open
+    if (S.B > 0.03 && Math.random() < 0.5 * k) spawnIons(1);
+  }
+
+  function pushInstances(mesh, arr, max) {
+    const n = Math.min(arr.length, max);
+    for (let i = 0; i < n; i += 1) {
+      const p = arr[i];
+      dummy.position.set(p.x, p.y, p.z);
+      dummy.scale.setScalar(p.scale || 1);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.count = n;
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  function syncScene() {
+    const vis = vesicles.filter((v) => v.state !== 'fusing' || v.prog < 0.6);
+    for (const v of vis) v.scale = v.state === 'fusing' ? (1 - v.prog) : 1;
+    pushInstances(vesMesh, vis, MAX_VES);
+    pushInstances(ntMesh, ntParts, MAX_NT);
+    pushInstances(caMesh, caParts, MAX_CA);
+    pushInstances(ionMesh, ionParts, MAX_ION);
+
+    ntMat.color.setHex(ntKind === 'glu' ? COL.nt : COL.gaba);
+
+    // the action potential sweeping down the axon, then the terminal flashing
+    const age = apT >= 0 ? S.t - apT : 1e9;
+    if (age >= 0 && age < AP_DUR) {
+      const f = age / AP_DUR;
+      apBand.material.opacity = 0.9 * (1 - f);
+      apBand.position.set(-3.1 - 1.9 + f * 3.4, 8.9 - f * 4.2, -0.3);
+      apBand.rotation.set(Math.PI * 0.5, 0, Math.PI * 0.30);
+      boutonMat.opacity = 0.40 + 0.22 * (1 - f);
+      boutonMat.color.setHex(COL.membraneD);
+      const chanOpen = age > CA_DELAY ? 1 : 0;
+      for (const c of channels) {
+        c.scale.y = 1 + chanOpen * 0.35;
+        c.material.color.setHex(chanOpen ? 0xe07a45 : COL.channel);
+      }
+    } else {
+      apBand.material.opacity = 0;
+      boutonMat.opacity = 0.40;
+      boutonMat.color.setHex(COL.membrane);
+      for (const c of channels) { c.scale.y = 1; c.material.color.setHex(COL.channel); }
+    }
+
+    // postsynaptic membrane tints with its own voltage
+    const d = Math.max(-1, Math.min(1, (S.V - V_REST) / 40));
+    postMat.color.setRGB(
+      0.79 + d * 0.18,
+      0.74 - Math.abs(d) * 0.10,
+      0.87 - d * 0.16
+    );
+  }
+
+  // ---- projected labels ----
+  // Anchors are spread well apart in y so the projected boxes don't collide at
+  // any angle the constrained orbit allows.
+  const LABELS = [
+    { text: 'axon terminal',     cls: '',   pos: new THREE.Vector3(-4.3, 6.9, 0) },
+    { text: 'synaptic vesicles', cls: 'nt', pos: new THREE.Vector3(3.4, 5.2, 0) },
+    { text: 'Ca²⁺ channels',     cls: 'na', pos: new THREE.Vector3(-5.0, 2.2, 0) },
+    { text: 'synaptic cleft',    cls: '',   pos: new THREE.Vector3(5.0, 0.66, 0) },
+    { text: 'receptors',         cls: 'k',  pos: new THREE.Vector3(-1.4, 0.45, 2.9) },
+    { text: 'postsynaptic cell', cls: '',   pos: new THREE.Vector3(3.4, -1.4, 1.6) }
+  ];
+  for (const L of LABELS) {
+    const el = document.createElement('div');
+    el.className = 'label ' + L.cls;
+    el.textContent = L.text;
+    wrap.appendChild(el);
+    L.el = el;
+  }
+
+  const proj = new THREE.Vector3();
+  function placeLabels(w, h) {
+    for (const L of LABELS) {
+      proj.copy(L.pos).project(camera);
+      if (proj.z > 1) { L.el.classList.remove('on'); continue; }
+      const x = (proj.x * 0.5 + 0.5) * w;
+      const y = (-proj.y * 0.5 + 0.5) * h;
+      if (x < 4 || x > w - 4 || y < 4 || y > h - 4) { L.el.classList.remove('on'); continue; }
+      L.el.style.left = x + 'px';
+      L.el.style.top = y + 'px';
+      L.el.classList.add('on');
+    }
+  }
+
+  // =================================================================
+  // 3. The trace
+  // =================================================================
+
+  const tCanvas = document.getElementById('trace');
+  const tctx = tCanvas.getContext('2d');
+  const css = getComputedStyle(document.documentElement);
+  const cv = (n) => css.getPropertyValue(n).trim();
+  const TC = {
+    ink: cv('--ink'), ink2: cv('--ink-2'), ink3: cv('--ink-3'),
+    rule: cv('--rule'), rule2: cv('--rule-2'),
+    nt: cv('--nt'), gaba: cv('--gaba'), trace: cv('--trace'), k: cv('--k')
+  };
+
+  let TW = 0, TH = 0;
+  const TPAD = { l: 60, r: 10, t: 6, b: 18 };   // wide enough for the "threshold" tick
+
+  function layoutTrace() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = tCanvas.getBoundingClientRect();
+    TW = r.width; TH = r.height;
+    tCanvas.width = Math.round(TW * dpr);
+    tCanvas.height = Math.round(TH * dpr);
+    tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // A 5 mV EPSP is invisible on chapter 01's axis, so the default range is
+  // tight and only opens up when a spike actually happens.
+  let vHi = -45, vLo = -80;
+
+  function drawTrace() {
+    tctx.clearRect(0, 0, TW, TH);
+    const w = TW - TPAD.l - TPAD.r;
+    const h = TH - TPAD.t - TPAD.b;
+    const tMax = Math.max(S.t, WINDOW_MS), tMin = tMax - WINDOW_MS;
+
+    // ease the y-range toward what the recent trace needs
+    let peak = V_REST;
+    for (const s of hist) peak = Math.max(peak, s.V);
+    const wantHi = peak > -40 ? 55 : -45;
+    vHi += (wantHi - vHi) * 0.08;
+    const wantLo = peak > -40 ? -90 : -80;
+    vLo += (wantLo - vLo) * 0.08;
+
+    const xAt = (t) => TPAD.l + ((t - tMin) / WINDOW_MS) * w;
+    const yAt = (v) => TPAD.t + h * (1 - (v - vLo) / (vHi - vLo));
+
+    tctx.strokeStyle = TC.rule;
+    tctx.lineWidth = 1;
+    tctx.strokeRect(TPAD.l + 0.5, TPAD.t + 0.5, w - 1, h - 1);
+
+    tctx.font = '500 9.5px "IBM Plex Mono", monospace';
+    tctx.textAlign = 'right';
+    tctx.textBaseline = 'middle';
+
+    const ticks = vHi > 0 ? [50, 0, -55, -65, -77] : [-45, -50, -55, -60, -65, -70, -75];
+    for (const v of ticks) {
+      const y = yAt(v);
+      if (y < TPAD.t || y > TPAD.t + h) continue;
+      const isRest = v === -65, isThr = v === -55;
+      tctx.strokeStyle = isRest || isThr ? TC.rule : TC.rule2;
+      tctx.setLineDash(isRest || isThr ? [3, 4] : []);
+      tctx.beginPath(); tctx.moveTo(TPAD.l, y); tctx.lineTo(TW - TPAD.r, y); tctx.stroke();
+      tctx.setLineDash([]);
+      tctx.fillStyle = isThr ? cv('--na') : TC.ink3;
+      tctx.fillText(isThr ? 'threshold' : String(v), TPAD.l - 6, y);
+    }
+
+    // receptor occupancy, as a filled band along the bottom
+    if (hist.length > 1) {
+      tctx.save();
+      tctx.beginPath(); tctx.rect(TPAD.l, TPAD.t, w, h); tctx.clip();
+      tctx.beginPath();
+      for (let i = 0; i < hist.length; i += 1) {
+        const s = hist[i];
+        const x = xAt(s.t);
+        const y = TPAD.t + h - s.B * h * 0.30;
+        if (i === 0) tctx.moveTo(x, y); else tctx.lineTo(x, y);
+      }
+      tctx.lineTo(xAt(hist[hist.length - 1].t), TPAD.t + h);
+      tctx.lineTo(xAt(hist[0].t), TPAD.t + h);
+      tctx.closePath();
+      tctx.fillStyle = ntKind === 'glu' ? 'rgba(122, 92, 184, 0.16)' : 'rgba(47, 125, 95, 0.16)';
+      tctx.fill();
+      tctx.restore();
+    }
+
+    // membrane potential
+    if (hist.length > 1) {
+      tctx.save();
+      tctx.beginPath(); tctx.rect(TPAD.l, TPAD.t, w, h); tctx.clip();
+      tctx.beginPath();
+      for (let i = 0; i < hist.length; i += 1) {
+        const s = hist[i];
+        const x = xAt(s.t), y = yAt(s.V);
+        if (i === 0) tctx.moveTo(x, y); else tctx.lineTo(x, y);
+      }
+      tctx.strokeStyle = TC.trace;
+      tctx.lineWidth = 1.7;
+      tctx.lineJoin = 'round';
+      tctx.stroke();
+      tctx.restore();
+    }
+
+    tctx.font = '500 9px "IBM Plex Mono", monospace';
+    tctx.textAlign = 'left';
+    tctx.textBaseline = 'top';
+    tctx.fillStyle = TC.ink3;
+    tctx.fillText('POSTSYNAPTIC mV', TPAD.l + 7, TPAD.t + 5);
+    tctx.textAlign = 'right';
+    tctx.fillText('60 ms window', TW - TPAD.r - 4, TPAD.t + h + 5);
+  }
+
+  // =================================================================
+  // 4. Loop
+  // =================================================================
+
+  let W = 0, H = 0, perf = 0;
+
+  function layout() {
+    const r = wrap.getBoundingClientRect();
+    W = r.width; H = r.height;
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.setSize(W, H, false);
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    layoutTrace();
+  }
+
+  function updateSteps() {
+    const items = ui.steps.querySelectorAll('.step');
+    items.forEach((el, i) => {
+      const at = stageAt[i];
+      el.classList.remove('on', 'done');
+      if (at < 0) return;
+      const age = S.t - at;
+      if (age >= 0 && age < 6) el.classList.add('on');
+      else if (age >= 6 && age < 90) el.classList.add('done');
+    });
+  }
+
+  function updateReadout() {
+    ui.roV.textContent = S.V.toFixed(1).replace('-', '−');
+    ui.roC.textContent = S.C.toFixed(2);
+    ui.roB.textContent = Math.round(S.B * 100) + '%';
+    ui.roN.textContent = String(spikeCount);
+  }
+
+  let last = 0, visible = true;
+
+  function frame(ts) {
+    requestAnimationFrame(frame);
+    const elapsed = last ? Math.min(50, ts - last) : 16.7;
+    last = ts;
+    perf = ts;
+
+    if (!visible) return;
+
+    if (running) {
+      const steps = Math.round((elapsed / slowdown) / DT);
+      for (let i = 0; i < steps; i += 1) step();
+      stepParticles(elapsed / 1000);
+    }
+
+    controls.update();
+    syncScene();
+    renderer.render(scene, camera);
+    placeLabels(W, H);
+    drawTrace();
+    updateSteps();
+    updateReadout();
+  }
+
+  // Don't burn frames on a WebGL scene the reader has scrolled past. An observer
+  // in here can't see that — our own body always intersects our own viewport — so
+  // the host page watches the frame and tells us.
+  document.addEventListener('visibilitychange', () => { visible = !document.hidden; });
+
+  // =================================================================
+  // 5. Wiring
+  // =================================================================
+
+  ui.ca.addEventListener('input', () => { ui.caV.textContent = ui.ca.value; });
+
+  ui.fire.addEventListener('click', fireAP);
+
+  ui.ntType.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-nt]');
+    if (!b) return;
+    ntKind = b.dataset.nt;
+    for (const x of ui.ntType.querySelectorAll('button')) {
+      x.setAttribute('aria-pressed', String(x === b));
+    }
+    document.querySelector('.stage-title').textContent =
+      ntKind === 'glu' ? 'Synapse — glutamatergic bouton' : 'Synapse — GABAergic bouton';
+    ui.ntType.className = 'seg ' + (ntKind === 'glu' ? 'nt' : 'gaba');
+  });
+
+  ui.pause.addEventListener('click', () => {
+    running = !running;
+    ui.pause.textContent = running ? 'Pause' : 'Resume';
+  });
+
+  ui.reset.addEventListener('click', () => {
+    resetModel();
+    hist.length = 0; nextRecord = 0;
+    spikeCount = 0; armed = true;
+    apT = -1; pendingFusion = -1;
+    for (let i = 0; i < stageAt.length; i += 1) stageAt[i] = -1;
+    ntParts = []; caParts = []; ionParts = [];
+    for (const r of RECEPTORS) { r.bound = false; r.openness = 0; }
+    seedVesiclePool();
+    vHi = -45; vLo = -80;
+  });
+
+  ui.view.addEventListener('click', () => {
+    camera.position.copy(HOME);
+    controls.target.copy(TARGET);
+    controls.update();
+  });
+
+  ui.speed.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-slow]');
+    if (!b) return;
+    slowdown = parseFloat(b.dataset.slow);
+    for (const x of ui.speed.querySelectorAll('button')) {
+      x.setAttribute('aria-pressed', String(x === b));
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    const el = document.activeElement;
+    if (el && (el.tagName === 'BUTTON' || (el.tagName === 'INPUT' && el.type === 'checkbox'))) return;
+    e.preventDefault();
+    fireAP();
+  });
+
+  window.addEventListener('message', (e) => {
+    if (e.source !== window.parent) return;
+    const d = e.data;
+    if (!d) return;
+    if (d.type === 'synapse-fire') fireAP();
+    if (d.type === 'synapse-visible') visible = !!d.visible;
+  });
+
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(layout, 140); });
+
+  function postHeight() {
+    const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'synapse-height', height: h }, '*');
+    }
+  }
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.documentElement);
+  window.addEventListener('load', postHeight);
+
+  resetModel();
+  seedVesiclePool();
+  layout();
+  record();
+  if (!running) ui.pause.textContent = 'Resume';
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

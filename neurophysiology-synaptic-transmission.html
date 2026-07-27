@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synaptic Transmission | Neurophysiology | Sam Kirwan</title>
+  <meta name="description" content="An interactive 3D synapse: fire an action potential, watch calcium trigger vesicle fusion, transmitter cross the cleft, and the next neuron respond." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:   #f2efe6;
+      --paper-2: #eae6db;
+      --ink:     #23211c;
+      --ink-2:   rgba(35, 33, 28, 0.68);
+      --ink-3:   rgba(35, 33, 28, 0.36);
+      --rule:    rgba(35, 33, 28, 0.16);
+      --na:      #b8442a;
+      --k:       #2c6486;
+      --nt:      #7a5cb8;
+      --gaba:    #2f7d5f;
+      --stim:    #9a7513;
+      --leak:    #6f7466;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background:
+        linear-gradient(rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 100% 26px,
+        linear-gradient(90deg, rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 26px 100%,
+        var(--paper);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1080px, 100% - 2.5rem);
+      margin: 0 auto;
+      border-left: 1px solid var(--rule);
+      border-right: 1px solid var(--rule);
+      background: rgba(242, 239, 230, 0.75);
+      padding: 0 clamp(1.2rem, 4vw, 3.4rem) 0;
+    }
+    .col { max-width: 62ch; }
+
+    header { padding: clamp(1.8rem, 5vh, 3rem) 0 0; }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      text-decoration: none;
+      display: inline-block;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin: clamp(1.8rem, 5vh, 2.8rem) 0 0.75rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.8rem, 6.4vw, 3.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.018em;
+      max-width: 18ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.2rem);
+      line-height: 1.62;
+      color: var(--ink-2);
+      max-width: 50ch;
+      margin-top: 1.15rem;
+      padding-bottom: clamp(1.6rem, 4vh, 2.4rem);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    main { padding-bottom: 1rem; }
+
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(1.4rem, 3.2vw, 1.85rem);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      color: var(--ink-3);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600;
+      font-size: 0.96rem;
+      margin: 1.9rem 0 0.55rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.075rem);
+      line-height: 1.68;
+    }
+    p + p { margin-top: 0.95rem; }
+    ul, ol { margin: 0.9rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.5rem; }
+    li::marker { color: var(--ink-3); }
+    strong { font-weight: 600; }
+
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .nt { color: var(--nt); }
+    .gaba { color: var(--gaba); }
+
+    .eq {
+      margin: 1.5rem 0;
+      padding: 1.15rem 1.3rem;
+      border-left: 2px solid var(--rule);
+      background: rgba(234, 230, 219, 0.6);
+      overflow-x: auto;
+    }
+    .eq-line {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.2vw, 1.2rem);
+      line-height: 2;
+      white-space: nowrap;
+    }
+    .eq-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem;
+      line-height: 1.6;
+      color: var(--ink-3);
+      margin-top: 0.7rem;
+      white-space: normal;
+    }
+    .frac {
+      display: inline-flex; flex-direction: column;
+      vertical-align: middle; text-align: center;
+      margin: 0 0.18em; line-height: 1.15; font-size: 0.86em;
+    }
+    .frac .num { border-bottom: 1px solid var(--ink-2); padding: 0 0.25em 0.08em; }
+    .frac .den { padding: 0.08em 0.25em 0; }
+
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 620px;          /* fallback; the widget posts its real height */
+      border: 0; background: var(--paper);
+    }
+    @media (max-width: 900px) {
+      iframe.bench { height: 1040px; }
+    }
+
+    .tries {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      margin-top: 1.3rem;
+    }
+    .try {
+      background: var(--paper);
+      padding: 1.05rem 1.1rem 1.15rem;
+      display: flex; flex-direction: column; gap: 0.45rem;
+    }
+    .try-head {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent, var(--ink-3));
+    }
+    .try-title {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.92rem; line-height: 1.28;
+    }
+    .try p {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-size: 0.83rem; line-height: 1.55; color: var(--ink-2);
+    }
+    .try.a { --accent: var(--nt); }
+    .try.b { --accent: var(--gaba); }
+    .try.c { --accent: var(--k); }
+    .try.d { --accent: var(--na); }
+
+    .params {
+      width: 100%; border-collapse: collapse; margin-top: 1.2rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.74rem;
+    }
+    .params th, .params td {
+      text-align: left; padding: 0.55rem 0.7rem 0.55rem 0;
+      border-bottom: 1px solid var(--rule); vertical-align: baseline;
+    }
+    .params th {
+      font-weight: 500; font-size: 0.6rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ink-3);
+    }
+    .params td:first-child { white-space: nowrap; }
+    .params td:nth-child(2) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .params td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; color: var(--ink-2); width: 100%;
+    }
+
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      border-top: 1px solid var(--rule);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.6rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ink-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="neurophysiology.html">Neurophysiology</a>
+      <p class="kicker">02 &nbsp;·&nbsp; Cellular</p>
+      <h1>Synaptic Transmission</h1>
+      <p class="standfirst">
+        An action potential cannot jump the gap between two neurons. It has to be
+        converted into a chemical, thrown across, and converted back. Here is that
+        machinery, in three dimensions, with the controls in your hands.
+      </p>
+    </header>
+
+    <main>
+      <section class="col">
+        <h2><span class="n">The gap</span>Where the wire runs out</h2>
+
+        <p>
+          Chapter 01 ended with a spike travelling down an axon, regenerating itself
+          indefinitely. That works right up until the axon stops. Between one neuron and
+          the next there is a gap of about twenty nanometres, and no electrical
+          continuity across it at all.
+        </p>
+
+        <p>
+          So the signal changes medium. The arriving spike triggers the release of a
+          chemical, the chemical drifts across the gap, and on the far side it opens
+          channels that start a new electrical event. It is a deliberate
+          bottleneck &mdash; slower and noisier than a wire &mdash; and it is where
+          almost everything interesting about nervous systems happens, because a junction
+          that has to be actively maintained is a junction that can be adjusted.
+        </p>
+
+        <h2><span class="n">The chain</span>Six steps, each gating the next</h2>
+
+        <p>
+          Every link below is a place where the signal can be amplified, weakened, or
+          stopped outright. The widget lights each one up as it happens.
+        </p>
+
+        <ol>
+          <li><strong>The action potential arrives</strong> at the terminal and depolarises it.</li>
+          <li><strong><span class="na">Calcium channels</span> open.</strong> These are voltage-gated, like the sodium channels of chapter 01, but they let Ca²⁺ in &mdash; and Ca²⁺ is a signal, not just a charge.</li>
+          <li><strong>Vesicles fuse.</strong> Calcium binds the machinery holding transmitter-filled vesicles against the membrane, and they empty into the gap. This step is steeply calcium-dependent, which is why it is the main volume knob.</li>
+          <li><strong><span class="nt">Transmitter crosses the cleft</span></strong> by plain diffusion. Twenty nanometres takes microseconds; this is not the slow part.</li>
+          <li><strong>Receptors bind and open.</strong> Transmitter docks into receptors on the far membrane, which open a pore.</li>
+          <li><strong>Ions flow</strong> and the postsynaptic membrane potential moves. Whether that moves it toward firing or away is set entirely by which ion the pore admits.</li>
+        </ol>
+
+        <h2><span class="n">The physics</span>One extra current</h2>
+
+        <p>
+          The postsynaptic cell in the widget is the same Hodgkin&#8211;Huxley membrane
+          from chapter 01 &mdash; same equations, same parameters, genuinely the same
+          code. The synapse adds exactly one term to the current balance:
+        </p>
+
+        <div class="eq">
+          <div class="eq-line">
+            <span class="v">I</span><sub>syn</sub> =
+            <span class="v">g</span><sub>syn</sub>(<span class="v">t</span>)
+            &nbsp;·&nbsp;
+            (<span class="v">V</span> &minus; <span class="v">E</span><sub>syn</sub>)
+          </div>
+          <p class="eq-note">
+            a conductance that opens when transmitter binds, times the distance from that channel's own equilibrium potential
+          </p>
+        </div>
+
+        <p>
+          That is the whole of it. <span class="v">g</span><sub>syn</sub> rises when
+          receptors are occupied and falls as transmitter unbinds and is cleared. The
+          two-stage chain behind it is just as plain &mdash; transmitter in the cleft
+          decays away, and bound receptors track it:
+        </p>
+
+        <div class="eq">
+          <div class="eq-line">
+            <span class="frac"><span class="num">d<span class="v">C</span></span><span class="den">d<span class="v">t</span></span></span>
+            = &minus;<span class="v">k</span><sub>clear</sub> <span class="v">C</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="frac"><span class="num">d<span class="v">B</span></span><span class="den">d<span class="v">t</span></span></span>
+            = <span class="v">k</span><sub>on</sub> <span class="v">C</span> (1 &minus; <span class="v">B</span>)
+            &minus; <span class="v">k</span><sub>off</sub> <span class="v">B</span>
+          </div>
+          <p class="eq-note">
+            C = transmitter in the cleft, B = fraction of receptors bound, g_syn = ḡ_syn · B
+          </p>
+        </div>
+
+        <p>
+          The one thing that decides excitation from inhibition is
+          <span class="v">E</span><sub>syn</sub>. Glutamate receptors pass sodium and
+          potassium together, giving <span class="nt">E<sub>syn</sub> &asymp; 0 mV</span>
+          &mdash; far above rest, so current flows inward and the cell depolarises. GABA
+          receptors pass chloride, giving
+          <span class="gaba">E<sub>syn</sub> &asymp; &minus;75 mV</span>, just below rest.
+          Same equation, opposite sign, entirely because of which ion fits through the hole.
+        </p>
+
+        <h2><span class="n">Quanta</span>Why the calcium knob is the interesting one</h2>
+
+        <p>
+          Vesicles are the reason transmitter comes in lumps. Each one holds roughly a
+          fixed amount, so the terminal cannot release a smooth continuum &mdash; it
+          releases one packet, or four, or none. Turn the calcium slider and you are
+          setting how many fuse.
+        </p>
+
+        <p>
+          What comes out is strikingly linear, right up until it isn't. One vesicle
+          produces a 1.0 mV bump. Two produce 2.0, three produce 3.2, four produce 4.7.
+          Five produce a hundred-millivolt action potential. The synapse adds up its
+          inputs in a perfectly graded way, and then hands the result to a membrane that
+          only has two answers.
+        </p>
+      </section>
+
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 1 &mdash; synaptic bench</span>
+          <span>drag to tilt · press space to fire</span>
+        </div>
+        <iframe
+          class="bench"
+          src="neurophysiology/synaptic-transmission/synapse-widget.html"
+          title="Interactive 3D synapse: fire an action potential and watch calcium entry, vesicle fusion, transmitter diffusion, receptor binding and the postsynaptic response"
+          loading="lazy"
+        ></iframe>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">Experiments</span>Four things worth doing</h2>
+
+        <div class="tries">
+          <div class="try a">
+            <span class="try-head">01 &mdash; threshold</span>
+            <span class="try-title">Find the fifth vesicle</span>
+            <p>
+              Set calcium to 1 and fire. A 1 mV blip. Step up one vesicle at a time,
+              firing at each: 2.0, 3.2, 4.7 mV &mdash; all just bumps. At five, the same
+              small increment produces a full spike. Nothing about the synapse changed;
+              you crossed the membrane's threshold.
+            </p>
+          </div>
+          <div class="try b">
+            <span class="try-head">02 &mdash; inhibition</span>
+            <span class="try-title">Watch GABA do almost nothing</span>
+            <p>
+              Switch to GABA and fire hard. The trace barely moves &mdash; under a
+              millivolt even at ten vesicles, because rest is already close to
+              chloride's equilibrium.
+              Inhibition mostly is not a push downward. It is a clamp: it holds the
+              membrane where it is by opening a hole that resists being moved.
+            </p>
+          </div>
+          <div class="try c">
+            <span class="try-head">03 &mdash; blockers</span>
+            <span class="try-title">Cut the chain</span>
+            <p>
+              Block the receptors and everything upstream still runs perfectly &mdash;
+              calcium enters, vesicles fuse, transmitter fills the cleft &mdash; and the
+              next neuron feels nothing. The signal is intact right up to the last step.
+              That is where most synaptic drugs act.
+            </p>
+          </div>
+          <div class="try d">
+            <span class="try-head">04 &mdash; reuptake</span>
+            <span class="try-title">Stop the cleanup</span>
+            <p>
+              Set calcium to 4, which is reliably subthreshold, then block reuptake and
+              fire again. The same four vesicles now fire a spike. Nothing more was
+              released &mdash; the transmitter simply stayed around, 33 ms instead of 7.
+              This is roughly what an SSRI does, and why it works on release you already had.
+            </p>
+          </div>
+        </div>
+
+        <h2><span class="n">A finding</span>The membrane is a coincidence detector</h2>
+
+        <p>
+          There is a result buried in this model that is worth stating plainly, because
+          it contradicts the usual story. Textbooks describe postsynaptic potentials
+          "summing until they reach threshold," which suggests a neuron patiently adding
+          up inputs over time.
+        </p>
+
+        <p>
+          The Hodgkin&#8211;Huxley membrane does not do this. Fire the synapse repeatedly
+          at 50 or 100 Hz and the cell never fires, no matter how many releases you stack
+          up &mdash; each EPSP has decayed and the potassium conductance has pushed the
+          membrane back before the next one lands. Only when releases arrive within about
+          three milliseconds of each other do they add up enough to cross threshold.
+        </p>
+
+        <p>
+          This is a real property of the squid axon membrane, not an artefact: it
+          accommodates, resisting slow depolarisation, and it fires on <em>coincidence</em>
+          rather than on accumulation. Neurons that genuinely integrate over tens of
+          milliseconds do it with different channels and a lot of dendrite &mdash; and
+          the ones that need to detect simultaneity, like those computing sound direction
+          from the two ears, look much more like this.
+        </p>
+
+        <h2><span class="n">The parameters</span>What the numbers are</h2>
+
+        <p>
+          The Hodgkin&#8211;Huxley half is unchanged from chapter 01. The synaptic half
+          was tuned so that a single release stays graded and subthreshold up to four
+          vesicles, with realistic time courses.
+        </p>
+
+        <table class="params">
+          <thead>
+            <tr><th>Symbol</th><th>Value</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>ḡ<sub>syn</sub></td><td>0.16 mS/cm²</td><td>Conductance at full receptor occupancy</td></tr>
+            <tr><td><span class="v">k</span><sub>on</sub></td><td>0.08 /ms</td><td>Receptor binding rate, per unit transmitter</td></tr>
+            <tr><td><span class="v">k</span><sub>off</sub></td><td>0.05 /ms</td><td>Unbinding &mdash; sets how long the response lasts</td></tr>
+            <tr><td><span class="v">k</span><sub>clear</sub></td><td>1.2 /ms</td><td>Clearance from the cleft; 0.18 with reuptake blocked</td></tr>
+            <tr><td class="nt"><span class="v">E</span><sub>syn</sub></td><td>0 mV</td><td>Glutamate &mdash; excitatory</td></tr>
+            <tr><td class="gaba"><span class="v">E</span><sub>syn</sub></td><td>&minus;75 mV</td><td>GABA &mdash; inhibitory</td></tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top:1.2rem">
+          One honest note on the visualisation: the moving particles are driven by the
+          same rate constants as the model, but they are decoration &mdash; they never
+          feed back into the voltage. The trace comes entirely from integrating the
+          equations above at a fixed 0.01 ms step. The cleft is also drawn far wider than
+          twenty nanometres, or there would be nothing to see.
+        </p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="neurophysiology-hodgkin-huxley.html">← The Hodgkin–Huxley Model</a>
+        <a href="neurophysiology.html">All Neurophysiology →</a>
+      </nav>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const frame = document.querySelector('iframe.bench');
+      if (!frame) return;
+      window.addEventListener('message', (e) => {
+        if (e.source !== frame.contentWindow) return;
+        const d = e.data;
+        if (!d || d.type !== 'synapse-height') return;
+        const h = Number(d.height);
+        if (Number.isFinite(h) && h > 200 && h < 4000) frame.style.height = h + 'px';
+      });
+
+      // The frame can't tell when it has scrolled out of view — its own body always
+      // intersects its own viewport — so watch it from here and let it know.
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+          const vis = entries[0].isIntersecting;
+          if (frame.contentWindow) {
+            frame.contentWindow.postMessage({ type: 'synapse-visible', visible: vis }, '*');
+          }
+        }, { threshold: 0.01 }).observe(frame);
+      }
+
+      // Space reaches this document, not the frame, until the reader clicks inside.
+      document.addEventListener('keydown', (e) => {
+        if (e.code !== 'Space') return;
+        const el = document.activeElement;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ||
+                   el.tagName === 'BUTTON' || el.tagName === 'SELECT' ||
+                   el.isContentEditable)) return;
+        const r = frame.getBoundingClientRect();
+        if (!(r.top < window.innerHeight * 0.8 && r.bottom > window.innerHeight * 0.2)) return;
+        e.preventDefault();
+        frame.contentWindow.postMessage({ type: 'synapse-fire' }, '*');
+      });
+    })();
+  </script>
+</body>
+</html>
