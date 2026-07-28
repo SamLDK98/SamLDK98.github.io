@@ -701,9 +701,9 @@
     uRim:   { value: new THREE.Color(COL.membraneR) },
     // Additive blending over a large double-sided surface saturates fast — front
     // and back faces both contribute. These stay deliberately low.
-    uPower: { value: 2.1 },
+    uPower: { value: 2.7 },
     uBaseA: { value: 0.02 },
-    uRimA:  { value: 1.05 },
+    uRimA:  { value: 0.70 },
     uFlash: { value: 0.0 },
     // A fresnel-only surface is unlit, so all the noise in the geometry is
     // invisible except on the silhouette. A diffuse term brings the form back.
@@ -994,6 +994,15 @@
     }
   });
 
+  // Push the small molecules above 1.0 in linear space. Colour is not clamped to
+  // the display range until output, so this puts them over the bloom threshold
+  // while no lit surface can ever reach it — selective bloom, without the cost of
+  // a second render pass and a material swap every frame.
+  const GLOW = 1.9;
+  for (const m of [ntMat, caMesh.material, ionMesh.material, apBand.material]) {
+    m.color.multiplyScalar(GLOW);
+  }
+
   // ---- particle agents ----
   let vesicles = [], ntParts = [], caParts = [], ionParts = [];
 
@@ -1022,10 +1031,12 @@
     // calcium enters through the channels
     for (let i = 0; i < Math.min(n * 5, MAX_CA - caParts.length); i += 1) {
       const ch = channels[(Math.random() * channels.length) | 0];
+      // calcium acts locally at the active zone; letting it drift up through the
+      // whole terminal would be pretty and wrong
       caParts.push({
-        x: ch.position.x + rnd(-0.1, 0.1), y: CLEFT_TOP + rnd(-0.3, 0.1), z: rnd(-0.2, 0.2),
-        vx: rnd(-0.02, 0.02), vy: rnd(0.02, 0.06), vz: rnd(-0.02, 0.02),
-        life: rnd(1.4, 3.0)
+        x: ch.position.x + rnd(-0.12, 0.12), y: CLEFT_TOP + rnd(-0.25, 0.1), z: ch.position.z + rnd(-0.15, 0.15),
+        vx: rnd(-0.014, 0.014), vy: rnd(0.008, 0.026), vz: rnd(-0.014, 0.014),
+        life: rnd(0.5, 1.1)
       });
     }
   }
@@ -1162,7 +1173,7 @@
     for (const r of RECEPTORS) {
       const target = r.bound ? 1 : 0;
       r.openness += (target - r.openness) * Math.min(1, 0.12 * k);
-      r.mat.emissiveIntensity = r.openness * 1.9;
+      r.mat.emissiveIntensity = r.openness * 0.85;   // higher and it blows out to white
       r.mesh.scale.set(1 + r.openness * 0.09, 1 + r.openness * 0.3, 1 + r.openness * 0.09);
       r.mesh.position.y = r.baseY + r.openness * 0.07;
     }
@@ -1192,7 +1203,8 @@
     pushInstances(caMesh, caParts, MAX_CA);
     pushInstances(ionMesh, ionParts, MAX_ION);
 
-    ntMat.color.setHex(ntKind === 'glu' ? COL.nt : COL.gaba).convertSRGBToLinear();
+    ntMat.color.setHex(ntKind === 'glu' ? COL.nt : COL.gaba)
+      .convertSRGBToLinear().multiplyScalar(GLOW);
 
     // the action potential sweeping down the axon, then the terminal flashing
     const age = apT >= 0 ? S.t - apT : 1e9;
@@ -1381,7 +1393,7 @@
   if (useBloom && THREE.EffectComposer && THREE.UnrealBloomPass) {
     composer = new THREE.EffectComposer(renderer);
     composer.addPass(new THREE.RenderPass(scene, camera));
-    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.7, 0.92);
+    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(1, 1), 0.75, 0.6, 1.0);
     composer.addPass(bloomPass);
   }
 
