@@ -73,47 +73,61 @@
   }
   .readout b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
+  /* A dark plate set into the light page — glow and bloom are worth nothing on
+     cream, and the contrast reads as a deliberate specimen view. */
   .scene-wrap {
     position: relative;
     width: 100%;
-    height: 400px;
+    height: 430px;
     overflow: hidden;
-    background:
-      radial-gradient(120% 90% at 50% 18%, #fbf9f4 0%, var(--paper) 62%, #e7e3d7 100%);
-    border: 1px solid var(--rule);
+    background: #0a0a12;
+    border: 1px solid rgba(35, 33, 28, 0.3);
   }
   .scene-wrap canvas { display: block; width: 100%; height: 100%; }
+
+  /* vignette, over the canvas but under the labels */
+  .scene-wrap::after {
+    content: "";
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background: radial-gradient(120% 95% at 50% 42%,
+      transparent 0%, transparent 46%, rgba(0, 0, 0, 0.42) 100%);
+  }
 
   /* projected labels */
   .label {
     position: absolute;
+    z-index: 2;
     transform: translate(-50%, -50%);
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.56rem;
     letter-spacing: 0.13em;
     text-transform: uppercase;
-    color: var(--ink-2);
-    background: rgba(242, 239, 230, 0.82);
-    padding: 2px 5px;
-    border: 1px solid var(--rule);
+    color: rgba(236, 240, 255, 0.86);
+    background: rgba(9, 10, 20, 0.62);
+    padding: 2px 6px;
+    border: 1px solid rgba(232, 238, 255, 0.22);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.25s ease;
   }
   .label.on { opacity: 1; }
-  .label.na { color: var(--na); border-color: rgba(184, 68, 42, 0.4); }
-  .label.nt { color: var(--nt); border-color: rgba(122, 92, 184, 0.4); }
-  .label.k  { color: var(--k);  border-color: rgba(44, 100, 134, 0.4); }
+  .label.na { color: #ffab7d; border-color: rgba(255, 140, 90, 0.42); }
+  .label.nt { color: #c9b0ff; border-color: rgba(180, 150, 255, 0.42); }
+  .label.k  { color: #7fd6ff; border-color: rgba(110, 200, 255, 0.42); }
 
   .view-hint {
     position: absolute;
-    right: 7px; bottom: 6px;
+    z-index: 2;
+    right: 8px; bottom: 7px;
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.55rem;
     letter-spacing: 0.13em;
     text-transform: uppercase;
-    color: var(--ink-3);
+    color: rgba(232, 238, 255, 0.34);
     pointer-events: none;
   }
 
@@ -351,6 +365,14 @@
 
 <script src="../../lib/three.min.js"></script>
 <script src="../../lib/OrbitControls.js"></script>
+<script src="../../lib/RoomEnvironment.js"></script>
+<script src="../../lib/BufferGeometryUtils.js"></script>
+<script src="../../lib/CopyShader.js"></script>
+<script src="../../lib/LuminosityHighPassShader.js"></script>
+<script src="../../lib/EffectComposer.js"></script>
+<script src="../../lib/RenderPass.js"></script>
+<script src="../../lib/ShaderPass.js"></script>
+<script src="../../lib/UnrealBloomPass.js"></script>
 <script>
 (function () {
   "use strict";
@@ -505,131 +527,419 @@
   // =================================================================
 
   const COL = {
-    membrane:  0xb9a9d6,
-    membraneD: 0x9c8bc4,
-    post:      0xc9bcdd,
-    vesicle:   0xd8cdee,
-    nt:        0x7a5cb8,
-    gaba:      0x2f7d5f,
-    ca:        0xb8442a,
-    receptor:  0x2c6486,
-    receptorOn:0x4fa3d1,
-    channel:   0xc4643f,
-    ion:       0xd4762c
+    membrane:  0x140e2e,   /* deep violet body of the membrane */
+    membraneR: 0x9d7bff,   /* fresnel rim */
+    post:      0x37306b,
+    postR:     0x7b8cff,
+    vesicle:   0x9184dd,
+    nt:        0xa98bff,
+    gaba:      0x54d6a0,
+    ca:        0xff7a3c,
+    receptor:  0x4795c2,
+    receptorOn:0x66e0ff,
+    channel:   0xe08a55,
+    ion:       0xffb057
   };
 
-  const scene = new THREE.Scene();
-  scene.background = null;
+  const isSmall = () => window.innerWidth < 700;
 
-  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
-  const HOME = new THREE.Vector3(0, 3.0, 15.5);
-  const TARGET = new THREE.Vector3(0, 2.1, 0);
+  // ---- cheap 3D value noise, used once on the CPU to rough up the geometry ----
+  function hash3(x, y, z) {
+    const n = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453;
+    return n - Math.floor(n);
+  }
+  function vnoise(x, y, z) {
+    const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
+    const fx = x - ix, fy = y - iy, fz = z - iz;
+    const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy), w = fz * fz * (3 - 2 * fz);
+    const L = (a, b, t) => a + (b - a) * t;
+    return L(
+      L(L(hash3(ix, iy, iz), hash3(ix + 1, iy, iz), u),
+        L(hash3(ix, iy + 1, iz), hash3(ix + 1, iy + 1, iz), u), v),
+      L(L(hash3(ix, iy, iz + 1), hash3(ix + 1, iy, iz + 1), u),
+        L(hash3(ix, iy + 1, iz + 1), hash3(ix + 1, iy + 1, iz + 1), u), v),
+      w);
+  }
+  function fbm(x, y, z, oct) {
+    let a = 0, amp = 0.5, f = 1;
+    for (let i = 0; i < (oct || 4); i += 1) {
+      a += amp * (vnoise(x * f, y * f, z * f) * 2 - 1);
+      f *= 2; amp *= 0.5;
+    }
+    return a;
+  }
+
+  const scene = new THREE.Scene();
+
+  // graded backdrop, so the plate has depth rather than a flat black field
+  (function backdrop() {
+    const c = document.createElement('canvas');
+    c.width = 8; c.height = 256;
+    const g = c.getContext('2d').createLinearGradient(0, 0, 0, 256);
+    g.addColorStop(0.00, '#14162e');
+    g.addColorStop(0.45, '#0c0d1c');
+    g.addColorStop(1.00, '#05050c');
+    const ctx2 = c.getContext('2d');
+    ctx2.fillStyle = g; ctx2.fillRect(0, 0, 8, 256);
+    const tex = new THREE.CanvasTexture(c);
+    tex.encoding = THREE.sRGBEncoding;
+    scene.background = tex;
+  })();
+  scene.fog = new THREE.FogExp2(0x0a0b16, 0.028);
+
+  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 200);
+  // slightly off-axis and above: a symmetric head-on view is what made the old
+  // composition read as a diagram rather than a specimen
+  const HOME = new THREE.Vector3(1.5, 4.0, 16.2);
+  const TARGET = new THREE.Vector3(0, 2.7, 0);
   camera.position.copy(HOME);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setClearColor(0x000000, 0);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setClearColor(0x05050c, 1);
   renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;   // without this everything reads chalky
+  renderer.toneMappingExposure = 0.88;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   wrap.insertBefore(renderer.domElement, wrap.firstChild);
+
+  // Image-based lighting. A PBR material with nothing to reflect renders as dead
+  // plastic; this is the single largest difference in the whole scene.
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  pmrem.compileEquirectangularShader();
+  const envRT = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04);
+  scene.environment = envRT.texture;
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.target.copy(TARGET);
   controls.enablePan = false;
   controls.enableZoom = true;
-  controls.minDistance = 11;
-  controls.maxDistance = 21;
+  controls.minDistance = 12;
+  controls.maxDistance = 25;
   // a narrow band around the canonical cross-section: tilting a specimen,
   // not flying a camera
   controls.minPolarAngle = Math.PI * 0.30;
-  controls.maxPolarAngle = Math.PI * 0.62;
-  controls.minAzimuthAngle = -Math.PI * 0.22;
-  controls.maxAzimuthAngle = Math.PI * 0.22;
+  controls.maxPolarAngle = Math.PI * 0.60;
+  controls.minAzimuthAngle = -Math.PI * 0.20;
+  controls.maxAzimuthAngle = Math.PI * 0.26;
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.update();
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xcfc7b4, 0.85));
-  const key = new THREE.DirectionalLight(0xffffff, 0.72);
-  key.position.set(4, 9, 8);
+  scene.add(new THREE.HemisphereLight(0x8ea2ff, 0x140f22, 0.28));
+
+  // kept fairly low so it rakes across the postsynaptic surface — a light from
+  // straight above flattens all the relief out of it
+  const key = new THREE.DirectionalLight(0xfff0dd, 1.25);
+  key.position.set(7, 6.5, 6.5);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.near = 4;
+  key.shadow.camera.far = 34;
+  key.shadow.camera.left = -9;
+  key.shadow.camera.right = 9;
+  key.shadow.camera.top = 9;
+  key.shadow.camera.bottom = -9;
+  key.shadow.bias = -0.0012;
+  key.shadow.radius = 3;
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xffe6c8, 0.3);
-  rim.position.set(-6, 3, -5);
-  scene.add(rim);
+
+  const rimLight = new THREE.DirectionalLight(0x6f8bff, 0.5);
+  rimLight.position.set(-7, 2.5, -6);
+  scene.add(rimLight);
+
+  // a warm lamp inside the terminal, so the membrane glows from within
+  const core = new THREE.PointLight(0xb98cff, 0.35, 14, 2);
+  core.position.set(0, 4.2, 0);
+  scene.add(core);
+
+  const BOUTON_Y = 4.0;
+  const CLEFT_TOP = 1.2;    // underside of the bouton
+  const CLEFT_BOT = 0.0;    // top of the postsynaptic membrane
+
+  // Nothing in a cell is a primitive — roughing the surface up with noise is what
+  // stops these reading as spheres and boxes.
+  function organicBlob(radius, detail, amp, freq, seed) {
+    const g = new THREE.IcosahedronGeometry(radius, detail);
+    const p = g.attributes.position;
+    const v = new THREE.Vector3();
+    for (let i = 0; i < p.count; i += 1) {
+      v.fromBufferAttribute(p, i);
+      const n = v.clone().normalize();
+      const d = fbm(n.x * freq + seed, n.y * freq + seed, n.z * freq + seed, 4);
+      v.setLength(radius * (1 + amp * d));
+      p.setXYZ(i, v.x, v.y, v.z);
+    }
+    g.computeVertexNormals();
+    return g;
+  }
 
   // ---- presynaptic terminal ----
-  const boutonGeo = new THREE.SphereGeometry(2.5, 48, 36);
-  const boutonMat = new THREE.MeshStandardMaterial({
-    color: COL.membrane, transparent: true, opacity: 0.40,
-    roughness: 0.55, metalness: 0.0, depthWrite: false,
-    side: THREE.DoubleSide
+  const boutonGeo = organicBlob(2.5, 6, 0.10, 3.3, 11.3);
+  (function shapeBouton() {
+    const p = boutonGeo.attributes.position;
+    for (let i = 0; i < p.count; i += 1) {
+      const x = p.getX(i) * 1.52;
+      let y = p.getY(i) * 1.10;
+      const z = p.getZ(i) * 1.24;
+      // flatten where the terminal is pressed against the cleft
+      const wy = y + BOUTON_Y;
+      const lip = CLEFT_TOP + 0.6;
+      if (wy < lip) {
+        const t = Math.min(1, (lip - wy) / 1.0);
+        y += (CLEFT_TOP - wy) * t * 0.88;
+      }
+      p.setXYZ(i, x, y, z);
+    }
+    boutonGeo.computeVertexNormals();
+  })();
+
+  // Fresnel shell: nearly clear facing the camera, bright at grazing angles.
+  // That rim is what makes a membrane read as wet rather than as frosted glass.
+  const membraneUniforms = {
+    uBase:  { value: new THREE.Color(COL.membrane) },
+    uRim:   { value: new THREE.Color(COL.membraneR) },
+    // Additive blending over a large double-sided surface saturates fast — front
+    // and back faces both contribute. These stay deliberately low.
+    uPower: { value: 2.1 },
+    uBaseA: { value: 0.02 },
+    uRimA:  { value: 1.05 },
+    uFlash: { value: 0.0 },
+    // A fresnel-only surface is unlit, so all the noise in the geometry is
+    // invisible except on the silhouette. A diffuse term brings the form back.
+    uLightDir: { value: new THREE.Vector3(7, 6.5, 6.5).normalize() },
+    uLit:      { value: new THREE.Color(0x7a63c4) },
+    uLitAmt:   { value: 0.13 }
+  };
+  const MEMBRANE_VERT = `
+    varying vec3 vN;
+    varying vec3 vV;
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vN = normalize(normalMatrix * normal);
+      vV = normalize(-mv.xyz);
+      gl_Position = projectionMatrix * mv;
+    }`;
+  const MEMBRANE_FRAG = `
+    uniform vec3 uBase; uniform vec3 uRim; uniform vec3 uLit;
+    uniform float uPower; uniform float uBaseA; uniform float uRimA;
+    uniform float uFlash; uniform float uLitAmt;
+    uniform vec3 uLightDir;
+    varying vec3 vN;
+    varying vec3 vV;
+    void main() {
+      vec3 N = normalize(vN);
+      float f = pow(1.0 - clamp(dot(N, normalize(vV)), 0.0, 1.0), uPower);
+
+      // diffuse term, so the noise displacement actually shows
+      vec3 Lv = normalize((viewMatrix * vec4(uLightDir, 0.0)).xyz);
+      float lam = max(dot(N, Lv), 0.0);
+      float wrap = lam * 0.75 + 0.25;           // soft wrap, this is a thin shell
+
+      vec3 c = mix(uBase, uRim, f) + uLit * wrap * uLitAmt;
+      c += uFlash * vec3(1.0, 0.55, 0.22) * (0.4 + f * 1.2);
+
+      float a = uBaseA + f * uRimA + wrap * uLitAmt * 0.10;
+      gl_FragColor = vec4(c, clamp(a, 0.0, 1.0));
+    }`;
+  const membraneMat = new THREE.ShaderMaterial({
+    uniforms: membraneUniforms,
+    vertexShader: MEMBRANE_VERT,
+    fragmentShader: MEMBRANE_FRAG,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending
   });
-  const bouton = new THREE.Mesh(boutonGeo, boutonMat);
-  bouton.position.set(0, 4.0, 0);
-  bouton.scale.set(1.5, 1.12, 1.25);
+
+  const bouton = new THREE.Mesh(boutonGeo, membraneMat);
+  bouton.position.set(0, BOUTON_Y, 0);
   scene.add(bouton);
 
-  const CLEFT_TOP = 4.0 - 2.5 * 1.12;   // 1.2 — underside of the bouton
-  const CLEFT_BOT = 0.0;
+  // axon feeding in from upper left, tapered and roughened
+  const axonGeo = new THREE.CylinderGeometry(0.34, 0.85, 5.4, 32, 22, true);
+  (function roughenAxon() {
+    const p = axonGeo.attributes.position;
+    const v = new THREE.Vector3();
+    for (let i = 0; i < p.count; i += 1) {
+      v.fromBufferAttribute(p, i);
+      const r = Math.hypot(v.x, v.z) || 1e-6;
+      const d = fbm(v.x * 1.6 + 3.1, v.y * 0.9 + 3.1, v.z * 1.6 + 3.1, 3);
+      const s = 1 + 0.14 * d;
+      p.setXYZ(i, (v.x / r) * r * s, v.y, (v.z / r) * r * s);
+    }
+    axonGeo.computeVertexNormals();
+  })();
+  // The axon needs its own, weaker material: where it intersects the bouton the
+  // additive faces stack four deep and blow out to white.
+  const axonMat = membraneMat.clone();
+  axonMat.uniforms = THREE.UniformsUtils.clone(membraneUniforms);
+  axonMat.uniforms.uRimA.value = 0.42;
+  axonMat.uniforms.uBaseA.value = 0.02;
 
-  // axon feeding in from upper left
-  const axon = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.62, 0.9, 5.4, 28, 1, true),
-    boutonMat
-  );
-  axon.position.set(-3.1, 7.2, -0.3);
-  axon.rotation.z = Math.PI * 0.30;
+  const axon = new THREE.Mesh(axonGeo, axonMat);
+  axon.position.set(-2.9, 7.0, -0.4);
+  axon.rotation.z = Math.PI * 0.26;
   scene.add(axon);
 
-  // the travelling action potential, a bright band on the axon
+  // the travelling action potential — emissive, so bloom catches it
   const apBand = new THREE.Mesh(
-    new THREE.TorusGeometry(0.78, 0.13, 10, 28),
-    new THREE.MeshBasicMaterial({ color: 0xe8a13a, transparent: true, opacity: 0 })
+    new THREE.TorusGeometry(0.92, 0.14, 12, 32),
+    new THREE.MeshBasicMaterial({
+      color: 0xffb057, transparent: true, opacity: 0, blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
   );
   scene.add(apBand);
 
   // ---- postsynaptic membrane ----
+  // a displaced surface with a solid body beneath, not a box
+  const postGeo = new THREE.PlaneGeometry(13, 7, 150, 80);
+  postGeo.rotateX(-Math.PI / 2);
+  // fade the displacement out at the border, or the rim of the plane fights the
+  // solid body underneath and the silhouette goes ragged
+  const postEdge = (x, z) => Math.max(0, Math.min(1,
+    Math.min((6.5 - Math.abs(x)) / 1.6, (3.5 - Math.abs(z)) / 1.2)));
+  const postDisp = (x, z) =>
+    (fbm(x * 0.85 + 7.7, 0.5, z * 0.85 + 7.7, 4) * 0.17 +
+     fbm(x * 2.6 + 2.2, 1.5, z * 2.6 + 2.2, 2) * 0.05) * postEdge(x, z);
+
+  (function undulate() {
+    const p = postGeo.attributes.position;
+    for (let i = 0; i < p.count; i += 1) {
+      p.setY(i, postDisp(p.getX(i), p.getZ(i)));
+    }
+    postGeo.computeVertexNormals();
+  })();
   const postMat = new THREE.MeshStandardMaterial({
-    color: COL.post, roughness: 0.62, metalness: 0.0,
-    transparent: true, opacity: 0.94
+    color: COL.post, roughness: 0.66, metalness: 0.04,
+    emissive: new THREE.Color(COL.postR), emissiveIntensity: 0.0
   });
-  const post = new THREE.Mesh(new THREE.BoxGeometry(11, 0.7, 6), postMat);
-  post.position.set(0, -0.35, 0);
+  const post = new THREE.Mesh(postGeo, postMat);
+  post.position.set(0, 0, 0);
+  post.receiveShadow = true;
   scene.add(post);
 
+  // solid body under the surface so the cell has thickness
+  const postBody = new THREE.Mesh(
+    new THREE.BoxGeometry(13, 1.5, 7),
+    new THREE.MeshStandardMaterial({ color: 0x231c4a, roughness: 0.85, metalness: 0.0 })
+  );
+  postBody.position.set(0, -0.78, 0);
+  scene.add(postBody);
+
+  // Soft contact shadow under the terminal. The membrane is additive and casts no
+  // real shadow, so this is what actually grounds it against the far surface.
+  const blobTex = (function () {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const rg = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+    rg.addColorStop(0, 'rgba(0,0,0,0.72)');
+    rg.addColorStop(0.55, 'rgba(0,0,0,0.30)');
+    rg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, 128, 128);
+    return new THREE.CanvasTexture(c);
+  })();
+  const blobShadow = new THREE.Mesh(
+    new THREE.PlaneGeometry(9.5, 6.4),
+    new THREE.MeshBasicMaterial({
+      map: blobTex, transparent: true, depthWrite: false,
+      blending: THREE.MultiplyBlending
+    })
+  );
+  blobShadow.rotation.x = -Math.PI / 2;
+  blobShadow.position.set(0, 0.34, 0);
+  blobShadow.renderOrder = 1;
+  scene.add(blobShadow);
+
+  // height of the undulating postsynaptic surface, so proteins sit *on* it
+  const surfaceY = (x, z) => postDisp(x, z);
+
+  // A ligand-gated channel is a ring of subunits around a central pore, not a
+  // cone. Building it that way costs nothing and is what it actually looks like.
+  function subunitGeo(h, r0) {
+    const pts = [];
+    for (let i = 0; i <= 12; i += 1) {
+      const t = i / 12;
+      const y = -h * 0.5 + t * h;
+      const r = r0 * (0.72 + 0.42 * Math.sin(t * Math.PI) + 0.10 * Math.sin(t * Math.PI * 3));
+      pts.push(new THREE.Vector2(Math.max(0.02, r), y));
+    }
+    return new THREE.LatheGeometry(pts, 14);
+  }
+
+  function ringCluster(n, h, r0, spread) {
+    const parts = [];
+    for (let i = 0; i < n; i += 1) {
+      const g = subunitGeo(h, r0);
+      const a = (i / n) * Math.PI * 2;
+      g.translate(Math.cos(a) * spread, 0, Math.sin(a) * spread);
+      parts.push(g);
+    }
+    return THREE.BufferGeometryUtils.mergeBufferGeometries(parts, false);
+  }
+
   // ---- calcium channels on the bouton underside ----
-  const chanGeo = new THREE.CylinderGeometry(0.19, 0.19, 0.75, 14);
-  const chanMat = new THREE.MeshStandardMaterial({ color: COL.channel, roughness: 0.5 });
+  const chanGeo = ringCluster(4, 0.9, 0.15, 0.17);
   const channels = [];
-  [-2.55, -2.05, 2.05, 2.55].forEach((x) => {
-    const c = new THREE.Mesh(chanGeo, chanMat.clone());
-    c.position.set(x, CLEFT_TOP + 0.15, 0);
+  [[-2.6, -0.35], [-2.0, 0.4], [2.0, -0.4], [2.6, 0.35]].forEach(([x, z]) => {
+    const c = new THREE.Mesh(chanGeo, new THREE.MeshStandardMaterial({
+      color: COL.channel, roughness: 0.38, metalness: 0.12,
+      emissive: new THREE.Color(COL.ca), emissiveIntensity: 0.0
+    }));
+    c.position.set(x, CLEFT_TOP + 0.16, z);
+    c.castShadow = true;
     scene.add(c);
     channels.push(c);
   });
 
   // ---- receptors on the postsynaptic membrane ----
   const RECEPTORS = [];
-  const recGeo = new THREE.CylinderGeometry(0.2, 0.26, 0.8, 14);
+  const recGeo = ringCluster(5, 1.05, 0.155, 0.2);
   for (let i = 0; i < 14; i += 1) {
-    const col = i % 7, row = Math.floor(i / 7);
-    const x = -2.7 + col * 0.9;
-    const z = row === 0 ? -0.55 : 0.55;
-    const mat = new THREE.MeshStandardMaterial({ color: COL.receptor, roughness: 0.45 });
+    const colI = i % 7, row = Math.floor(i / 7);
+    // slight jitter so the array doesn't read as a printed grid
+    const x = -2.75 + colI * 0.92 + (row ? 0.2 : -0.12);
+    const z = (row === 0 ? -0.62 : 0.66) + Math.sin(i * 2.7) * 0.09;
+    const mat = new THREE.MeshStandardMaterial({
+      color: COL.receptor, roughness: 0.34, metalness: 0.15,
+      emissive: new THREE.Color(COL.receptorOn), emissiveIntensity: 0.0
+    });
     const r = new THREE.Mesh(recGeo, mat);
-    r.position.set(x, 0.1, z);
+    const baseY = surfaceY(x, z) + 0.30;
+    r.position.set(x, baseY, z);
+    r.rotation.y = i * 0.7;
+    r.castShadow = true;
     scene.add(r);
-    RECEPTORS.push({ mesh: r, mat, bound: false, openness: 0 });
+    RECEPTORS.push({ mesh: r, mat, bound: false, openness: 0, baseY });
   }
 
   // ---- transporters (reuptake) on the presynaptic side ----
-  const transGeo = new THREE.CylinderGeometry(0.17, 0.17, 0.7, 12);
-  const transMat = new THREE.MeshStandardMaterial({ color: 0x6f7466, roughness: 0.5 });
+  const transGeo = ringCluster(3, 0.85, 0.14, 0.15);
   const TRANSPORTERS = [];
-  [-3.3, 3.3].forEach((x) => {
-    const tr = new THREE.Mesh(transGeo, transMat);
-    tr.position.set(x, CLEFT_TOP + 0.1, 0);
+  [[-3.4, 0.1], [3.4, -0.1]].forEach(([x, z]) => {
+    const tr = new THREE.Mesh(transGeo, new THREE.MeshStandardMaterial({
+      color: 0x5f6a8c, roughness: 0.45, metalness: 0.1
+    }));
+    tr.position.set(x, CLEFT_TOP + 0.12, z);
+    tr.castShadow = true;
     scene.add(tr);
     TRANSPORTERS.push(tr);
   });
+
+  // ---- active zone: the dense patch the vesicles dock against ----
+  (function activeZone() {
+    const g = new THREE.TorusGeometry(1.85, 0.075, 8, 64);
+    const m = new THREE.MeshStandardMaterial({
+      color: 0x7a6bc4, roughness: 0.4, metalness: 0.2,
+      emissive: new THREE.Color(0x4a3d8a), emissiveIntensity: 0.4
+    });
+    const t = new THREE.Mesh(g, m);
+    t.rotation.x = Math.PI / 2;
+    t.position.set(0, CLEFT_TOP + 0.04, 0);
+    scene.add(t);
+  })();
 
   // ---- instanced particles ----
   const MAX_VES = 14, MAX_NT = 260, MAX_CA = 90, MAX_ION = 70;
@@ -643,21 +953,46 @@
     return m;
   }
 
+  // vesicles get the organic treatment too — perfect spheres are a giveaway
   const vesMesh = makeInstanced(
-    new THREE.SphereGeometry(0.42, 18, 14),
-    new THREE.MeshStandardMaterial({ color: COL.vesicle, roughness: 0.4,
-      transparent: true, opacity: 0.92 }), MAX_VES);
+    organicBlob(0.44, 4, 0.13, 3.4, 5.2),
+    new THREE.MeshStandardMaterial({
+      color: COL.vesicle, roughness: 0.28, metalness: 0.1,
+      emissive: new THREE.Color(0x3a2f7a), emissiveIntensity: 0.22
+    }), MAX_VES);
 
-  const ntMat = new THREE.MeshStandardMaterial({ color: COL.nt, roughness: 0.35 });
+  // The small molecules use unlit materials at high value deliberately: they sit
+  // above the bloom threshold so they glow, while the surfaces stay below it.
+  const ntMat = new THREE.MeshBasicMaterial({ color: COL.nt });
   const ntMesh = makeInstanced(new THREE.SphereGeometry(0.115, 10, 8), ntMat, MAX_NT);
 
   const caMesh = makeInstanced(
-    new THREE.SphereGeometry(0.1, 8, 6),
-    new THREE.MeshStandardMaterial({ color: COL.ca, roughness: 0.3 }), MAX_CA);
+    new THREE.SphereGeometry(0.105, 8, 6),
+    new THREE.MeshBasicMaterial({ color: COL.ca }), MAX_CA);
 
   const ionMesh = makeInstanced(
     new THREE.SphereGeometry(0.1, 8, 6),
-    new THREE.MeshStandardMaterial({ color: COL.ion, roughness: 0.3 }), MAX_ION);
+    new THREE.MeshBasicMaterial({ color: COL.ion }), MAX_ION);
+
+  // RoomEnvironment is a bright interior; at full strength it lifts every surface
+  // to a pale grey. Dial it back so the plate keeps its dark, moody range.
+  //
+  // The colour conversion matters more than it looks. This build of three predates
+  // colour management, so a hex literal is taken as a *linear* value and then
+  // gamma-encoded on the way out — which turns a near-black 0x0d0a22 into a mid
+  // purple. Authoring in sRGB and converting once puts every surface back where
+  // it was designed to sit.
+  scene.traverse((o) => {
+    if (!o.material) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    for (const m of mats) {
+      if (m.__tuned) continue;
+      m.__tuned = true;
+      if ('envMapIntensity' in m) m.envMapIntensity = 0.35;
+      if (m.color && m.type !== 'ShaderMaterial') m.color.convertSRGBToLinear();
+      if (m.emissive) m.emissive.convertSRGBToLinear();
+    }
+  });
 
   // ---- particle agents ----
   let vesicles = [], ntParts = [], caParts = [], ionParts = [];
@@ -760,7 +1095,7 @@
         p.vz += rnd(-0.012, 0.012) * k;
         p.vy += rnd(-0.006, 0.004) * k;
         p.vy = Math.max(-0.16, Math.min(0.06, p.vy));
-        if (p.y < 0.62) { p.y = 0.62; p.vy = Math.abs(p.vy) * 0.3; }
+        if (p.y < 0.78) { p.y = 0.78; p.vy = Math.abs(p.vy) * 0.3; }
         if (p.y > CLEFT_TOP - 0.12) { p.y = CLEFT_TOP - 0.12; p.vy = -Math.abs(p.vy); }
         if (Math.abs(p.x) > 4.2) p.vx *= -1;
         if (Math.abs(p.z) > 1.6) p.vz *= -1;
@@ -781,7 +1116,7 @@
         }
       } else if (p.state === 'bound') {
         const r = RECEPTORS[p.rec];
-        p.x = r.mesh.position.x; p.y = 0.62; p.z = r.mesh.position.z;
+        p.x = r.mesh.position.x; p.y = r.baseY + 0.5; p.z = r.mesh.position.z;
         if (Math.random() < pOff) {
           r.bound = false;
           p.state = 'free';
@@ -827,9 +1162,9 @@
     for (const r of RECEPTORS) {
       const target = r.bound ? 1 : 0;
       r.openness += (target - r.openness) * Math.min(1, 0.12 * k);
-      r.mat.color.setHex(r.openness > 0.5 ? COL.receptorOn : COL.receptor);
-      r.mesh.scale.y = 1 + r.openness * 0.32;
-      r.mesh.position.y = 0.1 + r.openness * 0.06;
+      r.mat.emissiveIntensity = r.openness * 1.9;
+      r.mesh.scale.set(1 + r.openness * 0.09, 1 + r.openness * 0.3, 1 + r.openness * 0.09);
+      r.mesh.position.y = r.baseY + r.openness * 0.07;
     }
 
     // ion flow while receptors are open
@@ -857,36 +1192,33 @@
     pushInstances(caMesh, caParts, MAX_CA);
     pushInstances(ionMesh, ionParts, MAX_ION);
 
-    ntMat.color.setHex(ntKind === 'glu' ? COL.nt : COL.gaba);
+    ntMat.color.setHex(ntKind === 'glu' ? COL.nt : COL.gaba).convertSRGBToLinear();
 
     // the action potential sweeping down the axon, then the terminal flashing
     const age = apT >= 0 ? S.t - apT : 1e9;
     if (age >= 0 && age < AP_DUR) {
       const f = age / AP_DUR;
-      apBand.material.opacity = 0.9 * (1 - f);
-      apBand.position.set(-3.1 - 1.9 + f * 3.4, 8.9 - f * 4.2, -0.3);
+      apBand.material.opacity = 0.95 * (1 - f);
+      apBand.position.set(-3.2 - 1.9 + f * 3.5, 9.0 - f * 4.3, -0.4);
       apBand.rotation.set(Math.PI * 0.5, 0, Math.PI * 0.30);
-      boutonMat.opacity = 0.40 + 0.22 * (1 - f);
-      boutonMat.color.setHex(COL.membraneD);
+      membraneUniforms.uFlash.value = 0.55 * (1 - f);
+      core.intensity = 0.9 + 2.6 * (1 - f);
       const chanOpen = age > CA_DELAY ? 1 : 0;
       for (const c of channels) {
-        c.scale.y = 1 + chanOpen * 0.35;
-        c.material.color.setHex(chanOpen ? 0xe07a45 : COL.channel);
+        c.scale.y = 1 + chanOpen * 0.4;
+        c.material.emissiveIntensity = chanOpen ? 1.7 : 0;
       }
     } else {
       apBand.material.opacity = 0;
-      boutonMat.opacity = 0.40;
-      boutonMat.color.setHex(COL.membrane);
-      for (const c of channels) { c.scale.y = 1; c.material.color.setHex(COL.channel); }
+      membraneUniforms.uFlash.value = 0;
+      core.intensity = 0.9;
+      for (const c of channels) { c.scale.y = 1; c.material.emissiveIntensity = 0; }
     }
 
-    // postsynaptic membrane tints with its own voltage
-    const d = Math.max(-1, Math.min(1, (S.V - V_REST) / 40));
-    postMat.color.setRGB(
-      0.79 + d * 0.18,
-      0.74 - Math.abs(d) * 0.10,
-      0.87 - d * 0.16
-    );
+    // the postsynaptic cell glows as its own membrane depolarises
+    const d = Math.max(0, Math.min(1, (S.V - V_REST) / 45));
+    postMat.emissiveIntensity = d * 0.85;
+    membraneUniforms.uRim.value.setHex(ntKind === 'glu' ? COL.membraneR : 0x63d7a8);
   }
 
   // ---- projected labels ----
@@ -1041,13 +1373,32 @@
 
   let W = 0, H = 0, perf = 0;
 
+  // Bloom over the whole frame, with a threshold high enough that only the unlit
+  // molecules and open channels cross it — the surfaces stay under and keep their
+  // form. Cheaper and steadier than a two-pass selective bloom.
+  let composer = null, bloomPass = null;
+  const useBloom = !isSmall();
+  if (useBloom && THREE.EffectComposer && THREE.UnrealBloomPass) {
+    composer = new THREE.EffectComposer(renderer);
+    composer.addPass(new THREE.RenderPass(scene, camera));
+    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.7, 0.92);
+    composer.addPass(bloomPass);
+  }
+
   function layout() {
     const r = wrap.getBoundingClientRect();
     W = r.width; H = r.height;
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    // effects are expensive; hold the device pixel ratio down on small screens
+    const dpr = Math.min(isSmall() ? 1.5 : 2, window.devicePixelRatio || 1);
+    renderer.setPixelRatio(dpr);
     renderer.setSize(W, H, false);
     camera.aspect = W / H;
     camera.updateProjectionMatrix();
+    if (composer) {
+      composer.setPixelRatio(dpr);
+      composer.setSize(W, H);
+      if (bloomPass) bloomPass.setSize(W, H);
+    }
     layoutTrace();
   }
 
@@ -1088,7 +1439,7 @@
 
     controls.update();
     syncScene();
-    renderer.render(scene, camera);
+    if (composer) composer.render(); else renderer.render(scene, camera);
     placeLabels(W, H);
     drawTrace();
     updateSteps();
@@ -1185,6 +1536,14 @@
   layout();
   record();
   if (!running) ui.pause.textContent = 'Resume';
+
+  // Paint one frame synchronously. requestAnimationFrame does not run at all in a
+  // background tab, so without this the scene can sit blank until it gains focus.
+  syncScene();
+  if (composer) composer.render(); else renderer.render(scene, camera);
+  placeLabels(W, H);
+  drawTrace();
+
   requestAnimationFrame(frame);
 })();
 </script>
