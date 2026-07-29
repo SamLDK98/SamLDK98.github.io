@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Action potential — membrane anatomy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #06070e;
+    --panel:   #0b0d18;
+    --panel-2: #10131f;
+    --line:    rgba(140, 165, 225, 0.16);
+    --line-2:  rgba(140, 165, 225, 0.07);
+    --txt:     #e8eeff;
+    --txt-2:   rgba(226, 234, 255, 0.60);
+    --txt-3:   rgba(226, 234, 255, 0.34);
+
+    --na:      #ff6a3d;   /* sodium — hot */
+    --na-dim:  #7c3520;
+    --k:       #35d2ff;   /* potassium — cool */
+    --k-dim:   #1a5d78;
+    --leak:    #8fa0c4;
+    --stim:    #ffc247;   /* stimulus / threshold */
+    --v:       #ffffff;   /* membrane potential */
+    --ahp:     #9d7bff;
+  }
+
+  html, body { background: var(--bg); }
+  body {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    color: var(--txt);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bench {
+    background:
+      radial-gradient(120% 80% at 50% 0%, #10131f 0%, var(--bg) 70%);
+    border: 1px solid var(--line);
+  }
+
+  /* ---------- header ---------- */
+  .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    padding: 11px 16px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .head-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--txt-2);
+  }
+  .readout {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem; display: flex; gap: 1.05rem; flex-wrap: wrap; color: var(--txt-3);
+  }
+  .readout b { font-weight: 600; color: var(--txt); font-variant-numeric: tabular-nums; }
+  .readout .ph { color: var(--stim); font-weight: 600; }
+
+  /* ---------- main split ---------- */
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  }
+  .cell { min-width: 0; padding: 10px 12px 12px; }
+  .cell + .cell { border-left: 1px solid var(--line); }
+
+  .cap {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem; letter-spacing: 0.17em; text-transform: uppercase;
+    color: var(--txt-3); margin-bottom: 7px;
+  }
+
+  canvas { display: block; width: 100%; }
+  #scene  { height: 430px; }
+  #plots  { height: 430px; }
+  #trace  { height: 172px; cursor: ew-resize; touch-action: none; }
+
+  .strip { padding: 10px 12px 4px; border-top: 1px solid var(--line); }
+
+  /* ---------- controls ---------- */
+  .bar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 14px 13px;
+    border-top: 1px solid var(--line);
+  }
+
+  button {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.76rem; font-weight: 500;
+    color: var(--txt); background: var(--panel-2);
+    border: 1px solid var(--line); padding: 7px 13px; cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  button:hover { background: #182034; border-color: rgba(150,180,255,0.4); }
+  button:focus-visible { outline: 2px solid var(--stim); outline-offset: 2px; }
+
+  .btn-play {
+    background: var(--stim); color: #17130a; border-color: var(--stim);
+    font-weight: 600; min-width: 86px;
+  }
+  .btn-play:hover { background: #ffd06b; color: #17130a; border-color: #ffd06b; }
+
+  .seg { display: flex; }
+  .seg button {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.66rem;
+    padding: 7px 10px; border-right-width: 0;
+  }
+  .seg button:last-child { border-right-width: 1px; }
+  .seg button[aria-pressed="true"] {
+    background: #1d2740; color: #fff; border-color: rgba(150,180,255,0.45);
+  }
+
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-left: auto; }
+  .chip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 6px 9px; background: transparent; border: 1px solid var(--line);
+    color: var(--txt-3);
+  }
+  .chip:hover { color: var(--txt); }
+  .chip[aria-pressed="true"] { color: #07070e; background: var(--c, var(--stim)); border-color: var(--c, var(--stim)); }
+
+  .hint {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--txt-3);
+  }
+
+  @media (max-width: 820px) {
+    .main { grid-template-columns: minmax(0, 1fr); }
+    .cell + .cell { border-left: 0; border-top: 1px solid var(--line); }
+    #scene { height: 360px; }
+    #plots { height: 330px; }
+    .chips { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bench">
+  <div class="head">
+    <span class="head-title">Action potential — membrane anatomy</span>
+    <span class="readout">
+      <span>t <b id="ro-t">0.00</b> ms</span>
+      <span>V <b id="ro-v">−65.0</b> mV</span>
+      <span>g<sub>Na</sub> <b id="ro-gna">0.01</b></span>
+      <span>g<sub>K</sub> <b id="ro-gk">0.37</b></span>
+      <span class="ph" id="ro-phase">Resting</span>
+    </span>
+  </div>
+
+  <div class="main">
+    <div class="cell">
+      <div class="cap">Cross-section through the membrane</div>
+      <canvas id="scene" aria-label="Cross-section of the membrane showing sodium and potassium channels opening and closing"></canvas>
+    </div>
+    <div class="cell">
+      <div class="cap">Gates and conductances</div>
+      <canvas id="plots" aria-label="Gating variables and conductances over the course of the spike"></canvas>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="cap">Membrane potential — drag to scrub</div>
+    <canvas id="trace" aria-label="Membrane potential over time with a draggable playhead"></canvas>
+  </div>
+
+  <div class="bar">
+    <button class="btn-play" id="play" type="button">Play</button>
+    <div class="seg" id="speed" role="group" aria-label="Playback speed">
+      <button type="button" data-sp="0.06" aria-pressed="false">1/16×</button>
+      <button type="button" data-sp="0.02" aria-pressed="true">1/50×</button>
+      <button type="button" data-sp="0.006" aria-pressed="false">1/160×</button>
+    </div>
+    <span class="hint">← → to step</span>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // =================================================================
+  // 1. Precompute one action potential.
+  //
+  //    Everything drawn on this page is read out of this table — the gate
+  //    positions in the diagram are the model's own m, h and n at that
+  //    instant, not an artist's impression of them.
+  // =================================================================
+
+  const C_M = 1.0, G_NA = 120.0, G_K = 36.0, G_L = 0.3;
+  const E_NA = 50.0, E_K = -77.0, E_L = -54.387, V_REST = -65.0;
+  const DT = 0.01, REC = 2;              // record every 2nd step -> 0.02 ms
+  const T_END = 16.0;    // the spike and its undershoot; past this it is a flat line
+  const STIM_T0 = 1.0, STIM_DUR = 0.5, STIM_AMP = 20.0;
+
+  const ex = Math.exp;
+  const aN = (V) => { const d = V + 55; return Math.abs(d) < 1e-6 ? 0.1 : 0.01 * d / (1 - ex(-d / 10)); };
+  const bN = (V) => 0.125 * ex(-(V + 65) / 80);
+  const aM = (V) => { const d = V + 40; return Math.abs(d) < 1e-6 ? 1.0 : 0.1 * d / (1 - ex(-d / 10)); };
+  const bM = (V) => 4.0 * ex(-(V + 65) / 18);
+  const aH = (V) => 0.07 * ex(-(V + 65) / 20);
+  const bH = (V) => 1.0 / (1 + ex(-(V + 35) / 10));
+  const ss = (a, b) => a / (a + b);
+
+  const T = [], VV = [], MM = [], HH = [], NN = [], GNA = [], GK = [], INA = [], IK = [], DVDT = [], STIM = [];
+
+  (function integrate() {
+    let V = V_REST;
+    let m = ss(aM(V), bM(V)), h = ss(aH(V), bH(V)), n = ss(aN(V), bN(V));
+    let t = 0;
+    const steps = Math.round(T_END / DT);
+    for (let i = 0; i <= steps; i += 1) {
+      const gNa = G_NA * m * m * m * h;
+      const gK  = G_K * n * n * n * n;
+      const iNa = gNa * (V - E_NA);
+      const iK  = gK * (V - E_K);
+      const iL  = G_L * (V - E_L);
+      const I   = (t >= STIM_T0 && t < STIM_T0 + STIM_DUR) ? STIM_AMP : 0;
+      const dV  = (I - iNa - iK - iL) / C_M;
+
+      if (i % REC === 0) {
+        T.push(t); VV.push(V); MM.push(m); HH.push(h); NN.push(n);
+        GNA.push(gNa); GK.push(gK); INA.push(iNa); IK.push(iK); DVDT.push(dV); STIM.push(I);
+      }
+      V += dV * DT;
+      m += (aM(V) * (1 - m) - bM(V) * m) * DT;
+      h += (aH(V) * (1 - h) - bH(V) * h) * DT;
+      n += (aN(V) * (1 - n) - bN(V) * n) * DT;
+      t += DT;
+    }
+  })();
+
+  const N = T.length;
+
+  // ---- phase boundaries, derived from the table rather than hardcoded ----
+  const argmax = (a, lo, hi) => { let b = -1e18, bi = lo || 0; for (let i = lo || 0; i < (hi || a.length); i += 1) if (a[i] > b) { b = a[i]; bi = i; } return bi; };
+  const argmin = (a, lo, hi) => { let b = 1e18, bi = lo || 0; for (let i = lo || 0; i < (hi || a.length); i += 1) if (a[i] < b) { b = a[i]; bi = i; } return bi; };
+  const firstFrom = (lo, pred) => { for (let i = lo; i < N; i += 1) if (pred(i)) return i; return N - 1; };
+
+  const I_PEAK  = argmax(VV);
+  const I_THR   = firstFrom(0, (i) => VV[i] > -55);
+  const I_GNA   = argmax(GNA);
+  const I_GK    = argmax(GK);
+  const I_CROSS = firstFrom(I_PEAK, (i) => VV[i] < V_REST);
+  const I_AHP   = argmin(VV, I_PEAK);
+  const I_BACK  = firstFrom(I_AHP, (i) => VV[i] > V_REST - 1.0);
+  const I_STIM  = Math.round(STIM_T0 / (DT * REC));
+
+  const PHASES = [
+    { key: 'rest',  name: 'Resting',        a: 0,       b: I_STIM,  col: '#8fa0c4' },
+    { key: 'thr',   name: 'To threshold',   a: I_STIM,  b: I_THR,   col: '#ffc247' },
+    { key: 'rise',  name: 'Depolarising',   a: I_THR,   b: I_PEAK,  col: '#ff6a3d' },
+    { key: 'fall',  name: 'Repolarising',   a: I_PEAK,  b: I_CROSS, col: '#35d2ff' },
+    { key: 'ahp',   name: 'Undershoot',     a: I_CROSS, b: I_BACK,  col: '#9d7bff' },
+    { key: 'recov', name: 'Recovering',     a: I_BACK,  b: N - 1,   col: '#8fa0c4' }
+  ];
+  const phaseAt = (i) => {
+    for (const p of PHASES) if (i >= p.a && i < p.b) return p;
+    return PHASES[PHASES.length - 1];
+  };
+
+  const V_LO = -85, V_HI = 50;
+  const GNA_MAX = Math.max.apply(null, GNA);
+  const GK_MAX = Math.max.apply(null, GK);
+  const G_MAX = Math.ceil(Math.max(GNA_MAX, GK_MAX) / 5) * 5;
+
+  // =================================================================
+  // 2. State
+  // =================================================================
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let head = 0;                 // playhead, in table index (fractional)
+  let playing = !reduceMotion;
+  let speed = 0.02;             // simulated ms per real ms
+  let lastTs = 0;
+
+  const C = {
+    na: '#ff6a3d', naDim: '#7c3520', k: '#35d2ff', kDim: '#1a5d78',
+    v: '#ffffff', stim: '#ffc247', ahp: '#9d7bff', leak: '#8fa0c4',
+    txt: '#e8eeff', txt2: 'rgba(226,234,255,0.60)', txt3: 'rgba(226,234,255,0.34)',
+    line: 'rgba(140,165,225,0.16)', line2: 'rgba(140,165,225,0.07)'
+  };
+
+  const at = (arr) => {
+    const i = Math.max(0, Math.min(N - 1, head));
+    const i0 = Math.floor(i), i1 = Math.min(N - 1, i0 + 1), f = i - i0;
+    return arr[i0] + (arr[i1] - arr[i0]) * f;
+  };
+
+  // =================================================================
+  // 3. Canvas plumbing
+  // =================================================================
+
+  function setup(id) {
+    const cv = document.getElementById(id);
+    return { cv, ctx: cv.getContext('2d'), w: 0, h: 0 };
+  }
+  const scene = setup('scene');
+  const plots = setup('plots');
+  const trace = setup('trace');
+
+  function fit(o) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = o.cv.getBoundingClientRect();
+    o.w = r.width; o.h = r.height;
+    o.cv.width = Math.round(r.width * dpr);
+    o.cv.height = Math.round(r.height * dpr);
+    o.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  const rr = (ctx, x, y, w, h, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  };
+
+  const glow = (ctx, colour, blur, fn) => {
+    ctx.save();
+    ctx.shadowColor = colour;
+    ctx.shadowBlur = blur;
+    fn();
+    ctx.restore();
+  };
+
+  // =================================================================
+  // 4. The membrane cross-section
+  //
+  //    Drawn in a fixed 600x440 design space and scaled to fit, so the
+  //    composition never depends on the container size.
+  // =================================================================
+
+  const DW = 600, DH = 440;
+  const Y_OUT_TOP = 6, Y_MEM_TOP = 150, Y_MEM_BOT = 252, Y_IN_BOT = 434;
+  const NA_X = 178, K_X = 424;
+  const PORE_W = 30;
+
+  // free ions drifting in the two compartments and through open pores
+  const ions = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  function seedIons() {
+    ions.length = 0;
+    // extracellular: sodium-rich
+    for (let i = 0; i < 34; i += 1) ions.push({ kind: 'na', x: rnd(12, DW - 12), y: rnd(Y_OUT_TOP + 8, Y_MEM_TOP - 10), state: 'free', v: rnd(-0.12, 0.12) });
+    for (let i = 0; i < 7; i += 1)  ions.push({ kind: 'k',  x: rnd(12, DW - 12), y: rnd(Y_OUT_TOP + 8, Y_MEM_TOP - 10), state: 'free', v: rnd(-0.12, 0.12) });
+    // intracellular: potassium-rich
+    for (let i = 0; i < 32; i += 1) ions.push({ kind: 'k',  x: rnd(12, DW - 12), y: rnd(Y_MEM_BOT + 12, Y_IN_BOT - 8), state: 'free', v: rnd(-0.12, 0.12) });
+    for (let i = 0; i < 6; i += 1)  ions.push({ kind: 'na', x: rnd(12, DW - 12), y: rnd(Y_MEM_BOT + 12, Y_IN_BOT - 8), state: 'free', v: rnd(-0.12, 0.12) });
+  }
+  seedIons();
+
+  const movers = [];   // ions currently transiting a pore
+
+  function pumpIons(dtSec) {
+    const iNa = at(INA), iK = at(IK);
+    // spawn rate tracks the actual current magnitude
+    const rNa = Math.min(1, Math.abs(iNa) / 260) * 34 * dtSec;
+    const rK  = Math.min(1, Math.abs(iK) / 260) * 34 * dtSec;
+
+    if (Math.random() < rNa && at(MM) > 0.05) {
+      movers.push({ kind: 'na', x: NA_X + rnd(-7, 7), y: Y_MEM_TOP - 12, dir: 1, sp: rnd(52, 78) });
+    }
+    if (Math.random() < rK && at(NN) > 0.15) {
+      movers.push({ kind: 'k', x: K_X + rnd(-7, 7), y: Y_MEM_BOT + 12, dir: -1, sp: rnd(52, 78) });
+    }
+
+    for (let i = movers.length - 1; i >= 0; i -= 1) {
+      const p = movers[i];
+      p.y += p.dir * p.sp * dtSec;
+      if (p.dir > 0 && p.y > Y_IN_BOT - 20) movers.splice(i, 1);
+      else if (p.dir < 0 && p.y < Y_OUT_TOP + 16) movers.splice(i, 1);
+    }
+    if (movers.length > 90) movers.splice(0, movers.length - 90);
+
+    for (const s of ions) {
+      s.x += s.v * dtSec * 60;
+      if (s.x < 10 || s.x > DW - 10) s.v *= -1;
+    }
+  }
+
+  function ionDot(ctx, x, y, kind, bright) {
+    const col = kind === 'na' ? C.na : C.k;
+    ctx.fillStyle = col;
+    if (bright) { ctx.shadowColor = col; ctx.shadowBlur = 9; }
+    ctx.beginPath();
+    ctx.arc(x, y, kind === 'na' ? 4.2 : 4.6, 0, 6.2832);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(6,7,14,0.85)';
+    ctx.font = '600 6px "IBM Plex Sans", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(kind === 'na' ? '+' : '+', x, y + 0.5);
+  }
+
+  // one phospholipid: head + two tails
+  function lipid(ctx, x, y, dir) {
+    ctx.beginPath();
+    ctx.arc(x, y, 4.6, 0, 6.2832);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x - 1.9, y + dir * 4.2); ctx.lineTo(x - 2.6, y + dir * 15);
+    ctx.moveTo(x + 1.9, y + dir * 4.2); ctx.lineTo(x + 2.6, y + dir * 15);
+    ctx.stroke();
+  }
+
+  function drawBilayer(ctx) {
+    const midGap = 6;
+    const topY = Y_MEM_TOP + 8, botY = Y_MEM_BOT - 8;
+    ctx.fillStyle = '#2b3350';
+    ctx.strokeStyle = '#2b3350';
+    ctx.lineWidth = 1.7;
+    for (let x = 10; x < DW; x += 13.2) {
+      const nearNa = Math.abs(x - NA_X) < PORE_W;
+      const nearK = Math.abs(x - K_X) < PORE_W;
+      if (nearNa || nearK) continue;
+      lipid(ctx, x, topY, 1);
+      lipid(ctx, x, botY, -1);
+    }
+    void midGap;
+  }
+
+  // charge lining the membrane: outside positive at rest, flipping at the peak
+  function drawCharge(ctx, V) {
+    const pol = Math.max(-1, Math.min(1, (V - V_REST) / 60));   // 0 rest, >0 depolarised
+    const outSign = pol < 0.5 ? '+' : '−';
+    const inSign = pol < 0.5 ? '−' : '+';
+    const outCol = pol < 0.5 ? 'rgba(255,140,90,0.7)' : 'rgba(120,150,220,0.55)';
+    const inCol = pol < 0.5 ? 'rgba(120,150,220,0.55)' : 'rgba(255,140,90,0.7)';
+    ctx.font = '600 11px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let x = 22; x < DW - 10; x += 30) {
+      if (Math.abs(x - NA_X) < PORE_W + 6 || Math.abs(x - K_X) < PORE_W + 6) continue;
+      ctx.fillStyle = outCol; ctx.fillText(outSign, x, Y_MEM_TOP - 7);
+      ctx.fillStyle = inCol;  ctx.fillText(inSign, x, Y_MEM_BOT + 8);
+    }
+  }
+
+  // Sodium channel: an activation gate that opens with m, and a separate
+  // inactivation ball that swings up and plugs the pore as h falls.
+  function drawNaChannel(ctx, m, h) {
+    const x = NA_X, top = Y_MEM_TOP, bot = Y_MEM_BOT;
+    const open = m;                    // 0..1
+    const plug = 1 - h;                // 0..1
+
+    const bodyCol = '#5d2a1c';
+    const edge = '#a8destroy';
+    void edge;
+
+    // two walls
+    ctx.fillStyle = bodyCol;
+    ctx.strokeStyle = 'rgba(255,120,80,0.55)';
+    ctx.lineWidth = 1.4;
+    const wallW = 21;
+    rr(ctx, x - PORE_W / 2 - wallW, top - 12, wallW, bot - top + 24, 7); ctx.fill(); ctx.stroke();
+    rr(ctx, x + PORE_W / 2, top - 12, wallW, bot - top + 24, 7); ctx.fill(); ctx.stroke();
+
+    // pore lumen, brighter the more it conducts
+    const lum = open * (1 - plug);
+    ctx.fillStyle = `rgba(255,106,61,${0.06 + lum * 0.30})`;
+    ctx.fillRect(x - PORE_W / 2, top - 12, PORE_W, bot - top + 24);
+
+    // activation gate: two flaps at the inner mouth, swinging apart with m
+    const gy = bot + 4;
+    const ang = (1 - open) * 0.95;
+    ctx.strokeStyle = '#ff9a72';
+    ctx.lineWidth = 4.2;
+    ctx.lineCap = 'round';
+    for (const s of [-1, 1]) {
+      ctx.save();
+      ctx.translate(x + s * PORE_W / 2, gy);
+      ctx.rotate(s * ang);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-s * (PORE_W / 2 - 1), 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Inactivation ball on its tether. It is anchored to the inner face of the
+    // right-hand wall and swings up into the pore mouth as h falls — deliberately
+    // a separate structure from the activation gate, because during repolarisation
+    // the accurate state is gate open *and* pore plugged. That is refractoriness.
+    const anchorX = x + PORE_W / 2 + 12;
+    const anchorY = bot + 30;
+    const restX = anchorX + 16, restY = anchorY + 16;
+    const plugX = x, plugY = bot + 12;
+    const bx = restX + (plugX - restX) * plug;
+    const by = restY + (plugY - restY) * plug;
+
+    ctx.strokeStyle = 'rgba(255,150,110,0.8)';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(anchorX, anchorY);
+    ctx.quadraticCurveTo(anchorX + 14, by + 14, bx, by);
+    ctx.stroke();
+
+    ctx.fillStyle = plug > 0.5 ? '#ff6a3d' : '#8e4029';
+    ctx.strokeStyle = 'rgba(255,170,130,0.85)';
+    ctx.lineWidth = 1.3;
+    if (plug > 0.5) { ctx.shadowColor = C.na; ctx.shadowBlur = 14; }
+    ctx.beginPath(); ctx.arc(bx, by, 9.5, 0, 6.2832); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  // Delayed rectifier: one gate, driven by n, and no inactivation at all —
+  // it stays open long after sodium has been plugged.
+  function drawKChannel(ctx, n) {
+    const x = K_X, top = Y_MEM_TOP, bot = Y_MEM_BOT;
+    const open = n;
+
+    ctx.fillStyle = '#123c4e';
+    ctx.strokeStyle = 'rgba(80,200,255,0.5)';
+    ctx.lineWidth = 1.4;
+    const wallW = 21;
+    rr(ctx, x - PORE_W / 2 - wallW, top - 12, wallW, bot - top + 24, 7); ctx.fill(); ctx.stroke();
+    rr(ctx, x + PORE_W / 2, top - 12, wallW, bot - top + 24, 7); ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = `rgba(53,210,255,${0.05 + open * 0.30})`;
+    ctx.fillRect(x - PORE_W / 2, top - 12, PORE_W, bot - top + 24);
+
+    const gy = bot + 4;
+    const ang = (1 - open) * 0.95;
+    ctx.strokeStyle = '#7fe3ff';
+    ctx.lineWidth = 4.2;
+    ctx.lineCap = 'round';
+    for (const s of [-1, 1]) {
+      ctx.save();
+      ctx.translate(x + s * PORE_W / 2, gy);
+      ctx.rotate(s * ang);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-s * (PORE_W / 2 - 1), 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // text sits over drifting ions, so it needs a plate under it to stay readable
+  function plate(ctx, x, y, w, h) {
+    ctx.fillStyle = 'rgba(6,7,14,0.82)';
+    rr(ctx, x, y, w, h, 3);
+    ctx.fill();
+  }
+
+  function label(ctx, x, y, lines, colour, align) {
+    ctx.textAlign = align || 'center';
+    ctx.textBaseline = 'top';
+    ctx.font = '600 9.5px "IBM Plex Mono", monospace';
+    const w0 = ctx.measureText(lines[0]).width;
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    const w1 = lines[1] ? ctx.measureText(lines[1]).width : 0;
+    const wMax = Math.max(w0, w1) + 12;
+    const hMax = lines[1] ? 25 : 14;
+    const bx = (align === 'left') ? x - 6 : x - wMax / 2;
+    plate(ctx, bx, y - 3, wMax, hMax);
+
+    ctx.font = '600 9.5px "IBM Plex Mono", monospace';
+    ctx.fillStyle = colour;
+    ctx.fillText(lines[0], x, y);
+    if (lines[1]) {
+      ctx.font = '500 9px "IBM Plex Mono", monospace';
+      ctx.fillStyle = C.txt3;
+      ctx.fillText(lines[1], x, y + 12);
+    }
+  }
+
+  function drawScene() {
+    const { ctx, w, h } = scene;
+    ctx.save();
+    ctx.clearRect(0, 0, w, h);
+    const s = Math.min(w / DW, h / DH);
+    ctx.translate((w - DW * s) / 2, (h - DH * s) / 2);
+    ctx.scale(s, s);
+
+    const V = at(VV), m = at(MM), hh = at(HH), n = at(NN);
+
+    // compartments
+    ctx.fillStyle = '#0a0d18';
+    ctx.fillRect(0, 0, DW, Y_MEM_TOP);
+    ctx.fillStyle = '#080a14';
+    ctx.fillRect(0, Y_MEM_BOT, DW, DH - Y_MEM_BOT);
+
+    ctx.strokeStyle = C.line2;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, Y_MEM_TOP); ctx.lineTo(DW, Y_MEM_TOP); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, Y_MEM_BOT); ctx.lineTo(DW, Y_MEM_BOT); ctx.stroke();
+
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    const outT = 'OUTSIDE   Na⁺ 145 mM   K⁺ 4 mM';
+    const inT = 'INSIDE   K⁺ 140 mM   Na⁺ 12 mM';
+    plate(ctx, 6, 6, ctx.measureText(outT).width + 10, 15);
+    plate(ctx, 6, DH - 22, ctx.measureText(inT).width + 10, 15);
+    ctx.fillStyle = C.txt3;
+    ctx.fillText(outT, 11, 9);
+    ctx.fillText(inT, 11, DH - 19);
+
+    // resident ions
+    for (const s2 of ions) ionDot(ctx, s2.x, s2.y, s2.kind, false);
+
+    drawBilayer(ctx);
+    drawCharge(ctx, V);
+    drawNaChannel(ctx, m, hh);
+    drawKChannel(ctx, n);
+
+    // ions in transit, drawn bright
+    for (const p of movers) ionDot(ctx, p.x, p.y, p.kind, true);
+
+    // channel labels
+    label(ctx, NA_X, Y_MEM_BOT + 58,
+      ['Na⁺  m ' + m.toFixed(2) + '  h ' + hh.toFixed(2),
+       m > 0.5 && hh > 0.3 ? 'open — conducting' :
+       (1 - hh) > 0.5 && m > 0.5 ? 'inactivated — ball in pore' : 'shut'],
+      C.na);
+    label(ctx, K_X, Y_MEM_BOT + 58,
+      ['K⁺  n ' + n.toFixed(2),
+       n > 0.5 ? 'open — no inactivation' : 'shut'],
+      C.k);
+
+    ctx.restore();
+  }
+
+  // =================================================================
+  // 5. Gate and conductance plots
+  // =================================================================
+
+  function panelFrame(ctx, x, y, w, h, title) {
+    ctx.strokeStyle = C.line;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = C.txt3;
+    ctx.fillText(title, x + 7, y + 6);
+  }
+
+  function series(ctx, x, y, w, h, arr, lo, hi, colour, width, blur) {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+    ctx.beginPath();
+    for (let i = 0; i < N; i += 1) {
+      const px = x + (i / (N - 1)) * w;
+      const py = y + h * (1 - (arr[i] - lo) / (hi - lo));
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = width;
+    ctx.lineJoin = 'round';
+    if (blur) { ctx.shadowColor = colour; ctx.shadowBlur = blur; }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function playhead(ctx, x, y, w, h) {
+    const px = x + (head / (N - 1)) * w;
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 3]);
+    ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(px, y + h); ctx.stroke();
+    ctx.setLineDash([]);
+    return px;
+  }
+
+  function dotAt(ctx, x, y, w, h, arr, lo, hi, colour) {
+    const px = x + (head / (N - 1)) * w;
+    const py = y + h * (1 - (at(arr) - lo) / (hi - lo));
+    ctx.fillStyle = colour;
+    ctx.shadowColor = colour; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.arc(px, py, 3.4, 0, 6.2832); ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // right-aligned and plated, so it never sits on top of a curve
+  function legend(ctx, xRight, y, items) {
+    ctx.font = '600 9px "IBM Plex Mono", monospace';
+    ctx.textBaseline = 'middle';
+    let total = 0;
+    for (const it of items) total += 13 + ctx.measureText(it.t).width + 12;
+    let cx = xRight - total;
+    plate(ctx, cx - 6, y - 8, total + 8, 16);
+    ctx.textAlign = 'left';
+    for (const it of items) {
+      ctx.fillStyle = it.c;
+      ctx.fillRect(cx, y - 1.5, 9, 3);
+      ctx.fillStyle = C.txt2;
+      ctx.fillText(it.t, cx + 13, y);
+      cx += 13 + ctx.measureText(it.t).width + 12;
+    }
+  }
+
+  function drawPlots() {
+    const { ctx, w, h } = plots;
+    ctx.clearRect(0, 0, w, h);
+    const pad = 8, gap = 14;
+    const ph = (h - pad * 2 - gap) / 2;
+    const x = pad, wd = w - pad * 2;
+
+    // --- gates ---
+    let y = pad;
+    panelFrame(ctx, x, y, wd, ph, 'GATES   0 → 1');
+    for (const gy of [0.25, 0.5, 0.75]) {
+      const py = y + ph * (1 - gy);
+      ctx.strokeStyle = C.line2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, py); ctx.lineTo(x + wd, py); ctx.stroke();
+    }
+    series(ctx, x, y, wd, ph, MM, 0, 1, C.na, 1.8, 8);
+    series(ctx, x, y, wd, ph, HH, 0, 1, '#ffb08a', 1.6, 0);
+    series(ctx, x, y, wd, ph, NN, 0, 1, C.k, 1.8, 8);
+    playhead(ctx, x, y, wd, ph);
+    dotAt(ctx, x, y, wd, ph, MM, 0, 1, C.na);
+    dotAt(ctx, x, y, wd, ph, HH, 0, 1, '#ffb08a');
+    dotAt(ctx, x, y, wd, ph, NN, 0, 1, C.k);
+    legend(ctx, x + wd - 8, y + ph - 12, [
+      { t: 'm', c: C.na }, { t: 'h', c: '#ffb08a' }, { t: 'n', c: C.k }
+    ]);
+
+    // --- conductances ---
+    y = pad + ph + gap;
+    panelFrame(ctx, x, y, wd, ph, 'CONDUCTANCE   mS/cm²   0 → ' + G_MAX);
+    for (const gv of [G_MAX * 0.25, G_MAX * 0.5, G_MAX * 0.75]) {
+      const py = y + ph * (1 - gv / G_MAX);
+      ctx.strokeStyle = C.line2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, py); ctx.lineTo(x + wd, py); ctx.stroke();
+    }
+    series(ctx, x, y, wd, ph, GNA, 0, G_MAX, C.na, 1.9, 10);
+    series(ctx, x, y, wd, ph, GK, 0, G_MAX, C.k, 1.9, 10);
+    playhead(ctx, x, y, wd, ph);
+    dotAt(ctx, x, y, wd, ph, GNA, 0, G_MAX, C.na);
+    dotAt(ctx, x, y, wd, ph, GK, 0, G_MAX, C.k);
+    legend(ctx, x + wd - 8, y + ph - 12, [
+      { t: 'gNa', c: C.na }, { t: 'gK', c: C.k }
+    ]);
+  }
+
+  // =================================================================
+  // 6. The voltage trace with phase bands
+  // =================================================================
+
+  const TPAD = { l: 44, r: 12, t: 10, b: 20 };
+
+  function drawTrace() {
+    const { ctx, w, h } = trace;
+    ctx.clearRect(0, 0, w, h);
+    const x = TPAD.l, y = TPAD.t;
+    const wd = w - TPAD.l - TPAD.r, ht = h - TPAD.t - TPAD.b;
+
+    // phase bands
+    for (const p of PHASES) {
+      const x0 = x + (p.a / (N - 1)) * wd;
+      const x1 = x + (p.b / (N - 1)) * wd;
+      ctx.fillStyle = p.col;
+      ctx.globalAlpha = 0.07;
+      ctx.fillRect(x0, y, x1 - x0, ht);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = p.col;
+      ctx.globalAlpha = 0.5;
+      ctx.fillRect(x0, y + ht - 2, Math.max(1, x1 - x0 - 1), 2);
+      ctx.globalAlpha = 1;
+    }
+
+    // reference levels
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (const lv of [{ v: 50, l: '+50' }, { v: 0, l: '0' }, { v: -55, l: '−55', c: C.stim },
+                      { v: V_REST, l: '−65' }, { v: -77, l: '−77', c: C.k }]) {
+      const py = y + ht * (1 - (lv.v - V_LO) / (V_HI - V_LO));
+      ctx.strokeStyle = lv.c ? 'rgba(255,194,71,0.22)' : C.line2;
+      ctx.setLineDash(lv.v === -55 || lv.v === V_REST ? [3, 4] : []);
+      ctx.beginPath(); ctx.moveTo(x, py); ctx.lineTo(x + wd, py); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = lv.c || C.txt3;
+      ctx.fillText(lv.l, x - 6, py);
+    }
+
+    // the spike
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, wd, ht); ctx.clip();
+    ctx.beginPath();
+    for (let i = 0; i < N; i += 1) {
+      const px = x + (i / (N - 1)) * wd;
+      const py = y + ht * (1 - (VV[i] - V_LO) / (V_HI - V_LO));
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = C.v;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.shadowColor = 'rgba(255,255,255,0.75)';
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.restore();
+
+    // playhead + marker
+    const px = x + (head / (N - 1)) * wd;
+    const py = y + ht * (1 - (at(VV) - V_LO) / (V_HI - V_LO));
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(px, y + ht); ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = '#fff'; ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.arc(px, py, 4.2, 0, 6.2832); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // time axis
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillStyle = C.txt3;
+    for (let ms = 0; ms <= T_END; ms += 2) {
+      const tx = x + (ms / T_END) * wd;
+      ctx.fillText(String(ms), tx, y + ht + 5);
+    }
+    ctx.textAlign = 'right';
+    ctx.fillText('ms', x + wd, y + ht + 5);
+  }
+
+  // =================================================================
+  // 7. Loop, controls
+  // =================================================================
+
+  const ui = {
+    t: document.getElementById('ro-t'), v: document.getElementById('ro-v'),
+    gna: document.getElementById('ro-gna'), gk: document.getElementById('ro-gk'),
+    phase: document.getElementById('ro-phase'),
+    play: document.getElementById('play'), speed: document.getElementById('speed'),
+    chips: document.getElementById('chips')
+  };
+
+  for (const p of PHASES) {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.type = 'button';
+    b.textContent = p.name;
+    b.style.setProperty('--c', p.col);
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => { head = p.a; playing = false; syncPlayBtn(); render(); });
+    p.el = b;
+    ui.chips.appendChild(b);
+  }
+
+  function updateReadout() {
+    ui.t.textContent = at(T).toFixed(2);
+    ui.v.textContent = at(VV).toFixed(1).replace('-', '−');
+    ui.gna.textContent = at(GNA).toFixed(2);
+    ui.gk.textContent = at(GK).toFixed(2);
+    const p = phaseAt(Math.round(head));
+    ui.phase.textContent = p.name;
+    ui.phase.style.color = p.col;
+    for (const q of PHASES) q.el.setAttribute('aria-pressed', String(q === p));
+  }
+
+  function render() {
+    drawScene();
+    drawPlots();
+    drawTrace();
+    updateReadout();
+  }
+
+  function syncPlayBtn() { ui.play.textContent = playing ? 'Pause' : 'Play'; }
+
+  function layoutAll() { fit(scene); fit(plots); fit(trace); }
+
+  let raf = 0;
+  function frame(ts) {
+    raf = requestAnimationFrame(frame);
+    const dtMs = lastTs ? Math.min(60, ts - lastTs) : 16.7;
+    lastTs = ts;
+
+    if (playing) {
+      head += (dtMs * speed) / (DT * REC);
+      if (head >= N - 1) { head = N - 1; playing = false; syncPlayBtn(); }
+    }
+    pumpIons(dtMs / 1000);
+    render();
+  }
+
+  ui.play.addEventListener('click', () => {
+    if (head >= N - 1) head = 0;
+    playing = !playing;
+    syncPlayBtn();
+  });
+
+  ui.speed.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-sp]');
+    if (!b) return;
+    speed = parseFloat(b.dataset.sp);
+    for (const x of ui.speed.querySelectorAll('button')) {
+      x.setAttribute('aria-pressed', String(x === b));
+    }
+  });
+
+  // scrubbing
+  let dragging = false;
+  const scrubTo = (clientX) => {
+    const r = trace.cv.getBoundingClientRect();
+    const wd = r.width - TPAD.l - TPAD.r;
+    const f = (clientX - r.left - TPAD.l) / wd;
+    head = Math.max(0, Math.min(N - 1, f * (N - 1)));
+  };
+  trace.cv.addEventListener('pointerdown', (e) => {
+    dragging = true; playing = false; syncPlayBtn();
+    trace.cv.setPointerCapture(e.pointerId);
+    scrubTo(e.clientX); render();
+  });
+  trace.cv.addEventListener('pointermove', (e) => { if (dragging) { scrubTo(e.clientX); render(); } });
+  trace.cv.addEventListener('pointerup', () => { dragging = false; });
+  trace.cv.addEventListener('pointercancel', () => { dragging = false; });
+
+  document.addEventListener('keydown', (e) => {
+    const el = document.activeElement;
+    const onControl = el && (el.tagName === 'BUTTON' || el.tagName === 'INPUT');
+    if (e.code === 'ArrowRight') { head = Math.min(N - 1, head + (e.shiftKey ? 25 : 5)); playing = false; syncPlayBtn(); render(); e.preventDefault(); }
+    else if (e.code === 'ArrowLeft') { head = Math.max(0, head - (e.shiftKey ? 25 : 5)); playing = false; syncPlayBtn(); render(); e.preventDefault(); }
+    else if (e.code === 'Space' && !onControl) {
+      if (head >= N - 1) head = 0;
+      playing = !playing; syncPlayBtn(); e.preventDefault();
+    }
+  });
+
+  window.addEventListener('message', (e) => {
+    if (e.source !== window.parent) return;
+    if (e.data && e.data.type === 'ap-play') {
+      if (head >= N - 1) head = 0;
+      playing = !playing; syncPlayBtn();
+    }
+  });
+
+  let rt;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { layoutAll(); render(); }, 140);
+  });
+
+  function postHeight() {
+    const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    if (window.parent !== window) window.parent.postMessage({ type: 'ap-height', height: h }, '*');
+  }
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.documentElement);
+  window.addEventListener('load', postHeight);
+
+  layoutAll();
+  syncPlayBtn();
+  render();                       // a correct first frame even with rAF asleep
+  raf = requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
