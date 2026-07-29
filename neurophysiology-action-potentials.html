@@ -76,8 +76,9 @@
     }
     h1 em {
       font-style: normal;
-      /* straight orange → cyan; routing through yellow turns muddy green midway */
-      background: linear-gradient(100deg, #ff7a4d 5%, #35d2ff 92%);
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #ff7a4d 4%, #9d7bff 52%, #35d2ff 96%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
 
@@ -396,7 +397,7 @@
 
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="neurophysiology-synaptic-transmission.html">← Synaptic Transmission</a>
-        <a href="neurophysiology.html">All Neurophysiology →</a>
+        <a href="neurophysiology-ionic-movements.html">Ionic Movements →</a>
       </nav>
     </main>
   </div>
