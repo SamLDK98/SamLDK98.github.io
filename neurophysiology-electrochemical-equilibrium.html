@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electrochemical Equilibrium | Neurophysiology | Sam Kirwan</title>
+  <meta name="description" content="Two compartments, a wall permeable to potassium, and the balance between diffusion and electrostatics — worked through to the Nernst equation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #06070e;
+      --bg-2:    #0b0d18;
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #e8eeff;
+      --txt-2:   rgba(226, 234, 255, 0.66);
+      --txt-3:   rgba(226, 234, 255, 0.36);
+      --k:       #35d2ff;
+      --cl:      #54d6a0;
+      --chem:    #ffc247;
+      --elec:    #ff6a3d;
+      --eq:      #9d7bff;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background:
+        radial-gradient(90% 55% at 50% 0%, #101425 0%, var(--bg) 60%),
+        var(--bg);
+      background-attachment: fixed;
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: 64ch; }
+
+    header { padding: clamp(1.6rem, 5vh, 2.8rem) 0 0; }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--elec); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--elec); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.9rem, 6vw, 3.5rem);
+      line-height: 1.02; letter-spacing: -0.02em;
+      max-width: 18ch; overflow-wrap: break-word; hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(103deg, #ff7a4d 4%, #9d7bff 52%, #35d2ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--txt-2);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.98rem; color: var(--txt);
+      margin: 2rem 0 0.6rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.7; color: var(--txt-2);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    blockquote {
+      border-left: 2px solid var(--eq);
+      background: linear-gradient(90deg, rgba(157,123,255,0.08), transparent 70%);
+      padding: 0.9rem 1.2rem; margin: 1.5rem 0;
+    }
+    blockquote p { color: var(--txt); margin: 0; }
+
+    .k { color: var(--k); } .cl { color: var(--cl); }
+    .chem { color: var(--chem); } .elec { color: var(--elec); }
+
+    /* ---------- maths ---------- */
+    mjx-container[display="true"] {
+      margin: 1.4rem 0 !important;
+      overflow-x: auto; overflow-y: hidden;
+      padding-bottom: 2px;
+    }
+    /* No explicit colour here: MathJax draws in currentColor, so letting it
+       inherit is what allows a .k or .cl span to tint the maths inside it. */
+    .mathblock {
+      border-left: 2px solid var(--line);
+      background: linear-gradient(90deg, rgba(140,165,225,0.05), transparent 72%);
+      padding: 0.3rem 1.2rem 0.3rem;
+      margin: 1.4rem 0;
+    }
+    .mathblock mjx-container[display="true"] { margin: 0.9rem 0 !important; }
+
+    /* the step-by-step unit cancellation reads better tightened up */
+    .chain { margin: 1.4rem 0; }
+    .chain mjx-container[display="true"] { margin: 0.45rem 0 !important; }
+
+    /* ---------- variable table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .vars {
+      width: 100%; border-collapse: collapse; margin-top: 1.2rem;
+      font-size: 0.85rem;
+    }
+    .vars th, .vars td {
+      text-align: left; padding: 0.65rem 1rem 0.65rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: top;
+    }
+    .vars thead th {
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .vars td:first-child { white-space: nowrap; }
+    .vars td:nth-child(2) {
+      font-family: "IBM Plex Sans", sans-serif; color: var(--txt-2);
+      min-width: 22ch;
+    }
+    .vars td:last-child { white-space: nowrap; color: var(--txt-2); }
+
+    /* ---------- callout ---------- */
+    .callout {
+      border-left: 2px solid var(--eq);
+      background: linear-gradient(90deg, rgba(157,123,255,0.09), transparent 70%);
+      padding: 1.1rem 1.3rem; margin: 1.7rem 0;
+    }
+    .callout .tag {
+      display: block; font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--eq); margin-bottom: 0.5rem;
+    }
+    .callout p { color: var(--txt); }
+
+    /* an inserted sentence, marked so it is easy to find and replace */
+    .inserted { border-bottom: 1px dotted rgba(157,123,255,0.55); }
+
+    /* ---------- widget ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 790px;          /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 860px) { iframe.bench { height: 1180px; } }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="neurophysiology.html">Neurophysiology</a>
+      <p class="kicker">05 &nbsp;·&nbsp; Cellular</p>
+      <h1>Electrochemical <em>Equilibrium</em></h1>
+      <p class="standfirst">
+        Two compartments, a wall that lets one ion through, and two forces pulling in
+        opposite directions. Where they balance is a number you can predict &mdash; and
+        the equation that predicts it is the foundation of everything else in this
+        section.
+      </p>
+    </header>
+
+    <main>
+      <section class="col">
+        <h2><span class="n">The setup</span>A box with two compartments</h2>
+
+        <p>Imagine a box with two compartments. Both compartments are filled with water.</p>
+
+        <p>The wall dividing them is permeable to $K^+$.</p>
+
+        <p>
+          Both compartments contain some amount of a potassium chloride solution (KCl), a
+          mixture of <span class="k">$K^+$</span> and <span class="cl">$Cl^-$</span>.
+        </p>
+
+        <p>
+          Compartment 1 ($C1$) has a KCl concentration of 1 mM.<br>
+          Compartment 2 ($C2$) has a KCl concentration of 1 mM.
+        </p>
+
+        <p>
+          Initially, there would be no difference in charge between the two compartments.
+          If we measured the electrical charge in each and compared them we would find
+          that the voltage equals 0. This would remain true even over time, despite the
+          wall being selectively permeable to $K^+$, because
+          <span class="inserted">with equal concentrations on both sides there is nothing
+          driving a <em>net</em> movement: $K^+$ crosses the wall constantly, but at the
+          same rate in each direction, so no charge is ever separated</span>.
+        </p>
+
+        <p>
+          If we poured more KCl solution into $C1$, initially there would still be no
+          difference in charge between the two compartments. This is because, despite the
+          concentration being greater in one compartment, the charge of that compartment
+          remains neutral because we have increased <span class="k">$K^+$</span> and
+          <span class="cl">$Cl^-$</span> proportionally.
+        </p>
+
+        <p>
+          However, the difference in concentration between the two compartments creates a
+          gradient which the ions want to cancel. All the ions tend to move towards the
+          area of lower concentration; however, because the wall only permits $K^+$ to
+          pass, there will be a difference in charge created between the two compartments.
+        </p>
+
+        <p>That means we are going to have a system where there are two forces pushing in opposing directions:</p>
+
+        <ul>
+          <li><strong class="chem">Chemical force (diffusion):</strong> The concentration gradient wants more ions to enter $C2$.</li>
+          <li><strong class="elec">Electrical force (electrostatics):</strong> The charge gradient wants $K^+$ ions to move back into $C1$.</li>
+        </ul>
+
+        <p>
+          A balance between the two forces, the <strong>electrochemical equilibrium</strong>,
+          will need to be struck.
+        </p>
+
+        <p>
+          For a given concentration difference, we can predict the required electrical
+          potential difference needed to achieve the equilibrium potential using the
+          Nernst equation.
+        </p>
+      </section>
+
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 1 &mdash; the box, and the balance</span>
+          <span>it opens at 10 mM : 1 mM, the worked example below</span>
+        </div>
+        <iframe
+          class="bench"
+          src="neurophysiology/electrochemical-equilibrium/nernst-widget.html"
+          title="Interactive two-compartment box illustrating the Nernst equation: set concentrations, temperature, valence and membrane voltage, and see where the chemical and electrical forces balance"
+          loading="lazy"
+        ></iframe>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">The equation</span>Nernst</h2>
+
+        <div class="mathblock">
+          $$E_{\text{X}} = \frac{RT}{zF} \ln \frac{[\text{X}]_2}{[\text{X}]_1}$$
+        </div>
+
+        <div class="scroll-x">
+          <table class="vars">
+            <thead>
+              <tr><th>Variable</th><th>Definition</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$E_X$</td>
+                <td>Equilibrium potential for an ion $X$</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>$R$</td>
+                <td>Universal gas constant</td>
+                <td>$8.314 \frac{\text{J}}{\text{mol} \cdot \text{K}}$</td>
+              </tr>
+              <tr>
+                <td>$T$</td>
+                <td>Absolute temperature (Kelvin)</td>
+                <td>Standard laboratory temp: $293.15 \ \text{K}$ (20&nbsp;°C)</td>
+              </tr>
+              <tr>
+                <td>$z$</td>
+                <td>Valence (charge) of permeant ion</td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>$F$</td>
+                <td>Faraday constant (the amount of electrical potential in 1 mole of a univalent ion)</td>
+                <td>$96{,}485 \frac{\text{C}}{\text{mol}}$</td>
+              </tr>
+              <tr>
+                <td>$[X]$</td>
+                <td>Square brackets around a molecule mean 'concentration of'</td>
+                <td>&mdash;</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>The exchange rate</h3>
+
+        <p>
+          $\Large \frac{RT}{zF}$ &nbsp;→&nbsp; this gives us the 'exchange rate': for every
+          unit of kinetic energy acting on ions, how much electrical potential we need to
+          cancel it out. It converts joules to volts.
+        </p>
+
+        <p>
+          $RT$ &nbsp;→&nbsp; this quantifies the kinetic energy available to move ions at a
+          given temperature.<br>
+          $zF$ &nbsp;→&nbsp; this represents the amount of electrical charge in one mole of ions.
+        </p>
+
+        <div class="mathblock">
+          $$RT = \left(8.314 \, \frac{\text{J}}{\text{mol} \cdot \text{K}}\right) \times 293.15 \text{ K} \approx 2437 \text{ J/mol}$$
+        </div>
+
+        <p>
+          Dividing this by $F$ converts that molar kinetic energy into an electrical
+          potential in volts (or millivolts).
+        </p>
+
+        <div class="chain">
+          $$\frac{2437 \frac{\text{J}}{\text{mol}}}{96{,}485 \frac{\text{C}}{\text{mol}}}$$
+          $$\frac{2437\text{ J}}{\text{mol}} \cdot \frac{1\text{ mol}}{96{,}485\text{ C}}$$
+          $$\frac{2437\text{ J}}{96{,}485\text{ C}}$$
+          $$\frac{2437}{96{,}485} \cdot \frac{\text{J}}{\text{C}}$$
+          $$0.02526 \frac{\text{J}}{\text{C}}$$
+        </div>
+
+        <p>Since a volt ($V$) $= \frac{\text{J}}{\text{C}}$:</p>
+
+        <div class="chain">
+          $$0.02526\text{ V}$$
+        </div>
+
+        <p>To convert V to mV, multiply by 1,000:</p>
+
+        <div class="chain">
+          $$25.26\text{ mV}$$
+        </div>
+
+        <blockquote>
+          <p>
+            If one side has a concentration $e$ times greater than the other, there would
+            need to be $25.26\text{ mV}$ of a difference in charge between the sides to
+            cancel it out.
+          </p>
+        </blockquote>
+
+        <h3>The size of the gradient</h3>
+
+        <p>Now we have:</p>
+
+        <div class="mathblock">
+          $$E_{\text{K}} = 25.26 \ln \frac{[\text{K}]_2}{[\text{K}]_1}$$
+        </div>
+
+        <p>
+          $\Large \frac{[\text{K}]_2}{[\text{K}]_1}$ &nbsp;→&nbsp; this term tells us how
+          big the concentration gradient is.
+        </p>
+
+        <div class="mathblock">
+          $$\frac{1\text{ mM}}{10\text{ mM}} = \frac{1}{10} = 0.1$$
+        </div>
+
+        <p>For every 1 unit of potassium on side 2, we have 10 units on side 1.</p>
+
+        <p>
+          We now know that the concentration difference is 10-fold (0.1). However, this is
+          in terms of the actual physical count of ions.
+        </p>
+
+        <p>
+          If the energy required to push back against concentration gradients scaled
+          linearly, we could simply use this ratio. However, it doesn't. It scales
+          logarithmically. So:
+        </p>
+
+        <div class="mathblock">
+          $$\ln(0.1) \approx -2.3026$$
+        </div>
+
+        <p>
+          This $-2.3026$ is our exact multiplier. It tells us that our 10-to-1 gradient is
+          exactly 2.3026 times stronger than a standard $e$-to-1 gradient (and the negative
+          sign just indicates the direction of the flow).
+        </p>
+
+        <p>
+          To find the final voltage, we multiply our baseline exchange rate
+          ($25.26\text{ mV}$, the voltage needed for exactly one $e$-fold gradient) by this
+          new multiplier:
+        </p>
+
+        <div class="chain">
+          $$E_{\text{K}} = 25.26\ \text{mV} \ \cdot \ -2.3026$$
+          $$E_{\text{K}} = -58.16 \ \text{mV}$$
+        </div>
+
+        <p>
+          Therefore, we need <strong>$-58.16\text{ mV}$</strong> of electrical potential to
+          perfectly cancel out the chemical push of a 10-to-1 potassium gradient.
+        </p>
+
+        <h2><span class="n">Reading the sign</span>Negative relative to what?</h2>
+
+        <p>
+          The minus sign is doing real work, and it is worth being explicit about what it
+          refers to. With $[\text{X}]_2$ on top and $[\text{X}]_1$ underneath, the answer
+          comes out as <strong>the potential of $C1$ relative to $C2$</strong>.
+        </p>
+
+        <p>
+          That matches the physical picture. $C1$ is the concentrated side, so $K^+$ leaves
+          it; every ion that goes takes a positive charge with it and leaves its
+          <span class="cl">$Cl^-$</span> partner behind. $C1$ therefore becomes negative
+          with respect to $C2$ &mdash; hence $-58.16\text{ mV}$. In the figure above, the
+          minus signs collect on the $C1$ face of the wall.
+        </p>
+
+        <div class="callout">
+          <span class="tag">Why this convention is the useful one</span>
+          <p>
+            Map $C1$ onto the inside of a cell and $C2$ onto the outside, and this is
+            exactly the convention used for neurons. Run a real cell's numbers through the
+            figure &mdash; 140 mM inside, 4 mM outside, at 37&nbsp;°C &mdash; and it returns
+            $-95.4\text{ mV}$, which is where the resting potassium equilibrium of about
+            $-90\text{ mV}$ comes from.
+          </p>
+        </div>
+
+        <h2><span class="n">Worth trying</span>Three things the figure will show you</h2>
+
+        <ul>
+          <li>
+            <strong>Equal concentrations give exactly zero.</strong> Set both compartments
+            to the same value: $\ln(1) = 0$, so $E = 0$ no matter how concentrated they
+            are. Concentration alone creates no voltage &mdash; only a
+            <em>difference</em> does.
+          </li>
+          <li>
+            <strong>The line is straight on a log axis.</strong> Every tenfold change adds
+            the same $58.2\text{ mV}$ at 20&nbsp;°C. A hundredfold gradient is not ten
+            times the voltage of a tenfold one, it is twice it.
+          </li>
+          <li>
+            <strong>Valence divides.</strong> Switch the permeant ion to $Ca^{2+}$ and the
+            same gradient gives half the voltage, because $z$ sits underneath. Switch to
+            $Cl^-$ and the sign flips, because $z$ is negative.
+          </li>
+        </ul>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="neurophysiology-ionic-movements.html">← Ionic Movements</a>
+        <a href="neurophysiology.html">All Neurophysiology →</a>
+      </nav>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const frame = document.querySelector('iframe.bench');
+      if (!frame) return;
+      window.addEventListener('message', (e) => {
+        if (e.source !== frame.contentWindow) return;
+        const d = e.data;
+        if (!d || d.type !== 'nernst-height') return;
+        const h = Number(d.height);
+        if (Number.isFinite(h) && h > 200 && h < 4000) frame.style.height = h + 'px';
+      });
+    })();
+  </script>
+</body>
+</html>

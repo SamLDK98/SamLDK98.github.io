@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nernst equation — two-compartment box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #06070e;
+    --panel:   #0b0d18;
+    --panel-2: #10131f;
+    --line:    rgba(140, 165, 225, 0.16);
+    --line-2:  rgba(140, 165, 225, 0.07);
+    --txt:     #e8eeff;
+    --txt-2:   rgba(226, 234, 255, 0.62);
+    --txt-3:   rgba(226, 234, 255, 0.34);
+
+    --k:    #35d2ff;   /* K+  — the permeant ion */
+    --cl:   #54d6a0;   /* Cl- — stays put */
+    --chem: #ffc247;   /* chemical / diffusion force */
+    --elec: #ff6a3d;   /* electrical force */
+    --eq:   #9d7bff;
+  }
+
+  html, body { background: var(--bg); }
+  body {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    color: var(--txt);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bench {
+    background: radial-gradient(120% 80% at 50% 0%, #10131f 0%, var(--bg) 70%);
+    border: 1px solid var(--line);
+  }
+
+  .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    padding: 11px 16px 10px; border-bottom: 1px solid var(--line);
+  }
+  .head-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--txt-2);
+  }
+  .readout {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem; display: flex; gap: 1.1rem; flex-wrap: wrap; color: var(--txt-3);
+  }
+  .readout b { font-weight: 600; color: var(--txt); font-variant-numeric: tabular-nums; }
+  .readout .eqv { color: var(--eq); }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+  .cell { min-width: 0; padding: 10px 12px 12px; }
+  .cell + .cell { border-left: 1px solid var(--line); }
+
+  .cap {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem; letter-spacing: 0.17em; text-transform: uppercase;
+    color: var(--txt-3); margin-bottom: 7px;
+  }
+
+  canvas { display: block; width: 100%; }
+  #box   { height: 388px; }
+  #curve { height: 190px; }
+
+  /* ---------- live equation ---------- */
+  .eqbox {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem; line-height: 2.1; color: var(--txt);
+    font-variant-numeric: tabular-nums;
+  }
+  .eqrow { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+  .eqrow + .eqrow { margin-top: 0.5rem; }
+  .frac {
+    display: inline-flex; flex-direction: column; text-align: center;
+    vertical-align: middle; line-height: 1.25; font-size: 0.92em;
+  }
+  .frac .num { border-bottom: 1px solid var(--txt-2); padding: 0 0.45em 0.1em; }
+  .frac .den { padding: 0.1em 0.45em 0; }
+  .eqlbl { color: var(--txt-3); font-size: 0.68rem; letter-spacing: 0.06em; }
+  .eqres {
+    margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid var(--line);
+    font-size: 1.15rem; color: var(--eq); font-weight: 600;
+  }
+  .eqres small {
+    display: block; font-size: 0.62rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--txt-3); font-weight: 500; margin-top: 3px;
+  }
+  .k { color: var(--k); } .chem { color: var(--chem); } .elec { color: var(--elec); }
+
+  /* ---------- controls ---------- */
+  .bar { padding: 11px 14px 14px; border-top: 1px solid var(--line); }
+  .grid {
+    display: grid; gap: 11px 18px;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 0.73rem; color: var(--txt-2); gap: 0.5rem;
+  }
+  .field-label .val {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.71rem;
+    font-weight: 600; color: var(--txt); font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 16px; background: transparent; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: rgba(150,175,235,0.3); }
+  input[type="range"]::-moz-range-track { height: 2px; background: rgba(150,175,235,0.3); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 13px; height: 13px; margin-top: -5.5px;
+    border-radius: 50%; background: var(--txt); border: none;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%; background: var(--txt); border: none;
+  }
+  input[type="range"]:focus-visible { outline: 2px solid var(--chem); outline-offset: 3px; }
+
+  button {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.75rem; font-weight: 500; color: var(--txt);
+    background: var(--panel-2); border: 1px solid var(--line);
+    padding: 7px 12px; cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  button:hover { background: #182034; border-color: rgba(150,180,255,0.4); }
+  button:focus-visible { outline: 2px solid var(--chem); outline-offset: 2px; }
+  .btn-snap { background: var(--eq); color: #0b0718; border-color: var(--eq); font-weight: 600; }
+  .btn-snap:hover { background: #b79bff; color: #0b0718; border-color: #b79bff; }
+
+  .seg { display: flex; }
+  .seg button {
+    flex: 1; font-family: "IBM Plex Mono", monospace; font-size: 0.65rem;
+    padding: 6px 4px; border-right-width: 0;
+  }
+  .seg button:last-child { border-right-width: 1px; }
+  .seg button[aria-pressed="true"] { background: #1d2740; border-color: rgba(150,180,255,0.45); }
+
+  .row2 { display: flex; gap: 7px; align-items: flex-end; }
+
+  @media (max-width: 860px) {
+    .main { grid-template-columns: minmax(0, 1fr); }
+    .cell + .cell { border-left: 0; border-top: 1px solid var(--line); }
+    #box { height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bench">
+  <div class="head">
+    <span class="head-title">Two compartments, a wall permeable to one ion</span>
+    <span class="readout">
+      <span>ratio [K]<sub>2</sub>/[K]<sub>1</sub> <b id="ro-ratio">0.100</b></span>
+      <span>ln <b id="ro-ln">−2.303</b></span>
+      <span>RT/zF <b id="ro-rtzf">25.26</b> mV</span>
+      <span class="eqv">E<sub>K</sub> <b id="ro-e">−58.16</b> mV</span>
+    </span>
+  </div>
+
+  <div class="main">
+    <div class="cell">
+      <div class="cap">The box &mdash; V is measured as C1 relative to C2</div>
+      <canvas id="box" aria-label="Two compartments separated by a wall permeable to potassium, showing ion concentrations, charge separation and the opposing forces"></canvas>
+    </div>
+    <div class="cell">
+      <div class="cap">The equation, with your numbers</div>
+      <div class="eqbox">
+        <div class="eqrow">
+          <span>E<sub>K</sub></span><span>=</span>
+          <span class="frac"><span class="num">RT</span><span class="den">zF</span></span>
+          <span>·</span>
+          <span>ln</span>
+          <span class="frac"><span class="num k" id="eq-c2">1</span><span class="den k" id="eq-c1">10</span></span>
+        </div>
+        <div class="eqrow eqlbl">exchange rate &nbsp;·&nbsp; size of the gradient</div>
+
+        <div class="eqrow" style="margin-top:0.8rem">
+          <span>E<sub>K</sub></span><span>=</span>
+          <span id="eq-rtzf">25.26</span><span class="eqlbl">mV</span>
+          <span>·</span>
+          <span id="eq-ln">(−2.303)</span>
+        </div>
+
+        <div class="eqres">
+          E<sub>K</sub> = <span id="eq-out">−58.16</span> mV
+          <small id="eq-dir">C1 is negative relative to C2</small>
+        </div>
+
+        <div class="eqrow" style="margin-top:1rem">
+          <span class="eqlbl">Driving force on K⁺ &nbsp;(V &minus; E)</span>
+        </div>
+        <div class="eqrow">
+          <span id="eq-drive" style="font-size:0.95rem;font-weight:600">0.00</span>
+          <span class="eqlbl">mV</span>
+          <span class="eqlbl" id="eq-flux">&mdash; no net flux, at equilibrium</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cell" style="border-top:1px solid var(--line)">
+    <div class="cap">E against the concentration ratio &mdash; logarithmic, 58.2 mV per tenfold at 20 °C</div>
+    <canvas id="curve" aria-label="Equilibrium potential against concentration ratio on a logarithmic axis"></canvas>
+  </div>
+
+  <div class="bar">
+    <div class="grid">
+      <div class="field">
+        <label class="field-label" for="c1">
+          <span>[K⁺] in C1</span><span class="val"><span id="c1-v">10</span> mM</span>
+        </label>
+        <input type="range" id="c1" min="0" max="300" step="1" value="200" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="c2">
+          <span>[K⁺] in C2</span><span class="val"><span id="c2-v">1</span> mM</span>
+        </label>
+        <input type="range" id="c2" min="0" max="300" step="1" value="100" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="temp">
+          <span>Temperature</span><span class="val"><span id="temp-v">20</span> °C</span>
+        </label>
+        <input type="range" id="temp" min="0" max="40" step="1" value="20" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="volt">
+          <span>Membrane voltage V<sub>1</sub>&minus;V<sub>2</sub></span>
+          <span class="val"><span id="volt-v">−58.2</span> mV</span>
+        </label>
+        <input type="range" id="volt" min="-200" max="200" step="0.5" value="-58" />
+      </div>
+      <div class="field">
+        <span class="field-label"><span>Permeant ion</span></span>
+        <div class="seg" id="ion" role="group" aria-label="Permeant ion">
+          <button type="button" data-z="1"  data-name="K⁺"  aria-pressed="true">K⁺ z=+1</button>
+          <button type="button" data-z="2"  data-name="Ca²⁺" aria-pressed="false">Ca²⁺ z=+2</button>
+          <button type="button" data-z="-1" data-name="Cl⁻" aria-pressed="false">Cl⁻ z=−1</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label"><span>&nbsp;</span></span>
+        <div class="row2">
+          <button class="btn-snap" id="snap" type="button" style="flex:1">Snap V to E</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // =================================================================
+  // Constants and the equation itself
+  // =================================================================
+  const R = 8.314;      // J / (mol K)
+  const F = 96485;      // C / mol
+  const KELVIN = 273.15;
+
+  // Concentration sliders are logarithmic: 1 mM at 0, 1000 mM at 300.
+  // ln() of a zero concentration is undefined, so the low end is clamped to a
+  // positive value by construction rather than by a guard.
+  const sliderToConc = (s) => Math.pow(10, s / 100);         // 0..300  ->  1..1000 mM
+  const concToSlider = (c) => Math.log10(c) * 100;
+
+  const fmtConc = (c) => (c >= 100 ? c.toFixed(0) : c >= 10 ? c.toFixed(1) : c.toFixed(2));
+  const minus = (s) => String(s).replace('-', '−');
+
+  const state = {
+    c1: 10, c2: 1, tempC: 20, z: 1, ionName: 'K⁺',
+    volt: -58.16                      // V1 − V2, in mV
+  };
+
+  // E is the potential of compartment 1 relative to compartment 2 — the same
+  // convention as inside-relative-to-outside for a cell.
+  function nernst(c1, c2, tempC, z) {
+    const T = tempC + KELVIN;
+    return (R * T / (z * F)) * Math.log(c2 / c1) * 1000;     // mV
+  }
+  const rtzf = (tempC, z) => (R * (tempC + KELVIN) / (z * F)) * 1000;   // mV
+
+  // =================================================================
+  // Canvas plumbing
+  // =================================================================
+  function setup(id) {
+    const cv = document.getElementById(id);
+    return { cv, ctx: cv.getContext('2d'), w: 0, h: 0 };
+  }
+  const box = setup('box');
+  const curve = setup('curve');
+
+  function fit(o) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = o.cv.getBoundingClientRect();
+    o.w = r.width; o.h = r.height;
+    o.cv.width = Math.round(r.width * dpr);
+    o.cv.height = Math.round(r.height * dpr);
+    o.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  const C = {
+    k: '#35d2ff', cl: '#54d6a0', chem: '#ffc247', elec: '#ff6a3d', eq: '#9d7bff',
+    txt: '#e8eeff', txt2: 'rgba(226,234,255,0.62)', txt3: 'rgba(226,234,255,0.34)',
+    line: 'rgba(140,165,225,0.16)', line2: 'rgba(140,165,225,0.07)'
+  };
+
+  // stable dot positions so the box doesn't shimmer while sliders move
+  const seeded = (n, seed) => {
+    const out = [];
+    let s = seed;
+    for (let i = 0; i < n; i += 1) {
+      s = (s * 9301 + 49297) % 233280;
+      const a = s / 233280;
+      s = (s * 9301 + 49297) % 233280;
+      const b = s / 233280;
+      out.push([a, b]);
+    }
+    return out;
+  };
+  const PTS_A = seeded(90, 1234);
+  const PTS_B = seeded(90, 8765);
+
+  const dotCount = (c) => Math.round(5 + 33 * (Math.log10(c) / 3));   // 1..1000 mM -> 5..38
+
+  function ion(ctx, x, y, colour, sign, r) {
+    ctx.fillStyle = colour;
+    ctx.shadowColor = colour; ctx.shadowBlur = 7;
+    ctx.beginPath(); ctx.arc(x, y, r || 4.4, 0, 6.2832); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(6,7,14,0.9)';
+    ctx.font = '700 6.5px "IBM Plex Sans", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(sign, x, y + 0.5);
+  }
+
+  function arrow(ctx, x1, y, x2, colour, label, thick) {
+    const dir = Math.sign(x2 - x1) || 1;
+    ctx.strokeStyle = colour; ctx.fillStyle = colour;
+    ctx.lineWidth = thick;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2 - dir * 8, y); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y);
+    ctx.lineTo(x2 - dir * 9, y - 5.5);
+    ctx.lineTo(x2 - dir * 9, y + 5.5);
+    ctx.closePath(); ctx.fill();
+    if (label) {
+      ctx.font = '600 9.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = dir > 0 ? 'left' : 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(label, x1, y - 9);
+    }
+  }
+
+  function drawBox() {
+    const { ctx, w, h } = box;
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = 12, top = 26, bot = h - 82;
+    const wallW = 14;
+    const midX = w / 2;
+    const leftX = pad, rightX = w - pad;
+
+    const E = nernst(state.c1, state.c2, state.tempC, state.z);
+    const drive = state.volt - E;
+
+    // compartment bodies
+    ctx.fillStyle = '#0a0d18';
+    ctx.fillRect(leftX, top, midX - wallW / 2 - leftX, bot - top);
+    ctx.fillRect(midX + wallW / 2, top, rightX - midX - wallW / 2, bot - top);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    ctx.strokeRect(leftX + 0.5, top + 0.5, midX - wallW / 2 - leftX - 1, bot - top - 1);
+    ctx.strokeRect(midX + wallW / 2 + 0.5, top + 0.5, rightX - midX - wallW / 2 - 1, bot - top - 1);
+
+    // the wall, with pores that only the permeant ion fits through
+    ctx.fillStyle = '#1a2138';
+    ctx.fillRect(midX - wallW / 2, top, wallW, bot - top);
+    ctx.strokeStyle = 'rgba(150,180,255,0.35)';
+    ctx.strokeRect(midX - wallW / 2 + 0.5, top + 0.5, wallW - 1, bot - top - 1);
+    for (let y = top + 26; y < bot - 14; y += 34) {
+      ctx.fillStyle = '#06070e';
+      ctx.fillRect(midX - wallW / 2 + 1, y, wallW - 2, 13);
+      ctx.strokeStyle = C.k;
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath(); ctx.moveTo(midX - wallW / 2 + 1, y); ctx.lineTo(midX + wallW / 2 - 1, y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(midX - wallW / 2 + 1, y + 13); ctx.lineTo(midX + wallW / 2 - 1, y + 13); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // ions, count set by concentration
+    const draw = (x0, x1, conc, pts, tag) => {
+      const n = dotCount(conc);
+      const wdt = x1 - x0 - 26, hgt = bot - top - 54;
+      for (let i = 0; i < n; i += 1) {
+        const p = pts[i];
+        ion(ctx, x0 + 13 + p[0] * wdt, top + 30 + p[1] * hgt, C.k, '+');
+      }
+      // the impermeant counter-ion, in equal number — the compartment is neutral
+      for (let i = 0; i < n; i += 1) {
+        const p = pts[(i + 40) % pts.length];
+        ion(ctx, x0 + 13 + p[0] * wdt, top + 30 + p[1] * hgt, C.cl, '−', 4.1);
+      }
+      void tag;
+    };
+    draw(leftX, midX - wallW / 2, state.c1, PTS_A, 'C1');
+    draw(midX + wallW / 2, rightX, state.c2, PTS_B, 'C2');
+
+    // charge lining the wall: sign follows E, magnitude follows |V|
+    const mag = Math.min(1, Math.abs(state.volt) / 120);
+    if (mag > 0.02) {
+      const nCh = Math.max(1, Math.round(mag * 7));
+      const s1 = state.volt < 0 ? '−' : '+';
+      const s2 = state.volt < 0 ? '+' : '−';
+      ctx.font = '700 12px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for (let i = 0; i < nCh; i += 1) {
+        const y = top + 34 + i * ((bot - top - 60) / Math.max(1, nCh - 1 || 1));
+        ctx.fillStyle = state.volt < 0 ? C.k : C.elec;
+        ctx.globalAlpha = 0.85;
+        ctx.fillText(s1, midX - wallW / 2 - 11, y);
+        ctx.fillStyle = state.volt < 0 ? C.elec : C.k;
+        ctx.fillText(s2, midX + wallW / 2 + 11, y);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // labels
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = C.txt2;
+    ctx.fillText('C1   ' + fmtConc(state.c1) + ' mM', leftX + 6, top + 8);
+    ctx.fillText('C2   ' + fmtConc(state.c2) + ' mM', midX + wallW / 2 + 6, top + 8);
+
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.fillStyle = C.txt3;
+    ctx.fillText('WALL — ' + state.ionName + ' ONLY', midX, top - 16);
+
+    // The two opposing forces, on separate rows so they can be told apart.
+    // Both are drawn in millivolts, which is why they are exactly equal and
+    // opposite when V = E — that equality *is* the equilibrium condition.
+    const lenOf = (mv) => 16 + Math.min(1, Math.abs(mv) / 150) * 86;
+    const chemDir = Math.sign(Math.log(state.c1 / state.c2)) || 0;      // down the gradient
+    const elecDir = (Math.sign(state.volt) * Math.sign(state.z)) || 0;  // charge in a field
+
+    const rowC = bot + 20, rowE = bot + 42;
+    ctx.font = '600 9.5px "IBM Plex Mono", monospace';
+    ctx.textBaseline = 'middle';
+
+    ctx.textAlign = 'right'; ctx.fillStyle = C.chem;
+    ctx.fillText('chemical', midX - 108, rowC);
+    if (chemDir) arrow(ctx, midX - 100, rowC, midX - 100 + chemDir * lenOf(E), C.chem, null, 3);
+
+    ctx.textAlign = 'right'; ctx.fillStyle = C.elec;
+    ctx.fillText('electrical', midX - 108, rowE);
+    if (elecDir) arrow(ctx, midX - 100, rowE, midX - 100 + elecDir * lenOf(state.volt), C.elec, null, 3);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = C.chem; ctx.fillText(minus(Math.abs(E).toFixed(1)) + ' mV', midX + 96, rowC);
+    ctx.fillStyle = C.elec; ctx.fillText(minus(Math.abs(state.volt).toFixed(1)) + ' mV', midX + 96, rowE);
+
+    // verdict
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
+    if (Math.abs(drive) < 0.5) {
+      ctx.fillStyle = C.eq;
+      ctx.fillText('BALANCED — net flux zero', midX, bot + 56);
+    } else {
+      ctx.fillStyle = C.txt3;
+      const toC2 = (drive * state.z) > 0;
+      ctx.fillText('net ' + state.ionName + (toC2 ? ' → C2' : ' → C1')
+        + '   (' + minus(drive.toFixed(1)) + ' mV out of balance)', midX, bot + 56);
+    }
+  }
+
+  // =================================================================
+  // E against ratio, on a log axis
+  // =================================================================
+  const CPAD = { l: 48, r: 14, t: 12, b: 26 };
+
+  function drawCurve() {
+    const { ctx, w, h } = curve;
+    ctx.clearRect(0, 0, w, h);
+    const x = CPAD.l, y = CPAD.t;
+    const wd = w - CPAD.l - CPAD.r, ht = h - CPAD.t - CPAD.b;
+
+    const slope = rtzf(state.tempC, state.z) * Math.LN10;      // mV per decade
+    const yMax = Math.max(80, Math.abs(slope) * 3.2);
+    const xAt = (d) => x + ((d + 3) / 6) * wd;                 // decades −3..+3
+    const yAt = (v) => y + ht * (1 - (v + yMax) / (2 * yMax));
+
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, wd - 1, ht - 1);
+
+    // grid
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (const v of [-yMax, -yMax / 2, 0, yMax / 2, yMax]) {
+      const py = yAt(v);
+      ctx.strokeStyle = Math.abs(v) < 1e-6 ? C.line : C.line2;
+      ctx.beginPath(); ctx.moveTo(x, py); ctx.lineTo(x + wd, py); ctx.stroke();
+      ctx.fillStyle = C.txt3;
+      ctx.fillText(minus(v.toFixed(0)), x - 6, py);
+    }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (let d = -3; d <= 3; d += 1) {
+      const px = xAt(d);
+      ctx.strokeStyle = C.line2;
+      ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(px, y + ht); ctx.stroke();
+      ctx.fillStyle = C.txt3;
+      const lbl = d === 0 ? '1:1' : (d > 0 ? '10^' + d : '1/10' + (d < -1 ? '^' + (-d) : ''));
+      ctx.fillText(lbl, px, y + ht + 5);
+    }
+
+    // the line itself — straight, because the relationship is logarithmic
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, wd, ht); ctx.clip();
+    ctx.beginPath();
+    for (let d = -3; d <= 3; d += 0.05) {
+      const px = xAt(d), py = yAt(slope * d);
+      if (d === -3) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = C.eq; ctx.lineWidth = 2;
+    ctx.shadowColor = C.eq; ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.restore();
+
+    // where we are now
+    const dNow = Math.log10(state.c2 / state.c1);
+    const eNow = nernst(state.c1, state.c2, state.tempC, state.z);
+    if (dNow >= -3 && dNow <= 3) {
+      const px = xAt(dNow), py = yAt(eNow);
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+      ctx.setLineDash([2, 3]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(px, y + ht); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#fff';
+      ctx.shadowColor = '#fff'; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.arc(px, py, 4.2, 0, 6.2832); ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.font = '600 9.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = px > x + wd - 80 ? 'right' : 'left';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = C.txt;
+      ctx.fillText(minus(eNow.toFixed(2)) + ' mV', px + (px > x + wd - 80 ? -8 : 8), py - 7);
+    }
+
+    ctx.font = '500 9px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = C.txt3;
+    ctx.fillText('mV', x + 5, y + 4);
+    // sits inside the plot, top-right — along the axis it collided with the last tick
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+    ctx.fillText('[' + state.ionName + ']₂ / [' + state.ionName + ']₁', x + wd - 6, y + 4);
+  }
+
+  // =================================================================
+  // Readouts
+  // =================================================================
+  const $ = (id) => document.getElementById(id);
+
+  function update() {
+    const ratio = state.c2 / state.c1;
+    const lnR = Math.log(ratio);
+    const factor = rtzf(state.tempC, state.z);
+    const E = nernst(state.c1, state.c2, state.tempC, state.z);
+    const drive = state.volt - E;
+
+    $('ro-ratio').textContent = ratio >= 0.01 ? ratio.toFixed(3) : ratio.toExponential(2);
+    $('ro-ln').textContent = minus(lnR.toFixed(3));
+    $('ro-rtzf').textContent = minus(factor.toFixed(2));
+    $('ro-e').textContent = minus(E.toFixed(2));
+
+    $('eq-c2').textContent = fmtConc(state.c2);
+    $('eq-c1').textContent = fmtConc(state.c1);
+    $('eq-rtzf').textContent = minus(factor.toFixed(2));
+    $('eq-ln').textContent = '(' + minus(lnR.toFixed(3)) + ')';
+    $('eq-out').textContent = minus(E.toFixed(2));
+    $('eq-dir').textContent =
+      Math.abs(E) < 0.05 ? 'no gradient — no potential' :
+      (E < 0 ? 'C1 is negative relative to C2' : 'C1 is positive relative to C2');
+
+    $('eq-drive').textContent = minus(drive.toFixed(2));
+    $('eq-drive').style.color = Math.abs(drive) < 0.5 ? C.eq : C.txt;
+    $('eq-flux').textContent = Math.abs(drive) < 0.5
+      ? '— no net flux, at equilibrium'
+      : '— ' + state.ionName + ' keeps moving';
+
+    $('c1-v').textContent = fmtConc(state.c1);
+    $('c2-v').textContent = fmtConc(state.c2);
+    $('temp-v').textContent = String(state.tempC);
+    $('volt-v').textContent = minus(state.volt.toFixed(1));
+
+    drawBox();
+    drawCurve();
+  }
+
+  // =================================================================
+  // Wiring
+  // =================================================================
+  $('c1').addEventListener('input', (e) => { state.c1 = sliderToConc(+e.target.value); update(); });
+  $('c2').addEventListener('input', (e) => { state.c2 = sliderToConc(+e.target.value); update(); });
+  $('temp').addEventListener('input', (e) => { state.tempC = +e.target.value; update(); });
+  $('volt').addEventListener('input', (e) => { state.volt = +e.target.value; update(); });
+
+  $('ion').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-z]');
+    if (!b) return;
+    state.z = +b.dataset.z;
+    state.ionName = b.dataset.name;
+    for (const x of $('ion').querySelectorAll('button')) {
+      x.setAttribute('aria-pressed', String(x === b));
+    }
+    update();
+  });
+
+  $('snap').addEventListener('click', () => {
+    // keep the exact value in state so the driving force reads a true 0.00;
+    // the slider itself may round to its step, which only affects the thumb
+    state.volt = Math.max(-200, Math.min(200, nernst(state.c1, state.c2, state.tempC, state.z)));
+    $('volt').value = String(state.volt);
+    update();
+  });
+
+  $('reset').addEventListener('click', () => {
+    state.c1 = 10; state.c2 = 1; state.tempC = 20; state.z = 1; state.ionName = 'K⁺';
+    state.volt = -58;
+    $('c1').value = String(Math.round(concToSlider(10)));
+    $('c2').value = String(Math.round(concToSlider(1)));
+    $('temp').value = '20';
+    $('volt').value = '-58';
+    const btns = $('ion').querySelectorAll('button');
+    btns.forEach((b, i) => b.setAttribute('aria-pressed', String(i === 0)));
+    update();
+  });
+
+  let rt;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { fit(box); fit(curve); update(); }, 140);
+  });
+
+  function postHeight() {
+    const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    if (window.parent !== window) window.parent.postMessage({ type: 'nernst-height', height: h }, '*');
+  }
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.documentElement);
+  window.addEventListener('load', postHeight);
+
+  // initial state matches the worked example in the prose: 10 mM vs 1 mM at 20 °C
+  $('c1').value = String(Math.round(concToSlider(10)));
+  $('c2').value = String(Math.round(concToSlider(1)));
+  fit(box); fit(curve);
+  update();                       // fully static — no animation loop at all
+})();
+</script>
+</body>
+</html>
