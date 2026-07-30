@@ -11,14 +11,14 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:      #06070e;
-    --panel:   #0b0d18;
-    --panel-2: #10131f;
+    --bg:      #0e0e11;   /* matte, matching the page */
+    --panel:   #121216;
+    --panel-2: #17171d;
     --line:    rgba(140, 165, 225, 0.16);
     --line-2:  rgba(140, 165, 225, 0.07);
-    --txt:     #e8eeff;
-    --txt-2:   rgba(226, 234, 255, 0.62);
-    --txt-3:   rgba(226, 234, 255, 0.34);
+    --txt:     #f4f6ff;
+    --txt-2:   rgba(238, 242, 252, 0.74);
+    --txt-3:   rgba(238, 242, 252, 0.44);
 
     --k:    #35d2ff;   /* K+  — the permeant ion */
     --cl:   #54d6a0;   /* Cl- — stays put */
@@ -35,7 +35,7 @@
   }
 
   .bench {
-    background: radial-gradient(120% 80% at 50% 0%, #10131f 0%, var(--bg) 70%);
+    background: var(--bg);
     border: 1px solid var(--line);
   }
 
@@ -340,7 +340,7 @@
     ctx.shadowColor = colour; ctx.shadowBlur = 7;
     ctx.beginPath(); ctx.arc(x, y, r || 4.4, 0, 6.2832); ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(6,7,14,0.9)';
+    ctx.fillStyle = 'rgba(14,14,17,0.92)';
     ctx.font = '700 6.5px "IBM Plex Sans", sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(sign, x, y + 0.5);
@@ -378,7 +378,7 @@
     const drive = state.volt - E;
 
     // compartment bodies
-    ctx.fillStyle = '#0a0d18';
+    ctx.fillStyle = '#101014';
     ctx.fillRect(leftX, top, midX - wallW / 2 - leftX, bot - top);
     ctx.fillRect(midX + wallW / 2, top, rightX - midX - wallW / 2, bot - top);
     ctx.strokeStyle = C.line; ctx.lineWidth = 1;
@@ -391,7 +391,7 @@
     ctx.strokeStyle = 'rgba(150,180,255,0.35)';
     ctx.strokeRect(midX - wallW / 2 + 0.5, top + 0.5, wallW - 1, bot - top - 1);
     for (let y = top + 26; y < bot - 14; y += 34) {
-      ctx.fillStyle = '#06070e';
+      ctx.fillStyle = '#0b0b0e';
       ctx.fillRect(midX - wallW / 2 + 1, y, wallW - 2, 13);
       ctx.strokeStyle = C.k;
       ctx.globalAlpha = 0.5;

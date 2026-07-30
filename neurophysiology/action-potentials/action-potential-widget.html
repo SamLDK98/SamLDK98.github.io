@@ -11,14 +11,14 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:      #06070e;
-    --panel:   #0b0d18;
-    --panel-2: #10131f;
+    --bg:      #0e0e11;   /* matte, matching the page */
+    --panel:   #121216;
+    --panel-2: #17171d;
     --line:    rgba(140, 165, 225, 0.16);
     --line-2:  rgba(140, 165, 225, 0.07);
-    --txt:     #e8eeff;
-    --txt-2:   rgba(226, 234, 255, 0.60);
-    --txt-3:   rgba(226, 234, 255, 0.34);
+    --txt:     #f4f6ff;
+    --txt-2:   rgba(238, 242, 252, 0.74);
+    --txt-3:   rgba(238, 242, 252, 0.44);
 
     --na:      #ff6a3d;   /* sodium — hot */
     --na-dim:  #7c3520;
@@ -39,7 +39,7 @@
 
   .bench {
     background:
-      radial-gradient(120% 80% at 50% 0%, #10131f 0%, var(--bg) 70%);
+      var(--bg);
     border: 1px solid var(--line);
   }
 
@@ -124,7 +124,7 @@
     color: var(--txt-3);
   }
   .chip:hover { color: var(--txt); }
-  .chip[aria-pressed="true"] { color: #07070e; background: var(--c, var(--stim)); border-color: var(--c, var(--stim)); }
+  .chip[aria-pressed="true"] { color: #0e0e11; background: var(--c, var(--stim)); border-color: var(--c, var(--stim)); }
 
   .hint {
     font-family: "IBM Plex Mono", monospace;
@@ -398,7 +398,7 @@
     ctx.arc(x, y, kind === 'na' ? 4.2 : 4.6, 0, 6.2832);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(6,7,14,0.85)';
+    ctx.fillStyle = 'rgba(14,14,17,0.88)';
     ctx.font = '600 6px "IBM Plex Sans", sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(kind === 'na' ? '+' : '+', x, y + 0.5);
@@ -546,7 +546,7 @@
 
   // text sits over drifting ions, so it needs a plate under it to stay readable
   function plate(ctx, x, y, w, h) {
-    ctx.fillStyle = 'rgba(6,7,14,0.82)';
+    ctx.fillStyle = 'rgba(14,14,17,0.86)';
     rr(ctx, x, y, w, h, 3);
     ctx.fill();
   }
@@ -584,9 +584,9 @@
     const V = at(VV), m = at(MM), hh = at(HH), n = at(NN);
 
     // compartments
-    ctx.fillStyle = '#0a0d18';
+    ctx.fillStyle = '#101014';
     ctx.fillRect(0, 0, DW, Y_MEM_TOP);
-    ctx.fillStyle = '#080a14';
+    ctx.fillStyle = '#0b0b0e';
     ctx.fillRect(0, Y_MEM_BOT, DW, DH - Y_MEM_BOT);
 
     ctx.strokeStyle = C.line2;
