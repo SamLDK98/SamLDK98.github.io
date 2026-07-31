@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Build an ion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0e11; --panel: #121216; --panel-2: #17171d;
+    --line: rgba(140,165,225,0.16); --line-2: rgba(140,165,225,0.07);
+    --txt: #f4f6ff; --txt-2: rgba(238,242,252,0.74); --txt-3: rgba(238,242,252,0.44);
+    --pos: #ff6a3d;   /* positive / cation — warm */
+    --neg: #35d2ff;   /* negative / anion — cool */
+    --neutral: #9aa6c4;
+  }
+  html, body { background: var(--bg); }
+  body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: var(--txt); -webkit-font-smoothing: antialiased; }
+  .bench { background: var(--bg); border: 1px solid var(--line); }
+
+  .head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    padding: 11px 16px 10px; border-bottom: 1px solid var(--line);
+  }
+  .head-title { font-family: "IBM Plex Mono", monospace; font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--txt-2); }
+  .verdict {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.1em;
+    text-transform: uppercase; font-weight: 600; color: var(--neutral);
+  }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+  .cell { min-width: 0; padding: 12px 14px 14px; }
+  .cell + .cell { border-left: 1px solid var(--line); }
+  .cap { font-family: "IBM Plex Mono", monospace; font-size: 0.58rem; letter-spacing: 0.17em; text-transform: uppercase; color: var(--txt-3); margin-bottom: 7px; }
+
+  canvas { display: block; width: 100%; height: 300px; }
+
+  /* the ledger */
+  .ledger { font-family: "IBM Plex Mono", monospace; font-size: 0.82rem; line-height: 2; color: var(--txt-2); }
+  .ledger .row { display: flex; justify-content: space-between; gap: 1rem; }
+  .ledger .row b { color: var(--txt); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .ledger .pos b { color: var(--pos); }
+  .ledger .neg b { color: var(--neg); }
+  .ledger .rule { border-top: 1px solid var(--line); margin: 0.5rem 0; }
+  .ledger .net { font-size: 1rem; }
+  .ledger .net b { font-size: 1.15rem; }
+
+  .badge {
+    margin-top: 0.9rem; padding: 0.7rem 0.9rem; text-align: center;
+    border: 1px solid var(--c, var(--neutral));
+    background: color-mix(in srgb, var(--c, var(--neutral)) 12%, transparent);
+    font-family: "IBM Plex Sans", sans-serif;
+  }
+  .badge .big { font-size: 1.05rem; font-weight: 600; color: var(--c, var(--neutral)); letter-spacing: 0.02em; }
+  .badge .sub { display: block; font-size: 0.78rem; color: var(--txt-2); margin-top: 3px; }
+
+  .bar { padding: 12px 16px 15px; border-top: 1px solid var(--line); display: grid; gap: 12px 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.75rem; color: var(--txt-2); gap: 0.5rem; }
+  .field-label .val { font-family: "IBM Plex Mono", monospace; font-size: 0.73rem; font-weight: 600; color: var(--txt); font-variant-numeric: tabular-nums; }
+  .field-label .val.pos { color: var(--pos); } .field-label .val.neg { color: var(--neg); }
+
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 16px; background: transparent; cursor: pointer; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: rgba(150,175,235,0.3); }
+  input[type="range"]::-moz-range-track { height: 2px; background: rgba(150,175,235,0.3); }
+  input[type="range"].pos::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 50%; background: var(--pos); border: none; }
+  input[type="range"].pos::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--pos); border: none; }
+  input[type="range"].neg::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 50%; background: var(--neg); border: none; }
+  input[type="range"].neg::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--neg); border: none; }
+  input[type="range"]:focus-visible { outline: 2px solid var(--txt-3); outline-offset: 3px; }
+
+  .presets { display: flex; gap: 6px; align-items: flex-end; }
+  button {
+    font-family: "IBM Plex Sans", sans-serif; font-size: 0.74rem; font-weight: 500; color: var(--txt);
+    background: var(--panel-2); border: 1px solid var(--line); padding: 7px 11px; cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  button:hover { background: #1c1c24; border-color: rgba(150,180,255,0.4); }
+  button:focus-visible { outline: 2px solid var(--txt-3); outline-offset: 2px; }
+
+  @media (max-width: 720px) {
+    .main { grid-template-columns: minmax(0,1fr); }
+    .cell + .cell { border-left: 0; border-top: 1px solid var(--line); }
+    canvas { height: 260px; }
+  }
+</style>
+</head>
+<body>
+<div class="bench">
+  <div class="head">
+    <span class="head-title">Build an ion</span>
+    <span class="verdict" id="verdict">Neutral atom</span>
+  </div>
+
+  <div class="main">
+    <div class="cell">
+      <div class="cap">Protons in the nucleus, electrons around it</div>
+      <canvas id="atom" aria-label="An atom with a nucleus of protons and surrounding electrons; its net charge changes as electrons are added or removed"></canvas>
+    </div>
+    <div class="cell">
+      <div class="cap">The charge ledger</div>
+      <div class="ledger">
+        <div class="row pos"><span>Protons&nbsp; <span id="np">3</span> × (+1e)</span><b id="pcharge">+3e</b></div>
+        <div class="row neg"><span>Electrons&nbsp; <span id="ne">3</span> × (−1e)</span><b id="echarge">−3e</b></div>
+        <div class="rule"></div>
+        <div class="row net"><span>Net charge&nbsp; Q</span><b id="net">0</b></div>
+      </div>
+      <div class="badge" id="badge">
+        <span class="big" id="badge-big">Neutral atom</span>
+        <span class="sub" id="badge-sub">equal protons and electrons — no net charge</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <div class="field">
+      <label class="field-label" for="protons"><span>Protons</span><span class="val pos" id="protons-v">3</span></label>
+      <input class="pos" type="range" id="protons" min="1" max="10" step="1" value="3" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="electrons"><span>Electrons</span><span class="val neg" id="electrons-v">3</span></label>
+      <input class="neg" type="range" id="electrons" min="0" max="12" step="1" value="3" />
+    </div>
+    <div class="field">
+      <span class="field-label"><span>Presets</span></span>
+      <div class="presets">
+        <button type="button" data-p="3" data-e="3">Neutral</button>
+        <button type="button" data-p="3" data-e="2">Cation</button>
+        <button type="button" data-p="3" data-e="4">Anion</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const cv = $('atom'), ctx = cv.getContext('2d');
+  const css = getComputedStyle(document.documentElement);
+  const C = {
+    pos: css.getPropertyValue('--pos').trim(),
+    neg: css.getPropertyValue('--neg').trim(),
+    neutral: css.getPropertyValue('--neutral').trim(),
+    txt3: css.getPropertyValue('--txt-3').trim(),
+    line: css.getPropertyValue('--line').trim()
+  };
+  const minus = (s) => String(s).replace('-', '−');
+
+  let W = 0, H = 0;
+  function fit() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = cv.getBoundingClientRect();
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // deterministic scatter inside a disc, so the nucleus never shimmers between draws
+  function discPts(n, seed) {
+    const out = []; let s = seed;
+    for (let i = 0; i < n; i += 1) {
+      s = (s * 9301 + 49297) % 233280; const a = s / 233280 * Math.PI * 2;
+      s = (s * 9301 + 49297) % 233280; const rr = Math.sqrt(s / 233280);
+      out.push([Math.cos(a) * rr, Math.sin(a) * rr]);
+    }
+    return out;
+  }
+
+  function particle(x, y, r, colour, sign) {
+    ctx.fillStyle = colour;
+    ctx.shadowColor = colour; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(14,14,17,0.92)';
+    ctx.font = '700 ' + (r * 1.25) + 'px "IBM Plex Sans", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(sign, x, y + 0.5);
+  }
+
+  function draw() {
+    const np = +$('protons').value, ne = +$('electrons').value;
+    ctx.clearRect(0, 0, W, H);
+    const cx = W * 0.44, cy = H * 0.5;
+
+    // electron shells: fill 2 then 8, purely illustrative
+    const shells = [];
+    let left = ne;
+    for (const cap of [2, 8, 6]) { const k = Math.min(cap, left); if (k > 0) shells.push(k); left -= k; if (left <= 0) break; }
+    if (left > 0 && shells.length) shells[shells.length - 1] += left;
+
+    const baseR = Math.min(W, H) * 0.17;
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    shells.forEach((_, i) => {
+      const rr = baseR + (i + 1) * Math.min(W, H) * 0.13;
+      ctx.beginPath(); ctx.arc(cx, cy, rr, 0, 6.2832); ctx.stroke();
+    });
+
+    // nucleus: protons clustered
+    const nucR = baseR * (0.5 + 0.06 * np);
+    const pts = discPts(np, 7);
+    const pr = Math.max(6, nucR / Math.sqrt(np + 1) * 0.9);
+    pts.forEach((p) => particle(cx + p[0] * nucR * 0.7, cy + p[1] * nucR * 0.7, pr, C.pos, '+'));
+
+    // electrons spaced around each shell
+    ctx.font = '';
+    shells.forEach((count, i) => {
+      const rr = baseR + (i + 1) * Math.min(W, H) * 0.13;
+      for (let j = 0; j < count; j += 1) {
+        const a = (j / count) * Math.PI * 2 - Math.PI / 2 + i * 0.4;
+        particle(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, Math.max(5, pr * 0.62), C.neg, '−');
+      }
+    });
+
+    // net-charge glyph, floating to the right
+    const net = np - ne;
+    const gx = W * 0.88, gy = H * 0.5;
+    const col = net > 0 ? C.pos : net < 0 ? C.neg : C.neutral;
+    ctx.fillStyle = col;
+    ctx.shadowColor = col; ctx.shadowBlur = net === 0 ? 0 : 14;
+    ctx.font = '600 ' + Math.min(46, H * 0.16) + 'px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(net > 0 ? '+' + net : net < 0 ? minus(net) : '0', gx, gy - 8);
+    ctx.shadowBlur = 0;
+    ctx.font = '500 11px "IBM Plex Mono", monospace';
+    ctx.fillStyle = C.txt3;
+    ctx.fillText('NET  (e)', gx, gy + Math.min(46, H * 0.16) * 0.5 + 4);
+  }
+
+  function update() {
+    const np = +$('protons').value, ne = +$('electrons').value;
+    const net = np - ne;
+    $('protons-v').textContent = np; $('electrons-v').textContent = ne;
+    $('np').textContent = np; $('ne').textContent = ne;
+    $('pcharge').textContent = '+' + np + 'e';
+    $('echarge').textContent = '−' + ne + 'e';
+    $('net').textContent = (net > 0 ? '+' + net : net < 0 ? minus(net) : '0') + 'e';
+    $('net').style.color = net > 0 ? C.pos : net < 0 ? C.neg : '';
+
+    const badge = $('badge');
+    let name, sub, colour;
+    if (net === 0) {
+      name = 'Neutral atom'; colour = C.neutral;
+      sub = 'equal protons and electrons — no net charge';
+    } else if (net > 0) {
+      name = 'Cation  (' + '+' + net + 'e)'; colour = C.pos;
+      sub = 'fewer electrons than protons — positively charged';
+    } else {
+      name = 'Anion  (' + minus(net) + 'e)'; colour = C.neg;
+      sub = 'fewer protons than electrons — negatively charged';
+    }
+    $('badge-big').textContent = name;
+    $('badge-sub').textContent = sub;
+    badge.style.setProperty('--c', colour);
+    $('verdict').textContent = net === 0 ? 'Neutral atom' : net > 0 ? 'Cation' : 'Anion';
+    $('verdict').style.color = colour;
+    draw();
+  }
+
+  $('protons').addEventListener('input', update);
+  $('electrons').addEventListener('input', update);
+  document.querySelectorAll('button[data-p]').forEach((b) => {
+    b.addEventListener('click', () => {
+      $('protons').value = b.dataset.p; $('electrons').value = b.dataset.e; update();
+    });
+  });
+
+  // Measure the actual widget box, and re-post on every resize (see note in the
+  // Coulomb widget — measuring the root element can stick at a stale height).
+  function postHeight() {
+    const el = document.querySelector('.bench');
+    const h = Math.ceil(el.getBoundingClientRect().height);
+    if (window.parent !== window && h > 100) window.parent.postMessage({ type: 'ion-height', height: h }, '*');
+  }
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { fit(); draw(); postHeight(); }, 140); });
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.querySelector('.bench'));
+  window.addEventListener('load', () => { postHeight(); setTimeout(postHeight, 250); });
+
+  fit(); update();     // fully reactive — no animation loop
+  postHeight();
+})();
+</script>
+</body>
+</html>
