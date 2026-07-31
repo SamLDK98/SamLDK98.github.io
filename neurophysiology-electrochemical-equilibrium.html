@@ -91,19 +91,19 @@
       line-height: 1.02; letter-spacing: -0.02em;
       max-width: 18ch; overflow-wrap: break-word; hyphens: auto;
     }
-    h1 em {
-      font-style: normal;
-      background: linear-gradient(103deg, #ff7a4d 4%, #9d7bff 52%, #35d2ff 96%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-
-    .standfirst {
-      font-family: "Spectral", Georgia, serif;
-      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
-      line-height: 1.62; color: var(--body);
-      max-width: 52ch; margin-top: 1.15rem;
+    /* colour reference — five section accents, kept as a visible key */
+    .swatches {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.6rem;
       padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
       border-bottom: 1px solid var(--line);
+    }
+    .swatches i {
+      width: 0.95rem; height: 0.95rem;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 0 11px currentColor;
     }
 
     h2 {
@@ -254,15 +254,17 @@
 <body>
   <div class="sheet">
     <header>
-      <a class="crumb" href="neurophysiology.html">Neurophysiology</a>
-      <p class="kicker">05 &nbsp;·&nbsp; Cellular</p>
-      <h1>Electrochemical <em>Equilibrium</em></h1>
-      <p class="standfirst">
-        Two compartments, a wall that lets one ion through, and two forces pulling in
-        opposite directions. Where they balance is a number you can predict &mdash; and
-        the equation that predicts it is the foundation of everything else in this
-        section.
-      </p>
+      <h1>Electrochemical Equilibrium</h1>
+
+      <!-- Colour reference. Section palette, saved as a visible key.
+           Delete this whole .swatches block to hide it; nothing else depends on it. -->
+      <div class="swatches" aria-hidden="true">
+        <i style="color: var(--elec)"></i>
+        <i style="color: var(--cl)"></i>
+        <i style="color: var(--k)"></i>
+        <i style="color: var(--chem)"></i>
+        <i style="color: var(--eq)"></i>
+      </div>
     </header>
 
     <main>
