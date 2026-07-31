@@ -14,7 +14,7 @@
     :root {
       --bg:      #0e0e11;      /* matte soot, not blue-black */
       --bg-2:    #141419;
-      --measure: 68ch;         /* the reading column */
+      --measure: 74ch;         /* the reading column */
       --line:    rgba(140, 165, 225, 0.16);
       --line-2:  rgba(140, 165, 225, 0.07);
       --txt:     #f4f6ff;
@@ -28,7 +28,14 @@
       --eq:      #9d7bff;
     }
 
-    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    /* Everything on this page is sized in rem or ch, so scaling the root scales
+       the whole layout together — the same effect as browser zoom, but built in.
+       It grows with the viewport instead of being fixed at the browser default. */
+    html {
+      font-size: clamp(17px, 0.78vw + 11.4px, 26px);
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
 
     body {
       background: var(--bg);
@@ -38,7 +45,9 @@
     }
 
     .sheet {
-      width: min(1120px, 100% - 2.2rem);
+      /* in rem, so the sheet grows with the root scale rather than clamping the
+         column back to its old width */
+      width: min(80rem, 100% - 2.2rem);
       margin: 0 auto;
       padding: 0 clamp(0.6rem, 3vw, 2.4rem);
     }
