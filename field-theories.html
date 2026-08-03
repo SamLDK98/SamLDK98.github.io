@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Field Theories | Sam Kirwan</title>
+  <meta name="description" content="A field as a place where every point reads zero, and what happens when a source with real size and mass is placed in it." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot */
+      --bg-2:    #141419;
+      --measure: 74ch;
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --pot:     #9d7bff;
+      --str:     #ffc247;
+      --dens:    #54d6a0;
+      --src:     #ff6a3d;
+    }
+
+    /* Everything is sized in rem or ch, so scaling the root scales the whole
+       layout together — built-in zoom that grows with the viewport. */
+    html {
+      font-size: clamp(17px, 0.78vw + 11.4px, 26px);
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* fine grain — a flat dark colour alone reads as a glossy void */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .sheet {
+      position: relative; z-index: 1;
+      width: min(80rem, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    header {
+      padding: clamp(1.8rem, 6vh, 3.2rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(2rem, 6.4vw, 3.6rem);
+      line-height: 1.02; letter-spacing: -0.02em;
+      color: var(--txt);
+      overflow-wrap: break-word; hyphens: auto;
+    }
+    .divider {
+      max-width: var(--measure); margin-inline: auto;
+      margin-top: clamp(1.6rem, 5vh, 2.4rem);
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 600; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+    ul + p, ol + p { margin-top: 0.95rem; }
+
+    .pot { color: var(--pot); } .str { color: var(--str); }
+    .dens { color: var(--dens); } .src { color: var(--src); }
+
+    /* maths */
+    mjx-container[display="true"] { margin: 1.4rem 0 !important; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
+    .mathblock {
+      border-left: 2px solid var(--line);
+      background: linear-gradient(90deg, rgba(140,165,225,0.05), transparent 72%);
+      padding: 0.3rem 1.2rem; margin: 1.4rem 0;
+    }
+    .mathblock mjx-container[display="true"] { margin: 0.9rem 0 !important; }
+
+    .callout {
+      border-left: 2px solid var(--dens);
+      background: linear-gradient(90deg, rgba(84,214,160,0.08), transparent 70%);
+      padding: 1.1rem 1.3rem; margin: 1.7rem 0;
+    }
+    .callout .tag {
+      display: block; font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--dens); margin-bottom: 0.5rem;
+    }
+    .callout p { color: var(--txt); }
+
+    /* widget */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 780px;          /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1160px; } }
+
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--pot); }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <h1>Field Theories</h1>
+    </header>
+    <div class="divider"></div>
+
+    <main>
+      <section class="col">
+        <p>
+          We will take one thing as primitive: the field exists as a place where every
+          point has a value equal to 0.
+        </p>
+
+        <p>
+          <strong>Sources</strong> are objects that enter the field and change the values
+          of points in their vicinity, with the magnitude decreasing the further the
+          source's effects propagate out into the field.
+        </p>
+
+        <p>
+          Sources are not just zero-dimensional dots. They take up real area, volume, or
+          region of space. A source therefore has a <strong>size</strong> (the amount of
+          space/field it takes up) and a <strong>coupling constant</strong> (the property
+          that interacts with the field, in this case, mass).
+        </p>
+
+        <p>
+          <strong>Source density</strong> ($\rho$) is a measure of the mass-to-volume
+          ratio; that is, how tightly the given mass is packed together.
+        </p>
+
+        <p>
+          Because many objects are non-uniform in how their mass is distributed, the
+          average density ($\Large \frac{mass}{volume}$) may not reflect the source
+          density at a specific point inside the object. Instead, we use pointwise source
+          density to measure the ratio of mass to volume in an infinitesimally small
+          region:
+        </p>
+
+        <div class="mathblock">
+          $$\rho = \frac{dm}{dV}$$
+        </div>
+
+        <p>
+          Source density is not directly observable in our hills and valleys analogy.
+          Instead, it is the <em>effects</em> of the source density that are observable.
+        </p>
+
+        <p>
+          For example, imagine a default field with a value of $0$ at every location. We
+          then introduce an object with a high source density. The specific coordinates
+          where the object physically sits now have non-zero source density values, but
+          those are not the landscape heights we map.
+        </p>
+
+        <p>
+          Instead, that localised source density distorts the surrounding field, creating
+          the non-zero potential values (the hills, valleys, and slopes) that ripple
+          outward through the space around the object.
+        </p>
+
+        <p>
+          So, placing an object in a field affects the field strength and field potential
+          in its vicinity, with the magnitude of its influence decreasing as the effect
+          spreads outwards.
+        </p>
+      </section>
+
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 1 &mdash; an empty field, and a source placed in it</span>
+          <span>set a mass to begin</span>
+        </div>
+        <iframe
+          class="bench"
+          src="field-theories/field-source-widget.html"
+          title="An initially empty field. Place a source with adjustable mass and size and watch how it distorts the surrounding potential and field strength."
+          loading="lazy"
+        ></iframe>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">Reading the figure</span>What the widget is showing</h2>
+
+        <p>
+          The field starts as the primitive we assumed: every point reads exactly
+          <span class="pot">0</span>, and the cross-section beneath it is a flat line.
+          Nothing is happening. Raising the mass places a source at the centre, and the
+          landscape deforms around it.
+        </p>
+
+        <ul>
+          <li>
+            <strong class="pot">Potential Φ</strong> is the landscape &mdash; the hills and
+            valleys. A source digs a well, deepest at its centre and flattening back
+            towards 0 as you move away.
+          </li>
+          <li>
+            <strong class="str">Field strength |g|</strong> is the steepness of that
+            landscape &mdash; the slope rather than the height.
+          </li>
+          <li>
+            <strong class="dens">Source density ρ</strong> is non-zero
+            <em>only where the object physically sits</em>, and zero everywhere else.
+            Switching to that view shows a flat disc and nothing beyond it.
+          </li>
+        </ul>
+
+        <p>
+          That third view is the point your text is making: the density occupies the
+          coordinates the object sits at, but those values are not the landscape. The
+          landscape is what the density <em>causes</em> around it.
+        </p>
+
+        <h2><span class="n">A consequence</span>Why size matters, and where it doesn't</h2>
+
+        <p>
+          Because the source has real extent rather than being a point, two things follow
+          that a zero-dimensional dot could never show you.
+        </p>
+
+        <p>
+          First, hold the mass at 100 and change only the size. The far field does not
+          move at all &mdash; at a distance of 5 units the potential reads
+          <span class="pot">&minus;20</span> and the strength reads
+          <span class="str">4</span> whether the source has a radius of 1, 2 or 3. Yet the
+          density across those three cases differs by a factor of 27. From outside, you
+          cannot tell how tightly the mass is packed. You can only see how much of it
+          there is.
+        </p>
+
+        <div class="callout">
+          <span class="tag">This is what "not directly observable" means</span>
+          <p>
+            Source density leaves no fingerprint on the field outside the source. Two
+            objects of the same mass and wildly different densities produce identical
+            landscapes everywhere beyond their surfaces. The density only reveals itself
+            <em>inside</em> &mdash; where the potential bottoms out, and how steeply the
+            slope climbs to meet the surface.
+          </p>
+        </div>
+
+        <p>
+          Second, look at the field strength at the very centre of the source. It is
+          <strong>zero</strong>. The slope of the landscape flattens out at the middle of
+          the object, because the surrounding mass pulls equally in every direction and
+          the pulls cancel. The strength climbs steadily from nothing at the centre to its
+          maximum right at the surface, and only then begins to fall away. A point source
+          has no inside, so it can never show you this.
+        </p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="index.html">← Interactive Explanations</a>
+        <a href="neurophysiology.html">Neurophysiology →</a>
+      </nav>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const frame = document.querySelector('iframe.bench');
+      if (!frame) return;
+      window.addEventListener('message', (e) => {
+        if (e.source !== frame.contentWindow) return;
+        const d = e.data;
+        if (!d || d.type !== 'field-height') return;
+        const h = Number(d.height);
+        if (Number.isFinite(h) && h > 200 && h < 4000) frame.style.height = h + 'px';
+      });
+    })();
+  </script>
+</body>
+</html>
