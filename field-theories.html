@@ -141,9 +141,11 @@
       border: 0; background: var(--bg);
     }
     iframe.zero { height: 620px; }
+    iframe.land { height: 520px; }
     @media (max-width: 820px) {
       iframe.bench { height: 1160px; }
       iframe.zero { height: 560px; }
+      iframe.land { height: 540px; }
     }
 
     .foot-nav {
@@ -251,7 +253,22 @@
           the non-zero potential values (the hills, valleys, and slopes) that ripple
           outward through the space around the object.
         </p>
+      </section>
 
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 2 &mdash; the same field, as a landscape</span>
+          <span>height is the value; steepness is the pull</span>
+        </div>
+        <iframe
+          class="bench land"
+          src="field-theories/landscape-widget.html"
+          title="A side-on landscape. Flat when the field is empty; an object digs a valley whose depth is the potential and whose steepness is the field strength. A ball dropped on it rolls downhill."
+          loading="lazy"
+        ></iframe>
+      </section>
+
+      <section class="col">
         <p>
           So, placing an object in a field affects the field strength and field potential
           in its vicinity, with the magnitude of its influence decreasing as the effect
@@ -261,7 +278,7 @@
 
       <section class="lab">
         <div class="lab-cap">
-          <span>Figure 2 &mdash; the same idea, in more detail</span>
+          <span>Figure 3 &mdash; the same idea, in more detail</span>
           <span>set a mass to begin</span>
         </div>
         <iframe
@@ -354,6 +371,7 @@
     (function () {
       const frames = {
         'zero-height':  document.querySelector('iframe.zero'),
+        'land-height':  document.querySelector('iframe.land'),
         'field-height': document.querySelector('iframe[src*="field-source"]')
       };
       window.addEventListener('message', (e) => {
