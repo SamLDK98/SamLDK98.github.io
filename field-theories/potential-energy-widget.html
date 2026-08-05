@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Potential Energy Levels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --bg: #0e0e11;
+      --panel: #121217;
+      --line: rgba(140, 165, 225, 0.1);
+      --text: #f4f6ff;
+      --muted: rgba(238, 242, 252, 0.56);
+      --yellow: #ffe34d;
+      --orange-light: #ffb18f;
+      --orange: #ff6a3d;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "IBM Plex Mono", monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .widget {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 227, 77, 0.055), transparent 42%),
+        var(--panel);
+    }
+
+    .equations {
+      position: relative;
+      z-index: 1;
+      padding: clamp(1rem, 3vw, 1.45rem) 1rem 0.55rem;
+      text-align: center;
+    }
+
+    .equation-symbolic {
+      color: var(--yellow);
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.8rem, 5vw, 2.45rem);
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .equation-numeric {
+      min-height: 1.45em;
+      margin-top: 0.5rem;
+      color: var(--text);
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+      font-weight: 300;
+      line-height: 1.2;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .baseline {
+      stroke: rgba(238, 242, 252, 0.42);
+      stroke-width: 1.6;
+      stroke-dasharray: 6 9;
+    }
+
+    .level-line {
+      stroke: var(--yellow);
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .level-label,
+    .zero-label {
+      font-family: "Spectral", Georgia, serif;
+      font-size: 25px;
+    }
+
+    .level-label { fill: var(--yellow); }
+    .zero-label { fill: rgba(238, 242, 252, 0.68); }
+
+    .ball {
+      cursor: grab;
+      outline: none;
+      transition: transform 130ms ease;
+    }
+
+    .ball.dragging {
+      cursor: grabbing;
+      transition: none;
+    }
+
+    .ball-shell {
+      stroke: var(--yellow);
+      stroke-width: 4;
+      filter: drop-shadow(0 9px 8px rgba(0, 0, 0, 0.42));
+    }
+
+    .mass-2 .ball-shell { fill: url(#ball-gradient-2); }
+    .mass-3 .ball-shell { fill: url(#ball-gradient-3); }
+    .mass-5 .ball-shell { fill: url(#ball-gradient-5); }
+
+    .selection-ring {
+      fill: none;
+      stroke: rgba(255, 227, 77, 0.82);
+      stroke-width: 2;
+      stroke-dasharray: 3 5;
+      opacity: 0;
+    }
+
+    .ball.selected .selection-ring,
+    .ball:focus-visible .selection-ring {
+      opacity: 1;
+    }
+
+    .glint {
+      fill: rgba(255, 255, 255, 0.72);
+      pointer-events: none;
+      animation: glisten 2.6s ease-in-out infinite;
+    }
+
+    .ball:nth-of-type(2) .glint { animation-delay: 0.45s; }
+    .ball:nth-of-type(3) .glint { animation-delay: 0.9s; }
+
+    @keyframes glisten {
+      0%, 42%, 100% { opacity: 0.25; }
+      17% { opacity: 0.9; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ball { transition: none; }
+      .glint { animation: none; opacity: 0.48; }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="equations">
+      <div class="equation-symbolic" aria-label="U equals m times Phi">U = mΦ</div>
+      <div class="equation-numeric" id="numeric-equation" aria-live="polite">0 = 0 × 0</div>
+    </div>
+
+    <svg id="field" viewBox="0 0 900 540" role="img" aria-labelledby="widget-title widget-desc">
+      <title id="widget-title">Interactive potential-energy levels</title>
+      <desc id="widget-desc">Three draggable balls with masses two, three, and five begin on the zero-potential baseline. Drag a ball to any yellow potential level from one to four to update the potential-energy equation.</desc>
+      <defs>
+        <radialGradient id="ball-gradient-2" cx="34%" cy="28%" r="72%">
+          <stop offset="0" stop-color="#c9f5ff" />
+          <stop offset="1" stop-color="#36a9e1" />
+        </radialGradient>
+        <radialGradient id="ball-gradient-3" cx="34%" cy="28%" r="72%">
+          <stop offset="0" stop-color="#ffd0ad" />
+          <stop offset="1" stop-color="#ff743d" />
+        </radialGradient>
+        <radialGradient id="ball-gradient-5" cx="34%" cy="28%" r="72%">
+          <stop offset="0" stop-color="#edc8ff" />
+          <stop offset="1" stop-color="#a65cff" />
+        </radialGradient>
+      </defs>
+
+      <line class="level-line" x1="90" y1="70" x2="800" y2="70" />
+      <text class="level-label" x="822" y="78">Φ = 4</text>
+      <line class="level-line" x1="90" y1="165" x2="800" y2="165" />
+      <text class="level-label" x="822" y="173">Φ = 3</text>
+      <line class="level-line" x1="90" y1="260" x2="800" y2="260" />
+      <text class="level-label" x="822" y="268">Φ = 2</text>
+      <line class="level-line" x1="90" y1="355" x2="800" y2="355" />
+      <text class="level-label" x="822" y="363">Φ = 1</text>
+      <line class="baseline" x1="36" y1="450" x2="864" y2="450" />
+      <text class="zero-label" x="42" y="438">Φ = 0</text>
+
+      <g class="ball mass-2" data-mass="2" data-x="220" data-level="0" transform="translate(220 450)" role="button" tabindex="0" aria-label="Mass two ball at potential zero. Use the up and down arrow keys to move it between potential levels.">
+        <circle class="selection-ring" r="31" />
+        <circle class="ball-shell" r="23" />
+        <ellipse class="glint" cx="-8" cy="-9" rx="5.5" ry="9" transform="rotate(-35 -8 -9)" />
+      </g>
+
+      <g class="ball mass-3" data-mass="3" data-x="450" data-level="0" transform="translate(450 450)" role="button" tabindex="0" aria-label="Mass three ball at potential zero. Use the up and down arrow keys to move it between potential levels.">
+        <circle class="selection-ring" r="36" />
+        <circle class="ball-shell" r="28" />
+        <ellipse class="glint" cx="-9" cy="-10" rx="6.5" ry="11" transform="rotate(-35 -9 -10)" />
+      </g>
+
+      <g class="ball mass-5" data-mass="5" data-x="680" data-level="0" transform="translate(680 450)" role="button" tabindex="0" aria-label="Mass five ball at potential zero. Use the up and down arrow keys to move it between potential levels.">
+        <circle class="selection-ring" r="41" />
+        <circle class="ball-shell" r="33" />
+        <ellipse class="glint" cx="-11" cy="-12" rx="8" ry="13" transform="rotate(-35 -11 -12)" />
+      </g>
+    </svg>
+  </div>
+
+  <script>
+    (function () {
+      const svg = document.getElementById('field');
+      const equation = document.getElementById('numeric-equation');
+      const balls = Array.from(svg.querySelectorAll('.ball'));
+      const baselineY = 450;
+      const levelStep = 95;
+      let activeBall = null;
+      let draggingBall = null;
+
+      function clampLevel(value) {
+        return Math.max(0, Math.min(4, value));
+      }
+
+      function updateAccessibleLabel(ball) {
+        const mass = Number(ball.dataset.mass);
+        const level = Number(ball.dataset.level);
+        ball.setAttribute(
+          'aria-label',
+          `Mass ${mass} ball at potential ${level}. Use the up and down arrow keys to move it between potential levels.`
+        );
+      }
+
+      function updateEquation(ball) {
+        if (!ball) {
+          equation.textContent = '0 = 0 × 0';
+          return;
+        }
+        const mass = Number(ball.dataset.mass);
+        const level = Number(ball.dataset.level);
+        equation.textContent = `${mass * level} = ${mass} × ${level}`;
+      }
+
+      function selectBall(ball) {
+        balls.forEach((item) => item.classList.toggle('selected', item === ball));
+        activeBall = ball;
+        updateEquation(ball);
+      }
+
+      function setLevel(ball, level) {
+        const nextLevel = clampLevel(level);
+        const x = Number(ball.dataset.x);
+        const y = baselineY - nextLevel * levelStep;
+        ball.dataset.level = String(nextLevel);
+        ball.setAttribute('transform', `translate(${x} ${y})`);
+        updateAccessibleLabel(ball);
+        if (activeBall === ball) updateEquation(ball);
+      }
+
+      function levelFromPointer(event) {
+        const rect = svg.getBoundingClientRect();
+        const svgY = (event.clientY - rect.top) * (540 / rect.height);
+        return clampLevel(Math.round((baselineY - svgY) / levelStep));
+      }
+
+      balls.forEach((ball) => {
+        ball.addEventListener('pointerdown', (event) => {
+          event.preventDefault();
+          selectBall(ball);
+          draggingBall = ball;
+          ball.classList.add('dragging');
+          if (ball.setPointerCapture) ball.setPointerCapture(event.pointerId);
+          setLevel(ball, levelFromPointer(event));
+        });
+
+        ball.addEventListener('focus', () => selectBall(ball));
+        ball.addEventListener('keydown', (event) => {
+          if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+          event.preventDefault();
+          selectBall(ball);
+          const change = event.key === 'ArrowUp' ? 1 : -1;
+          setLevel(ball, Number(ball.dataset.level) + change);
+        });
+      });
+
+      window.addEventListener('pointermove', (event) => {
+        if (!draggingBall) return;
+        event.preventDefault();
+        setLevel(draggingBall, levelFromPointer(event));
+      }, { passive: false });
+
+      function finishDrag() {
+        if (!draggingBall) return;
+        draggingBall.classList.remove('dragging');
+        draggingBall = null;
+      }
+
+      window.addEventListener('pointerup', finishDrag);
+      window.addEventListener('pointercancel', finishDrag);
+
+      function reportHeight() {
+        parent.postMessage({
+          type: 'potential-energy-height',
+          height: Math.ceil(document.documentElement.scrollHeight)
+        }, '*');
+      }
+
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(reportHeight).observe(document.documentElement);
+      }
+      window.addEventListener('load', reportHeight);
+      reportHeight();
+    })();
+  </script>
+</body>
+</html>

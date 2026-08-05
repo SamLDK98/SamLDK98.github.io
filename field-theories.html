@@ -76,6 +76,329 @@
       border-top: 1px solid var(--line);
     }
 
+    .overview {
+      padding-top: clamp(1.6rem, 5vh, 2.4rem);
+    }
+    .overview h4 {
+      margin-bottom: 0.9rem;
+      color: var(--txt);
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.4rem, 3vw, 1.8rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .thought-experiment-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-top: 1.2rem;
+      padding: 0.35rem 0;
+      border: 0;
+      background: transparent;
+      color: #ffe34d;
+      font: italic 400 1rem/1.45 "Spectral", Georgia, serif;
+      text-align: left;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .thought-experiment-trigger::after {
+      content: "↑";
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.9em;
+      font-style: normal;
+      transition: transform 0.2s ease;
+    }
+    .thought-experiment-trigger:hover,
+    .thought-experiment-trigger:focus-visible {
+      color: var(--txt);
+      outline: none;
+    }
+    .thought-experiment-trigger:hover::after,
+    .thought-experiment-trigger:focus-visible::after {
+      transform: translateY(-0.12rem);
+    }
+    .thought-experiment-dialog {
+      width: min(44rem, calc(100% - 2rem));
+      max-height: min(82vh, 46rem);
+      margin: auto;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255,227,77,0.3);
+      background: #151519;
+      color: var(--body);
+      box-shadow: 0 1.5rem 5rem rgba(0,0,0,0.66);
+    }
+    .thought-experiment-dialog::backdrop {
+      background: rgba(3,3,6,0.78);
+      backdrop-filter: blur(4px);
+    }
+    .thought-experiment-window {
+      position: relative;
+      max-height: min(82vh, 46rem);
+      overflow-y: auto;
+      padding: clamp(1.35rem, 4vw, 2.25rem);
+    }
+    .thought-experiment-window h2 {
+      margin: 0 2.8rem 1.2rem 0;
+      color: #ffe34d;
+      font-size: clamp(1.35rem, 3vw, 1.8rem);
+    }
+    .thought-experiment-window blockquote {
+      border-left: 2px solid rgba(255,227,77,0.58);
+      padding-left: clamp(1rem, 3vw, 1.4rem);
+    }
+    .thought-experiment-window blockquote p {
+      color: var(--body);
+    }
+    .thought-experiment-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--txt-2);
+      font: 400 1.25rem/1 "IBM Plex Sans", sans-serif;
+      cursor: pointer;
+    }
+    .thought-experiment-close:hover,
+    .thought-experiment-close:focus-visible {
+      border-color: #ffe34d;
+      color: #ffe34d;
+      outline: none;
+    }
+
+    .potential-intro {
+      padding-top: clamp(1.6rem, 5vh, 2.4rem);
+    }
+    .potential-intro > p {
+      max-width: 68ch;
+    }
+    .potential-figure {
+      margin-top: clamp(1.4rem, 4vh, 2rem);
+      padding: clamp(0.8rem, 2.5vw, 1.25rem);
+      border: 1px solid var(--line-2);
+      background: linear-gradient(180deg, rgba(255,227,77,0.06), rgba(255,227,77,0.012));
+    }
+    .potential-figure svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .potential-figure .baseline {
+      stroke: rgba(238,242,252,0.42);
+      stroke-width: 1.5;
+      stroke-dasharray: 5 8;
+    }
+    .potential-figure .profile {
+      fill: none;
+      stroke: #ffe34d;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .potential-figure .guide {
+      stroke: rgba(255,227,77,0.58);
+      stroke-width: 1.25;
+      stroke-dasharray: 3 5;
+    }
+    .potential-figure text {
+      fill: var(--txt-2);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 22px;
+    }
+    .potential-figure .value {
+      fill: #ffe34d;
+      font-weight: 600;
+    }
+    .potential-figure .phi-symbol {
+      font-family: "Spectral", Georgia, serif;
+      font-size: 32px;
+      font-weight: 500;
+    }
+    .potential-levels .level-line {
+      stroke: rgba(244, 246, 255, 0.82);
+      stroke-width: 2;
+      stroke-dasharray: 6 9;
+      stroke-linecap: round;
+    }
+    .potential-levels .level-label {
+      fill: var(--txt);
+      font-family: "Spectral", Georgia, serif;
+      font-size: 26px;
+      font-weight: 400;
+    }
+    .potential-levels .baseline {
+      stroke: #ffe34d;
+      stroke-width: 3;
+      stroke-dasharray: none;
+    }
+    .potential-levels .zero-level-label {
+      fill: #ffe34d;
+      font-family: "Spectral", Georgia, serif;
+      font-size: 26px;
+      font-weight: 400;
+    }
+    .created-figures {
+      margin-top: clamp(2.8rem, 7vh, 4rem);
+      padding-top: clamp(1rem, 3vh, 1.6rem);
+      border-top: 1px solid var(--line);
+    }
+    .coupling-copy {
+      margin-top: clamp(2rem, 5vh, 2.8rem);
+    }
+    .coupling-figure {
+      margin-top: clamp(1.4rem, 4vh, 2rem);
+      padding: clamp(0.8rem, 2.5vw, 1.25rem);
+      border: 1px solid var(--line-2);
+      background: linear-gradient(180deg, rgba(255,227,77,0.045), rgba(255,227,77,0.01));
+    }
+    .coupling-figure + .coupling-figure {
+      margin-top: 1rem;
+    }
+    .coupling-figure svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .coupling-figure text {
+      fill: var(--txt-2);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 22px;
+    }
+    .coupling-figure .value {
+      fill: #ffe34d;
+      font-weight: 600;
+    }
+    .coupling-figure .equation-symbolic {
+      fill: #ffe34d;
+      font-family: "Spectral", Georgia, serif;
+      font-size: 42px;
+      font-style: italic;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+    .coupling-figure .equation-numeric {
+      fill: var(--txt-2);
+      font-family: "Spectral", Georgia, serif;
+      font-size: 28px;
+      font-weight: 300;
+    }
+    .coupling-figure .ball {
+      fill: var(--src);
+      stroke: #ffe34d;
+      stroke-width: 4;
+    }
+    .coupling-figure .arrow,
+    .coupling-figure .leader {
+      fill: none;
+      stroke: #ffe34d;
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+    .coupling-figure .baseline {
+      stroke: rgba(238,242,252,0.35);
+      stroke-width: 1.5;
+      stroke-dasharray: 5 8;
+    }
+    .coupling-figure .profile {
+      fill: none;
+      stroke: #ffe34d;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .slope-figure .sample-mark,
+    .slope-figure .distance-segment,
+    .slope-figure .distance-cap {
+      stroke: #ff4d5f;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+    .slope-figure .sample-guide {
+      stroke: rgba(255,77,95,0.48);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 6;
+    }
+    .slope-figure .sample-label,
+    .slope-figure .distance-label {
+      fill: #ff4d5f;
+      font-family: "Spectral", Georgia, serif;
+      font-size: 28px;
+      font-weight: 400;
+    }
+    .field-strength-intro {
+      margin-top: clamp(2.6rem, 7vh, 3.6rem);
+    }
+    .field-strength-intro h4 {
+      margin-bottom: 0.9rem;
+      color: var(--txt);
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.4rem, 3vw, 1.8rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .unit-slope-figure .potential-line {
+      stroke: rgba(244,246,255,0.78);
+      stroke-width: 2;
+      stroke-dasharray: 6 9;
+    }
+    .unit-slope-figure .distance-axis,
+    .unit-slope-figure .distance-tick {
+      stroke: #ffe34d;
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+    .unit-slope-figure .unit-slope-line {
+      stroke: #54d68b;
+      stroke-width: 5;
+      stroke-linecap: round;
+    }
+    .unit-slope-figure .potential-axis-label {
+      fill: var(--txt);
+      font-family: "Spectral", Georgia, serif;
+      font-size: 25px;
+      font-weight: 400;
+    }
+    .unit-slope-figure .zero-axis-label {
+      fill: var(--txt);
+      font-family: "Spectral", Georgia, serif;
+      font-size: 25px;
+      font-weight: 400;
+    }
+    .unit-slope-figure .distance-unit-label,
+    .unit-slope-figure .distance-axis-title {
+      fill: #ffe34d;
+      font-family: "Spectral", Georgia, serif;
+      font-size: 25px;
+      font-weight: 400;
+    }
+    .force-ball-figure .coordinate-guide {
+      stroke: rgba(54,169,225,0.62);
+      stroke-width: 2;
+      stroke-dasharray: 5 7;
+    }
+    .force-ball-figure .force-ball {
+      fill: url(#force-ball-gradient);
+      stroke: #ffe34d;
+      stroke-width: 3;
+    }
+    .force-ball-figure .force-ball-glint {
+      fill: rgba(255,255,255,0.72);
+    }
+    .force-ball-figure .force-ball-label,
+    .force-ball-figure .coordinate-label {
+      fill: var(--txt);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
     h2 {
       font-family: "Spectral", Georgia, serif;
       font-weight: 400;
@@ -140,10 +463,19 @@
       height: 780px;          /* fallback; each widget posts its real height */
       border: 0; background: var(--bg);
     }
+    iframe.concept-widget {
+      display: block;
+      width: 100%;
+      height: 720px;
+      margin-top: clamp(1.5rem, 4vh, 2.1rem);
+      border: 0;
+      background: var(--bg);
+    }
     iframe.zero { height: 620px; }
     iframe.land { height: 520px; }
     @media (max-width: 820px) {
       iframe.bench { height: 1160px; }
+      iframe.concept-widget { height: 600px; }
       iframe.zero { height: 560px; }
       iframe.land { height: 540px; }
     }
@@ -182,9 +514,319 @@
     <header>
       <h1>Field Theories</h1>
     </header>
-    <div class="divider"></div>
 
     <main>
+      <section class="col overview" aria-labelledby="overview-title">
+        <h4 id="overview-title">Overview</h4>
+
+        <p>Field theories are mathematical frameworks where we imagine:</p>
+
+        <ul>
+          <li>Every location in a space takes a value.</li>
+          <li>Objects in that space influence those values through one of their properties.</li>
+        </ul>
+
+        <p>This framework is agnostic to specific systems of objects and environments.</p>
+
+        <p>
+          Once we have a property that can be quantified, and an environment that can
+          interact with that property, we can describe it in the language of a field
+          theory.
+        </p>
+
+        <p>
+          The clearest instantiation of this framework uses mass, because we can intuit
+          the physical analogy. However, we will also think in terms of electrical charge
+          to help intuit the framework abstractly.
+        </p>
+
+        <button
+          class="thought-experiment-trigger"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="solar-system-thought-experiment"
+        >Why did field theories even come about?</button>
+      </section>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <section class="col potential-intro">
+        <p>
+          <strong>Potential</strong>, or <strong>Field Potential</strong> ($\Phi$), refers
+          to the elevation of a particular point on that map relative to a baseline
+          (where $\Phi = 0$). <strong>It is a property of a location in an
+          environment</strong>.
+        </p>
+
+        <figure class="potential-figure potential-levels" id="potential-levels" aria-label="Positive and negative field-potential levels arranged around a zero baseline.">
+          <svg viewBox="0 0 900 440" role="img" aria-labelledby="potential-levels-title potential-levels-desc">
+            <title id="potential-levels-title">Field-potential levels relative to zero</title>
+            <desc id="potential-levels-desc">A solid yellow baseline labelled Phi equals zero runs through the middle. Four dotted white positive-potential levels sit above it and four dotted white negative-potential levels sit below it.</desc>
+
+            <line class="baseline" x1="36" y1="220" x2="864" y2="220" />
+            <text class="zero-level-label" x="42" y="208"><tspan class="phi-symbol">Φ</tspan><tspan> = 0</tspan></text>
+
+            <line class="level-line" x1="170" y1="76" x2="700" y2="76" />
+            <text class="level-label" x="735" y="84">Φ = 4</text>
+            <line class="level-line" x1="170" y1="112" x2="700" y2="112" />
+            <text class="level-label" x="735" y="120">Φ = 3</text>
+            <line class="level-line" x1="170" y1="148" x2="700" y2="148" />
+            <text class="level-label" x="735" y="156">Φ = 2</text>
+            <line class="level-line" x1="170" y1="184" x2="700" y2="184" />
+            <text class="level-label" x="735" y="192">Φ = 1</text>
+
+            <line class="level-line" x1="170" y1="256" x2="700" y2="256" />
+            <text class="level-label" x="735" y="264">Φ = −1</text>
+            <line class="level-line" x1="170" y1="292" x2="700" y2="292" />
+            <text class="level-label" x="735" y="300">Φ = −2</text>
+            <line class="level-line" x1="170" y1="328" x2="700" y2="328" />
+            <text class="level-label" x="735" y="336">Φ = −3</text>
+            <line class="level-line" x1="170" y1="364" x2="700" y2="364" />
+            <text class="level-label" x="735" y="372">Φ = −4</text>
+          </svg>
+        </figure>
+
+        <div class="coupling-copy" id="coupling-property">
+          <p>
+            A <strong>coupling property</strong> is <strong>the property of an
+            object</strong> that interacts with the field potential to give the potential
+            energy. Imagine that object as a ball. For a gravitational field, that
+            property is mass ($m$).
+          </p>
+
+          <figure class="coupling-figure" id="mass-diagram" aria-label="Three differently colored balls with masses two, three, and five increase in size from left to right.">
+            <svg viewBox="0 0 900 270" role="img" aria-labelledby="mass-balls-title mass-balls-desc">
+              <title id="mass-balls-title">Three objects with different masses</title>
+              <desc id="mass-balls-desc">A small blue ball, a medium orange ball, and a large purple ball are arranged left to right. Yellow arrows point from labels Mass equals two, Mass equals three, and Mass equals five to the corresponding balls.</desc>
+              <defs>
+                <marker id="mass-arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffe34d" />
+                </marker>
+                <radialGradient id="static-ball-2" cx="34%" cy="28%" r="72%">
+                  <stop offset="0" stop-color="#c9f5ff" />
+                  <stop offset="1" stop-color="#36a9e1" />
+                </radialGradient>
+                <radialGradient id="static-ball-3" cx="34%" cy="28%" r="72%">
+                  <stop offset="0" stop-color="#ffd0ad" />
+                  <stop offset="1" stop-color="#ff743d" />
+                </radialGradient>
+                <radialGradient id="static-ball-5" cx="34%" cy="28%" r="72%">
+                  <stop offset="0" stop-color="#edc8ff" />
+                  <stop offset="1" stop-color="#a65cff" />
+                </radialGradient>
+              </defs>
+
+              <text class="value" x="180" y="42" text-anchor="middle">Mass = 2</text>
+              <path class="arrow" d="M 180 58 L 180 140" marker-end="url(#mass-arrowhead)" />
+              <circle cx="180" cy="186" r="32" fill="url(#static-ball-2)" stroke="#ffe34d" stroke-width="4" />
+              <ellipse cx="180" cy="232" rx="42" ry="7" fill="rgba(0,0,0,0.34)" />
+
+              <text class="value" x="450" y="42" text-anchor="middle">Mass = 3</text>
+              <path class="arrow" d="M 450 58 L 450 126" marker-end="url(#mass-arrowhead)" />
+              <circle cx="450" cy="179" r="39" fill="url(#static-ball-3)" stroke="#ffe34d" stroke-width="4" />
+              <ellipse cx="450" cy="232" rx="50" ry="8" fill="rgba(0,0,0,0.34)" />
+
+              <text class="value" x="720" y="42" text-anchor="middle">Mass = 5</text>
+              <path class="arrow" d="M 720 58 L 720 104" marker-end="url(#mass-arrowhead)" />
+              <circle cx="720" cy="172" r="46" fill="url(#static-ball-5)" stroke="#ffe34d" stroke-width="4" />
+              <ellipse cx="720" cy="232" rx="58" ry="9" fill="rgba(0,0,0,0.34)" />
+            </svg>
+          </figure>
+
+          <p>
+            <strong>Potential energy</strong> ($U$), on the other hand, is a
+            <strong>property of the interaction between both</strong>. You can think of
+            the mass or field potential as scaling the other.
+          </p>
+
+          <div class="mathblock">
+            $$\text{Potential Energy} = \text{Mass} \times \text{Field Potential}$$
+            $$U = m\Phi$$
+          </div>
+
+        </div>
+        <iframe
+          class="concept-widget potential-energy-widget"
+          src="field-theories/potential-energy-widget.html"
+          title="Drag balls with masses two, three, and five between field-potential levels to calculate their potential energy"
+          loading="lazy"
+        ></iframe>
+
+        <div class="field-strength-intro" id="field-strength">
+          <h4>Field Strength and Force</h4>
+
+          <p>
+            Let's imagine some 'land' in our model. Imagine a slope running from the top
+            left corner to the bottom right corner.
+          </p>
+
+          <p>How do we describe the slope mathematically?</p>
+
+          <p>
+            If we continue with the physical landscape analogy, the $x$-axis denotes
+            distance while the $y$-axis denotes the field potential.
+          </p>
+
+          <p>
+            It's clear then that the slope represents a particular change in field
+            potential for a change in distance ($r$).
+          </p>
+
+          <p>
+            For a 1 unit change in distance, there is a -1 unit change in field
+            potential.
+          </p>
+
+          <figure class="coupling-figure unit-slope-figure" aria-label="A green line descends one potential unit for every one distance unit across aligned field-potential levels.">
+            <svg viewBox="0 0 900 520" role="img" aria-labelledby="unit-slope-title unit-slope-desc">
+              <title id="unit-slope-title">A slope with a one-to-one change in distance and field potential</title>
+              <desc id="unit-slope-desc">White dotted lines mark field potentials four through one. A solid yellow horizontal axis marks field potential zero and distance units zero through four. A plain green line descends one potential unit for each unit of distance.</desc>
+
+              <line class="potential-line" x1="100" y1="80" x2="820" y2="80" />
+              <text class="potential-axis-label" x="24" y="88">Φ = 4</text>
+              <line class="potential-line" x1="100" y1="165" x2="820" y2="165" />
+              <text class="potential-axis-label" x="24" y="173">Φ = 3</text>
+              <line class="potential-line" x1="100" y1="250" x2="820" y2="250" />
+              <text class="potential-axis-label" x="24" y="258">Φ = 2</text>
+              <line class="potential-line" x1="100" y1="335" x2="820" y2="335" />
+              <text class="potential-axis-label" x="24" y="343">Φ = 1</text>
+
+              <line class="distance-axis" x1="100" y1="420" x2="820" y2="420" />
+              <text class="zero-axis-label" x="24" y="428">Φ = 0</text>
+
+              <line class="unit-slope-line" x1="140" y1="80" x2="780" y2="420" />
+
+              <line class="distance-tick" x1="140" y1="410" x2="140" y2="432" />
+              <text class="distance-unit-label" x="140" y="462" text-anchor="middle">0</text>
+              <line class="distance-tick" x1="300" y1="410" x2="300" y2="432" />
+              <text class="distance-unit-label" x="300" y="462" text-anchor="middle">1</text>
+              <line class="distance-tick" x1="460" y1="410" x2="460" y2="432" />
+              <text class="distance-unit-label" x="460" y="462" text-anchor="middle">2</text>
+              <line class="distance-tick" x1="620" y1="410" x2="620" y2="432" />
+              <text class="distance-unit-label" x="620" y="462" text-anchor="middle">3</text>
+              <line class="distance-tick" x1="780" y1="410" x2="780" y2="432" />
+              <text class="distance-unit-label" x="780" y="462" text-anchor="middle">4</text>
+
+              <text class="distance-axis-title" x="460" y="502" text-anchor="middle">Distance, r</text>
+            </svg>
+          </figure>
+
+          <p>
+            Every location on this slope has a property we will call <strong>Field
+            Strength</strong>. This property quantifies two things: the direction and
+            steepness of the slope at that particular point.
+          </p>
+
+          <p>
+            The steepness is derived from how much the field potential changes for a
+            unit change in distance.
+          </p>
+
+          <p>
+            In this case, the field potential decreases by 1 for every unit increase in
+            distance.
+          </p>
+
+          <div class="mathblock">
+            $$\frac{-1}{1} = -1$$
+          </div>
+
+          <p>
+            Notice that, while field strength encodes two variables, and is therefore a
+            vector rather than a scalar quantity, one of these variables, the direction,
+            is encoded by the sign. So a field strength of -1 tells us that we are moving
+            down at a rate of 1, while a field strength of +1 would tell us we are moving
+            up at a rate of 1.
+          </p>
+
+          <p>
+            Field strength has no universal symbol, but in this scenario, field strength is gravity
+            ($g$).
+          </p>
+
+          <div class="mathblock">
+            $$g=- \frac{\Delta \Phi}{\Delta r}$$
+          </div>
+
+          <p>
+            So, just like field potential is a property of the environment, so too is
+            field strength.
+          </p>
+
+          <p>
+            And just like the introduction of an object leads to an interaction between
+            field potential and mass to give potential energy, that mass also interacts
+            with the field strength to give a new property: force.
+          </p>
+
+          <div class="mathblock">
+            $$F=mg$$
+          </div>
+
+          <p>So, what happens to an object when placed on this slope?</p>
+
+          <figure class="coupling-figure unit-slope-figure force-ball-figure" aria-label="A small blue ball of mass two placed at distance one and field potential three on the slope.">
+            <svg viewBox="0 0 900 520" role="img" aria-labelledby="force-ball-title force-ball-desc">
+              <title id="force-ball-title">A mass-two ball at distance one and field potential three</title>
+              <desc id="force-ball-desc">A small blue ball sits on the green descending slope at the coordinate distance one, field potential three. White dotted potential lines and a yellow distance axis make the coordinate clear.</desc>
+
+              <defs>
+                <radialGradient id="force-ball-gradient" cx="35%" cy="28%" r="70%">
+                  <stop offset="0%" stop-color="#d8f8ff" />
+                  <stop offset="40%" stop-color="#62c7ee" />
+                  <stop offset="100%" stop-color="#1676b5" />
+                </radialGradient>
+              </defs>
+
+              <line class="potential-line" x1="100" y1="80" x2="820" y2="80" />
+              <text class="potential-axis-label" x="24" y="88">Φ = 4</text>
+              <line class="potential-line" x1="100" y1="165" x2="820" y2="165" />
+              <text class="potential-axis-label" x="24" y="173">Φ = 3</text>
+              <line class="potential-line" x1="100" y1="250" x2="820" y2="250" />
+              <text class="potential-axis-label" x="24" y="258">Φ = 2</text>
+              <line class="potential-line" x1="100" y1="335" x2="820" y2="335" />
+              <text class="potential-axis-label" x="24" y="343">Φ = 1</text>
+
+              <line class="distance-axis" x1="100" y1="420" x2="820" y2="420" />
+              <text class="zero-axis-label" x="24" y="428">Φ = 0</text>
+
+              <line class="unit-slope-line" x1="140" y1="80" x2="780" y2="420" />
+              <line class="coordinate-guide" x1="300" y1="165" x2="300" y2="420" />
+
+              <line class="distance-tick" x1="140" y1="410" x2="140" y2="432" />
+              <text class="distance-unit-label" x="140" y="462" text-anchor="middle">0</text>
+              <line class="distance-tick" x1="300" y1="410" x2="300" y2="432" />
+              <text class="distance-unit-label" x="300" y="462" text-anchor="middle">1</text>
+              <line class="distance-tick" x1="460" y1="410" x2="460" y2="432" />
+              <text class="distance-unit-label" x="460" y="462" text-anchor="middle">2</text>
+              <line class="distance-tick" x1="620" y1="410" x2="620" y2="432" />
+              <text class="distance-unit-label" x="620" y="462" text-anchor="middle">3</text>
+              <line class="distance-tick" x1="780" y1="410" x2="780" y2="432" />
+              <text class="distance-unit-label" x="780" y="462" text-anchor="middle">4</text>
+
+              <circle class="force-ball" cx="300" cy="165" r="25" />
+              <ellipse class="force-ball-glint" cx="291" cy="156" rx="7" ry="5" transform="rotate(-28 291 156)" />
+              <text class="force-ball-label" x="338" y="142">Mass = 2</text>
+              <text class="coordinate-label" x="338" y="174">(1, 3)</text>
+              <text class="distance-axis-title" x="460" y="502" text-anchor="middle">Distance, r</text>
+            </svg>
+          </figure>
+
+          <p>
+            Because this slope is a straight line, the field strength remains the same
+            at every location on it.
+          </p>
+
+          <p>
+            The field strength where the ball is introduced is -1. The ball's mass is
+            2. Therefore the force equals -2.
+          </p>
+        </div>
+
+      </section>
+
+      <div class="divider" aria-hidden="true"></div>
+
       <section class="col">
         <p>
           We will take one thing as primitive: the field exists as a place where every
@@ -360,6 +1002,68 @@
         </p>
       </section>
 
+      <section class="col created-figures" aria-label="Field-theory illustrations">
+        <figure class="potential-figure" aria-label="A curved field-potential profile with a hill at positive five, a dotted zero baseline, and a valley at negative five.">
+          <svg viewBox="0 0 900 320" role="img" aria-labelledby="potential-profile-title potential-profile-desc">
+            <title id="potential-profile-title">Field-potential hill and valley</title>
+            <desc id="potential-profile-desc">A yellow curve rises from a dotted zero baseline to a hill labelled Phi equals five, returns to zero, then falls to a valley labelled Phi equals negative five before returning to zero.</desc>
+
+            <line class="baseline" x1="36" y1="160" x2="864" y2="160" />
+            <text class="value" x="42" y="200"><tspan class="phi-symbol">Φ</tspan><tspan> = 0</tspan></text>
+            <path class="profile" d="M 36 160 C 105 160, 130 70, 245 70 C 360 70, 540 250, 655 250 C 770 250, 795 160, 864 160" />
+            <line class="guide" x1="245" y1="70" x2="245" y2="42" />
+            <text class="value" x="245" y="28" text-anchor="middle"><tspan class="phi-symbol">Φ</tspan><tspan> = 5</tspan></text>
+            <line class="guide" x1="655" y1="250" x2="655" y2="278" />
+            <text class="value" x="655" y="306" text-anchor="middle"><tspan class="phi-symbol">Φ</tspan><tspan> = −5</tspan></text>
+          </svg>
+        </figure>
+
+        <figure class="coupling-figure" id="energy-diagram" aria-label="A mass-three ball at the top of a positive-potential hill and at the bottom of a negative-potential valley, with the resulting potential energies calculated.">
+          <svg viewBox="0 0 900 440" role="img" aria-labelledby="energy-landscape-title energy-landscape-desc">
+            <title id="energy-landscape-title">Mass and field potential combine to give potential energy</title>
+            <desc id="energy-landscape-desc">At the hill, mass three multiplied by field potential five gives potential energy fifteen. At the valley, mass three multiplied by field potential negative five gives potential energy negative fifteen.</desc>
+            <defs>
+              <radialGradient id="ball-shading-two" cx="34%" cy="28%" r="72%">
+                <stop offset="0" stop-color="#ffb18f" />
+                <stop offset="1" stop-color="#ff6a3d" />
+              </radialGradient>
+            </defs>
+
+            <line class="baseline" x1="36" y1="220" x2="864" y2="220" />
+            <path class="profile" d="M 36 220 C 105 220, 130 120, 245 120 C 360 120, 540 320, 655 320 C 770 320, 795 220, 864 220" />
+            <text class="value" x="42" y="248">Φ = 0</text>
+            <text class="equation-symbolic" x="830" y="54" text-anchor="end">U = mΦ</text>
+            <text class="equation-numeric" x="245" y="48" text-anchor="middle">3 × 5 = 15</text>
+            <circle cx="245" cy="92" r="28" fill="url(#ball-shading-two)" stroke="#ffe34d" stroke-width="4" />
+            <circle cx="655" cy="292" r="28" fill="url(#ball-shading-two)" stroke="#ffe34d" stroke-width="4" />
+            <text class="equation-numeric" x="655" y="385" text-anchor="middle">3 × (−5) = −15</text>
+          </svg>
+        </figure>
+
+        <figure class="coupling-figure slope-figure" id="slope-diagram" aria-label="Two field-potential samples on the slope of a hill, with their separation shown underneath.">
+          <svg viewBox="0 0 900 390" role="img" aria-labelledby="slope-title slope-desc">
+            <title id="slope-title">Measuring field strength from the slope</title>
+            <desc id="slope-desc">A yellow hill and valley cross a dotted zero baseline. Two red marks on the descending slope are labelled Phi equals four and Phi equals two. Red guide lines project down to a red distance segment labelled r equals one.</desc>
+
+            <line class="baseline" x1="36" y1="220" x2="864" y2="220" />
+            <path class="profile" d="M 36 220 C 105 220, 130 90, 245 90 C 360 90, 540 350, 655 350 C 770 350, 795 220, 864 220" />
+            <text x="42" y="248">Φ = 0</text>
+            <line class="sample-mark" x1="311" y1="126" x2="327" y2="106" />
+            <circle cx="319" cy="116" r="5" fill="#ff4d5f" />
+            <text class="sample-label" x="278" y="80">Φ = 4</text>
+            <line class="sample-mark" x1="382" y1="178" x2="398" y2="158" />
+            <circle cx="390" cy="168" r="5" fill="#ff4d5f" />
+            <text class="sample-label" x="405" y="150">Φ = 2</text>
+            <line class="sample-guide" x1="319" y1="124" x2="319" y2="310" />
+            <line class="sample-guide" x1="390" y1="176" x2="390" y2="310" />
+            <line class="distance-segment" x1="319" y1="310" x2="390" y2="310" />
+            <line class="distance-cap" x1="319" y1="300" x2="319" y2="320" />
+            <line class="distance-cap" x1="390" y1="300" x2="390" y2="320" />
+            <text class="distance-label" x="354.5" y="354" text-anchor="middle">r = 1</text>
+          </svg>
+        </figure>
+      </section>
+
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="index.html">← Interactive Explanations</a>
         <a href="neurophysiology.html">Neurophysiology →</a>
@@ -367,12 +1071,67 @@
     </main>
   </div>
 
+  <dialog
+    class="thought-experiment-dialog"
+    id="solar-system-thought-experiment"
+    aria-labelledby="thought-experiment-title"
+  >
+    <div class="thought-experiment-window">
+      <button class="thought-experiment-close" type="button" aria-label="Close thought experiment">×</button>
+      <h2 id="thought-experiment-title">The Solar System Collapse Thought Experiment</h2>
+
+      <blockquote>
+        <p>
+          If you are pulling on a rope with someone and they let go, the end of the rope
+          in your hand does not instantly go slack. The drop in tension actually travels
+          down the rope until it reaches your end.
+        </p>
+
+        <p>
+          So, imagine the Sun suddenly vanishes. We would expect a delay before the
+          tension of the pulling force reaches the Earth.
+        </p>
+
+        <p>
+          However, Newton's equation for gravity had no variable for time. It therefore
+          predicted that the Earth would fly off instantaneously should the Sun vanish.
+        </p>
+
+        <p>
+          Time was considered absolute. "Now" happens at the same time at any location
+          in the cosmos. Einstein's relativity was yet to come. So too was the
+          understanding of light speed as the fastest anything could travel.
+        </p>
+
+        <p>
+          Still, Newton did not agree philosophically with the implication of his
+          equation. He once wrote: "That one body may act upon another at a distance
+          through a vacuum... is to me so great an absurdity that I believe no man who
+          has in philosophical matters a competent faculty of thinking can ever fall
+          into it."
+        </p>
+
+        <p>
+          Field theories were motivated in part to address this issue of
+          'action-at-a-distance'.
+        </p>
+
+        <p>
+          With a field, an object alters the space just next to it, which in turn alters
+          the space next to it, and so forth. Action, then, only ever occurs locally, but
+          propagates outwards to have effects at a distance.
+        </p>
+      </blockquote>
+    </div>
+  </dialog>
+
   <script>
     (function () {
       const frames = {
         'zero-height':  document.querySelector('iframe.zero'),
         'land-height':  document.querySelector('iframe.land'),
-        'field-height': document.querySelector('iframe[src*="field-source"]')
+        'field-height': document.querySelector('iframe[src*="field-source"]'),
+        'potential-energy-height': document.querySelector('iframe.potential-energy-widget')
       };
       window.addEventListener('message', (e) => {
         const d = e.data;
@@ -380,6 +1139,20 @@
         if (e.source !== frames[d.type].contentWindow) return;
         const h = Number(d.height);
         if (Number.isFinite(h) && h > 200 && h < 4000) frames[d.type].style.height = h + 'px';
+      });
+
+      const thoughtExperiment = document.querySelector('#solar-system-thought-experiment');
+      const thoughtExperimentTrigger = document.querySelector('.thought-experiment-trigger');
+      const thoughtExperimentClose = document.querySelector('.thought-experiment-close');
+
+      thoughtExperimentTrigger.addEventListener('click', () => thoughtExperiment.showModal());
+      thoughtExperimentClose.addEventListener('click', () => thoughtExperiment.close());
+      thoughtExperiment.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        thoughtExperiment.close();
+      });
+      thoughtExperiment.addEventListener('click', (event) => {
+        if (event.target === thoughtExperiment) thoughtExperiment.close();
       });
     })();
   </script>
