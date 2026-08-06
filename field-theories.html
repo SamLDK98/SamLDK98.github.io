@@ -511,6 +511,26 @@
       iframe.land { height: 540px; }
     }
 
+    /* ---- testing area: fenced off at the foot of the page ---- */
+    .testbed { margin-top: clamp(3rem, 9vh, 5rem); }
+    .testbed-rule {
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+    }
+    .testbed-tag {
+      max-width: var(--measure); margin-inline: auto;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--str); padding-top: 0.9rem; margin-bottom: 1.6rem;
+    }
+    .testbed-h {
+      font-family: "Spectral", Georgia, serif; font-weight: 400;
+      font-size: clamp(1.3rem, 3vw, 1.8rem); line-height: 1.2;
+      letter-spacing: -0.012em; margin: 0 0 0.9rem;
+    }
+    iframe.super { height: 700px; }
+    @media (max-width: 900px) { iframe.super { height: 1080px; } }
+
     .foot-nav {
       display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
       max-width: var(--measure); margin-inline: auto;
@@ -1157,6 +1177,45 @@
         </p>
       </section>
 
+      <!-- ===================== TESTING AREA =====================
+           Parked at the bottom, fenced off by a rule. Nothing above depends
+           on it — delete this whole <section class="testbed"> to remove.
+           ======================================================== -->
+      <section class="testbed">
+        <div class="testbed-rule"></div>
+        <p class="testbed-tag">Testing area &mdash; not yet placed in the text</p>
+
+        <div class="col">
+          <h2 class="testbed-h">Many sources, one landscape</h2>
+          <p>
+            Each intersection sums the pull of every source. The panel on the right
+            breaks the selected value into the contribution each source makes to it, so
+            the summation is visible rather than asserted. Drag a source and the whole
+            map re-sums.
+          </p>
+          <p>
+            <strong>Two equal</strong> puts a saddle point at the centre &mdash; the pulls
+            cancel exactly, so the slope is zero even though the potential is not.
+            <strong>One dominant</strong> shows the claim about a single slope emerging:
+            the heavy mass supplies most of the value everywhere, and every slope arrow
+            leans toward it while the small masses only dimple the surface locally.
+          </p>
+        </div>
+
+        <div class="lab">
+          <div class="lab-cap">
+            <span>Test &mdash; superposition across many sources</span>
+            <span>drag a source &middot; click to inspect a point</span>
+          </div>
+          <iframe
+            class="bench super"
+            src="field-theories/superposition-widget.html"
+            title="A topographic map of the field produced by several sources, with a breakdown showing how each source contributes to the value at a selected point."
+            loading="lazy"
+          ></iframe>
+        </div>
+      </section>
+
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="index.html">← Interactive Explanations</a>
         <a href="neurophysiology.html">Neurophysiology →</a>
@@ -1303,7 +1362,8 @@
         'zero-height':  document.querySelector('iframe.zero'),
         'land-height':  document.querySelector('iframe.land'),
         'field-height': document.querySelector('iframe[src*="field-source"]'),
-        'potential-energy-height': document.querySelector('iframe.potential-energy-widget')
+        'potential-energy-height': document.querySelector('iframe.potential-energy-widget'),
+        'super-height': document.querySelector('iframe.super')
       };
       window.addEventListener('message', (e) => {
         const d = e.data;
