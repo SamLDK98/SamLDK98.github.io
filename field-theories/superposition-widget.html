@@ -112,6 +112,7 @@
       </div>
     </div>
     <div class="actions">
+      <button class="btn" type="button" id="drop">Release an object here</button>
       <button class="btn" type="button" id="add">Add a source</button>
       <button class="btn" type="button" id="clear">Clear</button>
     </div>
@@ -138,6 +139,7 @@
   let srcs = [];
   let sel = { x: 0, y: 0 };
   const show = { nums: true, arrows: false };
+  let path = null;              // { pts, reveal, ended }
 
   const PRESETS = {
     two:    [{ M: 15, x: -3, y: 0 }, { M: 15, x: 3, y: 0 }],
@@ -158,6 +160,36 @@
       gx += m * dx / r; gy += m * dy / r;          // points toward the source
     }
     return { gx, gy, mag: Math.hypot(gx, gy) };
+  }
+
+  // Release an object from rest and follow it. The whole path is integrated up
+  // front rather than a step per frame: the trajectory is then known immediately,
+  // so a dropped animation frame costs a bit of the reveal, never the result.
+  //
+  // Note there is no term for the object's own mass anywhere below — its
+  // acceleration is just g at wherever it currently is. The path is nothing more
+  // than the local slope, obeyed over and over.
+  function tracePath(x0, y0) {
+    const DT = 0.008, DAMP = 0.55, MAX = 3000;
+    let x = x0, y = y0, vx = 0, vy = 0;
+    const pts = [[x, y]];
+    let ended = 'stopped';
+    for (let i = 0; i < MAX; i += 1) {
+      let hit = false;
+      for (const s of srcs) if (Math.hypot(s.x - x, s.y - y) < R) { hit = true; break; }
+      if (hit) { ended = 'was absorbed by a source'; break; }
+      const g = gAt(x, y);
+      // released where the slope is zero (a saddle, or an exact balance point):
+      // it has nowhere to go, so stop rather than logging thousands of identical points
+      if (g.mag < 1e-4 && Math.hypot(vx, vy) < 1e-4) { ended = 'stayed exactly where it was'; break; }
+      vx += g.gx * DT; vy += g.gy * DT;
+      vx *= (1 - DAMP * DT); vy *= (1 - DAMP * DT);
+      x += vx * DT; y += vy * DT;
+      if (!isFinite(x) || !isFinite(y)) { ended = 'stopped'; break; }
+      if (Math.abs(x) > EX + 1.5 || Math.abs(y) > EY + 1.5) { ended = 'left the field'; break; }
+      pts.push([x, y]);
+    }
+    return { pts, reveal: 0, ended };
   }
 
   // ---- canvas ----
@@ -260,6 +292,39 @@
       }
     }
 
+    // --- the path an object takes ---
+    if (path && path.pts.length > 1) {
+      const n = Math.max(2, Math.floor(path.reveal * path.pts.length));
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+
+      // a soft under-stroke so the trail stays legible over bright contour bands
+      ctx.beginPath();
+      for (let i = 0; i < n; i += 1) {
+        const p = path.pts[i], px = xAt(p[0]), py = yAt(p[1]);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = 'rgba(10,10,14,0.55)'; ctx.lineWidth = 6; ctx.stroke();
+      ctx.strokeStyle = '#54d6a0'; ctx.lineWidth = 2.2;
+      ctx.shadowColor = '#54d6a0'; ctx.shadowBlur = 8; ctx.stroke(); ctx.shadowBlur = 0;
+
+      // where it was released
+      const s0 = path.pts[0];
+      ctx.strokeStyle = 'rgba(84,214,160,0.75)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(xAt(s0[0]), yAt(s0[1]), 6, 0, 6.2832); ctx.stroke();
+
+      // the object itself
+      const p = path.pts[n - 1];
+      const hx = xAt(p[0]), hy = yAt(p[1]);
+      ctx.fillStyle = '#eafff5';
+      ctx.shadowColor = '#54d6a0'; ctx.shadowBlur = 14;
+      ctx.beginPath(); ctx.arc(hx, hy, 5.5, 0, 6.2832); ctx.fill(); ctx.shadowBlur = 0;
+
+      if (n >= path.pts.length && path.ended === 'was absorbed by a source') {
+        ctx.strokeStyle = 'rgba(84,214,160,0.6)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(hx, hy, 12, 0, 6.2832); ctx.stroke();
+      }
+    }
+
     // --- sources ---
     srcs.forEach((s, i) => {
       const x = xAt(s.x), y = yAt(s.y);
@@ -312,9 +377,17 @@
     $('ro-n').textContent = srcs.length;
     $('ro-phi').textContent = minus(net);
     $('ro-g').textContent = g.mag.toFixed(2);
-    $('hint').textContent = g.mag < 0.02 && srcs.length > 1
-      ? 'Here the pulls cancel exactly — a saddle point. Downhill toward either mass, uphill at right angles.'
-      : 'Every intersection adds up the pull of every source. Drag a source and watch the whole map re-sum.';
+    if (path) {
+      const steps = path.pts.length;
+      $('hint').textContent = steps < 3
+        ? 'Released at a point where the slope is zero — it has nowhere to go, so it stays exactly where it is.'
+        : 'The object never consults the whole map. At each step it reads the slope where it is and moves — '
+          + steps + ' of those local decisions, and it ' + path.ended + '.';
+    } else {
+      $('hint').textContent = g.mag < 0.02 && srcs.length > 1
+        ? 'Here the pulls cancel exactly — a saddle point. Downhill toward either mass, uphill at right angles.'
+        : 'Every intersection adds up the pull of every source. Drag a source and watch the whole map re-sum.';
+    }
   }
 
   function render() { draw(); ledger(); }
@@ -338,6 +411,7 @@
     const { u, v } = localPt(e);
     srcs[drag].x = Math.max(-EX + 0.5, Math.min(EX - 0.5, u));
     srcs[drag].y = Math.max(-EY + 0.5, Math.min(EY - 0.5, v));
+    path = null;                 // moving a source invalidates the traced path
     render();
   });
   const endDrag = () => { drag = -1; };
@@ -349,6 +423,7 @@
     load(b.dataset.p);
     for (const x of $('preset').querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
     sel = { x: 0, y: 0 };
+    path = null;                 // the old trace belongs to a field that no longer exists
     render();
   });
 
@@ -360,12 +435,40 @@
     render();
   });
 
+  // Reveal the (already computed) path. A timeout guarantees the full trace is
+  // shown even if frames never arrive, so the drawing can never stop halfway and
+  // imply the object came to rest somewhere it did not.
+  let raf = 0, done = 0;
+  function revealPath() {
+    cancelAnimationFrame(raf); clearTimeout(done);
+    if (!path) return;
+    render();                     // reflect the new state at once, not on the first frame
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || path.pts.length < 3) {
+      path.reveal = 1; render(); return;
+    }
+    const t0 = performance.now();
+    const DUR = Math.min(2600, 380 + path.pts.length * 1.6);
+    const step = (now) => {
+      path.reveal = Math.min(1, (now - t0) / DUR);
+      render();
+      if (path.reveal < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    done = setTimeout(() => { cancelAnimationFrame(raf); path.reveal = 1; render(); }, DUR + 150);
+  }
+
+  $('drop').addEventListener('click', () => {
+    if (!srcs.length) { path = null; render(); return; }
+    path = tracePath(sel.x, sel.y);
+    revealPath();
+  });
+
   $('add').addEventListener('click', () => {
     const i = srcs.length;
     srcs.push({ M: 10 + ((i * 7) % 20), x: (i % 5) * 3 - 6 + 0.7, y: ((i * 3) % 7) - 3, c: PALETTE[i % PALETTE.length] });
     render();
   });
-  $('clear').addEventListener('click', () => { srcs = []; render(); });
+  $('clear').addEventListener('click', () => { srcs = []; path = null; render(); });
 
   function postHeight() {
     const hh = Math.ceil(document.querySelector('.bench').getBoundingClientRect().height);
