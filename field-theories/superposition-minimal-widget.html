@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Superposition — minimal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0e11; --panel-2: #17171d;
+    --line: rgba(140,165,225,0.16);
+    --txt: #f4f6ff; --txt-2: rgba(238,242,252,0.72); --txt-3: rgba(238,242,252,0.40);
+    --pot: #9d7bff; --obj: #54d6a0;
+  }
+  html, body { background: var(--bg); }
+  body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: var(--txt); -webkit-font-smoothing: antialiased; }
+  .bench { background: var(--bg); border: 1px solid var(--line); }
+
+  canvas { display: block; width: 100%; height: 420px; cursor: crosshair; touch-action: none; }
+
+  /* the one thing worth reading: how this point's value is made */
+  .sum {
+    padding: 18px 20px 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(0.95rem, 2.1vw, 1.22rem);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    color: var(--txt-2);
+    display: flex; align-items: baseline; gap: 0.4em; flex-wrap: wrap;
+  }
+  .sum .eq { color: var(--txt-3); }
+  .sum .net { color: var(--pot); font-weight: 600; font-size: 1.18em; }
+  .sub {
+    padding: 0 20px 16px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem; letter-spacing: 0.12em; color: var(--txt-3);
+  }
+
+  .bar {
+    border-top: 1px solid var(--line);
+    padding: 12px 16px 13px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  button {
+    font-family: "IBM Plex Sans", sans-serif; font-size: 0.74rem; font-weight: 500;
+    color: var(--txt-2); background: transparent;
+    border: 1px solid var(--line); padding: 7px 12px; cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  button:hover { color: var(--txt); border-color: rgba(150,180,255,0.42); }
+  button:focus-visible { outline: 2px solid var(--obj); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--pot); border-color: var(--pot); color: #100a1c; font-weight: 600; }
+  .spacer { margin-left: auto; }
+  #release { border-color: var(--obj); color: var(--obj); }
+  #release:hover { background: var(--obj); color: #071410; }
+
+  @media (max-width: 640px) {
+    canvas { height: 320px; }
+    .spacer { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="bench">
+  <canvas id="map" aria-label="A contour map of the field made by several sources. Click a point to see how its value is built from each source."></canvas>
+
+  <div class="sum" id="sum"></div>
+  <div class="sub" id="sub"></div>
+
+  <div class="bar">
+    <button type="button" data-p="two"    aria-pressed="true">Two equal</button>
+    <button type="button" data-p="uneven" aria-pressed="false">One dominant</button>
+    <button type="button" data-p="many"   aria-pressed="false">Scattered</button>
+    <span class="spacer"></span>
+    <button type="button" id="release">Release an object</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+
+  // --- field maths, unchanged from the fuller figure ---
+  const R = 0.6;
+  const phiOne = (M, r) => (r >= R ? -M / r : -M * (3 * R * R - r * r) / (2 * R * R * R));
+  const gOne   = (M, r) => (r >= R ? M / (r * r) : M * r / (R * R * R));
+  const EX = 8, EY = 5, PHI_REF = 26, BANDS = 11;
+  const PALETTE = ['#ff6a3d', '#ffc247', '#54d6a0', '#35d2ff', '#c98bff', '#ff8fa3'];
+
+  let srcs = [], path = null;
+  let sel = { x: 2, y: -2 };
+
+  const PRESETS = {
+    two:    [{ M: 15, x: -3, y: 0 }, { M: 15, x: 3, y: 0 }],
+    uneven: [{ M: 60, x: -4, y: 0 }, { M: 7, x: 2.5, y: 2 }, { M: 7, x: 3.5, y: -2 }],
+    many:   [{ M: 26, x: -5, y: 1.5 }, { M: 10, x: -1, y: -2.5 }, { M: 16, x: 2, y: 2.2 },
+             { M: 8, x: 5, y: -1 }, { M: 12, x: 6, y: 2.6 }]
+  };
+  const load = (k) => { srcs = PRESETS[k].map((s, i) => ({ ...s, c: PALETTE[i % PALETTE.length] })); };
+  load('two');
+
+  const phiAt = (x, y) => srcs.reduce((a, s) => a + phiOne(s.M, Math.hypot(x - s.x, y - s.y)), 0);
+  function gAt(x, y) {
+    let gx = 0, gy = 0;
+    for (const s of srcs) {
+      const dx = s.x - x, dy = s.y - y, r = Math.hypot(dx, dy);
+      if (r < 1e-6) continue;
+      const m = gOne(s.M, r);
+      gx += m * dx / r; gy += m * dy / r;
+    }
+    return { gx, gy, mag: Math.hypot(gx, gy) };
+  }
+
+  // whole trajectory computed up front, so a lost frame costs the reveal, not the result
+  function tracePath(x0, y0) {
+    const DT = 0.008, DAMP = 0.55, MAX = 3000;
+    let x = x0, y = y0, vx = 0, vy = 0;
+    const pts = [[x, y]];
+    let ended = 'stopped';
+    for (let i = 0; i < MAX; i += 1) {
+      let hit = false;
+      for (const s of srcs) if (Math.hypot(s.x - x, s.y - y) < R) { hit = true; break; }
+      if (hit) { ended = 'was absorbed'; break; }
+      const g = gAt(x, y);
+      if (g.mag < 1e-4 && Math.hypot(vx, vy) < 1e-4) { ended = 'stayed put'; break; }
+      vx += g.gx * DT; vy += g.gy * DT;
+      vx *= (1 - DAMP * DT); vy *= (1 - DAMP * DT);
+      x += vx * DT; y += vy * DT;
+      if (!isFinite(x) || !isFinite(y)) break;
+      if (Math.abs(x) > EX + 1.5 || Math.abs(y) > EY + 1.5) { ended = 'left the field'; break; }
+      pts.push([x, y]);
+    }
+    return { pts, reveal: 0, ended };
+  }
+
+  // --- canvas ---
+  const cvs = $('map'), ctx = cvs.getContext('2d');
+  let w = 0, h = 0, dpr = 1;
+  function fit() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = cvs.getBoundingClientRect();
+    w = r.width; h = r.height;
+    cvs.width = Math.round(w * dpr); cvs.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const xAt = (u) => ((u + EX) / (2 * EX)) * w;
+  const yAt = (v) => ((v + EY) / (2 * EY)) * h;
+  const uOf = (px) => (px / w) * 2 * EX - EX;
+  const vOf = (py) => (py / h) * 2 * EY - EY;
+  const neg = (n) => (n < 0 ? '−' : '') + Math.abs(n).toFixed(2);
+
+  function draw() {
+    const W = cvs.width, H = cvs.height;
+    if (W < 1 || H < 1) return;                 // zero-width canvas: skip the pixel work
+    ctx.clearRect(0, 0, w, h);
+
+    // contour bands — quantising the value is what makes the band edges contours
+    const img = ctx.createImageData(W, H);
+    const d = img.data;
+    const band = new Int16Array(W * H);
+    for (let py = 0; py < H; py += 1) {
+      const v = vOf(py / dpr);
+      for (let px = 0; px < W; px += 1) {
+        const t = Math.min(1, Math.abs(phiAt(uOf(px / dpr), v)) / PHI_REF);
+        const b = Math.min(BANDS - 1, Math.floor(Math.pow(t, 0.72) * BANDS));
+        band[py * W + px] = b;
+        const k = b / (BANDS - 1);
+        const i = (py * W + px) * 4;
+        d[i]     = 14 + 121 * k * 0.85;
+        d[i + 1] = 14 + 94 * k * 0.72;
+        d[i + 2] = 17 + 200 * k * 0.80;
+        d[i + 3] = 255;
+      }
+    }
+    for (let py = 1; py < H; py += 1) {
+      for (let px = 1; px < W; px += 1) {
+        const b = band[py * W + px];
+        if (b !== band[py * W + px - 1] || b !== band[(py - 1) * W + px]) {
+          const i = (py * W + px) * 4;
+          d[i] += 60; d[i + 1] += 60; d[i + 2] += 68;
+        }
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+
+    // the path an object took
+    if (path && path.pts.length > 1) {
+      const n = Math.max(2, Math.floor(path.reveal * path.pts.length));
+      ctx.lineJoin = ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (let i = 0; i < n; i += 1) {
+        const p = path.pts[i];
+        if (i === 0) ctx.moveTo(xAt(p[0]), yAt(p[1])); else ctx.lineTo(xAt(p[0]), yAt(p[1]));
+      }
+      ctx.strokeStyle = 'rgba(10,10,14,0.5)'; ctx.lineWidth = 6; ctx.stroke();
+      ctx.strokeStyle = '#54d6a0'; ctx.lineWidth = 2.2;
+      ctx.shadowColor = '#54d6a0'; ctx.shadowBlur = 8; ctx.stroke(); ctx.shadowBlur = 0;
+      const p = path.pts[n - 1];
+      ctx.fillStyle = '#eafff5'; ctx.shadowColor = '#54d6a0'; ctx.shadowBlur = 13;
+      ctx.beginPath(); ctx.arc(xAt(p[0]), yAt(p[1]), 5.5, 0, 6.2832); ctx.fill(); ctx.shadowBlur = 0;
+    }
+
+    // sources
+    for (const s of srcs) {
+      const x = xAt(s.x), y = yAt(s.y), rad = 6 + Math.sqrt(s.M) * 1.5;
+      ctx.fillStyle = s.c; ctx.shadowColor = s.c; ctx.shadowBlur = 14;
+      ctx.beginPath(); ctx.arc(x, y, rad, 0, 6.2832); ctx.fill(); ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(10,10,14,0.9)';
+      ctx.font = '700 10px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(s.M), x, y);
+    }
+
+    // the inspected point, with its value read out in place
+    const sx = xAt(sel.x), sy = yAt(sel.y);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(sx, sy, 5, 0, 6.2832); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx, sy - 11); ctx.lineTo(sx, sy - 7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx, sy + 7); ctx.lineTo(sx, sy + 11); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx - 11, sy); ctx.lineTo(sx - 7, sy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx + 7, sy); ctx.lineTo(sx + 11, sy); ctx.stroke();
+  }
+
+  function readout() {
+    const parts = srcs.map((s) => ({ c: s.c, v: phiOne(s.M, Math.hypot(sel.x - s.x, sel.y - s.y)) }));
+    const net = parts.reduce((a, p) => a + p.v, 0);
+    const g = gAt(sel.x, sel.y);
+
+    // every contribution is negative, so factoring the sign out reads far more
+    // cleanly than a string of "−5.00 + −5.00"
+    let html = '<span class="eq">−(</span>';
+    html += parts.map((p) => '<span style="color:' + p.c + '">' + Math.abs(p.v).toFixed(2) + '</span>').join('<span class="eq">+</span>');
+    html += '<span class="eq">)&nbsp;=</span> <span class="net">' + neg(net) + '</span>';
+    $('sum').innerHTML = html;
+
+    $('sub').textContent = path
+      ? (path.ended === 'stayed put'
+          ? 'released where the slope is zero — it has nowhere to go'
+          : path.pts.length + ' local steps, then it ' + path.ended)
+      : (g.mag < 0.02 && srcs.length > 1
+          ? 'slope 0 — the pulls cancel exactly'
+          : 'slope ' + g.mag.toFixed(2) + ' · click anywhere · drag a source');
+  }
+
+  const render = () => { draw(); readout(); };
+
+  // --- interaction ---
+  let drag = -1;
+  const pt = (e) => { const r = cvs.getBoundingClientRect(); return { u: uOf(e.clientX - r.left), v: vOf(e.clientY - r.top) }; };
+  cvs.addEventListener('pointerdown', (e) => {
+    const { u, v } = pt(e);
+    drag = srcs.findIndex((s) => Math.hypot(s.x - u, s.y - v) < 0.9);
+    if (drag >= 0) { cvs.setPointerCapture(e.pointerId); return; }
+    sel = { x: u, y: v }; path = null; render();
+  });
+  cvs.addEventListener('pointermove', (e) => {
+    if (drag < 0) return;
+    const { u, v } = pt(e);
+    srcs[drag].x = Math.max(-EX + 0.5, Math.min(EX - 0.5, u));
+    srcs[drag].y = Math.max(-EY + 0.5, Math.min(EY - 0.5, v));
+    path = null; render();
+  });
+  const stopDrag = () => { drag = -1; };
+  cvs.addEventListener('pointerup', stopDrag);
+  cvs.addEventListener('pointercancel', stopDrag);
+
+  let raf = 0, done = 0;
+  function reveal() {
+    cancelAnimationFrame(raf); clearTimeout(done);
+    render();
+    if (!path || path.pts.length < 3 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (path) path.reveal = 1;
+      render(); return;
+    }
+    const t0 = performance.now();
+    const DUR = Math.min(2400, 360 + path.pts.length * 1.5);
+    const step = (now) => {
+      path.reveal = Math.min(1, (now - t0) / DUR);
+      render();
+      if (path.reveal < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    done = setTimeout(() => { cancelAnimationFrame(raf); path.reveal = 1; render(); }, DUR + 150);
+  }
+
+  document.querySelectorAll('button[data-p]').forEach((b) => {
+    b.addEventListener('click', () => {
+      load(b.dataset.p);
+      document.querySelectorAll('button[data-p]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      path = null; sel = { x: 2, y: -2 }; render();
+    });
+  });
+  $('release').addEventListener('click', () => { path = tracePath(sel.x, sel.y); reveal(); });
+
+  function postHeight() {
+    const hh = Math.ceil(document.querySelector('.bench').getBoundingClientRect().height);
+    if (window.parent !== window && hh > 100) window.parent.postMessage({ type: 'supermin-height', height: hh }, '*');
+  }
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { fit(); render(); postHeight(); }, 140); });
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.querySelector('.bench'));
+  window.addEventListener('load', () => { fit(); render(); postHeight(); setTimeout(postHeight, 250); });
+
+  fit(); render(); postHeight();
+})();
+</script>
+</body>
+</html>

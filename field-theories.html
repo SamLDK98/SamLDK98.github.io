@@ -529,7 +529,16 @@
       letter-spacing: -0.012em; margin: 0 0 0.9rem;
     }
     iframe.super { height: 700px; }
-    @media (max-width: 900px) { iframe.super { height: 1080px; } }
+    iframe.supermin { height: 560px; }
+    .testbed-split {
+      max-width: var(--measure); margin: clamp(2.2rem, 6vh, 3.4rem) auto 0;
+      border-top: 1px dashed var(--line);
+      padding-top: clamp(1.6rem, 4vh, 2.2rem);
+    }
+    @media (max-width: 900px) {
+      iframe.super { height: 1080px; }
+      iframe.supermin { height: 620px; }
+    }
 
     .foot-nav {
       display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
@@ -1186,7 +1195,7 @@
         <p class="testbed-tag">Testing area &mdash; not yet placed in the text</p>
 
         <div class="col">
-          <h2 class="testbed-h">Many sources, one landscape</h2>
+          <h2 class="testbed-h">Version A &mdash; many sources, one landscape</h2>
           <p>
             Each intersection sums the pull of every source. The panel on the right
             breaks the selected value into the contribution each source makes to it, so
@@ -1211,6 +1220,32 @@
             class="bench super"
             src="field-theories/superposition-widget.html"
             title="A topographic map of the field produced by several sources, with a breakdown showing how each source contributes to the value at a selected point."
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        <div class="testbed-split"></div>
+
+        <div class="col">
+          <h2 class="testbed-h">Version B &mdash; stripped back</h2>
+          <p>
+            The same field and the same maths, with everything that was not carrying an
+            idea removed: no readout strip, no captions, no grid of numbers competing with
+            the contours, and the five-row breakdown collapsed into one line. Since every
+            contribution is negative, the sign factors out and the sum reads as a single
+            statement.
+          </p>
+        </div>
+
+        <div class="lab">
+          <div class="lab-cap">
+            <span>Test &mdash; minimal revision</span>
+            <span>click a point &middot; drag a source &middot; release an object</span>
+          </div>
+          <iframe
+            class="bench supermin"
+            src="field-theories/superposition-minimal-widget.html"
+            title="A stripped-back version of the superposition map: contours, a single summation line, and the path an object takes."
             loading="lazy"
           ></iframe>
         </div>
@@ -1363,7 +1398,8 @@
         'land-height':  document.querySelector('iframe.land'),
         'field-height': document.querySelector('iframe[src*="field-source"]'),
         'potential-energy-height': document.querySelector('iframe.potential-energy-widget'),
-        'super-height': document.querySelector('iframe.super')
+        'super-height': document.querySelector('iframe.super'),
+        'supermin-height': document.querySelector('iframe.supermin')
       };
       window.addEventListener('message', (e) => {
         const d = e.data;
