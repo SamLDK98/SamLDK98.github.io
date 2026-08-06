@@ -104,15 +104,9 @@
       transition: none;
     }
 
-    .ball-shell {
-      stroke: var(--yellow);
-      stroke-width: 4;
-      filter: drop-shadow(0 9px 8px rgba(0, 0, 0, 0.42));
-    }
-
-    .mass-2 .ball-shell { fill: url(#ball-gradient-2); }
-    .mass-3 .ball-shell { fill: url(#ball-gradient-3); }
-    .mass-5 .ball-shell { fill: url(#ball-gradient-5); }
+    .mass-2 .ball-shell { fill: #36a9e1; }
+    .mass-3 .ball-shell { fill: #ff743d; }
+    .mass-5 .ball-shell { fill: #a65cff; }
 
     .selection-ring {
       fill: none;
@@ -127,23 +121,8 @@
       opacity: 1;
     }
 
-    .glint {
-      fill: rgba(255, 255, 255, 0.72);
-      pointer-events: none;
-      animation: glisten 2.6s ease-in-out infinite;
-    }
-
-    .ball:nth-of-type(2) .glint { animation-delay: 0.45s; }
-    .ball:nth-of-type(3) .glint { animation-delay: 0.9s; }
-
-    @keyframes glisten {
-      0%, 42%, 100% { opacity: 0.25; }
-      17% { opacity: 0.9; }
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .ball { transition: none; }
-      .glint { animation: none; opacity: 0.48; }
     }
   </style>
 </head>
@@ -157,21 +136,6 @@
     <svg id="field" viewBox="0 0 900 540" role="img" aria-labelledby="widget-title widget-desc">
       <title id="widget-title">Interactive potential-energy levels</title>
       <desc id="widget-desc">Three draggable balls with masses two, three, and five begin on the zero-potential baseline. Drag a ball to any yellow potential level from one to four to update the potential-energy equation.</desc>
-      <defs>
-        <radialGradient id="ball-gradient-2" cx="34%" cy="28%" r="72%">
-          <stop offset="0" stop-color="#c9f5ff" />
-          <stop offset="1" stop-color="#36a9e1" />
-        </radialGradient>
-        <radialGradient id="ball-gradient-3" cx="34%" cy="28%" r="72%">
-          <stop offset="0" stop-color="#ffd0ad" />
-          <stop offset="1" stop-color="#ff743d" />
-        </radialGradient>
-        <radialGradient id="ball-gradient-5" cx="34%" cy="28%" r="72%">
-          <stop offset="0" stop-color="#edc8ff" />
-          <stop offset="1" stop-color="#a65cff" />
-        </radialGradient>
-      </defs>
-
       <line class="level-line" x1="90" y1="70" x2="800" y2="70" />
       <text class="level-label" x="822" y="78">Φ = 4</text>
       <line class="level-line" x1="90" y1="165" x2="800" y2="165" />
@@ -186,19 +150,16 @@
       <g class="ball mass-2" data-mass="2" data-x="220" data-level="0" transform="translate(220 450)" role="button" tabindex="0" aria-label="Mass two ball at potential zero. Use the up and down arrow keys to move it between potential levels.">
         <circle class="selection-ring" r="31" />
         <circle class="ball-shell" r="23" />
-        <ellipse class="glint" cx="-8" cy="-9" rx="5.5" ry="9" transform="rotate(-35 -8 -9)" />
       </g>
 
       <g class="ball mass-3" data-mass="3" data-x="450" data-level="0" transform="translate(450 450)" role="button" tabindex="0" aria-label="Mass three ball at potential zero. Use the up and down arrow keys to move it between potential levels.">
         <circle class="selection-ring" r="36" />
         <circle class="ball-shell" r="28" />
-        <ellipse class="glint" cx="-9" cy="-10" rx="6.5" ry="11" transform="rotate(-35 -9 -10)" />
       </g>
 
       <g class="ball mass-5" data-mass="5" data-x="680" data-level="0" transform="translate(680 450)" role="button" tabindex="0" aria-label="Mass five ball at potential zero. Use the up and down arrow keys to move it between potential levels.">
         <circle class="selection-ring" r="41" />
         <circle class="ball-shell" r="33" />
-        <ellipse class="glint" cx="-11" cy="-12" rx="8" ry="13" transform="rotate(-35 -11 -12)" />
       </g>
     </svg>
   </div>

@@ -124,6 +124,13 @@
     .field-question .thought-experiment-trigger {
       margin-top: 0;
     }
+    .thought-experiment-trigger.confusion-trigger {
+      color: #ff5f67;
+    }
+    .thought-experiment-trigger.confusion-trigger:hover,
+    .thought-experiment-trigger.confusion-trigger:focus-visible {
+      color: #ff9298;
+    }
     .thought-experiment-dialog {
       width: min(44rem, calc(100% - 2rem));
       max-height: min(82vh, 46rem);
@@ -352,6 +359,9 @@
       line-height: 1.2;
       letter-spacing: -0.01em;
     }
+    .source-density-intro {
+      margin-top: clamp(4rem, 10vh, 5.5rem);
+    }
     .source-note {
       margin: 1.35rem 0;
       padding: 0.9rem 1.2rem;
@@ -410,19 +420,10 @@
       stroke-dasharray: 5 7;
     }
     .force-ball-figure .force-ball {
-      fill: url(#force-ball-gradient);
-      stroke: #ffe34d;
-      stroke-width: 3;
+      fill: #36a9e1;
     }
-    .force-ball-figure .force-ball-glint {
-      fill: rgba(255,255,255,0.72);
-    }
-    .force-ball-figure .force-ball-label,
-    .force-ball-figure .coordinate-label {
-      fill: var(--txt);
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 20px;
-      font-weight: 500;
+    .force-ball-figure {
+      margin-bottom: clamp(2.2rem, 5vh, 3rem);
     }
 
     h2 {
@@ -462,23 +463,26 @@
       padding: 0.3rem 1.2rem; margin: 1.4rem 0;
     }
     .mathblock mjx-container[display="true"] { margin: 0.9rem 0 !important; }
+    .field-strength-intro .mathblock {
+      border-left: 0;
+      background: none;
+      padding: 0;
+    }
+    .source-density-intro .mathblock {
+      border-left: 0;
+      background: none;
+      padding: 0;
+    }
+    .field-strength-intro hr {
+      margin: 3.4rem 0 2.2rem;
+      border: 0;
+      border-top: 1px solid var(--line);
+    }
     .energy-equations {
       border-left: 0;
       background: none;
       padding: 0;
     }
-
-    .callout {
-      border-left: 2px solid var(--dens);
-      background: linear-gradient(90deg, rgba(84,214,160,0.08), transparent 70%);
-      padding: 1.1rem 1.3rem; margin: 1.7rem 0;
-    }
-    .callout .tag {
-      display: block; font-family: "IBM Plex Mono", monospace;
-      font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--dens); margin-bottom: 0.5rem;
-    }
-    .callout p { color: var(--txt); }
 
     /* widget */
     .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
@@ -503,40 +507,15 @@
       background: var(--bg);
     }
     iframe.zero { height: 620px; }
-    iframe.land { height: 520px; }
     @media (max-width: 820px) {
       iframe.bench { height: 1160px; }
       iframe.concept-widget { height: 600px; }
       iframe.zero { height: 560px; }
-      iframe.land { height: 540px; }
     }
 
-    /* ---- testing area: fenced off at the foot of the page ---- */
     .testbed { margin-top: clamp(3rem, 9vh, 5rem); }
-    .testbed-rule {
-      max-width: var(--measure); margin-inline: auto;
-      border-top: 1px solid var(--line);
-    }
-    .testbed-tag {
-      max-width: var(--measure); margin-inline: auto;
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--str); padding-top: 0.9rem; margin-bottom: 1.6rem;
-    }
-    .testbed-h {
-      font-family: "Spectral", Georgia, serif; font-weight: 400;
-      font-size: clamp(1.3rem, 3vw, 1.8rem); line-height: 1.2;
-      letter-spacing: -0.012em; margin: 0 0 0.9rem;
-    }
-    iframe.super { height: 700px; }
     iframe.supermin { height: 560px; }
-    .testbed-split {
-      max-width: var(--measure); margin: clamp(2.2rem, 6vh, 3.4rem) auto 0;
-      border-top: 1px dashed var(--line);
-      padding-top: clamp(1.6rem, 4vh, 2.2rem);
-    }
     @media (max-width: 900px) {
-      iframe.super { height: 1080px; }
       iframe.supermin { height: 620px; }
     }
 
@@ -589,7 +568,7 @@
         <p>This framework is agnostic to specific systems of objects and environments.</p>
 
         <p>
-          Once we have a property that can be quantified, and an environment that can
+          Once we have a property that can be quantified and an environment that can
           interact with that property, we can describe it in the language of a field
           theory.
         </p>
@@ -612,7 +591,7 @@
       <section class="col potential-intro" aria-labelledby="field-potential-title">
         <h4 id="field-potential-title">Field Potential and Potential Energy</h4>
 
-        <p>Imagine a 2D physical space. The yellow line represents the ground.</p>
+        <p>Imagine a 2D space. The yellow line represents the ground.</p>
 
         <p>
           <strong>Potential</strong>, or <strong>Field Potential</strong> ($\Phi$), refers
@@ -658,39 +637,21 @@
             <svg viewBox="0 0 900 270" role="img" aria-labelledby="mass-balls-title mass-balls-desc">
               <title id="mass-balls-title">Three objects with different masses</title>
               <desc id="mass-balls-desc">A small blue ball, a medium orange ball, and a large purple ball are arranged left to right beneath labels Mass equals two, Mass equals three, and Mass equals five.</desc>
-              <defs>
-                <radialGradient id="static-ball-2" cx="34%" cy="28%" r="72%">
-                  <stop offset="0" stop-color="#c9f5ff" />
-                  <stop offset="1" stop-color="#36a9e1" />
-                </radialGradient>
-                <radialGradient id="static-ball-3" cx="34%" cy="28%" r="72%">
-                  <stop offset="0" stop-color="#ffd0ad" />
-                  <stop offset="1" stop-color="#ff743d" />
-                </radialGradient>
-                <radialGradient id="static-ball-5" cx="34%" cy="28%" r="72%">
-                  <stop offset="0" stop-color="#edc8ff" />
-                  <stop offset="1" stop-color="#a65cff" />
-                </radialGradient>
-              </defs>
-
               <text class="value" x="180" y="42" text-anchor="middle">Mass = 2</text>
-              <circle cx="180" cy="186" r="32" fill="url(#static-ball-2)" stroke="#ffe34d" stroke-width="4" />
-              <ellipse cx="180" cy="232" rx="42" ry="7" fill="rgba(0,0,0,0.34)" />
+              <circle cx="180" cy="186" r="32" fill="#36a9e1" />
 
               <text class="value" x="450" y="42" text-anchor="middle">Mass = 3</text>
-              <circle cx="450" cy="179" r="39" fill="url(#static-ball-3)" stroke="#ffe34d" stroke-width="4" />
-              <ellipse cx="450" cy="232" rx="50" ry="8" fill="rgba(0,0,0,0.34)" />
+              <circle cx="450" cy="179" r="39" fill="#ff743d" />
 
               <text class="value" x="720" y="42" text-anchor="middle">Mass = 5</text>
-              <circle cx="720" cy="172" r="46" fill="url(#static-ball-5)" stroke="#ffe34d" stroke-width="4" />
-              <ellipse cx="720" cy="232" rx="58" ry="9" fill="rgba(0,0,0,0.34)" />
+              <circle cx="720" cy="172" r="46" fill="#a65cff" />
             </svg>
           </figure>
 
           <p>
             <strong>Potential energy</strong> ($U$), on the other hand, is a
-            <strong>property of the interaction</strong> between both the field potential
-            and coupling property of the object.
+            <strong>property of the interaction</strong> between the field potential and
+            coupling property of the object.
           </p>
 
           <p>
@@ -705,13 +666,13 @@
 
           <p>
             To move the ball up to a given height requires spending an amount of energy
-            equal to the ball's mass and the field potential of that elevation
-            ($m\Phi$).
+            equal to the product of the ball's mass and the field potential of that
+            elevation ($m\Phi$).
           </p>
 
           <p>
-            Once at that height, the ball holds that exact amount of energy as stored
-            potential energy ($U$).
+            Once at that height, that exact amount of energy is stored as potential
+            energy ($U$) by the ball-field system at that location.
           </p>
 
         </div>
@@ -786,45 +747,18 @@
           </figure>
 
           <p>
-            This ratio, at specific points in the space, is the local gradient of the
-            field potential. <strong>Field Strength</strong> has the same steepness but
-            points in the opposite direction, toward lower potential. In this example,
-            the field strength is the same all along the slope because it is a straight
-            line, but typically it will vary from point-to-point as the landscape becomes
-            more complicated.
+            The sign of the potential gradient tells us which way the potential
+            increases; however, movement always occurs in the direction that potential
+            decreases, so we must flip the sign.
           </p>
 
-          <p class="field-question">
-            <button
-              class="thought-experiment-trigger"
-              type="button"
-              aria-haspopup="dialog"
-              aria-controls="off-slope-coordinate-explanation"
-              data-dialog-target="off-slope-coordinate-explanation"
-            >What is the field strength at a coordinate not on the green line, say (3, 4) or (0, 2)?</button>
-          </p>
+          <div class="mathblock">
+            $$-1 \rightarrow \ +1$$
+          </div>
 
           <p>
-            Field strength encodes two things: the direction and steepness of the slope
-            at that particular point. It is therefore a vector rather than a scalar
-            quantity. In this one-dimensional model of space, there are only two possible
-            directions along $r$, so the sign of the field-strength value can encode the
-            direction.
-          </p>
-
-          <ul>
-            <li>$(-)$ means the field strength points to the left $\leftarrow$</li>
-            <li>$(+)$ means the field strength points to the right $\rightarrow$</li>
-          </ul>
-
-          <p class="field-question">
-            <button
-              class="thought-experiment-trigger"
-              type="button"
-              aria-haspopup="dialog"
-              aria-controls="multiple-directions-explanation"
-              data-dialog-target="multiple-directions-explanation"
-            >What about if we can move in more than two ways?</button>
+            The slope gradient with the sign flipped is called the <strong>Field
+            Strength</strong>.
           </p>
 
           <p>
@@ -836,36 +770,56 @@
             $$g=- \frac{\Delta \Phi}{\Delta r}$$
           </div>
 
+          <p>
+            Here, the slope is a straight line, so the field strength is the same at any
+            point along the line; however, the slope will typically vary from
+            point-to-point as the landscape becomes more complicated.
+          </p>
+
           <p class="field-question">
             <button
-              class="thought-experiment-trigger"
+              class="thought-experiment-trigger confusion-trigger"
               type="button"
               aria-haspopup="dialog"
-              aria-controls="gravity-minus-sign-explanation"
-              data-dialog-target="gravity-minus-sign-explanation"
-            >Why is gravity always negative?</button>
+              aria-controls="field-graph-confusion-warning"
+              data-dialog-target="field-graph-confusion-warning"
+            >Confusion Warning</button>
           </p>
 
           <p>
-            Previously we said that field potential was a property of a location in the
-            environment. The coupling property of an object was sensitive to the
-            properties of each location.
+            Field strength encodes two things: the direction and steepness of the slope
+            at that particular point. It is therefore a vector rather than a scalar
+            quantity.
           </p>
 
           <p>
-            This sensitivity meant the object's mass scaled the field potential to give
-            potential energy.
+            In this 2D space, only one dimension is spatial ($r$), so the field can point
+            in only one of two directions. Therefore, we can encode the direction in the
+            sign of the field strength value. That is why we are not using vector arrow
+            symbols.
           </p>
 
-          <p>
-            We have now just established another property of each location: field
-            strength. So, how does the coupling property of an object interact with this?
-          </p>
+          <ul>
+            <li>$(+)$ means $\large \Phi$ is decreasing as we travel $\rightarrow$ along the $x$-axis.</li>
+            <li>$(-)$ means $\large \Phi$ is increasing as we travel $\rightarrow$ along the $x$-axis.</li>
+          </ul>
+
+          <hr />
+
+          <p>Remember that:</p>
+
+          <ul>
+            <li>The field potential is a property of a location in the environment.</li>
+            <li>The coupling property of an object is sensitive to the properties of each location.</li>
+          </ul>
+
+          <p>We have just established another location property: field strength.</p>
 
           <p>
-            Likewise, the coupling property scales the field strength. This time, it
-            determines the value of a new property of the interaction between the object
-            and environment: force.
+            Just as the coupling property scales the field potential to determine the
+            value of a property of the object&ndash;field system (potential energy), it
+            also scales the field strength to determine the value of another property of
+            the object&ndash;field system: force.
           </p>
 
           <div class="mathblock">
@@ -874,18 +828,10 @@
 
           <p>Now, let's introduce a blue ball to a location on the slope: $(1, 3)$.</p>
 
-          <figure class="coupling-figure unit-slope-figure force-ball-figure" aria-label="A small blue ball of mass two placed at distance one and field potential three on the slope.">
+          <figure class="coupling-figure unit-slope-figure force-ball-figure" aria-label="A small blue ball of mass two resting just above the slope at distance one and field potential three.">
             <svg viewBox="0 0 900 520" role="img" aria-labelledby="force-ball-title force-ball-desc">
-              <title id="force-ball-title">A mass-two ball at distance one and field potential three</title>
-              <desc id="force-ball-desc">A small blue ball sits on the bright green descending slope at the coordinate distance one, field potential three. A muted green triangular area beneath the line represents solid land. White dotted potential lines and a yellow distance axis make the coordinate clear.</desc>
-
-              <defs>
-                <radialGradient id="force-ball-gradient" cx="35%" cy="28%" r="70%">
-                  <stop offset="0%" stop-color="#d8f8ff" />
-                  <stop offset="40%" stop-color="#62c7ee" />
-                  <stop offset="100%" stop-color="#1676b5" />
-                </radialGradient>
-              </defs>
+              <title id="force-ball-title">A mass-two ball above the slope at distance one and field potential three</title>
+              <desc id="force-ball-desc">A small blue ball rests just above the bright green descending slope at the coordinate distance one, field potential three. A dotted blue guide ends at that point on the slope. A muted green triangular area beneath the line represents solid land. White dotted potential lines and a yellow distance axis make the coordinate clear.</desc>
 
               <line class="potential-line" x1="100" y1="80" x2="820" y2="80" />
               <text class="potential-axis-label" x="24" y="88">Φ = 4</text>
@@ -914,39 +860,43 @@
               <line class="distance-tick" x1="780" y1="410" x2="780" y2="432" />
               <text class="distance-unit-label" x="780" y="462" text-anchor="middle">4</text>
 
-              <circle class="force-ball" cx="300" cy="165" r="25" />
-              <ellipse class="force-ball-glint" cx="291" cy="156" rx="7" ry="5" transform="rotate(-28 291 156)" />
-              <text class="force-ball-label" x="338" y="142">Mass = 2</text>
-              <text class="coordinate-label" x="338" y="174">(1, 3)</text>
+              <circle class="force-ball" cx="300" cy="138" r="25" />
               <text class="distance-axis-title" x="460" y="502" text-anchor="middle">Distance (r)</text>
             </svg>
           </figure>
 
           <p>
-            The properties of the location are: $\Phi = 3$ and $g = 1$.<br />
-            The coupling property of the ball is: $m = 2$.
+            The properties of the location are $\Phi = 3$ and $g = 1$.<br />
+            The coupling property of the ball is $m = 2$.
           </p>
 
           <p>
-            The properties of the object-environment system are: $U = 6$ and $F = 2$.
+            The properties of the object-environment system are $U = 6$ and $F = 2$.
           </p>
 
           <p>So, what does this force value mean for the object?</p>
 
-          <ul>
-            <li>The force points in the positive $r$ direction and has magnitude $2$.</li>
-            <li>The ball accelerates in that direction at $a = F/m = 2/2 = 1$.</li>
-          </ul>
+          <p>
+            Force tells us the direction (via the sign) and strength of the push (number)
+            on an object.
+          </p>
+
+          <p>
+            The object's mass is the resistance placed against the force. So depending on
+            the mass, the acceleration of the object in response to the push varies.
+          </p>
+
+          <div class="mathblock">
+            $$a = \frac{F}{m} \qquad 1 = \frac{2}{2}$$
+          </div>
 
           <p><strong>The key thing to realise:</strong></p>
 
           <p>
-            What 'acts on' the ball to 'push' it in a specific direction and to
-            accelerate it at a specific rate is right there at the specific location it
-            exists at. In other words, there is not a force at the bottom of the slope
-            pulling the ball down per se. Everything is encoded locally. The ball moves
-            to the next point and that point acts on it according to its own properties.
-            As such, the ball's movement is governed by a series of local gradients.
+            The force that governs the object’s trajectory is exerted locally at each
+            particular location. As the object moves, it encounters a continuous series
+            of local gradients that influence its movement, rather than a force acting
+            upon it from a distance.
           </p>
         </div>
 
@@ -969,12 +919,13 @@
 
         <p>
           When an object is introduced, the values in the field at that location decrease
-          proportionally to the mass of the object.
+          in proportion to the mass of the object.
         </p>
 
         <p>
           This effect propagates outward around the object, diminishing in strength the
-          further it travels.
+          further it travels. The effect ultimately influences the entire field, never
+          reaching exactly zero.
         </p>
 
         <p>
@@ -982,36 +933,40 @@
           intersections would naturally be affected by more than one mass.
         </p>
 
-        <p>Each intersection sums all the effects on itself to produce a net value.</p>
-
         <p>
-          By the way, these values at the intersections are synonymous with the elevation
-          in our previous analogy. That is, they are <strong>field potentials</strong>.
+          At each intersection, all the contributions are summed to produce one net
+          value.
         </p>
 
         <p>
-          We could think of high field-potential values as being like the peaks of hills
-          and low field-potential values as being like the bottoms of valleys.
+          These values at the intersections correspond to the elevation in our previous
+          analogy. That is, they are <strong>field potentials</strong>.
         </p>
 
         <p>
-          Naturally, there then exist 'slopes'—not in the physical sense, but in the
-          mathematical sense—between the field potentials in our field.
+          We could think of high field potential values as being like the peaks of hills
+          and the low field potential values being like the bottoms of valleys. In a
+          gravitational field, positive masses create low regions called potential wells.
         </p>
 
         <p>
-          <strong>The really interesting thing is that, at first, we might expect a kind
-          of random spread of numbers to appear in our field. In fact, because objects
-          with larger masses make proportionally larger contributions to the field
-          values, the combined numbers resolve into a coherent landscape in which slopes
-          can be observed.</strong>
+          Naturally, slopes then exist&mdash;not in the physical sense, but in the
+          mathematical sense&mdash;between the field potentials in our field.
         </p>
 
         <p>
-          This is an instance of a fundamental law of physics known as the Principle of
-          Classical Superposition: the total effect equals the sum of the individual
-          parts. The term comes from the verb 'to superimpose'—to place one thing on top
-          of another.
+          The really interesting thing is that, although we might initially expect a
+          random spread of numbers to appear in our field, resulting in jagged,
+          zigzagging movement along the local gradients, we instead find much smoother,
+          continuous changes in field potential across the landscape. It makes sense. A
+          location $x$ beside a location $y$ is going to be affected by nearly all the
+          exact same influences, except for a tiny difference.
+        </p>
+
+        <p>
+          This is an example of the <strong>classical superposition principle</strong>:
+          in a linear system, the total effect at one specific location is the sum of all
+          the individual contributions at that location.
         </p>
 
         <blockquote class="source-note">
@@ -1023,56 +978,47 @@
         </blockquote>
 
         <p>
-          That means every point in our field also has a field strength that indicates
-          the direction and steepness of the slope it is a part of.
+          That means every point in our field also has a <strong>field strength</strong>,
+          a single slope vector ($\vec{g}$) that indicates the direction and steepness of
+          the slope it is a part of.
         </p>
 
-        <ul>
-          <li>
-            <strong>Globally:</strong> Across the entire field, the landscape is not a
-            single uniform slope. It is a bumpy terrain filled with countless peaks,
-            troughs, valleys, and saddle points.
-          </li>
-          <li>
-            <strong>Locally:</strong> At each specific point, the terrain at that exact
-            coordinate resolves into a single slope vector ($\vec{g}$) with a direction
-            and steepness.
-          </li>
-        </ul>
-
         <p>
-          The other interesting thing to note here is that the environment itself—the
-          scale of 'elevation' and the 'slopes' between peaks and troughs—is created by
+          The other interesting thing to note here is that the environment itself (the
+          scale of 'elevation' and the 'slopes' between peaks and troughs) is created by
           the objects. Well, not entirely. We should still think of the field as existing
           whether objects exist in it or not. The field describes the potential for
           interaction. But without objects it is entirely flat. Objects create the
-          landscape.
+          potential landscape, not the potential for a landscape!
         </p>
 
-        <p>There are a couple of refinements to make to the understanding.</p>
-
-        <p>Objects here are referred to as <strong>sources</strong>.</p>
+        <p>A couple of refinements to our understanding...</p>
 
         <p>
-          A source does not only have mass, but size as well. It takes up some region of
-          space. We could have a huge object with a mass of $x$ and a small object with a
-          mass of $x$. The ratio of an object's mass to its volume is called the
-          <strong>source density</strong> ($\rho$).
-        </p>
-
-        <p>
-          Because many objects are non-uniform in how their mass is distributed, the
-          average density of the object overall may not reflect the source density at a
-          specific point inside the object.
+          I have been referring to 'objects' throughout this explanation. Yet, at the
+          beginning I said only a particular property of an object was sensitive to the
+          field. Thinking about objects feels more natural, but really it is exclusively
+          the mass, charge, or whatever the coupling property may be that contributes to
+          the field. Because it is these properties that create the potential landscape,
+          we call them <strong>sources</strong>.
         </p>
 
         <p>
-          Instead, we use pointwise source density to measure the ratio of mass to volume
-          in an infinitesimally small region:
+          The object's mass (the source) is not concentrated in one point, but takes up a
+          region of space. The same mass may take up a region of any size. The ratio of
+          an object's mass to size (area or volume) is called <strong>source
+          density</strong> ($\rho$).
+        </p>
+
+        <p>
+          The mass itself may be unevenly distributed throughout this region. So, to be a
+          little more precise, we use pointwise source density to describe the mass per
+          unit volume around each point. We can calculate the object’s total effect by
+          adding, or integrating, the contributions from all these small regions.
         </p>
 
         <div class="mathblock">
-          $$\rho = \frac{dm}{dV}$$
+          $$\rho(\mathbf{r}) = \frac{dm}{dV}$$
         </div>
       </section>
 
@@ -1089,159 +1035,16 @@
         ></iframe>
       </section>
 
-      <section class="lab">
-        <div class="lab-cap">
-          <span>Figure 2 &mdash; the same field, as a landscape</span>
-          <span>height is the value; steepness is the pull</span>
-        </div>
-        <iframe
-          class="bench land"
-          src="field-theories/landscape-widget.html"
-          title="A side-on landscape. Flat when the field is empty; an object digs a valley whose depth is the potential and whose steepness is the field strength. A ball dropped on it rolls downhill."
-          loading="lazy"
-        ></iframe>
-      </section>
-
-      <section class="lab">
-        <div class="lab-cap">
-          <span>Figure 3 &mdash; the same idea, in more detail</span>
-          <span>set a mass to begin</span>
-        </div>
-        <iframe
-          class="bench"
-          src="field-theories/field-source-widget.html"
-          title="An initially empty field. Place a source with adjustable mass and size and watch how it distorts the surrounding potential and field strength."
-          loading="lazy"
-        ></iframe>
-      </section>
-
       <section class="col">
-        <h2><span class="n">Reading the figure</span>What the widget is showing</h2>
-
         <p>
-          The field starts as the primitive we assumed: every point reads exactly
-          <span class="pot">0</span>, and the cross-section beneath it is a flat line.
-          Nothing is happening. Raising the mass places a source at the centre, and the
-          landscape deforms around it.
-        </p>
-
-        <ul>
-          <li>
-            <strong class="pot">Potential Φ</strong> is the landscape &mdash; the hills and
-            valleys. A source digs a well, deepest at its centre and flattening back
-            towards 0 as you move away.
-          </li>
-          <li>
-            <strong class="str">Field strength |g|</strong> is the steepness of that
-            landscape &mdash; the slope rather than the height.
-          </li>
-          <li>
-            <strong class="dens">Source density ρ</strong> is non-zero
-            <em>only where the object physically sits</em>, and zero everywhere else.
-            Switching to that view shows a flat disc and nothing beyond it.
-          </li>
-        </ul>
-
-        <p>
-          That third view is the point your text is making: the density occupies the
-          coordinates the object sits at, but those values are not the landscape. The
-          landscape is what the density <em>causes</em> around it.
-        </p>
-
-        <h2><span class="n">A consequence</span>Why size matters, and where it doesn't</h2>
-
-        <p>
-          Because the source has real extent rather than being a point, two things follow
-          that a zero-dimensional dot could never show you.
-        </p>
-
-        <p>
-          First, hold the mass at 100 and change only the size. The far field does not
-          move at all &mdash; at a distance of 5 units the potential reads
-          <span class="pot">&minus;20</span> and the strength reads
-          <span class="str">4</span> whether the source has a radius of 1, 2 or 3. Yet the
-          density across those three cases differs by a factor of 27. From outside, you
-          cannot tell how tightly the mass is packed. You can only see how much of it
-          there is.
-        </p>
-
-        <div class="callout">
-          <span class="tag">This is what "not directly observable" means</span>
-          <p>
-            Source density leaves no fingerprint on the field outside the source. Two
-            objects of the same mass and wildly different densities produce identical
-            landscapes everywhere beyond their surfaces. The density only reveals itself
-            <em>inside</em> &mdash; where the potential bottoms out, and how steeply the
-            slope climbs to meet the surface.
-          </p>
-        </div>
-
-        <p>
-          Second, look at the field strength at the very centre of the source. It is
-          <strong>zero</strong>. The slope of the landscape flattens out at the middle of
-          the object, because the surrounding mass pulls equally in every direction and
-          the pulls cancel. The strength climbs steadily from nothing at the centre to its
-          maximum right at the surface, and only then begins to fall away. A point source
-          has no inside, so it can never show you this.
+          <strong class="pot">Potential</strong> &middot;
+          <strong class="str">Field strength</strong> &middot;
+          <strong class="dens">Source density</strong>
         </p>
       </section>
 
-      <!-- ===================== TESTING AREA =====================
-           Parked at the bottom, fenced off by a rule. Nothing above depends
-           on it — delete this whole <section class="testbed"> to remove.
-           ======================================================== -->
       <section class="testbed">
-        <div class="testbed-rule"></div>
-        <p class="testbed-tag">Testing area &mdash; not yet placed in the text</p>
-
-        <div class="col">
-          <h2 class="testbed-h">Version A &mdash; many sources, one landscape</h2>
-          <p>
-            Each intersection sums the pull of every source. The panel on the right
-            breaks the selected value into the contribution each source makes to it, so
-            the summation is visible rather than asserted. Drag a source and the whole
-            map re-sums.
-          </p>
-          <p>
-            <strong>Two equal</strong> puts a saddle point at the centre &mdash; the pulls
-            cancel exactly, so the slope is zero even though the potential is not.
-            <strong>One dominant</strong> shows the claim about a single slope emerging:
-            the heavy mass supplies most of the value everywhere, and every slope arrow
-            leans toward it while the small masses only dimple the surface locally.
-          </p>
-        </div>
-
         <div class="lab">
-          <div class="lab-cap">
-            <span>Test &mdash; superposition across many sources</span>
-            <span>drag a source &middot; click to inspect a point</span>
-          </div>
-          <iframe
-            class="bench super"
-            src="field-theories/superposition-widget.html"
-            title="A topographic map of the field produced by several sources, with a breakdown showing how each source contributes to the value at a selected point."
-            loading="lazy"
-          ></iframe>
-        </div>
-
-        <div class="testbed-split"></div>
-
-        <div class="col">
-          <h2 class="testbed-h">Version B &mdash; stripped back</h2>
-          <p>
-            The same field and the same maths, with everything that was not carrying an
-            idea removed: no readout strip, no captions, no grid of numbers competing with
-            the contours, and the five-row breakdown collapsed into one line. Since every
-            contribution is negative, the sign factors out and the sum reads as a single
-            statement.
-          </p>
-        </div>
-
-        <div class="lab">
-          <div class="lab-cap">
-            <span>Test &mdash; minimal revision</span>
-            <span>click a point &middot; drag a source &middot; release an object</span>
-          </div>
           <iframe
             class="bench supermin"
             src="field-theories/superposition-minimal-widget.html"
@@ -1260,79 +1063,30 @@
 
   <dialog
     class="thought-experiment-dialog"
-    id="off-slope-coordinate-explanation"
-    aria-labelledby="off-slope-coordinate-title"
+    id="field-graph-confusion-warning"
+    aria-labelledby="field-graph-confusion-title"
   >
     <div class="thought-experiment-window">
-      <button class="thought-experiment-close" type="button" aria-label="Close coordinate explanation">×</button>
-      <h2 id="off-slope-coordinate-title">Coordinates Away from the Green Line</h2>
+      <button class="thought-experiment-close" type="button" aria-label="Close confusion warning">×</button>
+      <h2 id="field-graph-confusion-title">Confusion Warning</h2>
 
       <p>
-        In this graph, $r$ and $\Phi$ are not two independent spatial coordinates. The
-        graph shows a function, $\Phi(r)$: each location $r$ has one field-potential
-        value, represented by the green line.
+        Bear in mind that the above graph should not be thought of as a cross-section of
+        a real 3D hill. I think it's beneficial to start using terrain-type terminology
+        and have the sense of a topographical map; however, it is a metaphor in this
+        context.
       </p>
 
       <p>
-        On this line, $r = 3$ has $\Phi = 1$, while $r = 0$ has $\Phi = 4$. The points
-        $(3,4)$ and $(0,2)$ do not lie on $\Phi(r)$, so they do not represent locations
-        in this particular field plot. Field strength is therefore not defined at those
-        off-line graph points.
+        The $\Phi$-axis might feel like it represents physical height because, in a
+        simplified gravitational example, field potential can be directly proportional
+        to height. Nevertheless, physical height and field potential are separate
+        quantities.
       </p>
 
       <p>
-        In a genuinely two-dimensional physical space, potential would instead be a
-        function $\Phi(x,y)$, and field strength would be defined at every spatial
-        coordinate $(x,y)$ by the local gradient of that surface.
-      </p>
-    </div>
-  </dialog>
-
-  <dialog
-    class="thought-experiment-dialog"
-    id="multiple-directions-explanation"
-    aria-labelledby="multiple-directions-title"
-  >
-    <div class="thought-experiment-window">
-      <button class="thought-experiment-close" type="button" aria-label="Close vector-direction explanation">×</button>
-      <h2 id="multiple-directions-title">More Than One Spatial Direction</h2>
-
-      <p>
-        A true two-dimensional physical space already allows infinitely many directions,
-        described using two independent components. In three-dimensional space, a field
-        strength similarly has three independent components—one along each of the $x$,
-        $y$, and $z$ axes.
-      </p>
-
-      <p>
-        We write this as $\mathbf{g} = -\nabla\Phi$. The three components combine to
-        form one vector that can point in any spatial direction. A single plus or minus
-        sign is no longer enough; the vector's components encode its full direction and
-        magnitude.
-      </p>
-    </div>
-  </dialog>
-
-  <dialog
-    class="thought-experiment-dialog"
-    id="gravity-minus-sign-explanation"
-    aria-labelledby="gravity-minus-sign-title"
-  >
-    <div class="thought-experiment-window">
-      <button class="thought-experiment-close" type="button" aria-label="Close gravity sign explanation">×</button>
-      <h2 id="gravity-minus-sign-title">Why the Minus Sign?</h2>
-
-      <p>
-        Gravity is not numerically negative in every coordinate system. The minus sign
-        in $\mathbf{g} = -\nabla\Phi$ says that gravity points opposite to the direction
-        in which potential increases—in other words, downhill toward lower potential.
-      </p>
-
-      <p>
-        Its numerical component may be positive or negative depending on which direction
-        we chose as positive. In this diagram, $\Delta\Phi/\Delta r = -1$, so
-        $g = -(-1) = +1$: gravity points toward increasing $r$, which is downhill on the
-        plotted slope.
+        We would need three axes to represent two dimensions of space, with field
+        potential plotted along the third axis.
       </p>
     </div>
   </dialog>
@@ -1355,18 +1109,18 @@
 
         <p>
           So, imagine the Sun suddenly vanishes. We would expect a delay before the
-          tension of the pulling force reaches the Earth.
+          tension of the 'pulling force' reaches the Earth.
         </p>
 
         <p>
-          However, Newton's equation for gravity had no variable for time. It therefore
+          However, Newton's inverse-square law for gravity had no variable for time. It
           predicted that the Earth would fly off instantaneously should the Sun vanish.
         </p>
 
         <p>
           Time was considered absolute. "Now" happens at the same time at any location
           in the cosmos. Einstein's relativity was yet to come. So too was the
-          understanding of light speed as the fastest anything could travel.
+          understanding of light speed as the limiting speed for causal influence.
         </p>
 
         <p>
@@ -1395,10 +1149,7 @@
     (function () {
       const frames = {
         'zero-height':  document.querySelector('iframe.zero'),
-        'land-height':  document.querySelector('iframe.land'),
-        'field-height': document.querySelector('iframe[src*="field-source"]'),
         'potential-energy-height': document.querySelector('iframe.potential-energy-widget'),
-        'super-height': document.querySelector('iframe.super'),
         'supermin-height': document.querySelector('iframe.supermin')
       };
       window.addEventListener('message', (e) => {

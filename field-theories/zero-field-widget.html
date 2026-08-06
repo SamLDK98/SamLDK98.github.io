@@ -6,165 +6,136 @@
 <title>A field of zeros</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0e0e11; --panel-2: #17171d;
-    --line: rgba(140,165,225,0.16);
-    --grid: rgba(140,165,225,0.13);
-    --txt: #f4f6ff; --txt-2: rgba(238,242,252,0.74); --txt-3: rgba(238,242,252,0.40);
-    --zero: rgba(238,242,252,0.30);   /* an undisturbed point */
-    --val:  #9d7bff;                  /* a point that has changed */
-    --src:  #ff6a3d;
+    --bg:     #0e0e11;
+    --line:   rgba(140,165,225,0.16);
+    --line-2: rgba(140,165,225,0.07);
+    --txt:    #f4f6ff;
+    --txt-2:  rgba(238,242,252,0.72);
+    --txt-3:  rgba(238,242,252,0.40);
+    --accent: #ffe34d;
+    --src:    #ff6a3d;
+    --zero:   rgba(238,242,252,0.26);
   }
   html, body { background: var(--bg); }
   body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: var(--txt); -webkit-font-smoothing: antialiased; }
-  .bench { background: var(--bg); border: 1px solid var(--line); }
 
-  .head {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
-    padding: 11px 16px 10px; border-bottom: 1px solid var(--line);
+  .fig {
+    padding: clamp(1.1rem, 3vw, 1.7rem);
+    border: 1px solid var(--line-2);
+    background: linear-gradient(180deg, rgba(255,227,77,0.045), rgba(255,227,77,0.01));
   }
-  .head-title { font-family: "IBM Plex Mono", monospace; font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--txt-2); }
-  .state { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--txt-3); }
-  .state.on { color: var(--val); }
 
   /* ---- the field ---- */
-  .fieldwrap { padding: 30px 34px 34px; }
   .field {
     position: relative;
     width: 100%;
-    /* (NX-1) : (NY-1), so one field unit is the same length horizontally and
-       vertically — otherwise the source draws as an ellipse */
+    /* (NX-1):(NY-1) — keeps one field unit square, so the source is a circle */
     aspect-ratio: 2 / 1;
+    margin: 0.4rem 0 0;
   }
-  .gl { position: absolute; background: var(--grid); }
-  .gl.v { width: 1px; top: 0; bottom: 0; }
-  .gl.h { height: 1px; left: 0; right: 0; }
+  .gl { position: absolute; background: transparent; }
+  .gl.v { width: 0; top: 0; bottom: 0; border-left: 1px dashed rgba(244,246,255,0.10); }
+  .gl.h { height: 0; left: 0; right: 0; border-top: 1px dashed rgba(244,246,255,0.10); }
 
   .pt {
     position: absolute;
     transform: translate(-50%, -50%);
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.74rem; font-weight: 500;
+    /* the values are the whole figure — sized to be read, not glanced at */
+    font-size: clamp(0.74rem, 1.7vw, 0.95rem);
+    font-weight: 500;
     font-variant-numeric: tabular-nums;
     color: var(--zero);
-    background: var(--bg);
-    padding: 1px 4px;
+    /* not fully opaque: enough to stay legible over the grid lines, but the
+       source reads as one continuous shape rather than a row of punched holes */
+    background: rgba(14, 14, 17, 0.78);
+    padding: 1px 6px;
     white-space: nowrap;
-    transition: color 0.18s ease;
+    transition: color 0.2s ease;
   }
-  .pt.changed { color: var(--val); font-weight: 600; }
+  .pt.on { color: var(--accent); font-weight: 600; }
 
   .source {
     position: absolute;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    border: 2px solid var(--src);
-    background: rgba(255,106,61,0.12);
-    box-shadow: 0 0 18px rgba(255,106,61,0.45);
+    border: 2.5px solid var(--accent);
+    background: rgba(255,106,61,0.22);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.25s ease;
   }
   .source.on { opacity: 1; }
 
-  /* ---- build bar ---- */
-  .bar { border-top: 1px solid var(--line); padding: 13px 16px 15px; }
-  .build { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
-
-  .preview {
-    width: 76px; height: 76px; flex: none;
-    border: 1px solid var(--line);
-    display: grid; place-items: center;
-    background: #101014;
+  /* ---- controls ---- */
+  .controls {
+    display: flex; align-items: flex-end; gap: clamp(1rem, 3vw, 2rem);
+    flex-wrap: wrap;
+    margin-top: clamp(1.1rem, 3vh, 1.6rem);
   }
-  .preview i {
-    display: block; border-radius: 50%;
-    border: 2px solid var(--src); background: rgba(255,106,61,0.14);
+  .grp { display: flex; flex-direction: column; gap: 6px; }
+  .lbl {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.56rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--txt-3);
   }
-
-  .group { display: flex; flex-direction: column; gap: 5px; }
-  .glabel { font-family: "IBM Plex Mono", monospace; font-size: 0.57rem; letter-spacing: 0.17em; text-transform: uppercase; color: var(--txt-3); }
   .seg { display: flex; }
   .seg button {
-    font-family: "IBM Plex Sans", sans-serif; font-size: 0.75rem; font-weight: 500;
-    color: var(--txt-2); background: var(--panel-2);
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.74rem; font-weight: 500;
+    color: var(--txt-2); background: transparent;
     border: 1px solid var(--line); border-right-width: 0;
-    padding: 8px 14px; cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
+    padding: 7px 13px; cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
   }
   .seg button:last-child { border-right-width: 1px; }
-  .seg button:hover { background: #1e1e27; color: var(--txt); }
-  .seg button[aria-pressed="true"] { background: var(--src); border-color: var(--src); color: #14100c; font-weight: 600; }
-  .seg button:focus-visible { outline: 2px solid var(--val); outline-offset: 2px; }
+  .seg button:hover { color: var(--txt); }
+  .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #16130a; font-weight: 600; }
+  .seg button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
 
-  .actions { display: flex; gap: 8px; margin-left: auto; align-items: flex-end; }
-  .actions button {
-    font-family: "IBM Plex Sans", sans-serif; font-size: 0.78rem; font-weight: 600;
-    padding: 9px 16px; cursor: pointer; border: 1px solid var(--line);
-    background: var(--panel-2); color: var(--txt);
-    transition: background 0.15s ease, border-color 0.15s ease;
+  #toggle {
+    margin-left: auto;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.76rem; font-weight: 500;
+    color: var(--accent); background: transparent;
+    border: 1px solid var(--accent);
+    padding: 8px 16px; cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
   }
-  .actions button:hover { background: #1e1e27; border-color: rgba(150,180,255,0.4); }
-  .actions button:focus-visible { outline: 2px solid var(--val); outline-offset: 2px; }
-  #place { background: var(--val); border-color: var(--val); color: #100a1c; }
-  #place:hover { background: #b79bff; border-color: #b79bff; }
-  #place[disabled] { opacity: 0.4; cursor: default; }
+  #toggle:hover { background: var(--accent); color: #16130a; }
+  #toggle:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
 
-  .hint {
-    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem;
-    letter-spacing: 0.1em; color: var(--txt-3); margin-top: 9px;
-  }
-
-  @media (max-width: 700px) {
-    .fieldwrap { padding: 24px 20px 26px; }
-    .pt { font-size: 0.62rem; }
-    .actions { margin-left: 0; width: 100%; }
-    .actions button { flex: 1; }
+  @media (max-width: 620px) {
+    #toggle { margin-left: 0; width: 100%; }
   }
 </style>
 </head>
 <body>
-<div class="bench">
-  <div class="head">
-    <span class="head-title">Every point in the field</span>
-    <span class="state" id="state">Empty — all values 0</span>
-  </div>
+<div class="fig">
+  <div class="field" id="field" aria-label="A grid of field values. Every intersection reads zero until a source is placed."></div>
 
-  <div class="fieldwrap">
-    <div class="field" id="field" aria-label="A grid of field values. Every intersection reads zero until a source is placed."></div>
-  </div>
-
-  <div class="bar">
-    <div class="build">
-      <div class="preview"><i id="preview"></i></div>
-
-      <div class="group">
-        <span class="glabel">Mass</span>
-        <div class="seg" id="mass" role="group" aria-label="Mass of the object">
-          <button type="button" data-m="6"  aria-pressed="false">Light</button>
-          <button type="button" data-m="12" aria-pressed="true">Medium</button>
-          <button type="button" data-m="18" aria-pressed="false">Heavy</button>
-        </div>
-      </div>
-
-      <div class="group">
-        <span class="glabel">Size</span>
-        <div class="seg" id="size" role="group" aria-label="Size of the object">
-          <button type="button" data-r="0.6" aria-pressed="false">Small</button>
-          <button type="button" data-r="1.0" aria-pressed="true">Medium</button>
-          <button type="button" data-r="1.4" aria-pressed="false">Large</button>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button type="button" id="place">Place in the field</button>
-        <button type="button" id="remove">Remove</button>
+  <div class="controls">
+    <div class="grp">
+      <span class="lbl">Mass</span>
+      <div class="seg" id="mass" role="group" aria-label="Mass">
+        <button type="button" data-m="6"  aria-pressed="false">Light</button>
+        <button type="button" data-m="12" aria-pressed="true">Medium</button>
+        <button type="button" data-m="18" aria-pressed="false">Heavy</button>
       </div>
     </div>
-    <p class="hint" id="hint">Build an object, then place it. Watch the zeros change.</p>
+    <div class="grp">
+      <span class="lbl">Size</span>
+      <div class="seg" id="size" role="group" aria-label="Size">
+        <button type="button" data-r="0.6" aria-pressed="false">Small</button>
+        <button type="button" data-r="1.0" aria-pressed="true">Medium</button>
+        <button type="button" data-r="1.4" aria-pressed="false">Large</button>
+      </div>
+    </div>
+    <button type="button" id="toggle">Place in the field</button>
   </div>
 </div>
 
@@ -173,100 +144,78 @@
   "use strict";
   const $ = (id) => document.getElementById(id);
 
-  // The grid: 9 columns x 5 rows, one unit apart, source sits at the centre.
-  const NX = 9, NY = 5;
-  const X0 = -4, Y0 = -2;                 // top-left in field units
-
-  // Same physics as the fuller figure: a uniform sphere, G = 1.
-  //   outside r>=R : Phi = -M/r
-  //   inside  r<R  : Phi = -M(3R^2 - r^2)/(2R^3)
+  const NX = 9, NY = 5, X0 = -4, Y0 = -2;
+  // uniform sphere, G = 1 — same field as the other figures
   const Phi = (M, R, r) => (r >= R ? -M / r : -M * (3 * R * R - r * r) / (2 * R * R * R));
 
   const state = { M: 12, R: 1.0, placed: false, p: 0 };
 
-  // build the grid once
   const field = $('field');
   const pts = [];
   (function build() {
     for (let i = 0; i < NX; i += 1) {
-      const gl = document.createElement('div');
-      gl.className = 'gl v';
-      gl.style.left = (i / (NX - 1)) * 100 + '%';
-      field.appendChild(gl);
+      const g = document.createElement('div');
+      g.className = 'gl v'; g.style.left = (i / (NX - 1)) * 100 + '%';
+      field.appendChild(g);
     }
     for (let j = 0; j < NY; j += 1) {
-      const gl = document.createElement('div');
-      gl.className = 'gl h';
-      gl.style.top = (j / (NY - 1)) * 100 + '%';
-      field.appendChild(gl);
+      const g = document.createElement('div');
+      g.className = 'gl h'; g.style.top = (j / (NY - 1)) * 100 + '%';
+      field.appendChild(g);
     }
     for (let j = 0; j < NY; j += 1) {
       for (let i = 0; i < NX; i += 1) {
-        const x = X0 + i, y = Y0 + j;
         const el = document.createElement('span');
         el.className = 'pt';
         el.textContent = '0';
         el.style.left = (i / (NX - 1)) * 100 + '%';
         el.style.top = (j / (NY - 1)) * 100 + '%';
         field.appendChild(el);
-        pts.push({ el, x, y, r: Math.hypot(x, y) });
+        pts.push({ el, r: Math.hypot(X0 + i, Y0 + j) });
       }
     }
-    const src = document.createElement('div');
-    src.className = 'source';
-    src.id = 'src';
-    src.style.left = '50%'; src.style.top = '50%';
-    field.appendChild(src);
+    const s = document.createElement('div');
+    s.className = 'source'; s.id = 'src';
+    s.style.left = '50%'; s.style.top = '50%';
+    field.appendChild(s);
   })();
 
   const maxR = Math.max.apply(null, pts.map((p) => p.r));
   const fmt = (v) => (v === 0 ? '0' : (v < 0 ? '−' : '') + Math.abs(v).toFixed(1));
 
   function sizeSource() {
-    const el = $('src');
     const rect = field.getBoundingClientRect();
-    const unit = rect.width / (NX - 1);          // px per field unit
+    const unit = rect.width / (NX - 1);
     const d = state.R * 2 * unit;
-    el.style.width = d + 'px';
-    el.style.height = d + 'px';
-    // preview swatch, scaled to the same relative sizes
-    const pv = $('preview');
-    const pd = 20 + (state.R - 0.6) * 26;
-    pv.style.width = pd + 'px'; pv.style.height = pd + 'px';
-    pv.style.borderWidth = (state.M / 12) + 'px';
+    const el = $('src');
+    el.style.width = d + 'px'; el.style.height = d + 'px';
   }
 
   function render() {
     for (const p of pts) {
       let v = 0;
       if (state.placed) {
-        // ripple: points near the centre settle first, the effect spreads outward
+        // the change spreads outward: points near the source settle first
         const lead = (p.r / maxR) * 0.55;
         const local = Math.max(0, Math.min(1, (state.p - lead) / 0.45));
         v = Phi(state.M, state.R, p.r) * local;
       }
-      const rounded = Math.abs(v) < 0.05 ? 0 : v;
-      p.el.textContent = fmt(rounded);
-      p.el.classList.toggle('changed', rounded !== 0);
+      const val = Math.abs(v) < 0.05 ? 0 : v;
+      p.el.textContent = fmt(val);
+      p.el.classList.toggle('on', val !== 0);
     }
     $('src').classList.toggle('on', state.placed);
-    $('state').textContent = state.placed
-      ? 'Source placed — values changed'
-      : 'Empty — all values 0';
-    $('state').classList.toggle('on', state.placed);
-    $('place').disabled = state.placed;
-    $('hint').textContent = state.placed
-      ? 'Every value away from 0 was caused by the object — and the further out, the smaller it gets.'
-      : 'Build an object, then place it. Watch the zeros change.';
+    $('toggle').textContent = state.placed ? 'Remove' : 'Place in the field';
   }
 
-  // Animate 0 -> value. The end state is guaranteed by a timeout as well as by
-  // rAF, so the numbers are still correct if frames never arrive.
+  // animate 0 -> value; a timeout guarantees the end state without frames
   let raf = 0, done = 0;
   function animate() {
     cancelAnimationFrame(raf); clearTimeout(done);
-    const t0 = performance.now();
-    const DUR = 900;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      state.p = 1; render(); return;
+    }
+    const t0 = performance.now(), DUR = 900;
     const step = (now) => {
       state.p = Math.min(1, (now - t0) / DUR);
       render();
@@ -280,10 +229,8 @@
     const b = e.target.closest('button[data-m]'); if (!b) return;
     state.M = +b.dataset.m;
     for (const x of $('mass').querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
-    sizeSource();
     if (state.placed) { state.p = 1; render(); }
   });
-
   $('size').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-r]'); if (!b) return;
     state.R = +b.dataset.r;
@@ -291,29 +238,24 @@
     sizeSource();
     if (state.placed) { state.p = 1; render(); }
   });
-
-  $('place').addEventListener('click', () => {
-    state.placed = true; state.p = 0;
-    sizeSource();
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { state.p = 1; render(); }
-    else animate();
-  });
-
-  $('remove').addEventListener('click', () => {
+  $('toggle').addEventListener('click', () => {
     cancelAnimationFrame(raf); clearTimeout(done);
-    state.placed = false; state.p = 0; render();
+    if (state.placed) { state.placed = false; state.p = 0; render(); return; }
+    state.placed = true; state.p = 0; sizeSource(); animate();
   });
 
   function postHeight() {
-    const h = Math.ceil(document.querySelector('.bench').getBoundingClientRect().height);
+    const h = Math.ceil(document.querySelector('.fig').getBoundingClientRect().height);
     if (window.parent !== window && h > 100) window.parent.postMessage({ type: 'zero-height', height: h }, '*');
   }
   let rt;
-  window.addEventListener('resize', () => {
-    clearTimeout(rt); rt = setTimeout(() => { sizeSource(); postHeight(); }, 140);
-  });
-  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.querySelector('.bench'));
-  window.addEventListener('load', () => { sizeSource(); postHeight(); setTimeout(postHeight, 250); });
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { sizeSource(); postHeight(); }, 140); });
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.querySelector('.fig'));
+  // Re-post a few times after load. A ResizeObserver alone can miss the correction
+  // if the frame is first laid out at a collapsed width and the observer is
+  // throttled — these catch it, and cost nothing once the height has settled.
+  window.addEventListener('load', () => { sizeSource(); postHeight(); });
+  [120, 400, 1000, 2200].forEach((t) => setTimeout(() => { sizeSource(); postHeight(); }, t));
 
   sizeSource(); render(); postHeight();
 })();
