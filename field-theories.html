@@ -507,16 +507,30 @@
       background: var(--bg);
     }
     iframe.zero { height: 620px; }
+    .zero-inline {
+      width: min(100%, 38rem);
+      margin: clamp(1.5rem, 4vh, 2.2rem) auto 0;
+    }
+    .zero-inline + p {
+      margin-top: clamp(1.5rem, 4vh, 2.2rem);
+    }
     @media (max-width: 820px) {
       iframe.bench { height: 1160px; }
       iframe.concept-widget { height: 600px; }
       iframe.zero { height: 560px; }
     }
 
-    .testbed { margin-top: clamp(3rem, 9vh, 5rem); }
-    iframe.supermin { height: 560px; }
+    .testbed {
+      width: 94%;
+      margin: clamp(3rem, 9vh, 5rem) auto 0;
+    }
+    iframe.supermin {
+      height: 600px;
+      overflow: hidden;
+      border-radius: 1rem;
+    }
     @media (max-width: 900px) {
-      iframe.supermin { height: 620px; }
+      iframe.supermin { height: 660px; }
     }
 
     .foot-nav {
@@ -928,6 +942,15 @@
           reaching exactly zero.
         </p>
 
+        <div class="lab zero-inline">
+          <iframe
+            class="bench zero"
+            src="field-theories/zero-field-widget.html"
+            title="A grid where every intersection shows the field value. All read zero until an object is built and placed, at which point the values change."
+            loading="lazy"
+          ></iframe>
+        </div>
+
         <p>
           If we scattered many objects into the field, the values at the grid's
           intersections would naturally be affected by more than one mass.
@@ -1020,27 +1043,6 @@
         <div class="mathblock">
           $$\rho(\mathbf{r}) = \frac{dm}{dV}$$
         </div>
-      </section>
-
-      <section class="lab">
-        <div class="lab-cap">
-          <span>Figure 1 &mdash; every point reads 0</span>
-          <span>build an object, then place it</span>
-        </div>
-        <iframe
-          class="bench zero"
-          src="field-theories/zero-field-widget.html"
-          title="A grid where every intersection shows the field value. All read zero until an object is built and placed, at which point the values change."
-          loading="lazy"
-        ></iframe>
-      </section>
-
-      <section class="col">
-        <p>
-          <strong class="pot">Potential</strong> &middot;
-          <strong class="str">Field strength</strong> &middot;
-          <strong class="dens">Source density</strong>
-        </p>
       </section>
 
       <section class="testbed">

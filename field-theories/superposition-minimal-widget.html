@@ -17,66 +17,139 @@
   }
   html, body { background: var(--bg); }
   body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: var(--txt); -webkit-font-smoothing: antialiased; }
-  .bench { background: var(--bg); border: 1px solid var(--line); }
+  .bench {
+    display: grid;
+    gap: 0.75rem;
+    background: transparent;
+  }
 
-  canvas { display: block; width: 100%; height: 420px; cursor: crosshair; touch-action: none; }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 420px;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    cursor: crosshair;
+    touch-action: none;
+  }
 
-  /* the one thing worth reading: how this point's value is made */
+  .readout-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 0.7fr);
+    align-items: start;
+    gap: 1.5rem;
+    padding: 22px 26px 20px;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    background: var(--bg);
+  }
+  .sum-line {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .phi-symbol {
+    flex: 0 0 auto;
+    color: var(--pot);
+    font-family: Georgia, serif;
+    font-size: clamp(1.58rem, 3vw, 1.9rem);
+    line-height: 1;
+  }
+
+  /* how this point's value is made */
   .sum {
-    padding: 18px 20px 6px;
     font-family: "IBM Plex Mono", monospace;
-    font-size: clamp(0.95rem, 2.1vw, 1.22rem);
+    font-size: clamp(1.18rem, 2.6vw, 1.52rem);
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.01em;
     color: var(--txt-2);
     display: flex; align-items: baseline; gap: 0.4em; flex-wrap: wrap;
   }
-  .sum .eq { color: var(--txt-3); }
+  .sum .eq { color: #fff; }
   .sum .net { color: var(--pot); font-weight: 600; font-size: 1.18em; }
   .sub {
-    padding: 0 20px 16px;
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.66rem; letter-spacing: 0.12em; color: var(--txt-3);
+    margin-top: 0.65rem;
+    font-size: clamp(1.28rem, 2.9vw, 1.65rem);
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: 0.035em;
+    color: var(--obj);
+    text-align: left;
   }
 
-  .bar {
-    border-top: 1px solid var(--line);
-    padding: 12px 16px 13px;
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  .modes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+    width: min(100%, 31rem);
+    margin-top: 0.65rem;
   }
   button {
-    font-family: "IBM Plex Sans", sans-serif; font-size: 0.74rem; font-weight: 500;
+    font-family: "IBM Plex Sans", sans-serif; font-size: 0.82rem; font-weight: 500;
     color: var(--txt-2); background: transparent;
-    border: 1px solid var(--line); padding: 7px 12px; cursor: pointer;
+    min-height: 2.7rem;
+    border: 1px solid var(--line); padding: 8px 12px; cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
   button:hover { color: var(--txt); border-color: rgba(150,180,255,0.42); }
   button:focus-visible { outline: 2px solid var(--obj); outline-offset: 2px; }
   button[aria-pressed="true"] { background: var(--pot); border-color: var(--pot); color: #100a1c; font-weight: 600; }
-  .spacer { margin-left: auto; }
-  #release { border-color: var(--obj); color: var(--obj); }
-  #release:hover { background: var(--obj); color: #071410; }
 
-  @media (max-width: 640px) {
+  .widget-instructions {
+    align-self: center;
+    color: rgba(243, 246, 255, 0.93);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: clamp(1.02rem, 1.6vw, 1.14rem);
+    font-weight: 400;
+    line-height: 1.45;
+  }
+  .widget-instructions div {
+    display: grid;
+    grid-template-columns: 7.2rem minmax(0, 1fr);
+    gap: 0.85rem;
+    align-items: baseline;
+  }
+  .widget-instructions div + div { margin-top: 0.55rem; }
+  .widget-instructions dt {
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .widget-instructions dd { color: rgba(243, 246, 255, 0.78); }
+
+  @media (max-width: 760px) {
     canvas { height: 320px; }
-    .spacer { margin-left: 0; }
+    .readout-row { grid-template-columns: 1fr; }
+    .modes { width: 100%; }
   }
 </style>
 </head>
 <body>
 <div class="bench">
-  <canvas id="map" aria-label="A contour map of the field made by several sources. Click a point to see how its value is built from each source."></canvas>
-
-  <div class="sum" id="sum"></div>
-  <div class="sub" id="sub"></div>
-
-  <div class="bar">
-    <button type="button" data-p="two"    aria-pressed="true">Two equal</button>
-    <button type="button" data-p="uneven" aria-pressed="false">One dominant</button>
-    <button type="button" data-p="many"   aria-pressed="false">Scattered</button>
-    <span class="spacer"></span>
-    <button type="button" id="release">Release an object</button>
+  <div class="readout-row">
+    <div class="readout-left">
+      <div class="sum-line">
+        <span class="phi-symbol">Φ</span>
+        <div class="sum" id="sum"></div>
+      </div>
+      <div class="sub" id="sub"></div>
+      <div class="modes">
+        <button type="button" data-p="two"    aria-pressed="true">Two equal</button>
+        <button type="button" data-p="uneven" aria-pressed="false">One dominant</button>
+        <button type="button" data-p="many"   aria-pressed="false">Scattered</button>
+      </div>
+    </div>
+    <div class="widget-instructions">
+      <dl>
+        <div><dt>Click once</dt><dd>View field values</dd></div>
+        <div><dt>Double-click</dt><dd>Release an object</dd></div>
+        <div><dt>Click + drag</dt><dd>Move an existing object</dd></div>
+      </dl>
+    </div>
   </div>
+
+  <canvas id="map" aria-label="A contour map of the field made by several sources. Click a point to see how its value is built from each source."></canvas>
 </div>
 
 <script>
@@ -215,14 +288,10 @@
       ctx.fillText(String(s.M), x, y);
     }
 
-    // the inspected point, with its value read out in place
+    // the selected point where an object can be released
     const sx = xAt(sel.x), sy = yAt(sel.y);
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.4;
-    ctx.beginPath(); ctx.arc(sx, sy, 5, 0, 6.2832); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sx, sy - 11); ctx.lineTo(sx, sy - 7); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sx, sy + 7); ctx.lineTo(sx, sy + 11); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sx - 11, sy); ctx.lineTo(sx - 7, sy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sx + 7, sy); ctx.lineTo(sx + 11, sy); ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(sx, sy, 5, 0, 6.2832); ctx.fill();
   }
 
   function readout() {
@@ -238,12 +307,8 @@
     $('sum').innerHTML = html;
 
     $('sub').textContent = path
-      ? (path.ended === 'stayed put'
-          ? 'released where the slope is zero — it has nowhere to go'
-          : path.pts.length + ' local steps, then it ' + path.ended)
-      : (g.mag < 0.02 && srcs.length > 1
-          ? 'slope 0 — the pulls cancel exactly'
-          : 'slope ' + g.mag.toFixed(2) + ' · click anywhere · drag a source');
+      ? (path.ended === 'stayed put' ? '0 local steps' : path.pts.length + ' local steps')
+      : 'slope ' + (g.mag < 0.02 ? '0.00' : g.mag.toFixed(2));
   }
 
   const render = () => { draw(); readout(); };
@@ -287,6 +352,14 @@
     done = setTimeout(() => { cancelAnimationFrame(raf); path.reveal = 1; render(); }, DUR + 150);
   }
 
+  cvs.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    const { u, v } = pt(e);
+    sel = { x: u, y: v };
+    path = tracePath(u, v);
+    reveal();
+  });
+
   document.querySelectorAll('button[data-p]').forEach((b) => {
     b.addEventListener('click', () => {
       load(b.dataset.p);
@@ -294,8 +367,6 @@
       path = null; sel = { x: 2, y: -2 }; render();
     });
   });
-  $('release').addEventListener('click', () => { path = tracePath(sel.x, sel.y); reveal(); });
-
   function postHeight() {
     const hh = Math.ceil(document.querySelector('.bench').getBoundingClientRect().height);
     if (window.parent !== window && hh > 100) window.parent.postMessage({ type: 'supermin-height', height: hh }, '*');
