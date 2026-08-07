@@ -3,306 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Neurophysiology | Sam Kirwan</title>
-  <meta name="description" content="Interactive explanations of how neurons work, from ion channels to circuits." />
+  <meta name="description" content="Interactive neurophysiology explanations by Sam Kirwan." />
+  <title>Neurophysiology</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --paper:   #f2efe6;
-      --paper-2: #eae6db;
-      --ink:     #23211c;
-      --ink-2:   rgba(35, 33, 28, 0.66);
-      --ink-3:   rgba(35, 33, 28, 0.36);
-      --rule:    rgba(35, 33, 28, 0.16);
-      --na:      #b8442a;
-      --k:       #2c6486;
-      --stim:    #9a7513;
+      --bg: #08090b;
+      --text: #f4f5f8;
     }
 
-    html { -webkit-text-size-adjust: 100%; }
+    html, body { min-height: 100%; }
 
     body {
-      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
       background:
-        linear-gradient(rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 100% 26px,
-        linear-gradient(90deg, rgba(35, 33, 28, 0.045) 1px, transparent 1px) 0 0 / 26px 100%,
-        var(--paper);
-      color: var(--ink);
-      font-family: "IBM Plex Sans", system-ui, sans-serif;
+        radial-gradient(circle at 15% 38%, rgba(184, 68, 42, 0.055), transparent 25rem),
+        radial-gradient(circle at 24% 70%, rgba(44, 100, 134, 0.065), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
-      display: flex;
-      flex-direction: column;
     }
 
-    .sheet {
-      width: min(880px, 100% - 2.5rem);
-      margin: 0 auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--rule);
-      border-right: 1px solid var(--rule);
-      background: rgba(242, 239, 230, 0.72);
-      padding: 0 clamp(1.2rem, 4vw, 3.2rem);
+    main {
+      width: min(46rem, calc(100% - 2rem));
+      margin-left: clamp(2rem, 11vw, 10rem);
+      padding: clamp(3rem, 9vh, 5.5rem) 0;
+      text-align: left;
     }
-
-    /* ---------- masthead ---------- */
-
-    header { padding: clamp(2rem, 6vh, 3.6rem) 0 0; }
-
-    .crumb {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      text-decoration: none;
-      display: inline-block;
-      margin-bottom: clamp(1.6rem, 5vh, 2.6rem);
-      border-bottom: 1px solid transparent;
-      transition: color 0.2s ease, border-color 0.2s ease;
-    }
-    .crumb:hover { color: var(--ink); border-bottom-color: var(--ink); }
-    .crumb::before { content: "← "; }
 
     h1 {
-      font-family: "Spectral", Georgia, serif;
-      font-weight: 400;
-      font-size: clamp(1.9rem, 8vw, 4.4rem);
-      line-height: 0.98;
-      letter-spacing: -0.018em;
-      overflow-wrap: break-word;
-      hyphens: auto;
+      font-size: clamp(3rem, 7vw, 5.4rem);
+      font-weight: 300;
+      line-height: 0.96;
+      letter-spacing: -0.045em;
     }
 
-    .standfirst {
-      font-family: "Spectral", Georgia, serif;
-      font-size: clamp(1rem, 2.1vw, 1.16rem);
-      line-height: 1.62;
-      color: var(--ink-2);
-      max-width: 46ch;
-      margin-top: 1.1rem;
-    }
+    nav { margin-top: clamp(2.4rem, 6vh, 4rem); }
 
-    /* ---------- rule above the contents ---------- */
+    ul { list-style: none; }
 
-    .divider {
-      margin: clamp(1.8rem, 5vh, 2.8rem) 0 clamp(1.4rem, 4vh, 2.2rem);
-      border-top: 1px solid var(--rule);
-    }
+    li + li { margin-top: 0.7rem; }
 
-    /* ---------- index of pages ---------- */
-
-    .index-label {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      margin-bottom: 0.4rem;
-    }
-
-    nav.contents { display: flex; flex-direction: column; }
-
-    .entry {
-      display: grid;
-      grid-template-columns: 3.1rem minmax(0, 1fr) auto;
-      align-items: baseline;
-      gap: 0 1rem;
-      padding: 1.35rem 0.6rem 1.35rem 0.2rem;
-      border-top: 1px solid var(--rule);
-      text-decoration: none;
-      color: inherit;
-      position: relative;
-      transition: background 0.22s ease, padding-left 0.22s ease;
-    }
-    .entry:last-of-type { border-bottom: 1px solid var(--rule); }
-
-    /* the accent bar that slides out on hover */
-    .entry::before {
-      content: "";
-      position: absolute;
-      left: 0; top: -1px; bottom: -1px;
-      width: 2px;
-      background: var(--na);
-      transform: scaleY(0);
-      transform-origin: 50% 0;
-      transition: transform 0.26s cubic-bezier(0.22, 0.7, 0.2, 1);
-    }
-    .entry:hover, .entry:focus-visible {
-      background: rgba(35, 33, 28, 0.035);
-      padding-left: 0.85rem;
-      outline: none;
-    }
-    .entry:hover::before, .entry:focus-visible::before { transform: scaleY(1); }
-
-    .entry-num {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 0.72rem;
-      font-weight: 500;
-      color: var(--ink-3);
-      letter-spacing: 0.06em;
-    }
-    .entry-body { min-width: 0; }
-    .entry-title {
-      display: block;
-      font-family: "Spectral", Georgia, serif;
-      font-size: clamp(1.24rem, 3vw, 1.62rem);
-      font-weight: 500;
-      line-height: 1.16;
-      letter-spacing: -0.008em;
-    }
-    .entry-sub {
-      display: block;
-      font-size: 0.86rem;
-      line-height: 1.5;
-      color: var(--ink-2);
-      margin-top: 0.4rem;
-      max-width: 52ch;
-    }
-    .entry-meta {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      white-space: nowrap;
-      align-self: center;
-    }
-    .entry-meta .arrow {
+    a {
       display: inline-block;
-      transition: transform 0.26s cubic-bezier(0.22, 0.7, 0.2, 1);
+      color: var(--text);
+      font-size: clamp(1rem, 1.65vw, 1.25rem);
+      font-weight: 300;
+      line-height: 1.35;
+      text-decoration: none;
+      transition: color 180ms ease, transform 180ms ease;
     }
-    .entry:hover .arrow, .entry:focus-visible .arrow { transform: translateX(5px); }
+
+    a:hover,
+    a:focus-visible {
+      color: #dbff4a;
+      outline: none;
+      transform: translateX(3px);
+    }
+
+    @media (max-height: 720px) and (min-width: 600px) {
+      main { padding-block: 2rem; }
+      nav { margin-top: 2rem; }
+      li + li { margin-top: 0.45rem; }
+    }
 
     @media (max-width: 560px) {
-      .entry { grid-template-columns: 2.4rem minmax(0, 1fr); }
-      .entry-meta { grid-column: 2; margin-top: 0.6rem; align-self: start; }
-    }
+      main {
+        width: min(27rem, calc(100% - 4rem));
+        margin-left: 2rem;
+      }
 
-    /* ---------- footer ---------- */
-
-    footer {
-      margin-top: auto;
-      padding: clamp(2.4rem, 7vh, 4rem) 0 2.4rem;
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 0.66rem;
-      line-height: 1.7;
-      letter-spacing: 0.04em;
-      color: var(--ink-3);
+      h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
+      nav { margin-top: 2.6rem; }
+      li + li { margin-top: 0.8rem; }
     }
-    footer .na { color: var(--na); }
-    footer .k  { color: var(--k); }
 
     @media (prefers-reduced-motion: reduce) {
-      .entry, .entry::before, .entry-meta .arrow { transition: none; }
+      a { transition: none; }
     }
   </style>
 </head>
 <body>
-  <div class="sheet">
-    <header>
-      <a class="crumb" href="index.html">Interactive Explanations</a>
-      <h1>Neurophysiology</h1>
-      <p class="standfirst">
-        How nervous systems actually work, from the charge across a single patch of
-        membrane up to the circuits it wires together. Built to be played with rather
-        than read.
-      </p>
-    </header>
-
-    <div class="divider"></div>
-
-    <p class="index-label">Contents</p>
-    <nav class="contents" aria-label="Neurophysiology pages">
-      <a class="entry" href="neurophysiology-hodgkin-huxley.html">
-        <span class="entry-num">01</span>
-        <span class="entry-body">
-          <span class="entry-title">Hodgkin&#8211;Huxley Model</span>
-          <span class="entry-sub">
-            Four coupled differential equations, fitted to a squid axon in 1952, that
-            still explain every action potential you have ever had. Take the controls
-            of a current clamp and find the threshold yourself.
-          </span>
-        </span>
-        <span class="entry-meta">Interactive <span class="arrow">&#8594;</span></span>
-      </a>
-
-      <a class="entry" href="neurophysiology-synaptic-transmission.html">
-        <span class="entry-num">02</span>
-        <span class="entry-body">
-          <span class="entry-title">Synaptic Transmission</span>
-          <span class="entry-sub">
-            Where the wire runs out. A synapse in three dimensions &mdash; fire an action
-            potential and watch calcium trigger vesicle fusion, transmitter cross the
-            cleft, and the next neuron decide whether to answer.
-          </span>
-        </span>
-        <span class="entry-meta">Interactive 3D <span class="arrow">&#8594;</span></span>
-      </a>
-
-      <a class="entry" href="neurophysiology-action-potentials.html">
-        <span class="entry-num">03</span>
-        <span class="entry-body">
-          <span class="entry-title">Action Potentials</span>
-          <span class="entry-sub">
-            One spike, taken apart. Scrub through a single action potential and watch the
-            channels move &mdash; every gate positioned by reading the model's own
-            solution, not drawn from memory.
-          </span>
-        </span>
-        <span class="entry-meta">Interactive <span class="arrow">&#8594;</span></span>
-      </a>
-
-      <a class="entry" href="neurophysiology-ionic-movements.html">
-        <span class="entry-num">04</span>
-        <span class="entry-body">
-          <span class="entry-title">How Ionic Movements Produce Electrical Signals</span>
-          <span class="entry-sub">
-            Underneath everything else. Where the voltage across a membrane actually comes
-            from &mdash; concentration gradients, selective permeability, and why moving
-            almost no ions at all is enough to move it.
-          </span>
-        </span>
-        <span class="entry-meta">Interactive <span class="arrow">&#8594;</span></span>
-      </a>
-
-      <a class="entry" href="neurophysiology-electrochemical-equilibrium.html">
-        <span class="entry-num">05</span>
-        <span class="entry-body">
-          <span class="entry-title">Electrochemical Equilibrium</span>
-          <span class="entry-sub">
-            Two compartments, a wall that lets one ion through, and two forces pulling
-            opposite ways. Worked through to the Nernst equation, with a box you can set
-            the numbers on yourself.
-          </span>
-        </span>
-        <span class="entry-meta">Interactive <span class="arrow">&#8594;</span></span>
-      </a>
-
-      <a class="entry" href="neurophysiology-basics-of-electricity.html">
-        <span class="entry-num">06</span>
-        <span class="entry-body">
-          <span class="entry-title">Basics of Electricity</span>
-          <span class="entry-sub">
-            The groundwork underneath all of it: charge, ions, and the electric potential
-            energy a set of charges holds &mdash; build an ion, and see why the watery
-            medium of a cell changes everything.
-          </span>
-        </span>
-        <span class="entry-meta">Interactive <span class="arrow">&#8594;</span></span>
-      </a>
+  <main>
+    <h1>Neurophysiology</h1>
+    <nav aria-label="Neurophysiology pages">
+      <ul>
+        <li><a href="neurophysiology-hodgkin-huxley.html">Hodgkin–Huxley Model</a></li>
+        <li><a href="neurophysiology-synaptic-transmission.html">Synaptic Transmission</a></li>
+        <li><a href="neurophysiology-action-potentials.html">Action Potentials</a></li>
+        <li><a href="neurophysiology-ionic-movements.html">How Ionic Movements Produce Electrical Signals</a></li>
+        <li><a href="neurophysiology-electrochemical-equilibrium.html">Electrochemical Equilibrium</a></li>
+        <li><a href="neurophysiology-basics-of-electricity.html">Basics of Electricity</a></li>
+      </ul>
     </nav>
-
-    <footer>
-      the membrane is a capacitor in parallel with three conductances &mdash;
-      <span class="na">sodium in</span>, <span class="k">potassium out</span>, leak always leaking
-    </footer>
-  </div>
-
+  </main>
 </body>
 </html>
