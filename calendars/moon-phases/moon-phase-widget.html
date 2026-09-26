@@ -552,18 +552,22 @@
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(mx, my); ctx.stroke();
     ctx.setLineDash([]);
 
-    // the elongation angle, opened at the Earth
+    // The elongation angle, opened at the Earth. It runs from the Moon's
+    // direction round to the Sun's, and in canvas angles — which grow
+    // clockwise — that sweep is always the anticlockwise one.
     const arcR = orbit * 0.34;
-    ctx.strokeStyle = C.accent; ctx.lineWidth = 1.4;
-    ctx.beginPath(); ctx.arc(cx, cy, arcR, -ang * RAD, Math.PI, st.elong > 180); ctx.stroke();
-    const midAng = 180 - st.elong / 2;
-    ctx.fillStyle = C.accent;
-    mono(ctx, 10, 600);
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(st.elong.toFixed(0) + "°", cx + arcR * 1.34 * cos(midAng), cy - arcR * 1.34 * sin(midAng));
+    if (st.elong > 1) {
+      ctx.strokeStyle = C.accent; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.arc(cx, cy, arcR, -ang * RAD, Math.PI, true); ctx.stroke();
+      const midAng = 180 - st.elong / 2;
+      ctx.fillStyle = C.accent;
+      mono(ctx, 10, 600);
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(st.elong.toFixed(0) + "°", cx + arcR * 1.34 * cos(midAng), cy - arcR * 1.34 * sin(midAng));
+    }
 
     // In this top-down view the lit half always faces the Sun, i.e. left:
-    // that is a bright limb pointing 270° anticlockwise from "up".
+    // that is a bright limb 90° anticlockwise from "up".
     const mR = Math.max(11, orbit * 0.15);
     drawMoonDisc(ctx, mx, my, mR, 90, 90, { glow: false });
     ctx.fillStyle = C.txt;
@@ -665,12 +669,17 @@
       ctx.fillText(hr === 24 ? "24" : pad(hr), xx, y1 + 5);
     }
 
-    // the altitude curve, brightness tracking the lit fraction
+    // the altitude curve, brightness tracking the lit fraction. It is clipped
+    // to the plot box: the Moon can be 40 degrees under the horizon, and the
+    // tail of that would otherwise run over the hour labels.
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.clip();
     ctx.lineWidth = 2;
     ctx.strokeStyle = "rgba(232,236,255," + (0.28 + 0.62 * st.lit).toFixed(2) + ")";
     ctx.beginPath();
     samples.forEach((p, j) => { const xx = X(p.frac), yy = Y(p.s.alt); j ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); });
     ctx.stroke();
+    ctx.restore();
 
     // where the chosen moment sits on it
     const frac = Math.max(0, Math.min(1, (st.ms - dayStartMs) / 864e5));
