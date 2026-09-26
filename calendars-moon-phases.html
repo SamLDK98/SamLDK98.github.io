@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moon Phases | Calendars | Sam Kirwan</title>
+  <meta name="description" content="Half the Moon is always lit. The phases are what that lit half looks like from a moving vantage point — worked through for Exeter, UK." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot, not blue-black */
+      --bg-2:    #141419;
+      --measure: 68ch;         /* the reading column */
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);   /* running prose */
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --na:      #ffc247;   /* sunlight */
+      --k:       #cfd8ff;   /* moonlight */
+      --cl:      #54d6a0;
+      --stim:    #ffc247;
+      --ahp:     #9d7bff;   /* the observer */
+      --leak:    #8fa0c4;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    /* Fine grain. A flat dark colour on its own reads as a glossy void; the
+       noise is what makes it feel like a matte surface. */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .sheet { position: relative; z-index: 1; }
+
+    /* ---------- masthead ---------- */
+    header {
+      padding: clamp(1.6rem, 5vh, 2.8rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--na); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--na); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 5.4vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #ffc247 4%, #9d7bff 52%, #cfd8ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--body);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ---------- prose ---------- */
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.95rem; color: var(--txt);
+      margin: 1.8rem 0 0.5rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .cl { color: var(--cl); }
+    .stim { color: var(--stim); }
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+
+    /* ---------- equations ---------- */
+    .eq {
+      margin: 1.5rem 0;
+      padding: 1.15rem 1.3rem;
+      border-left: 2px solid var(--line);
+      background: linear-gradient(90deg, rgba(140,165,225,0.06), transparent 70%);
+      overflow-x: auto;
+    }
+    .eq-line {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.2vw, 1.2rem);
+      line-height: 2; white-space: nowrap; color: var(--txt);
+    }
+    .eq-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.65rem; line-height: 1.6; color: var(--txt-3);
+      margin-top: 0.7rem; white-space: normal;
+    }
+    .frac {
+      display: inline-flex; flex-direction: column;
+      vertical-align: middle; text-align: center;
+      margin: 0 0.18em; line-height: 1.15; font-size: 0.86em;
+    }
+    .frac .num { border-bottom: 1px solid var(--txt-2); padding: 0 0.25em 0.08em; }
+    .frac .den { padding: 0.08em 0.25em 0; }
+
+    /* ---------- callout ---------- */
+    .callout {
+      border-left: 2px solid var(--na);
+      background: linear-gradient(90deg, rgba(255,194,71,0.07), transparent 70%);
+      padding: 1.1rem 1.3rem; margin: 1.6rem 0;
+    }
+    .callout p { color: var(--txt); }
+    .callout .tag {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--na); margin-bottom: 0.5rem;
+    }
+
+    /* ---------- widget slot ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 1080px;            /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1560px; } }
+
+    /* placeholder shown until the figure is built */
+    .lab-empty {
+      border: 1px dashed var(--line);
+      background: linear-gradient(180deg, rgba(140,165,225,0.04), transparent);
+      padding: clamp(2.4rem, 8vh, 4.5rem) 1.5rem;
+      text-align: center;
+    }
+    .lab-empty p {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3);
+    }
+
+    /* ---------- data table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .data {
+      width: 100%; border-collapse: collapse; margin-top: 1.3rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.73rem;
+    }
+    .data th, .data td {
+      text-align: left; padding: 0.6rem 0.9rem 0.6rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+    }
+    .data thead th {
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .data td:first-child { white-space: nowrap; color: var(--txt); }
+    .data td { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--txt-2); }
+    .data td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; white-space: normal; width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+
+    .fig-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; line-height: 1.7; color: var(--txt-3);
+      margin-top: 0.7rem; max-width: 74ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="calendars.html">Calendars</a>
+      <p class="kicker">01 &nbsp;·&nbsp; Lunar</p>
+      <h1>The Phases of the <em>Moon</em></h1>
+      <p class="standfirst">
+        Half the Moon is lit at every moment of every night. The phases are not
+        something happening to the Moon &mdash; they are what that lit half looks
+        like from a vantage point that keeps moving. Here is the geometry, and
+        what it puts in the sky over Exeter.
+      </p>
+    </header>
+
+    <main>
+      <section class="col">
+        <h2><span class="n">The setup</span>Nothing is casting a shadow</h2>
+
+        <p>
+          The most common explanation of the phases &mdash; that the Earth's shadow
+          falls across the Moon &mdash; describes something real, but rare. That is a
+          <strong>lunar eclipse</strong>, and it happens two or three times a year at
+          most. The phases happen every month, in daylight as well as at night, and
+          they have nothing to do with shadows at all.
+        </p>
+
+        <p>
+          The Sun lights one hemisphere of the Moon, always, the same way it lights
+          one hemisphere of the Earth. What changes over a month is not the lighting
+          but <em class="v">our angle onto it</em>. The Moon takes about 29.5 days to
+          go once around the Earth relative to the Sun, and as it goes we see the lit
+          hemisphere from the side, then from behind, then from the side again.
+        </p>
+
+        <div class="callout">
+          <span class="tag">The single number that decides everything</span>
+          <p>
+            <strong>Elongation</strong> is the angle Sun&ndash;Earth&ndash;Moon: how
+            far around the sky the Moon has drifted from the Sun. At
+            <strong>0&deg;</strong> the Moon is between us and the Sun and we are
+            looking at its unlit side &mdash; a new moon. At <strong>180&deg;</strong>
+            the Moon is opposite the Sun and the lit hemisphere faces us squarely
+            &mdash; a full moon. Every phase in between is just an intermediate angle.
+          </p>
+        </div>
+      </section>
+
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 1 &nbsp;·&nbsp; the same instant, twice</span>
+          <span>drag the time, or jump to a quarter</span>
+        </div>
+        <iframe class="bench" id="moon-frame" title="Interactive: the Moon's phase geometry and how it appears from Exeter"
+                src="calendars/moon-phases/moon-phase-widget.html" loading="lazy"></iframe>
+        <p class="fig-note">
+          Left: looking down on the orbit, where the lit half always faces the Sun.
+          Right: the same Moon from the ground in Exeter. Both panels are drawn from
+          one calculation, so they can never disagree &mdash; move the time and watch
+          which of them changes fast and which changes slowly.
+        </p>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">The eight names</span>What each angle looks like</h2>
+
+        <p>
+          The named phases are slices of a continuous sweep. Four of them &mdash; new,
+          first quarter, full, last quarter &mdash; are <em class="v">instants</em>,
+          the moments elongation passes 0&deg;, 90&deg;, 180&deg; and 270&deg;. The
+          other four are the stretches in between, which is why a crescent lasts days
+          and a "full moon" is technically a single second.
+        </p>
+
+        <div class="scroll-x">
+          <table class="data">
+            <thead>
+              <tr><th>Phase</th><th>Elongation</th><th>Disc lit</th><th>Rises</th><th>Where it is at sunset</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>New</td><td>0&deg;</td><td>0%</td><td>~06:00</td><td>Setting with the Sun &mdash; invisible</td></tr>
+              <tr><td class="k">Waxing crescent</td><td>45&deg;</td><td>15%</td><td>~09:00</td><td>Low in the west, horns tipped up</td></tr>
+              <tr><td class="k">First quarter</td><td>90&deg;</td><td>50%</td><td>~12:00</td><td>Due south, half lit on the right</td></tr>
+              <tr><td class="k">Waxing gibbous</td><td>135&deg;</td><td>85%</td><td>~15:00</td><td>High in the south-east</td></tr>
+              <tr><td class="k">Full</td><td>180&deg;</td><td>100%</td><td>~18:00</td><td>Rising in the east as the Sun sets</td></tr>
+              <tr><td>Waning gibbous</td><td>225&deg;</td><td>85%</td><td>~21:00</td><td>Still below the horizon</td></tr>
+              <tr><td>Last quarter</td><td>270&deg;</td><td>50%</td><td>~00:00</td><td>Below the horizon; rises at midnight</td></tr>
+              <tr><td>Waning crescent</td><td>315&deg;</td><td>15%</td><td>~03:00</td><td>Below the horizon; a dawn object</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          The rising times in that table are the part people find surprising. The Moon
+          is not a night-time object that happens to change shape; each phase comes
+          with its own timetable. A waxing crescent is an evening object you will never
+          see at 3&nbsp;a.m. A waning crescent is a dawn object you will never see in
+          the evening. Half of all moonlight falls in daylight hours, which is why the
+          Moon is so often visible in a blue sky.
+        </p>
+
+        <h3>Waxing or waning, in one glance</h3>
+        <p>
+          From Britain the rule is a bookkeeping trick: if the lit edge is on the
+          <strong>right</strong>, the Moon is waxing and is an evening object; if it is
+          on the <strong>left</strong>, it is waning and belongs to the morning. The lit
+          edge always points at the Sun, so it is really a question of which side of the
+          Sun the Moon has got to. South of the equator the rule flips, because the
+          observer is upside down relative to us.
+        </p>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">The local part</span>Why Exeter changes the picture</h2>
+
+        <p>
+          The fraction of the disc that is lit is the same from everywhere on Earth.
+          Someone in Sydney sees the identical 37% that someone in Exeter sees, to
+          within a rounding error. What is <em class="v">not</em> the same is the
+          <strong>tilt</strong>.
+        </p>
+
+        <p>
+          The bright limb points at the Sun. To say where that is in a real sky you
+          have to know where the Sun is <em class="v">relative to your own vertical</em>
+          &mdash; which depends on your latitude, on the time of year, and on the time
+          of night. Exeter sits at <span class="k">50.72&deg;N, 3.53&deg;W</span>. From
+          there the crescent that hangs over the Exe after a February sunset is tipped
+          quite differently from the same crescent seen from the tropics, where it lies
+          on its back like a bowl.
+        </p>
+
+        <p>
+          The tilt also rotates over the course of a single night. Follow one moon from
+          rise to set in Figure&nbsp;1 and the horns swing steadily round, because your
+          own "up" is turning with the Earth while the Sun stays put. Nothing about the
+          Moon changed; the observer did.
+        </p>
+
+        <div class="callout">
+          <span class="tag">A detail worth the arithmetic</span>
+          <p>
+            The Moon is close enough that <strong>where you stand matters to its
+            position</strong>. Parallax between the centre of the Earth and the surface
+            shifts it by up to a degree &mdash; about two Moon-widths, and the
+            difference between "just risen" and "not yet". Figure&nbsp;1 works in
+            Exeter-topocentric coordinates rather than geocentric ones for that reason.
+          </p>
+        </div>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">The calendar problem</span>29.5 days that fit nothing</h2>
+
+        <p>
+          The Moon completes an orbit in <strong>27.32 days</strong>, measured against
+          the stars. But the Earth has moved a twelfth of the way around the Sun in
+          that time, so the Moon has to travel about two days further to get back to
+          the same angle with the Sun. That longer figure &mdash;
+          <strong>29.53 days</strong>, the synodic month &mdash; is the one the phases
+          keep, and the one every lunar calendar is built on.
+        </p>
+
+        <div class="eq">
+          <div class="eq-line">
+            <span class="frac"><span class="num">1</span><span class="den">29.53</span></span>
+            =
+            <span class="frac"><span class="num">1</span><span class="den">27.32</span></span>
+            &minus;
+            <span class="frac"><span class="num">1</span><span class="den">365.26</span></span>
+          </div>
+          <div class="eq-note">
+            The phases run at the beat frequency between the Moon's orbit and the
+            Earth's. Sidereal month, synodic month, year &mdash; only two of the three
+            are independent.
+          </div>
+        </div>
+
+        <p>
+          Twelve of those months come to 354.4 days, eleven short of a solar year. That
+          single mismatch is why calendars are hard, and why the answers diverge: the
+          Islamic calendar lets its months drift backwards through the seasons, the
+          Hebrew and Chinese calendars insert a thirteenth month every few years to drag
+          them back, and the Gregorian calendar gives up on the Moon entirely and keeps
+          months only as a name for a length of time. Easter, awkwardly, still needs
+          both.
+        </p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="calendars.html">← All calendar pages</a>
+        <a href="index.html">Home →</a>
+      </nav>
+    </main>
+  </div>
+
+  <script>
+    // The widget measures its own content box and posts the height; the fallback
+    // in the stylesheet only has to be close.
+    (function () {
+      const frame = document.getElementById('moon-frame');
+      window.addEventListener('message', (e) => {
+        const d = e.data;
+        if (!d || d.type !== 'moon-height') return;
+        if (e.source !== frame.contentWindow) return;
+        const h = Number(d.height);
+        if (Number.isFinite(h) && h > 300 && h < 4000) frame.style.height = h + 'px';
+      });
+    })();
+  </script>
+</body>
+</html>
