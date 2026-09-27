@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From notches to numerals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0e11; --panel: #121216; --panel-2: #17171d;
+    --line: rgba(140,165,225,0.16); --line-2: rgba(140,165,225,0.07);
+    --txt: #f4f6ff; --txt-2: rgba(238,242,252,0.74); --txt-3: rgba(238,242,252,0.44);
+    --p1: #e8a33d;   /* tallies cut into bone */
+    --p2: #64c8a0;   /* clay tokens */
+    --p3: #7aa7ff;   /* written numerals */
+    --bone: #e4dcc8;
+    --clay: #c98b5e;
+  }
+  html, body { background: var(--bg); }
+  body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: var(--txt); -webkit-font-smoothing: antialiased; }
+  .bench { background: var(--bg); border: 1px solid var(--line); }
+
+  .head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    padding: 11px 16px 10px; border-bottom: 1px solid var(--line);
+  }
+  .head-title { font-family: "IBM Plex Mono", monospace; font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--txt-2); }
+  .verdict { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: var(--p1); }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+  .cell { min-width: 0; padding: 12px 14px 14px; }
+  .cell + .cell { border-left: 1px solid var(--line); }
+  .cell.wide { grid-column: 1 / -1; border-left: 0; }
+  .cell.wide + .cell { border-top: 1px solid var(--line); }
+  .cell.wide ~ .cell { border-top: 1px solid var(--line); }
+  .cap {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 0.8rem; flex-wrap: wrap;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.58rem; letter-spacing: 0.17em;
+    text-transform: uppercase; color: var(--txt-3); margin-bottom: 7px;
+  }
+  .cap .hint { letter-spacing: 0.08em; text-transform: none; }
+
+  canvas { display: block; width: 100%; }
+  #timeline { height: 232px; cursor: pointer; }
+  #artifact { height: 300px; }
+
+  /* the detail column */
+  .entry-date {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 600; margin-bottom: 4px;
+  }
+  .entry-title { font-size: 1.12rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+  .entry-place {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; color: var(--txt-3);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-top: 5px;
+  }
+  .entry-body { margin-top: 12px; }
+  .entry-body h4 {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.57rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--txt-3); font-weight: 500; margin-bottom: 4px;
+  }
+  .entry-body p { font-size: 0.87rem; line-height: 1.6; color: var(--txt-2); }
+  .entry-body p + h4 { margin-top: 11px; }
+  .entry-body p b { color: var(--txt); font-weight: 500; }
+
+  .bar { padding: 11px 16px 13px; border-top: 1px solid var(--line); display: flex; gap: 14px 18px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  button {
+    font-family: "IBM Plex Sans", sans-serif; font-size: 0.74rem; font-weight: 500; color: var(--txt);
+    background: var(--panel-2); border: 1px solid var(--line); padding: 6px 11px; cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  button:hover { background: #1c1c24; border-color: rgba(150,180,255,0.4); }
+  button:focus-visible { outline: 2px solid var(--txt-3); outline-offset: 2px; }
+  button[data-phase].on { color: var(--bg); }
+
+  .legend { display: flex; gap: 6px; flex-wrap: wrap; }
+  .legend button { display: flex; align-items: center; gap: 7px; }
+  .legend .swatch { width: 9px; height: 9px; flex: none; }
+
+  @media (max-width: 820px) {
+    .main { grid-template-columns: minmax(0,1fr); }
+    .cell + .cell { border-left: 0; border-top: 1px solid var(--line); }
+    #timeline { height: 268px; }
+    #artifact { height: 264px; }
+  }
+</style>
+</head>
+<body>
+<div class="bench">
+  <div class="head">
+    <span class="head-title">From notches to numerals &nbsp;·&nbsp; 60,000 &ndash; 1,200 BCE</span>
+    <span class="verdict" id="verdict">Les Pradelles hyena bone</span>
+  </div>
+
+  <div class="main">
+    <div class="cell wide">
+      <div class="cap">
+        <span>Ten finds, three phases</span>
+        <span class="hint">click a marker &mdash; the axis is logarithmic, so each step left is ten times further back</span>
+      </div>
+      <canvas id="timeline" aria-label="A logarithmic timeline from 60,000 BCE to 1,200 BCE carrying ten archaeological finds, grouped into tallying, token accounting and written numerals."></canvas>
+    </div>
+
+    <div class="cell">
+      <div class="cap"><span>What the find looks like</span><span class="hint" id="art-hint">schematic</span></div>
+      <canvas id="artifact" aria-label="A schematic drawing of the selected find."></canvas>
+    </div>
+
+    <div class="cell">
+      <div class="cap"><span>The record</span><span class="hint" id="phase-hint">Phase 1</span></div>
+      <div class="entry-date" id="e-date">—</div>
+      <div class="entry-title" id="e-title">—</div>
+      <div class="entry-place" id="e-place">—</div>
+      <div class="entry-body">
+        <h4>Evidence</h4>
+        <p id="e-evidence">—</p>
+        <h4 id="e-sig-h">Why it matters</h4>
+        <p id="e-significance">—</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <div class="btns">
+      <button type="button" id="b-prev">&larr; Earlier</button>
+      <button type="button" id="b-next">Later &rarr;</button>
+    </div>
+    <div class="legend">
+      <button type="button" data-phase="1"><span class="swatch"></span>Tallying</button>
+      <button type="button" data-phase="2"><span class="swatch"></span>Tokens</button>
+      <button type="button" data-phase="3"><span class="swatch"></span>Written numerals</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ================================================================
+     1. The record. Dates are BCE; a `to` field marks a find that is
+        placed across a span rather than at a point.
+     ================================================================ */
+
+  const PHASES = {
+    1: { name: "Prehistoric tallying", range: "60,000 – 20,000 BCE", colour: "--p1" },
+    2: { name: "Token accounting",     range: "8,000 – 3,500 BCE",   colour: "--p2" },
+    3: { name: "Written numerals",     range: "3,300 – 1,200 BCE",   colour: "--p3" }
+  };
+
+  const FINDS = [
+    {
+      id: "pradelles", phase: 1, bce: 60000, label: "Les Pradelles",
+      title: "Les Pradelles hyena bone", place: "Western Europe · France",
+      evidence: "A hyena leg bone carved by Neanderthals, bearing nine parallel and strikingly similar notches.",
+      significance: "Analysis suggests the notches were incised deliberately and over time, which makes this one of the earliest candidates for numerical tallying anywhere.",
+      draw: "bone", notches: [9], hint: "nine notches"
+    },
+    {
+      id: "lebombo", phase: 1, bce: 42000, label: "Lebombo bone",
+      title: "The Lebombo bone", place: "Southern Africa · Border Cave, Eswatini/South Africa",
+      evidence: "A baboon fibula bearing 29 distinct, purposefully carved notches.",
+      significance: "Widely read as a tally stick, and possibly a primitive calendar: 29 marks is close enough to a lunar month to invite the comparison.",
+      draw: "bone", notches: [29], hint: "29 notches"
+    },
+    {
+      id: "vestonice", phase: 1, bce: 30000, label: "Vestonice wolf bone",
+      title: "The Vestonice wolf bone", place: "Central Europe · Czech Republic",
+      evidence: "A young wolf's radius notched with 55 marks, organised into distinct groups of five.",
+      significance: "The grouping is the step that matters. Counting in fives is a structure imposed on the marks — an early way of organising a count rather than merely accumulating it.",
+      draw: "bone", notches: [5,5,5,5,5,5,5,5,5,5,5], hint: "55 notches in groups of five"
+    },
+    {
+      id: "ishango", phase: 1, bce: 20000, label: "Ishango bone",
+      title: "The Ishango bone", place: "Central Africa · Lake Edward, D.R. Congo",
+      evidence: "A baboon fibula with a quartz scraper still mounted at its tip, carrying three distinct columns of grouped notches.",
+      significance: "Some columns total 60 and others hold runs of prime numbers, which has been read as early arithmetic, grouping, or lunar tracking. The readings are contested; the deliberate grouping is not.",
+      draw: "ishango", hint: "three columns of grouped notches"
+    },
+    {
+      id: "tokens", phase: 2, bce: 8000, label: "Clay tokens",
+      title: "Geometric clay tokens", place: "The Fertile Crescent · Syria, Iraq, Iran",
+      evidence: "Excavations at Tell Abu Hureyra in Syria and Ganj-i-Dareh in Iran turned up small geometric clay tokens: spheres, cones, disks.",
+      significance: "A cone stood for one measure of grain, a sphere for a larger unit. Each token is one thing, so counting is done by matching rather than by symbol — concrete, quantity-specific accounting for a settled, farming society.",
+      draw: "tokens", hint: "cone, sphere, disk"
+    },
+    {
+      id: "bulla", phase: 2, bce: 4000, to: 3500, label: "Bulla",
+      title: "The bulla", place: "Mesopotamia · Sumer, modern Iraq",
+      evidence: "Hollow clay envelopes used to seal a transaction's tokens inside during trade.",
+      significance: "To check the contents without breaking the seal, traders pressed each token into the wet outer clay before enclosing it. The marks on the outside are the bridge: a written record standing in for physical objects.",
+      draw: "bulla", hint: "tokens sealed inside, impressed outside"
+    },
+    {
+      id: "uruk", phase: 3, bce: 3300, label: "Proto-cuneiform",
+      title: "Proto-cuneiform tablets", place: "Lower Mesopotamia · Uruk",
+      evidence: "Flat clay tablets impressed directly with the shapes that had been made by tokens.",
+      significance: "The world's first formal written counting system, and the moment quantity comes apart from commodity. Rather than drawing five sheep, a scribe wrote the sign for five beside the sign for sheep — and the five could then be applied to anything.",
+      draw: "tablet", hint: "quantity beside commodity"
+    },
+    {
+      id: "egypt", phase: 3, bce: 3000, label: "Egyptian numerals",
+      title: "Hieroglyphic numerals", place: "North Africa · Ancient Egypt",
+      evidence: "Numerals on royal annals, stone monuments and administrative papyri.",
+      significance: "A formal base-10 system with a distinct sign for each power of ten: a stroke for 1, a heel bone for 10, a coiled rope for 100, a lotus for 1,000.",
+      draw: "egypt", hint: "one sign per power of ten"
+    },
+    {
+      id: "indus", phase: 3, bce: 2000, label: "Indus weights",
+      title: "Indus Valley weights and seals", place: "The Indus Valley · Pakistan and India",
+      evidence: "Standardised weights and scales, and seals carrying early numeric marks.",
+      significance: "Number put to work on a city scale: binary and decimal ratios running through urban planning, trade and taxation.",
+      draw: "indus", hint: "weights in fixed ratios"
+    },
+    {
+      id: "oracle", phase: 3, bce: 1200, label: "Oracle bones",
+      title: "Shang oracle bones", place: "East Asia · Yellow River basin, China",
+      evidence: "Inscribed ox scapulae and turtle plastrons from the Shang dynasty.",
+      significance: "The earliest clear written Chinese numerals, already a full decimal system that builds large numbers by combining glyphs.",
+      draw: "oracle", hint: "schematic glyphs"
+    }
+  ];
+
+  /* ================================================================
+     2. Scales. Everything is BCE, so years-before-now is bce + 2026,
+        and a bigger BCE number sits further left.
+     ================================================================ */
+
+  const NOW_BCE = 2026;
+  const YA_MIN = 2200, YA_MAX = 86000;             // the padded domain, in years ago
+  const L_MIN = Math.log10(YA_MIN), L_MAX = Math.log10(YA_MAX);
+  const yearsAgo = (bce) => bce + NOW_BCE;
+  const tOf = (bce) => (Math.log10(yearsAgo(bce)) - L_MIN) / (L_MAX - L_MIN);  // 0 recent, 1 old
+  const TICKS = [60000, 30000, 10000, 3000, 1000];
+
+  const $ = (id) => document.getElementById(id);
+  const css = getComputedStyle(document.documentElement);
+  const C = {};
+  for (const k of ["p1","p2","p3","bone","clay","line","line-2","txt","txt-2","txt-3","bg","panel","panel-2"]) {
+    C[k.replace("-2", "2").replace("-3", "3")] = css.getPropertyValue("--" + k).trim();
+  }
+  const phaseColour = (p) => C["p" + p];
+  const commas = (n) => n.toLocaleString("en-GB");
+
+  const canvases = {};
+  function fit(id) {
+    const cv = $(id), r = cv.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.max(1, Math.round(r.width * dpr));
+    cv.height = Math.max(1, Math.round(r.height * dpr));
+    const ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvases[id] = { cv, ctx, w: r.width, h: r.height };
+    return canvases[id];
+  }
+  function mono(ctx, px, weight) { ctx.font = (weight || 500) + " " + px + 'px "IBM Plex Mono", monospace'; }
+  function sans(ctx, px, weight) { ctx.font = (weight || 500) + " " + px + 'px "IBM Plex Sans", sans-serif'; }
+
+  /* ================================================================
+     3. The timeline
+     ================================================================ */
+
+  let selected = 0;
+  let hovered = -1;
+  let hits = [];                                   // click targets, rebuilt on every draw
+
+  function drawTimeline() {
+    const { ctx, w, h } = canvases.timeline;
+    ctx.clearRect(0, 0, w, h);
+    const padL = 12, padR = 12;
+    const x0 = padL, x1 = w - padR;
+    const X = (bce) => x1 - tOf(bce) * (x1 - x0);
+    const axisY = Math.round(h * 0.60) + 0.5;
+    const bandY = axisY - 30, bandH = 15;
+
+    // phase bands, drawn from the finds they contain
+    for (const p of [1, 2, 3]) {
+      const inPhase = FINDS.filter((f) => f.phase === p);
+      const left = X(Math.max(...inPhase.map((f) => f.bce)));
+      const right = X(Math.min(...inPhase.map((f) => f.to || f.bce)));
+      const col = phaseColour(p);
+      ctx.fillStyle = col + "1f";
+      ctx.fillRect(left, bandY, right - left, bandH);
+      ctx.fillStyle = col;
+      mono(ctx, 8.5, 600);
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const label = ["", "TALLYING", "TOKENS", "WRITTEN NUMERALS"][p];
+      if (right - left > ctx.measureText(label).width + 10) ctx.fillText(label, (left + right) / 2, bandY + bandH / 2);
+    }
+
+    // the axis itself
+    ctx.strokeStyle = "rgba(160,180,240,0.35)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x0, axisY); ctx.lineTo(x1, axisY); ctx.stroke();
+    ctx.strokeStyle = C.line2;
+    ctx.fillStyle = C.txt3;
+    mono(ctx, 8.5, 500);
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    let lastRight = -Infinity;
+    for (const t of TICKS) {                      // every tick, but only the labels that fit
+      const xx = X(t);
+      ctx.beginPath(); ctx.moveTo(xx, axisY); ctx.lineTo(xx, axisY + 5); ctx.stroke();
+      const text = commas(t) + " BCE";
+      const tw = ctx.measureText(text).width;
+      if (xx - tw / 2 > lastRight + 8) {
+        ctx.fillText(text, xx, axisY + 8);
+        lastRight = xx + tw / 2;
+      }
+    }
+
+    // The finds. Labels go into three lanes and are then pushed apart within
+    // each lane, because the last five finds sit inside the right-hand third
+    // of a logarithmic axis and would otherwise print on top of each other.
+    const LANES = [52, 82, 112];
+    const placed = FINDS.map((f, i) => {
+      sans(ctx, i === selected ? 11 : 10, i === selected ? 600 : 500);
+      const w1 = ctx.measureText(f.label).width;
+      mono(ctx, 8.5, 500);
+      const w2 = ctx.measureText(commas(f.bce) + (f.to ? "–" + commas(f.to) : "") + " BCE").width;
+      return { i, f, x: X(f.bce), lw: Math.max(w1, w2), lane: i % LANES.length };
+    });
+    LANES.forEach((_, lane) => {
+      const row = placed.filter((p) => p.lane === lane);
+      let cursor = -Infinity;
+      row.forEach((p) => {                              // left to right, never overlapping
+        p.lx = Math.max(p.x, cursor + p.lw / 2 + 10);
+        cursor = p.lx + p.lw / 2;
+      });
+      for (let k = row.length - 1; k >= 0; k -= 1) {     // pull back inside the panel
+        const p = row[k];
+        const limit = k === row.length - 1 ? x1 - p.lw / 2 : row[k + 1].lx - row[k + 1].lw / 2 - p.lw / 2 - 10;
+        p.lx = Math.min(p.lx, limit);
+        p.lx = Math.max(p.lx, x0 + p.lw / 2);
+      }
+    });
+
+    hits = [];
+    placed.forEach((p) => {
+      const { f, i, x } = p;
+      const col = phaseColour(f.phase);
+      const isSel = i === selected, isHov = i === hovered;
+      const r = isSel ? 7.5 : isHov ? 6 : 4.5;
+      const laneY = axisY - LANES[p.lane];
+
+      if (f.to) {                                  // a span rather than a point
+        const x2 = X(f.to);
+        ctx.strokeStyle = col; ctx.lineWidth = isSel ? 3 : 2;
+        ctx.beginPath(); ctx.moveTo(x, axisY); ctx.lineTo(x2, axisY); ctx.stroke();
+      }
+
+      // an elbow from the marker up to wherever the label ended up
+      ctx.strokeStyle = isSel ? col : C.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, axisY - r);
+      ctx.lineTo(x, laneY + 14);
+      ctx.lineTo(p.lx, laneY + 6);
+      ctx.stroke();
+
+      ctx.beginPath(); ctx.arc(x, axisY, r, 0, 6.2832);
+      ctx.fillStyle = isSel || isHov ? col : C.bg;
+      ctx.strokeStyle = col; ctx.lineWidth = isSel ? 2 : 1.5;
+      ctx.fill(); ctx.stroke();
+
+      sans(ctx, isSel ? 11 : 10, isSel ? 600 : 500);
+      ctx.fillStyle = isSel ? C.txt : C.txt2;
+      ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.fillText(f.label, p.lx, laneY - 6);
+      mono(ctx, 8.5, 500);
+      ctx.fillStyle = isSel ? col : C.txt3;
+      ctx.fillText(commas(f.bce) + (f.to ? "–" + commas(f.to) : "") + " BCE", p.lx, laneY + 5);
+
+      hits.push({ x, y: axisY, i });
+    });
+
+    ctx.fillStyle = C.txt3;
+    mono(ctx, 8.5, 500);
+    ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+    ctx.fillText("← further back", x0, h - 3);
+    ctx.textAlign = "right";
+    ctx.fillText("nearer to us →", x1, h - 3);
+  }
+
+  /* ================================================================
+     4. The finds themselves, drawn schematically
+     ================================================================ */
+
+  // A long bone lying across the panel, with notches cut into its upper edge.
+  // `groups` is the run of notch counts; the drawing always cuts exactly as
+  // many notches as the groups add up to.
+  function drawBone(ctx, w, h, groups, colour) {
+    const total = groups.reduce((a, b) => a + b, 0);
+    const x0 = w * 0.09, x1 = w * 0.91, mid = h * 0.47;
+    const thick = Math.max(16, h * 0.115);
+
+    ctx.fillStyle = C.bone;
+    ctx.strokeStyle = "rgba(0,0,0,0.35)";
+    ctx.beginPath();
+    ctx.moveTo(x0 + 10, mid - thick / 2);
+    ctx.lineTo(x1 - 10, mid - thick / 2);
+    ctx.quadraticCurveTo(x1 + 4, mid - thick / 2, x1 + 4, mid);
+    ctx.quadraticCurveTo(x1 + 4, mid + thick / 2, x1 - 10, mid + thick / 2);
+    ctx.lineTo(x0 + 10, mid + thick / 2);
+    ctx.quadraticCurveTo(x0 - 4, mid + thick / 2, x0 - 4, mid);
+    ctx.quadraticCurveTo(x0 - 4, mid - thick / 2, x0 + 10, mid - thick / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // knuckled ends, so it reads as bone rather than as a stick
+    ctx.beginPath(); ctx.ellipse(x0 - 2, mid, thick * 0.42, thick * 0.62, 0, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x1 + 2, mid, thick * 0.42, thick * 0.62, 0, 0, 6.2832); ctx.fill();
+
+    const span = (x1 - x0) * 0.9;
+    const gapUnits = groups.length - 1;
+    const step = span / (total + gapUnits * 1.7);
+    let x = x0 + (x1 - x0) * 0.05, cut = 0;
+    ctx.strokeStyle = "rgba(40,32,22,0.85)";
+    ctx.lineWidth = Math.min(3.5, Math.max(1.2, step * 0.22));
+    groups.forEach((g, gi) => {
+      for (let j = 0; j < g; j += 1) {
+        ctx.beginPath();
+        ctx.moveTo(x, mid - thick / 2 + 1);
+        ctx.lineTo(x, mid + thick * 0.12);
+        ctx.stroke();
+        x += step; cut += 1;
+      }
+      if (gi < groups.length - 1) x += step * 1.7;
+    });
+
+    ctx.fillStyle = colour;
+    mono(ctx, 10, 600);
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText(cut + " notches cut", w / 2, mid + thick / 2 + 16);
+    if (groups.length > 1) {
+      ctx.fillStyle = C.txt3;
+      mono(ctx, 9, 500);
+      ctx.fillText("in " + groups.length + " groups of " + groups[0], w / 2, mid + thick / 2 + 30);
+    }
+    return cut;
+  }
+
+  // One published reading of the Ishango marks. The columns are contested,
+  // so the caption says so rather than presenting them as the artefact's
+  // settled content.
+  const ISHANGO = [
+    { name: "Column 1", runs: [11, 21, 19, 9], note: "sums to 60" },
+    { name: "Column 2", runs: [3, 6, 4, 8, 10, 5, 5, 7], note: "doubling and halving pairs" },
+    { name: "Column 3", runs: [11, 13, 17, 19], note: "the primes between 10 and 20 — also 60" }
+  ];
+
+  function drawIshango(ctx, w, h) {
+    const left = w * 0.07, right = w * 0.97;
+    const rowH = (h - 54) / 3;
+    ctx.textBaseline = "middle";
+    ISHANGO.forEach((col, ci) => {
+      const y = 26 + rowH * (ci + 0.42);
+      ctx.fillStyle = C.txt3;
+      mono(ctx, 8.5, 500);
+      ctx.textAlign = "left";
+      ctx.fillText(col.name.toUpperCase(), left, y - rowH * 0.3);
+
+      const total = col.runs.reduce((a, b) => a + b, 0);
+      const bx = left + 56, bw = right - bx;
+      const step = bw / (total + (col.runs.length - 1) * 1.6);
+      ctx.fillStyle = "rgba(228,220,200,0.14)";
+      ctx.fillRect(bx - 4, y - 11, bw + 8, 22);
+      ctx.strokeStyle = C.bone;
+      ctx.lineWidth = Math.max(1.1, step * 0.3);
+      let x = bx;
+      col.runs.forEach((run, ri) => {
+        for (let j = 0; j < run; j += 1) {
+          ctx.beginPath(); ctx.moveTo(x, y - 8); ctx.lineTo(x, y + 8); ctx.stroke();
+          x += step;
+        }
+        if (ri < col.runs.length - 1) x += step * 1.6;
+      });
+      ctx.fillStyle = C.p1;
+      mono(ctx, 8.5, 500);
+      ctx.textAlign = "left";
+      ctx.fillText(col.runs.join(" · ") + "  = " + total, left, y + rowH * 0.3);
+      ctx.fillStyle = C.txt3;
+      sans(ctx, 10, 500);
+      ctx.textAlign = "right";
+      ctx.fillText(col.note, right, y + rowH * 0.3);
+    });
+
+    ctx.fillStyle = C.txt3;
+    mono(ctx, 8.5, 500);
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText("ONE PUBLISHED READING OF THE THREE COLUMNS", w / 2, 6);
+  }
+
+  function clayBlob(ctx, cx, cy, r, shape) {
+    ctx.fillStyle = C.clay;
+    ctx.strokeStyle = "rgba(0,0,0,0.3)";
+    ctx.beginPath();
+    if (shape === "sphere") ctx.arc(cx, cy, r, 0, 6.2832);
+    else if (shape === "cone") { ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * 0.8, cy + r * 0.75); ctx.lineTo(cx - r * 0.8, cy + r * 0.75); ctx.closePath(); }
+    else ctx.ellipse(cx, cy, r, r * 0.42, 0, 0, 6.2832);        // disk, seen at a slight angle
+    ctx.fill();
+  }
+
+  function drawTokens(ctx, w, h) {
+    const items = [
+      ["cone", "CONE", "one measure of grain"],
+      ["sphere", "SPHERE", "a larger unit"],
+      ["disk", "DISK", "another commodity"]
+    ];
+    const r = Math.min(30, w * 0.08, h * 0.13);
+    items.forEach(([shape, name, gloss], i) => {
+      const cx = w * (0.2 + i * 0.3), cy = h * 0.42;
+      clayBlob(ctx, cx, cy, r, shape);
+      ctx.fillStyle = C.p2;
+      mono(ctx, 9, 600);
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText(name, cx, cy + r + 14);
+      ctx.fillStyle = C.txt3;
+      sans(ctx, 10.5, 500);
+      ctx.fillText(gloss, cx, cy + r + 28);
+    });
+    ctx.fillStyle = C.txt2;
+    sans(ctx, 11, 500);
+    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    ctx.fillText("Seven sheep means seven tokens. The count is kept by matching, one for one.", w / 2, h - 10);
+  }
+
+  function drawBulla(ctx, w, h) {
+    const cx = w * 0.36, cy = h * 0.46, r = Math.min(w * 0.2, h * 0.3);
+
+    ctx.fillStyle = C.clay;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832); ctx.fill();
+
+    // the hollow, drawn as a cutaway so the sealed tokens are visible
+    const inner = r * 0.64;
+    ctx.fillStyle = "rgba(14,14,17,0.86)";
+    ctx.beginPath(); ctx.arc(cx, cy + r * 0.12, inner, 0, 6.2832); ctx.fill();
+    ctx.strokeStyle = "rgba(228,220,200,0.35)"; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.arc(cx, cy + r * 0.12, inner, 0, 6.2832); ctx.stroke();
+    ctx.setLineDash([]);
+    clayBlob(ctx, cx - inner * 0.4, cy + r * 0.12 + inner * 0.18, inner * 0.28, "cone");
+    clayBlob(ctx, cx + inner * 0.22, cy + r * 0.12 - inner * 0.3, inner * 0.25, "sphere");
+    clayBlob(ctx, cx + inner * 0.34, cy + r * 0.12 + inner * 0.36, inner * 0.25, "sphere");
+
+    // the same tokens, pressed into the outer clay before sealing
+    ctx.fillStyle = "rgba(60,36,20,0.8)";
+    const marks = [-0.95, -0.45, 0.05, 0.55];
+    marks.forEach((a, i) => {
+      const mx = cx + Math.cos(a - Math.PI / 2) * r * 0.82;
+      const my = cy + Math.sin(a - Math.PI / 2) * r * 0.82;
+      const ms = r * 0.09;
+      ctx.beginPath();
+      if (i % 2) ctx.arc(mx, my, ms, 0, 6.2832);
+      else { ctx.moveTo(mx, my - ms * 1.2); ctx.lineTo(mx + ms, my + ms * 0.8); ctx.lineTo(mx - ms, my + ms * 0.8); ctx.closePath(); }
+      ctx.fill();
+    });
+
+    ctx.strokeStyle = C.p2; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(cx + r * 0.85, cy - r * 0.62); ctx.lineTo(w * 0.7, h * 0.26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx + inner * 0.95, cy + r * 0.3); ctx.lineTo(w * 0.7, h * 0.64); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.fillStyle = C.p2; mono(ctx, 9, 600);
+    ctx.fillText("PRESSED ON THE OUTSIDE", w * 0.715, h * 0.26);
+    ctx.fillStyle = C.txt3; sans(ctx, 10.5, 500);
+    ctx.fillText("the record you can read", w * 0.715, h * 0.26 + 15);
+    ctx.fillStyle = C.p2; mono(ctx, 9, 600);
+    ctx.fillText("SEALED INSIDE", w * 0.715, h * 0.64);
+    ctx.fillStyle = C.txt3; sans(ctx, 10.5, 500);
+    ctx.fillText("the tokens themselves", w * 0.715, h * 0.64 + 15);
+
+    ctx.fillStyle = C.txt2; sans(ctx, 11, 500);
+    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    ctx.fillText("The outside says what the inside holds — so the inside stops mattering.", w / 2, h - 10);
+  }
+
+  function drawTablet(ctx, w, h) {
+    const tw = Math.min(w * 0.7, 300), th = Math.min(h * 0.56, 168);
+    const x = (w - tw) / 2, y = h * 0.2;
+    ctx.fillStyle = C.clay;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, tw, th, 14); else ctx.rect(x, y, tw, th);
+    ctx.fill();
+
+    // five impressed number signs, then the commodity sign
+    ctx.fillStyle = "rgba(58,34,18,0.8)";
+    for (let i = 0; i < 5; i += 1) {
+      const cx = x + tw * 0.2 + (i % 3) * tw * 0.1, cy = y + th * 0.34 + Math.floor(i / 3) * th * 0.2;
+      ctx.beginPath(); ctx.arc(cx, cy, Math.min(9, tw * 0.028), 0, 6.2832); ctx.fill();
+    }
+    ctx.strokeStyle = "rgba(58,34,18,0.8)"; ctx.lineWidth = 2.4;
+    const sx = x + tw * 0.66, sy = y + th * 0.46, s = Math.min(26, tw * 0.09);
+    ctx.beginPath();                                   // a schematic commodity sign
+    ctx.moveTo(sx - s, sy - s * 0.6); ctx.lineTo(sx + s, sy - s * 0.6);
+    ctx.moveTo(sx - s, sy + s * 0.15); ctx.lineTo(sx + s, sy + s * 0.15);
+    ctx.moveTo(sx - s * 0.5, sy - s * 0.95); ctx.lineTo(sx - s * 0.5, sy + s * 0.5);
+    ctx.moveTo(sx + s * 0.5, sy - s * 0.95); ctx.lineTo(sx + s * 0.5, sy + s * 0.5);
+    ctx.stroke();
+
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillStyle = C.p3; mono(ctx, 9, 600);
+    ctx.fillText("“FIVE”", x + tw * 0.28, y + th + 12);
+    ctx.fillText("“SHEEP”", sx, y + th + 12);
+    ctx.fillStyle = C.txt2; sans(ctx, 11, 500);
+    ctx.fillText("the quantity, and separately the thing being counted", w / 2, y + th + 32);
+  }
+
+  function drawEgypt(ctx, w, h) {
+    const items = [
+      ["1", "stroke"], ["10", "heel"], ["100", "rope"], ["1,000", "lotus"]
+    ];
+    const cellW = w / 4;
+    items.forEach(([value, glyph], i) => {
+      const cx = cellW * (i + 0.5), cy = h * 0.42, s = Math.min(26, cellW * 0.3, h * 0.13);
+      ctx.strokeStyle = C.bone; ctx.lineWidth = 2.4; ctx.lineJoin = "round";
+      ctx.beginPath();
+      if (glyph === "stroke") { ctx.moveTo(cx, cy - s); ctx.lineTo(cx, cy + s); }
+      else if (glyph === "heel") { ctx.moveTo(cx - s, cy + s * 0.5); ctx.quadraticCurveTo(cx, cy - s * 1.1, cx + s, cy + s * 0.5); }
+      else if (glyph === "rope") {                       // a coil
+        for (let a = 0; a < 6.2832 * 1.6; a += 0.14) {
+          const rr = s * 0.28 + a * s * 0.085;
+          const px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr * 0.9;
+          a ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+        }
+      } else {                                           // lotus: stem, then bloom
+        ctx.moveTo(cx, cy + s); ctx.lineTo(cx, cy - s * 0.1);
+        ctx.moveTo(cx - s * 0.75, cy - s * 0.95); ctx.quadraticCurveTo(cx, cy + s * 0.35, cx, cy - s * 0.1);
+        ctx.quadraticCurveTo(cx, cy + s * 0.35, cx + s * 0.75, cy - s * 0.95);
+        ctx.moveTo(cx, cy - s * 1.15); ctx.lineTo(cx, cy - s * 0.1);
+      }
+      ctx.stroke();
+      ctx.fillStyle = C.p3; mono(ctx, 11, 600);
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText(value, cx, cy + s + 18);
+    });
+    ctx.fillStyle = C.txt2; sans(ctx, 11, 500);
+    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    ctx.fillText("Base ten, written by repeating the sign for each power.", w / 2, h - 10);
+  }
+
+  function drawIndus(ctx, w, h) {
+    const cx = w * 0.5, beamY = h * 0.3, arm = Math.min(w * 0.26, 130);
+    ctx.strokeStyle = C.bone; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, beamY - 26); ctx.lineTo(cx, beamY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - arm, beamY); ctx.lineTo(cx + arm, beamY); ctx.stroke();
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(cx + side * arm, beamY);
+      ctx.lineTo(cx + side * arm, beamY + 26);
+      ctx.stroke();
+      ctx.strokeStyle = C.bone;
+      ctx.beginPath();
+      ctx.moveTo(cx + side * arm - 22, beamY + 26);
+      ctx.lineTo(cx + side * arm + 22, beamY + 26);
+      ctx.lineTo(cx + side * arm + 14, beamY + 42);
+      ctx.lineTo(cx + side * arm - 14, beamY + 42);
+      ctx.closePath(); ctx.stroke();
+    }
+    // cubical weights in a doubling series
+    const ratios = [1, 2, 4, 8, 16];
+    const base = Math.min(11, w * 0.024);
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ratios.forEach((r, i) => {
+      const side = base * Math.cbrt(r);
+      const cxx = w * (0.14 + i * 0.18), cyy = h * 0.76;
+      ctx.fillStyle = "rgba(228,220,200,0.82)";
+      ctx.fillRect(cxx - side, cyy - side, side * 2, side * 2);
+      ctx.fillStyle = C.p3; mono(ctx, 9, 600);
+      ctx.fillText("×" + r, cxx, cyy + side + 8);
+    });
+    ctx.fillStyle = C.txt2; sans(ctx, 11, 500);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("Weights in fixed ratios — number as a civic standard.", w / 2, h * 0.53);
+  }
+
+  function drawOracle(ctx, w, h) {
+    // a shoulder blade, with schematic numerals scratched into it
+    const cx = w * 0.5, cy = h * 0.46;
+    ctx.fillStyle = C.bone;
+    ctx.beginPath();
+    ctx.moveTo(cx - w * 0.26, cy - h * 0.27);
+    ctx.quadraticCurveTo(cx + w * 0.3, cy - h * 0.33, cx + w * 0.25, cy + h * 0.1);
+    ctx.quadraticCurveTo(cx + w * 0.2, cy + h * 0.3, cx - w * 0.06, cy + h * 0.28);
+    ctx.quadraticCurveTo(cx - w * 0.3, cy + h * 0.24, cx - w * 0.26, cy - h * 0.27);
+    ctx.closePath(); ctx.fill();
+
+    ctx.strokeStyle = "rgba(40,32,22,0.85)"; ctx.lineWidth = 2; ctx.lineCap = "round";
+    const gx = cx - w * 0.15, gy = cy - h * 0.12, sp = Math.min(46, w * 0.115), u = Math.min(9, w * 0.022);
+    const glyphs = [
+      (x, y) => { ctx.moveTo(x - u, y); ctx.lineTo(x + u, y); },                                   // 1
+      (x, y) => { ctx.moveTo(x - u, y - u * 0.5); ctx.lineTo(x + u, y - u * 0.5); ctx.moveTo(x - u, y + u * 0.5); ctx.lineTo(x + u, y + u * 0.5); }, // 2
+      (x, y) => { ctx.moveTo(x, y - u); ctx.lineTo(x, y + u); },                                   // 10
+      (x, y) => { ctx.moveTo(x - u, y - u); ctx.lineTo(x + u, y + u); ctx.moveTo(x + u, y - u); ctx.lineTo(x - u, y + u); } // 5
+    ];
+    const labels = ["1", "2", "10", "5"];
+    ctx.beginPath();
+    glyphs.forEach((g, i) => g(gx + sp * i, gy));
+    ctx.stroke();
+    ctx.fillStyle = C.p3; mono(ctx, 9, 600);
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    labels.forEach((l, i) => ctx.fillText(l, gx + sp * i, gy + u + 10));
+
+    ctx.fillStyle = C.txt2; sans(ctx, 11, 500);
+    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    ctx.fillText("Schematic. A full decimal system, building large numbers from combined glyphs.", w / 2, h - 10);
+  }
+
+  function drawArtifact() {
+    const { ctx, w, h } = canvases.artifact;
+    const f = FINDS[selected];
+    ctx.clearRect(0, 0, w, h);
+    const col = phaseColour(f.phase);
+    switch (f.draw) {
+      case "bone": drawBone(ctx, w, h, f.notches, col); break;
+      case "ishango": drawIshango(ctx, w, h); break;
+      case "tokens": drawTokens(ctx, w, h); break;
+      case "bulla": drawBulla(ctx, w, h); break;
+      case "tablet": drawTablet(ctx, w, h); break;
+      case "egypt": drawEgypt(ctx, w, h); break;
+      case "indus": drawIndus(ctx, w, h); break;
+      case "oracle": drawOracle(ctx, w, h); break;
+    }
+  }
+
+  /* ================================================================
+     5. State and wiring
+     ================================================================ */
+
+  function render() {
+    const f = FINDS[selected];
+    const col = phaseColour(f.phase);
+    drawTimeline();
+    drawArtifact();
+
+    $("verdict").textContent = f.title;
+    $("verdict").style.color = col;
+    $("e-date").textContent = "c. " + commas(f.bce) + (f.to ? " – " + commas(f.to) : "") + " BCE";
+    $("e-date").style.color = col;
+    $("e-title").textContent = f.title;
+    $("e-place").textContent = f.place;
+    $("e-evidence").textContent = f.evidence;
+    $("e-significance").textContent = f.significance;
+    $("art-hint").textContent = f.hint;
+    $("phase-hint").textContent = PHASES[f.phase].name + " · " + PHASES[f.phase].range;
+    $("b-prev").disabled = false; $("b-next").disabled = false;
+
+    document.querySelectorAll("button[data-phase]").forEach((b) => {
+      const on = +b.dataset.phase === f.phase;
+      b.classList.toggle("on", on);
+      b.style.background = on ? phaseColour(+b.dataset.phase) : "";
+      b.style.borderColor = phaseColour(+b.dataset.phase);
+      b.querySelector(".swatch").style.background = on ? C.bg : phaseColour(+b.dataset.phase);
+    });
+
+    postHeight();
+  }
+
+  function select(i) {
+    selected = (i + FINDS.length) % FINDS.length;
+    render();
+  }
+
+  $("b-prev").addEventListener("click", () => select(selected - 1));   // earlier = further back
+  $("b-next").addEventListener("click", () => select(selected + 1));
+  document.querySelectorAll("button[data-phase]").forEach((b) => {
+    b.addEventListener("click", () => {
+      const p = +b.dataset.phase;
+      const i = FINDS.findIndex((f) => f.phase === p);
+      if (i >= 0) select(i);
+    });
+  });
+
+  function nearest(e) {
+    const r = $("timeline").getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    let best = -1, bestD = Infinity;
+    hits.forEach((hp) => {
+      const d = Math.hypot(hp.x - x, (hp.y - y) * 0.35);       // forgiving vertically
+      if (d < bestD) { bestD = d; best = hp.i; }
+    });
+    return bestD < 34 ? best : -1;
+  }
+  $("timeline").addEventListener("click", (e) => { const i = nearest(e); if (i >= 0) select(i); });
+  $("timeline").addEventListener("mousemove", (e) => {
+    const i = nearest(e);
+    if (i !== hovered) { hovered = i; drawTimeline(); }
+    $("timeline").style.cursor = i >= 0 ? "pointer" : "default";
+  });
+  $("timeline").addEventListener("mouseleave", () => { if (hovered !== -1) { hovered = -1; drawTimeline(); } });
+
+  function postHeight() {
+    const el = document.querySelector(".bench");
+    const hh = Math.ceil(el.getBoundingClientRect().height);
+    if (window.parent !== window && hh > 100) window.parent.postMessage({ type: "timeline-height", height: hh }, "*");
+  }
+
+  function fitAll() { ["timeline", "artifact"].forEach(fit); }
+
+  let rt;
+  window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { fitAll(); render(); }, 140);
+  });
+  window.addEventListener("load", () => { fitAll(); render(); setTimeout(postHeight, 250); });
+
+  // Inside an iframe the laid-out width can still be near zero on the first
+  // pass, which would leave the drawings stretched. Re-fit on any real change.
+  if (window.ResizeObserver) {
+    let pending = false;
+    const ro = new ResizeObserver(() => {
+      const stale = ["timeline", "artifact"].some((id) => {
+        const c = canvases[id];
+        return !c || Math.abs($(id).getBoundingClientRect().width - c.w) > 1;
+      });
+      if (!stale || pending) return;
+      pending = true;
+      requestAnimationFrame(() => { pending = false; fitAll(); render(); });
+    });
+    ["timeline", "artifact"].forEach((id) => ro.observe($(id)));
+  }
+
+  fitAll();
+  render();        // one frame synchronously: never blank, no animation loop
+})();
+</script>
+</body>
+</html>
