@@ -405,6 +405,10 @@
     digits.forEach((d, di) => {
       const cy = 4 + rowH * (di + 0.5);
       const cx = w * 0.56;
+      if (di > 0) {                            // the places are stacked, so say where each begins
+        ctx.strokeStyle = C.line2; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(5, 4 + rowH * di); ctx.lineTo(w - 5, 4 + rowH * di); ctx.stroke();
+      }
       ctx.fillStyle = C.txt3; mono(ctx, 8, 500);
       ctx.textAlign = "left"; ctx.textBaseline = "middle";
       const power = Math.pow(20, digits.length - 1 - di);
@@ -464,11 +468,13 @@
   };
 
   /* the comparison strip, read off the same mark counts */
-  function drawCompare(n) {
+  /* `counts` comes from the panels that have just drawn themselves, so the
+     bar and the figure above it can never report different numbers. */
+  function drawCompare(counts) {
     const c = canvases.compare; if (!c) return;
     const { ctx, w, h } = c;
     ctx.clearRect(0, 0, w, h);
-    const rows = SYSTEMS.map((s) => ({ s, marks: s.marks(n) }));
+    const rows = SYSTEMS.map((s) => ({ s, marks: counts[s.key] }));
     const max = Math.max(...rows.map((r) => r.marks));
     const labelW = Math.min(104, w * 0.28);
     const x0 = labelW + 6, x1 = w - 58;
@@ -512,19 +518,21 @@
   });
 
   function render() {
+    const counts = {};
     SYSTEMS.forEach((s) => {
       const c = canvases["cv-" + s.key]; if (!c) return;
       c.ctx.clearRect(0, 0, c.w, c.h);
       const drawn = DRAW[s.key](c.ctx, c.w, c.h, value);
       // what the panel reports is what the panel drew
       const total = s.key === "tally" ? value : drawn;
+      counts[s.key] = total;
       $("m-" + s.key).textContent = commas(total);
       const note = $("note-" + s.key);
       const warn = s.warnAt && s.warnAt(value);
       note.textContent = warn ? s.warn : s.note;
       note.classList.toggle("warn", !!warn);
     });
-    drawCompare(value);
+    drawCompare(counts);
     $("verdict").textContent = commas(value);
     $("n-val").textContent = commas(value);
     $("n").value = value;
