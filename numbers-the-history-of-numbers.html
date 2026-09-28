@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The History of Numbers | Numbers | Sam Kirwan</title>
+  <meta name="description" content="Tallies, grouping, invented signs, and the one idea that made arithmetic easy: letting the position of a digit carry its value." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot, not blue-black */
+      --bg-2:    #141419;
+      --measure: 68ch;         /* the reading column */
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);   /* running prose */
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --na:      #e8a33d;   /* bone and notch */
+      --k:       #64c8a0;   /* clay token */
+      --cl:      #54d6a0;
+      --stim:    #ffc247;
+      --ahp:     #7aa7ff;   /* written numeral */
+      --leak:    #8fa0c4;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    /* Fine grain. A flat dark colour on its own reads as a glossy void; the
+       noise is what makes it feel like a matte surface. */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .sheet { position: relative; z-index: 1; }
+
+    /* ---------- masthead ---------- */
+    header {
+      padding: clamp(1.6rem, 5vh, 2.8rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--na); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--na); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 5.4vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #e8a33d 4%, #64c8a0 52%, #7aa7ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--body);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ---------- prose ---------- */
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.95rem; color: var(--txt);
+      margin: 1.8rem 0 0.5rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .cl { color: var(--cl); }
+    .stim { color: var(--stim); }
+    .ahp { color: var(--ahp); }
+
+    a.inline {
+      color: var(--k);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(100, 200, 160, 0.35);
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    a.inline:hover, a.inline:focus-visible { color: var(--txt); border-bottom-color: var(--txt); outline: none; }
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+
+    /* ---------- equations ---------- */
+    .eq {
+      margin: 1.5rem 0;
+      padding: 1.15rem 1.3rem;
+      border-left: 2px solid var(--line);
+      background: linear-gradient(90deg, rgba(140,165,225,0.06), transparent 70%);
+      overflow-x: auto;
+    }
+    .eq-line {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.2vw, 1.2rem);
+      line-height: 2; white-space: nowrap; color: var(--txt);
+    }
+    .eq-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.65rem; line-height: 1.6; color: var(--txt-3);
+      margin-top: 0.7rem; white-space: normal;
+    }
+    .frac {
+      display: inline-flex; flex-direction: column;
+      vertical-align: middle; text-align: center;
+      margin: 0 0.18em; line-height: 1.15; font-size: 0.86em;
+    }
+    .frac .num { border-bottom: 1px solid var(--txt-2); padding: 0 0.25em 0.08em; }
+    .frac .den { padding: 0.08em 0.25em 0; }
+
+    /* ---------- callout ---------- */
+    .callout {
+      border-left: 2px solid var(--na);
+      background: linear-gradient(90deg, rgba(232,163,61,0.07), transparent 70%);
+      padding: 1.1rem 1.3rem; margin: 1.6rem 0;
+    }
+    .callout p { color: var(--txt); }
+    .callout .tag {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--na); margin-bottom: 0.5rem;
+    }
+
+    /* ---------- widget slot ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 1115px;            /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1895px; } }
+    iframe.bench.short { height: 610px; }
+    @media (max-width: 820px) { iframe.bench.short { height: 765px; } }
+
+    /* placeholder shown until the figure is built */
+    .lab-empty {
+      border: 1px dashed var(--line);
+      background: linear-gradient(180deg, rgba(140,165,225,0.04), transparent);
+      padding: clamp(2.4rem, 8vh, 4.5rem) 1.5rem;
+      text-align: center;
+    }
+    .lab-empty p {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3);
+    }
+
+    /* ---------- data table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .data {
+      width: 100%; border-collapse: collapse; margin-top: 1.3rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.73rem;
+    }
+    .data th, .data td {
+      text-align: left; padding: 0.6rem 0.9rem 0.6rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+    }
+    .data thead th {
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .data td:first-child { white-space: nowrap; color: var(--txt); }
+    .data td { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--txt-2); }
+    .data td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; white-space: normal; width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+
+    .fig-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; line-height: 1.7; color: var(--txt-3);
+      margin-top: 0.7rem; max-width: 74ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="numbers.html">Numbers</a>
+      <p class="kicker">02 &nbsp;·&nbsp; Notation</p>
+      <h1>The History of <em>Numbers</em></h1>
+      <p class="standfirst">
+        The ten digits you were taught at school are a technology, and a late
+        one. Getting to them meant solving three separate problems &mdash; and
+        the last of the three is the reason you can multiply on paper at all.
+      </p>
+    </header>
+
+    <main>
+      <section class="col">
+        <h2><span class="n">Where this starts</span>Counting came first</h2>
+
+        <p>
+          People kept exact counts for tens of thousands of years before anyone
+          wrote a number. A notch for each hide, a pebble for each sheep: that is
+          counting, and <a class="inline" href="numbers-the-origins-of-counting.html">the
+          previous chapter</a> follows it from the first cut bones to the clay
+          tokens of the Fertile Crescent.
+        </p>
+
+        <p>
+          This chapter is about the next problem. Once you can count, how do you
+          <em class="v">write it down</em> &mdash; in a way that stays readable when
+          the numbers get big, and that lets you calculate rather than merely record?
+        </p>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">Problem one</span>A long record is unreadable</h2>
+
+        <p>
+          A tally is perfect and useless. Perfect, because one mark per thing cannot
+          be wrong. Useless, because nobody can look at
+          <span class="na">||||||||||||||||||||||||||</span> and say how many that is
+          without counting it again &mdash; and two people counting it will disagree.
+        </p>
+
+        <p>
+          The first fix is <strong>grouping</strong>: crossing off every fifth mark,
+          or cutting in blocks of five, so the eye can read the total in chunks. That
+          alone is already an enormous gain, and it is visible on bones tens of
+          thousands of years old. But it only postpones the problem. Six hundred sheep
+          is still six hundred marks.
+        </p>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">Problem two</span>A new sign for every size</h2>
+
+        <p>
+          The second fix is to invent a sign that <em class="v">means</em> a group.
+          Egypt did it with a stroke for 1, a heel bone for 10, a coiled rope for 100
+          and a lotus for 1,000. Rome did it with I, V, X, L, C, D and M. Write the
+          signs, add up what they are worth, and the number is however much they come
+          to. These are <strong>additive</strong> systems, and they are a vast
+          improvement: 1,999 takes 28 marks in Egyptian rather than 1,999.
+        </p>
+
+        <p>
+          They also have a hard ceiling built into them. Every time you need a bigger
+          number you need a <em class="v">brand-new sign</em>, agreed with everyone
+          else, for the next size up. Roman numerals simply stop: without extra
+          notation there is no way to write 4,000. And the signs tell you nothing
+          about how to calculate &mdash; try multiplying MCMXCIX by XLII and see how
+          far the notation helps you.
+        </p>
+      </section>
+
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 1 &nbsp;·&nbsp; the same number, six ways</span>
+          <span>drag the number, and watch the mark counts</span>
+        </div>
+        <iframe class="bench" id="systems-frame" title="Interactive: one number written as tallies, Egyptian, Roman, Babylonian, Maya and Hindu-Arabic numerals"
+                src="numbers/history-of-numbers/number-systems-widget.html" loading="lazy"></iframe>
+        <p class="fig-note">
+          The bar at the foot is the whole argument in one picture: how many marks each
+          system needs for the number you have chosen. Watch what happens to the last
+          two bars as the number grows, and what happens to the first.
+        </p>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">Problem three</span>Let the position do the work</h2>
+
+        <p>
+          The decisive idea appears in Mesopotamia, some time before 2,000 BCE. Instead
+          of giving each size its own sign, give each <strong>place</strong> its own
+          value. The same handful of marks means one thing in the right-hand column and
+          sixty times as much one column to the left.
+        </p>
+
+        <p>
+          This is <strong>positional notation</strong>, and it changes the economics of
+          writing numbers completely. An additive system needs new signs as numbers grow;
+          a positional one needs new <em class="v">columns</em>, which are free. Two
+          symbols got the Babylonians any number they liked. Ten symbols get us the same.
+        </p>
+
+        <div class="callout">
+          <span class="tag">What a base actually is</span>
+          <p>
+            The <strong>base</strong> is just how many a column holds before it has to
+            pass one to the left. Base ten means a column fills at nine; base two means
+            it fills at one; base sixty means it fills at fifty-nine. Nothing else about
+            the machinery changes &mdash; which is why a computer using two symbols and a
+            Babylonian scribe using sixty are doing the identical thing.
+          </p>
+        </div>
+      </section>
+
+      <section class="lab">
+        <div class="lab-cap">
+          <span>Figure 2 &nbsp;·&nbsp; the place-value machine</span>
+          <span>step it by one and watch a column roll over</span>
+        </div>
+        <iframe class="bench short" id="place-frame" title="Interactive: a number in columns of any base, with carrying shown as it happens"
+                src="numbers/history-of-numbers/place-value-widget.html" loading="lazy"></iframe>
+        <p class="fig-note">
+          Switching base keeps the value and changes only its spelling. Press <em>+1</em>
+          against a full units column to see the carry &mdash; and set the value to 999
+          to see three columns roll over at once.
+        </p>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">The missing piece</span>Why zero had to be invented</h2>
+
+        <p>
+          Positional notation has a flaw that shows up immediately: what do you write
+          when a column is <em class="v">empty</em>? The Babylonians left a gap, which is
+          exactly as ambiguous as it sounds. A single wedge might mean one, or sixty, or
+          three thousand six hundred, and readers were expected to work it out from
+          context. Later scribes added a separator sign, but only ever between digits
+          &mdash; never at the end, where it was needed most.
+        </p>
+
+        <p>
+          The <span class="k">Maya</span> wrote a zero &mdash; a shell glyph &mdash; and
+          used it as a full placeholder in their vigesimal counts. And in India, by
+          around the seventh century, zero became something more than a gap-filler: a
+          <strong>number in its own right</strong>, with rules for adding and multiplying
+          it, set out by Brahmagupta. That system travelled west through the Islamic
+          world, where al-Khwārizmī's ninth-century book on calculating with Hindu
+          numerals gave us the word <em class="v">algorithm</em>, and reached Europe in
+          the thirteenth century largely through Fibonacci.
+        </p>
+
+        <p>
+          It took centuries to be accepted. Several Italian cities banned the new
+          numerals for official accounts &mdash; a 0 is easy to doctor into a 6 or a 9,
+          and a notation nobody's grandfather could read was not obviously trustworthy.
+          Roman numerals stayed in European ledgers long after the mathematics had moved on.
+        </p>
+      </section>
+
+      <section class="col">
+        <h2><span class="n">The arbitrary part</span>Why ten?</h2>
+
+        <p>
+          Nothing about mathematics prefers ten. Ten is a fact about primates, and the
+          languages give it away: <em class="v">digit</em> means finger, and so does the
+          Latin <em class="v">digitus</em> it comes from.
+        </p>
+
+        <p>
+          Other choices left fossils all over daily life. Sixty survives every time you
+          read a clock or measure an angle, inherited directly from Mesopotamia &mdash;
+          and sixty is a genuinely good choice, because it divides evenly by 2, 3, 4, 5,
+          6, 10, 12, 15, 20 and 30, which makes halves and thirds exact. Twelve survives
+          in dozens and inches. Twenty survives in the French
+          <em class="v">quatre-vingts</em> and in score. Two won in the end anyway,
+          because a wire is either carrying current or it is not.
+        </p>
+
+        <div class="callout">
+          <span class="tag">The test of a good notation</span>
+          <p>
+            Positional notation did not just make numbers shorter to write. It made
+            arithmetic into something you can do <strong>mechanically</strong>, column by
+            column, without understanding what the number means &mdash; which is why
+            long multiplication is teachable to a child, and why the same procedure can
+            be handed to a machine. Additive systems have no such algorithm. That is the
+            whole difference.
+          </p>
+        </div>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="numbers-the-origins-of-counting.html">← The Origins of Counting</a>
+        <a href="numbers.html">All Numbers pages →</a>
+      </nav>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const frames = {
+        'systems-height': document.getElementById('systems-frame'),
+        'placevalue-height': document.getElementById('place-frame')
+      };
+      window.addEventListener('message', (e) => {
+        const d = e.data;
+        if (!d || !frames[d.type]) return;
+        if (e.source !== frames[d.type].contentWindow) return;
+        const h = Number(d.height);
+        if (Number.isFinite(h) && h > 300 && h < 4000) frames[d.type].style.height = h + 'px';
+      });
+    })();
+  </script>
+</body>
+</html>
