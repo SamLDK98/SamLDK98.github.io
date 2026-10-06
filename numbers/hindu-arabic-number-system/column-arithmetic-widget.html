@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Column arithmetic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0e11; --panel: #121216; --panel-2: #17171d;
+    --line: rgba(140,165,225,0.16); --line-2: rgba(140,165,225,0.07);
+    --txt: #f4f6ff; --txt-2: rgba(238,242,252,0.74); --txt-3: rgba(238,242,252,0.44);
+    --digit: #7aa7ff;      /* the written digit */
+    --carry: #e8a33d;      /* a carried digit, and the fact in use */
+    --new:   #64c8a0;      /* the digit just written */
+    --col:   rgba(232,163,61,0.10);
+  }
+  html, body { background: var(--bg); }
+  body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: var(--txt); -webkit-font-smoothing: antialiased; }
+  .bench { background: var(--bg); border: 1px solid var(--line); }
+
+  .head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    padding: 11px 16px 10px; border-bottom: 1px solid var(--line);
+  }
+  .head-title { font-family: "IBM Plex Mono", monospace; font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--txt-2); }
+  .verdict { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; letter-spacing: 0.06em; font-weight: 600; color: var(--digit); font-variant-numeric: tabular-nums; }
+
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0; }
+  .cell { padding: 12px 14px 14px; min-width: 0; }
+  .cell + .cell { border-left: 1px solid var(--line); }
+  .cap {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 0.8rem; flex-wrap: wrap;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.58rem; letter-spacing: 0.17em;
+    text-transform: uppercase; color: var(--txt-3); margin-bottom: 9px;
+  }
+  .cap .hint { letter-spacing: 0.08em; text-transform: none; }
+
+  /* ---- the sum, written out in columns ---- */
+  .paper { display: flex; justify-content: center; overflow-x: auto; padding: 4px 0 2px; }
+  .grid { display: grid; font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+  .g {
+    width: 1.55em; height: 1.75em; display: flex; align-items: center; justify-content: center;
+    font-size: clamp(1.05rem, 3.4vw, 1.4rem); font-weight: 500; color: var(--txt);
+  }
+  .g.col { background: var(--col); }
+  .g.carry { font-size: clamp(0.66rem, 2vw, 0.8rem); height: 1.6em; color: var(--carry); font-weight: 600; align-items: flex-end; }
+  .g.op { color: var(--txt-3); }
+  .g.src { color: var(--carry); font-weight: 600; }
+  .g.new { color: var(--new); font-weight: 600; }
+  .g.pad { color: var(--txt-3); }
+  .g.dim { color: var(--txt-3); }
+  .rule { height: 0; border-top: 1px solid var(--txt-3); margin: 3px 0; }
+  .lbl { font-family: "IBM Plex Mono", monospace; font-size: 0.56rem; letter-spacing: 0.1em; color: var(--txt-3);
+         display: flex; align-items: center; padding-left: 10px; white-space: nowrap; }
+
+  /* ---- the fact table ---- */
+  .table { display: grid; grid-template-columns: repeat(11, 1fr); gap: 1px; font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+  .t {
+    width: 25px; height: 21px; display: flex; align-items: center; justify-content: center;
+    font-size: 0.62rem; color: var(--txt-3); background: var(--panel);
+  }
+  .t.h { background: none; color: var(--txt-2); font-weight: 600; }
+  .t.h.on { color: var(--carry); }
+  .t.corner { color: var(--txt-3); background: none; }
+  .t.line { background: rgba(232,163,61,0.06); }
+  .t.hit { background: var(--carry); color: #17120a; font-weight: 600; }
+  .t.used { color: var(--txt); background: #1b1b22; }
+
+  .readout { border-top: 1px solid var(--line); padding: 11px 16px 12px; }
+  .msg {
+    padding: 8px 10px; border-left: 2px solid var(--carry);
+    background: linear-gradient(90deg, rgba(232,163,61,0.09), transparent 80%);
+    font-size: 0.84rem; line-height: 1.55; color: var(--txt-2); min-height: 3.2rem;
+  }
+  .msg.quiet { border-left-color: var(--line); background: none; color: var(--txt-3); }
+  .msg b { color: var(--txt); font-weight: 500; }
+  .msg .f { font-family: "IBM Plex Mono", monospace; color: var(--carry); font-weight: 600; }
+  .stats { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; color: var(--txt-3); }
+  .stats b { color: var(--txt); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .roman { margin-top: 8px; font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; line-height: 1.6; color: var(--txt-3); overflow-wrap: anywhere; }
+  .roman b { color: var(--txt-2); font-weight: 500; }
+
+  .bar { padding: 12px 16px 15px; border-top: 1px solid var(--line); display: grid; gap: 12px 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .field-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.75rem; color: var(--txt-2); gap: 0.5rem; }
+  .field-label .val { font-family: "IBM Plex Mono", monospace; font-size: 0.73rem; font-weight: 600; color: var(--txt); font-variant-numeric: tabular-nums; }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  button, input[type="text"] {
+    font-family: "IBM Plex Sans", sans-serif; font-size: 0.74rem; font-weight: 500; color: var(--txt);
+    background: var(--panel-2); border: 1px solid var(--line); padding: 6px 11px;
+    font-variant-numeric: tabular-nums;
+  }
+  button { cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
+  button:hover { background: #1c1c24; border-color: rgba(150,180,255,0.4); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--txt-3); outline-offset: 2px; }
+  button.on { border-color: var(--digit); color: var(--digit); }
+  button:disabled { opacity: 0.4; cursor: default; }
+  input[type="text"] { font-family: "IBM Plex Mono", monospace; width: 6.6em; padding: 6px 8px; }
+  .x { font-family: "IBM Plex Mono", monospace; color: var(--txt-3); font-size: 0.8rem; }
+
+  @media (max-width: 640px) {
+    .stage { grid-template-columns: 1fr; }
+    .cell + .cell { border-left: 0; border-top: 1px solid var(--line); }
+    .table-wrap { display: flex; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="bench">
+  <div class="head">
+    <span class="head-title">Arithmetic by columns</span>
+    <span class="verdict" id="verdict">—</span>
+  </div>
+
+  <div class="stage">
+    <div class="cell">
+      <div class="cap">
+        <span>The working, one column at a time</span>
+        <span class="hint" id="step-hint">step 0 of 0</span>
+      </div>
+      <div class="paper"><div class="grid" id="grid"></div></div>
+    </div>
+    <div class="cell">
+      <div class="cap">
+        <span id="table-title">The addition table</span>
+      </div>
+      <div class="table-wrap"><div class="table" id="table"></div></div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="msg quiet" id="msg">—</div>
+    <div class="stats">
+      <span>Facts looked up <b id="s-facts">0</b></span>
+      <span>Different facts in the whole table <b>100</b></span>
+      <span>Digits in the answer <b id="s-digits">0</b></span>
+    </div>
+    <div class="roman" id="roman"></div>
+  </div>
+
+  <div class="bar">
+    <div class="field">
+      <span class="field-label"><span>Operation</span></span>
+      <div class="btns">
+        <button type="button" id="op-add" class="on">Add</button>
+        <button type="button" id="op-mul">Multiply</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="field-label"><span>Numbers</span><span class="val" id="limits">up to 6 digits each</span></span>
+      <div class="btns">
+        <input type="text" id="in-a" inputmode="numeric" aria-label="First number" />
+        <span class="x" id="op-sign">+</span>
+        <input type="text" id="in-b" inputmode="numeric" aria-label="Second number" />
+        <button type="button" id="b-rand">Random</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="field-label"><span>Step</span></span>
+      <div class="btns">
+        <button type="button" id="b-back">← Back</button>
+        <button type="button" id="b-next">Next →</button>
+        <button type="button" id="b-play">Play</button>
+        <button type="button" id="b-end">Answer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const LIMITS = { add: [6, 6], mul: [4, 3] };
+  const DEFAULTS = { add: [36952, 8479], mul: [352, 47] };
+
+  let op = "add";
+  let A = 36952, B = 8479;
+  let steps = [];
+  let at = 0;
+  let timer = null;
+
+  const commas = (n) => n.toLocaleString("en-GB");
+  const digitsOf = (n) => String(n).split("").reverse().map(Number);   // index = power of ten
+
+  /* ------------------------------------------------------------------
+     Step generation. Each step is a full snapshot of the paper, so going
+     back is just showing an earlier snapshot. Mirrored and checked in
+     Python against exact products and sums before being ported here.
+     ------------------------------------------------------------------ */
+
+  // Rows on the paper: "a", "b", "p0".."p2" (partial products), "r" (result).
+  // Each row is a map power -> digit. carries is a map power -> number.
+  function snap(state, extra) {
+    const copy = { rows: {}, carries: Object.assign({}, state.carries) };
+    for (const k in state.rows) copy.rows[k] = Object.assign({}, state.rows[k]);
+    return Object.assign(copy, { facts: state.facts }, extra);
+  }
+
+  function addSteps(a, b) {
+    const da = digitsOf(a), db = digitsOf(b);
+    const n = Math.max(da.length, db.length);
+    const st = { rows: { a: toRow(da), b: toRow(db), r: {} }, carries: {}, facts: 0 };
+    const out = [];
+    out.push(snap(st, { col: null, table: "add",
+      msg: "Line the two numbers up by their <b>right-hand ends</b>, so units sit under units, tens under tens. Then work from the right." }));
+    let carry = 0;
+    for (let p = 0; p < n; p += 1) {
+      const x = p < da.length ? da[p] : null, y = p < db.length ? db[p] : null;
+      const s = (x || 0) + (y || 0) + carry;
+      let msg, hit = null;
+      const place = placeName(p);
+      if (x !== null && y !== null) {
+        st.facts += 1; hit = [x, y];
+        msg = "The " + place + " column: <span class=\"f\">" + x + " + " + y + " = " + (x + y) + "</span>";
+        if (carry) msg += ", plus the carried <span class=\"f\">" + carry + "</span> makes <b>" + s + "</b>";
+      } else {
+        const only = x !== null ? x : y;
+        msg = "The " + place + " column has only one digit, <b>" + only + "</b>";
+        if (carry) msg += ", plus the carried <span class=\"f\">" + carry + "</span> makes <b>" + s + "</b>";
+      }
+      st.rows.r[p] = s % 10;
+      const newCarry = Math.floor(s / 10);
+      delete st.carries[p];
+      if (newCarry) {
+        st.carries[p + 1] = newCarry;
+        msg += ". That is more than one column can hold: write <b>" + (s % 10) + "</b> and carry <b>" + newCarry + "</b> into the " + placeName(p + 1) + " column.";
+      } else {
+        msg += ". It fits: write <b>" + s + "</b>.";
+      }
+      carry = newCarry;
+      out.push(snap(st, { col: p, table: "add", hit: hit, src: ["a", "b"], write: ["r", p], msg: msg }));
+    }
+    if (carry) {
+      st.rows.r[n] = carry; delete st.carries[n];
+      out.push(snap(st, { col: n, table: "add", write: ["r", n],
+        msg: "Nothing left to add but the carry. It drops straight down into a new " + placeName(n) + " column." }));
+    }
+    out.push(finish(st, a + b, "add"));
+    return out;
+  }
+
+  function mulSteps(a, b) {
+    const da = digitsOf(a), db = digitsOf(b);
+    const st = { rows: { a: toRow(da), b: toRow(db) }, carries: {}, facts: 0 };
+    const out = [];
+    out.push(snap(st, { col: null, table: "mul",
+      msg: "Multiply the top number by <b>one digit of the bottom number at a time</b>, starting with its units digit. Each pass is one row." }));
+    for (let j = 0; j < db.length; j += 1) {
+      const y = db[j], key = "p" + j;
+      st.rows[key] = {}; st.carries = {};
+      if (j > 0) {
+        for (let p = 0; p < j; p += 1) st.rows[key][p] = 0;
+        out.push(snap(st, { col: null, table: "mul", pad: key,
+          msg: "Next digit: the <b>" + y + "</b> in the " + placeName(j) + " column, which really means <b>" + commas(y * Math.pow(10, j)) + "</b>. " +
+               "Multiplying by " + commas(Math.pow(10, j)) + " needs no work at all: shift " + (j === 1 ? "one place" : j + " places") + " left by writing " +
+               (j === 1 ? "a <b>0</b>" : "<b>" + j + " zeros</b>") + " first. This is the notation doing the arithmetic for you." }));
+      }
+      let carry = 0;
+      for (let i = 0; i < da.length; i += 1) {
+        const x = da[i];
+        const pr = x * y + carry;
+        st.facts += 1;
+        const p = i + j;
+        let msg = "<span class=\"f\">" + x + " × " + y + " = " + (x * y) + "</span>";
+        if (carry) msg += ", plus the carried <span class=\"f\">" + carry + "</span> makes <b>" + pr + "</b>";
+        st.rows[key][p] = pr % 10;
+        delete st.carries[p];
+        const nc = Math.floor(pr / 10);
+        if (nc) { st.carries[p + 1] = nc; msg += ". Write <b>" + (pr % 10) + "</b>, carry <b>" + nc + "</b>."; }
+        else msg += ". Write <b>" + pr + "</b>.";
+        carry = nc;
+        out.push(snap(st, { col: p, table: "mul", hit: [x, y], srcCells: [["a", i], ["b", j]], write: [key, p], msg: msg }));
+      }
+      if (carry) {
+        const p = da.length + j;
+        st.rows[key][p] = carry; delete st.carries[p];
+        out.push(snap(st, { col: p, table: "mul", write: [key, p],
+          msg: "No digits left on top, so the last carry, <b>" + carry + "</b>, is written as it stands. Row " + (j + 1) + " done: " +
+               "<b>" + commas(a) + " × " + commas(y * Math.pow(10, j)) + " = " + commas(a * y * Math.pow(10, j)) + "</b>." }));
+      } else {
+        out[out.length - 1].msg += " Row " + (j + 1) + " done: <b>" + commas(a) + " × " + commas(y * Math.pow(10, j)) + " = " + commas(a * y * Math.pow(10, j)) + "</b>.";
+      }
+    }
+    st.carries = {};
+    if (db.length > 1) {
+      const keys = db.map((_, j) => "p" + j);
+      const width = Math.max.apply(null, keys.map((k) => Math.max.apply(null, Object.keys(st.rows[k]).map(Number)))) + 1;
+      st.rows.r = {};
+      out.push(snap(st, { col: null, table: "add",
+        msg: "Each row is one piece of the product. Now <b>add the rows</b>, column by column, exactly as in addition. Same table, same carrying." }));
+      let carry = 0;
+      for (let p = 0; p < width; p += 1) {
+        const ds = keys.map((k) => st.rows[k][p]).filter((d) => d !== undefined);
+        const s = ds.reduce((u, v) => u + v, 0) + carry;
+        let hit = null;
+        if (ds.length >= 2) { hit = [ds[0], ds[1]]; st.facts += ds.length - 1; }
+        let msg = "The " + placeName(p) + " column: ";
+        msg += ds.length > 1 ? "<span class=\"f\">" + ds.join(" + ") + " = " + ds.reduce((u, v) => u + v, 0) + "</span>"
+                             : "only <b>" + ds[0] + "</b>";
+        if (carry) msg += ", plus the carried <span class=\"f\">" + carry + "</span> makes <b>" + s + "</b>";
+        st.rows.r[p] = s % 10;
+        delete st.carries[p];
+        const nc = Math.floor(s / 10);
+        if (nc) { st.carries[p + 1] = nc; msg += ". Write <b>" + (s % 10) + "</b>, carry <b>" + nc + "</b>."; }
+        else msg += ". Write <b>" + s + "</b>.";
+        carry = nc;
+        out.push(snap(st, { col: p, table: "add", hit: hit, src: keys, write: ["r", p], msg: msg }));
+      }
+      let p = width;
+      while (carry) {
+        st.rows.r[p] = carry % 10; delete st.carries[p];
+        carry = Math.floor(carry / 10);
+        out.push(snap(st, { col: p, table: "add", write: ["r", p], msg: "The final carry drops into a new column." }));
+        p += 1;
+      }
+      trimLeading(st.rows.r);
+    } else {
+      st.rows.r = Object.assign({}, st.rows.p0);
+      delete st.rows.p0;
+      trimLeading(st.rows.r);
+    }
+    out.push(finish(st, a * b, "mul"));
+    return out;
+  }
+
+  function finish(st, value, kind) {
+    const got = rowValue(st.rows.r);
+    const ok = got === value;          // the paper must agree with the machine's own arithmetic
+    const facts = st.facts;
+    return snap(st, { col: null, table: kind, done: true,
+      msg: (ok ? "" : "<b>Mismatch</b> — ") + "Answer: <b>" + commas(got) + "</b>. Every step used only facts from a table of 100, the same table whatever the size of the numbers: " +
+           "<b>" + facts + "</b> look-up" + (facts === 1 ? "" : "s") + " in all, and never a column holding more than 9." });
+  }
+
+  function toRow(ds) { const r = {}; ds.forEach((d, p) => { r[p] = d; }); return r; }
+  function rowValue(r) { return Object.keys(r).reduce((s, p) => s + r[p] * Math.pow(10, +p), 0); }
+  function trimLeading(r) {
+    const ps = Object.keys(r).map(Number).sort((u, v) => v - u);
+    for (const p of ps) { if (p > 0 && r[p] === 0) delete r[p]; else break; }
+  }
+  function placeName(p) {
+    return ["units", "tens", "hundreds", "thousands", "ten-thousands", "hundred-thousands", "millions", "ten-millions", "hundred-millions"][p] || "10^" + p;
+  }
+
+  /* ------------------------------------------------------------------
+     Rendering
+     ------------------------------------------------------------------ */
+
+  function render() {
+    const s = steps[at];
+    const rowKeys = ["a", "b"].concat(Object.keys(s.rows).filter((k) => k[0] === "p").sort()).concat(s.rows.r ? ["r"] : []);
+    let width = 1;
+    for (const k of rowKeys) for (const p in s.rows[k]) width = Math.max(width, +p + 1);
+    for (const p in s.carries) width = Math.max(width, +p + 1);
+    // final answer width decides the paper width so nothing jumps at the end
+    const last = steps[steps.length - 1];
+    for (const p in last.rows.r || {}) width = Math.max(width, +p + 1);
+    if (op === "mul") for (const k in last.rows) if (k[0] === "p") for (const p in last.rows[k]) width = Math.max(width, +p + 1);
+    const W = width + 1;                     // one extra column for the operator sign
+
+    const g = $("grid");
+    g.style.gridTemplateColumns = "repeat(" + W + ", auto) auto";
+    let html = "";
+    const colOf = (p) => W - 1 - p;          // grid column index for power p
+
+    function cellsFor(rowKey, cls, opSign, label) {
+      let h = "";
+      for (let c = 0; c < W; c += 1) {
+        const p = W - 1 - c;
+        const classes = ["g"];
+        if (cls) classes.push(cls);
+        if (s.col !== null && s.col !== undefined && p === s.col) classes.push("col");
+        let txt = "";
+        if (c === 0 && opSign) { txt = opSign; classes.push("op"); }
+        else if (rowKey === "carry") { txt = s.carries[p] !== undefined ? s.carries[p] : ""; }
+        else {
+          const row = s.rows[rowKey] || {};
+          if (row[p] !== undefined) {
+            txt = row[p];
+            if (s.write && s.write[0] === rowKey && s.write[1] === p) classes.push("new");
+            else if (s.srcCells && s.srcCells.some((sc) => sc[0] === rowKey && sc[1] === p)) classes.push("src");
+            else if (s.src && s.src.indexOf(rowKey) >= 0 && p === s.col) classes.push("src");
+            else if (s.pad === rowKey && p < +rowKey.slice(1)) classes.push("pad");
+            else if (s.srcCells && rowKey[0] === "p" && s.write && s.write[0] !== rowKey) classes.push("dim");
+          }
+        }
+        h += '<div class="' + classes.join(" ") + '">' + txt + "</div>";
+      }
+      h += '<div class="lbl">' + (label || "") + "</div>";
+      return h;
+    }
+    const rule = '<div class="rule" style="grid-column: 1 / span ' + W + '"></div><div></div>';
+
+    html += cellsFor("carry", "carry", "", Object.keys(s.carries).length ? "carried" : "");
+    html += cellsFor("a", "", "", "");
+    html += cellsFor("b", "", op === "add" ? "+" : "×", "");
+    html += rule;
+    const partials = Object.keys(s.rows).filter((k) => k[0] === "p").sort();
+    if (partials.length) {
+      partials.forEach((k) => {
+        const j = +k.slice(1);
+        html += cellsFor(k, "", partials.length > 1 && j === partials.length - 1 && s.rows.r ? "+" : "",
+          "× " + commas(digitsOf(B)[j] * Math.pow(10, j)));
+      });
+      if (s.rows.r) html += rule;
+    }
+    if (s.rows.r) html += cellsFor("r", "", "", "");
+    g.innerHTML = html;
+
+    renderTable(s);
+
+    const msg = $("msg");
+    msg.innerHTML = s.msg;
+    msg.classList.toggle("quiet", s.col === null && !s.done);
+    $("step-hint").textContent = "step " + at + " of " + (steps.length - 1);
+    $("s-facts").textContent = s.facts;
+    $("s-digits").textContent = s.done ? String(rowValue(s.rows.r)).length : "—";
+    const ans = op === "add" ? A + B : A * B;
+    $("verdict").textContent = commas(A) + (op === "add" ? " + " : " × ") + commas(B) + (s.done ? " = " + commas(ans) : "");
+
+    const ra = roman(A), rb = roman(B), rr = roman(ans);
+    $("roman").innerHTML = ra && rb && rr
+      ? "The same " + (op === "add" ? "sum" : "product") + " in Roman numerals: <b>" + ra + (op === "add" ? " + " : " × ") + rb + " = " + rr +
+        "</b>. Nothing lines up: a letter's place says nothing about its size, so there is no column to work down."
+      : "In Roman numerals this " + (op === "add" ? "sum" : "product") + " cannot even be written: without extra notation they stop at 3,999. " +
+        "Here the same procedure simply uses " + (op === "add" ? "another column." : "more columns.");
+
+    $("b-back").disabled = at === 0;
+    $("b-next").disabled = at === steps.length - 1;
+    $("b-end").disabled = at === steps.length - 1;
+    $("b-play").textContent = timer ? "Pause" : (at === steps.length - 1 ? "Replay" : "Play");
+    postHeight();
+  }
+
+  function renderTable(s) {
+    const kind = s.table;
+    $("table-title").textContent = kind === "add" ? "The addition table" : "The multiplication table";
+    // every fact used so far in this kind of table
+    const used = {};
+    for (let i = 0; i <= at; i += 1) {
+      const t = steps[i];
+      if (t.hit && t.table === kind) used[t.hit[0] + "," + t.hit[1]] = true;
+    }
+    const hit = s.hit || null;
+    let h = '<div class="t corner">' + (kind === "add" ? "+" : "×") + "</div>";
+    for (let c = 0; c < 10; c += 1) h += '<div class="t h' + (hit && hit[1] === c ? " on" : "") + '">' + c + "</div>";
+    for (let r = 0; r < 10; r += 1) {
+      h += '<div class="t h' + (hit && hit[0] === r ? " on" : "") + '">' + r + "</div>";
+      for (let c = 0; c < 10; c += 1) {
+        const v = kind === "add" ? r + c : r * c;
+        let cls = "t";
+        if (hit && hit[0] === r && hit[1] === c) cls += " hit";
+        else if (used[r + "," + c]) cls += " used";
+        else if (hit && (hit[0] === r || hit[1] === c)) cls += " line";
+        h += '<div class="' + cls + '">' + v + "</div>";
+      }
+    }
+    $("table").innerHTML = h;
+  }
+
+  function roman(n) {
+    if (n < 1 || n > 3999) return null;
+    const map = [[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];
+    let s = "";
+    for (const [v, t] of map) while (n >= v) { s += t; n -= v; }
+    return s;
+  }
+
+  /* ------------------------------------------------------------------
+     Controls
+     ------------------------------------------------------------------ */
+
+  function rebuild() {
+    stop();
+    steps = op === "add" ? addSteps(A, B) : mulSteps(A, B);
+    at = 0;
+    $("in-a").value = A; $("in-b").value = B;
+    $("op-sign").textContent = op === "add" ? "+" : "×";
+    $("limits").textContent = op === "add" ? "up to 6 digits each" : "up to 4 digits × 3 digits";
+    $("op-add").classList.toggle("on", op === "add");
+    $("op-mul").classList.toggle("on", op === "mul");
+    render();
+  }
+
+  function readInput(id, maxDigits, fallback) {
+    const raw = $(id).value.replace(/[^0-9]/g, "").slice(0, maxDigits);
+    return raw === "" ? fallback : parseInt(raw, 10);
+  }
+  function onInput() {
+    const [la, lb] = LIMITS[op];
+    A = readInput("in-a", la, A); B = readInput("in-b", lb, B);
+    rebuild();
+  }
+
+  function go(i) { at = Math.max(0, Math.min(steps.length - 1, i)); render(); }
+  function stop() { if (timer) { clearTimeout(timer); timer = null; } }
+  function tick() {
+    if (at >= steps.length - 1) { stop(); render(); return; }
+    go(at + 1);
+    timer = setTimeout(tick, 1300);        // setTimeout, not rAF: keeps running in a background pane
+    render();
+  }
+
+  $("b-next").addEventListener("click", () => { stop(); go(at + 1); });
+  $("b-back").addEventListener("click", () => { stop(); go(at - 1); });
+  $("b-end").addEventListener("click", () => { stop(); go(steps.length - 1); });
+  $("b-play").addEventListener("click", () => {
+    if (timer) { stop(); render(); return; }
+    if (at === steps.length - 1) at = 0;
+    timer = setTimeout(tick, 400);
+    render();
+  });
+  $("op-add").addEventListener("click", () => { if (op !== "add") { op = "add"; [A, B] = DEFAULTS.add; rebuild(); } });
+  $("op-mul").addEventListener("click", () => { if (op !== "mul") { op = "mul"; [A, B] = DEFAULTS.mul; rebuild(); } });
+  ["in-a", "in-b"].forEach((id) => {
+    $(id).addEventListener("change", onInput);
+    $(id).addEventListener("keydown", (e) => { if (e.key === "Enter") onInput(); });
+  });
+  $("b-rand").addEventListener("click", () => {
+    const [la, lb] = LIMITS[op];
+    const pick = (d) => Math.floor(Math.pow(10, d - 1) + Math.random() * 9 * Math.pow(10, d - 1));
+    A = pick(op === "add" ? 3 + Math.floor(Math.random() * (la - 2)) : 2 + Math.floor(Math.random() * (la - 1)));
+    B = pick(op === "add" ? 2 + Math.floor(Math.random() * (lb - 1)) : 1 + Math.floor(Math.random() * lb));
+    rebuild();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT") return;
+    if (e.key === "ArrowRight") { stop(); go(at + 1); }
+    if (e.key === "ArrowLeft") { stop(); go(at - 1); }
+  });
+
+  function postHeight() {
+    const el = document.querySelector(".bench");
+    const hh = Math.ceil(el.getBoundingClientRect().height);
+    if (window.parent !== window && hh > 100) window.parent.postMessage({ type: "algorithms-height", height: hh }, "*");
+  }
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(postHeight, 140); });
+  window.addEventListener("load", () => setTimeout(postHeight, 250));
+
+  // exposed for headless checking of the step generator against exact arithmetic
+  window.__columns = { addSteps, mulSteps, rowValue };
+
+  rebuild();
+})();
+</script>
+</body>
+</html>
