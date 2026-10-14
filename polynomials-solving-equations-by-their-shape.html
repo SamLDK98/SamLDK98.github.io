@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solving Equations by Their Shape | Polynomials | Sam Kirwan</title>
+  <meta name="description" content="What solving an equation means, how every equation built from +, − and × collapses to a polynomial, and why degree decides how hard it is to solve." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot, not blue-black */
+      --bg-2:    #141419;
+      --measure: 92ch;         /* the reading column */
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);   /* running prose */
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --na:      #e8a33d;   /* bone and notch */
+      --k:       #64c8a0;   /* clay token */
+      --cl:      #54d6a0;
+      --stim:    #ffc247;
+      --ahp:     #7aa7ff;   /* written numeral */
+      --leak:    #8fa0c4;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    /* Fine grain. A flat dark colour on its own reads as a glossy void; the
+       noise is what makes it feel like a matte surface. */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .sheet { position: relative; z-index: 1; }
+
+    /* ---------- masthead ---------- */
+    header {
+      padding: clamp(1.6rem, 5vh, 2.8rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--na); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--na); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 5.4vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #e8a33d 4%, #64c8a0 52%, #7aa7ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--body);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ---------- prose ---------- */
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.95rem; color: var(--txt);
+      margin: 1.8rem 0 0.5rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .cl { color: var(--cl); }
+    .stim { color: var(--stim); }
+    .ahp { color: var(--ahp); }
+
+    a.inline {
+      color: var(--k);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(100, 200, 160, 0.35);
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    a.inline:hover, a.inline:focus-visible { color: var(--txt); border-bottom-color: var(--txt); outline: none; }
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+
+    /* ---------- widget slot ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 1115px;            /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1895px; } }
+    iframe.bench.short { height: 610px; }
+    @media (max-width: 820px) { iframe.bench.short { height: 765px; } }
+
+    /* placeholder shown until the figure is built */
+    .lab-empty {
+      border: 1px dashed var(--line);
+      background: linear-gradient(180deg, rgba(140,165,225,0.04), transparent);
+      padding: clamp(2.4rem, 8vh, 4.5rem) 1.5rem;
+      text-align: center;
+    }
+    .lab-empty p {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3);
+    }
+
+    /* ---------- data table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .data {
+      width: 100%; border-collapse: collapse; margin-top: 1.3rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.73rem;
+    }
+    .data th, .data td {
+      text-align: left; padding: 0.6rem 0.9rem 0.6rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+    }
+    .data thead th {
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .data td:first-child { white-space: nowrap; color: var(--txt); }
+    .data td { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--txt-2); }
+    .data td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; white-space: normal; width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+
+    .fig-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; line-height: 1.7; color: var(--txt-3);
+      margin-top: 0.7rem; max-width: 74ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  
+    /* ---------- glyph figures ---------- */
+    .glyphs { margin: 1rem 0 1.4rem; padding: 0.9rem 1.1rem 0.8rem; border: 1px solid var(--line-2); background: var(--bg-2); }
+    .glyph-row { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; align-items: center; color: var(--na); }
+    .glyph-row .grp { display: inline-flex; gap: 0.15rem; }
+    .glyph-row svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .roman-row { font-family: "Spectral", Georgia, serif; font-size: 1.9rem; letter-spacing: 0.08em; line-height: 1; gap: 0; }
+    .roman-row .inline-glyph { width: 30px; height: 34px; margin: 0 0.12em; vertical-align: middle; }
+    .glyphs figcaption { font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; color: var(--txt-3); margin-top: 0.55rem; }
+    ul + p, ol + p, .eq + p, .glyphs + h3 { margin-top: 0.95rem; }
+    .eq-line.wrap { white-space: normal; }
+    .eq-line.wrap .sep { margin-right: 0.6em; }
+    h1 { max-width: none; }
+    p strong, li strong { color: #d9692b; }
+    .col p, .col li { font-size: clamp(1.12rem, 2.4vw, 1.25rem); }
+    iframe.bench.cols { height: 760px; }
+    @media (max-width: 820px) { iframe.bench.cols { height: 1100px; } }
+  
+    .area-figure { margin: 1.7rem 0; }
+    .area-figure svg { display: block; width: min(100%, 540px); height: auto; margin-inline: auto; }
+    .area-rearrangement svg { width: min(100%, 760px); }
+    .area-figure .label { font-family: "Spectral", Georgia, serif; font-size: 25px; fill: var(--txt); font-style: italic; }
+    .area-figure .dimension { font-size: 22px; fill: var(--txt-2); }
+    .area-figure + p { margin-top: 0.95rem; }
+    mjx-container { color: inherit; }
+    a:focus-visible { outline: 2px solid var(--na); outline-offset: 5px; }
+    .math { overflow-x: auto; overflow-y: hidden; margin: 0.95rem 0; padding: 0.15rem 0; font-size: clamp(1.12rem, 2.4vw, 1.25rem); color: var(--body); }
+    .math mjx-container[display="true"] { text-align: left !important; margin: 0 !important; }
+    .math + p, .scroll-x + p { margin-top: 0.95rem; }
+    .col h3 { font-family: "Spectral", Georgia, serif; font-weight: 500; font-size: clamp(1.15rem, 2.4vw, 1.3rem); color: var(--txt); margin: 2rem 0 0.7rem; }
+    .data { min-width: 38rem; }
+    .data td { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; color: var(--body); }
+    .data td:first-child { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+    .data td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    a.inline { color: var(--k); text-decoration: none; border-bottom: 1px solid rgba(100,200,160,0.35); }
+    a.inline:hover { color: var(--txt); border-bottom-color: var(--txt); }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="polynomials.html">Polynomials</a>
+      <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Solving Equations by Their Shape</h1>
+    </header>
+    <main>
+      <section class="col" aria-labelledby="what-is-solving">
+        <h2 id="what-is-solving">What does it mean to solve an equation?</h2>
+        <p>"When we know the value of the unknown!"</p>
+        <p>But do we know the value of the unknown here?</p>
+        <div class="math">\[x=10-3\]</div>
+        <p>We still need to perform a mental computation if we want to <em>know</em> that \(x=7\).</p>
+        <p>Consider:</p>
+        <div class="math">\[\begin{aligned}
+          \text{E1:}\quad &amp; x=7\\
+          \text{E2:}\quad &amp; x=10-3\\
+          \text{E3:}\quad &amp; 8x-43=4+9
+        \end{aligned}\]</div>
+        <p>All of these equations contain the same information about \(x\).</p>
+        <p>We might think that an equation is solved when \(x\) is isolated and all the arithmetic has been performed.</p>
+        <p>But in fact we would consider \(\text{E2}\) to be solved already, even though a subtraction is still waiting to be done.</p>
+        <p>So if it's not a matter of performing all the arithmetic, why isn't \(\text{E3}\) solved?</p>
+        <p>Sure, there is more arithmetic left: we need to add \(4\), \(9\) and \(43\) together and divide the sum by \(8\).</p>
+        <p>But \(\text{E2}\) also has arithmetic left, so the amount of arithmetic can't be what separates them.</p>
+        <p>What separates them is their <em>form</em>.</p>
+        <p>In \(\text{E2}\), \(x\) stands alone on one side, and the other side contains only known numbers.</p>
+        <p>In \(\text{E3}\), \(x\) is still tangled up with the known numbers.</p>
+        <p><strong>An equation is solved when the unknown is expressed in terms of known quantities.</strong></p>
+        <p>This is why solving is synonymous with isolating the unknown, as long as no unknown is left on the other side.</p>
+        <p>\(x=3-x\) has \(x\) on its own on the left, but it isn't solved: the right-hand side still depends on \(x\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="general-solution-formula">
+        <h2 id="general-solution-formula">What is a general solution formula?</h2>
+        <p>Algebra allows us to abstract structure from specific cases to express general forms.</p>
+        <p>Consider these equations:</p>
+        <div class="math">\[\begin{aligned}
+          2x+5&amp;=25\\
+          3x+7&amp;=19\\
+          5x-8&amp;=12
+        \end{aligned}\]</div>
+        <p>They contain different numbers, but share the same structure.</p>
+        <p>(Subtraction fits too: \(5x-8\) is \(5x+(-8)\). Subtracting is adding a negative.)</p>
+        <p>We can express the shared structure as an algebraic equation:</p>
+        <div class="math">\[ax+b=c\]</div>
+        <p>A <strong>general solution formula</strong> takes the shared structure and rearranges it so that the unknown is expressed in terms of the known quantities:</p>
+        <div class="math">\[x=\frac{c-b}{a}\qquad (a\neq 0)\]</div>
+        <p>The condition \(a\neq0\) matters: we can't divide by zero, and if \(a=0\) there is no \(x\) left in the equation to solve for.</p>
+        <p>Notice that a general solution formula is just an equation solved algebraically: \(x\) has been expressed in terms of the known quantities \(a\), \(b\) and \(c\).</p>
+        <p>One formula now solves all three equations at once:</p>
+        <div class="math">\[x=\frac{25-5}{2}=10\qquad x=\frac{19-7}{3}=4\qquad x=\frac{12-(-8)}{5}=4\]</div>
+        <p>Instead of solving equations case by case, we can solve every case of a particular structure.</p>
+      </section>
+
+      <section class="col" aria-labelledby="general-forms">
+        <h2 id="general-forms">The General Forms of Equations</h2>
+        <p>To use formulas like this, we want to classify equations.</p>
+        <p>To do that we must identify the general forms that equations can take.</p>
+        <p>Let's build increasingly complicated equations, adding one new ingredient at a time.</p>
+        <p>Each time, we'll ask: no matter how messy the equation looks, what simple form does it always collapse to?</p>
+
+        <h3>One unknown, one constant, no operations</h3>
+        <p>What is the simplest equation?</p>
+        <div class="math">\[x=7\]</div>
+        <p>By definition it is already solved.</p>
+        <p>But for fun, let's identify the structure. If \(x\) is the unknown and \(c\) is a known constant:</p>
+        <div class="math">\[x=c\]</div>
+        <p>The general form and the formula are the same thing.</p>
+        <p>Okay, that is a bit silly. Let's introduce something new.</p>
+
+        <h3>One unknown, any number of constants, addition</h3>
+        <p>We can now include any number of constants and add them together:</p>
+        <div class="math">\[\begin{aligned}
+          x+2&amp;=7\\
+          x+2+3&amp;=7+10\\
+          x+2+3+4+2&amp;=3+7+10+6
+        \end{aligned}\]</div>
+        <p>The first key idea: <strong>like terms can always be combined</strong>.</p>
+        <p>However many constants there are on a side, they always collapse into a single constant.</p>
+        <p>Call the constant on the left \(b\) and the constant on the right \(c\).</p>
+        <p>\(x\) is not a like term, so it can't be merged into \(b\).</p>
+        <p>So every equation of this kind has the general form:</p>
+        <div class="math">\[x+b=c\]</div>
+        <p>which we can solve once and for all:</p>
+        <div class="math">\[x=c-b\]</div>
+
+        <h3>Any number of the unknown, any number of constants, addition</h3>
+        <p>Now let the unknown appear more than once:</p>
+        <div class="math">\[\begin{aligned}
+          x+x+3&amp;=7\\
+          x+x+x+x+3+4&amp;=7+13\\
+          x+x+x+x+x+x+x+10&amp;=150
+        \end{aligned}\]</div>
+        <p>Copies of \(x\) are like terms too, so they collapse into a single term: \(2x\), \(4x\), \(7x\).</p>
+        <p>The general form becomes:</p>
+        <div class="math">\[ax+b=c\]</div>
+        <p>The unknown now has a <strong>coefficient</strong>: a known number it is multiplied by.</p>
+        <p>The formula is the one we've already met:</p>
+        <div class="math">\[x=\frac{c-b}{a}\]</div>
+        <p>Notice that the previous form, \(x+b=c\), is just the special case \(a=1\). Each new form contains the old ones.</p>
+        <p>The unknown can even appear on both sides:</p>
+        <div class="math">\[3x+2=x+10\]</div>
+        <p>Taking \(x\) away from both sides gives \(2x+2=10\): the same general form. So \(x=\frac{10-2}{2}=4\), and checking, \(3(4)+2=14=4+10\).</p>
+        <p>No matter how many copies of the unknown and constants we add together, on either side, the equation still reduces to \(ax+b=c\).</p>
+
+        <h3>Adding multiplication</h3>
+        <p>Can we also allow multiplication and keep the same general form?</p>
+        <p>It's tempting to say multiplication is just repeated addition, but that only works when we know how many copies we are adding. \(x\cdot x\) means "\(x\) copies of \(x\)", and we don't know \(x\).</p>
+        <p>So let's look at what a product of two terms can be. There are three possibilities.</p>
+        <p><strong>1. A constant \(\times\) a constant</strong></p>
+        <div class="math">\[x+3\cdot2=7\quad\longrightarrow\quad x+6=7\]</div>
+        <p>The product is just another constant. Still \(ax+b=c\).</p>
+        <p><strong>2. A constant \(\times\) the unknown</strong></p>
+        <div class="math">\[x\cdot2+3=7\quad\longrightarrow\quad 2x+3=7\]</div>
+        <p>The product is a copy count: a coefficient. Still \(ax+b=c\).</p>
+        <p>(Dividing by a known number is covered here too: \(\frac{x}{2}\) is \(\frac12 x\).)</p>
+        <p><strong>3. The unknown \(\times\) the unknown</strong></p>
+        <div class="math">\[x\cdot x+3=7\]</div>
+        <p>This is neither a constant nor a copy of \(x\). We can't merge it into any term of our current general form.</p>
+        <p>It is a new kind of term:</p>
+        <div class="math">\[x^2+3=7\]</div>
+        <p>What about products of <em>sums</em>, like \(3(x+1)\) or \((x+2)(x+3)\)?</p>
+        <p>The <strong>distributive law</strong> breaks every product of sums into a sum of products of single terms:</p>
+        <div class="math">\[3(x+1)=3x+3\qquad (x+2)(x+3)=x^2+3x+2x+6=x^2+5x+6\]</div>
+        <p>Each of those single products is one of the three cases above, so the three cases really do cover everything.</p>
+        <p>With the new term, the general form is:</p>
+        <div class="math">\[ax^2+b=c\]</div>
+        <p>and we can still express \(x\) in terms of the known quantities:</p>
+        <div class="math">\[x=\pm\sqrt{\frac{c-b}{a}}\]</div>
+        <p>For example, \(x^2+3=7\) gives \(x^2=4\), so \(x=2\) or \(x=-2\). Both work: \(4+3=7\).</p>
+        <p>Two things are new here. A solution can now be <em>two</em> values, written with \(\pm\). And there may be no real solution at all: \(x^2=-4\) has none, because no real number squares to a negative. Real solutions need \(\frac{c-b}{a}\geq0\).</p>
+        <p>And once \(x\cdot x\) is allowed, nothing stops \(x\cdot x\cdot x=x^3\), or \(x^4\), or any higher power.</p>
+      </section>
+
+      <section class="col" aria-labelledby="polynomials">
+        <h2 id="polynomials">Polynomials</h2>
+        <p>Let's take stock.</p>
+        <p>We are allowed one unknown, any constants, and addition, subtraction and multiplication, as often as we like, on either side.</p>
+        <p>Combining like terms and distributing will always collapse the equation into a sum of powers of \(x\), each with its own coefficient.</p>
+        <p>If we also move everything to one side, every such equation has the general form:</p>
+        <div class="math">\[a_nx^n+\dots+a_2x^2+a_1x+a_0=0\]</div>
+        <p>The left-hand side is a <strong>polynomial</strong>: a sum of terms, each a constant times a whole-number power of the unknown.</p>
+        <ul>
+          <li>Each \(a_k x^k\) is a <strong>term</strong>.</li>
+          <li>The numbers \(a_n,\dots,a_1,a_0\) are its <strong>coefficients</strong>. \(a_0\) is the <strong>constant term</strong>.</li>
+          <li>The highest power with a non-zero coefficient is its <strong>degree</strong>.</li>
+        </ul>
+        <p>For example, \(4x-7\) has degree 1, \(2x^2-3x+1\) has degree 2, and \(x^3-x\) has degree 3.</p>
+        <p>Dividing by the unknown, taking a root of it, or putting it in an exponent would take us outside polynomials. Those make different kinds of equations.</p>
+        <p>A note on letters. Up to now \(c\) stood for the right-hand side. With everything moved to one side, it's conventional to write a quadratic as \(ax^2+bx+c=0\), where \(c\) is the <em>constant term</em>. That's how \(c\) is used from here on, and on the <a class="inline" href="algebra-completing-the-square.html">Completing the Square</a> page.</p>
+        <p>The degree is the classification we were looking for. Every form we built is a polynomial equation of some degree:</p>
+        <div class="scroll-x">
+          <table class="data">
+            <thead><tr><th>Degree</th><th>Name</th><th>General form</th><th>What we found</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Linear</td><td>\(ax+b=0\)</td><td>Always one formula: \(x=-\frac{b}{a}\)</td></tr>
+              <tr><td>2</td><td>Quadratic</td><td>\(ax^2+bx+c=0\)</td><td>Only solved so far without the \(bx\) term</td></tr>
+              <tr><td>3</td><td>Cubic</td><td>\(ax^3+bx^2+cx+d=0\)</td><td>Not yet attempted</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="col" aria-labelledby="quadratics-tricky">
+        <h2 id="quadratics-tricky">Why are quadratic equations extra tricky?</h2>
+        <p>Look at the gap in that table: the full quadratic, with all three kinds of term at once.</p>
+        <div class="math">\[ax^2+bx+c=0\]</div>
+        <p>Take a specific case:</p>
+        <div class="math">\[x^2+6x=7\]</div>
+        <p>Until now, the unknown always collapsed into a single term, and we isolated it by undoing one operation at a time.</p>
+        <p>Here, \(x\) is stuck in two terms that can never be combined: \(x^2\) and \(6x\) are not like terms.</p>
+        <p>And every operation that frees one of them traps the other:</p>
+        <ul>
+          <li>Divide by \(x\): \(x+6=\frac{7}{x}\). Now \(x\) is on both sides.</li>
+          <li>Take a square root: \(\sqrt{x^2+6x}\) is not \(x+\sqrt{6x}\). The root won't split across the sum.</li>
+        </ul>
+        <p>To isolate \(x\), we need to rewrite the left-hand side so that \(x\) appears <em>only once</em>.</p>
+        <p>Here is the trick. Adding \(9\) to both sides makes the left-hand side a perfect square:</p>
+        <div class="math">\[x^2+6x+9=16\quad\longrightarrow\quad(x+3)^2=16\]</div>
+        <p>Now \(x\) appears once, and we can undo the operations one at a time:</p>
+        <div class="math">\[x+3=\pm4\quad\longrightarrow\quad x=1\ \text{ or }\ x=-7\]</div>
+        <p>Both check: \(1+6=7\) and \(49-42=7\).</p>
+        <p>Why \(9\), and why it always works, is the subject of <a class="inline" href="algebra-completing-the-square.html">Completing the Square</a>.</p>
+        <p>Doing the same thing once to the general form \(ax^2+bx+c=0\) gives the general solution formula for every quadratic. First divide through by \(a\) (which can't be \(0\), or there would be no \(x^2\) term), then add \(\left(\frac{b}{2a}\right)^2\) to both sides:</p>
+        <div class="math">\[\begin{aligned}
+          x^2+\frac{b}{a}x&amp;=-\frac{c}{a}\\
+          x^2+\frac{b}{a}x+\frac{b^2}{4a^2}&amp;=\frac{b^2}{4a^2}-\frac{c}{a}\\
+          \left(x+\frac{b}{2a}\right)^2&amp;=\frac{b^2-4ac}{4a^2}\\
+          x+\frac{b}{2a}&amp;=\pm\frac{\sqrt{b^2-4ac}}{2a}\\
+          x&amp;=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
+        \end{aligned}\]</div>
+        <p>This is the <strong>quadratic formula</strong>. It is exactly what this page has been building towards: \(x\) expressed in terms of known quantities, for every equation of one shape. Real solutions need \(b^2-4ac\geq0\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="every-degree">
+        <h2 id="every-degree">Is there a formula for every degree?</h2>
+        <p>It's natural to keep going.</p>
+        <ul>
+          <li><strong>Degree 1</strong>: the linear formula, \(x=-\frac{b}{a}\).</li>
+          <li><strong>Degree 2</strong>: the quadratic formula. Quadratic problems were solved in Babylon nearly four thousand years ago, and al-Khwārizmī set out general methods in the ninth century.</li>
+          <li><strong>Degree 3</strong>: a cubic formula exists, found by Scipione del Ferro and Niccolò Tartaglia and published by Gerolamo Cardano in 1545.</li>
+          <li><strong>Degree 4</strong>: a quartic formula exists too, found by Lodovico Ferrari and published in the same book.</li>
+          <li><strong>Degree 5 and above</strong>: there is <em>no</em> general formula built from the coefficients using only addition, subtraction, multiplication, division and roots. This was proved by Niels Henrik Abel in 1824, completing an argument begun by Paolo Ruffini.</li>
+        </ul>
+        <p>That doesn't mean these equations have no solutions. They do, and we can approximate them as closely as we like. It means the strategy of this page — rearrange the <em>general</em> form until \(x\) stands alone — runs out at degree 5. (Some particular equations of degree 5 can still be solved exactly; there just isn't one formula for all of them.)</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="polynomials.html">← All Polynomials pages</a>
+        <a href="algebra-completing-the-square.html">Next: Completing the Square →</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>
