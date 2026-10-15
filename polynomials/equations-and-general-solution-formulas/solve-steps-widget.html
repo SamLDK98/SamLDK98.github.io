@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From E3 to a value</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 520px; margin: 0 auto; }
+
+  .eq {
+    display: grid; place-items: center;
+    height: 6.2rem;
+    font-size: clamp(1.45rem, 6vw, 2.05rem);
+    color: var(--txt);
+  }
+  .eq > div {
+    grid-area: 1 / 1;
+    display: flex; align-items: center; gap: 0.35em; white-space: nowrap;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .eq > div.on { opacity: 1; transform: none; }
+
+  .frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.12; }
+  .frac > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 0.2em 0.06em; }
+  .frac > span:last-child { padding-top: 0.06em; }
+
+  .lone { color: var(--const); text-shadow: 0 0 14px var(--glow); }
+
+  .track { position: relative; margin: 0.5rem 0.2rem 0; }
+  .marks { position: relative; height: 1.6rem; margin-top: 0.35rem; }
+  .marks span {
+    position: absolute; top: 0; transform: translateX(-50%);
+    transition: color 0.3s ease;
+  }
+  .marks .solved { left: 50%; }
+  .marks .solved::before {
+    content: ""; display: block; width: 7px; height: 7px; margin: -1.15rem auto 0.55rem;
+    transform: rotate(45deg); background: var(--faint); transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .marks .rearrange { left: 25%; }
+  .marks .arith { left: 75%; }
+  .marks .lit { color: var(--body); }
+  .marks .solved.lit { color: var(--const); }
+  .marks .solved.lit::before { background: var(--const); box-shadow: 0 0 8px var(--glow); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="eq" aria-live="polite">
+    <div data-i="0"><span>8<span class="v">x</span> − 43</span><span>=</span><span>4 + 9</span></div>
+    <div data-i="1"><span>8<span class="v">x</span></span><span>=</span><span>4 + 9 + 43</span></div>
+    <div data-i="2"><span class="v lone">x</span><span>=</span><span class="frac"><span>4 + 9 + 43</span><span>8</span></span></div>
+    <div data-i="3"><span class="v lone">x</span><span>=</span><span class="frac"><span>56</span><span>8</span></span></div>
+    <div data-i="4"><span class="v lone">x</span><span>=</span><span>7</span></div>
+  </div>
+
+  <div class="track">
+    <input id="step" type="range" min="0" max="4" step="1" value="0" aria-label="Step through solving E3" />
+    <div class="marks" aria-hidden="true">
+      <span class="tag rearrange">rearrange</span>
+      <span class="tag solved">solved</span>
+      <span class="tag arith">arithmetic</span>
+    </div>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const step = document.getElementById("step");
+  const lines = [...document.querySelectorAll(".eq > div")];
+  const tags = {
+    rearrange: document.querySelector(".rearrange"),
+    solved: document.querySelector(".solved"),
+    arith: document.querySelector(".arith"),
+  };
+  function render() {
+    const i = +step.value;
+    lines.forEach((el) => el.classList.toggle("on", +el.dataset.i === i));
+    tags.rearrange.classList.toggle("lit", i < 2);
+    tags.solved.classList.toggle("lit", i >= 2);
+    tags.arith.classList.toggle("lit", i > 2);
+  }
+  step.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

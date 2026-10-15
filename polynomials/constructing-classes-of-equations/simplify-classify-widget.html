@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simplify first, then classify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 520px; margin: 0 auto; }
+  .eq { display: grid; place-items: center; height: 5.4rem; font-size: clamp(1.4rem, 6vw, 2rem); color: var(--txt); }
+  .eq > div {
+    grid-area: 1 / 1; display: flex; gap: 0.32em; align-items: baseline; white-space: nowrap;
+    opacity: 0; transform: translateY(6px); transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .eq > div.on { opacity: 1; transform: none; }
+  sup { font-size: 0.6em; line-height: 0; }
+  .gone { position: relative; opacity: 0.35; }
+  .gone::after { content: ""; position: absolute; left: -0.1em; right: -0.1em; top: 55%; border-top: 1.5px solid var(--sq); transform: rotate(-12deg); }
+
+  .track { position: relative; margin: 0.4rem 0.2rem 0; }
+  .marks { position: relative; height: 1.4rem; margin-top: 0.3rem; }
+  .marks span { position: absolute; top: 0; transform: translateX(-50%); transition: color 0.3s ease; white-space: nowrap; }
+  .marks .m1 { left: 33.33%; } .marks .m2 { left: 66.67%; } .marks .m3 { left: 100%; transform: translateX(-100%); }
+  .marks .lit { color: var(--body); }
+  .marks .m3.lit { color: var(--lin); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="eq" aria-live="polite">
+    <div data-i="0"><span><span class="v">x</span>(<span class="v">x</span> + 3)</span><span>=</span><span><span class="k-sq"><span class="v">x</span><sup>2</sup></span> + <span class="k-const">5</span></span></div>
+    <div data-i="1"><span><span class="k-sq"><span class="v">x</span><sup>2</sup></span> + <span class="k-lin">3<span class="v">x</span></span></span><span>=</span><span><span class="k-sq"><span class="v">x</span><sup>2</sup></span> + <span class="k-const">5</span></span></div>
+    <div data-i="2"><span><span class="k-sq gone"><span class="v">x</span><sup>2</sup></span> + <span class="k-lin">3<span class="v">x</span></span></span><span>=</span><span><span class="k-sq gone"><span class="v">x</span><sup>2</sup></span> + <span class="k-const">5</span></span></div>
+    <div data-i="3"><span class="k-lin">3<span class="v">x</span></span><span>=</span><span class="k-const">5</span></div>
+  </div>
+  <div class="track">
+    <input id="step" type="range" min="0" max="3" step="1" value="0" aria-label="Simplify the equation step by step" />
+    <div class="marks" aria-hidden="true">
+      <span class="tag m1">distribute</span>
+      <span class="tag m2">combine</span>
+      <span class="tag m3">degree 1</span>
+    </div>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const step = document.getElementById("step");
+  const lines = [...document.querySelectorAll(".eq > div")];
+  const marks = [null, ...document.querySelectorAll(".marks span")];
+  function render() {
+    const i = +step.value;
+    lines.forEach((el) => el.classList.toggle("on", +el.dataset.i === i));
+    marks.forEach((m, k) => m && m.classList.toggle("lit", k === i));
+  }
+  step.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

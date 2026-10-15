@@ -1,0 +1,74 @@
+/* Shared look for the Polynomials widgets: no frame, no title, no panel.
+   The widget sits on the page's own background and carries one control. */
+:root {
+  --txt:   #f4f6ff;
+  --body:  rgba(243, 246, 255, 0.93);
+  --dim:   rgba(238, 242, 252, 0.42);
+  --faint: rgba(238, 242, 252, 0.16);
+  --const: #e8a33d;   /* constants */
+  --lin:   #64c8a0;   /* x terms */
+  --sq:    #7aa7ff;   /* x² terms */
+  --glow:  rgba(232, 163, 61, 0.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: transparent; }
+
+body {
+  color: var(--body);
+  font-family: "Spectral", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.widget { width: 100%; padding: 0.4rem 0 0.6rem; }
+
+.v { font-style: italic; }                      /* a variable */
+.k-const { color: var(--const); }
+.k-lin   { color: var(--lin); }
+.k-sq    { color: var(--sq); }
+
+.tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--dim);
+}
+
+/* the one control: a thin track and a small glowing thumb */
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  display: block; width: 100%;
+  height: 18px; background: transparent; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 2px; border-radius: 2px; background: var(--faint); }
+input[type="range"]::-moz-range-track { height: 2px; border-radius: 2px; background: var(--faint); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 15px; height: 15px; margin-top: -6.5px; border-radius: 50%;
+  background: var(--const); box-shadow: 0 0 9px var(--glow);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 15px; height: 15px; border: 0; border-radius: 50%;
+  background: var(--const); box-shadow: 0 0 9px var(--glow);
+}
+input[type="range"]:focus-visible { outline: 1px solid var(--dim); outline-offset: 4px; }
+
+/* choose-one: quiet text options, the chosen one lit */
+.choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem 1.4rem; }
+.choices button {
+  font: inherit; font-size: 1.05rem;
+  background: none; border: 0; padding: 0.2rem 0;
+  color: var(--dim); cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.choices button:hover { color: var(--body); }
+.choices button[aria-pressed="true"] { color: var(--txt); border-bottom-color: var(--const); }
+.choices button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

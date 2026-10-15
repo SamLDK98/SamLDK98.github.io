@@ -274,6 +274,22 @@
     .data.cases td:nth-child(2) { white-space: nowrap; }
     .data.cases td:last-child { width: auto; text-align: center; }
     .data.cases th:last-child { text-align: center; }
+    /* ---------- widgets and figures ---------- */
+    iframe.poly-widget { display: block; width: 100%; border: 0; margin: 1.6rem 0 1.8rem; overflow: hidden; background: transparent; }
+    .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 clamp(1.5rem, 4vw, 3rem); align-items: center; margin: 0.95rem 0; }
+    .pair > :first-child { margin-top: 0; }
+    .pair .math { margin: 0.3rem 0; }
+    .pair p + p, .pair ul + p { margin-top: 0.6rem; }
+    figure.nest { margin: 0; }
+    figure.nest svg { display: block; width: 100%; max-width: 330px; height: auto; margin-inline: auto; }
+    figure.nest text { font-family: "Spectral", Georgia, serif; font-style: italic; }
+    @media (max-width: 900px) {
+      .pair { grid-template-columns: 1fr; gap: 0.6rem; }
+    }
+    .math { scrollbar-width: thin; scrollbar-color: rgba(238,242,252,0.16) transparent; }
+    .math::-webkit-scrollbar { height: 4px; }
+    .math::-webkit-scrollbar-track { background: transparent; }
+    .math::-webkit-scrollbar-thumb { background: rgba(238,242,252,0.16); border-radius: 4px; }
   </style>
   <script>
     window.MathJax = {
@@ -295,42 +311,41 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Equations and General Solution Formulas</h1>
     </header>
     <main>
-      <section class="col" aria-labelledby="what-is-solving">
-        <h2 id="what-is-solving">What does it mean to solve an equation?</h2>
+      <section class="col" aria-labelledby="what-does-it-mean-to-solve-an-equation">
+        <h2 id="what-does-it-mean-to-solve-an-equation">What does it mean to solve an equation?</h2>
         <p>"When we know the value of the unknown!"</p>
         <p>But do we know the value here?</p>
         <div class="math">\[x=10-3\]</div>
         <p>We still need to perform a mental (or physical) computation if we want to <em>know</em> that \(x=7\).</p>
         <p>Consider:</p>
         <div class="math">\[\begin{aligned}
-          \text{E1:}\quad &amp; x=7\\
-          \text{E2:}\quad &amp; x=10-3\\
-          \text{E3:}\quad &amp; 8x-43=4+9
-        \end{aligned}\]</div>
+\text{E1:}\quad &amp; x=7\\
+\text{E2:}\quad &amp; x=10-3\\
+\text{E3:}\quad &amp; 8x-43=4+9
+\end{aligned}\]</div>
         <p>All of these equations contain the same information about \(x\).</p>
-        <p>We might think that an equation is solved when all the arithmetic has been performed.</p>
+        <p>We might think that an equation is solved when all arithmetic has been performed.</p>
         <p>But we would consider \(\text{E2}\) to be solved already, even though a subtraction is still waiting to be done.</p>
         <p>\(\text{E3}\) looks more complicated, but really there is just more arithmetic waiting to be done: we need to add \(4\), \(9\) and \(43\) together and divide the sum by \(8\).</p>
-        <p>So why is \(\text{E2}\) solved but not \(\text{E3}\), if both are just waiting for some sequence of computations to reveal \(x\)?</p>
+        <p>So why is \(\text{E2}\) solved but not \(\text{E3}\) if they are both just waiting for some sequence of computations to reveal \(x\)?</p>
         <p>Because <strong>an equation is solved when the value of the unknown is expressed in terms of known quantities.</strong></p>
-        <p>In \(\text{E2}\), the computations are written out explicitly: one side is \(x\), the other side is made only of known numbers, and evaluating it gives \(x\).</p>
-        <p>In \(\text{E3}\), the computations that would reveal \(x\) are not written down anywhere. We have to work out what they are by rearranging the equation.</p>
-        <p>So solving is not necessarily about reducing the amount of computation required to evaluate \(x\). It is about rearranging the equation into a particular form.</p>
-        <p>This is why solving is synonymous with isolating the unknown, as long as no unknown is left on the other side. (\(x=3-x\) has \(x\) on its own on the left, but it isn't solved: the right-hand side still depends on \(x\).)</p>
+        <p>It is not necessarily about reducing the amount of computation required to evaluate \(x\), but rearranging the equation into a particular form.</p>
+        <iframe class="poly-widget" src="polynomials/equations-and-general-solution-formulas/solve-steps-widget.html" title="Interactive: E3 rearranged step by step until x stands alone, then evaluated" style="height: 175px" scrolling="no" loading="lazy"></iframe>
+        <p>This is why solving is synonymous with isolating the unknown (as long as no unknown is left on the other side). (\(x=3-x\) has \(x\) on its own on the left, but it isn't solved: the right-hand side still depends on \(x\).)</p>
       </section>
 
-      <section class="col" aria-labelledby="general-solution-formula">
-        <h2 id="general-solution-formula">What is a general solution formula?</h2>
+      <section class="col" aria-labelledby="what-is-a-general-solutions-formula">
+        <h2 id="what-is-a-general-solutions-formula">What is a general solutions formula?</h2>
         <p>Algebra allows us to abstract structure from specific cases to express general forms.</p>
         <p>Consider these equations:</p>
         <div class="math">\[\begin{aligned}
-          2x+5&amp;=25\\
-          3x+7&amp;=19\\
-          5x-8&amp;=12
-        \end{aligned}\]</div>
+2x+5&amp;=25\\
+3x+7&amp;=19\\
+5x-8&amp;=12
+\end{aligned}\]</div>
         <p>They contain different numbers, but share the same structure.</p>
         <p>(Subtraction fits too: \(5x-8\) is \(5x+(-8)\). Subtracting is adding a negative.)</p>
-        <p>We can express the shared structure as an algebraic equation, using letters for the known numbers that change from case to case:</p>
+        <p>We can express the shared structure as an algebraic equation:</p>
         <div class="math">\[ax+b=c\]</div>
         <p>Here \(x\) is still the unknown, while \(a\), \(b\) and \(c\) stand for known numbers.</p>
         <p>A <strong>general solution formula</strong> takes the shared structure and rearranges it so that the unknown is expressed in terms of the known quantities:</p>
@@ -339,8 +354,7 @@
         <p>One formula now solves all three equations at once:</p>
         <div class="math">\[x=\frac{25-5}{2}=10\qquad x=\frac{19-7}{3}=4\qquad x=\frac{12-(-8)}{5}=4\]</div>
         <p>Instead of solving equations case by case, we can solve every case of a particular structure.</p>
-        <p>But a formula only works for equations that have its structure. \(x=\frac{c-b}{a}\) is no help with \(x^2+6x=7\).</p>
-        <p>So before we can reach for a formula, we need to know which structure an equation has. That raises the question the next page answers: what structures can equations have?</p>
+        <iframe class="poly-widget" src="polynomials/equations-and-general-solution-formulas/one-formula-widget.html" title="Interactive: choose one of the three equations and watch its numbers fill the general solution formula" style="height: 190px" scrolling="no" loading="lazy"></iframe>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
@@ -349,5 +363,14 @@
       </nav>
     </main>
   </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "poly-widget-height") return;
+      document.querySelectorAll("iframe.poly-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
 </body>
 </html>

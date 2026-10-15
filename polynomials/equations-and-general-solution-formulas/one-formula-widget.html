@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>One formula, every case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  :root { --a: #7aa7ff; --b: #64c8a0; --c: #e8a33d; }
+  .widget {
+    max-width: 640px; margin: 0 auto;
+    display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 1rem clamp(2rem, 8vw, 4.5rem);
+    font-size: clamp(1.15rem, 3.6vw, 1.45rem);
+  }
+  .a { color: var(--a); } .b { color: var(--b); } .c { color: var(--c); }
+
+  .cases { display: flex; flex-direction: column; gap: 0.55rem; }
+  .cases button {
+    font: inherit; background: none; border: 0; cursor: pointer; text-align: left;
+    color: var(--txt); opacity: 0.32; padding: 0.15rem 0 0.15rem 0.9rem;
+    border-left: 1.5px solid transparent;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+  }
+  .cases button:hover { opacity: 0.6; }
+  .cases button[aria-pressed="true"] { opacity: 1; border-left-color: var(--faint); }
+  .cases button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+
+  .formula { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; gap: 0.5rem 0.45em; color: var(--txt); }
+  .formula .rhs { display: flex; align-items: center; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.15; }
+  .frac > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 0.25em 0.08em; }
+  .frac > span:last-child { padding-top: 0.08em; }
+  .num, .den { color: var(--txt); }
+  .sub { transition: opacity 0.3s ease, transform 0.3s ease; }
+  .sub.swap { opacity: 0; transform: translateY(5px); }
+  .answer { font-weight: 500; }
+
+  @media (max-width: 520px) {
+    .widget { grid-template-columns: 1fr; justify-items: center; gap: 1.3rem; }
+    .cases { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.35rem 1.1rem; font-size: 0.95em; }
+    .cases button { padding: 0.15rem 0 0.2rem; border-left: 0; border-bottom: 1.5px solid transparent; }
+    .cases button[aria-pressed="true"] { border-bottom-color: var(--faint); }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="cases" role="group" aria-label="Choose an equation"></div>
+
+  <div class="formula" aria-live="polite">
+    <span class="v">x</span>
+    <span class="rhs">=&nbsp;<span class="frac"><span><span class="v c">c</span> − <span class="v b">b</span></span><span><span class="v a">a</span></span></span></span>
+    <span></span>
+    <span class="rhs sub" id="sub"></span>
+    <span></span>
+    <span class="rhs sub" id="ans"></span>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const CASES = [[2, 5, 25], [3, 7, 19], [5, -8, 12]];
+  const casesEl = document.querySelector(".cases");
+  const sub = document.getElementById("sub"), ans = document.getElementById("ans");
+  const fmt = (n) => (n < 0 ? "−" + Math.abs(n) : String(n));
+
+  function eqHTML([a, b, c]) {
+    const bTerm = b < 0 ? `<span class="b">− ${Math.abs(b)}</span>` : `<span class="b">+ ${b}</span>`;
+    return `<span class="a">${a}</span><span class="v">x</span> ${bTerm} = <span class="c">${c}</span>`;
+  }
+
+  const buttons = CASES.map((cs, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.innerHTML = eqHTML(cs);
+    btn.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+    btn.addEventListener("click", () => choose(i));
+    casesEl.appendChild(btn);
+    return btn;
+  });
+
+  function fill(i) {
+    const [a, b, c] = CASES[i];
+    const bPart = b < 0 ? `(${fmt(b)})` : fmt(b);
+    sub.innerHTML = `=&nbsp;<span class="frac"><span><span class="c">${c}</span> − <span class="b">${bPart}</span></span><span><span class="a">${a}</span></span></span>`;
+    ans.innerHTML = `=&nbsp;<span class="answer">${fmt((c - b) / a)}</span>`;
+  }
+
+  let current = 0;
+  function choose(i) {
+    if (i === current) return;
+    current = i;
+    buttons.forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false"));
+    sub.classList.add("swap"); ans.classList.add("swap");
+    setTimeout(() => { fill(i); sub.classList.remove("swap"); ans.classList.remove("swap"); }, 180);
+  }
+  fill(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Every term times every term</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 560px; margin: 0 auto; }
+  .choices { margin-bottom: 1.4rem; }
+
+  .grid {
+    display: grid; justify-content: center;
+    font-size: clamp(1.1rem, 4.4vw, 1.4rem); color: var(--txt);
+  }
+  .grid > div { display: grid; place-items: center; text-align: center; }
+  .grid > div.head { display: flex; align-items: center; justify-content: center; }
+  .head { color: var(--body); padding: 0.35rem 0.75rem; white-space: nowrap; transition: color 0.2s ease, text-shadow 0.2s ease; }
+  .head.hot { color: var(--const); text-shadow: 0 0 10px var(--glow); }
+  .cell {
+    min-width: clamp(4.6rem, 20vw, 6.4rem); min-height: 4.2rem; padding: 0.4rem 0.5rem;
+    border-left: 1px solid var(--faint); border-top: 1px solid var(--faint);
+    opacity: 0; transform: scale(0.96);
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.2s ease;
+    cursor: default;
+  }
+  .cell.in { opacity: 1; transform: none; }
+  .cell.r-last { border-bottom: 1px solid var(--faint); }
+  .cell.c-last { border-right: 1px solid var(--faint); }
+  .cell:hover, .cell:focus-visible { background: rgba(255, 255, 255, 0.025); outline: none; }
+  .cell .case { display: block; margin-top: 0.15rem; font-size: 0.6rem; }
+
+  .result {
+    margin-top: 1.3rem; text-align: center; color: var(--txt);
+    font-size: clamp(1.15rem, 4.4vw, 1.45rem);
+    transition: opacity 0.3s ease;
+  }
+  sup { font-size: 0.62em; line-height: 0; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="choices" role="group" aria-label="Choose a product"></div>
+  <div class="grid" id="grid" aria-live="polite"></div>
+  <div class="result" id="result"></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // A term is [coefficient, power of x].
+  const PRODUCTS = [
+    { label: "4(2x + 5)",       rows: [[4, 0]],         cols: [[2, 1], [5, 0]] },
+    { label: "x(3x + 8)",       rows: [[1, 1]],         cols: [[3, 1], [8, 0]] },
+    { label: "(2x + 1)(x + 4)", rows: [[2, 1], [1, 0]], cols: [[1, 1], [4, 0]] },
+  ];
+  const KIND = ["k-const", "k-lin", "k-sq"];
+  const CASE = { "0,0": 1, "0,1": 2, "1,0": 2, "1,1": 4 };
+
+  function term([c, p], colour) {
+    const x = p === 0 ? "" : '<span class="v">x</span>' + (p > 1 ? "<sup>" + p + "</sup>" : "");
+    const coef = p > 0 && c === 1 ? "" : String(c);
+    const html = coef + x;
+    return colour ? '<span class="' + KIND[p] + '">' + html + "</span>" : html;
+  }
+  const labelHTML = (s) => s.replace(/x/g, '<span class="v">x</span>');
+
+  const choices = document.querySelector(".choices");
+  const buttons = PRODUCTS.map((p, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.innerHTML = labelHTML(p.label);
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => show(i));
+    choices.appendChild(b);
+    return b;
+  });
+
+  const grid = document.getElementById("grid");
+  const result = document.getElementById("result");
+
+  function show(i) {
+    const P = PRODUCTS[i];
+    buttons.forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false"));
+    grid.innerHTML = "";
+    grid.style.gridTemplateColumns = "auto repeat(" + P.cols.length + ", auto)";
+    grid.appendChild(document.createElement("div"));
+    const colHeads = P.cols.map((c) => { const d = document.createElement("div"); d.className = "head"; d.innerHTML = term(c); grid.appendChild(d); return d; });
+    const cells = [];
+    const sums = {};
+    P.rows.forEach((r, ri) => {
+      const rh = document.createElement("div"); rh.className = "head"; rh.innerHTML = term(r); grid.appendChild(rh);
+      P.cols.forEach((c, ci) => {
+        const prod = [r[0] * c[0], r[1] + c[1]];
+        sums[prod[1]] = (sums[prod[1]] || 0) + prod[0];
+        const d = document.createElement("div");
+        d.className = "cell" + (ri === P.rows.length - 1 ? " r-last" : "") + (ci === P.cols.length - 1 ? " c-last" : "");
+        d.tabIndex = 0;
+        d.innerHTML = "<div>" + term(prod, true) + '<span class="case tag">case ' + CASE[r[1] + "," + c[1]] + "</span></div>";
+        const hot = (on) => { rh.classList.toggle("hot", on); colHeads[ci].classList.toggle("hot", on); };
+        d.addEventListener("mouseenter", () => hot(true)); d.addEventListener("mouseleave", () => hot(false));
+        d.addEventListener("focus", () => hot(true)); d.addEventListener("blur", () => hot(false));
+        grid.appendChild(d); cells.push(d);
+      });
+    });
+    cells.forEach((d, k) => setTimeout(() => d.classList.add("in"), 70 * k + 20));
+
+    // the products, added up: like terms combine
+    const powers = Object.keys(sums).map(Number).sort((a, b) => b - a);
+    result.innerHTML = "= " + powers.map((p) => term([sums[p], p], true)).join(" + ");
+    if (window.postWidgetHeight) setTimeout(window.postWidgetHeight, 50);
+  }
+  show(2);
+</script>
+</body>
+</html>

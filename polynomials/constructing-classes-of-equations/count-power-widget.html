@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adding copies and multiplying copies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .rows {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline;
+    gap: 0.7rem 0.6em; color: var(--txt);
+    font-size: clamp(1.25rem, 5vw, 1.8rem);
+    min-height: 5.6rem;
+  }
+  .lhs { justify-self: end; white-space: nowrap; }
+  .rhs { justify-self: start; white-space: nowrap; }
+  .n { color: var(--const); text-shadow: 0 0 12px var(--glow); }
+  .op { color: var(--dim); margin: 0 0.18em; }
+  sup { font-size: 0.6em; line-height: 0; }
+  .slider { max-width: 300px; margin: 0.9rem auto 0; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="rows" aria-live="polite">
+    <span class="lhs" id="sum"></span><span>=</span><span class="rhs" id="coef"></span>
+    <span class="lhs" id="prod"></span><span>=</span><span class="rhs" id="pow"></span>
+  </div>
+  <div class="slider"><input id="n" type="range" min="2" max="6" step="1" value="3" aria-label="Number of copies of x" /></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const n = document.getElementById("n");
+  const X = '<span class="v">x</span>';
+  function render() {
+    const k = +n.value;
+    const copies = (op) => Array(k).fill(X).join('<span class="op">' + op + "</span>");
+    document.getElementById("sum").innerHTML = copies("+");
+    document.getElementById("prod").innerHTML = copies("·");
+    document.getElementById("coef").innerHTML = '<span class="n">' + k + "</span>" + X;
+    document.getElementById("pow").innerHTML = X + '<sup class="n">' + k + "</sup>";
+  }
+  n.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Like terms combine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 620px; margin: 0 auto; }
+  .row { position: relative; height: 4.6rem; color: var(--txt); }
+  .row span.t { position: absolute; top: 0.9rem; white-space: nowrap; line-height: 1.4; will-change: transform, opacity; }
+  .row span.lab { position: absolute; top: 3.05rem; transform: translateX(-50%); }
+  .measure { position: absolute; visibility: hidden; white-space: nowrap; display: flex; }
+  .slider { max-width: 340px; margin: 0.3rem auto 0; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="row" id="row" aria-live="polite"></div>
+  <div class="slider"><input id="t" type="range" min="0" max="1000" value="0" aria-label="Combine like terms" /></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Two sets, chosen by ?set=: constants only, or copies of x as well.
+  const SETS = {
+    constants: { left: ["x", 2, 3, 4, 2], right: [3, 7, 10, 6] },
+    copies:    { left: ["x", "x", "x", "x", 3, 4], right: [7, 13] },
+  };
+  const set = SETS[new URLSearchParams(location.search).get("set")] || SETS.constants;
+  const row = document.getElementById("row");
+  const slider = document.getElementById("t");
+
+  const kindOf = (v) => (v === "x" ? "x" : "c");
+  const xHTML = (n) => (n === 1 ? '<span class="v">x</span>' : n + '<span class="v">x</span>');
+
+  // The collapsed form of one side: at most one x term and one constant.
+  function collapse(terms) {
+    const xs = terms.filter((v) => v === "x").length;
+    const cs = terms.filter((v) => v !== "x");
+    const out = [];
+    if (xs) out.push({ kind: "x", html: xHTML(xs), letter: xs > 1 ? "a" : null });
+    if (cs.length) out.push({ kind: "c", html: String(cs.reduce((a, b) => a + b, 0)), letter: null });
+    return out;
+  }
+  const leftC = collapse(set.left), rightC = collapse(set.right);
+  leftC.forEach((g) => { if (g.kind === "c") g.letter = "b"; });
+  rightC.forEach((g) => { if (g.kind === "c") g.letter = "c"; });
+
+  // Build a token list for a layout: terms, pluses and the equals sign.
+  function layout(left, right, termHTML) {
+    const toks = [];
+    left.forEach((v, i) => { if (i) toks.push({ op: "+" }); toks.push({ term: v, side: "L", i }); });
+    toks.push({ op: "=" });
+    right.forEach((v, i) => { if (i) toks.push({ op: "+" }); toks.push({ term: v, side: "R", i }); });
+    return toks.map((t) => Object.assign(t, { html: t.op ? t.op : termHTML(t.term) }));
+  }
+  const expanded = layout(set.left, set.right, (v) => (v === "x" ? '<span class="v">x</span>' : String(v)));
+  const collapsed = layout(leftC, rightC, (g) => g.html);
+
+  const GAP = 0.32; // em between tokens
+  function measure(toks, fontPx) {
+    const m = document.createElement("div");
+    m.className = "measure"; m.style.fontSize = fontPx + "px"; m.style.gap = GAP + "em";
+    toks.forEach((t) => { const s = document.createElement("span"); s.innerHTML = t.html; m.appendChild(s); });
+    row.appendChild(m);
+    const spans = [...m.children], total = m.getBoundingClientRect().width;
+    const pos = spans.map((s) => ({ x: s.offsetLeft, w: s.getBoundingClientRect().width }));
+    m.remove();
+    return { pos, total };
+  }
+
+  let els = [], geo = null;
+  function build() {
+    const W = row.getBoundingClientRect().width;
+    let font = Math.min(32, Math.max(17, W / 17));
+    let e = measure(expanded, font);
+    if (e.total > W - 8) { font *= (W - 8) / e.total; e = measure(expanded, font); }
+    const c = measure(collapsed, font);
+    const eOff = (W - e.total) / 2, cOff = (W - c.total) / 2;
+    row.style.fontSize = font + "px";
+    row.querySelectorAll("span").forEach((s) => s.remove());
+
+    // where each expanded term ends up: the centre of its merged group
+    const groupCentre = {};
+    collapsed.forEach((t, k) => {
+      if (t.term) groupCentre[t.side + t.term.kind] = cOff + c.pos[k].x + c.pos[k].w / 2;
+    });
+    const eqE = expanded.findIndex((t) => t.op === "="), eqC = collapsed.findIndex((t) => t.op === "=");
+
+    els = [];
+    expanded.forEach((t, k) => {
+      const s = document.createElement("span");
+      s.className = "t" + (t.term !== undefined ? (kindOf(t.term) === "x" ? " k-lin" : " k-const") : "");
+      s.innerHTML = t.html; row.appendChild(s);
+      const x0 = eOff + e.pos[k].x, w = e.pos[k].w;
+      let x1 = x0, role = "plus";
+      if (t.term !== undefined) { x1 = groupCentre[t.side + kindOf(t.term)] - w / 2; role = "term"; }
+      if (k === eqE) { x1 = cOff + c.pos[eqC].x; role = "eq"; }
+      els.push({ s, x0, x1, role });
+    });
+    collapsed.forEach((t, k) => {
+      if (t.op === "=") return;
+      const s = document.createElement("span");
+      s.className = "t" + (t.term ? (t.term.kind === "x" ? " k-lin" : " k-const") : "");
+      s.innerHTML = t.html; row.appendChild(s);
+      const x = cOff + c.pos[k].x;
+      els.push({ s, x0: x, x1: x, role: t.term ? "merged" : "newplus" });
+      if (t.term && t.term.letter) {
+        const l = document.createElement("span");
+        l.className = "lab tag"; l.innerHTML = '<span class="v">' + t.term.letter + "</span>";
+        l.style.left = x + c.pos[k].w / 2 + "px"; l.style.textTransform = "none"; l.style.fontFamily = "Spectral, serif"; l.style.fontSize = "0.55em";
+        row.appendChild(l);
+        els.push({ s: l, role: "label" });
+      }
+    });
+    render();
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  const clamp01 = (v) => Math.max(0, Math.min(1, v));
+  const ease = (v) => v * v * (3 - 2 * v);
+  function render() {
+    const t = slider.value / 1000;
+    const move = ease(clamp01(t / 0.85));
+    els.forEach((e) => {
+      if (e.role === "label") { e.s.style.opacity = clamp01((t - 0.82) / 0.18); return; }
+      const x = e.x0 + (e.x1 - e.x0) * move;
+      e.s.style.transform = "translateX(" + x.toFixed(2) + "px)";
+      e.s.style.left = "0";
+      let o = 1;
+      if (e.role === "term") o = 1 - clamp01((t - 0.3) / 0.45);
+      if (e.role === "plus") o = 1 - clamp01(t / 0.35);
+      if (e.role === "merged") o = clamp01((t - 0.42) / 0.4);
+      if (e.role === "newplus") o = clamp01((t - 0.7) / 0.25);
+      e.s.style.opacity = o;
+    });
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 120); });
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(build);
+  build();
+</script>
+</body>
+</html>
