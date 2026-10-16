@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>x² against 5x</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+  svg .name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 19px; }
+  svg .gap { font-family: "Spectral", Georgia, serif; font-size: 19px; fill: var(--const); transition: filter 0.25s ease; }
+  svg .gap.hit { filter: drop-shadow(0 0 6px rgba(232,163,61,0.9)); }
+  svg .tick { fill: var(--dim); font-size: 10px; }
+  svg .tick.on { fill: var(--txt); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="bars" aria-hidden="true"></svg>
+  <input id="x" type="range" min="0" max="5" step="0.1" value="0.6" aria-label="Value of x" />
+  <svg id="ticks" aria-hidden="true"></svg>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The same x fed to two processes: squared (blue) and multiplied by 5 (green).
+  // The amber band is how far 5x is ahead: 5x − x². Units are hundredths, so 6 is exact.
+  const NS = "http://www.w3.org/2000/svg";
+  const bars = document.getElementById("bars"), ticks = document.getElementById("ticks");
+  const slider = document.getElementById("x");
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+  const SQ = "#7aa7ff", LIN = "#64c8a0", AMB = "#e8a33d";
+
+  function el(name, attrs, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    parent.appendChild(e);
+    return e;
+  }
+
+  const H = 116, R1 = 14, R2 = 80, BH = 16, NAME = 40, PAD = 7.5;
+
+  function render() {
+    const t = Math.round(+slider.value * 10);
+    const sq = t * t, lin = 50 * t, gap = lin - sq;     // hundredths
+    const W = bars.clientWidth || 560;
+    bars.setAttribute("viewBox", `0 0 ${W} ${H}`); bars.setAttribute("height", H);
+    bars.textContent = "";
+    const x0 = NAME, x1 = W - 34;
+    const sx = (v) => x0 + (v / 2500) * (x1 - x0);
+
+    el("text", { x: 0, y: R1 + BH - 2, class: "name", fill: SQ }, bars).textContent = "x²";
+    el("text", { x: 0, y: R2 + BH - 2, class: "name", fill: LIN }, bars).textContent = "5x";
+    for (const y of [R1, R2]) el("rect", { x: x0, y, width: x1 - x0, height: BH, rx: 2, fill: "rgba(238,242,252,0.04)" }, bars);
+
+    // the lead 5x has over x², spanning the space between the two bars
+    if (gap > 0) {
+      el("rect", { x: sx(sq), y: R1 + BH, width: sx(lin) - sx(sq), height: R2 - R1 - BH,
+                   fill: gap === 600 ? "rgba(232,163,61,0.22)" : "rgba(232,163,61,0.1)" }, bars);
+      for (const v of [sq, lin]) el("line", { x1: sx(v), x2: sx(v), y1: R1 + BH, y2: R2, stroke: "rgba(232,163,61,0.55)", "stroke-dasharray": "3 3" }, bars);
+      if (sx(lin) - sx(sq) > 26)
+        el("text", { x: (sx(sq) + sx(lin)) / 2, y: (R1 + BH + R2) / 2 + 6, "text-anchor": "middle",
+                     class: "gap" + (gap === 600 ? " hit" : "") }, bars).textContent = fmt(gap / 100);
+    }
+
+    el("rect", { x: x0, y: R1, width: sx(sq) - x0, height: BH, rx: 2, fill: SQ, opacity: 0.85 }, bars);
+    el("rect", { x: x0, y: R2, width: sx(lin) - x0, height: BH, rx: 2, fill: LIN, opacity: 0.85 }, bars);
+    el("text", { x: sx(sq) + 6, y: R1 + BH - 4, fill: SQ }, bars).textContent = fmt(sq / 100);
+    el("text", { x: sx(lin) + 6, y: R2 + BH - 4, fill: LIN }, bars).textContent = fmt(lin / 100);
+
+    // x ticks under the slider
+    ticks.setAttribute("viewBox", `0 0 ${W} 16`); ticks.setAttribute("height", 16);
+    ticks.textContent = "";
+    for (let u = 0; u <= 5; u++)
+      el("text", { x: PAD + (u / 5) * (W - 2 * PAD), y: 12, "text-anchor": "middle",
+                   class: "tick" + (t === u * 10 ? " on" : "") }, ticks).textContent = u;
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
