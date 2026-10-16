@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple Solutions (1) | Polynomials | Sam Kirwan</title>
+  <meta name="description" content="Why one unknown can have two solutions: every linear step can be undone to one number, but squaring is many-to-one, and the x term only moves the mirror between the two answers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot, not blue-black */
+      --bg-2:    #141419;
+      --measure: 92ch;         /* the reading column */
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);   /* running prose */
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --na:      #e8a33d;   /* bone and notch */
+      --k:       #64c8a0;   /* clay token */
+      --cl:      #54d6a0;
+      --stim:    #ffc247;
+      --ahp:     #7aa7ff;   /* written numeral */
+      --leak:    #8fa0c4;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    /* Fine grain. A flat dark colour on its own reads as a glossy void; the
+       noise is what makes it feel like a matte surface. */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .sheet { position: relative; z-index: 1; }
+
+    /* ---------- masthead ---------- */
+    header {
+      padding: clamp(1.6rem, 5vh, 2.8rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--na); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--na); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 5.4vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #e8a33d 4%, #64c8a0 52%, #7aa7ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--body);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ---------- prose ---------- */
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.95rem; color: var(--txt);
+      margin: 1.8rem 0 0.5rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .cl { color: var(--cl); }
+    .stim { color: var(--stim); }
+    .ahp { color: var(--ahp); }
+
+    a.inline {
+      color: var(--k);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(100, 200, 160, 0.35);
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    a.inline:hover, a.inline:focus-visible { color: var(--txt); border-bottom-color: var(--txt); outline: none; }
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+
+    /* ---------- widget slot ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 1115px;            /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1895px; } }
+    iframe.bench.short { height: 610px; }
+    @media (max-width: 820px) { iframe.bench.short { height: 765px; } }
+
+    /* placeholder shown until the figure is built */
+    .lab-empty {
+      border: 1px dashed var(--line);
+      background: linear-gradient(180deg, rgba(140,165,225,0.04), transparent);
+      padding: clamp(2.4rem, 8vh, 4.5rem) 1.5rem;
+      text-align: center;
+    }
+    .lab-empty p {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3);
+    }
+
+    /* ---------- data table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .data {
+      width: 100%; border-collapse: collapse; margin-top: 1.3rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.73rem;
+    }
+    .data th, .data td {
+      text-align: left; padding: 0.6rem 0.9rem 0.6rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+    }
+    .data thead th {
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .data td:first-child { white-space: nowrap; color: var(--txt); }
+    .data td { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--txt-2); }
+    .data td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; white-space: normal; width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+
+    .fig-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; line-height: 1.7; color: var(--txt-3);
+      margin-top: 0.7rem; max-width: 74ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  
+    /* ---------- glyph figures ---------- */
+    .glyphs { margin: 1rem 0 1.4rem; padding: 0.9rem 1.1rem 0.8rem; border: 1px solid var(--line-2); background: var(--bg-2); }
+    .glyph-row { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; align-items: center; color: var(--na); }
+    .glyph-row .grp { display: inline-flex; gap: 0.15rem; }
+    .glyph-row svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .roman-row { font-family: "Spectral", Georgia, serif; font-size: 1.9rem; letter-spacing: 0.08em; line-height: 1; gap: 0; }
+    .roman-row .inline-glyph { width: 30px; height: 34px; margin: 0 0.12em; vertical-align: middle; }
+    .glyphs figcaption { font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; color: var(--txt-3); margin-top: 0.55rem; }
+    ul + p, ol + p, .eq + p, .glyphs + h3 { margin-top: 0.95rem; }
+    .eq-line.wrap { white-space: normal; }
+    .eq-line.wrap .sep { margin-right: 0.6em; }
+    h1 { max-width: none; }
+    p strong, li strong { color: #d9692b; }
+    .col p, .col li { font-size: clamp(1.12rem, 2.4vw, 1.25rem); }
+    iframe.bench.cols { height: 760px; }
+    @media (max-width: 820px) { iframe.bench.cols { height: 1100px; } }
+  
+    .area-figure { margin: 1.7rem 0; }
+    .area-figure svg { display: block; width: min(100%, 540px); height: auto; margin-inline: auto; }
+    .area-rearrangement svg { width: min(100%, 760px); }
+    .area-figure .label { font-family: "Spectral", Georgia, serif; font-size: 25px; fill: var(--txt); font-style: italic; }
+    .area-figure .dimension { font-size: 22px; fill: var(--txt-2); }
+    .area-figure + p { margin-top: 0.95rem; }
+    mjx-container { color: inherit; }
+    a:focus-visible { outline: 2px solid var(--na); outline-offset: 5px; }
+    .math { overflow-x: auto; overflow-y: hidden; margin: 0.95rem 0; padding: 0.15rem 0; font-size: clamp(1.12rem, 2.4vw, 1.25rem); color: var(--body); }
+    .math mjx-container[display="true"] { text-align: left !important; margin: 0 !important; }
+    .math + p, .scroll-x + p { margin-top: 0.95rem; }
+    .col h4 { font-family: "IBM Plex Sans", sans-serif; font-weight: 500; font-size: 0.98rem; color: var(--txt-2); margin: 1.5rem 0 0.6rem; }
+    .col h3 { font-family: "Spectral", Georgia, serif; font-weight: 500; font-size: clamp(1.15rem, 2.4vw, 1.3rem); color: var(--txt); margin: 2rem 0 0.7rem; }
+    .data { min-width: 38rem; }
+    .data td { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; color: var(--body); }
+    .data td:first-child { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+    .data td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    a.inline { color: var(--k); text-decoration: none; border-bottom: 1px solid rgba(100,200,160,0.35); }
+    a.inline:hover { color: var(--txt); border-bottom-color: var(--txt); }
+    blockquote.note { margin: 1rem 0; padding: 0.7rem 1.1rem; border-left: 2px solid var(--na); background: linear-gradient(90deg, rgba(232,163,61,0.07), transparent 75%); }
+    blockquote.note p { color: var(--txt-2); }
+    blockquote.note p + p { margin-top: 0.6rem; }
+    blockquote.note + p, blockquote.note + h3 { margin-top: 0.95rem; }
+    .tick { color: var(--k); font-weight: 600; font-size: 1.2rem; }
+    .cross { color: #e0675a; font-weight: 600; font-size: 1.2rem; }
+    .data.cases { min-width: 44rem; }
+    .data.cases td:nth-child(2) { white-space: nowrap; }
+    .data.cases td:last-child { width: auto; text-align: center; }
+    .data.cases th:last-child { text-align: center; }
+    /* ---------- widgets and figures ---------- */
+    iframe.poly-widget { display: block; width: 100%; border: 0; margin: 1.6rem 0 1.8rem; overflow: hidden; background: transparent; }
+    .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 clamp(1.5rem, 4vw, 3rem); align-items: center; margin: 0.95rem 0; }
+    .pair > :first-child { margin-top: 0; }
+    .pair .math { margin: 0.3rem 0; }
+    .pair p + p, .pair ul + p { margin-top: 0.6rem; }
+    figure.nest { margin: 0; }
+    figure.nest svg { display: block; width: 100%; max-width: 330px; height: auto; margin-inline: auto; }
+    figure.nest text { font-family: "Spectral", Georgia, serif; font-style: italic; }
+    @media (max-width: 900px) {
+      .pair { grid-template-columns: 1fr; gap: 0.6rem; }
+    }
+    .math { scrollbar-width: thin; scrollbar-color: rgba(238,242,252,0.16) transparent; }
+    .math::-webkit-scrollbar { height: 4px; }
+    .math::-webkit-scrollbar-track { background: transparent; }
+    .math::-webkit-scrollbar-thumb { background: rgba(238,242,252,0.16); border-radius: 4px; }
+    .data.steps { min-width: 34rem; }
+    .data.steps td, .data.steps th { text-align: center; }
+    .data.steps td:first-child, .data.steps th:first-child { text-align: left; font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    .data.steps td:last-child { width: auto; }
+    .data.steps thead th { font-size: 0.95rem; letter-spacing: 0; text-transform: none; }
+    .data.steps td.ahp { color: var(--ahp); }
+    .data.steps td.k { color: var(--k); }
+    .data.steps td.na { color: var(--na); }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="polynomials.html">Polynomials</a>
+      <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Multiple Solutions (1)</h1>
+    </header>
+    <main>
+      <section class="col" aria-labelledby="undoing-gives-one-answer">
+        <h2 id="undoing-gives-one-answer">Undoing Gives One Answer</h2>
+        <p>Linear equations have exactly one solution (as long as \(a\neq0\)).</p>
+        <div class="math">\[2x+4=7\]</div>
+        <p>Why only one?</p>
+        <p>Because we can express \(x\) in terms of known quantities. The left-hand side is built from \(x\) in two steps: multiply by \(2\), then add \(4\). To find \(x\), we undo the steps in reverse order:</p>
+        <div class="math">\[x=\frac{7-4}{2}=1.5\]</div>
+        <p>Every step can be undone perfectly. Adding a number is undone by subtracting it. Multiplying by a non-zero number is undone by dividing by it.</p>
+        <p>These operations are <strong>bijective</strong>: they pair inputs with outputs one-to-one, so different inputs always give different outputs.</p>
+        <p>If adding \(4\) to a number gives \(7\), there is only one number it could have been: \(3\).</p>
+        <p>So each time we undo a step, there is only one number to go back to. The chain ends at a single value of \(x\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="squaring-is-many-to-one">
+        <h2 id="squaring-is-many-to-one">Squaring Is Many-to-One</h2>
+        <p>Once \(x^2\) appears, one of the steps can't be undone this way.</p>
+        <p>Squaring is <strong>many-to-one</strong>: different inputs can give the same output.</p>
+        <div class="math">\[2\cdot2=4\qquad(-2)\cdot(-2)=4\]</div>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-1/mapping-widget.html" title="Interactive: choose adding 4, doubling or squaring; each input is joined to its output, and only squaring sends two inputs to the same output" style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p>So knowing the output does not tell us the input. If \(x\cdot x=4\), then \(x=2\) or \(x=-2\).</p>
+        <p>Every positive number has two square roots, one positive and one negative. Undoing a square gives two candidates, not one. This is where a second solution comes from.</p>
+        <p>The two solutions of \(x^2=4\) are opposites. They sit the same distance either side of \(0\), because squaring ignores sign: \(x\) and \(-x\) always give the same output.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-1/mirror-widget.html?f=sq" title="Interactive: drag the level up and down the curve of x squared; the two solutions sit the same distance either side of 0" style="height: 320px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="the-mirror-moves">
+        <h2 id="the-mirror-moves">The Mirror Moves</h2>
+        <p>Now take:</p>
+        <div class="math">\[x^2-5x=-6\]</div>
+        <p>Its solutions are \(2\) and \(3\). They are not opposites. So where did the symmetry go?</p>
+        <p>It moved. \(x^2-5x\) is a square in disguise:</p>
+        <div class="math">\[x^2-5x=(x-2.5)^2-6.25\]</div>
+        <p>(Expand the right-hand side to check: \(x^2-5x+6.25-6.25\).)</p>
+        <p>So the equation is really:</p>
+        <div class="math">\[\begin{aligned}
+(x-2.5)^2-6.25&amp;=-6\\
+(x-2.5)^2&amp;=0.25
+\end{aligned}\]</div>
+        <p>Undo the square, and there are two possibilities again:</p>
+        <div class="math">\[\begin{aligned}
+x-2.5=0.5&amp;\quad\text{or}\quad x-2.5=-0.5\\
+x=3&amp;\quad\text{or}\quad x=2
+\end{aligned}\]</div>
+        <p>The two solutions are mirror images, just as before. But the mirror is at \(2.5\), not \(0\). Both \(2\) and \(3\) are \(0.5\) away from it.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-1/mirror-widget.html" title="Interactive: drag the level up and down the curve of x squared minus 5x; the two solutions sit the same distance either side of 2.5" style="height: 320px" scrolling="no" loading="lazy"></iframe>
+        <p>The \(-5x\) term does not create the second solution. Squaring does. The \(-5x\) term moves the mirror.</p>
+        <p>In \(2x+4\), each unit increase in \(x\) changes the output by the same amount, so no output repeats. In \(x^2-5x\), the change is different each time: the outputs fall until \(2.5\), then rise, retracing the same values on the other side of the mirror. (<a class="inline" href="polynomials-multiple-solutions.html">Multiple Solutions</a> follows this rise and fall step by step.)</p>
+        <p>If the right-hand side is exactly the lowest output, \(-6.25\), the two mirror images meet at \(2.5\) and there is one solution. Below that, there are none.</p>
+      </section>
+
+      <section class="col" aria-labelledby="the-last-step-is-an-or">
+        <h2 id="the-last-step-is-an-or">The Last Step Is an “Or”</h2>
+        <p>A linear equation can be solved with arithmetic alone: \(x=\frac{7-4}{2}\).</p>
+        <p>A quadratic can't be undone step by step in the same way. Move everything to one side, and \(x^2-5x=-6\) becomes \(x^2-5x+6=0\). The unknown sits in two unlike terms, \(x^2\) and \(-5x\), so there is no single chain of operations to reverse.</p>
+        <p>There are two ways around this, and both end with a logical step rather than a calculation.</p>
+        <p><strong>Factoring.</strong> \(x^2-5x+6=0\) becomes \((x-2)(x-3)=0\). The <strong>zero-product law</strong> says that if a product of two numbers is zero, at least one of the factors is zero. So \(x-2=0\) or \(x-3=0\), which gives \(x=2\) or \(x=3\).</p>
+        <p><strong>Completing the square.</strong> Rewrite the equation so that \(x\) appears only once, as above: \((x-2.5)^2=0.25\). Now there is a single chain to reverse, but one of its steps is undoing a square, and that step gives two possibilities.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-1/undo-path-widget.html" title="Interactive: choose an equation and see its steps undone; the linear chain ends at one value, while undoing the square forks into two" style="height: 240px" scrolling="no" loading="lazy"></iframe>
+        <p>Either way, the answer is not a single number calculated from the knowns. It is a choice: \(x=2\) or \(x=3\).</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="polynomials.html">← All Polynomials pages</a>
+        <a href="polynomials-multiple-solutions.html">Multiple Solutions →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "poly-widget-height") return;
+      document.querySelectorAll("iframe.poly-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
