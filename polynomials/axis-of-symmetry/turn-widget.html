@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Where a quadratic turns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.7rem); color: var(--txt); }
+  .sub {
+    text-align: center; white-space: nowrap; min-height: 1.3em; margin: 0.15rem 0 0.5rem;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.82rem; color: rgba(238, 242, 252, 0.66);
+  }
+  .sub b { font-weight: 400; color: var(--const); }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.strip { font-size: 10.5px; fill: rgba(238, 242, 252, 0.7); }
+  svg text.amber { fill: var(--const); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" id="expr" aria-hidden="true"></div>
+  <div class="sub" id="sub" aria-live="polite"></div>
+  <svg id="plot" role="img"></svg>
+  <input id="k" type="range" aria-label="Coefficient" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // ?vary=b: f(x) = x² + bx, slide b. ?vary=a: f(x) = ax² + 2x, slide a.
+  // The strip under the graph shows the sign of 2ax + b: where f is falling and where it is rising.
+  // It flips at x = −b/2a, the turning point. The faint curve is x² (or x² + 2x) for comparison.
+  // Coefficients are held in quarters so every turning point is exact.
+  const VARY_A = new URLSearchParams(location.search).get("vary") === "a";
+  const C = VARY_A
+    ? { min: -2, max: 2, start: 1, ymin: -7, ymax: 7, ghost: (x) => x * x + 2 * x }
+    : { min: -6, max: 6, start: 2, ymin: -10, ymax: 10, ghost: (x) => x * x };
+  const slider = document.getElementById("k");
+  Object.assign(slider, { min: C.min, max: C.max, step: VARY_A ? 0.25 : 0.5, value: C.start });
+  slider.setAttribute("aria-label", VARY_A ? "Coefficient a" : "Coefficient b");
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("plot");
+  const X0 = -5, X1 = 5, PAD = 8, TOP = 8, PH = 220, STRIP = 18, H = PH + STRIP + 26;
+  const AMB = "#e8a33d";
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+  const X = '<span class="v">x</span>';
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function formula(a, b) {
+    const sq = a === 0 ? "" : `<span class="k-sq">${a === 1 ? "" : a === -1 ? "−" : fmt(a)}${X}²</span>`;
+    const lin = b === 0 ? "" : `<span class="k-lin">${sq ? (b < 0 ? " − " : " + ") : (b < 0 ? "−" : "")}${Math.abs(b) === 1 ? "" : fmt(Math.abs(b))}${X}</span>`;
+    return `<span class="v">f</span>(${X}) = ` + (sq + lin || "0");
+  }
+
+  function render() {
+    const q = Math.round(+slider.value * 4) / 4;          // exact quarters
+    const a = VARY_A ? q : 1, b = VARY_A ? 2 : q;
+    const turns = a !== 0, tx = turns ? -b / (2 * a) : null;
+    const f = (x) => a * x * x + b * x;
+
+    document.getElementById("expr").innerHTML = formula(a, b);
+    const exact = turns && Math.abs(tx * 100 - Math.round(tx * 100)) < 1e-9;
+    document.getElementById("sub").innerHTML = !turns
+      ? "a straight line: no turning point"
+      : `${VARY_A ? "x = −b/2a" : "x = −b/2"} ${exact ? "=" : "≈"} <b>${fmt(tx)}</b>`;
+
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => PAD + ((x - X0) / (X1 - X0)) * (W - 2 * PAD);
+    const sy = (y) => TOP + ((C.ymax - y) / (C.ymax - C.ymin)) * (PH - TOP);
+    const curve = (fn) => {
+      let d = "";
+      for (let i = 0; i <= 200; i++) { const x = X0 + ((X1 - X0) * i) / 200; d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(fn(x)).toFixed(1); }
+      return d;
+    };
+    const defs = el("defs", {});
+    el("rect", { x: PAD, y: TOP, width: W - 2 * PAD, height: PH - TOP }, null, el("clipPath", { id: "box" }, null, defs));
+    const clip = { "clip-path": "url(#box)" };
+
+    for (let u = X0; u <= X1; u++) el("line", { x1: sx(u), x2: sx(u), y1: TOP, y2: PH, stroke: "rgba(238,242,252,0.04)" });
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.2)" });
+    el("line", { x1: sx(0), x2: sx(0), y1: TOP, y2: PH, stroke: "rgba(238,242,252,0.14)" });
+
+    el("path", { d: curve(C.ghost), fill: "none", stroke: "rgba(238,242,252,0.22)", "stroke-width": 1.3, "stroke-dasharray": "4 4", ...clip });
+    el("path", { d: curve(f), fill: "none", stroke: "rgba(244,246,255,0.85)", "stroke-width": 1.8, ...clip });
+
+    // the strip: sign of 2ax + b, i.e. where f falls and where it rises
+    const SY = PH + 6;
+    const region = (x0, x1, rising) => {
+      if (sx(x1) - sx(x0) < 1) return;
+      el("rect", { x: sx(x0), y: SY, width: sx(x1) - sx(x0), height: STRIP, fill: rising ? "rgba(100,200,160,0.13)" : "rgba(122,167,255,0.12)" });
+      const w = sx(x1) - sx(x0);
+      const word = w > 74 ? (rising ? "↗ rising" : "↘ falling") : w > 16 ? (rising ? "↗" : "↘") : "";
+      if (word) el("text", { x: (sx(x0) + sx(x1)) / 2, y: SY + 12.5, "text-anchor": "middle", class: "strip" }, word);
+    };
+    if (!turns) region(X0, X1, b > 0);
+    else {
+      const t = Math.max(X0, Math.min(X1, tx));
+      region(X0, t, a < 0);
+      region(t, X1, a > 0);
+      if (tx >= X0 && tx <= X1) {
+        el("line", { x1: sx(tx), x2: sx(tx), y1: TOP, y2: SY + STRIP, stroke: AMB, "stroke-width": 1.3, "stroke-dasharray": "3 4" });
+        el("circle", { cx: sx(tx), cy: sy(f(tx)), r: 5, fill: AMB, style: "filter: drop-shadow(0 0 5px rgba(232,163,61,0.8))", ...clip });
+      }
+    }
+    for (let u = X0; u <= X1; u++)
+      el("text", { x: sx(u), y: H - 4, "text-anchor": "middle" }, fmt(u));
+
+    svg.setAttribute("aria-label", !turns ? "A straight line, rising everywhere."
+      : `f falls then rises, turning at x = ${fmt(tx)}`.replace("falls then rises", a > 0 ? "falls then rises" : "rises then falls"));
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

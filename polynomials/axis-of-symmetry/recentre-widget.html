@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Measuring from a different point</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.7rem); color: var(--txt); margin-bottom: 0.4rem; }
+  .expr .eq { display: inline-block; transition: text-shadow 0.25s ease; }
+  .expr .eq.hit { text-shadow: 0 0 14px var(--glow); }
+  .expr .gone { opacity: 0.35; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.k { fill: var(--const); }
+  svg text.zero { fill: var(--const); font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" id="expr" aria-live="polite"></div>
+  <svg id="plot" role="img"></svg>
+  <input id="o" type="range" min="-4.5" max="2.5" step="0.1" value="0" aria-label="The point inputs are measured from" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The curve g(x) = x² + 2x never moves. What moves is where we measure from: an input that is
+  // k to the right of the point o is x = o + k, and g(o + k) = k² + (2o + 2)k + (o² + 2o).
+  // Only from o = −1 does the k term vanish, leaving k² − 1: opposite k give the same output.
+  // o is held in tenths so that −1 is exact. The slider spans the plot, so its thumb sits under o.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("plot"), slider = document.getElementById("o");
+  const X0 = -4.5, X1 = 2.5, Y0 = -2.2, Y1 = 12, H = 250, TOP = 8, BOT = H - 22, PAD = 7.5;
+  const AMB = "#e8a33d";
+  const g = (x) => x * x + 2 * x;
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+  const K = '<span class="v">k</span>';
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const O = Math.round(+slider.value * 10), o = O / 10;
+    const B = (2 * O + 20) / 10, Cc = (O * O + 20 * O) / 100, hit = O === -10;
+
+    // g written in terms of k, the distance from o
+    let s = `<span class="k-sq">${K}²</span>`;
+    s += B === 0 ? ` <span class="k-lin gone">+ 0${K}</span>` : ` <span class="k-lin">${B < 0 ? "−" : "+"} ${Math.abs(B) === 1 ? "" : fmt(Math.abs(B))}${K}</span>`;
+    if (Cc !== 0) s += ` <span class="k-const">${Cc < 0 ? "−" : "+"} ${fmt(Math.abs(Cc))}</span>`;
+    document.getElementById("expr").innerHTML = `<span class="eq${hit ? " hit" : ""}"><span class="v">g</span> = ${s}</span>`;
+
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => PAD + ((x - X0) / (X1 - X0)) * (W - 2 * PAD);
+    const sy = (y) => TOP + ((Y1 - y) / (Y1 - Y0)) * (BOT - TOP);
+    const defs = el("defs", {});
+    el("rect", { x: PAD, y: TOP, width: W - 2 * PAD, height: BOT - TOP }, null, el("clipPath", { id: "box" }, null, defs));
+
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.16)" });
+    let d = "";
+    for (let i = 0; i <= 160; i++) { const x = X0 + ((X1 - X0) * i) / 160; d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(g(x)).toFixed(1); }
+    el("path", { d, fill: "none", stroke: "rgba(244,246,255,0.8)", "stroke-width": 1.8, "clip-path": "url(#box)" });
+
+    // when measuring from the turning point, show a pair of opposite steps giving the same output
+    if (hit) [1.5, 2.5].forEach((k) => {
+      el("line", { x1: sx(-1 - k), x2: sx(-1 + k), y1: sy(k * k - 1), y2: sy(k * k - 1), stroke: "rgba(232,163,61,0.55)", "stroke-dasharray": "3 3" });
+      [-1 - k, -1 + k].forEach((x) => el("circle", { cx: sx(x), cy: sy(g(x)), r: 3.5, fill: AMB }));
+    });
+
+    // the ruler: k = 0 at o, whole steps either side
+    el("line", { x1: sx(o), x2: sx(o), y1: TOP, y2: BOT + 4, stroke: hit ? AMB : "rgba(244,246,255,0.55)", "stroke-width": 1.3, "stroke-dasharray": "3 4" });
+    const flip = sx(o) > W - PAD - 60;
+    el("text", { x: sx(o) + (flip ? -7 : 7), y: TOP + 11, "text-anchor": flip ? "end" : "start", class: "zero" }, "k = 0");
+    for (let k = Math.ceil(X0 - o); o + k <= X1 + 1e-9; k++) {
+      if (o + k < X0 - 1e-9) continue;
+      el("line", { x1: sx(o + k), x2: sx(o + k), y1: BOT, y2: BOT + 4, stroke: "rgba(232,163,61,0.6)" });
+      el("text", { x: sx(o + k), y: H - 4, "text-anchor": "middle", class: "k" }, fmt(k));
+    }
+
+    svg.setAttribute("aria-label", hit
+      ? "Measured from x = −1, g is k² − 1: steps of k and −k give the same output."
+      : `Measured from x = ${fmt(o)}, g still has a k term, so opposite steps give different outputs.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

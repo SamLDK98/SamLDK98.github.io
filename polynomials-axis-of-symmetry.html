@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axis of Symmetry | Polynomials | Sam Kirwan</title>
+  <meta name="description" content="Why x squared is symmetric, why adding a linear term moves the axis of symmetry, and how to find where any quadratic turns." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot, not blue-black */
+      --bg-2:    #141419;
+      --measure: 92ch;         /* the reading column */
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);   /* running prose */
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --na:      #e8a33d;   /* bone and notch */
+      --k:       #64c8a0;   /* clay token */
+      --cl:      #54d6a0;
+      --stim:    #ffc247;
+      --ahp:     #7aa7ff;   /* written numeral */
+      --leak:    #8fa0c4;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    /* Fine grain. A flat dark colour on its own reads as a glossy void; the
+       noise is what makes it feel like a matte surface. */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .sheet { position: relative; z-index: 1; }
+
+    /* ---------- masthead ---------- */
+    header {
+      padding: clamp(1.6rem, 5vh, 2.8rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--na); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--na); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 5.4vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #e8a33d 4%, #64c8a0 52%, #7aa7ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--body);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ---------- prose ---------- */
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.95rem; color: var(--txt);
+      margin: 1.8rem 0 0.5rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .cl { color: var(--cl); }
+    .stim { color: var(--stim); }
+    .ahp { color: var(--ahp); }
+
+    a.inline {
+      color: var(--k);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(100, 200, 160, 0.35);
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    a.inline:hover, a.inline:focus-visible { color: var(--txt); border-bottom-color: var(--txt); outline: none; }
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+
+    /* ---------- widget slot ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 1115px;            /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1895px; } }
+    iframe.bench.short { height: 610px; }
+    @media (max-width: 820px) { iframe.bench.short { height: 765px; } }
+
+    /* placeholder shown until the figure is built */
+    .lab-empty {
+      border: 1px dashed var(--line);
+      background: linear-gradient(180deg, rgba(140,165,225,0.04), transparent);
+      padding: clamp(2.4rem, 8vh, 4.5rem) 1.5rem;
+      text-align: center;
+    }
+    .lab-empty p {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3);
+    }
+
+    /* ---------- data table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .data {
+      width: 100%; border-collapse: collapse; margin-top: 1.3rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.73rem;
+    }
+    .data th, .data td {
+      text-align: left; padding: 0.6rem 0.9rem 0.6rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+    }
+    .data thead th {
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .data td:first-child { white-space: nowrap; color: var(--txt); }
+    .data td { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--txt-2); }
+    .data td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; white-space: normal; width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+
+    .fig-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; line-height: 1.7; color: var(--txt-3);
+      margin-top: 0.7rem; max-width: 74ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  
+    /* ---------- glyph figures ---------- */
+    .glyphs { margin: 1rem 0 1.4rem; padding: 0.9rem 1.1rem 0.8rem; border: 1px solid var(--line-2); background: var(--bg-2); }
+    .glyph-row { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; align-items: center; color: var(--na); }
+    .glyph-row .grp { display: inline-flex; gap: 0.15rem; }
+    .glyph-row svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .roman-row { font-family: "Spectral", Georgia, serif; font-size: 1.9rem; letter-spacing: 0.08em; line-height: 1; gap: 0; }
+    .roman-row .inline-glyph { width: 30px; height: 34px; margin: 0 0.12em; vertical-align: middle; }
+    .glyphs figcaption { font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; color: var(--txt-3); margin-top: 0.55rem; }
+    ul + p, ol + p, .eq + p, .glyphs + h3 { margin-top: 0.95rem; }
+    .eq-line.wrap { white-space: normal; }
+    .eq-line.wrap .sep { margin-right: 0.6em; }
+    h1 { max-width: none; }
+    p strong, li strong { color: #d9692b; }
+    .col p, .col li { font-size: clamp(1.12rem, 2.4vw, 1.25rem); }
+    iframe.bench.cols { height: 760px; }
+    @media (max-width: 820px) { iframe.bench.cols { height: 1100px; } }
+  
+    .area-figure { margin: 1.7rem 0; }
+    .area-figure svg { display: block; width: min(100%, 540px); height: auto; margin-inline: auto; }
+    .area-rearrangement svg { width: min(100%, 760px); }
+    .area-figure .label { font-family: "Spectral", Georgia, serif; font-size: 25px; fill: var(--txt); font-style: italic; }
+    .area-figure .dimension { font-size: 22px; fill: var(--txt-2); }
+    .area-figure + p { margin-top: 0.95rem; }
+    mjx-container { color: inherit; }
+    a:focus-visible { outline: 2px solid var(--na); outline-offset: 5px; }
+    .math { overflow-x: auto; overflow-y: hidden; margin: 0.95rem 0; padding: 0.15rem 0; font-size: clamp(1.12rem, 2.4vw, 1.25rem); color: var(--body); }
+    .math mjx-container[display="true"] { text-align: left !important; margin: 0 !important; }
+    .math + p, .scroll-x + p { margin-top: 0.95rem; }
+    .col h4 { font-family: "IBM Plex Sans", sans-serif; font-weight: 500; font-size: 0.98rem; color: var(--txt-2); margin: 1.5rem 0 0.6rem; }
+    .col h3 { font-family: "Spectral", Georgia, serif; font-weight: 500; font-size: clamp(1.15rem, 2.4vw, 1.3rem); color: var(--txt); margin: 2rem 0 0.7rem; }
+    .data { min-width: 38rem; }
+    .data td { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; color: var(--body); }
+    .data td:first-child { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+    .data td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    a.inline { color: var(--k); text-decoration: none; border-bottom: 1px solid rgba(100,200,160,0.35); }
+    a.inline:hover { color: var(--txt); border-bottom-color: var(--txt); }
+    blockquote.note { margin: 1rem 0; padding: 0.7rem 1.1rem; border-left: 2px solid var(--na); background: linear-gradient(90deg, rgba(232,163,61,0.07), transparent 75%); }
+    blockquote.note p { color: var(--txt-2); }
+    blockquote.note p + p { margin-top: 0.6rem; }
+    blockquote.note + p, blockquote.note + h3 { margin-top: 0.95rem; }
+    .tick { color: var(--k); font-weight: 600; font-size: 1.2rem; }
+    .cross { color: #e0675a; font-weight: 600; font-size: 1.2rem; }
+    .data.cases { min-width: 44rem; }
+    .data.cases td:nth-child(2) { white-space: nowrap; }
+    .data.cases td:last-child { width: auto; text-align: center; }
+    .data.cases th:last-child { text-align: center; }
+    /* ---------- widgets and figures ---------- */
+    iframe.poly-widget { display: block; width: 100%; border: 0; margin: 1.6rem 0 1.8rem; overflow: hidden; background: transparent; }
+    .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 clamp(1.5rem, 4vw, 3rem); align-items: center; margin: 0.95rem 0; }
+    .pair > :first-child { margin-top: 0; }
+    .pair .math { margin: 0.3rem 0; }
+    .pair p + p, .pair ul + p { margin-top: 0.6rem; }
+    figure.nest { margin: 0; }
+    figure.nest svg { display: block; width: 100%; max-width: 330px; height: auto; margin-inline: auto; }
+    figure.nest text { font-family: "Spectral", Georgia, serif; font-style: italic; }
+    @media (max-width: 900px) {
+      .pair { grid-template-columns: 1fr; gap: 0.6rem; }
+    }
+    .math { scrollbar-width: thin; scrollbar-color: rgba(238,242,252,0.16) transparent; }
+    .math::-webkit-scrollbar { height: 4px; }
+    .math::-webkit-scrollbar-track { background: transparent; }
+    .math::-webkit-scrollbar-thumb { background: rgba(238,242,252,0.16); border-radius: 4px; }
+    .data.steps { min-width: 34rem; }
+    .data.steps td, .data.steps th { text-align: center; }
+    .data.steps td:first-child, .data.steps th:first-child { text-align: left; font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    .data.steps td:last-child { width: auto; }
+    .data.steps thead th { font-size: 0.95rem; letter-spacing: 0; text-transform: none; }
+    .data.steps td.ahp { color: var(--ahp); }
+    .data.steps td.k { color: var(--k); }
+    .data.steps td.na { color: var(--na); }
+    .data.compact { min-width: 0; width: auto; }
+    .data.compact th, .data.compact td { text-align: center; padding: 0.5rem 1.1rem; white-space: nowrap; }
+    .data.compact thead th { font-family: "Spectral", Georgia, serif; font-size: 1rem; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--txt-2); }
+    .data.compact td, .data.compact td:first-child, .data.compact td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; width: auto; }
+    .data.compact .c-sq { color: var(--ahp); }
+    .data.compact .c-lin { color: var(--k); }
+    @media (max-width: 560px) {
+      .data.compact th, .data.compact td { padding: 0.45rem 0.5rem; }
+      .data.compact thead th { white-space: normal; line-height: 1.25; }
+    }
+    figure.chords { margin: 1.4rem 0 1.6rem; }
+    figure.chords svg { display: block; width: 100%; max-width: 380px; height: auto; margin-inline: auto; }
+    figure.chords text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: rgba(238, 242, 252, 0.44); }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="polynomials.html">Polynomials</a>
+      <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Axis of Symmetry</h1>
+    </header>
+    <main>
+      <section class="col" aria-labelledby="why-x-squared-is-symmetric">
+        <h2 id="why-x-squared-is-symmetric">Why \(x^2\) Is Symmetric</h2>
+        <p>Consider:</p>
+        <div class="math">\[f(x)=x^2\]</div>
+        <p>Opposite inputs produce identical outputs:</p>
+        <div class="math">\[f(3)=f(-3)=9\qquad f(2)=f(-2)=4\]</div>
+        <p>Squaring ignores the sign: \((-3)(-3)=3\times3\).</p>
+        <p>So the left half of the graph is the mirror image of the right half. The mirror is the vertical line \(x=0\), the <strong>axis of symmetry</strong>.</p>
+        <figure class="chords">
+            <svg viewBox="0 0 340 236" role="img" aria-label="The graph of x squared with level chords from -1 to 1, -2 to 2 and -3 to 3; every chord is cut in half by the line x = 0, and the turning point at (0, 0) has no partner.">
+            <line x1="14" x2="326" y1="193.4" y2="193.4" stroke="rgba(238,242,252,0.2)"/>
+            <line x1="170.0" x2="170.0" y1="10" y2="210" stroke="rgba(238,242,252,0.45)" stroke-dasharray="3 4"/>
+            <path d="M33.0 13.6 L35.3 19.5 L37.5 25.4 L39.8 31.1 L42.1 36.8 L44.4 42.3 L46.7 47.8 L49.0 53.1 L51.2 58.4 L53.5 63.5 L55.8 68.5 L58.1 73.5 L60.4 78.3 L62.7 83.1 L64.9 87.7 L67.2 92.3 L69.5 96.7 L71.8 101.1 L74.1 105.3 L76.4 109.4 L78.6 113.5 L80.9 117.4 L83.2 121.3 L85.5 125.0 L87.8 128.7 L90.1 132.2 L92.3 135.7 L94.6 139.0 L96.9 142.3 L99.2 145.4 L101.5 148.5 L103.8 151.4 L106.1 154.3 L108.3 157.0 L110.6 159.6 L112.9 162.2 L115.2 164.6 L117.5 167.0 L119.8 169.2 L122.0 171.4 L124.3 173.4 L126.6 175.4 L128.9 177.2 L131.2 179.0 L133.5 180.6 L135.7 182.2 L138.0 183.6 L140.3 185.0 L142.6 186.2 L144.9 187.4 L147.2 188.4 L149.4 189.4 L151.7 190.2 L154.0 191.0 L156.3 191.6 L158.6 192.2 L160.9 192.6 L163.1 193.0 L165.4 193.2 L167.7 193.4 L170.0 193.4 L172.3 193.4 L174.6 193.2 L176.9 193.0 L179.1 192.6 L181.4 192.2 L183.7 191.6 L186.0 191.0 L188.3 190.2 L190.6 189.4 L192.8 188.4 L195.1 187.4 L197.4 186.2 L199.7 185.0 L202.0 183.6 L204.3 182.2 L206.5 180.6 L208.8 179.0 L211.1 177.2 L213.4 175.4 L215.7 173.4 L218.0 171.4 L220.2 169.2 L222.5 167.0 L224.8 164.6 L227.1 162.2 L229.4 159.6 L231.7 157.0 L233.9 154.3 L236.2 151.4 L238.5 148.5 L240.8 145.4 L243.1 142.3 L245.4 139.0 L247.7 135.7 L249.9 132.2 L252.2 128.7 L254.5 125.0 L256.8 121.3 L259.1 117.4 L261.4 113.5 L263.6 109.4 L265.9 105.3 L268.2 101.1 L270.5 96.7 L272.8 92.3 L275.1 87.7 L277.3 83.1 L279.6 78.3 L281.9 73.5 L284.2 68.5 L286.5 63.5 L288.8 58.4 L291.0 53.1 L293.3 47.8 L295.6 42.3 L297.9 36.8 L300.2 31.1 L302.5 25.4 L304.7 19.5 L307.0 13.6" fill="none" stroke="rgba(244,246,255,0.8)" stroke-width="1.8"/>
+            <line x1="126.7" x2="213.3" y1="175.4" y2="175.4" stroke="rgba(232,163,61,0.6)" stroke-width="1.3"/>
+            <circle cx="126.7" cy="175.4" r="3.4" fill="#e8a33d"/>
+            <circle cx="213.3" cy="175.4" r="3.4" fill="#e8a33d"/>
+            <circle cx="170.0" cy="175.4" r="2.2" fill="rgba(244,246,255,0.75)"/>
+            <line x1="83.3" x2="256.7" y1="121.5" y2="121.5" stroke="rgba(232,163,61,0.6)" stroke-width="1.3"/>
+            <circle cx="83.3" cy="121.5" r="3.4" fill="#e8a33d"/>
+            <circle cx="256.7" cy="121.5" r="3.4" fill="#e8a33d"/>
+            <circle cx="170.0" cy="121.5" r="2.2" fill="rgba(244,246,255,0.75)"/>
+            <line x1="40.0" x2="300.0" y1="31.6" y2="31.6" stroke="rgba(232,163,61,0.6)" stroke-width="1.3"/>
+            <circle cx="40.0" cy="31.6" r="3.4" fill="#e8a33d"/>
+            <circle cx="300.0" cy="31.6" r="3.4" fill="#e8a33d"/>
+            <circle cx="170.0" cy="31.6" r="2.2" fill="rgba(244,246,255,0.75)"/>
+            <circle cx="170.0" cy="193.4" r="5" fill="#e8a33d" style="filter: drop-shadow(0 0 5px rgba(232,163,61,0.8))"/>
+            <text x="176.0" y="19">x = 0</text>
+            <text x="40.0" y="230" text-anchor="middle">−3</text>
+            <text x="83.3" y="230" text-anchor="middle">−2</text>
+            <text x="126.7" y="230" text-anchor="middle">−1</text>
+            <text x="170.0" y="230" text-anchor="middle">0</text>
+            <text x="213.3" y="230" text-anchor="middle">1</text>
+            <text x="256.7" y="230" text-anchor="middle">2</text>
+            <text x="300.0" y="230" text-anchor="middle">3</text>
+            </svg>
+        </figure>
+        <p>Zero is the only number that is its own opposite, so its output, \(0\), comes from just one input. Every positive output comes from two opposite inputs, the same distance either side of \(0\). (No input gives a negative output.)</p>
+        <p>That lone point, \((0,0)\), is the <strong>turning point</strong> (also called the vertex): where the graph stops falling and starts rising. It sits on the axis.</p>
+      </section>
+
+      <section class="col" aria-labelledby="adding-a-linear-term">
+        <h2 id="adding-a-linear-term">Adding a Linear Term</h2>
+        <p>Now add a linear term:</p>
+        <div class="math">\[g(x)=x^2+2x\]</div>
+        <p>The \(x^2\) term treats \(x\) and \(-x\) identically. The \(2x\) term does not: it adds to positive inputs and takes away from negative ones.</p>
+        <div class="scroll-x">
+          <table class="data compact">
+            <thead><tr><th>\(x\)</th><th class="c-sq">\(x^2\)</th><th class="c-lin">\(2x\)</th><th>\(g(x)\)</th></tr></thead>
+            <tbody>
+              <tr><td>−4</td><td class="c-sq">16</td><td class="c-lin">−8</td><td>8</td></tr>
+              <tr><td>−3</td><td class="c-sq">9</td><td class="c-lin">−6</td><td>3</td></tr>
+              <tr><td>−2</td><td class="c-sq">4</td><td class="c-lin">−4</td><td>0</td></tr>
+              <tr><td>−1</td><td class="c-sq">1</td><td class="c-lin">−2</td><td>−1</td></tr>
+              <tr><td>0</td><td class="c-sq">0</td><td class="c-lin">0</td><td>0</td></tr>
+              <tr><td>1</td><td class="c-sq">1</td><td class="c-lin">2</td><td>3</td></tr>
+              <tr><td>2</td><td class="c-sq">4</td><td class="c-lin">4</td><td>8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The outputs are no longer symmetric around \(0\): \(g(1)=3\), but \(g(-1)=-1\).</p>
+        <p>But they still pair up. The output \(0\) appears twice, at \(-2\) and \(0\). So does \(3\), at \(-3\) and \(1\), and \(8\), at \(-4\) and \(2\). Each pair sits the same distance either side of \(-1\), and \(-1\) is the only input whose output appears once.</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/fold-widget.html" title="Interactive: slide a vertical mirror along the graph of x squared plus 2x; the left half, reflected, lands on the right half only when the mirror is at x = -1" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+        <p>So the axis of symmetry has moved to \(x=-1\), and the turning point with it. Why there?</p>
+      </section>
+
+      <section class="col" aria-labelledby="why-the-turning-point-moves">
+        <h2 id="why-the-turning-point-moves">Why the Turning Point Moves</h2>
+        <p>Think about what happens when \(x\) increases by \(1\).</p>
+        <p>For \(x^2\), the change depends on where we are. For \(2x\), it is always \(+2\).</p>
+        <div class="scroll-x">
+          <table class="data compact">
+            <thead><tr><th>Movement</th><th class="c-sq">Change in \(x^2\)</th><th class="c-lin">Change in \(2x\)</th><th>Total change</th></tr></thead>
+            <tbody>
+              <tr><td>−3 → −2</td><td class="c-sq">−5</td><td class="c-lin">+2</td><td>−3</td></tr>
+              <tr><td>−2 → −1</td><td class="c-sq">−3</td><td class="c-lin">+2</td><td>−1</td></tr>
+              <tr><td>−1 → 0</td><td class="c-sq">−1</td><td class="c-lin">+2</td><td>+1</td></tr>
+              <tr><td>0 → 1</td><td class="c-sq">+1</td><td class="c-lin">+2</td><td>+3</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>On its own, \(x^2\) falls until \(0\). Its falls shrink as it gets there: \(5\), then \(3\), then \(1\).</p>
+        <p>The \(2x\) term adds a steady \(2\) on every step. Once \(x^2\) is falling by less than \(2\), the total starts rising.</p>
+        <p>That happens before \(x^2\) reaches \(0\), so the turning point moves left.</p>
+        <p>Why exactly to \(-1\)? The changes in \(x^2\) are the odd numbers: \(-5,-3,-1,+1,+3\), switching from falling to rising at \(0\). Adding \(2\) to each gives \(-3,-1,+1,+3,+5\): the same numbers, one step to the left. So the switch comes one step earlier, at \(-1\).</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/steps-widget.html" title="Interactive: choose x squared, x squared plus 2x or x squared plus 4x; each step's change is split into the change in x squared and the steady linear part, and the turn slides left" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+        <p>Read the total change column again: the graph falls by \(3\), then \(1\), and rises by \(1\), then \(3\). The climb after \(-1\) is the descent before it, in reverse. That is the symmetry again.</p>
+      </section>
+
+      <section class="col" aria-labelledby="where-any-quadratic-turns">
+        <h2 id="where-any-quadratic-turns">Where Any Quadratic Turns</h2>
+        <p>Take any quadratic of the form</p>
+        <div class="math">\[f(x)=x^2+bx\]</div>
+        <p>Increase \(x\) by a very small amount \(h\). The change in the function is:</p>
+        <div class="math">\[\begin{aligned}
+f(x+h)-f(x)&amp;=(x+h)^2+b(x+h)-(x^2+bx)\\
+&amp;=2xh+h^2+bh\\
+&amp;=h(2x+b+h)
+\end{aligned}\]</div>
+        <p>\(h\) is positive, so the change has the same sign as \(2x+b+h\). When \(h\) is tiny, that is the sign of \(2x+b\).</p>
+        <p>So \(f\) falls while \(2x+b\) is negative, and rises once it is positive. It turns where:</p>
+        <div class="math">\[2x+b=0\quad\Rightarrow\quad x=-\frac{b}{2}\]</div>
+        <p>For \(g\), \(b=2\), so it turns at \(x=-1\).</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/turn-widget.html" title="Interactive: slide b; the graph of x squared plus bx keeps its shape and slides, and the strip showing where it falls and rises flips at x = -b/2" style="height: 360px" scrolling="no" loading="lazy"></iframe>
+        <p>The larger \(b\), the further left the turning point. A negative \(b\) puts it to the right of \(0\): \(x^2-5x\) turns at \(2.5\), the mirror line on <a class="inline" href="polynomials-multiple-solutions-1.html">Multiple Solutions (1)</a>.</p>
+      </section>
+
+      <section class="col" aria-labelledby="why-the-two-sides-match">
+        <h2 id="why-the-two-sides-match">Why the Two Sides Match</h2>
+        <p>Knowing where the graph turns doesn't yet explain why its two sides are mirror images.</p>
+        <p>Measure each input from the turning point instead: write \(x=-\frac{b}{2}+k\), where \(k\) is how far \(x\) is from the turning point. Then:</p>
+        <div class="math">\[\begin{aligned}
+f\left(-\tfrac{b}{2}+k\right)&amp;=\left(-\tfrac{b}{2}+k\right)^2+b\left(-\tfrac{b}{2}+k\right)\\
+&amp;=\tfrac{b^2}{4}-bk+k^2-\tfrac{b^2}{2}+bk\\
+&amp;=k^2-\tfrac{b^2}{4}
+\end{aligned}\]</div>
+        <p>The output depends only on \(k^2\). Steps of \(k\) and \(-k\) give the same \(k^2\), so inputs the same distance either side of \(-\frac{b}{2}\) give the same output, just as opposite inputs did for \(x^2\).</p>
+        <p>For \(g\): \(g(-1+k)=k^2-1\). Measured from anywhere else, a \(k\) term is left over, and opposite steps give different outputs. Only from the turning point does it vanish.</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/recentre-widget.html" title="Interactive: slide the point that inputs are measured from; g is rewritten in terms of the distance k, and at x = -1 the k term vanishes, leaving k squared minus 1" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="leading-coefficients-and-constants">
+        <h2 id="leading-coefficients-and-constants">Leading Coefficients and Constants</h2>
+        <p>For \(f(x)=ax^2+bx+c\), the same small step gives a change of \(h(2ax+b+ah)\), so the turning point is where \(2ax+b=0\):</p>
+        <div class="math">\[x=-\frac{b}{2a}\]</div>
+        <p>If \(a\) is positive, \(2ax+b\) climbs from negative to positive as \(x\) grows. The graph falls and then rises, and the turning point is its lowest point.</p>
+        <p>If \(a\) is negative, \(2ax+b\) drops from positive to negative. The graph rises and then falls, and the turning point is its highest point.</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/turn-widget.html?vary=a" title="Interactive: slide a in a x squared plus 2x; the turning point sits at -b/2a, becomes a highest point when a is negative, and disappears when a is 0" style="height: 360px" scrolling="no" loading="lazy"></iframe>
+        <p>The constant \(c\) adds the same amount to every output. It lifts or lowers the whole graph but never moves it sideways, so the axis stays put.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="polynomials-multiple-solutions-2.html">← Multiple Solutions (2)</a>
+        <a href="polynomials.html">All Polynomials pages →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "poly-widget-height") return;
+      document.querySelectorAll("iframe.poly-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

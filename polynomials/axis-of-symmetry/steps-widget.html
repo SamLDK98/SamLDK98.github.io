@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Changes per step</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  svg { display: block; width: 100%; overflow: visible; margin-top: 0.7rem; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.net { fill: rgba(238, 242, 252, 0.82); }
+  svg text.turn { fill: var(--const); font-size: 10.5px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="choices" role="group" aria-label="Function">
+    <button data-b="0" aria-pressed="false"><span class="v">x</span>²</button>
+    <button data-b="2" aria-pressed="true"><span class="v">x</span>² + 2<span class="v">x</span></button>
+    <button data-b="4" aria-pressed="false"><span class="v">x</span>² + 4<span class="v">x</span></button>
+  </div>
+  <svg id="fig" role="img"></svg>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Top: the outputs at x = −4 … 3. Bottom: the change on each step from x to x + 1, as a
+  // waterfall: the change in x² (blue, 2x + 1), then the linear term's steady b (green), ending
+  // at the net change. Adding b to every step slides the sign change, and the turn, b/2 steps left.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const XS = [-4, -3, -2, -1, 0, 1, 2, 3];
+  const SQ = "#7aa7ff", LIN = "#64c8a0", AMB = "#e8a33d", PAD = 10;
+  const T0 = 6, T1 = 134, LAB = 150, B0 = 166, B1 = 298, H = 304;   // top panel, x labels, bottom panel
+  const VT = [-5, 22], VB = [-8, 10];
+  const fmt = (n) => (n < 0 ? "−" : n > 0 ? "+" : "") + String(+Math.abs(n).toFixed(2));
+  let b = 2, from = 2, to = 2, t0 = 0;
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function draw(bb, settled) {
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const unit = (W - 2 * PAD) / 8;
+    const sx = (x) => PAD + (x + 4.5) * unit;
+    const ty = (v) => T1 - ((v - VT[0]) / (VT[1] - VT[0])) * (T1 - T0);
+    const by = (v) => B1 - ((v - VB[0]) / (VB[1] - VB[0])) * (B1 - B0);
+    const f = (x) => x * x + bb * x, turn = -bb / 2;
+
+    el("line", { x1: PAD, x2: W - PAD, y1: ty(0), y2: ty(0), stroke: "rgba(238,242,252,0.12)" });
+    el("line", { x1: PAD, x2: W - PAD, y1: by(0), y2: by(0), stroke: "rgba(238,242,252,0.22)" });
+    [[T0, LAB - 13], [LAB + 6, B1]].forEach(([y1, y2]) =>
+      el("line", { x1: sx(turn), x2: sx(turn), y1, y2, stroke: AMB, "stroke-width": 1.2, "stroke-dasharray": "3 4", opacity: 0.85 }));
+    if (settled) el("text", { x: sx(turn) + 5, y: T0 + 9, class: "turn" }, `turns at x = ${fmt(turn).replace("+", "")}`);
+
+    // outputs
+    el("path", { d: XS.map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + ty(f(x)).toFixed(1)).join(""),
+                 fill: "none", stroke: "rgba(238,242,252,0.3)", "stroke-width": 1.2 });
+    XS.forEach((x) => {
+      const low = settled && x === turn;
+      el("circle", { cx: sx(x), cy: ty(f(x)), r: low ? 5 : 3.2, fill: low ? AMB : "rgba(244,246,255,0.85)",
+                     style: low ? "filter: drop-shadow(0 0 5px rgba(232,163,61,0.8))" : "" });
+      el("text", { x: sx(x), y: LAB, "text-anchor": "middle" }, fmt(x).replace("+", ""));
+    });
+
+    // changes, one waterfall per step
+    const half = Math.min(unit * 0.22, 14);
+    XS.slice(0, -1).forEach((x) => {
+      const c = sx(x + 0.5), dsq = 2 * x + 1, net = dsq + bb;
+      el("rect", { x: c - half - 1, y: Math.min(by(0), by(dsq)), width: half, height: Math.abs(by(dsq) - by(0)), fill: SQ, opacity: 0.85 });
+      if (bb !== 0)
+        el("rect", { x: c + 1, y: Math.min(by(dsq), by(net)), width: half, height: Math.abs(by(net) - by(dsq)), fill: LIN, opacity: 0.9 });
+      el("line", { x1: c - half - 3, x2: c + half + 3, y1: by(net), y2: by(net), stroke: "#f4f6ff", "stroke-width": 1.4 });
+      if (settled)
+        el("text", { x: c, y: net >= 0 ? by(Math.max(net, dsq, 0)) - 5 : by(Math.min(net, dsq, 0)) + 12, "text-anchor": "middle", class: "net" }, fmt(net));
+    });
+
+    svg.setAttribute("aria-label", `Changes per step for ${bb === 0 ? "x²" : "x² + " + fmt(bb).replace("+", "") + "x"}: ${XS.slice(0, -1).map((x) => fmt(2 * x + 1 + bb)).join(", ")}. It turns at x = ${fmt(turn).replace("+", "")}.`);
+  }
+
+  function animate(now) {
+    const k = Math.min(1, (now - t0) / 550), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    b = from + (to - from) * e;
+    draw(b, k === 1);
+    if (k < 1) requestAnimationFrame(animate);
+  }
+
+  document.querySelectorAll(".choices button").forEach((btn) => btn.addEventListener("click", () => {
+    const nb = +btn.dataset.b;
+    document.querySelectorAll(".choices button").forEach((o) => o.setAttribute("aria-pressed", String(o === btn)));
+    if (nb === to) return;
+    from = b; to = nb; t0 = performance.now();
+    requestAnimationFrame(animate);
+    setTimeout(() => { if (b !== to) { b = to; draw(b, true); } }, 700);   // settle even if frames are paused
+  }));
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => draw(b, b === to), 60); });
+  draw(b, true);
+</script>
+</body>
+</html>

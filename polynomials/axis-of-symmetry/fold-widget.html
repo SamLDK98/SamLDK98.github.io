@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Finding the mirror</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.7rem); color: var(--txt); margin-bottom: 0.4rem; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.mirror { font-size: 11px; fill: var(--const); }
+  svg text.mirror.hit { filter: drop-shadow(0 0 5px rgba(232, 163, 61, 0.9)); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" aria-hidden="true"><span class="v">g</span>(<span class="v">x</span>) = <span class="k-sq"><span class="v">x</span>²</span> <span class="k-lin">+ 2<span class="v">x</span></span></div>
+  <svg id="plot" role="img"></svg>
+  <input id="m" type="range" min="-4.5" max="2.5" step="0.1" value="0" aria-label="Position of the mirror" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Reflect the part of g left of the mirror onto the right (dashed) and shade the gap
+  // between that reflection and g itself. The gap closes only when the mirror is at −1.
+  // The slider spans the plot's x range, so its thumb sits under the mirror.
+  // The mirror position is held in tenths so that −1 is exact.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("plot"), slider = document.getElementById("m");
+  const X0 = -4.5, X1 = 2.5, Y0 = -2.2, Y1 = 12, H = 250, TOP = 8, BOT = H - 22, PAD = 7.5;
+  const AMB = "#e8a33d";
+  const g = (x) => x * x + 2 * x;
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const M = Math.round(+slider.value * 10), m = M / 10, hit = M === -10;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => PAD + ((x - X0) / (X1 - X0)) * (W - 2 * PAD);
+    const sy = (y) => TOP + ((Y1 - y) / (Y1 - Y0)) * (BOT - TOP);
+    const path = (pts) => pts.map((p, i) => (i ? "L" : "M") + sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1)).join("");
+
+    const defs = el("defs", {});
+    const cp = el("clipPath", { id: "box" }, null, defs);
+    el("rect", { x: PAD, y: TOP, width: W - 2 * PAD, height: BOT - TOP }, null, cp);
+
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.16)" });
+    el("line", { x1: sx(0), x2: sx(0), y1: TOP, y2: BOT, stroke: "rgba(238,242,252,0.1)" });
+
+    const N = 160, curve = [];
+    for (let i = 0; i <= N; i++) { const x = X0 + ((X1 - X0) * i) / N; curve.push([x, g(x)]); }
+
+    // the left part, reflected across the mirror, only where it lands inside the plot
+    const reach = Math.min(X1, 2 * m - X0), refl = [], real = [];
+    if (reach > m) {
+      for (let i = 0; i <= N; i++) {
+        const u = m + ((reach - m) * i) / N;
+        refl.push([u, g(2 * m - u)]);
+        real.push([u, g(u)]);
+      }
+    }
+    const clip = { "clip-path": "url(#box)" };
+    if (refl.length && !hit)
+      el("path", { d: path(real) + path(refl.slice().reverse()).replace("M", "L") + "Z", fill: "rgba(232,163,61,0.13)", ...clip });
+
+    el("path", { d: path(curve), fill: "none", stroke: "rgba(238,242,252,0.7)", "stroke-width": 1.7, ...clip });
+    if (refl.length)
+      el("path", { d: path(refl), fill: "none", stroke: AMB, "stroke-width": hit ? 2.2 : 1.6,
+                   "stroke-dasharray": hit ? "" : "5 4", opacity: hit ? 1 : 0.85, ...clip,
+                   style: hit ? "filter: drop-shadow(0 0 5px rgba(232,163,61,0.7))" : "" });
+
+    el("line", { x1: sx(m), x2: sx(m), y1: TOP, y2: BOT + 4, stroke: AMB, "stroke-width": 1.3, "stroke-dasharray": "3 4" });
+    const flip = sx(m) > W - PAD - 70;                     // near the right edge, label on the left
+    el("text", { x: sx(m) + (flip ? -7 : 7), y: TOP + 11, "text-anchor": flip ? "end" : "start",
+                 class: "mirror" + (hit ? " hit" : "") }, `x = ${fmt(m)}`);
+    if (hit) el("circle", { cx: sx(-1), cy: sy(-1), r: 4.5, fill: AMB, style: "filter: drop-shadow(0 0 5px rgba(232,163,61,0.8))" });
+
+    for (let u = Math.ceil(X0); u <= X1; u++)
+      el("text", { x: sx(u), y: H - 4, "text-anchor": "middle" }, fmt(u));
+
+    svg.setAttribute("aria-label", hit
+      ? "With the mirror at x = −1, the reflected left half lies exactly on the right half."
+      : `With the mirror at x = ${fmt(m)}, the reflected left half misses the right half.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
