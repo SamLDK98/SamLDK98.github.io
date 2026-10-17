@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Two calculations on the same x</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.7rem); color: var(--txt); margin-bottom: 0.5rem; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--dim); }
+  svg text.name { font-family: "Spectral", Georgia, serif; font-size: 15px; fill: rgba(238, 242, 252, 0.85); }
+  svg text.sum { font-size: 11px; fill: var(--txt); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" aria-hidden="true"><span class="k-sq"><span class="v">x</span>²</span> <span class="k-lin">+ 2<span class="v">x</span></span></div>
+  <svg id="bars" role="img"></svg>
+  <input id="a" type="range" min="0" max="4" step="0.5" value="3" aria-label="Distance of the two inputs from 0" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The two opposite inputs a and −a. For each, a waterfall: x² (blue) from 0, then 2x (green)
+  // added on, ending at the total. The x² parts always match; the 2x parts point opposite ways.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("bars"), slider = document.getElementById("a");
+  const SQ = "#7aa7ff", LIN = "#64c8a0", LO = -2, HI = 25, NAME = 62, PAD = 8, BH = 14, H = 96;
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const a = Math.round(+slider.value * 2) / 2;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (v) => NAME + ((v - LO) / (HI - LO)) * (W - NAME - PAD - 86);
+    el("line", { x1: sx(0), x2: sx(0), y1: 4, y2: H - 18, stroke: "rgba(238,242,252,0.3)" });
+    el("text", { x: sx(0), y: H - 4, "text-anchor": "middle" }, "0");
+
+    [a, -a].forEach((x, i) => {
+      const Y = 14 + i * 40, sq = x * x, lin = 2 * x, tot = sq + lin;
+      el("text", { x: 0, y: Y + BH - 2, class: "name" }, `x = ${fmt(x)}`);
+      el("rect", { x: sx(0), y: Y, width: sx(sq) - sx(0), height: BH / 2 - 1, fill: SQ, opacity: 0.9 });
+      el("rect", { x: Math.min(sx(sq), sx(tot)), y: Y + BH / 2 + 1, width: Math.abs(sx(tot) - sx(sq)), height: BH / 2 - 1, fill: LIN, opacity: 0.9 });
+      el("line", { x1: sx(tot), x2: sx(tot), y1: Y - 3, y2: Y + BH + 3, stroke: "#f4f6ff", "stroke-width": 1.6 });
+      el("text", { x: Math.max(sx(sq), sx(tot)) + 6, y: Y + BH - 3, class: "sum" },
+         `${fmt(sq)} ${lin < 0 ? "−" : "+"} ${fmt(Math.abs(lin))} = ${fmt(tot)}`);
+    });
+    svg.setAttribute("aria-label", `For x = ${fmt(a)}: ${fmt(a * a)} + ${fmt(2 * a)} = ${fmt(a * a + 2 * a)}. For x = ${fmt(-a)}: ${fmt(a * a)} − ${fmt(2 * a)} = ${fmt(a * a - 2 * a)}.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

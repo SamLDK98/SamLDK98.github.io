@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Addition and Multiplication of Unknowns | Polynomials | Sam Kirwan</title>
+  <meta name="description" content="Why multiplying an unknown by itself behaves so differently from adding it: addition slides, multiplication stretches and flips, and x times x folds the number line so two inputs share an output." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot, not blue-black */
+      --bg-2:    #141419;
+      --measure: 92ch;         /* the reading column */
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);   /* running prose */
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --na:      #e8a33d;   /* bone and notch */
+      --k:       #64c8a0;   /* clay token */
+      --cl:      #54d6a0;
+      --stim:    #ffc247;
+      --ahp:     #7aa7ff;   /* written numeral */
+      --leak:    #8fa0c4;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    /* Fine grain. A flat dark colour on its own reads as a glossy void; the
+       noise is what makes it feel like a matte surface. */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .sheet { position: relative; z-index: 1; }
+
+    /* ---------- masthead ---------- */
+    header {
+      padding: clamp(1.6rem, 5vh, 2.8rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--na); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--na); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 5.4vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #e8a33d 4%, #64c8a0 52%, #7aa7ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--body);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ---------- prose ---------- */
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.95rem; color: var(--txt);
+      margin: 1.8rem 0 0.5rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .cl { color: var(--cl); }
+    .stim { color: var(--stim); }
+    .ahp { color: var(--ahp); }
+
+    a.inline {
+      color: var(--k);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(100, 200, 160, 0.35);
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    a.inline:hover, a.inline:focus-visible { color: var(--txt); border-bottom-color: var(--txt); outline: none; }
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+
+    /* ---------- widget slot ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 1115px;            /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1895px; } }
+    iframe.bench.short { height: 610px; }
+    @media (max-width: 820px) { iframe.bench.short { height: 765px; } }
+
+    /* placeholder shown until the figure is built */
+    .lab-empty {
+      border: 1px dashed var(--line);
+      background: linear-gradient(180deg, rgba(140,165,225,0.04), transparent);
+      padding: clamp(2.4rem, 8vh, 4.5rem) 1.5rem;
+      text-align: center;
+    }
+    .lab-empty p {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3);
+    }
+
+    /* ---------- data table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .data {
+      width: 100%; border-collapse: collapse; margin-top: 1.3rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.73rem;
+    }
+    .data th, .data td {
+      text-align: left; padding: 0.6rem 0.9rem 0.6rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+    }
+    .data thead th {
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .data td:first-child { white-space: nowrap; color: var(--txt); }
+    .data td { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--txt-2); }
+    .data td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; white-space: normal; width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+
+    .fig-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; line-height: 1.7; color: var(--txt-3);
+      margin-top: 0.7rem; max-width: 74ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  
+    /* ---------- glyph figures ---------- */
+    .glyphs { margin: 1rem 0 1.4rem; padding: 0.9rem 1.1rem 0.8rem; border: 1px solid var(--line-2); background: var(--bg-2); }
+    .glyph-row { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; align-items: center; color: var(--na); }
+    .glyph-row .grp { display: inline-flex; gap: 0.15rem; }
+    .glyph-row svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .roman-row { font-family: "Spectral", Georgia, serif; font-size: 1.9rem; letter-spacing: 0.08em; line-height: 1; gap: 0; }
+    .roman-row .inline-glyph { width: 30px; height: 34px; margin: 0 0.12em; vertical-align: middle; }
+    .glyphs figcaption { font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; color: var(--txt-3); margin-top: 0.55rem; }
+    ul + p, ol + p, .eq + p, .glyphs + h3 { margin-top: 0.95rem; }
+    .eq-line.wrap { white-space: normal; }
+    .eq-line.wrap .sep { margin-right: 0.6em; }
+    h1 { max-width: none; }
+    p strong, li strong { color: #d9692b; }
+    .col p, .col li { font-size: clamp(1.12rem, 2.4vw, 1.25rem); }
+    iframe.bench.cols { height: 760px; }
+    @media (max-width: 820px) { iframe.bench.cols { height: 1100px; } }
+  
+    .area-figure { margin: 1.7rem 0; }
+    .area-figure svg { display: block; width: min(100%, 540px); height: auto; margin-inline: auto; }
+    .area-rearrangement svg { width: min(100%, 760px); }
+    .area-figure .label { font-family: "Spectral", Georgia, serif; font-size: 25px; fill: var(--txt); font-style: italic; }
+    .area-figure .dimension { font-size: 22px; fill: var(--txt-2); }
+    .area-figure + p { margin-top: 0.95rem; }
+    mjx-container { color: inherit; }
+    a:focus-visible { outline: 2px solid var(--na); outline-offset: 5px; }
+    .math { overflow-x: auto; overflow-y: hidden; margin: 0.95rem 0; padding: 0.15rem 0; font-size: clamp(1.12rem, 2.4vw, 1.25rem); color: var(--body); }
+    .math mjx-container[display="true"] { text-align: left !important; margin: 0 !important; }
+    .math + p, .scroll-x + p { margin-top: 0.95rem; }
+    .col h4 { font-family: "IBM Plex Sans", sans-serif; font-weight: 500; font-size: 0.98rem; color: var(--txt-2); margin: 1.5rem 0 0.6rem; }
+    .col h3 { font-family: "Spectral", Georgia, serif; font-weight: 500; font-size: clamp(1.15rem, 2.4vw, 1.3rem); color: var(--txt); margin: 2rem 0 0.7rem; }
+    .data { min-width: 38rem; }
+    .data td { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; color: var(--body); }
+    .data td:first-child { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+    .data td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    a.inline { color: var(--k); text-decoration: none; border-bottom: 1px solid rgba(100,200,160,0.35); }
+    a.inline:hover { color: var(--txt); border-bottom-color: var(--txt); }
+    blockquote.note { margin: 1rem 0; padding: 0.7rem 1.1rem; border-left: 2px solid var(--na); background: linear-gradient(90deg, rgba(232,163,61,0.07), transparent 75%); }
+    blockquote.note p { color: var(--txt-2); }
+    blockquote.note p + p { margin-top: 0.6rem; }
+    blockquote.note + p, blockquote.note + h3 { margin-top: 0.95rem; }
+    .tick { color: var(--k); font-weight: 600; font-size: 1.2rem; }
+    .cross { color: #e0675a; font-weight: 600; font-size: 1.2rem; }
+    .data.cases { min-width: 44rem; }
+    .data.cases td:nth-child(2) { white-space: nowrap; }
+    .data.cases td:last-child { width: auto; text-align: center; }
+    .data.cases th:last-child { text-align: center; }
+    /* ---------- widgets and figures ---------- */
+    iframe.poly-widget { display: block; width: 100%; border: 0; margin: 1.6rem 0 1.8rem; overflow: hidden; background: transparent; }
+    .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 clamp(1.5rem, 4vw, 3rem); align-items: center; margin: 0.95rem 0; }
+    .pair > :first-child { margin-top: 0; }
+    .pair .math { margin: 0.3rem 0; }
+    .pair p + p, .pair ul + p { margin-top: 0.6rem; }
+    figure.nest { margin: 0; }
+    figure.nest svg { display: block; width: 100%; max-width: 330px; height: auto; margin-inline: auto; }
+    figure.nest text { font-family: "Spectral", Georgia, serif; font-style: italic; }
+    @media (max-width: 900px) {
+      .pair { grid-template-columns: 1fr; gap: 0.6rem; }
+    }
+    .math { scrollbar-width: thin; scrollbar-color: rgba(238,242,252,0.16) transparent; }
+    .math::-webkit-scrollbar { height: 4px; }
+    .math::-webkit-scrollbar-track { background: transparent; }
+    .math::-webkit-scrollbar-thumb { background: rgba(238,242,252,0.16); border-radius: 4px; }
+    .data.steps { min-width: 34rem; }
+    .data.steps td, .data.steps th { text-align: center; }
+    .data.steps td:first-child, .data.steps th:first-child { text-align: left; font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    .data.steps td:last-child { width: auto; }
+    .data.steps thead th { font-size: 0.95rem; letter-spacing: 0; text-transform: none; }
+    .data.steps td.ahp { color: var(--ahp); }
+    .data.steps td.k { color: var(--k); }
+    .data.steps td.na { color: var(--na); }
+    .data.compact { min-width: 0; width: auto; }
+    .data.compact th, .data.compact td { text-align: center; padding: 0.5rem 1.1rem; white-space: nowrap; }
+    .data.compact thead th { font-family: "Spectral", Georgia, serif; font-size: 1rem; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--txt-2); }
+    .data.compact td, .data.compact td:first-child, .data.compact td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; width: auto; }
+    .data.compact .c-sq { color: var(--ahp); }
+    .data.compact .c-lin { color: var(--k); }
+    @media (max-width: 560px) {
+      .data.compact th, .data.compact td { padding: 0.45rem 0.5rem; }
+      .data.compact thead th { white-space: normal; line-height: 1.25; }
+    }
+    figure.chords { margin: 1.4rem 0 1.6rem; }
+    figure.chords svg { display: block; width: 100%; max-width: 380px; height: auto; margin-inline: auto; }
+    figure.chords text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: rgba(238, 242, 252, 0.44); }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="polynomials.html">Polynomials</a>
+      <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Addition and Multiplication of Unknowns</h1>
+    </header>
+    <main>
+      <section class="col" aria-labelledby="is-multiplication-just-repeated-addition">
+        <h2 id="is-multiplication-just-repeated-addition">Is Multiplication Just Repeated Addition?</h2>
+        <p>Addition combines quantities into one:</p>
+        <div class="math">\[2+3=5\]</div>
+        <p>Multiplication is usually introduced as repeated addition:</p>
+        <div class="math">\[5\cdot3=5+5+5=3+3+3+3+3=15\]</div>
+        <p>So it can feel like multiplication is addition in disguise, and should behave the same way.</p>
+        <p>When we multiply by a positive whole number, it is. But once negative numbers are allowed, multiplication does something addition never does. That difference is where quadratics get their two solutions.</p>
+      </section>
+
+      <section class="col" aria-labelledby="sliding-stretching-and-flipping">
+        <h2 id="sliding-stretching-and-flipping">Sliding, Stretching and Flipping</h2>
+        <p>Picture every number on the number line, and apply one operation to all of them at once.</p>
+        <p>Adding \(3\) slides every number \(3\) places to the right. Every number moves the same distance, in the same direction, wherever it starts.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=add" title="Interactive: choose a number to add to every number from -4 to 4; they all slide the same way and keep their order" style="height: 170px" scrolling="no" loading="lazy"></iframe>
+        <p>Multiplying by \(3\) works differently. It moves each number to \(3\) times its distance from \(0\), on the same side: \(2\) goes to \(6\), and \(-4\) goes to \(-12\). Numbers right of \(0\) move right, numbers left of \(0\) move left, and \(0\) stays put.</p>
+        <p>Multiplying by \(-3\) stretches in the same way, but also flips every number to the other side of \(0\): \(2\) goes to \(-6\), and \(-4\) goes to \(12\).</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=mul" title="Interactive: choose a number to multiply every number from -4 to 4 by; they stretch away from 0, collapse onto 0 at zero, and flip with their order reversed when it is negative" style="height: 170px" scrolling="no" loading="lazy"></iframe>
+        <p>Repeated addition explains the stretch, but not the flip: there is no way to add something "negative three times". The flip is the new ingredient. It is also why a negative times a negative is positive: \((-3)(-4)\) flips \(-4\), which is on the left, over to the right, and stretches it to \(12\).</p>
+        <p>So addition slides. Multiplication stretches from \(0\), and flips across \(0\) when the multiplier is negative. Multiplication is anchored at \(0\) in a way addition isn't.</p>
+      </section>
+
+      <section class="col" aria-labelledby="why-linear-equations-have-one-solution">
+        <h2 id="why-linear-equations-have-one-solution">Why Linear Equations Have One Solution</h2>
+        <p>Watch the order of the numbers. After adding \(3\), they are in the same order as before. After multiplying by \(3\), the same order, spread out. After multiplying by \(-3\), the order is exactly reversed.</p>
+        <p>In every case, two different numbers end up in two different places. Nothing lands on top of anything else. (The one exception is multiplying by \(0\), which squashes everything onto \(0\). That is why \(ax+b=c\) needs \(a\neq0\).)</p>
+        <p>An equation asks which inputs land on a given output. If an operation never puts two numbers in the same place, at most one input can land there. A linear equation like \(4x+3=11\) is built from one stretch and one slide, so it has one solution.</p>
+        <p>Adding an unknown to itself doesn't change this. \(x+x\) is \(2x\): a stretch by the known number \(2\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="multiplying-an-unknown-by-itself">
+        <h2 id="multiplying-an-unknown-by-itself">Multiplying an Unknown by Itself</h2>
+        <p>\(x\cdot x\) is different in kind. The multiplier is no longer a fixed number: it is \(x\) itself, so it changes from one input to the next.</p>
+        <ul>
+          <li>A positive number is multiplied by a positive number. It is stretched and stays on the right: \(3\cdot3=9\).</li>
+          <li>A negative number is multiplied by a negative number. It is stretched and flipped to the right: \((-3)(-3)=9\).</li>
+        </ul>
+        <p>\(3\) and \(-3\) are the same distance from \(0\), so they are stretched by the same amount. One is flipped and the other isn't, but the flipped one started on the left. Both land on \(9\).</p>
+        <p>So \(x\cdot x\) does two things. It folds the left half of the number line over onto the right half, so \(-3\) lands on \(3\). Then it stretches each number by its own size, so \(3\) becomes \(9\).</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/fold-widget.html" title="Interactive: slide to multiply each number from -3 to 3 by itself, first folding the negatives over 0, then stretching each number by its own size" style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p>The fold is at \(0\) because that is where the multiplier changes sign. Every input left of \(0\) is multiplied by a negative number and flipped; every input right of \(0\) isn't.</p>
+      </section>
+
+      <section class="col" aria-labelledby="what-the-fold-does">
+        <h2 id="what-the-fold-does">What the Fold Does</h2>
+        <p>Two things follow from the fold, and neither can happen with \(x+x\).</p>
+        <p><strong>Bigger inputs can give smaller outputs.</strong> With \(x+x\), a bigger input always gives a bigger output. With \(x\cdot x\), going from \(-4\) to \(-3\) drops the output from \(16\) to \(9\).</p>
+        <p>After the fold, only distance from \(0\) matters, and \(-3\) is closer to \(0\) than \(-4\). Past \(0\), moving right takes inputs further away, so the output grows. So \(x\cdot x\) falls until \(0\) and rises after it: \(0\) is its turning point.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/sweep-widget.html" title="Interactive: drag x from -4 to 4; x + x always moves the same way, while x times x moves left until 0 and then right" style="height: 210px" scrolling="no" loading="lazy"></iframe>
+        <p><strong>Two inputs share each positive output.</strong> For \(x\cdot x=9\), both \(3\) and \(-3\) land on \(9\). These are separate tests: each uses one number throughout, and each passes. (The <a class="inline" href="polynomials-multiple-solutions.html">Multiple Solutions</a> pages start from exactly this worry.) Every positive output gets two inputs, the same distance either side of \(0\). Zero gets one. Negative outputs get none.</p>
+        <p>That is the bottom-up reason a quadratic can have two solutions: multiplying the unknown by itself folds the number line, and a fold puts two inputs in the same place.</p>
+        <p>(A check on the idea: \(x\cdot x\cdot x\) flips a negative number twice, which puts it back on the left. So there is no fold, the order is kept, and \(x^3=8\) has only one real solution, \(2\).)</p>
+      </section>
+
+      <section class="col" aria-labelledby="mixing-the-two">
+        <h2 id="mixing-the-two">Mixing the Two</h2>
+        <p>Most quadratics mix both operations, like \(x^2+2x\). Two calculations happen to the same \(x\):</p>
+        <ul>
+          <li>\(x\cdot x\) gives the same output for \(3\) and \(-3\): \(9\).</li>
+          <li>\(2x\) does not: \(6\) and \(-6\).</li>
+        </ul>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/pairs-widget.html" title="Interactive: choose a distance from 0; for the two opposite inputs, the x squared parts match and the 2x parts point opposite ways" style="height: 150px" scrolling="no" loading="lazy"></iframe>
+        <p>Added together, \(3\) gives \(15\) but \(-3\) gives \(3\). The outputs are no longer symmetric about \(0\).</p>
+        <p>But the fold hasn't gone. \(x^2+2x\) still falls and then rises, so its outputs still come in pairs, around a different point. <a class="inline" href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a> finds where, and why.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="polynomials-multiple-solutions-2.html">← Multiple Solutions (2)</a>
+        <a href="polynomials-axis-of-symmetry.html">Next: Axis of Symmetry →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "poly-widget-height") return;
+      document.querySelectorAll("iframe.poly-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

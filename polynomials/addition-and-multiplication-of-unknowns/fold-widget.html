@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multiplying a number by itself</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .tag { display: block; text-align: center; min-height: 1.2em; margin-bottom: 0.2rem; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <span class="tag" id="tag" aria-live="polite"></span>
+  <svg id="line" role="img"></svg>
+  <input id="t" type="range" min="0" max="2" step="0.01" value="0" aria-label="How far through multiplying each number by itself" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // x · x as two moves. First half of the slider: the fold. Every number left of 0 swings over
+  // to the same distance on the right (it is multiplied by a negative, so it flips). Second half:
+  // the stretch. Each number is multiplied by its own size. Partners (x and −x) share a colour;
+  // the left one is hollow, and it ends exactly on top of the right one.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("line"), slider = document.getElementById("t");
+  const IN = [-3, -2, -1, 0, 1, 2, 3];
+  const COL = { 0: "#f4f6ff", 1: "#64c8a0", 2: "#7aa7ff", 3: "#e8a33d" };
+  const X0 = -3.6, X1 = 9.6, PAD = 10, H = 132, Y = 100;
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const t = +slider.value;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const unit = (W - 2 * PAD) / (X1 - X0);
+    const sx = (v) => PAD + (v - X0) * unit;
+    document.getElementById("tag").textContent = t === 0 ? "x" : t < 1 ? "fold: numbers left of 0 flip over"
+      : t < 2 ? "stretch: each number × its own size" : "x · x";
+
+    el("line", { x1: PAD, x2: W - PAD, y1: Y, y2: Y, stroke: "rgba(238,242,252,0.22)" });
+    for (let u = Math.ceil(X0); u <= X1; u++) {
+      const big = [0, 1, 4, 9].includes(u) || u < 0;
+      el("line", { x1: sx(u), x2: sx(u), y1: Y, y2: Y + (big ? 5 : 3), stroke: "rgba(238,242,252,0.2)" });
+      if (big) el("text", { x: sx(u), y: Y + 18, "text-anchor": "middle" }, fmt(u));
+    }
+    el("line", { x1: sx(0), x2: sx(0), y1: Y - 72, y2: Y + 5, stroke: "rgba(238,242,252,0.35)", "stroke-dasharray": "2 4" });
+
+    // the right-hand dots first, so the hollow left-hand partners land on top of them
+    [...IN].sort((a, b) => b - a).forEach((x) => {
+      const size = Math.abs(x), c = COL[size];
+      let px, py = 0;
+      if (t <= 1) {
+        if (x < 0) { px = x * Math.cos(Math.PI * t); py = size * Math.sin(Math.PI * t); }   // swing over 0
+        else px = x;
+      } else px = size + (t - 1) * (size * size - size);                                   // stretch by own size
+      const cy = Y - py * Math.min(unit, 22);
+      if (x < 0) el("circle", { cx: sx(px), cy, r: 7, fill: "none", stroke: c, "stroke-width": 2 });
+      else el("circle", { cx: sx(px), cy, r: 5, fill: c });
+    });
+    if (t === 2) [1, 2, 3].forEach((s) => el("text", { x: sx(s * s), y: Y - 14, "text-anchor": "middle", style: `fill: ${COL[s]}` },
+      `${fmt(-s)}, ${s}`));
+    svg.setAttribute("aria-label", t === 2 ? "Each pair of opposite numbers lands on the same point: −1 and 1 on 1, −2 and 2 on 4, −3 and 3 on 9."
+      : "The numbers from −3 to 3 part way through being multiplied by themselves.");
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

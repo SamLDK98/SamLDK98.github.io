@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Which way the output moves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 15px; fill: rgba(238, 242, 252, 0.8); }
+  svg text.val { font-size: 11px; fill: var(--txt); }
+  svg text.dir { font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="rows" role="img"></svg>
+  <input id="x" type="range" min="-4" max="4" step="0.1" value="2" aria-label="Value of x" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Drag x. Under each row, its output's path is drawn with time running downwards, so a row that
+  // reverses draws a "<". x + x always moves the same way as x; x · x moves left until 0, then right.
+  // It starts part-way through a sweep from −4, so the turn is visible before any dragging.
+  // The x row is aligned with the slider. x is held in tenths.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("rows"), slider = document.getElementById("x");
+  const ROWS = [
+    { name: "x", f: (x) => x, lo: -4, hi: 4, col: "#f4f6ff" },
+    { name: "x + x", f: (x) => x + x, lo: -8, hi: 8, col: "#64c8a0" },
+    { name: "x · x", f: (x) => x * x, lo: -16, hi: 16, col: "#7aa7ff" },
+  ];
+  const PAD = 7.5, GAP = 78, TOP = 30, TRACK = 26, H = TOP + GAP * 2 + TRACK + 26;
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+  const path = [];                                   // visited x values in order, in tenths
+  for (let t = -40; t <= 20; t++) path.push(t);
+  let prev = 20, dirs = [1, 1, 1];
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const T = Math.round(+slider.value * 10), x = T / 10;
+    if (T !== prev) {
+      const step = T > prev ? 1 : -1;               // fill in skipped values so the path stays continuous
+      for (let t = prev + step; t !== T + step; t += step) path.push(t);
+      if (path.length > 500) path.splice(0, path.length - 500);
+      dirs = ROWS.map((r) => Math.sign(r.f(T / 10) - r.f(prev / 10)));
+      prev = T;
+    }
+
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    ROWS.forEach((r, i) => {
+      const Y = TOP + i * GAP;
+      const sx = (v) => PAD + ((v - r.lo) / (r.hi - r.lo)) * (W - 2 * PAD);
+      el("line", { x1: PAD, x2: W - PAD, y1: Y, y2: Y, stroke: "rgba(238,242,252,0.2)" });
+      el("line", { x1: sx(0), x2: sx(0), y1: Y - 5, y2: Y + 5, stroke: "rgba(238,242,252,0.4)" });
+      el("text", { x: sx(r.lo), y: Y + 15 }, fmt(r.lo));
+      el("text", { x: sx(r.hi), y: Y + 15, "text-anchor": "end" }, fmt(r.hi));
+      el("text", { x: PAD, y: Y - 10, class: "name" }, r.name);
+      if (path.length > 1) el("path", { d: path.map((t, k) => (k ? "L" : "M") + sx(r.f(t / 10)).toFixed(1) + " " +
+        (Y + 22 + (k / (path.length - 1)) * TRACK).toFixed(1)).join(""), fill: "none", stroke: r.col, "stroke-width": 1.4, opacity: 0.45 });
+      const v = r.f(x), px = sx(v);
+      el("circle", { cx: px, cy: Y, r: 6, fill: r.col, style: `filter: drop-shadow(0 0 5px ${r.col})` });
+      el("text", { x: Math.min(Math.max(px, PAD + 60), W - PAD - 30), y: Y - 11, "text-anchor": "middle", class: "val" },
+         fmt(v) + (dirs[i] > 0 ? "  →" : dirs[i] < 0 ? "  ←" : ""));
+    });
+    svg.setAttribute("aria-label", `x = ${fmt(x)}: x + x = ${fmt(2 * x)}, x · x = ${fmt(x * x)}.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
