@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.7rem); color: var(--txt); }
+  .expr .k { color: var(--const); }
+  .sub {
+    text-align: center; white-space: nowrap; margin: 0.15rem 0 0.5rem;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.86rem; color: rgba(238, 242, 252, 0.66);
+  }
+  .sub b { font-weight: 400; color: var(--const); }
+  .sub .sep { margin: 0 0.9em; opacity: 0.6; }
+  svg { display: block; width: 100%; overflow: visible; }
+  .row { position: relative; height: 3rem; }
+  .row button {
+    position: absolute; top: 0.25rem; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+    min-width: 2.2rem; padding: 0.1rem 0.2rem;
+    font: inherit; color: var(--body); background: none; border: 0; cursor: pointer;
+  }
+  .row .num { font-size: 1.15rem; line-height: 1.1; transition: color 0.2s ease, text-shadow 0.2s ease; }
+  .row .val { font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; color: var(--dim); transition: color 0.2s ease; }
+  .row button:hover .num { color: var(--txt); }
+  .row button.on .num { color: var(--const); text-shadow: 0 0 12px var(--glow); }
+  .row button.on .val { color: var(--const); }
+  .row button:focus-visible { outline: 1px solid var(--dim); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" id="expr" aria-live="polite"></div>
+  <div class="sub" id="sub"></div>
+  <svg id="arcs" aria-hidden="true"></svg>
+  <div class="row" id="row" role="group" aria-label="Choose a number"></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Each number is joined to its partner, 5 − x, by an arc. Under each number is x(5 − x).
+  // A number and its partner multiply the same two numbers, in the other order, so they share a value.
+  const NUMS = [-1, 0, 1, 2, 3, 4, 5, 6];
+  const AMB = "#e8a33d", PAD = 22;
+  let pick = 2;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("arcs");
+  const fmt = (n) => (n < 0 ? "−" : "") + Math.abs(n);
+  const par = (n) => (n < 0 ? "(" + fmt(n) + ")" : fmt(n));
+
+  function el(name, attrs) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    svg.appendChild(e);
+    return e;
+  }
+
+  const row = document.getElementById("row");
+  const buttons = NUMS.map((v) => {
+    const b = document.createElement("button");
+    b.innerHTML = `<span class="num">${fmt(v)}</span><span class="val">${fmt(v * (5 - v))}</span>`;
+    b.setAttribute("aria-label", `${fmt(v)}, whose partner is ${fmt(5 - v)}`);
+    b.addEventListener("click", () => { pick = v; render(); });
+    row.appendChild(b);
+    return b;
+  });
+
+  function render() {
+    const W = svg.clientWidth || 560, H = 76, Y = H - 3;
+    const sx = (v) => PAD + ((v - NUMS[0]) / (NUMS[NUMS.length - 1] - NUMS[0])) * (W - 2 * PAD);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const partner = 5 - pick;
+
+    // nested arcs, innermost pair (2, 3) lowest
+    [2, 1, 0, -1].forEach((a, k) => {
+      const b = 5 - a, lit = a === pick || b === pick;
+      const x1 = sx(a), x2 = sx(b);
+      el("path", { d: `M${x1} ${Y} A${(x2 - x1) / 2} ${12 + 18 * k} 0 0 1 ${x2} ${Y}`, fill: "none",
+                   stroke: lit ? AMB : "rgba(238,242,252,0.22)", "stroke-width": lit ? 1.8 : 1.1 });
+    });
+    NUMS.forEach((v) => {
+      const lit = v === pick || v === partner;
+      el("circle", { cx: sx(v), cy: Y, r: lit ? 4 : 2.6, fill: lit ? AMB : "rgba(238,242,252,0.55)" });
+    });
+
+    buttons.forEach((b, i) => {
+      b.style.left = sx(NUMS[i]) + "px";
+      b.classList.toggle("on", NUMS[i] === pick || NUMS[i] === partner);
+      b.setAttribute("aria-pressed", String(NUMS[i] === pick));
+    });
+
+    const P = pick * partner;
+    document.getElementById("expr").innerHTML =
+      `<span class="v">x</span>(5 − <span class="v">x</span>) = <span class="k">${fmt(P)}</span>`;
+    document.getElementById("sub").innerHTML =
+      `<b>${fmt(pick)}</b> × <b>${par(partner)}</b> = ${fmt(P)}<span class="sep">·</span>` +
+      `<b>${fmt(partner)}</b> × <b>${par(pick)}</b> = ${fmt(P)}`;
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

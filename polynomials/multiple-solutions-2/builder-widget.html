@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Building an equation from its solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .lines { text-align: center; color: var(--txt); }
+  .line { white-space: nowrap; font-size: clamp(1.02rem, 4.3vw, 1.4rem); line-height: 1.55; }
+  .line .n { color: var(--const); }
+  .or { font-style: italic; color: var(--dim); margin: 0 0.45em; }
+  .poly { display: inline-flex; align-items: flex-start; justify-content: center; gap: 0.5em; }
+  .poly.three { gap: 0.3em; }
+  .term { display: inline-flex; flex-direction: column; align-items: center; }
+  .term .zero { opacity: 0.4; }
+  .note {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; line-height: 1.3; color: rgba(238, 242, 252, 0.66);
+    white-space: nowrap; margin-top: 0.12rem; padding-top: 0.1rem; border-top: 1px solid rgba(238, 242, 252, 0.22);
+  }
+  svg { display: block; width: 100%; overflow: visible; margin-top: 0.6rem; touch-action: pan-y; cursor: ew-resize; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.pin { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 15px; fill: var(--const); }
+  .widget { position: relative; }
+  input.sr[type="range"] { position: absolute; left: 0; top: 0; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="lines" aria-live="polite">
+    <div class="line" id="l1"></div>
+    <div class="line" id="l2"></div>
+    <div class="line"><span class="poly" id="l3"></span></div>
+  </div>
+  <svg id="track" aria-hidden="true"></svg>
+  <div id="keys"></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Drag the solutions; the equation is rebuilt from them. Lines 1 and 2 list the pins in their
+  // own order (r first), so dragging r past s reorders them, while the multiplied-out line
+  // depends only on the sum and the product and stays the same.
+  // ?n=3 builds a cubic from three whole-number solutions. Pins are held in halves so everything stays exact.
+  const THREE = new URLSearchParams(location.search).get("n") === "3";
+  const NAMES = THREE ? ["r", "s", "t"] : ["r", "s"];
+  const MIN = THREE ? -2 : -3, MAX = THREE ? 5 : 6;
+  const pins = THREE ? [2, 4, 8] : [4, 6];
+  const SNAP = THREE ? 2 : 1;            // in halves: the cubic's solutions are whole numbers
+  const AMB = "#e8a33d", PAD = 12, H = 60, Y = 34;
+  let active = -1, focused = -1;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("track");
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(3));
+  const par = (v, i) => (i > 0 && v < 0 ? "(" + fmt(v) + ")" : fmt(v));
+  const X = '<span class="v">x</span>';
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function writeLines() {
+    const v = pins.map((h) => h / 2);
+    document.getElementById("l1").innerHTML =
+      v.map((a) => `${X} = <span class="n">${fmt(a)}</span>`).join('<span class="or">or</span>');
+    document.getElementById("l2").innerHTML =
+      v.map((a) => (a === 0 ? X : `(${X} ${a < 0 ? "+" : "−"} <span class="n">${fmt(Math.abs(a))}</span>)`)).join("") + " = 0";
+
+    const coefs = THREE
+      ? [1, -(v[0] + v[1] + v[2]), v[0] * v[1] + v[0] * v[2] + v[1] * v[2], -(v[0] * v[1] * v[2])]
+      : [1, -(v[0] + v[1]), v[0] * v[1]];
+    const n = coefs.length - 1;
+    const KIND = { 3: "", 2: "k-sq", 1: "k-lin", 0: "k-const" };
+    const notes = { 1: v.map(par).join(" + "), [n]: v.map(par).join(" × ") };
+    let html = "";
+    coefs.forEach((c, i) => {
+      const deg = n - i, mag = Math.abs(c);
+      const xs = deg === 0 ? "" : X + (deg === 3 ? "³" : deg === 2 ? "²" : "");
+      const t = i === 0 ? xs : (c < 0 ? "− " : "+ ") + (deg > 0 && mag === 1 ? "" : fmt(mag)) + xs;
+      html += `<span class="term"><span class="${KIND[deg]}${c === 0 ? " zero" : ""}">${t}</span>` +
+              (notes[i] ? `<span class="note">${notes[i]}</span>` : "") + "</span>";
+    });
+    document.getElementById("l3").innerHTML = html + '<span class="term"><span>= 0</span></span>';
+  }
+
+  const width = () => svg.clientWidth || 560;
+  const sx = (u) => PAD + ((u - MIN) / (MAX - MIN)) * (width() - 2 * PAD);
+
+  function drawTrack() {
+    const W = width();
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    el("line", { x1: sx(MIN), x2: sx(MAX), y1: Y, y2: Y, stroke: "rgba(238,242,252,0.22)" });
+    for (let u = MIN; u <= MAX; u++) {
+      el("line", { x1: sx(u), x2: sx(u), y1: Y, y2: Y + 5, stroke: "rgba(238,242,252,0.22)" });
+      el("text", { x: sx(u), y: Y + 18, "text-anchor": "middle" }, fmt(u));
+    }
+    // pins that sit on the same number are drawn once, with a ring and both letters
+    const at = new Map();
+    pins.forEach((h, i) => { if (!at.has(h)) at.set(h, []); at.get(h).push(i); });
+    at.forEach((idx, h) => {
+      const x = sx(h / 2);
+      if (idx.length > 1) el("circle", { cx: x, cy: Y, r: 11.5, fill: "none", stroke: AMB, "stroke-width": 1.2, opacity: 0.7 });
+      if (idx.includes(focused)) el("circle", { cx: x, cy: Y, r: 15, fill: "none", stroke: "rgba(238,242,252,0.55)" });
+      el("circle", { cx: x, cy: Y, r: 7.5, fill: AMB, style: "filter: drop-shadow(0 0 6px rgba(232,163,61,0.6))" });
+      el("text", { x, y: Y - 15, "text-anchor": "middle", class: "pin" }, idx.map((i) => NAMES[i]).join(", "));
+    });
+  }
+
+  // keyboard and screen readers get one hidden slider per pin
+  const inputs = NAMES.map((name, i) => {
+    const inp = document.createElement("input");
+    Object.assign(inp, { type: "range", className: "sr", min: MIN, max: MAX, step: SNAP / 2 });
+    inp.setAttribute("aria-label", "Solution " + name);
+    inp.addEventListener("input", () => set(i, Math.round(+inp.value * 2)));
+    inp.addEventListener("focus", () => { focused = i; drawTrack(); });
+    inp.addEventListener("blur", () => { focused = -1; drawTrack(); });
+    document.getElementById("keys").appendChild(inp);
+    return inp;
+  });
+
+  function render() {
+    inputs.forEach((inp, i) => { inp.value = pins[i] / 2; });
+    writeLines();
+    drawTrack();
+  }
+  function set(i, h) {
+    h = Math.max(MIN * 2, Math.min(MAX * 2, Math.round(h / SNAP) * SNAP));
+    if (pins[i] === h) return;
+    pins[i] = h;
+    render();
+  }
+
+  const toHalves = (clientX) => {
+    const r = svg.getBoundingClientRect();
+    return Math.round((MIN + ((clientX - r.left - PAD) / (r.width - 2 * PAD)) * (MAX - MIN)) * 2);
+  };
+  svg.addEventListener("pointerdown", (e) => {
+    const px = e.clientX - svg.getBoundingClientRect().left;
+    let best = 0, bd = Infinity;
+    pins.forEach((h, i) => { const d = Math.abs(sx(h / 2) - px); if (d < bd) { bd = d; best = i; } });
+    active = best;
+    svg.setPointerCapture(e.pointerId);
+    set(active, toHalves(e.clientX));
+  });
+  svg.addEventListener("pointermove", (e) => { if (active >= 0) set(active, toHalves(e.clientX)); });
+  svg.addEventListener("pointerup", () => { active = -1; });
+  svg.addEventListener("pointercancel", () => { active = -1; });
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawTrack, 60); });
+  if (THREE) document.getElementById("l3").classList.add("three");
+  render();
+</script>
+</body>
+</html>

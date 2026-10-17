@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple Solutions (2) | Polynomials | Sam Kirwan</title>
+  <meta name="description" content="Why one unknown can have two solutions: a quadratic is a question about two numbers written with one symbol, and its coefficients record only their sum and product." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e11;      /* matte soot, not blue-black */
+      --bg-2:    #141419;
+      --measure: 92ch;         /* the reading column */
+      --line:    rgba(140, 165, 225, 0.16);
+      --line-2:  rgba(140, 165, 225, 0.07);
+      --txt:     #f4f6ff;
+      --body:    rgba(243, 246, 255, 0.93);   /* running prose */
+      --txt-2:   rgba(238, 242, 252, 0.74);
+      --txt-3:   rgba(238, 242, 252, 0.44);
+      --na:      #e8a33d;   /* bone and notch */
+      --k:       #64c8a0;   /* clay token */
+      --cl:      #54d6a0;
+      --stim:    #ffc247;
+      --ahp:     #7aa7ff;   /* written numeral */
+      --leak:    #8fa0c4;
+    }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      width: min(1120px, 100% - 2.2rem);
+      margin: 0 auto;
+      padding: 0 clamp(0.6rem, 3vw, 2.4rem);
+    }
+    .col { max-width: var(--measure); margin-inline: auto; }
+
+    /* Fine grain. A flat dark colour on its own reads as a glossy void; the
+       noise is what makes it feel like a matte surface. */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .sheet { position: relative; z-index: 1; }
+
+    /* ---------- masthead ---------- */
+    header {
+      padding: clamp(1.6rem, 5vh, 2.8rem) 0 0;
+      max-width: var(--measure); margin-inline: auto;
+    }
+
+    .crumb {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      display: inline-block; border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .crumb:hover { color: var(--txt); border-bottom-color: var(--na); }
+    .crumb::before { content: "← "; }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.61rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--na); margin: clamp(1.6rem, 5vh, 2.6rem) 0 0.8rem;
+    }
+
+    h1 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 5.4vw, 3.3rem);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    h1 em {
+      font-style: normal;
+      /* Orange and cyan are near-complementary, so interpolating straight between
+         them passes through grey. A violet midpoint keeps it saturated the whole way. */
+      background: linear-gradient(103deg, #e8a33d 4%, #64c8a0 52%, #7aa7ff 96%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .standfirst {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1.02rem, 2.1vw, 1.22rem);
+      line-height: 1.62; color: var(--body);
+      max-width: 52ch; margin-top: 1.15rem;
+      padding-bottom: clamp(1.5rem, 4vh, 2.2rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ---------- prose ---------- */
+    h2 {
+      font-family: "Spectral", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      line-height: 1.18; letter-spacing: -0.012em;
+      margin: clamp(2.4rem, 6vh, 3.4rem) 0 0.9rem;
+    }
+    h2 .n {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+
+    h3 {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 600; font-size: 0.95rem; color: var(--txt);
+      margin: 1.8rem 0 0.5rem;
+    }
+
+    p, li {
+      font-family: "Spectral", Georgia, serif;
+      font-size: clamp(1rem, 2vw, 1.08rem);
+      line-height: 1.72; color: var(--body);
+    }
+    p + p { margin-top: 0.95rem; }
+    p strong, li strong { color: var(--txt); font-weight: 500; }
+    ul, ol { margin: 1rem 0 0; padding-left: 1.15rem; }
+    li + li { margin-top: 0.55rem; }
+    li::marker { color: var(--txt-3); }
+
+    .na { color: var(--na); }
+    .k  { color: var(--k); }
+    .cl { color: var(--cl); }
+    .stim { color: var(--stim); }
+    .ahp { color: var(--ahp); }
+
+    a.inline {
+      color: var(--k);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(100, 200, 160, 0.35);
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    a.inline:hover, a.inline:focus-visible { color: var(--txt); border-bottom-color: var(--txt); outline: none; }
+    .v { font-family: "Spectral", Georgia, serif; font-style: italic; }
+
+    /* ---------- widget slot ---------- */
+    .lab { margin: clamp(1.8rem, 5vh, 2.6rem) 0 0; width: 100%; }
+    .lab-cap {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; flex-wrap: wrap;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--txt-3); margin-bottom: 0.55rem;
+    }
+    iframe.bench {
+      display: block; width: 100%;
+      height: 1115px;            /* fallback; the widget posts its real height */
+      border: 0; background: var(--bg);
+    }
+    @media (max-width: 820px) { iframe.bench { height: 1895px; } }
+    iframe.bench.short { height: 610px; }
+    @media (max-width: 820px) { iframe.bench.short { height: 765px; } }
+
+    /* placeholder shown until the figure is built */
+    .lab-empty {
+      border: 1px dashed var(--line);
+      background: linear-gradient(180deg, rgba(140,165,225,0.04), transparent);
+      padding: clamp(2.4rem, 8vh, 4.5rem) 1.5rem;
+      text-align: center;
+    }
+    .lab-empty p {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3);
+    }
+
+    /* ---------- data table ---------- */
+    .scroll-x { overflow-x: auto; }
+    .data {
+      width: 100%; border-collapse: collapse; margin-top: 1.3rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.73rem;
+    }
+    .data th, .data td {
+      text-align: left; padding: 0.6rem 0.9rem 0.6rem 0;
+      border-bottom: 1px solid var(--line-2); vertical-align: baseline;
+    }
+    .data thead th {
+      font-weight: 500; font-size: 0.58rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--txt-3);
+      border-bottom-color: var(--line);
+    }
+    .data td:first-child { white-space: nowrap; color: var(--txt); }
+    .data td { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--txt-2); }
+    .data td:last-child {
+      font-family: "IBM Plex Sans", sans-serif; white-space: normal; width: 100%;
+    }
+
+    /* ---------- footer nav ---------- */
+    .foot-nav {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      max-width: var(--measure); margin-inline: auto;
+      border-top: 1px solid var(--line);
+      margin-top: clamp(2.6rem, 7vh, 4rem);
+      padding: 1.5rem 0 2.8rem;
+    }
+    .foot-nav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--txt-3); text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .foot-nav a:hover { color: var(--txt); border-bottom-color: var(--k); }
+
+
+    .fig-note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem; line-height: 1.7; color: var(--txt-3);
+      margin-top: 0.7rem; max-width: 74ch;
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  
+    /* ---------- glyph figures ---------- */
+    .glyphs { margin: 1rem 0 1.4rem; padding: 0.9rem 1.1rem 0.8rem; border: 1px solid var(--line-2); background: var(--bg-2); }
+    .glyph-row { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; align-items: center; color: var(--na); }
+    .glyph-row .grp { display: inline-flex; gap: 0.15rem; }
+    .glyph-row svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .roman-row { font-family: "Spectral", Georgia, serif; font-size: 1.9rem; letter-spacing: 0.08em; line-height: 1; gap: 0; }
+    .roman-row .inline-glyph { width: 30px; height: 34px; margin: 0 0.12em; vertical-align: middle; }
+    .glyphs figcaption { font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; color: var(--txt-3); margin-top: 0.55rem; }
+    ul + p, ol + p, .eq + p, .glyphs + h3 { margin-top: 0.95rem; }
+    .eq-line.wrap { white-space: normal; }
+    .eq-line.wrap .sep { margin-right: 0.6em; }
+    h1 { max-width: none; }
+    p strong, li strong { color: #d9692b; }
+    .col p, .col li { font-size: clamp(1.12rem, 2.4vw, 1.25rem); }
+    iframe.bench.cols { height: 760px; }
+    @media (max-width: 820px) { iframe.bench.cols { height: 1100px; } }
+  
+    .area-figure { margin: 1.7rem 0; }
+    .area-figure svg { display: block; width: min(100%, 540px); height: auto; margin-inline: auto; }
+    .area-rearrangement svg { width: min(100%, 760px); }
+    .area-figure .label { font-family: "Spectral", Georgia, serif; font-size: 25px; fill: var(--txt); font-style: italic; }
+    .area-figure .dimension { font-size: 22px; fill: var(--txt-2); }
+    .area-figure + p { margin-top: 0.95rem; }
+    mjx-container { color: inherit; }
+    a:focus-visible { outline: 2px solid var(--na); outline-offset: 5px; }
+    .math { overflow-x: auto; overflow-y: hidden; margin: 0.95rem 0; padding: 0.15rem 0; font-size: clamp(1.12rem, 2.4vw, 1.25rem); color: var(--body); }
+    .math mjx-container[display="true"] { text-align: left !important; margin: 0 !important; }
+    .math + p, .scroll-x + p { margin-top: 0.95rem; }
+    .col h4 { font-family: "IBM Plex Sans", sans-serif; font-weight: 500; font-size: 0.98rem; color: var(--txt-2); margin: 1.5rem 0 0.6rem; }
+    .col h3 { font-family: "Spectral", Georgia, serif; font-weight: 500; font-size: clamp(1.15rem, 2.4vw, 1.3rem); color: var(--txt); margin: 2rem 0 0.7rem; }
+    .data { min-width: 38rem; }
+    .data td { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; color: var(--body); }
+    .data td:first-child { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+    .data td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    a.inline { color: var(--k); text-decoration: none; border-bottom: 1px solid rgba(100,200,160,0.35); }
+    a.inline:hover { color: var(--txt); border-bottom-color: var(--txt); }
+    blockquote.note { margin: 1rem 0; padding: 0.7rem 1.1rem; border-left: 2px solid var(--na); background: linear-gradient(90deg, rgba(232,163,61,0.07), transparent 75%); }
+    blockquote.note p { color: var(--txt-2); }
+    blockquote.note p + p { margin-top: 0.6rem; }
+    blockquote.note + p, blockquote.note + h3 { margin-top: 0.95rem; }
+    .tick { color: var(--k); font-weight: 600; font-size: 1.2rem; }
+    .cross { color: #e0675a; font-weight: 600; font-size: 1.2rem; }
+    .data.cases { min-width: 44rem; }
+    .data.cases td:nth-child(2) { white-space: nowrap; }
+    .data.cases td:last-child { width: auto; text-align: center; }
+    .data.cases th:last-child { text-align: center; }
+    /* ---------- widgets and figures ---------- */
+    iframe.poly-widget { display: block; width: 100%; border: 0; margin: 1.6rem 0 1.8rem; overflow: hidden; background: transparent; }
+    .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 clamp(1.5rem, 4vw, 3rem); align-items: center; margin: 0.95rem 0; }
+    .pair > :first-child { margin-top: 0; }
+    .pair .math { margin: 0.3rem 0; }
+    .pair p + p, .pair ul + p { margin-top: 0.6rem; }
+    figure.nest { margin: 0; }
+    figure.nest svg { display: block; width: 100%; max-width: 330px; height: auto; margin-inline: auto; }
+    figure.nest text { font-family: "Spectral", Georgia, serif; font-style: italic; }
+    @media (max-width: 900px) {
+      .pair { grid-template-columns: 1fr; gap: 0.6rem; }
+    }
+    .math { scrollbar-width: thin; scrollbar-color: rgba(238,242,252,0.16) transparent; }
+    .math::-webkit-scrollbar { height: 4px; }
+    .math::-webkit-scrollbar-track { background: transparent; }
+    .math::-webkit-scrollbar-thumb { background: rgba(238,242,252,0.16); border-radius: 4px; }
+    .data.steps { min-width: 34rem; }
+    .data.steps td, .data.steps th { text-align: center; }
+    .data.steps td:first-child, .data.steps th:first-child { text-align: left; font-family: "Spectral", Georgia, serif; font-size: 1.05rem; }
+    .data.steps td:last-child { width: auto; }
+    .data.steps thead th { font-size: 0.95rem; letter-spacing: 0; text-transform: none; }
+    .data.steps td.ahp { color: var(--ahp); }
+    .data.steps td.k { color: var(--k); }
+    .data.steps td.na { color: var(--na); }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="polynomials.html">Polynomials</a>
+      <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Multiple Solutions (2)</h1>
+    </header>
+    <main>
+      <section class="col" aria-labelledby="two-tests-two-passes">
+        <h2 id="two-tests-two-passes">Two Tests, Two Passes</h2>
+        <p>Here is a quadratic equation:</p>
+        <div class="math">\[x^2-5x+6=0\]</div>
+        <p>(It's the same equation as \(x^2-5x=-6\), with everything moved to one side.)</p>
+        <p>It has two solutions: \(2\) and \(3\).</p>
+        <p>Whatever number we test goes into every \(x\) at once:</p>
+        <div class="math">\[2^2-5(2)+6=0\qquad3^2-5(3)+6=0\]</div>
+        <p>\(x\) is never \(2\) in one place and \(3\) in another. These are two separate tests, and each one passes.</p>
+        <p>So how can two different numbers pass a test with only one unknown?</p>
+        <p>One answer: the equation is a question about two numbers, in disguise.</p>
+      </section>
+
+      <section class="col" aria-labelledby="a-question-about-two-numbers">
+        <h2 id="a-question-about-two-numbers">A Question About Two Numbers</h2>
+        <p>Find two numbers that add to \(5\) and multiply to \(6\).</p>
+        <p>With two unknowns, that is:</p>
+        <div class="math">\[x+y=5\qquad xy=6\]</div>
+        <p>On its own, \(x+y=5\) has endless solutions. Adding \(xy=6\) narrows them to two pairs: \((2,3)\) and \((3,2)\). The same two numbers, in either order.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-2/pair-plane-widget.html" title="Interactive: the line x + y = 5 and the curve xy = P; slide the product P and watch where they meet" style="height: 480px" scrolling="no" loading="lazy"></iframe>
+        <p>The two meeting points are mirror images across the diagonal: each is the other with its coordinates swapped. Raise the product, and they stay mirror images until they meet on the diagonal and vanish. We'll see why below.</p>
+        <p>Now hide \(y\). The first equation says \(y=5-x\). Put that into the second:</p>
+        <div class="math">\[\begin{aligned}
+x(5-x)&amp;=6\\
+5x-x^2&amp;=6\\
+x^2-5x+6&amp;=0
+\end{aligned}\]</div>
+        <p>That's our quadratic. It has one unknown, but it asks the same question. Asking for \(x\) now means asking: what could one of the two numbers be? There are two right answers, \(2\) and \(3\).</p>
+        <p>Hiding \(y\) didn't make the second number go away. It turned up as the second solution.</p>
+      </section>
+
+      <section class="col" aria-labelledby="every-quadratic-asks-for-a-pair">
+        <h2 id="every-quadratic-asks-for-a-pair">Every Quadratic Asks for a Pair</h2>
+        <p>But a quadratic we're handed doesn't come with a \(y\). Does it still hide a pair?</p>
+        <p>It does. Start from any two numbers, \(r\) and \(s\). The equation</p>
+        <div class="math">\[(x-r)(x-s)=0\]</div>
+        <p>is true exactly when \(x=r\) or \(x=s\), because a product is zero only when one of its factors is zero.</p>
+        <p>Multiply it out:</p>
+        <div class="math">\[x^2-(r+s)x+rs=0\]</div>
+        <p>The coefficients are the sum and the product of the two solutions. For \(2\) and \(3\), that's \(x^2-5x+6=0\).</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-2/builder-widget.html" title="Interactive: drag the two solutions r and s; the equation is rebuilt from them, first as an or, then as a product, then multiplied out" style="height: 220px" scrolling="no" loading="lazy"></iframe>
+        <p>So, read backwards, every quadratic asks: which two numbers have this sum and this product? For \(x^2-5x+6=0\), the sum is \(5\) and the product is \(6\). (If the \(x^2\) term has a coefficient, divide through by it first.)</p>
+      </section>
+
+      <section class="col" aria-labelledby="the-equation-cant-tell-them-apart">
+        <h2 id="the-equation-cant-tell-them-apart">The Equation Can't Tell Them Apart</h2>
+        <p>A sum and a product don't care about order: \(2+3=3+2\) and \(2\times3=3\times2\). So nothing in \(x^2-5x+6=0\) can prefer \(2\) over \(3\). In the builder above, drag one solution past the other: the last line doesn't change.</p>
+        <p>We can check this directly with the form we found earlier, \(x(5-x)=6\). Call \(5-x\) the <strong>partner</strong> of \(x\): the number that brings the sum up to \(5\). Swapping a number for its partner gives the same product, so whenever a number passes, its partner passes too.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-2/partner-widget.html" title="Interactive: choose a number; it and its partner, 5 minus it, light up and give the same product" style="height: 200px" scrolling="no" loading="lazy"></iframe>
+        <p>Solutions come in pairs. The only number that is its own partner is \(2.5\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="finding-the-pair">
+        <h2 id="finding-the-pair">Finding the Pair</h2>
+        <p>To solve \(x^2-5x+6=0\), look for two numbers with sum \(5\) and product \(6\).</p>
+        <p>Two numbers that add to \(5\) have an average of \(2.5\), so they sit the same distance either side of it: \(2.5-d\) and \(2.5+d\).</p>
+        <p>Their product is:</p>
+        <div class="math">\[(2.5-d)(2.5+d)=6.25-d^2\]</div>
+        <p>For a product of \(6\), \(d^2=0.25\), so \(d=0.5\). The numbers are \(2\) and \(3\).</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-2/spread-widget.html" title="Interactive: move two numbers that add to 5 apart; their product falls from 6.25 and passes 6 when they are 2 and 3" style="height: 180px" scrolling="no" loading="lazy"></iframe>
+        <p>The product is largest when \(d=0\), and then it's \(6.25\). That decides how many solutions there are:</p>
+        <ul>
+          <li>Below \(6.25\): two different numbers, so two solutions.</li>
+          <li>Exactly \(6.25\): the pair is \(2.5\) and \(2.5\). One solution.</li>
+          <li>Above \(6.25\): no pair exists. \(x^2-5x+7=0\) has no real solutions. (The <a class="inline" href="complex-numbers.html">complex numbers</a> are where equations like this find theirs.)</li>
+        </ul>
+        <p>That's why, in the first picture, the meeting points merge on the diagonal at \(6.25\) and then vanish.</p>
+      </section>
+
+      <section class="col" aria-labelledby="more-solutions-built-in">
+        <h2 id="more-solutions-built-in">More Solutions Built In</h2>
+        <p>A linear equation is built from one solution: \(2x-3=0\) is \(2(x-1.5)=0\).</p>
+        <p>A cubic is built from three: \((x-1)(x-2)(x-4)=0\) multiplies out to \(x^3-7x^2+14x-8=0\), with solutions \(1\), \(2\) and \(4\).</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions-2/builder-widget.html?n=3" title="Interactive: drag three solutions r, s and t; the cubic is rebuilt from them" style="height: 220px" scrolling="no" loading="lazy"></iframe>
+        <p>An equation of degree \(n\) has at most \(n\) solutions.</p>
+      </section>
+
+      <section class="col" aria-labelledby="back-to-the-puzzle">
+        <h2 id="back-to-the-puzzle">Back to the Puzzle</h2>
+        <p>\(x\) is never two numbers at once. A quadratic is a question about two numbers, written with only one symbol. Both numbers fit the question equally well, so each one, tested on its own, passes.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="polynomials-multiple-solutions-1.html">← Multiple Solutions (1)</a>
+        <a href="polynomials.html">All Polynomials pages →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "poly-widget-height") return;
+      document.querySelectorAll("iframe.poly-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

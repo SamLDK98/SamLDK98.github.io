@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Two numbers with a given sum and product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 400px; margin: 0 auto; }
+  .expr {
+    display: flex; justify-content: center; gap: 1.8em; white-space: nowrap;
+    font-size: clamp(1.15rem, 5vw, 1.55rem); color: var(--txt); margin-bottom: 0.4rem;
+  }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.amber { fill: var(--const); }
+  svg text.axis { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 15px; fill: rgba(238,242,252,0.6); }
+  input[type="range"] { margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" aria-hidden="true">
+    <span><span class="k-lin"><span class="v">x</span> + <span class="v">y</span></span> = <span class="k-const">5</span></span>
+    <span><span class="k-sq"><span class="v">xy</span></span> = <span class="k-const" id="p"></span></span>
+  </div>
+  <svg id="plane" role="img"></svg>
+  <input id="prod" type="range" min="0.5" max="8" step="0.25" value="6" aria-label="Product of the two numbers" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Pairs (x, y) that add to 5 lie on a line; pairs that multiply to P lie on a curve.
+  // They meet where x = 2.5 ± √(6.25 − P), and the two meeting points are each other's
+  // mirror image across the diagonal y = x. P is held in hundredths so 6 and 6.25 are exact.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("plane"), slider = document.getElementById("prod");
+  const pEl = document.getElementById("p");
+  const LO = -0.7, HI = 6.4, PAD = 4, MB = 4;
+  const GREEN = "#64c8a0", BLUE = "#7aa7ff", AMB = "#e8a33d";
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const p100 = Math.round(+slider.value * 100), P = p100 / 100;
+    pEl.textContent = fmt(P);
+
+    const W = svg.clientWidth || 380, size = W - 2 * PAD, H = size + PAD + MB;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (u) => PAD + ((u - LO) / (HI - LO)) * size;
+    const sy = (v) => PAD + ((HI - v) / (HI - LO)) * size;
+
+    for (let k = 1; k <= 6; k++) {
+      el("line", { x1: sx(k), x2: sx(k), y1: sy(LO), y2: sy(HI), stroke: "rgba(238,242,252,0.05)" });
+      el("line", { x1: sx(LO), x2: sx(HI), y1: sy(k), y2: sy(k), stroke: "rgba(238,242,252,0.05)" });
+    }
+    el("line", { x1: sx(LO), x2: sx(HI), y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.26)" });
+    el("line", { x1: sx(0), x2: sx(0), y1: sy(LO), y2: sy(HI), stroke: "rgba(238,242,252,0.26)" });
+    el("text", { x: sx(HI) - 3, y: sy(0) - 7, "text-anchor": "end", class: "axis" }, "x");
+    el("text", { x: sx(0) + 7, y: sy(HI) + 13, class: "axis" }, "y");
+
+    // the mirror: swapping the two numbers reflects a point across y = x
+    el("line", { x1: sx(LO), y1: sy(LO), x2: sx(HI), y2: sy(HI), stroke: "rgba(238,242,252,0.24)", "stroke-dasharray": "2 5" });
+
+    // every pair that adds to 5
+    el("line", { x1: sx(LO), y1: sy(5 - LO), x2: sx(5 - LO), y2: sy(LO), stroke: GREEN, "stroke-width": 1.8, opacity: 0.9 });
+
+    // every pair that multiplies to P (spaced geometrically so the bend stays smooth)
+    const x0 = P / HI;
+    let d = "";
+    for (let i = 0; i <= 200; i++) {
+      const u = x0 * Math.pow(HI / x0, i / 200);
+      d += (i ? "L" : "M") + sx(u).toFixed(1) + " " + sy(P / u).toFixed(1);
+    }
+    el("path", { d, fill: "none", stroke: BLUE, "stroke-width": 1.8, opacity: 0.9 });
+
+    // where both hold
+    const disc100 = 625 - p100;
+    const xs = [];
+    let exact = true;
+    if (disc100 >= 0) {
+      const dd = Math.sqrt(disc100 / 100);
+      exact = Math.abs(dd * 100 - Math.round(dd * 100)) < 1e-9;
+      (dd === 0 ? [2.5] : [2.5 - dd, 2.5 + dd]).forEach((a) => {
+        const b = 5 - a;
+        xs.push(a);
+        el("line", { x1: sx(a), x2: sx(a), y1: sy(b), y2: sy(0), stroke: "rgba(232,163,61,0.4)", "stroke-dasharray": "3 3" });
+        el("circle", { cx: sx(a), cy: sy(b), r: 5, fill: AMB, style: "filter: drop-shadow(0 0 5px rgba(232,163,61,0.8))" });
+        if (exact) el("text", { x: sx(a) + 9, y: sy(b) - 8, class: "amber" }, `(${fmt(a)}, ${fmt(b)})`);
+        el("text", { x: sx(a), y: sy(0) + 15, "text-anchor": "middle", class: "amber" }, (exact ? "" : "≈") + fmt(a));
+      });
+    }
+
+    for (let k = 1; k <= 6; k++) {
+      if (!xs.some((a) => Math.abs(a - k) < 0.4))
+        el("text", { x: sx(k), y: sy(0) + 15, "text-anchor": "middle" }, k);
+      el("text", { x: sx(0) - 6, y: sy(k) + 3.5, "text-anchor": "end" }, k);
+    }
+
+    svg.setAttribute("aria-label", xs.length === 0
+      ? `No pair adds to 5 and multiplies to ${fmt(P)}.`
+      : `The pairs adding to 5 and multiplying to ${fmt(P)} have x = ${xs.map((a) => (exact ? "" : "about ") + fmt(a)).join(" and x = ")}.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

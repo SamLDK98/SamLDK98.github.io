@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spreading a pair apart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.7rem); color: var(--txt); }
+  .expr .n { color: var(--const); }
+  .expr .res { display: inline-block; min-width: 3.4ch; text-align: left; transition: color 0.25s ease, text-shadow 0.25s ease; }
+  .expr .res.hit { color: var(--const); text-shadow: 0 0 14px var(--glow); }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.amber { fill: var(--const); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" id="expr" aria-live="polite"></div>
+  <svg id="fig" aria-hidden="true"></svg>
+  <input id="d" type="range" min="0" max="3" step="0.05" value="1.5" aria-label="How far apart the two numbers are" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Two numbers that add to 5 sit the same distance d either side of 2.5. The slider moves
+  // them apart. Their product, 6.25 − d², is marked on the lower line: it can only fall as
+  // they spread, so it never passes 6.25. d is held in hundredths so 6 and 6.25 are exact.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig"), slider = document.getElementById("d");
+  const exprEl = document.getElementById("expr");
+  const AMB = "#e8a33d", PAD = 10, H = 116, Y1 = 34, Y2 = 90;
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(4));
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const D = Math.round(+slider.value * 100);
+    const a = (250 - D) / 100, b = (250 + D) / 100, p10k = 62500 - D * D, P = p10k / 10000;
+    const hit = p10k === 60000;
+    exprEl.innerHTML = D === 0
+      ? `<span class="n">2.5</span> × <span class="n">2.5</span> = <span class="res">6.25</span>`
+      : `<span class="n">${fmt(a)}</span> × <span class="n">${fmt(b)}</span> = <span class="res${hit ? " hit" : ""}">${fmt(P)}</span>`;
+
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+
+    // the pair, on a number line
+    const nx = (v) => PAD + ((v + 1) / 7) * (W - 2 * PAD);
+    el("line", { x1: nx(-1), x2: nx(6), y1: Y1, y2: Y1, stroke: "rgba(238,242,252,0.22)" });
+    for (let u = -1; u <= 6; u++) {
+      el("line", { x1: nx(u), x2: nx(u), y1: Y1, y2: Y1 + 5, stroke: "rgba(238,242,252,0.22)" });
+      el("text", { x: nx(u), y: Y1 + 17, "text-anchor": "middle" }, fmt(u));
+    }
+    el("line", { x1: nx(2.5), x2: nx(2.5), y1: Y1 - 18, y2: Y1 + 5, stroke: "rgba(238,242,252,0.35)", "stroke-dasharray": "2 3" });
+    el("line", { x1: nx(a), x2: nx(b), y1: Y1, y2: Y1, stroke: AMB, "stroke-width": 2, opacity: 0.75 });
+    (D === 0 ? [2.5] : [a, b]).forEach((v) => {
+      el("circle", { cx: nx(v), cy: Y1, r: 5.5, fill: AMB, style: "filter: drop-shadow(0 0 5px rgba(232,163,61,0.7))" });
+    });
+    if (D === 0) el("circle", { cx: nx(2.5), cy: Y1, r: 9.5, fill: "none", stroke: AMB, "stroke-width": 1.2, opacity: 0.7 });
+
+    // their product, on a second line; past 6.25 no pair can reach
+    const px = (v) => PAD + ((v + 3) / 10) * (W - 2 * PAD);
+    el("text", { x: px(-3), y: Y2 - 12 }, "product");
+    el("rect", { x: px(6.25), y: Y2 - 7, width: px(7) - px(6.25), height: 14, fill: "rgba(238,242,252,0.07)" });
+    el("line", { x1: px(-3), x2: px(7), y1: Y2, y2: Y2, stroke: "rgba(238,242,252,0.22)" });
+    for (let u = -2; u <= 6; u += 2) {
+      el("line", { x1: px(u), x2: px(u), y1: Y2, y2: Y2 + 5, stroke: "rgba(238,242,252,0.22)" });
+      el("text", { x: px(u), y: Y2 + 17, "text-anchor": "middle", class: u === 6 ? "amber" : "" }, fmt(u));
+    }
+    el("line", { x1: px(6.25), x2: px(6.25), y1: Y2 - 7, y2: Y2 + 5, stroke: "rgba(238,242,252,0.45)" });
+    el("text", { x: px(6.25) + 3, y: Y2 - 11 }, "6.25");
+    el("circle", { cx: px(P), cy: Y2, r: 5.5, fill: hit ? AMB : "#f4f6ff",
+                   style: `filter: drop-shadow(0 0 5px ${hit ? "rgba(232,163,61,0.85)" : "rgba(244,246,255,0.4)"})` });
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
