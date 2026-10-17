@@ -384,7 +384,6 @@
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/sweep-widget.html" title="Interactive: drag x from -4 to 4; x + x always moves the same way, while x times x moves left until 0 and then right" style="height: 210px" scrolling="no" loading="lazy"></iframe>
         <p><strong>Two inputs share each positive output.</strong> For \(x\cdot x=9\), both \(3\) and \(-3\) land on \(9\). These are separate tests: each uses one number throughout, and each passes. (The <a class="inline" href="polynomials-multiple-solutions.html">Multiple Solutions</a> pages start from exactly this worry.) Every positive output gets two inputs, the same distance either side of \(0\). Zero gets one. Negative outputs get none.</p>
         <p>That is the bottom-up reason a quadratic can have two solutions: multiplying the unknown by itself folds the number line, and a fold puts two inputs in the same place.</p>
-        <p>(A check on the idea: \(x\cdot x\cdot x\) flips a negative number twice, which puts it back on the left. So there is no fold, the order is kept, and \(x^3=8\) has only one real solution, \(2\).)</p>
       </section>
 
       <section class="col" aria-labelledby="mixing-the-two">
@@ -396,7 +395,21 @@
         </ul>
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/pairs-widget.html" title="Interactive: choose a distance from 0; for the two opposite inputs, the x squared parts match and the 2x parts point opposite ways" style="height: 150px" scrolling="no" loading="lazy"></iframe>
         <p>Added together, \(3\) gives \(15\) but \(-3\) gives \(3\). The outputs are no longer symmetric about \(0\).</p>
-        <p>But the fold hasn't gone. \(x^2+2x\) still falls and then rises, so its outputs still come in pairs, around a different point. <a class="inline" href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a> finds where, and why.</p>
+        <p>But the fold hasn't gone. \(x^2+2x\) still falls and then rises, so its outputs still come in pairs, around a different point. Following the calculation one step at a time shows where.</p>
+      </section>
+
+      <section class="col" aria-labelledby="following-a-calculation-step-by-step">
+        <h2 id="following-a-calculation-step-by-step">Following a Calculation Step by Step</h2>
+        <p>Most expressions are built from several steps, not one. We can follow a handful of numbers through every step, one number line at a time. Each number keeps its colour, and a thread joins it from one line to the next.</p>
+        <p>In \(4x+3\), the numbers are stretched, then slid. Neither step lets two numbers meet, so seven inputs give seven different outputs, and \(4x+3=11\) has one solution.</p>
+        <p>In \(-2x+5\), the stretch is also a flip. The threads all cross and the order is reversed, but still nothing meets.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/chain-widget.html" title="Interactive: choose a calculation and follow a handful of numbers through each of its steps; threads that meet show two inputs landing on one output" style="height: 300px" scrolling="no" loading="lazy"></iframe>
+        <p>In \(x\cdot x\), the threads from opposite numbers meet in pairs.</p>
+        <p>\(x^2+2x\) can be built in three steps: slide by \(1\), multiply by itself, then slide back.</p>
+        <div class="math">\[(x+1)^2-1=x^2+2x+1-1=x^2+2x\]</div>
+        <p>The squaring step still folds at \(0\), but the numbers that are at \(0\) when they reach it started at \(x=-1\). So the pairs meet around \(-1\) instead.</p>
+        <p>\(x\cdot x\cdot x\) folds and then unfolds. Its last step multiplies the negative numbers by a negative again, which sends them back to the left. Nothing ends up together, which is why \(x^3=8\) has only one real solution, \(2\).</p>
+        <p><a class="inline" href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a> looks more closely at why the fold moves to \(-1\), and finds where it sits for any quadratic.</p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
