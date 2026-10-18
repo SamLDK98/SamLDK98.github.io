@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Copies of x</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: rgba(238, 242, 252, 0.66); }
+  svg text.name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 15px; fill: rgba(238, 242, 252, 0.88); }
+  svg text.hit { fill: var(--const); }
+  svg text.target { fill: var(--const); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="rows" role="img"></svg>
+  <input id="x" type="range" aria-label="Value of x" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // ?mode=linear: one, two, three and four copies of x, laid end to end, against a target of 9.
+  //   Every row grows as x grows, so each reaches 9 at exactly one x.
+  // ?mode=square: 5x is always five copies of x; x · x is x copies of x, so its count changes with x.
+  // x is held in quarters, so 2.25, 4.5 and 9 are exact hits.
+  const SQUARE = new URLSearchParams(location.search).get("mode") === "square";
+  const C = SQUARE
+    ? { min: 0, max: 4, start: 3, scale: 20,
+        rows: [{ name: "5x", count: () => 5, col: "#64c8a0" }, { name: "x · x", count: (x) => x, col: "#7aa7ff" }] }
+    : { min: 0, max: 9, start: 2, scale: 18, target: 9,
+        rows: [1, 2, 3, 4].map((n) => ({ name: Array(n).fill("x").join(" + "), count: () => n, col: "#64c8a0" })) };
+  const slider = document.getElementById("x");
+  Object.assign(slider, { min: C.min, max: C.max, step: 0.25, value: C.start });
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("rows");
+  const PAD = 8, ROW = SQUARE ? 56 : 46, BH = 14, TOP = 22;
+  const fmt = (n) => String(+n.toFixed(4));
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const q = Math.round(+slider.value * 4), x = q / 4;
+    const W = svg.clientWidth || 560, H = TOP + C.rows.length * ROW + 6;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (v) => PAD + (Math.min(v, C.scale) / C.scale) * (W - 2 * PAD);
+
+    if (C.target) {
+      el("line", { x1: sx(C.target), x2: sx(C.target), y1: TOP - 10, y2: H - 4, stroke: "rgba(232,163,61,0.7)", "stroke-dasharray": "3 4" });
+      el("text", { x: sx(C.target) + 5, y: TOP - 4, class: "target" }, "9");
+    }
+    const labels = [];
+    C.rows.forEach((r, i) => {
+      const y = TOP + i * ROW + 22, n = r.count(x), total = n * x;
+      const hit = C.target && Math.round(total * 16) === C.target * 16;
+      el("text", { x: PAD, y: y - 6, class: "name" }, r.name);
+      // the copies, end to end; a part-copy (when the count isn't whole) is drawn fainter
+      for (let k = 0; k < Math.ceil(n - 1e-9); k++) {
+        const part = Math.min(1, n - k), x0 = k * x, x1 = x0 + part * x;
+        if (x0 >= C.scale) break;
+        el("rect", { x: sx(x0) + 0.5, y, width: Math.max(0, sx(x1) - sx(x0) - 1), height: BH, rx: 1.5,
+                     fill: r.col, opacity: part < 1 ? 0.4 : (k % 2 ? 0.7 : 0.9) });
+      }
+      if (total > C.scale) el("text", { x: W - PAD, y: y + 11, "text-anchor": "end" }, "→");
+      const desc = SQUARE ? `${fmt(n)} ${n === 1 ? "copy" : "copies"} of ${fmt(x)} = ${fmt(total)}` : `= ${fmt(total)}`;
+      el("text", { x: W - PAD, y: y - 6, "text-anchor": "end", class: hit ? "hit" : "" }, desc + (hit ? `  ← x = ${fmt(x)}` : ""));
+      labels.push(`${r.name} = ${fmt(total)}`);
+    });
+    svg.setAttribute("aria-label", `x = ${fmt(x)}: ` + labels.join(", "));
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
