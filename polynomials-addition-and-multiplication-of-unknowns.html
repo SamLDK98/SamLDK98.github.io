@@ -355,14 +355,44 @@
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/fold-widget.html" title="Interactive: slide to multiply each number from -3 to 3 by itself, first folding the negatives over 0, then stretching each number by its own size" style="height: 190px" scrolling="no" loading="lazy"></iframe>
       </section>
 
-      <section class="col" aria-labelledby="what-the-fold-does">
-        <h2 id="what-the-fold-does">What the Fold Does</h2>
-        <p>Two things follow from the fold, and neither can happen with \(x+x\).</p>
-        <p><strong>Bigger inputs can give smaller outputs.</strong> With \(x+x\), a bigger input always gives a bigger output. With \(x\cdot x\), going from \(-4\) to \(-3\) drops the output from \(16\) to \(9\).</p>
-        <p>After the fold, only distance from \(0\) matters, and \(-3\) is closer to \(0\) than \(-4\). Past \(0\), moving right takes inputs further away, so the output grows. So \(x\cdot x\) falls until \(0\) and rises after it: \(0\) is its turning point.</p>
-        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/sweep-widget.html" title="Interactive: drag x from -4 to 4; x + x always moves the same way, while x times x moves left until 0 and then right" style="height: 210px" scrolling="no" loading="lazy"></iframe>
-        <p><strong>Two inputs share each positive output.</strong> For \(x\cdot x=9\), both \(3\) and \(-3\) land on \(9\). These are separate tests: each uses one number throughout, and each passes. (The <a class="inline" href="polynomials-multiple-solutions.html">Multiple Solutions</a> pages start from exactly this worry.) Every positive output gets two inputs, the same distance either side of \(0\). Zero gets one. Negative outputs get none.</p>
-        <p>That is the bottom-up reason a quadratic can have two solutions: multiplying the unknown by itself folds the number line, and a fold puts two inputs in the same place.</p>
+      <section class="col" aria-labelledby="why-x-squared-is-symmetric">
+        <h2 id="why-x-squared-is-symmetric">Why \(x^2\) Is Symmetric</h2>
+        <p>Consider:</p>
+        <div class="math">\[f(x)=x^2\]</div>
+        <p>Opposite inputs produce identical outputs:</p>
+        <div class="math">\[f(3)=f(-3)=9\qquad f(2)=f(-2)=4\]</div>
+        <p>Squaring ignores the sign: \((-3)(-3)=3\times3\).</p>
+        <p>So the left half of the graph is the mirror image of the right half. The mirror is the vertical line \(x=0\), the <strong>axis of symmetry</strong>.</p>
+        <figure class="chords">
+            <svg viewBox="0 0 340 236" role="img" aria-label="The graph of x squared with level chords from -1 to 1, -2 to 2 and -3 to 3; every chord is cut in half by the line x = 0, and the turning point at (0, 0) has no partner.">
+            <line x1="14" x2="326" y1="193.4" y2="193.4" stroke="rgba(238,242,252,0.2)"/>
+            <line x1="170.0" x2="170.0" y1="10" y2="210" stroke="rgba(238,242,252,0.45)" stroke-dasharray="3 4"/>
+            <path d="M33.0 13.6 L35.3 19.5 L37.5 25.4 L39.8 31.1 L42.1 36.8 L44.4 42.3 L46.7 47.8 L49.0 53.1 L51.2 58.4 L53.5 63.5 L55.8 68.5 L58.1 73.5 L60.4 78.3 L62.7 83.1 L64.9 87.7 L67.2 92.3 L69.5 96.7 L71.8 101.1 L74.1 105.3 L76.4 109.4 L78.6 113.5 L80.9 117.4 L83.2 121.3 L85.5 125.0 L87.8 128.7 L90.1 132.2 L92.3 135.7 L94.6 139.0 L96.9 142.3 L99.2 145.4 L101.5 148.5 L103.8 151.4 L106.1 154.3 L108.3 157.0 L110.6 159.6 L112.9 162.2 L115.2 164.6 L117.5 167.0 L119.8 169.2 L122.0 171.4 L124.3 173.4 L126.6 175.4 L128.9 177.2 L131.2 179.0 L133.5 180.6 L135.7 182.2 L138.0 183.6 L140.3 185.0 L142.6 186.2 L144.9 187.4 L147.2 188.4 L149.4 189.4 L151.7 190.2 L154.0 191.0 L156.3 191.6 L158.6 192.2 L160.9 192.6 L163.1 193.0 L165.4 193.2 L167.7 193.4 L170.0 193.4 L172.3 193.4 L174.6 193.2 L176.9 193.0 L179.1 192.6 L181.4 192.2 L183.7 191.6 L186.0 191.0 L188.3 190.2 L190.6 189.4 L192.8 188.4 L195.1 187.4 L197.4 186.2 L199.7 185.0 L202.0 183.6 L204.3 182.2 L206.5 180.6 L208.8 179.0 L211.1 177.2 L213.4 175.4 L215.7 173.4 L218.0 171.4 L220.2 169.2 L222.5 167.0 L224.8 164.6 L227.1 162.2 L229.4 159.6 L231.7 157.0 L233.9 154.3 L236.2 151.4 L238.5 148.5 L240.8 145.4 L243.1 142.3 L245.4 139.0 L247.7 135.7 L249.9 132.2 L252.2 128.7 L254.5 125.0 L256.8 121.3 L259.1 117.4 L261.4 113.5 L263.6 109.4 L265.9 105.3 L268.2 101.1 L270.5 96.7 L272.8 92.3 L275.1 87.7 L277.3 83.1 L279.6 78.3 L281.9 73.5 L284.2 68.5 L286.5 63.5 L288.8 58.4 L291.0 53.1 L293.3 47.8 L295.6 42.3 L297.9 36.8 L300.2 31.1 L302.5 25.4 L304.7 19.5 L307.0 13.6" fill="none" stroke="rgba(244,246,255,0.8)" stroke-width="1.8"/>
+            <line x1="126.7" x2="213.3" y1="175.4" y2="175.4" stroke="rgba(232,163,61,0.6)" stroke-width="1.3"/>
+            <circle cx="126.7" cy="175.4" r="3.4" fill="#e8a33d"/>
+            <circle cx="213.3" cy="175.4" r="3.4" fill="#e8a33d"/>
+            <circle cx="170.0" cy="175.4" r="2.2" fill="rgba(244,246,255,0.75)"/>
+            <line x1="83.3" x2="256.7" y1="121.5" y2="121.5" stroke="rgba(232,163,61,0.6)" stroke-width="1.3"/>
+            <circle cx="83.3" cy="121.5" r="3.4" fill="#e8a33d"/>
+            <circle cx="256.7" cy="121.5" r="3.4" fill="#e8a33d"/>
+            <circle cx="170.0" cy="121.5" r="2.2" fill="rgba(244,246,255,0.75)"/>
+            <line x1="40.0" x2="300.0" y1="31.6" y2="31.6" stroke="rgba(232,163,61,0.6)" stroke-width="1.3"/>
+            <circle cx="40.0" cy="31.6" r="3.4" fill="#e8a33d"/>
+            <circle cx="300.0" cy="31.6" r="3.4" fill="#e8a33d"/>
+            <circle cx="170.0" cy="31.6" r="2.2" fill="rgba(244,246,255,0.75)"/>
+            <circle cx="170.0" cy="193.4" r="5" fill="#e8a33d" style="filter: drop-shadow(0 0 5px rgba(232,163,61,0.8))"/>
+            <text x="176.0" y="19">x = 0</text>
+            <text x="40.0" y="230" text-anchor="middle">−3</text>
+            <text x="83.3" y="230" text-anchor="middle">−2</text>
+            <text x="126.7" y="230" text-anchor="middle">−1</text>
+            <text x="170.0" y="230" text-anchor="middle">0</text>
+            <text x="213.3" y="230" text-anchor="middle">1</text>
+            <text x="256.7" y="230" text-anchor="middle">2</text>
+            <text x="300.0" y="230" text-anchor="middle">3</text>
+            </svg>
+        </figure>
+        <p>Zero is the only number that is its own opposite, so its output, \(0\), comes from just one input. Every positive output comes from two opposite inputs, the same distance either side of \(0\). (No input gives a negative output.)</p>
+        <p>That lone point, \((0,0)\), is the <strong>turning point</strong> (also called the vertex): where the graph stops falling and starts rising. It sits on the axis.</p>
       </section>
 
       <section class="col" aria-labelledby="mixing-the-two">
