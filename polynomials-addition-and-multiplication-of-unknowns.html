@@ -333,29 +333,26 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Addition and Multiplication of Unknowns</h1>
     </header>
     <main>
-      <section class="col" aria-label="Adding and multiplying every number at once">
-        <p style="margin-top: clamp(1.6rem, 4vh, 2.4rem);">Imagine performing addition on every number on the number line at once.</p>
+      <section class="col" aria-labelledby="adding-to-all-numbers">
+        <h2 id="adding-to-all-numbers">Adding To All Numbers</h2>
+        <p>Imagine performing addition on every number on the number line at once.</p>
         <p>Every number moves in the same direction and the same distance.</p>
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=add" title="Interactive: choose a number to add to every number from -4 to 4; they all slide the same way and keep their order" style="height: 170px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="multiplying-all-numbers-by-a-constant">
+        <h2 id="multiplying-all-numbers-by-a-constant">Multiplying All Numbers by a Constant</h2>
         <p>Multiplying by a positive causes every number to spread out from each other. Specifically, each number moves \(x\) times its distance from \(0\).</p>
         <p>Multiplying by a negative causes the same movement except every number swaps with its additive inverse counterpart before stretching outwards.</p>
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=mul" title="Interactive: choose a number to multiply every number from -4 to 4 by; they stretch away from 0, collapse onto 0 at zero, and flip with their order reversed when it is negative" style="height: 170px" scrolling="no" loading="lazy"></iframe>
       </section>
 
-      <section class="col" aria-labelledby="multiplying-an-unknown-by-itself">
-        <h2 id="multiplying-an-unknown-by-itself">Multiplying All Numbers by Themselves</h2>
-        <p>Now imagine multiplying every number on the number line by itself.</p>
-        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=sq" title="Interactive: slide to multiply every number from -4 to 4 by itself; each pair of opposite numbers lands in the same place" style="height: 170px" scrolling="no" loading="lazy"></iframe>
-        <p>Numbers the same distance either side of \(0\) land in the same place: \(2\) and \(-2\) both land on \(4\). Unlike adding or multiplying by a constant, two different numbers now end up on top of each other.</p>
-        <p>\(x\cdot x\) is different in kind. The multiplier is no longer a fixed number: it is \(x\) itself, so it changes from one input to the next.</p>
-        <ul>
-          <li>A positive number is multiplied by a positive number. It is stretched and stays on the right: \(3\cdot3=9\).</li>
-          <li>A negative number is multiplied by a negative number. It is stretched and flipped to the right: \((-3)(-3)=9\).</li>
-        </ul>
-        <p>\(3\) and \(-3\) are the same distance from \(0\), so they are stretched by the same amount. One is flipped and the other isn't, but the flipped one started on the left. Both land on \(9\).</p>
-        <p>So \(x\cdot x\) does two things. It folds the left half of the number line over onto the right half, so \(-3\) lands on \(3\). Then it stretches each number by its own size, so \(3\) becomes \(9\).</p>
+      <section class="col" aria-labelledby="multiplying-all-numbers-by-themselves">
+        <h2 id="multiplying-all-numbers-by-themselves">Multiplying All Numbers by Themselves</h2>
+        <p>A negative times a negative is a positive.</p>
+        <p>All the negatives first turn \(180^\circ\) and land on their positive counterparts.</p>
+        <p>They then move a proportional distance relative to their own value.</p>
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/fold-widget.html" title="Interactive: slide to multiply each number from -3 to 3 by itself, first folding the negatives over 0, then stretching each number by its own size" style="height: 190px" scrolling="no" loading="lazy"></iframe>
-        <p>The fold is at \(0\) because that is where the multiplier changes sign. Every input left of \(0\) is multiplied by a negative number and flipped; every input right of \(0\) isn't.</p>
       </section>
 
       <section class="col" aria-labelledby="what-the-fold-does">
