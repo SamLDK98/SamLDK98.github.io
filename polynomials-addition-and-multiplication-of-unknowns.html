@@ -333,24 +333,13 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Addition and Multiplication of Unknowns</h1>
     </header>
     <main>
-      <section class="col" aria-labelledby="sliding-stretching-and-flipping">
-        <h2 id="sliding-stretching-and-flipping">Sliding, Stretching and Flipping</h2>
-        <p>Picture every number on the number line, and apply one operation to all of them at once.</p>
-        <p>Adding \(3\) slides every number \(3\) places to the right. Every number moves the same distance, in the same direction, wherever it starts.</p>
+      <section class="col" aria-label="Adding and multiplying every number at once">
+        <p style="margin-top: clamp(1.6rem, 4vh, 2.4rem);">Imagine performing addition on every number on the number line at once.</p>
+        <p>Every number moves in the same direction and the same distance.</p>
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=add" title="Interactive: choose a number to add to every number from -4 to 4; they all slide the same way and keep their order" style="height: 170px" scrolling="no" loading="lazy"></iframe>
-        <p>Multiplying by \(3\) works differently. It moves each number to \(3\) times its distance from \(0\), on the same side: \(2\) goes to \(6\), and \(-4\) goes to \(-12\). Numbers right of \(0\) move right, numbers left of \(0\) move left, and \(0\) stays put.</p>
-        <p>Multiplying by \(-3\) stretches in the same way, but also flips every number to the other side of \(0\): \(2\) goes to \(-6\), and \(-4\) goes to \(12\).</p>
+        <p>Multiplying by a positive causes every number to spread out from each other. Specifically, each number moves \(x\) times its distance from \(0\).</p>
+        <p>Multiplying by a negative causes the same movement except every number swaps with its additive inverse counterpart before stretching outwards.</p>
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=mul" title="Interactive: choose a number to multiply every number from -4 to 4 by; they stretch away from 0, collapse onto 0 at zero, and flip with their order reversed when it is negative" style="height: 170px" scrolling="no" loading="lazy"></iframe>
-        <p>Repeated addition explains the stretch, but not the flip: there is no way to add something "negative three times". The flip is the new ingredient. It is also why a negative times a negative is positive: \((-3)(-4)\) flips \(-4\), which is on the left, over to the right, and stretches it to \(12\).</p>
-        <p>So addition slides. Multiplication stretches from \(0\), and flips across \(0\) when the multiplier is negative. Multiplication is anchored at \(0\) in a way addition isn't.</p>
-      </section>
-
-      <section class="col" aria-labelledby="why-linear-equations-have-one-solution">
-        <h2 id="why-linear-equations-have-one-solution">Why Linear Equations Have One Solution</h2>
-        <p>Watch the order of the numbers. After adding \(3\), they are in the same order as before. After multiplying by \(3\), the same order, spread out. After multiplying by \(-3\), the order is exactly reversed.</p>
-        <p>In every case, two different numbers end up in two different places. Nothing lands on top of anything else. (The one exception is multiplying by \(0\), which squashes everything onto \(0\). That is why \(ax+b=c\) needs \(a\neq0\).)</p>
-        <p>An equation asks which inputs land on a given output. If an operation never puts two numbers in the same place, at most one input can land there. A linear equation like \(4x+3=11\) is built from one stretch and one slide, so it has one solution.</p>
-        <p>Adding an unknown to itself doesn't change this. \(x+x\) is \(2x\): a stretch by the known number \(2\).</p>
       </section>
 
       <section class="col" aria-labelledby="multiplying-an-unknown-by-itself">
