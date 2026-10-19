@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Axis of Symmetry | Polynomials | Sam Kirwan</title>
-  <meta name="description" content="Why x squared is symmetric, why adding a linear term moves the axis of symmetry, and how to find where any quadratic turns." />
+  <meta name="description" content="Adding, multiplying and squaring every number at once, why x squared is symmetric, and how a linear term moves the axis of symmetry of any quadratic." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -333,13 +333,32 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Axis of Symmetry</h1>
     </header>
     <main>
+      <section class="col" aria-labelledby="adding-to-all-numbers">
+        <h2 id="adding-to-all-numbers">Adding To All Numbers</h2>
+        <p>Imagine performing addition on every number on the number line at once.</p>
+        <p>Every number moves in the same direction and the same distance.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=add" title="Interactive: choose a number to add to every number from -4 to 4; they all slide the same way and keep their order" style="height: 170px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="multiplying-all-numbers-by-a-constant">
+        <h2 id="multiplying-all-numbers-by-a-constant">Multiplying All Numbers by a Constant</h2>
+        <p>Multiplying by a positive causes every number to spread out from each other. Specifically, each number moves \(x\) times its distance from \(0\).</p>
+        <p>Multiplying by a negative causes the same movement except every number swaps with its additive inverse counterpart before stretching outwards.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=mul" title="Interactive: choose a number to multiply every number from -4 to 4 by; they stretch away from 0, collapse onto 0 at zero, and flip with their order reversed when it is negative" style="height: 170px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="multiplying-all-numbers-by-themselves">
+        <h2 id="multiplying-all-numbers-by-themselves">Multiplying All Numbers by Themselves</h2>
+        <p>A negative times a negative is a positive.</p>
+        <p>All the negatives first turn \(180^\circ\) and land on their positive counterparts.</p>
+        <p>They then move a proportional distance relative to their own value.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/fold-widget.html" title="Interactive: slide to multiply each number from -3 to 3 by itself, first folding the negatives over 0, then stretching each number by its own size" style="height: 190px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
       <section class="col" aria-labelledby="why-x-squared-is-symmetric">
-        <h2 id="why-x-squared-is-symmetric">Why \(x^2\) Is Symmetric</h2>
-        <p>Consider:</p>
-        <div class="math">\[f(x)=x^2\]</div>
+        <h2 id="why-x-squared-is-symmetric">Why Is \(f(x)=x^2\) Symmetric?</h2>
         <p>Opposite inputs produce identical outputs:</p>
         <div class="math">\[f(3)=f(-3)=9\qquad f(2)=f(-2)=4\]</div>
-        <p>Squaring ignores the sign: \((-3)(-3)=3\times3\).</p>
         <p>So the left half of the graph is the mirror image of the right half. The mirror is the vertical line \(x=0\), the <strong>axis of symmetry</strong>.</p>
         <figure class="chords">
             <svg viewBox="0 0 340 236" role="img" aria-label="The graph of x squared with level chords from -1 to 1, -2 to 2 and -3 to 3; every chord is cut in half by the line x = 0, and the turning point at (0, 0) has no partner.">
@@ -369,15 +388,25 @@
             <text x="300.0" y="230" text-anchor="middle">3</text>
             </svg>
         </figure>
-        <p>Zero is the only number that is its own opposite, so its output, \(0\), comes from just one input. Every positive output comes from two opposite inputs, the same distance either side of \(0\). (No input gives a negative output.)</p>
-        <p>That lone point, \((0,0)\), is the <strong>turning point</strong> (also called the vertex): where the graph stops falling and starts rising. It sits on the axis.</p>
+        <p>Zero is the only number that is its own opposite, so its output, \(0\), comes from just one input.</p>
+        <p>The point \((0,0)\) is the <strong>turning point</strong> (also called the <strong>vertex</strong>).</p>
       </section>
 
       <section class="col" aria-labelledby="adding-a-linear-term">
         <h2 id="adding-a-linear-term">Adding a Linear Term</h2>
-        <p>Now add a linear term:</p>
         <div class="math">\[g(x)=x^2+2x\]</div>
-        <p>The \(x^2\) term treats \(x\) and \(-x\) identically. The \(2x\) term does not: it adds to positive inputs and takes away from negative ones.</p>
+        <p>We can think of \(f(x)=x^2\) existing first on the graph.</p>
+        <p>It falls towards \(0\) and then rises again.</p>
+        <p>As we increase in negative values, the input-output pairs draw towards each other.</p>
+        <p>Once the inputs are greater than \(0\), the outputs begin increasing.</p>
+        <div class="math">\[(-4,16),\ (-3,9),\ (-2,4),\ (-1,1),\ (0,0),\ (1,1),\ (2,4),\ (3,9)\]</div>
+        <p>There is no way for this function to produce an output lower than \(0\) as it treats negatives as positives.</p>
+        <p>How does \(2x\) contribute to the output?</p>
+        <p>While the input is:</p>
+        <ul>
+          <li>negative → takes away</li>
+          <li>positive → adds</li>
+        </ul>
         <div class="scroll-x">
           <table class="data compact">
             <thead><tr><th>\(x\)</th><th class="c-sq">\(x^2\)</th><th class="c-lin">\(2x\)</th><th>\(g(x)\)</th></tr></thead>
@@ -392,10 +421,13 @@
             </tbody>
           </table>
         </div>
-        <p>The outputs are no longer symmetric around \(0\): \(g(1)=3\), but \(g(-1)=-1\).</p>
-        <p>But they still pair up. The output \(0\) appears twice, at \(-2\) and \(0\). So does \(3\), at \(-3\) and \(1\), and \(8\), at \(-4\) and \(2\). Each pair sits the same distance either side of \(-1\), and \(-1\) is the only input whose output appears once.</p>
+        <p>With this contribution, the new lowest output value is \(-1\). This becomes the turning point.</p>
+        <p>The turning point occurs where the decreasing contribution from the squared term is exactly balanced by the increasing contribution from the linear term.</p>
+        <p>The outputs are no longer symmetric about \(0\), so we don't get perfect opposite pairs.</p>
+        <p>However, input-output symmetry remains, it just has a different axis of symmetry.</p>
+        <p>The only output that appears for one input is the vertex.</p>
+        <p>In this case, it is \(-1\). Each symmetrical pair sits the same distance either side of \(-1\).</p>
         <iframe class="poly-widget" src="polynomials/axis-of-symmetry/fold-widget.html" title="Interactive: slide a vertical mirror along the graph of x squared plus 2x; the left half, reflected, lands on the right half only when the mirror is at x = -1" style="height: 340px" scrolling="no" loading="lazy"></iframe>
-        <p>So the axis of symmetry has moved to \(x=-1\), and the turning point with it. Why there?</p>
       </section>
 
       <section class="col" aria-labelledby="why-the-turning-point-moves">
@@ -463,9 +495,35 @@ f\left(-\tfrac{b}{2}+k\right)&amp;=\left(-\tfrac{b}{2}+k\right)^2+b\left(-\tfrac
         <p>The constant \(c\) adds the same amount to every output. It lifts or lowers the whole graph but never moves it sideways, so the axis stays put.</p>
       </section>
 
+      <section class="col" aria-labelledby="mixing-the-two">
+        <h2 id="mixing-the-two">Mixing the Two</h2>
+        <p>Most quadratics mix both operations, like \(x^2+2x\). Two calculations happen to the same \(x\):</p>
+        <ul>
+          <li>\(x\cdot x\) gives the same output for \(3\) and \(-3\): \(9\).</li>
+          <li>\(2x\) does not: \(6\) and \(-6\).</li>
+        </ul>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/pairs-widget.html" title="Interactive: choose a distance from 0; for the two opposite inputs, the x squared parts match and the 2x parts point opposite ways" style="height: 150px" scrolling="no" loading="lazy"></iframe>
+        <p>Added together, \(3\) gives \(15\) but \(-3\) gives \(3\). The outputs are no longer symmetric about \(0\).</p>
+        <p>But the fold hasn't gone. \(x^2+2x\) still falls and then rises, so its outputs still come in pairs, around a different point. Following the calculation one step at a time shows where.</p>
+      </section>
+
+      <section class="col" aria-labelledby="following-a-calculation-step-by-step">
+        <h2 id="following-a-calculation-step-by-step">Following a Calculation Step by Step</h2>
+        <p>Most expressions are built from several steps, not one. We can follow a handful of numbers through every step, one number line at a time. Each number keeps its colour, and a thread joins it from one line to the next.</p>
+        <p>In \(4x+3\), the numbers are stretched, then slid. Neither step lets two numbers meet, so seven inputs give seven different outputs, and \(4x+3=11\) has one solution.</p>
+        <p>In \(-2x+5\), the stretch is also a flip. The threads all cross and the order is reversed, but still nothing meets.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/chain-widget.html" title="Interactive: choose a calculation and follow a handful of numbers through each of its steps; threads that meet show two inputs landing on one output" style="height: 300px" scrolling="no" loading="lazy"></iframe>
+        <p>In \(x\cdot x\), the threads from opposite numbers meet in pairs.</p>
+        <p>\(x^2+2x\) can be built in three steps: slide by \(1\), multiply by itself, then slide back.</p>
+        <div class="math">\[(x+1)^2-1=x^2+2x+1-1=x^2+2x\]</div>
+        <p>The squaring step still folds at \(0\), but the numbers that are at \(0\) when they reach it started at \(x=-1\). So the pairs meet around \(-1\) instead.</p>
+        <p>\(x\cdot x\cdot x\) folds and then unfolds. Its last step multiplies the negative numbers by a negative again, which sends them back to the left. Nothing ends up together, which is why \(x^3=8\) has only one real solution, \(2\).</p>
+        <p>The sections above look more closely at why the fold moves to \(-1\), and finds where it sits for any quadratic.</p>
+      </section>
+
       <nav class="foot-nav" aria-label="Page navigation">
-        <a href="polynomials-multiple-solutions-2.html">← Multiple Solutions (2)</a>
-        <a href="polynomials-why-quadratics-are-tricky.html">Next: Why Quadratics are Tricky →</a>
+        <a href="polynomials-equations-and-general-solution-formulas.html">← Equations and General Solution Formulas</a>
+        <a href="polynomials-constructing-classes-of-equations.html">Next: Constructing Classes of Equations →</a>
       </nav>
     </main>
   </div>
