@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Same for every x?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .choices button { font-size: 0.98rem; }
+  svg { display: block; width: 100%; overflow: visible; margin-top: 0.7rem; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: rgba(238, 242, 252, 0.5); }
+  svg text.key { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 14px; }
+  svg text.amber { fill: var(--const); }
+  .tag { display: block; text-align: center; margin-top: 0.4rem; min-height: 1.2em; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="choices" role="group" aria-label="Pair">
+    <button aria-pressed="false">2<span class="v">x</span> + 3<span class="v">x</span> vs 5<span class="v">x</span></button>
+    <button aria-pressed="false">2<span class="v">x</span>² + 3<span class="v">x</span>² vs 5<span class="v">x</span>²</button>
+    <button aria-pressed="true">2<span class="v">x</span>² + 3<span class="v">x</span> vs 5<span class="v">x</span>²</button>
+    <button aria-pressed="false">2<span class="v">x</span>² + 3<span class="v">x</span> vs 5<span class="v">x</span></button>
+  </div>
+  <svg id="plot" role="img"></svg>
+  <span class="tag" id="tag" aria-live="polite"></span>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Both sides drawn for every x from −2 to 3. A real combination gives one curve on top of the other
+  // everywhere. A false one crosses only at a few points (here x = 0 and x = 1): a coincidence.
+  const PAIRS = [
+    { f: (x) => 2 * x + 3 * x, g: (x) => 5 * x, fn: "2x + 3x", gn: "5x", meet: null },
+    { f: (x) => 2 * x * x + 3 * x * x, g: (x) => 5 * x * x, fn: "2x² + 3x²", gn: "5x²", meet: null },
+    { f: (x) => 2 * x * x + 3 * x, g: (x) => 5 * x * x, fn: "2x² + 3x", gn: "5x²", meet: [0, 1] },
+    { f: (x) => 2 * x * x + 3 * x, g: (x) => 5 * x, fn: "2x² + 3x", gn: "5x", meet: [0, 1] },
+  ];
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("plot");
+  const X0 = -2, X1 = 3, PAD = 8, H = 230, TOP = 8, BOT = H - 22, F = "#f4f6ff", G = "#e8a33d";
+  let pick = 2;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const P = PAIRS[pick], W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const xs = Array.from({ length: 201 }, (_, i) => X0 + ((X1 - X0) * i) / 200);
+    const vals = xs.flatMap((x) => [P.f(x), P.g(x)]);
+    const lo = Math.min(...vals, 0), hi = Math.max(...vals, 0);
+    const sx = (x) => PAD + ((x - X0) / (X1 - X0)) * (W - 2 * PAD);
+    const sy = (y) => TOP + ((hi - y) / (hi - lo)) * (BOT - TOP);
+    const path = (fn) => xs.map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(fn(x)).toFixed(1)).join("");
+
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.16)" });
+    el("line", { x1: sx(0), x2: sx(0), y1: TOP, y2: BOT, stroke: "rgba(238,242,252,0.1)" });
+    for (let u = X0; u <= X1; u++) el("text", { x: sx(u), y: H - 4, "text-anchor": "middle" }, (u < 0 ? "−" : "") + Math.abs(u));
+    // the combination underneath, thick; the original sum on top, thin, so a perfect match reads as one line
+    el("path", { d: path(P.g), fill: "none", stroke: G, "stroke-width": 5, opacity: 0.55 });
+    el("path", { d: path(P.f), fill: "none", stroke: F, "stroke-width": 1.6 });
+    (P.meet || []).forEach((x) => el("circle", { cx: sx(x), cy: sy(P.f(x)), r: 5, fill: "none", stroke: G, "stroke-width": 1.8 }));
+    el("text", { x: PAD + 4, y: TOP + 12, class: "key", style: `fill: ${F}` }, P.fn);
+    el("text", { x: PAD + 4, y: TOP + 30, class: "key", style: `fill: ${G}` }, P.gn);
+
+    const tag = P.meet ? `they agree only at x = ${P.meet.join(" and x = ")}: a coincidence, not a combination`
+                       : "they agree for every x: one curve lies exactly on the other";
+    document.getElementById("tag").textContent = tag;
+    svg.setAttribute("aria-label", `${P.fn} against ${P.gn}: ${tag}`);
+  }
+
+  document.querySelectorAll(".choices button").forEach((b, i) => b.addEventListener("click", () => {
+    document.querySelectorAll(".choices button").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+    pick = i;
+    render();
+  }));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

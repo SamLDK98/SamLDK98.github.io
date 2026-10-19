@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Copies as blocks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  svg { display: block; width: 100%; overflow: visible; margin-top: 0.8rem; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: rgba(238, 242, 252, 0.66); }
+  svg text.name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 15px; fill: rgba(238, 242, 252, 0.88); }
+  svg text.in { fill: #0e0e11; font-weight: 500; }
+  .tag { display: block; text-align: center; margin-top: 0.4rem; min-height: 1.2em; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="choices" role="group" aria-label="Sum">
+    <button aria-pressed="true">2<span class="v">x</span> + 3<span class="v">x</span></button>
+    <button aria-pressed="false">2<span class="v">a</span> + 3<span class="v">b</span></button>
+    <button aria-pressed="false">2<span class="v">x</span>² + 3<span class="v">x</span>²</button>
+    <button aria-pressed="false">2<span class="v">x</span>² + 3<span class="v">x</span></button>
+  </div>
+  <svg id="blocks" role="img"></svg>
+  <span class="tag" id="tag" aria-live="polite"></span>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Each copy is a block whose length is its value, with x = 5, a = 2 and b = 10. The two terms sit on
+  // their own rows, then end to end on the last row. If every block is the same, the sum is just a count
+  // of that block, so it is one term; if not, it stays two terms.
+  const SUMS = [
+    { terms: [{ n: 2, name: "2x", v: 5, col: "#64c8a0" }, { n: 3, name: "3x", v: 5, col: "#64c8a0" }], one: "5x" },
+    { terms: [{ n: 2, name: "2a", v: 2, col: "#64c8a0" }, { n: 3, name: "3b", v: 10, col: "#e8a33d" }] },
+    { terms: [{ n: 2, name: "2x²", v: 25, col: "#7aa7ff" }, { n: 3, name: "3x²", v: 25, col: "#7aa7ff" }], one: "5x²" },
+    { terms: [{ n: 2, name: "2x²", v: 25, col: "#7aa7ff" }, { n: 3, name: "3x", v: 5, col: "#64c8a0" }] },
+  ];
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("blocks");
+  const PAD = 8, ROW = 44, BH = 18, SCALE = 125;
+  let pick = 0;
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function row(y, blocks, label, W) {
+    const sx = (v) => PAD + (v / SCALE) * (W - 2 * PAD);
+    el("text", { x: PAD, y: y - 6, class: "name" }, label);
+    let at = 0;
+    blocks.forEach((b) => {
+      const x0 = sx(at), x1 = sx(at + b.v);
+      el("rect", { x: x0 + 0.5, y, width: Math.max(1, x1 - x0 - 1), height: BH, rx: 2, fill: b.col, opacity: 0.9 });
+      if (x1 - x0 > 16) el("text", { x: (x0 + x1) / 2, y: y + 13, "text-anchor": "middle", class: "in" }, b.v);
+      at += b.v;
+    });
+    el("text", { x: W - PAD, y: y - 6, "text-anchor": "end" }, "= " + at);
+  }
+
+  function render() {
+    const S = SUMS[pick], W = svg.clientWidth || 560, H = ROW * 3 + 8;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const copies = (t) => Array.from({ length: t.n }, () => t);
+    S.terms.forEach((t, i) => row(18 + i * ROW, copies(t), t.name, W));
+    const all = S.terms.flatMap(copies);
+    const same = all.every((b) => b.v === all[0].v && b.col === all[0].col);
+    row(18 + 2 * ROW, all, S.terms.map((t) => t.name).join(" + ") + (same ? " = " + S.one : ""), W);
+    const tag = same ? `five copies of the same block (${all[0].v}): one term, ${S.one}`
+                     : `two different blocks (${S.terms[0].v} and ${S.terms[1].v}): it stays two terms`;
+    document.getElementById("tag").textContent = tag;
+    svg.setAttribute("aria-label", tag);
+  }
+
+  document.querySelectorAll(".choices button").forEach((b, i) => b.addEventListener("click", () => {
+    document.querySelectorAll(".choices button").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+    pick = i;
+    render();
+  }));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
