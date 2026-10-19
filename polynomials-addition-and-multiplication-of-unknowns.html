@@ -395,7 +395,18 @@
       <section class="col" aria-labelledby="adding-a-linear-term">
         <h2 id="adding-a-linear-term">Adding a Linear Term</h2>
         <div class="math">\[g(x)=x^2+2x\]</div>
-        <p>The \(x^2\) term treats \(x\) and \(-x\) identically. The \(2x\) term does not: it adds to positive inputs and takes away from negative ones.</p>
+        <p>We can think of \(f(x)=x^2\) existing first on the graph.</p>
+        <p>It falls towards \(0\) and then rises again.</p>
+        <p>As we increase in negative values, the input-output pairs draw towards each other.</p>
+        <p>Once the inputs are greater than \(0\), the outputs begin increasing.</p>
+        <div class="math">\[(-4,16),\ (-3,9),\ (-2,4),\ (-1,1),\ (0,0),\ (1,1),\ (2,4),\ (3,9)\]</div>
+        <p>There is no way for this function to produce an output lower than \(0\) as it treats negatives as positives.</p>
+        <p>How does \(2x\) contribute to the output?</p>
+        <p>While the input is:</p>
+        <ul>
+          <li>negative → takes away</li>
+          <li>positive → adds</li>
+        </ul>
         <div class="scroll-x">
           <table class="data compact">
             <thead><tr><th>\(x\)</th><th class="c-sq">\(x^2\)</th><th class="c-lin">\(2x\)</th><th>\(g(x)\)</th></tr></thead>
@@ -410,11 +421,13 @@
             </tbody>
           </table>
         </div>
-        <p>Notice how as \(x\) increases from \(-4\) to \(-1\) the value of the output decreases at each step. Then from \(-1\) onwards it begins increasing again.</p>
-        <p>The outputs are no longer symmetric around \(0\): \(g(1)=3\), but \(g(-1)=-1\).</p>
-        <p>But they still pair up. The output \(0\) appears twice, at \(-2\) and \(0\). So does \(3\), at \(-3\) and \(1\), and \(8\), at \(-4\) and \(2\). Each pair sits the same distance either side of \(-1\), and \(-1\) is the only input whose output appears once.</p>
+        <p>With this contribution, the new lowest output value is \(-1\). This becomes the turning point.</p>
+        <p>The turning point occurs where the decreasing contribution from the squared term is exactly balanced by the increasing contribution from the linear term.</p>
+        <p>The outputs are no longer symmetric about \(0\), so we don't get perfect opposite pairs.</p>
+        <p>However, input-output symmetry remains, it just has a different axis of symmetry.</p>
+        <p>The only output that appears for one input is the vertex.</p>
+        <p>In this case, it is \(-1\). Each symmetrical pair sits the same distance either side of \(-1\).</p>
         <iframe class="poly-widget" src="polynomials/axis-of-symmetry/fold-widget.html" title="Interactive: slide a vertical mirror along the graph of x squared plus 2x; the left half, reflected, lands on the right half only when the mirror is at x = -1" style="height: 340px" scrolling="no" loading="lazy"></iframe>
-        <p>So the axis of symmetry has moved to \(x=-1\), and the turning point with it. Why there?</p>
       </section>
 
       <section class="col" aria-labelledby="why-the-turning-point-moves">
