@@ -395,6 +395,96 @@
         <p>That lone point, \((0,0)\), is the <strong>turning point</strong> (also called the vertex): where the graph stops falling and starts rising. It sits on the axis.</p>
       </section>
 
+      <section class="col" aria-labelledby="adding-a-linear-term">
+        <h2 id="adding-a-linear-term">Adding a Linear Term</h2>
+        <p>Now add a linear term:</p>
+        <div class="math">\[g(x)=x^2+2x\]</div>
+        <p>The \(x^2\) term treats \(x\) and \(-x\) identically. The \(2x\) term does not: it adds to positive inputs and takes away from negative ones.</p>
+        <div class="scroll-x">
+          <table class="data compact">
+            <thead><tr><th>\(x\)</th><th class="c-sq">\(x^2\)</th><th class="c-lin">\(2x\)</th><th>\(g(x)\)</th></tr></thead>
+            <tbody>
+              <tr><td>−4</td><td class="c-sq">16</td><td class="c-lin">−8</td><td>8</td></tr>
+              <tr><td>−3</td><td class="c-sq">9</td><td class="c-lin">−6</td><td>3</td></tr>
+              <tr><td>−2</td><td class="c-sq">4</td><td class="c-lin">−4</td><td>0</td></tr>
+              <tr><td>−1</td><td class="c-sq">1</td><td class="c-lin">−2</td><td>−1</td></tr>
+              <tr><td>0</td><td class="c-sq">0</td><td class="c-lin">0</td><td>0</td></tr>
+              <tr><td>1</td><td class="c-sq">1</td><td class="c-lin">2</td><td>3</td></tr>
+              <tr><td>2</td><td class="c-sq">4</td><td class="c-lin">4</td><td>8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The outputs are no longer symmetric around \(0\): \(g(1)=3\), but \(g(-1)=-1\).</p>
+        <p>But they still pair up. The output \(0\) appears twice, at \(-2\) and \(0\). So does \(3\), at \(-3\) and \(1\), and \(8\), at \(-4\) and \(2\). Each pair sits the same distance either side of \(-1\), and \(-1\) is the only input whose output appears once.</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/fold-widget.html" title="Interactive: slide a vertical mirror along the graph of x squared plus 2x; the left half, reflected, lands on the right half only when the mirror is at x = -1" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+        <p>So the axis of symmetry has moved to \(x=-1\), and the turning point with it. Why there?</p>
+      </section>
+
+      <section class="col" aria-labelledby="why-the-turning-point-moves">
+        <h2 id="why-the-turning-point-moves">Why the Turning Point Moves</h2>
+        <p>Think about what happens when \(x\) increases by \(1\).</p>
+        <p>For \(x^2\), the change depends on where we are. For \(2x\), it is always \(+2\).</p>
+        <div class="scroll-x">
+          <table class="data compact">
+            <thead><tr><th>Movement</th><th class="c-sq">Change in \(x^2\)</th><th class="c-lin">Change in \(2x\)</th><th>Total change</th></tr></thead>
+            <tbody>
+              <tr><td>−3 → −2</td><td class="c-sq">−5</td><td class="c-lin">+2</td><td>−3</td></tr>
+              <tr><td>−2 → −1</td><td class="c-sq">−3</td><td class="c-lin">+2</td><td>−1</td></tr>
+              <tr><td>−1 → 0</td><td class="c-sq">−1</td><td class="c-lin">+2</td><td>+1</td></tr>
+              <tr><td>0 → 1</td><td class="c-sq">+1</td><td class="c-lin">+2</td><td>+3</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>On its own, \(x^2\) falls until \(0\). Its falls shrink as it gets there: \(5\), then \(3\), then \(1\).</p>
+        <p>The \(2x\) term adds a steady \(2\) on every step. Once \(x^2\) is falling by less than \(2\), the total starts rising.</p>
+        <p>That happens before \(x^2\) reaches \(0\), so the turning point moves left.</p>
+        <p>Why exactly to \(-1\)? The changes in \(x^2\) are the odd numbers: \(-5,-3,-1,+1,+3\), switching from falling to rising at \(0\). Adding \(2\) to each gives \(-3,-1,+1,+3,+5\): the same numbers, one step to the left. So the switch comes one step earlier, at \(-1\).</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/steps-widget.html" title="Interactive: choose x squared, x squared plus 2x or x squared plus 4x; each step's change is split into the change in x squared and the steady linear part, and the turn slides left" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+        <p>Read the total change column again: the graph falls by \(3\), then \(1\), and rises by \(1\), then \(3\). The climb after \(-1\) is the descent before it, in reverse. That is the symmetry again.</p>
+      </section>
+
+      <section class="col" aria-labelledby="where-any-quadratic-turns">
+        <h2 id="where-any-quadratic-turns">Where Any Quadratic Turns</h2>
+        <p>Take any quadratic of the form</p>
+        <div class="math">\[f(x)=x^2+bx\]</div>
+        <p>Increase \(x\) by a very small amount \(h\). The change in the function is:</p>
+        <div class="math">\[\begin{aligned}
+f(x+h)-f(x)&amp;=(x+h)^2+b(x+h)-(x^2+bx)\\
+&amp;=2xh+h^2+bh\\
+&amp;=h(2x+b+h)
+\end{aligned}\]</div>
+        <p>\(h\) is positive, so the change has the same sign as \(2x+b+h\). When \(h\) is tiny, that is the sign of \(2x+b\).</p>
+        <p>So \(f\) falls while \(2x+b\) is negative, and rises once it is positive. It turns where:</p>
+        <div class="math">\[2x+b=0\quad\Rightarrow\quad x=-\frac{b}{2}\]</div>
+        <p>For \(g\), \(b=2\), so it turns at \(x=-1\).</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/turn-widget.html" title="Interactive: slide b; the graph of x squared plus bx keeps its shape and slides, and the strip showing where it falls and rises flips at x = -b/2" style="height: 360px" scrolling="no" loading="lazy"></iframe>
+        <p>The larger \(b\), the further left the turning point. A negative \(b\) puts it to the right of \(0\): \(x^2-5x\) turns at \(2.5\), the mirror line on <a class="inline" href="polynomials-multiple-solutions-1.html">Multiple Solutions (1)</a>.</p>
+      </section>
+
+      <section class="col" aria-labelledby="why-the-two-sides-match">
+        <h2 id="why-the-two-sides-match">Why the Two Sides Match</h2>
+        <p>Knowing where the graph turns doesn't yet explain why its two sides are mirror images.</p>
+        <p>Measure each input from the turning point instead: write \(x=-\frac{b}{2}+k\), where \(k\) is how far \(x\) is from the turning point. Then:</p>
+        <div class="math">\[\begin{aligned}
+f\left(-\tfrac{b}{2}+k\right)&amp;=\left(-\tfrac{b}{2}+k\right)^2+b\left(-\tfrac{b}{2}+k\right)\\
+&amp;=\tfrac{b^2}{4}-bk+k^2-\tfrac{b^2}{2}+bk\\
+&amp;=k^2-\tfrac{b^2}{4}
+\end{aligned}\]</div>
+        <p>The output depends only on \(k^2\). Steps of \(k\) and \(-k\) give the same \(k^2\), so inputs the same distance either side of \(-\frac{b}{2}\) give the same output, just as opposite inputs did for \(x^2\).</p>
+        <p>For \(g\): \(g(-1+k)=k^2-1\). Measured from anywhere else, a \(k\) term is left over, and opposite steps give different outputs. Only from the turning point does it vanish.</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/recentre-widget.html" title="Interactive: slide the point that inputs are measured from; g is rewritten in terms of the distance k, and at x = -1 the k term vanishes, leaving k squared minus 1" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="leading-coefficients-and-constants">
+        <h2 id="leading-coefficients-and-constants">Leading Coefficients and Constants</h2>
+        <p>For \(f(x)=ax^2+bx+c\), the same small step gives a change of \(h(2ax+b+ah)\), so the turning point is where \(2ax+b=0\):</p>
+        <div class="math">\[x=-\frac{b}{2a}\]</div>
+        <p>If \(a\) is positive, \(2ax+b\) climbs from negative to positive as \(x\) grows. The graph falls and then rises, and the turning point is its lowest point.</p>
+        <p>If \(a\) is negative, \(2ax+b\) drops from positive to negative. The graph rises and then falls, and the turning point is its highest point.</p>
+        <iframe class="poly-widget" src="polynomials/axis-of-symmetry/turn-widget.html?vary=a" title="Interactive: slide a in a x squared plus 2x; the turning point sits at -b/2a, becomes a highest point when a is negative, and disappears when a is 0" style="height: 360px" scrolling="no" loading="lazy"></iframe>
+        <p>The constant \(c\) adds the same amount to every output. It lifts or lowers the whole graph but never moves it sideways, so the axis stays put.</p>
+      </section>
+
       <section class="col" aria-labelledby="mixing-the-two">
         <h2 id="mixing-the-two">Mixing the Two</h2>
         <p>Most quadratics mix both operations, like \(x^2+2x\). Two calculations happen to the same \(x\):</p>
