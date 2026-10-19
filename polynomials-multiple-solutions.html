@@ -299,6 +299,10 @@
     .data.steps td.ahp { color: var(--ahp); }
     .data.steps td.k { color: var(--k); }
     .data.steps td.na { color: var(--na); }
+    .data.compact { min-width: 0; width: auto; }
+    .data.compact th, .data.compact td { text-align: center; padding: 0.5rem 1.1rem; white-space: nowrap; }
+    .data.compact thead th { font-family: "Spectral", Georgia, serif; font-size: 1rem; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--txt-2); }
+    .data.compact td, .data.compact td:first-child, .data.compact td:last-child { font-family: "Spectral", Georgia, serif; font-size: 1.05rem; width: auto; }
   </style>
   <script>
     window.MathJax = {
@@ -320,73 +324,117 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Multiple Solutions</h1>
     </header>
     <main>
-      <section class="col" aria-labelledby="one-number-at-a-time">
-        <h2 id="one-number-at-a-time">One Number at a Time</h2>
-        <p>Here is a quadratic equation:</p>
-        <div class="math">\[x^2-5x=-6\]</div>
-        <p>It has two solutions: \(2\) and \(3\).</p>
-        <p>That can feel wrong. There is only one unknown. Shouldn't there be only one answer?</p>
-        <p>Look at what happens when we test a number. Whatever number we try, every \(x\) in the equation takes that same number:</p>
+      <section class="col" aria-labelledby="one-unknown">
+        <h2 id="one-unknown">Multiple Solutions in an Equation with Only One Unknown?</h2>
+        <p>Quadratic equations can feel confusing if you are used to thinking of equations with one unknown as having only one possible solution.</p>
+        <p>If an equation has two unknowns, the possible values for either \(x\) or \(y\) are infinite.</p>
+        <p>Whatever value \(x\) is set to, \(y\) can be set to the value that balances the equation.</p>
+        <div class="math">\[3x+2y=5\]</div>
+        <p>However, in an equation with one unknown in the first degree, there is only one value that \(x\) can be.</p>
+        <div class="math">\[3x-1=5\]</div>
+        <p>So \(x^2-5x=6\), which has one unknown but two possible solutions (\(-1\) and \(6\)), feels counterintuitive.</p>
+        <p>To understand where this second solution comes from, let's build up from the simplest equations.</p>
+      </section>
+
+      <section class="col" aria-labelledby="univariate-linear-expressions">
+        <h2 id="univariate-linear-expressions">Univariate Linear Expressions</h2>
+        <h3>Any equation that can be expressed in terms of constants has only one solution.</h3>
+        <p>\(x=9\) → Already solved.</p>
+        <p>\(x+3=9\) → Says that \(x\) is \(3\) less than \(9\). There is only one number that is \(3\) less than \(9\).</p>
+        <p>\(x=\frac{4(13-9)+2}{2.735}\) → There is only one number that is the result of these arithmetic operations.</p>
+        <h3>Any equation that can be expressed as the addition of copies of \(x\) values has only a single solution.</h3>
+        <p>\(x+x=9\) → Says that two copies of \(x\) make \(9\).</p>
+        <p>\(x\) must be \(4.5\) because there is no other number that two copies of make \(9\).</p>
+        <div class="math">\[x+x+x=9\]</div>
+        <p>\(x\) must be \(3\) because there is no other number that three copies of make \(9\).</p>
+        <p>For all these expressions, as \(x\) increases, every copy of \(x\) increases, so the total only ever moves in one direction. It therefore can only pass each value once.</p>
+        <p>This type of growth is known as linear, and expressions of the form \(ax+b\) are called linear expressions.</p>
+        <iframe class="poly-widget" src="polynomials/why-quadratics-are-tricky/copies-widget.html?mode=linear" title="Interactive: slide x; one, two, three and four copies of x laid end to end each reach 9 at exactly one value of x" style="height: 240px" scrolling="no" loading="lazy"></iframe>
+        <h3>A Constant Times an Unknown (\(Ax\))</h3>
+        <p>If an expression simplifies to a constant times an unknown, we can express the output as the sum of \(x\) values, and it therefore has only one solution.</p>
         <div class="math">\[\begin{aligned}
-2^2-5(2)&amp;=4-10=-6\\
-3^2-5(3)&amp;=9-15=-6
+4x=9\ &amp;\rightarrow\ x+x+x+x=9\\
+2x+x=9\ &amp;\rightarrow\ 3x=9\ \rightarrow\ (x+x)+x=9\ \rightarrow\ x+x+x=9\\
+3\cdot2x=9\ &amp;\rightarrow\ 6x=9\ \rightarrow\ x+x+x+x+x+x=9
 \end{aligned}\]</div>
-        <p>\(x\) is never \(2\) in one place and \(3\) in the other.</p>
-        <p>An equation is a test. A number either makes it true or it doesn't. Solving means finding <strong>every</strong> number that passes.</p>
-        <p>Here, two different numbers pass, each on its own:</p>
-        <div class="math">\[x=2\quad\text{or}\quad x=3\]</div>
-        <p>So the real question is: how can a test with one unknown let two numbers through?</p>
-      </section>
-
-      <section class="col" aria-labelledby="why-we-expect-one-answer">
-        <h2 id="why-we-expect-one-answer">Why We Expect One Answer</h2>
-        <p>Take a linear equation:</p>
-        <div class="math">\[x+x=10\]</div>
-        <p>As \(x\) increases, \(x+x\) only ever increases. It reaches \(10\) once, at \(x=5\), and then climbs past it.</p>
-        <iframe class="poly-widget" src="polynomials/multiple-solutions/trace-widget.html?eq=linear" title="Interactive: slide x and watch x + x climb steadily, passing 10 only once" style="height: 290px" scrolling="no" loading="lazy"></iframe>
-        <p>Once it has passed \(10\), it never comes back. So only one number can pass the test.</p>
-        <p>It isn't about how many times \(x\) appears. \(x+x=10\) contains two \(x\)'s and has one solution. \(x^2=9\) contains one \(x\) and has two: \(3\) and \(-3\).</p>
-        <p>What matters is whether the left-hand side can <strong>turn around</strong>.</p>
-      </section>
-
-      <section class="col" aria-labelledby="two-processes-one-unknown">
-        <h2 id="two-processes-one-unknown">Two Processes, One Unknown</h2>
-        <p>In \(x^2-5x\), the same \(x\) goes through two processes. It is squared, and it is multiplied by \(5\). Then one result is taken from the other.</p>
-        <p>The two processes grow at different speeds. Moving the terms across, the equation becomes \(5x-x^2=6\): it asks when \(5x\) is exactly \(6\) ahead of \(x^2\). That lead is the amber gap.</p>
-        <iframe class="poly-widget" src="polynomials/multiple-solutions/race-widget.html" title="Interactive: slide x and compare x squared with 5x; the gap between them opens, then closes" style="height: 190px" scrolling="no" loading="lazy"></iframe>
-        <p>Each time \(x\) goes up by \(1\), \(5x\) goes up by \(5\). Always \(5\). But \(x^2\) goes up by more each time:</p>
+        <p>In other words, the multiplication of an unknown by a constant still produces a linear expression.</p>
+        <p>However, unlike addition, where we can add copies of \(x\) together, we cannot multiply copies of \(x\) together.</p>
+        <p>To appreciate why, let's consider the differences in how multiplication and addition behave.</p>
+        <h3>The Difference between Multiplication and Repeated Addition</h3>
+        <p>Multiplication is often introduced as repeated addition. However, addition and multiplication can behave differently.</p>
+        <p>When adding two numbers, there is no interaction between their signs, per se.</p>
+        <ul>
+          <li>\((+)+(+)=(+)\)</li>
+          <li>\((-)+(-)=(-)\)</li>
+          <li>\((+)+(-)=\) the number with the greater absolute magnitude's sign.</li>
+        </ul>
+        <p>However, when we multiply two numbers, the signs themselves can determine the sign of the output.</p>
+        <ul>
+          <li>\((+)\cdot(+)=(+)\)</li>
+          <li>\((-)\cdot(-)=(+)\)</li>
+          <li>\((+)\cdot(-)=(-)\)</li>
+        </ul>
+        <p>There are two behavioural changes:</p>
+        <ul>
+          <li>Multiplying by a negative of any magnitude changes the sign of the output.</li>
+          <li>Multiplying two negatives results in a positive output.</li>
+        </ul>
+        <p>So what does this mean for expressions featuring a constant times an unknown?</p>
         <div class="scroll-x">
-          <table class="data steps">
-            <thead><tr><th>\(x\)</th><th>\(0\to1\)</th><th>\(1\to2\)</th><th>\(2\to3\)</th><th>\(3\to4\)</th><th>\(4\to5\)</th></tr></thead>
+          <table class="data compact">
+            <thead><tr><th>Constant</th><th>Unknown</th><th>Output</th></tr></thead>
             <tbody>
-              <tr><td class="ahp">\(x^2\) grows by</td><td>\(1\)</td><td>\(3\)</td><td>\(5\)</td><td>\(7\)</td><td>\(9\)</td></tr>
-              <tr><td class="k">\(5x\) grows by</td><td>\(5\)</td><td>\(5\)</td><td>\(5\)</td><td>\(5\)</td><td>\(5\)</td></tr>
-              <tr><td>\(x^2-5x\) changes by</td><td>\(-4\)</td><td>\(-2\)</td><td class="na">\(0\)</td><td>\(+2\)</td><td>\(+4\)</td></tr>
+              <tr><td>+</td><td>+</td><td>+</td></tr>
+              <tr><td>+</td><td>−</td><td>−</td></tr>
+              <tr><td>−</td><td>+</td><td>−</td></tr>
+              <tr><td>−</td><td>−</td><td>+</td></tr>
             </tbody>
           </table>
         </div>
-        <p>At first \(5x\) grows faster, so \(x^2-5x\) falls. Then \(x^2\) catches up and overtakes, and \(x^2-5x\) rises again.</p>
-        <p>The step from \(2\) to \(3\) is a tie: both grow by \(5\). So \(x^2-5x\) ends that step exactly where it started. That is why \(2\) and \(3\) give the same result.</p>
+        <p>In linear expressions the constant and output are known.</p>
+        <p>Imagine:</p>
+        <div class="math">\[3x=9\]</div>
+        <p>The constant and output are both positive. Therefore the unknown must be positive.</p>
+        <p>However, if we allow multiplication <strong>by</strong> the unknown <strong>on</strong> the unknown, things fundamentally change. Knowing the sign of the output no longer enables the unique determination of the unknown.</p>
+        <h3>An Unknown Times an Unknown (\(x^2\))</h3>
+        <p>If we had an equation like:</p>
+        <div class="math">\[-2x=8\]</div>
+        <p>While the output \(8\) can be produced by:</p>
+        <div class="math">\[-2\cdot-4\qquad\text{or}\qquad2\cdot4\]</div>
+        <p>We already know that one of these numbers must be \((-2)\) so there is only one possible solution for \(x\).</p>
+        <p>So:</p>
+        <p>Multiplying an unknown value by a known constant still lets the output uniquely determine the unknown.</p>
+        <p>If we know the output and the factor multiplying the unknown, we can work out what number the unknown <strong>must be</strong>.</p>
+        <p>However, the possible inputs for a multiplication involving unknowns are fundamentally different from the possible inputs for an addition of unknowns.</p>
+        <p>Let's take a basic example to illustrate:</p>
+        <div class="math">\[\text{E1: }x+x=9\qquad\text{E2: }x\cdot x=9\]</div>
+        <p>There is only one possible value for \(x\) in E1.</p>
+        <p>Yet there are two possible values for \(x\) in E2.</p>
+        <p>\(9\) could be the output of:</p>
+        <div class="math">\[3\cdot3\qquad\text{or}\qquad-3\cdot-3\]</div>
+        <p>But \(x^2-5x=6\) has solutions \(-1\) and \(6\) which aren't just opposites.</p>
+        <p>An \(x^2\) term allows pairs of additive inverses to be solutions to an equation; however, to understand how possible solutions can differ in magnitude not just sign, we need to consider what happens when we have a first degree and second degree term in an equation.</p>
+      </section>
+
+      <section class="col" aria-labelledby="univariate-quadratic-expressions">
+        <h2 id="univariate-quadratic-expressions">Univariate Quadratic Expressions</h2>
+        <p>Take:</p>
+        <div class="math">\[x^2-5x=-6\]</div>
+        <p>The same \(x\) is involved in two separate terms.</p>
+        <p>For a given \(x\), the output is the difference between \(x^2\) and \(5x\).</p>
+        <p>We can rearrange it for a clearer interpretation:</p>
+        <div class="math">\[5x-x^2=6\]</div>
+        <p>We could rearrange the equation to make it slightly easier to interpret.</p>
+        <div class="math">\[a-b=6\]</div>
+        <p>Solutions for \(x\) are those that make the difference between \(5x\) and \(x^2\) equal to \(6\).</p>
+        <p>If we think about the terms growing as \(x\) increases, we can look for any moments when \(5x\) is exactly \(6\) ahead of \(x^2\).</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions/race-widget.html" title="Interactive: slide x and compare x squared with 5x; the gap between them opens, then closes" style="height: 190px" scrolling="no" loading="lazy"></iframe>
         <p>Falling, then rising. Anything that falls and then rises can pass the same level twice: once on the way down, once on the way up.</p>
-        <iframe class="poly-widget" src="polynomials/multiple-solutions/trace-widget.html" title="Interactive: slide x and watch x squared minus 5x fall then rise, passing -6 at x = 2 and again at x = 3" style="height: 290px" scrolling="no" loading="lazy"></iframe>
         <p>\(x^2-5x\) passes \(-6\) at \(x=2\) on the way down, and again at \(x=3\) on the way up.</p>
-        <p>Its lowest point is \(-6.25\), at \(x=2.5\). Ask for a level lower than that, and no number passes at all.</p>
-      </section>
-
-      <section class="col" aria-labelledby="the-two-answers-are-partners">
-        <h2 id="the-two-answers-are-partners">The Two Answers Are Partners</h2>
-        <p>The lead of \(5x\) over \(x^2\) can also be drawn as an area.</p>
-        <p>Picture \(5x\) as a strip, \(x\) tall and \(5\) wide, and \(x^2\) as a square, \(x\) by \(x\). Set the square inside the strip. What is left over is \(x\) tall and \(5-x\) wide, and its area is \(5x-x^2\).</p>
+        <iframe class="poly-widget" src="polynomials/multiple-solutions/trace-widget.html" title="Interactive: slide x and watch x squared minus 5x fall then rise, passing -6 at x = 2 and again at x = 3" style="height: 290px" scrolling="no" loading="lazy"></iframe>
+        <p>The lead of \(5x\) over \(x^2\) can also be drawn as an area. Picture \(5x\) as a strip, \(x\) tall and \(5\) wide, and \(x^2\) as a square, \(x\) by \(x\). Set the square inside the strip. What is left over is \(x\) tall and \(5-x\) wide, and its area is \(5x-x^2\).</p>
         <iframe class="poly-widget" src="polynomials/multiple-solutions/area-widget.html" title="Interactive: slide x; an x by x square sits inside a 5 by x strip, and the leftover rectangle's area is 5x minus x squared" style="height: 470px" scrolling="no" loading="lazy"></iframe>
-        <p>As \(x\) grows, the leftover gets taller but narrower. Its area rises, then falls.</p>
-        <p>At \(x=2\) it is \(2\) tall and \(3\) wide. At \(x=3\) it is \(3\) tall and \(2\) wide. It is the same rectangle stood on its side, and both have area \(6\).</p>
-        <p>So the two solutions come as a pair: swap the height and the width, and one becomes the other.</p>
-      </section>
-
-      <section class="col" aria-labelledby="where-factoring-fits">
-        <h2 id="where-factoring-fits">Where Factoring Fits</h2>
-        <p>Moving everything to one side gives \(x^2-5x+6=0\). Written as \((x-2)(x-3)=0\), the equation shows <em>where</em> its two crossings are. That is the <a class="inline" href="polynomials-constructing-classes-of-equations.html#sums-and-products-two-ways-to-write-the-same-thing">product form</a> doing its job. The rise and fall is <em>why</em> there are two.</p>
-        <p>Higher powers can turn around more often. A cubic can fall, rise and fall again, so it can pass the same level three times.</p>
+        <p>As \(x\) grows, the leftover gets taller but narrower. Its area rises, then falls. At \(x=2\) it is \(2\) tall and \(3\) wide; at \(x=3\) it is \(3\) tall and \(2\) wide. It is the same rectangle stood on its side, and both have area \(6\).</p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
