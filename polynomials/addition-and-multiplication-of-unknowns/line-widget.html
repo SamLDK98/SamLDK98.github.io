@@ -27,14 +27,18 @@
 
 <script src="../widget-base.js"></script>
 <script>
-  // Every number from −4 to 4 gets the same operation. ?op=add adds k; ?op=mul multiplies by k.
+  // Every number from −4 to 4 gets the same operation. ?op=add adds k; ?op=mul multiplies by k;
+  // ?op=sq multiplies every number by itself, with the slider sliding each one from x to x · x.
   // The dots are coloured in their starting order, so the colours show whether order is kept,
   // reversed, or (at ×0) lost. Faint ticks mark where each dot started. k is held in tenths.
-  const MUL = new URLSearchParams(location.search).get("op") === "mul";
-  const C = MUL ? { min: -3, max: 3, step: 0.1, start: 3, view: 12.6 } : { min: -4, max: 4, step: 0.5, start: 3, view: 8.6 };
+  const OP = new URLSearchParams(location.search).get("op");
+  const MUL = OP === "mul", SQ = OP === "sq";
+  const C = SQ ? { min: 0, max: 1, step: 0.01, start: 0, lo: -4.6, hi: 16.6, lab: 4 }
+          : MUL ? { min: -3, max: 3, step: 0.1, start: 3, lo: -12.6, hi: 12.6, lab: 3 }
+          : { min: -4, max: 4, step: 0.5, start: 3, lo: -8.6, hi: 8.6, lab: 2 };
   const slider = document.getElementById("k");
   Object.assign(slider, { min: C.min, max: C.max, step: C.step, value: C.start });
-  slider.setAttribute("aria-label", MUL ? "The number every input is multiplied by" : "The number added to every input");
+  slider.setAttribute("aria-label", SQ ? "How far through multiplying every number by itself" : MUL ? "The number every input is multiplied by" : "The number added to every input");
 
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("line");
@@ -57,28 +61,34 @@
   }
 
   function render() {
-    const K = Math.round(+slider.value * 10), k = K / 10;
-    const out = IN.map((x) => (MUL ? x * K / 10 : x + k));
-    document.getElementById("expr").innerHTML = MUL
+    const K = Math.round(+slider.value * 10), k = K / 10, t = +slider.value;
+    const out = IN.map((x) => (SQ ? x + t * (x * x - x) : MUL ? x * K / 10 : x + k));
+    document.getElementById("expr").innerHTML = SQ
+      ? `every <span class="v">x</span> → <span class="v">x</span> · <span class="v">x</span>`
+      : MUL
       ? `every <span class="v">x</span> → <span class="k">${K < 0 ? "(" + fmt(k) + ")" : fmt(k)}</span> · <span class="v">x</span>`
       : `every <span class="v">x</span> → <span class="v">x</span> ${k < 0 ? "−" : "+"} <span class="k">${fmt(Math.abs(k))}</span>`;
-    document.getElementById("tag").textContent = MUL && K === 0 ? "everything lands on 0"
+    document.getElementById("tag").textContent = SQ ? (t === 1 ? "pairs land together" : t === 0 ? "slide to multiply every number by itself" : "")
+      : MUL && K === 0 ? "everything lands on 0"
       : MUL && K < 0 ? "order reversed" : "same order";
 
     const W = svg.clientWidth || 560;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
     svg.textContent = "";
-    const sx = (v) => PAD + ((v + C.view) / (2 * C.view)) * (W - 2 * PAD);
+    const sx = (v) => PAD + ((v - C.lo) / (C.hi - C.lo)) * (W - 2 * PAD);
     el("line", { x1: PAD, x2: W - PAD, y1: Y, y2: Y, stroke: "rgba(238,242,252,0.22)" });
-    const stepLab = MUL ? 3 : 2;
-    for (let u = -Math.floor(C.view); u <= C.view; u++) {
+    const stepLab = C.lab;
+    for (let u = Math.ceil(C.lo); u <= C.hi; u++) {
       el("line", { x1: sx(u), x2: sx(u), y1: Y, y2: Y + (u % stepLab === 0 ? 5 : 3), stroke: "rgba(238,242,252,0.2)" });
       if (u % stepLab === 0) el("text", { x: sx(u), y: Y + 18, "text-anchor": "middle" }, fmt(u));
     }
     el("line", { x1: sx(0), x2: sx(0), y1: Y - 16, y2: Y + 5, stroke: "rgba(238,242,252,0.4)" });
     IN.forEach((x, i) => el("line", { x1: sx(x), x2: sx(x), y1: Y - 22, y2: Y - 15, stroke: colour(i), "stroke-width": 2, opacity: 0.55 }));
     // draw later dots on top; at ×0 they all sit on one point
-    IN.forEach((x, i) => el("circle", { cx: sx(out[i]), cy: Y, r: 5.5, fill: colour(i), stroke: "#0e0e11", "stroke-width": 1 }));
+    // when squaring, the negative numbers are drawn as rings so a pair that lands together shows both
+    IN.forEach((x, i) => el("circle", SQ && x < 0
+      ? { cx: sx(out[i]), cy: Y, r: 8, fill: "none", stroke: colour(i), "stroke-width": 2 }
+      : { cx: sx(out[i]), cy: Y, r: 5.5, fill: colour(i), stroke: "#0e0e11", "stroke-width": 1 }));
     svg.setAttribute("aria-label", `Inputs −4 to 4 go to ${out.map(fmt).join(", ")}.`);
   }
 
