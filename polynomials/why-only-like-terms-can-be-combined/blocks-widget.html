@@ -26,7 +26,6 @@
     <button aria-pressed="false">2<span class="v">x</span>² + 3<span class="v">x</span></button>
   </div>
   <svg id="blocks" role="img"></svg>
-  <span class="tag" id="tag" aria-live="polite"></span>
 </div>
 
 <script src="../widget-base.js"></script>
@@ -77,7 +76,6 @@
     row(18 + 2 * ROW, all, S.terms.map((t) => t.name).join(" + ") + (same ? " = " + S.one : ""), W);
     const tag = same ? `five copies of the same block (${all[0].v}): one term, ${S.one}`
                      : `two different blocks (${S.terms[0].v} and ${S.terms[1].v}): it stays two terms`;
-    document.getElementById("tag").textContent = tag;
     svg.setAttribute("aria-label", tag);
   }
 
