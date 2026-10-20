@@ -333,28 +333,6 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Axis of Symmetry</h1>
     </header>
     <main>
-      <section class="col" aria-labelledby="adding-to-all-numbers">
-        <h2 id="adding-to-all-numbers">Adding To All Numbers</h2>
-        <p>Imagine performing addition on every number on the number line at once.</p>
-        <p>Every number moves in the same direction and the same distance.</p>
-        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=add" title="Interactive: choose a number to add to every number from -4 to 4; they all slide the same way and keep their order" style="height: 170px" scrolling="no" loading="lazy"></iframe>
-      </section>
-
-      <section class="col" aria-labelledby="multiplying-all-numbers-by-a-constant">
-        <h2 id="multiplying-all-numbers-by-a-constant">Multiplying All Numbers by a Constant</h2>
-        <p>Multiplying by a positive causes every number to spread out from each other. Specifically, each number moves \(x\) times its distance from \(0\).</p>
-        <p>Multiplying by a negative causes the same movement except every number swaps with its additive inverse counterpart before stretching outwards.</p>
-        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/line-widget.html?op=mul" title="Interactive: choose a number to multiply every number from -4 to 4 by; they stretch away from 0, collapse onto 0 at zero, and flip with their order reversed when it is negative" style="height: 170px" scrolling="no" loading="lazy"></iframe>
-      </section>
-
-      <section class="col" aria-labelledby="multiplying-all-numbers-by-themselves">
-        <h2 id="multiplying-all-numbers-by-themselves">Multiplying All Numbers by Themselves</h2>
-        <p>A negative times a negative is a positive.</p>
-        <p>All the negatives first turn \(180^\circ\) and land on their positive counterparts.</p>
-        <p>They then move a proportional distance relative to their own value.</p>
-        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/fold-widget.html" title="Interactive: slide to multiply each number from -3 to 3 by itself, first folding the negatives over 0, then stretching each number by its own size" style="height: 190px" scrolling="no" loading="lazy"></iframe>
-      </section>
-
       <section class="col" aria-labelledby="why-x-squared-is-symmetric">
         <h2 id="why-x-squared-is-symmetric">Why Is \(f(x)=x^2\) Symmetric?</h2>
         <p>Opposite inputs produce identical outputs:</p>
@@ -504,21 +482,7 @@ f\left(-\tfrac{b}{2}+k\right)&amp;=\left(-\tfrac{b}{2}+k\right)^2+b\left(-\tfrac
         </ul>
         <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/pairs-widget.html" title="Interactive: choose a distance from 0; for the two opposite inputs, the x squared parts match and the 2x parts point opposite ways" style="height: 150px" scrolling="no" loading="lazy"></iframe>
         <p>Added together, \(3\) gives \(15\) but \(-3\) gives \(3\). The outputs are no longer symmetric about \(0\).</p>
-        <p>But the fold hasn't gone. \(x^2+2x\) still falls and then rises, so its outputs still come in pairs, around a different point. Following the calculation one step at a time shows where.</p>
-      </section>
-
-      <section class="col" aria-labelledby="following-a-calculation-step-by-step">
-        <h2 id="following-a-calculation-step-by-step">Following a Calculation Step by Step</h2>
-        <p>Most expressions are built from several steps, not one. We can follow a handful of numbers through every step, one number line at a time. Each number keeps its colour, and a thread joins it from one line to the next.</p>
-        <p>In \(4x+3\), the numbers are stretched, then slid. Neither step lets two numbers meet, so seven inputs give seven different outputs, and \(4x+3=11\) has one solution.</p>
-        <p>In \(-2x+5\), the stretch is also a flip. The threads all cross and the order is reversed, but still nothing meets.</p>
-        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/chain-widget.html" title="Interactive: choose a calculation and follow a handful of numbers through each of its steps; threads that meet show two inputs landing on one output" style="height: 300px" scrolling="no" loading="lazy"></iframe>
-        <p>In \(x\cdot x\), the threads from opposite numbers meet in pairs.</p>
-        <p>\(x^2+2x\) can be built in three steps: slide by \(1\), multiply by itself, then slide back.</p>
-        <div class="math">\[(x+1)^2-1=x^2+2x+1-1=x^2+2x\]</div>
-        <p>The squaring step still folds at \(0\), but the numbers that are at \(0\) when they reach it started at \(x=-1\). So the pairs meet around \(-1\) instead.</p>
-        <p>\(x\cdot x\cdot x\) folds and then unfolds. Its last step multiplies the negative numbers by a negative again, which sends them back to the left. Nothing ends up together, which is why \(x^3=8\) has only one real solution, \(2\).</p>
-        <p>The sections above look more closely at why the fold moves to \(-1\), and finds where it sits for any quadratic.</p>
+        <p>But the fold hasn't gone. \(x^2+2x\) still falls and then rises, so its outputs still come in pairs, around a different point. Following the calculation one step at a time, on <a class="inline" href="polynomials-addition-multiplication-squaring.html">Addition, Multiplication, Squaring</a>, shows where.</p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
