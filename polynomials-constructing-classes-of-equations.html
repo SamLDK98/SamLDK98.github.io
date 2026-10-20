@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Constructing Classes of Equations | Polynomials | Sam Kirwan</title>
+  <title>Polynomials | Sam Kirwan</title>
   <meta name="description" content="Building classes of equations one ingredient at a time, why distribution and combining like terms lead to polynomials, and why the sum and product forms do different jobs." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -291,6 +291,9 @@
     .math::-webkit-scrollbar { height: 4px; }
     .math::-webkit-scrollbar-track { background: transparent; }
     .math::-webkit-scrollbar-thumb { background: rgba(238,242,252,0.16); border-radius: 4px; }
+    a.term-link { color: var(--stim); text-decoration: none; border-bottom: 1px dotted var(--stim); transition: color 0.2s ease, border-color 0.2s ease; }
+    a.term-link.solid { border-bottom-style: solid; }
+    a.term-link:hover, a.term-link:focus-visible { color: #ffd77a; border-bottom-color: #ffd77a; outline: none; }
   </style>
   <script>
     window.MathJax = {
@@ -309,188 +312,78 @@
   <div class="sheet">
     <header>
       <a class="crumb" href="polynomials.html">Polynomials</a>
-      <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Constructing Classes of Equations</h1>
+      <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Polynomials</h1>
     </header>
     <main>
-      <section class="col" aria-labelledby="the-general-forms-of-equations">
-        <h2 id="the-general-forms-of-equations">The General Forms of Equations</h2>
-        <p>We want to classify equations according to shared structures.</p>
-        <p>For each class we will:</p>
-        <ul>
-          <li>Identify the general structure that every equation in the class can be simplified to.</li>
-          <li>Rearrange that structure algebraically to create a general solution formula.</li>
-        </ul>
-        <p>We'll build increasingly complicated classes of equations, adding one new ingredient at a time.</p>
-        <h3>An Unknown = A Known</h3>
-        <p>What is the simplest equation?</p>
-        <div class="math">\[x=7\]</div>
-        <p>By definition it is already solved.</p>
-        <p>But for fun, let's identify the structure. If \(x\) is the unknown and \(c\) is a known constant:</p>
+      <section class="col" aria-label="Introduction" style="margin-top: clamp(1.4rem, 4vh, 2.2rem);">
+        <p>Identifying and classifying underlying structure in equations became a major part of the mathematical programme once we began to think of numbers symbolically.</p>
+        <p>A general algebraic structure can be rearranged to give a general solution formula; an infinite number of problems can become one solved problem.</p>
+        <p>Fundamentally, we are just combining like terms to simplify equations into particular structures.</p>
+        <p>We will focus on equations in one variable (univariate) and build increasingly complicated classes, adding one new ingredient at a time.</p>
+      </section>
+
+      <section class="col" aria-labelledby="univariate-linear-equations">
+        <h2 id="univariate-linear-equations">Univariate Linear Equations</h2>
+        <h3>An unknown with constants</h3>
+        <p>The simplest equation, for it's already solved! (Where \(x\) is an unknown and \(c\) is a constant.):</p>
         <div class="math">\[x=c\]</div>
-        <p>The general structure and the formula are the same thing.</p>
-        <p>Okay, that is a bit silly. Let's introduce something new.</p>
-        <h3>An Unknown, Constants, and Addition</h3>
-        <h4>Addition of constants permitted</h4>
-        <div class="pair">
-          <div>
-            <p>Let's now allow:</p>
-            <ul>
-              <li>One unknown.</li>
-              <li>Any number of constants.</li>
-              <li>Addition.</li>
-            </ul>
-            <p>(Subtraction is included in addition as it involves the addition of a negative number.)</p>
-          </div>
-          <div>
-            <div class="math">\[\begin{aligned}
+        <p>If we include the addition of constants, we can construct things like:</p>
+        <div class="math">\[\begin{aligned}
     x+2&amp;=7\\
-    x+2+3&amp;=7+10\\
-    x+2+3+4+2&amp;=3+7+10+6
+    x+2-3&amp;=7+10
     \end{aligned}\]</div>
-          </div>
-        </div>
-        <p>To find the structure these share, we need one idea:</p>
-        <p><strong>Any number of like terms can be combined into a single term.</strong></p>
-        <p>Constants are like terms: the sum of any set of constants is always another constant.</p>
-        <div class="math">\[\begin{array}{r}
-2 + 3 = 5 \\
-2 + 3 + 4 = 9 \\
-2 + 3 + 4 + 5 + 6 = 20
-\end{array}\]</div>
-        <p>So however many constants sit on one side of an equation, we can always replace them with a single symbol.</p>
-        <p>Call the sum of all constants on the left hand side \(b\), and the sum of all constants on the right hand side \(c\).</p>
-        <p>\(x\) is not a like term, so it can't be merged into \(b\).</p>
+        <p><a class="term-link" href="polynomials-why-only-like-terms-can-be-combined.html">Combining like terms</a> simplifies the constants on each side into single values, \(b\) and \(c\).</p>
         <iframe class="poly-widget" src="polynomials/constructing-classes-of-equations/collapse-widget.html?set=constants" title="Interactive: the constants on each side slide together into a single constant" style="height: 140px" scrolling="no" loading="lazy"></iframe>
-        <p>We could represent all of these equations algebraically as:</p>
+        <p>All of these equations share the structure:</p>
         <div class="math">\[x+b=c\]</div>
         <p>Rearranging to express \(x\) in terms of the known quantities gives the general solution formula:</p>
         <div class="math">\[x=c-b\]</div>
-        <h4>Adding copies of the unknown</h4>
-        <div class="pair">
-          <div>
-            <p>Let's expand the inclusion criteria:</p>
-            <ul>
-              <li><strong>Any number of copies of the unknown.</strong></li>
-              <li>Any number of constants.</li>
-              <li>Addition.</li>
-            </ul>
-          </div>
-          <div>
-            <div class="math">\[x+x+3=7\]</div>
-            <div class="math">\[x+x+x+x+3+4=7+13\]</div>
-            <div class="math">\[x+x+x+x+x+x+x+10=150\]</div>
-          </div>
-        </div>
-        <p>Copies of \(x\) are like terms too, so they can be combined into a single term: \(2x\), \(4x\), \(7x\).</p>
+        <h3>Adding copies of the unknown</h3>
+        <div class="math">\[\begin{aligned}
+    x+x+3&amp;=7\\
+    x+x+x+x+3+4&amp;=7+13
+    \end{aligned}\]</div>
+        <p>Copies of \(x\) are like terms too. They can be combined into a single term: \(2x\), \(4x\), \(7x\).</p>
         <iframe class="poly-widget" src="polynomials/constructing-classes-of-equations/collapse-widget.html?set=copies" title="Interactive: copies of x combine into 4x and the constants into single numbers" style="height: 140px" scrolling="no" loading="lazy"></iframe>
-        <p>The general structure under this expanded criteria is therefore:</p>
+        <p>The general structure:</p>
         <div class="math">\[ax+b=c\]</div>
-        <div class="pair">
-          <blockquote class="note"><p>The unknown now has a <strong>coefficient</strong>, \(a\): for now, the number of copies of \(x\). (Later a coefficient can be any known number, such as \(-3\) or \(\frac{1}{2}\).)</p><p>The previous structure, \(x+b=c\), is just the special case \(a=1\).</p><p>Each new structure can capture every expression the previous ones did.</p></blockquote>
-          <figure class="nest" aria-label="Three nested structures: x = c inside x + b = c inside ax + b = c">
-            <svg viewBox="0 0 300 214" role="img">
-              <rect x="3" y="3" width="294" height="208" rx="16" fill="none" stroke="rgba(238,242,252,0.22)" stroke-width="1.4" />
-              <rect x="27" y="50" width="246" height="138" rx="12" fill="none" stroke="rgba(238,242,252,0.32)" stroke-width="1.4" />
-              <rect x="51" y="97" width="198" height="68" rx="9" fill="rgba(232,163,61,0.06)" stroke="rgba(232,163,61,0.75)" stroke-width="1.4" />
-              <text x="21" y="34" font-size="19" fill="rgba(238,242,252,0.6)">ax + b = c</text>
-              <text x="45" y="81" font-size="19" fill="rgba(238,242,252,0.78)">x + b = c</text>
-              <text x="150" y="138" font-size="20" fill="#e8a33d" text-anchor="middle">x = c</text>
-            </svg>
-          </figure>
-        </div>
-        <p>The unknown can appear on both sides, too:</p>
-        <div class="math">\[3x+2=x+10\]</div>
-        <p>Subtracting \(x\) from both sides reveals our structure: \(2x+2=10\).</p>
+        <p>Which just adds a coefficient to our \(x\) term from the previous structure as we can now create copies of it.</p>
+        <p>Notice that we could also allow the multiplication by constants and we could not create any expressions that could not be represented by this structure.</p>
         <p>This is our first real class of equations: <strong>linear equations</strong>.</p>
-        <p>The formula for linear equations is the one we've already met:</p>
+        <p>The general solution formula is:</p>
         <div class="math">\[x=\frac{c-b}{a} \qquad (a\neq 0)\]</div>
-        <h3>Linear expressions</h3>
-        <p>Pause for a moment to make sure you really appreciate this:</p>
-        <ul>
-          <li>We could take any number of constants of any values (provided they are real numbers).</li>
-          <li>And any number of copies of the unknown.</li>
-          <li>Allow the operation of addition.</li>
-          <li>And we can always simplify to the structure \(ax+b\) (and this is enabled because we can combine like terms.)</li>
-        </ul>
-        <p>Adding two linear expressions just combines the like terms again.</p>
+        <p>Any expression we can form with the construction criteria we have just gone through is called a <strong>linear expression</strong>.</p>
+        <p>We can also add linear expressions together and the result is always another linear expression, or something even simpler: if the \(x\) terms cancel, only a constant is left.</p>
+        <div class="math">\[(2x+1)+(-2x+3)=4\]</div>
         <p>In general:</p>
         <div class="math">\[(a_1x+b_1)+(a_2x+b_2)=(a_1+a_2)x+(b_1+b_2)\]</div>
-        <p>The result is another linear expression, or something even simpler: if the \(x\) terms cancel, only a constant is left.</p>
-        <div class="math">\[(2x+1)+(-2x+3)=4\]</div>
-        <p>So addition never creates a new kind of term. It can only keep the kinds we already have, or lose one.</p>
-        <p>Linear expressions will matter in a moment, when we start multiplying.</p>
-        <h3>An Unknown, Constants, Addition, and Multiplication</h3>
-        <p>Can we also allow multiplication and keep the same general structure?</p>
-        <div class="math">\[ax+b=c\]</div>
-        <p>A product fits this structure only if it gives terms that are like the ones already in it: a constant, or a number of copies of \(x\).</p>
-        <p>Here are the products we could form from the things we have so far:</p>
-        <div class="scroll-x">
-          <table class="data cases">
-            <thead><tr><th></th><th>Product</th><th>Example</th><th>Fits \(ax+b=c\)?</th></tr></thead>
-            <tbody>
-              <tr><td>1</td><td>Constant × constant</td><td>\(3\cdot2=6\)</td><td><span class="tick" aria-label="yes">✓</span></td></tr>
-              <tr><td>2</td><td>Constant × the unknown</td><td>\(5\cdot x=5x\)</td><td><span class="tick" aria-label="yes">✓</span></td></tr>
-              <tr><td>3</td><td>Constant × linear expression</td><td>\(4(2x+5)=8x+20\)</td><td><span class="tick" aria-label="yes">✓</span></td></tr>
-              <tr><td>4</td><td>The unknown × the unknown</td><td>\(x\cdot x=x^2\)</td><td><span class="cross" aria-label="no">✗</span></td></tr>
-              <tr><td>5</td><td>The unknown × linear expression</td><td>\(x(3x+8)=3x^2+8x\)</td><td><span class="cross" aria-label="no">✗</span></td></tr>
-              <tr><td>6</td><td>Linear expression × linear expression</td><td>\((2x+1)(x+4)=2x^2+9x+4\)</td><td><span class="cross" aria-label="no">✗</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>So what's going on here?</p>
-        <h3>The distributive law</h3>
-        <p>Cases 3, 5 and 6 multiply <em>sums</em>. The <strong>distributive law</strong> says that multiplying a sum means multiplying each of its terms:</p>
-        <div class="math">\[p(q+r)=pq+pr\]</div>
-        <p>Applying it breaks every product of sums into a sum of products of <em>single terms</em>, and each of those is case 1, 2 or 4:</p>
-        <div class="math">\[\begin{aligned}
-4(2x+5)&amp;=\underbrace{4\cdot2x}_{\text{case 2}}+\underbrace{4\cdot5}_{\text{case 1}}=8x+20\\[4pt]
-x(3x+8)&amp;=\underbrace{x\cdot3x}_{\text{case 4}}+\underbrace{x\cdot8}_{\text{case 2}}=3x^2+8x\\[4pt]
-(2x+1)(x+4)&amp;=\underbrace{2x\cdot x}_{\text{case 4}}+\underbrace{2x\cdot4}_{\text{case 2}}+\underbrace{1\cdot x}_{\text{case 2}}+\underbrace{1\cdot4}_{\text{case 1}}\\[4pt]
-&amp;=2x^2+9x+4
-\end{aligned}\]</div>
-        <iframe class="poly-widget" src="polynomials/constructing-classes-of-equations/distribute-grid-widget.html" title="Interactive: choose a product and see every term multiplied by every term, each cell labelled with its case" style="height: 330px" scrolling="no" loading="lazy"></iframe>
-        <p>This is why distribution matters to our classification. Without it, every new way of multiplying brackets would be a new case to think about. With it, we only ever need to know how to multiply single terms.</p>
-        <p>It also explains the pattern of ticks and crosses. Cases 3, 5 and 6 inherit their answer from the single products inside them: case 3 contains only cases 1 and 2, while cases 5 and 6 each contain an \(x\) times an \(x\), which is case 4.</p>
-        <h3>Multiplying single terms</h3>
-        <p>So everything comes down to one question: what happens when single terms are multiplied?</p>
-        <p>Adding copies of \(x\) changes the <strong>coefficient</strong>:</p>
-        <div class="math">\[x+x=2x\qquad x+x+x=3x\qquad x+x+x+x=4x\]</div>
-        <p>Multiplying copies of \(x\) changes the <strong>exponent</strong>:</p>
-        <div class="math">\[x\cdot x=x^2\qquad x\cdot x\cdot x=x^3\qquad x\cdot x\cdot x\cdot x=x^4\]</div>
-        <iframe class="poly-widget" src="polynomials/constructing-classes-of-equations/count-power-widget.html" title="Interactive: choose how many copies of x; adding them sets the coefficient, multiplying them sets the exponent" style="height: 170px" scrolling="no" loading="lazy"></iframe>
-        <p>When two single terms are multiplied, the numbers multiply and the copies of \(x\) pile up, so the exponents add:</p>
-        <div class="math">\[(3x^2)(5x)=3\cdot5\cdot x\cdot x\cdot x=15x^3\]</div>
-        <p>A product that comes out as a constant or as copies of \(x\) can be absorbed into a term we already have. But \(x\cdot x\) can't: \(x^2\) is not a constant and not a number of copies of \(x\).</p>
-        <p>And terms with different exponents are unlike terms, so they can never be combined:</p>
-        <div class="math">\[3x+2x=5x\qquad\text{but}\qquad x^3+x^2\ \text{can't be simplified}\]</div>
-        <h3>Quadratic equations</h3>
-        <p>Once multiplication is allowed, an equation can contain three kinds of term: \(x^2\) terms, \(x\) terms and constants.</p>
-        <p>Distribute any brackets, combine like terms of each kind, and every such equation has at most one term of each kind on each side.</p>
-        <p>From here on it's simpler to move everything to one side, leaving \(0\) on the other. The general structure becomes:</p>
-        <div class="math">\[ax^2+bx+c=0\qquad(a\neq0)\]</div>
-        <blockquote class="note"><p>A note on letters: in this form \(c\) is the constant term on the left, not the right-hand side as before. This is the conventional way to write it. The linear structure can be moved over in the same way: \(ax+b=c\) becomes \(ax+(b-c)=0\), and since \(b-c\) is just another constant, we can write it as \(ax+b=0\).</p></blockquote>
-        <p>We call this class <strong>quadratic equations</strong>. (The condition \(a\neq0\) just says the \(x^2\) term is really there. If it isn't, the equation is linear.)</p>
-        <blockquote class="note"><p>Creating the formula for quadratics is not as straightforward as it was for linear equations. The last part of this section explains why, and the general formula gets a section of its own.</p></blockquote>
-        <p>And nothing stops us multiplying more copies of \(x\): \(x^3\), \(x^4\), and so on. Each new exponent is a new kind of term, and a new class of equation.</p>
+      </section>
+
+      <section class="col" aria-labelledby="quadratic-equations">
+        <h2 id="quadratic-equations">Quadratic Equations</h2>
+        <p>Univariate linear equations allow addition over constants and the unknown and multiplication by constants on other constants or the unknown.</p>
+        <p>However, if we allow multiplication outright we will encounter \(x^2\) terms.</p>
+        <p><a class="term-link solid" href="polynomials-why-only-like-terms-can-be-combined.html">Read here</a> if you are unsure why different powers are unlike terms.</p>
+        <p>We need to expand our previous general structure to allow for coefficients of \(x^2\):</p>
+        <div class="math">\[ax^2+bx+c=d\qquad(a\neq 0)\]</div>
+        <p>We call this class: <strong>quadratic equations</strong>.</p>
+        <blockquote class="note"><p>Creating the formula for quadratics is not as straightforward as it was for linear equations. We will explore this next.</p></blockquote>
+        <p>Adding \(ax^2\) terms can only produce another \(ax^2\) term; however, multiplying \(x\)-terms can produce new exponents. This creates more and more classes of equations.</p>
+        <p>While each new exponent of \(x\) creates a new equation class, we can group all of these classes under a family: <strong>polynomial equations.</strong></p>
       </section>
 
       <section class="col" aria-labelledby="polynomial-equations">
         <h2 id="polynomial-equations">Polynomial Equations</h2>
-        <p>Let's take stock. We allow one unknown, any constants, and addition, subtraction and multiplication, as often as we like, on either side.</p>
-        <p>Two moves will always simplify such an equation:</p>
-        <ol>
-          <li><strong>Distribute</strong>, until no products of sums are left. Every term is now a single number times some number of copies of \(x\).</li>
-          <li><strong>Combine like terms</strong>, until there is at most one term for each exponent.</li>
-        </ol>
-        <p>Moving everything to one side then gives the general structure of every equation we can build:</p>
-        <div class="math">\[a_nx^n+\dots+a_2x^2+a_1x+a_0=0\]</div>
-        <p>The left-hand side is a <strong>polynomial</strong>: a sum of terms, each a constant times a whole-number power of \(x\).</p>
+        <p>Any equation that can be constructed under the following criteria is considered a polynomial equation:</p>
         <ul>
-          <li>Each \(a_kx^k\) is a <strong>term</strong>, and \(a_k\) is its <strong>coefficient</strong>.</li>
-          <li>\(a_0\), the term with no \(x\), is the <strong>constant term</strong>.</li>
-          <li>The highest exponent with a non-zero coefficient is the <strong>degree</strong>.</li>
+          <li>One unknown, \(x\)</li>
+          <li>Any number of constants</li>
+          <li>Addition, subtraction and multiplication (applied any finite number of times)</li>
         </ul>
-        <p>Every class we built is the family of polynomial equations of one degree:</p>
+        <p>Equations might become messy looking, but we can combine like terms and distribute until everything is expressed as a sum of terms (no products of sums), each term being a constant times a whole-number power of \(x\).</p>
+        <div class="math">\[a_nx^n+\dots+a_2x^2+a_1x+a_0=0\]</div>
+        <p>Rather than relying on a different name for each equation class, we can refer to them by their degree.</p>
+        <p>The degree of a polynomial refers to the highest exponent featured in it (after simplification).</p>
         <div class="scroll-x">
           <table class="data">
             <thead><tr><th>Degree</th><th>Name</th><th>General structure</th></tr></thead>
@@ -499,41 +392,10 @@ x(3x+8)&amp;=\underbrace{x\cdot3x}_{\text{case 4}}+\underbrace{x\cdot8}_{\text{c
               <tr><td>2</td><td>Quadratic</td><td>\(ax^2+bx+c=0\)</td></tr>
               <tr><td>3</td><td>Cubic</td><td>\(ax^3+bx^2+cx+d=0\)</td></tr>
               <tr><td>4</td><td>Quartic</td><td>\(ax^4+bx^3+cx^2+dx+e=0\)</td></tr>
+              <tr><td>5</td><td>Quintic</td><td>\(ax^5+bx^4+cx^3+dx^2+ex+f=0\)</td></tr>
             </tbody>
           </table>
         </div>
-        <h3>Simplify first, then classify</h3>
-        <p>We can only read off the class of an equation <em>after</em> distributing and combining like terms. Before that, it can look like something it isn't:</p>
-        <div class="math">\[x(x+3)=x^2+5\]</div>
-        <p>This looks quadratic. Distribute:</p>
-        <div class="math">\[x^2+3x=x^2+5\]</div>
-        <p>Now take \(x^2\) from both sides, and the \(x^2\) terms cancel:</p>
-        <div class="math">\[3x=5\]</div>
-        <p>It was a linear equation all along.</p>
-        <iframe class="poly-widget" src="polynomials/constructing-classes-of-equations/simplify-classify-widget.html" title="Interactive: distribute, then combine like terms, and the apparent quadratic turns out to be linear" style="height: 160px" scrolling="no" loading="lazy"></iframe>
-        <p>This shows what each move does to the degree:</p>
-        <ul>
-          <li><strong>Distributing never changes the degree.</strong> It only changes how the expression is written. When single terms multiply, their exponents add, so a product's degree is the sum of its factors' degrees: linear × linear is quadratic.</li>
-          <li><strong>Combining like terms can lower the degree</strong>, but only when the highest terms cancel, as \(x^2\) did here. It can never raise it.</li>
-        </ul>
-      </section>
-
-      <section class="col" aria-labelledby="sums-and-products-two-ways-to-write-the-same-thing">
-        <h2 id="sums-and-products-two-ways-to-write-the-same-thing">Sums and Products: Two Ways to Write the Same Thing</h2>
-        <p>Distributing turns a product into a sum of powers:</p>
-        <div class="math">\[(x-1)(x+7)=x^2+7x-x-7=x^2+6x-7\]</div>
-        <p>Both sides are the same polynomial, written two ways. Each way is good for something different.</p>
-        <p><strong>The sum of powers is the form for classifying.</strong> The degree and the coefficients can be read straight off it, so it tells us which class an equation is in, and its coefficients are exactly what a general solution formula takes as inputs.</p>
-        <p><strong>The product is the form for solving.</strong> If a product is zero, one of its factors must be zero:</p>
-        <div class="math">\[(x-1)(x+7)=0\quad\longrightarrow\quad x-1=0\ \text{ or }\ x+7=0\quad\longrightarrow\quad x=1\ \text{ or }\ x=-7\]</div>
-        <iframe class="poly-widget" src="polynomials/constructing-classes-of-equations/zero-product-widget.html" title="Interactive: move x along a number line; the product is zero exactly when one of its factors is" style="height: 180px" scrolling="no" loading="lazy"></iframe>
-        <p>In the sum form, the same equation is \(x^2+6x-7=0\), and it is much less obvious what \(x\) is.</p>
-        <p>The reason connects back to the previous page: solving means isolating the unknown.</p>
-        <p>In a linear equation, combining like terms gathers every copy of \(x\) into a single term, so there is one place to isolate it from.</p>
-        <p>In \(x^2+6x-7=0\), the unknown is spread across two unlike terms, \(x^2\) and \(6x\), that can never be combined. There is no single place to isolate it from.</p>
-        <p>The product form gathers the unknown back up. In \((x-1)(x+7)=0\), each factor contains \(x\) just once, and each can be solved on its own.</p>
-        <p>So distributing and combining like terms take us <em>towards</em> the general structure, which is what we need to classify. But solving asks us to go the other way: back from the sum to a form where \(x\) appears once.</p>
-        <p>Distributing is always mechanical. Going back is not, and that is why quadratics need more than rearranging. One way back, which works for every quadratic, is <a class="inline" href="algebra-completing-the-square.html">Completing the Square</a>: it rewrites \(x^2+6x-7=0\) as \((x+3)^2=16\), where \(x\) appears once.</p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
