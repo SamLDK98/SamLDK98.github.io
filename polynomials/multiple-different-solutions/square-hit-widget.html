@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>x times x, turning around</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: rgba(238, 242, 252, 0.66); }
+  svg text.name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 15px; fill: rgba(238, 242, 252, 0.88); }
+  svg text.hit { fill: var(--const); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="rows" role="img"></svg>
+  <input id="x" type="range" min="-4" max="4" step="0.25" value="-4" aria-label="Value of x" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The look of the copies widget, but x runs from −4 to 4. Top: x itself on a number line, which
+  // passes 9 nowhere and each value once. Bottom: x · x laid out from 0 against a target of 9. As x
+  // rises through the negatives the bar shrinks to nothing, then grows again, so it reaches 9 twice.
+  // Each value of x that hits 9 is marked on the top line and stays marked. x is held in quarters.
+  const slider = document.getElementById("x");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("rows");
+  const PAD = 8, TOP = 22, ROW = 52, BH = 14, H = TOP + 2 * ROW + 6, SCALE = 17;
+  const hits = new Set();
+  const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(4));
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const x = Math.round(+slider.value * 4) / 4, sq = x * x, hit = sq === 9;
+    if (hit) hits.add(x);
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+
+    // x on a number line from −4.5 to 4.5
+    const nx = (v) => PAD + ((v + 4.5) / 9) * (W - 2 * PAD);
+    const y1 = TOP + 22;
+    el("text", { x: PAD, y: y1 - 10, class: "name" }, "x");
+    el("line", { x1: PAD, x2: W - PAD, y1: y1 + 7, y2: y1 + 7, stroke: "rgba(238,242,252,0.22)" });
+    for (let u = -4; u <= 4; u++) {
+      el("line", { x1: nx(u), x2: nx(u), y1: y1 + 7, y2: y1 + (u === 0 ? 14 : 11), stroke: "rgba(238,242,252,0.25)" });
+      el("text", { x: nx(u), y: y1 + 25, "text-anchor": "middle" }, fmt(u));
+    }
+    hits.forEach((h) => el("line", { x1: nx(h), x2: nx(h), y1: y1 - 3, y2: y1 + 17, stroke: "#e8a33d", "stroke-width": 2 }));
+    el("circle", { cx: nx(x), cy: y1 + 7, r: 5.5, fill: "#64c8a0", stroke: "#0e0e11", "stroke-width": 1 });
+    el("text", { x: W - PAD, y: y1 - 10, "text-anchor": "end" }, "= " + fmt(x));
+
+    // x · x from 0, against 9
+    const sx = (v) => PAD + (Math.min(v, SCALE) / SCALE) * (W - 2 * PAD);
+    const y2 = TOP + ROW + 34;
+    el("line", { x1: sx(9), x2: sx(9), y1: y2 - 22, y2: y2 + BH + 6, stroke: "rgba(232,163,61,0.7)", "stroke-dasharray": "3 4" });
+    el("text", { x: sx(9) + 5, y: y2 - 14, class: "hit" }, "9");
+    el("text", { x: PAD, y: y2 - 6, class: "name" }, "x · x");
+    if (sq > 0) el("rect", { x: sx(0) + 0.5, y: y2, width: Math.max(1, sx(sq) - sx(0) - 1), height: BH, rx: 1.5, fill: "#7aa7ff", opacity: 0.9 });
+    el("text", { x: W - PAD, y: y2 - 6, "text-anchor": "end", class: hit ? "hit" : "" }, "= " + fmt(sq) + (hit ? `  ← x = ${fmt(x)}` : ""));
+
+    svg.setAttribute("aria-label", `x = ${fmt(x)}, x · x = ${fmt(sq)}.` + (hits.size ? ` x · x has reached 9 at x = ${[...hits].sort((a, b) => a - b).map(fmt).join(" and ")}.` : ""));
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adding a constant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.6rem); color: var(--txt); }
+  svg { display: block; width: 100%; overflow: visible; margin: 0.4rem 0 0.5rem; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  svg text.vertex { fill: var(--const); font-size: 10.5px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" id="expr" aria-hidden="true"></div>
+  <svg id="fig" role="img"></svg>
+  <input id="c" type="range" min="-6" max="6" step="1" value="4" aria-label="The constant added to x squared" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // x² + c for x from −3.5 to 3.5. The faint dashed curve is x² itself; the slider adds c to every
+  // output, so the whole curve, turning point included, moves straight up or down. The axis x = 0 stays.
+  const slider = document.getElementById("c");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const PAD = 10, H = 210, XR = 3.5, YR = [-7, 19];
+  const fmt = (n) => (n < 0 ? "−" : "") + Math.abs(n);
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function curve(c, sx, sy) {
+    let d = "";
+    for (let i = 0; i <= 140; i++) {
+      const x = -XR + (2 * XR * i) / 140;
+      d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(x * x + c).toFixed(1);
+    }
+    return d;
+  }
+
+  function render() {
+    const c = +slider.value;
+    document.getElementById("expr").innerHTML = c === 0 ? `<span class="v">x</span>²`
+      : `<span class="v">x</span>² ${c < 0 ? "−" : "+"} <span class="k-const">${Math.abs(c)}</span>`;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => W / 2 + (x / XR) * (W / 2 - PAD);
+    const sy = (y) => H - 6 - ((y - YR[0]) / (YR[1] - YR[0])) * (H - 12);
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.16)" });
+    el("line", { x1: sx(0), x2: sx(0), y1: 4, y2: H - 4, stroke: "rgba(238,242,252,0.4)", "stroke-dasharray": "3 4" });
+    el("text", { x: sx(0) + 6, y: 12 }, "x = 0");
+    el("path", { d: curve(0, sx, sy), fill: "none", stroke: "rgba(238,242,252,0.28)", "stroke-width": 1.2, "stroke-dasharray": "4 4" });
+    el("path", { d: curve(c, sx, sy), fill: "none", stroke: "rgba(244,246,255,0.85)", "stroke-width": 1.8 });
+    el("circle", { cx: sx(0), cy: sy(c), r: 5, fill: "#e8a33d", style: "filter: drop-shadow(0 0 5px rgba(232,163,61,0.8))" });
+    el("text", { x: sx(0) + 10, y: sy(c) + 4, class: "vertex" }, `(0, ${fmt(c)})`);
+    svg.setAttribute("aria-label", `The graph of x squared ${c < 0 ? "minus " + -c : "plus " + c}: the same curve moved ${c === 0 ? "nowhere" : Math.abs(c) + (c > 0 ? " up" : " down")}, turning at (0, ${fmt(c)}).`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
