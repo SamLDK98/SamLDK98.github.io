@@ -21,6 +21,7 @@
   svg.m1 .sqlab, svg.m1 .step { opacity: 0; }
   svg.m2 .sq, svg.m2 .sqlab, svg.m2 .move { opacity: 0; }
   svg.m2 .old { opacity: 0.2; }
+  svg.m0 .vsq { fill: #ff5d5d; }   /* x²'s own vertex, red while x² is shown alone */
 </style>
 </head>
 <body>
@@ -42,7 +43,7 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const IN = [-3, -2, -1, 0, 1, 2, 3, 4];
-  const BLUE = "#7aa7ff", AMBER = "#e8a33d";
+  const BLUE = "#7aa7ff", AMBER = "#e8a33d", RED = "#ff5d5d";
   const PAD = 12, PB = 294, H = 362, XR = [-3.6, 4.6], YR = [-2, 18.5];
   const fmt = (n) => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n);
   const f = (x) => x * x - 2 * x;
@@ -79,11 +80,11 @@
       el("text", { x: px, y: PB + 20, "text-anchor": "middle" }, String(x).replace("-", "−"));
       if (x !== 0) arrow(px, sy(0), y0 + r * 0.8 + 1, BLUE, 3, 11, "sq");
       el("text", { x: px, y: y0 - r - 7, "text-anchor": "middle", class: "amt g sqlab", style: small }, String(x * x));
-      el("circle", { cx: px, cy: y0, r: r * 0.8, fill: BLUE, class: "old" });
+      el("circle", { cx: px, cy: y0, r: r * 0.8, fill: BLUE, class: x === 0 ? "old vsq" : "old" });
       if (x !== 0) arrow(px, y0, y1 + (up ? 1 : -1) * (r + 1), AMBER, 3, 11, "move");
       const left = x !== 0 && x !== 1;
       el("text", { x: px + (left ? -gap : gap), y: (x === 0 || x === 1 ? y1 : (y0 + y1) / 2) + 5, "text-anchor": left ? "end" : "start", class: "amt move", style: small }, fmt(-2 * x));
-      el("circle", { cx: px, cy: y1, r, fill: AMBER, class: "new" });
+      el("circle", { cx: px, cy: y1, r, fill: x === 1 ? RED : AMBER, class: "new" });   // x² − 2x turns at 1
     });
 
     // each step right, drawn halfway between the inputs: x²'s change (blue), then −2x's change (amber)

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sliding in + 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.6rem); color: var(--txt); }
+  svg { display: block; width: 100%; overflow: visible; margin: 0.4rem 0 0.5rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" id="expr" aria-hidden="true"></div>
+  <svg id="fig" role="img"></svg>
+  <input id="c" type="range" min="0" max="5" step="0.1" value="0" aria-label="How much of + 5 is added to x squared" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Blue stems rise from the axis to x² at every quarter from −3 to 3; the slider grows a constant from 0
+  // to 5, and an amber line of that same length rises from every blue dot. Every output moves up by the
+  // same amount, so the curve keeps its shape and its vertex (red) stays on the y-axis, rising to (0, 5).
+  const slider = document.getElementById("c");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const IN = Array.from({ length: 25 }, (_, i) => -3 + i / 4);
+  const BLUE = "#7aa7ff", AMBER = "#e8a33d", RED = "#ff5d5d";
+  const PAD = 12, H = 300, XR = [-3.4, 3.4], YR = [-1, 14.5];
+  const fmt = (n) => String(+n.toFixed(1));
+
+  function el(name, attrs) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const c = Math.round(+slider.value * 10) / 10;
+    document.getElementById("expr").innerHTML = c === 0 ? `<span class="v">x</span>²`
+      : `<span class="v">x</span>² + <span class="k-const">${fmt(c)}</span>`;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => PAD + ((x - XR[0]) / (XR[1] - XR[0])) * (W - 2 * PAD);
+    const sy = (y) => H - 6 - ((y - YR[0]) / (YR[1] - YR[0])) * (H - 12);
+    const narrow = W < 420, r = narrow ? 2.6 : 3.4;
+
+    el("line", { x1: sx(0), x2: sx(0), y1: 4, y2: H - 4, stroke: "rgba(238,242,252,0.3)", "stroke-dasharray": "4 5" });
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.5)", "stroke-width": 1.5 });
+    IN.forEach((x) => {
+      const px = sx(x);
+      el("line", { x1: px, x2: px, y1: sy(0), y2: sy(x * x), stroke: BLUE, "stroke-width": narrow ? 1.5 : 2, opacity: c ? 0.45 : 0.8 });
+    });
+    IN.forEach((x) => {
+      const px = sx(x), y0 = sy(x * x), y1 = sy(x * x + c);
+      el("circle", { cx: px, cy: y0, r: x === 0 && !c ? r * 1.15 : r * 0.85, fill: x === 0 && !c ? RED : BLUE });
+      if (c) {
+        el("line", { x1: px, x2: px, y1: y0, y2: y1, stroke: AMBER, "stroke-width": narrow ? 2 : 2.5 });
+        el("circle", { cx: px, cy: y1, r: x === 0 ? r * 1.15 : r, fill: x === 0 ? RED : AMBER });
+      }
+    });
+    svg.setAttribute("aria-label", c === 0
+      ? "The outputs of x squared for inputs from −3 to 3, as blue stems rising from the x-axis; the vertex is at (0, 0)."
+      : `Adding ${fmt(c)}: an amber line ${fmt(c)} long rises from every blue output, so the whole curve moves up by ${fmt(c)} and its vertex moves to (0, ${fmt(c)}).`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

@@ -32,7 +32,7 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const IN = Array.from({ length: 33 }, (_, i) => -4 + i / 4);
-  const BLUE = "#7aa7ff", AMBER = "#e8a33d";
+  const BLUE = "#7aa7ff", AMBER = "#e8a33d", RED = "#ff5d5d";
   const PAD = 12, H = 340, XR = [-4.4, 4.4], YR = [-5.5, 17];
   const fmt = (n) => String(+Math.abs(n).toFixed(2));
 
@@ -84,6 +84,8 @@
         el("circle", { cx: px, cy: y1, r, fill: AMBER }, g);
       }
     });
+    // the vertex, (−b/2, −b²/4), in red; it lies between the stems unless b/2 is a quarter
+    el("circle", { cx: sx(-b / 2), cy: sy(-(b * b) / 4), r: r * 1.15, fill: RED }, g);
     const lo = -(b * b) / 4;
     svg.setAttribute("aria-label", b === 0
       ? "The outputs of x squared for inputs from −4 to 4, as blue stems rising from the x-axis; the lowest point is 0, at x = 0."

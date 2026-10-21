@@ -30,7 +30,7 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const IN = Array.from({ length: 29 }, (_, i) => -3 + i / 4);
-  const BLUE = "#7aa7ff", AMBER = "#e8a33d";
+  const BLUE = "#7aa7ff", AMBER = "#e8a33d", RED = "#ff5d5d";
   const PAD = 12, H = 300, XR = [-3.4, 4.4], YR = [-2, 17.5];
   const fmt = (n) => String(+n.toFixed(2));
 
@@ -66,6 +66,8 @@
         el("circle", { cx: px, cy: y1, r, fill: AMBER });
       }
     });
+    // the vertex, (b/2, −b²/4), in red; it lies between the stems unless b/2 is a quarter
+    el("circle", { cx: sx(b / 2), cy: sy(-(b * b) / 4), r: r * 1.15, fill: RED });
     svg.setAttribute("aria-label", b === 0
       ? "The outputs of x squared for inputs from −3 to 4, as blue stems rising from the x-axis."
       : `Adding −${fmt(b)}x: amber lines run from each blue output, up on the left of the y-axis and down on the right, to the outputs of x squared minus ${fmt(b)}x.`);
