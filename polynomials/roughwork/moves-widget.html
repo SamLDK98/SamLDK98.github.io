@@ -85,7 +85,7 @@
       }
       // labels sit left of their arrow, where the new curve never runs; 0 and 1 go right, clear of the dot at 0
       const left = x !== 0 && x !== 1;
-      el("text", { x: px + (left ? -gap : gap), y: (x === 0 ? y1 : (y0 + y1) / 2) + 5, "text-anchor": left ? "end" : "start", class: "amt move", style: narrow ? "font-size: 12px" : "" }, fmt(-2 * x));
+      el("text", { x: px + (left ? -gap : gap), y: (x === 0 || x === 1 ? y1 : (y0 + y1) / 2) + 5, "text-anchor": left ? "end" : "start", class: "amt move", style: narrow ? "font-size: 12px" : "" }, fmt(-2 * x));
       el("circle", { cx: px, cy: y1, r, fill: AMBER, class: "new" });
     });
     show();
