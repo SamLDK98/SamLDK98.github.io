@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sliding in −2x</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.6rem); color: var(--txt); }
+  svg { display: block; width: 100%; overflow: visible; margin: 0.4rem 0 0.5rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" id="expr" aria-hidden="true"></div>
+  <svg id="fig" role="img"></svg>
+  <input id="b" type="range" min="0" max="2" step="0.05" value="0" aria-label="How much of −2x is added to x squared" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The axis widget's picture, but with an input every quarter from −3 to 4, so the outputs read as a
+  // continuous curve. Blue stems rise from the axis to x²; the slider grows the −bx term from 0 to −2x,
+  // and an amber line runs from each blue dot to x² − bx: up on the left, down on the right.
+  const slider = document.getElementById("b");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const IN = Array.from({ length: 29 }, (_, i) => -3 + i / 4);
+  const BLUE = "#7aa7ff", AMBER = "#e8a33d";
+  const PAD = 12, H = 300, XR = [-3.4, 4.4], YR = [-2, 17.5];
+  const fmt = (n) => String(+n.toFixed(2));
+
+  function el(name, attrs) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const b = Math.round(+slider.value * 20) / 20;
+    document.getElementById("expr").innerHTML = b === 0 ? `<span class="v">x</span>²`
+      : `<span class="v">x</span>² − <span class="k-const">${b === 1 ? "" : fmt(b)}</span><span class="v k-const">x</span>`;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => PAD + ((x - XR[0]) / (XR[1] - XR[0])) * (W - 2 * PAD);
+    const sy = (y) => H - 6 - ((y - YR[0]) / (YR[1] - YR[0])) * (H - 12);
+    const narrow = W < 420, r = narrow ? 2.6 : 3.4;
+
+    el("line", { x1: sx(0), x2: sx(0), y1: 4, y2: H - 4, stroke: "rgba(238,242,252,0.3)", "stroke-dasharray": "4 5" });
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.5)", "stroke-width": 1.5 });
+    IN.forEach((x) => {
+      const px = sx(x), y0 = sy(x * x);
+      el("line", { x1: px, x2: px, y1: sy(0), y2: y0, stroke: BLUE, "stroke-width": narrow ? 1.5 : 2, opacity: b ? 0.45 : 0.8 });
+    });
+    IN.forEach((x) => {
+      const px = sx(x), y0 = sy(x * x), y1 = sy(x * x - b * x);
+      el("circle", { cx: px, cy: y0, r: r * 0.85, fill: BLUE });
+      if (b && x) {
+        el("line", { x1: px, x2: px, y1: y0, y2: y1, stroke: AMBER, "stroke-width": narrow ? 2 : 2.5 });
+        el("circle", { cx: px, cy: y1, r, fill: AMBER });
+      }
+    });
+    svg.setAttribute("aria-label", b === 0
+      ? "The outputs of x squared for inputs from −3 to 4, as blue stems rising from the x-axis."
+      : `Adding −${fmt(b)}x: amber lines run from each blue output, up on the left of the y-axis and down on the right, to the outputs of x squared minus ${fmt(b)}x.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
