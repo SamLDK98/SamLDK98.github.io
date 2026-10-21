@@ -13,9 +13,9 @@
   svg { display: block; width: 100%; overflow: visible; margin-top: 0.6rem; }
   svg text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
   svg text.amt { font-size: 14px; font-weight: 500; fill: var(--const); }
-  svg text.amt.g { fill: #b9bcc6; }
+  svg text.amt.g { fill: #a9c4ff; }
   .sq, .sqlab, .old, .move, .new, .step { transition: opacity 0.4s; }
-  /* x²: grey arrows from the axis.  add −2x: the moves on top.  step by step: each step's two changes. */
+  /* x²: blue arrows from the axis.  add −2x: the moves on top.  step by step: each step's two changes. */
   svg.m0 .move, svg.m0 .new, svg.m0 .step { opacity: 0; }
   svg.m1 .sq { opacity: 0.3; }
   svg.m1 .sqlab, svg.m1 .step { opacity: 0; }
@@ -35,14 +35,14 @@
 
 <script src="../widget-base.js"></script>
 <script>
-  // The same inputs, dots and arrows as the moves widget, now measured from the x-axis. Grey arrows rise
+  // The same inputs, dots and arrows as the moves widget, now measured from the x-axis. Blue arrows rise
   // from the axis to each output of x²; the amber −2x moves then go on from there, as before. Step by step
   // shows each step right as two changes: x² changes by 2x + 1 (−5, −3, −1, +1, +3, …) and −2x by −2 every
   // time. While x²'s change is below 2 the amber dots fall; from 1 to 2 it is +3, so they rise from there.
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const IN = [-3, -2, -1, 0, 1, 2, 3, 4];
-  const GREY = "#8d909a", AMBER = "#e8a33d";
+  const BLUE = "#7aa7ff", AMBER = "#e8a33d";
   const PAD = 12, PB = 294, H = 362, XR = [-3.6, 4.6], YR = [-2, 18.5];
   const fmt = (n) => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n);
   const f = (x) => x * x - 2 * x;
@@ -77,23 +77,23 @@
     IN.forEach((x) => {
       const px = sx(x), y0 = sy(x * x), y1 = sy(f(x)), up = y1 < y0;
       el("text", { x: px, y: PB + 20, "text-anchor": "middle" }, String(x).replace("-", "−"));
-      if (x !== 0) arrow(px, sy(0), y0 + r * 0.8 + 1, GREY, 3, 11, "sq");
+      if (x !== 0) arrow(px, sy(0), y0 + r * 0.8 + 1, BLUE, 3, 11, "sq");
       el("text", { x: px, y: y0 - r - 7, "text-anchor": "middle", class: "amt g sqlab", style: small }, String(x * x));
-      el("circle", { cx: px, cy: y0, r: r * 0.8, fill: GREY, class: "old" });
+      el("circle", { cx: px, cy: y0, r: r * 0.8, fill: BLUE, class: "old" });
       if (x !== 0) arrow(px, y0, y1 + (up ? 1 : -1) * (r + 1), AMBER, 3, 11, "move");
       const left = x !== 0 && x !== 1;
       el("text", { x: px + (left ? -gap : gap), y: (x === 0 || x === 1 ? y1 : (y0 + y1) / 2) + 5, "text-anchor": left ? "end" : "start", class: "amt move", style: small }, fmt(-2 * x));
       el("circle", { cx: px, cy: y1, r, fill: AMBER, class: "new" });
     });
 
-    // each step right, drawn halfway between the inputs: x²'s change (grey), then −2x's change (amber)
+    // each step right, drawn halfway between the inputs: x²'s change (blue), then −2x's change (amber)
     for (let x = IN[0]; x < IN[IN.length - 1]; x++) {
       const m = sx(x + 0.5), d = narrow ? 3.5 : 5, a = sy(f(x)), b = sy(f(x) + 2 * x + 1), c = sy(f(x + 1));
       const link = { stroke: "rgba(238,242,252,0.28)", "stroke-dasharray": "2 3", class: "step" };
       el("line", { x1: sx(x) + r, x2: m - d, y1: a, y2: a, ...link });
       el("line", { x1: m - d, x2: m + d, y1: b, y2: b, ...link });
       el("line", { x1: m + d, x2: sx(x + 1) - r, y1: c, y2: c, ...link });
-      arrow(m - d, a, b, GREY, 2.5, 8, "step");
+      arrow(m - d, a, b, BLUE, 2.5, 8, "step");
       arrow(m + d, b, c, AMBER, 2.5, 8, "step");
       el("text", { x: m, y: PB + 44, "text-anchor": "middle", class: "amt g step", style: small }, fmt(2 * x + 1));
       el("text", { x: m, y: PB + 62, "text-anchor": "middle", class: "amt step", style: small }, "−2");
@@ -105,7 +105,7 @@
   function show() {
     svg.setAttribute("class", "m" + mode);
     svg.setAttribute("aria-label", [
-      "The x-axis, with a grey arrow rising from it to each output of x squared at the inputs −3 to 4: 9, 4, 1, 0, 1, 4, 9, 16.",
+      "The x-axis, with a blue arrow rising from it to each output of x squared at the inputs −3 to 4: 9, 4, 1, 0, 1, 4, 9, 16.",
       "Each output of x squared then moved by −2x: +6, +4, +2, 0, −2, −4, −6, −8, giving 15, 8, 3, 0, −1, 0, 3, 8. The output at 1 goes below the axis.",
       "Each step right, x squared changes by −5, −3, −1, +1, +3, +5, +7 and −2x by −2 every time. Until x squared's change is more than 2 the outputs fall; from 1 to 2 it is +3, so they rise from there."][mode]);
   }
