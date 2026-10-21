@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Where x² − 4x turns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.2rem, 5.2vw, 1.6rem); color: var(--txt); margin-bottom: 0.4rem; }
+  svg { display: block; width: 100%; overflow: visible; margin-top: 0.6rem; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
+  svg text.amt { font-size: 13px; font-weight: 500; fill: var(--const); }
+  svg text.amt.g { fill: #a9c4ff; }
+  svg text.amt.r { fill: #ff5d5d; }
+  .tag { display: block; text-align: center; margin-top: 0.3rem; min-height: 2.4em; }
+  .sq, .lin, .old, .val, .step { transition: opacity 0.4s; }
+  /* the sizes: each term's value.  the changes: how much each term changes per step. */
+  svg.m0 .step { opacity: 0; }
+  svg.m1 .val { opacity: 0; }
+  svg.m1 .sq, svg.m1 .lin { opacity: 0.12; }
+  svg.m1 .old { opacity: 0.2; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" aria-hidden="true"><span class="v">x</span>² − <span class="k-const">4<span class="v">x</span></span></div>
+  <div class="choices" role="group" aria-label="What to show">
+    <button aria-pressed="true">the sizes</button>
+    <button aria-pressed="false">the changes</button>
+  </div>
+  <svg id="fig" role="img"></svg>
+  <span class="tag" id="tag" aria-live="polite"></span>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // x² − 4x at the inputs −1 to 5. The sizes: blue stems are x², amber lines are −4x, each labelled.
+  // At the turn, x = 2, −4x is −8, twice x² = 4; where the two are equal, x = 4, the output is back to 0.
+  // The changes: each step right, x² changes by 2x + 1 (−1, 1, 3, 5, 7, 9) and −4x by −4. The output falls
+  // while x² grows by less than 4 a step and rises once it grows by more; it crosses 4 at x = 2, the turn.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const IN = [-1, 0, 1, 2, 3, 4, 5];
+  const BLUE = "#7aa7ff", AMBER = "#e8a33d", RED = "#ff5d5d";
+  const PAD = 12, PB = 330, H = 398, XR = [-1.6, 5.6], YR = [-5.5, 27.5];
+  const fmt = (n) => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n);
+  const f = (x) => x * x - 4 * x;
+  const TAGS = [
+    "It turns at 2, where 4x (8) is twice x² (4). Where they are equal, at 4, the output is back to 0.",
+    "The output falls while x² grows by less than 4 a step, and rises once it grows by more.",
+  ];
+  let mode = 0;
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  // a vertical arrow at x = px from y = ya with its tip at y = yb
+  function arrow(px, ya, yb, col, w, head, cls) {
+    const s = yb < ya ? 1 : -1, len = Math.abs(yb - ya), h = Math.min(head, len * 0.6), base = yb + s * h;
+    el("line", { x1: px, x2: px, y1: ya, y2: base, stroke: col, "stroke-width": w, class: cls });
+    el("path", { d: `M${px - h * 0.55} ${base} L${px + h * 0.55} ${base} L${px} ${yb} Z`, fill: col, class: cls });
+  }
+
+  function render() {
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => PAD + ((x - XR[0]) / (XR[1] - XR[0])) * (W - 2 * PAD);
+    const sy = (y) => PB - ((y - YR[0]) / (YR[1] - YR[0])) * (PB - 8);
+    const narrow = W < 420, r = narrow ? 5 : 6.5, gap = narrow ? 7 : 10, small = narrow ? "font-size: 11.5px" : "";
+
+    el("line", { x1: sx(0), x2: sx(0), y1: 4, y2: PB + 2, stroke: "rgba(238,242,252,0.3)", "stroke-dasharray": "4 5" });
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.5)", "stroke-width": 1.5 });
+
+    IN.forEach((x) => {
+      const px = sx(x), y0 = sy(x * x), y1 = sy(f(x));
+      el("text", { x: px, y: PB + 20, "text-anchor": "middle" }, String(x).replace("-", "−"));
+      el("line", { x1: px, x2: px, y1: sy(0), y2: y0, stroke: BLUE, "stroke-width": 2.5, class: "sq" });
+      el("line", { x1: px, x2: px, y1: y0, y2: y1, stroke: AMBER, "stroke-width": 3, class: "lin" });
+      el("circle", { cx: px, cy: y0, r: r * 0.8, fill: BLUE, class: "old" });
+      // where −4x goes up (x < 0) the amber line runs above the blue dot, so its label goes to the right
+      el("text", x < 0 ? { x: px + r + 5, y: y0 + 4, class: "amt g val", style: small }
+        : { x: px, y: y0 - r - 6, "text-anchor": "middle", class: "amt g val", style: small }, String(x * x));
+      if (x) el("text", { x: px - gap, y: (x === 2 ? sy(2) : (y0 + y1) / 2) + 4, "text-anchor": "end", class: "amt val", style: small }, fmt(-4 * x));
+      el("circle", { cx: px, cy: y1, r: x === 2 ? r * 1.1 : r, fill: x === 2 ? RED : AMBER });
+    });
+    el("text", { x: sx(2) + r + 6, y: sy(f(2)) + 4, class: "amt r val", style: small }, "−4");
+
+    // each step right, drawn halfway between the inputs: x²'s change (blue), then −4x's change (amber)
+    for (let x = IN[0]; x < IN[IN.length - 1]; x++) {
+      const m = sx(x + 0.5), d = narrow ? 3.5 : 5, a = sy(f(x)), b = sy(f(x) + 2 * x + 1), c = sy(f(x + 1));
+      const link = { stroke: "rgba(238,242,252,0.28)", "stroke-dasharray": "2 3", class: "step" };
+      el("line", { x1: sx(x) + r, x2: m - d, y1: a, y2: a, ...link });
+      el("line", { x1: m - d, x2: m + d, y1: b, y2: b, ...link });
+      el("line", { x1: m + d, x2: sx(x + 1) - r, y1: c, y2: c, ...link });
+      arrow(m - d, a, b, BLUE, 2.5, 8, "step");
+      arrow(m + d, b, c, AMBER, 2.5, 8, "step");
+      el("text", { x: m, y: PB + 44, "text-anchor": "middle", class: "amt g step", style: small }, fmt(2 * x + 1));
+      el("text", { x: m, y: PB + 62, "text-anchor": "middle", class: "amt step", style: small }, "−4");
+    }
+    show();
+  }
+
+  // Switching mode only changes the svg's class, so the CSS transitions do the fading.
+  function show() {
+    svg.setAttribute("class", "m" + mode);
+    document.getElementById("tag").textContent = TAGS[mode];
+    svg.setAttribute("aria-label", [
+      "x squared minus 4x at the inputs −1 to 5. x squared is 1, 0, 1, 4, 9, 16, 25 and −4x is +4, 0, −4, −8, −12, −16, −20. The lowest output, −4, is at x = 2, where −4x is twice the size of x squared; at x = 4 they are the same size and the output is 0.",
+      "Each step right, x squared changes by −1, +1, +3, +5, +7, +9 and −4x by −4. The output falls while x squared grows by less than 4 a step, and rises once it grows by more, turning at x = 2.",
+    ][mode]);
+  }
+
+  const buttons = document.querySelectorAll(".choices button");
+  buttons.forEach((b, i) => b.addEventListener("click", () => {
+    buttons.forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+    mode = i;
+    show();
+  }));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
