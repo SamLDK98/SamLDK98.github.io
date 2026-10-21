@@ -348,13 +348,74 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Roughwork</h1>
     </header>
     <main>
-      <section class="col">
+      <section class="col" aria-labelledby="symmetry">
+        <h2 id="symmetry">Squaring and Adding a Constant</h2>
+        <p>It's relatively straightforward to sense how \(x^2\) has its symmetrical effect.</p>
+        <p>It treats positives and negatives as the same thing: \(3\) and \(-3\) both give \(9\).</p>
+        <p>Every output on the right of the \(y\)-axis is matched by the same output on the left, so the graph is a reflection of itself across the \(y\)-axis.</p>
+        <p>A constant just bumps everything up or down the \(y\)-axis, by increasing or decreasing every output by the same amount.</p>
+        <div class="math">\[f(x)=x^2+5\]</div>
+        <p>Every output rises by exactly \(5\), so the curve keeps its shape, and its vertex (red) stays on the \(y\)-axis, moving up to \((0,5)\).</p>
         <iframe class="poly-widget" src="polynomials/roughwork/constant-widget.html" title="Interactive: blue stems rise from the x-axis to x squared; slide to add a constant up to 5, and an amber line of the same length rises from every output, lifting the whole curve and its red vertex straight up" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="linear">
+        <h2 id="linear">Adding a Linear Term</h2>
+        <p>The effect of a linear term depends on which side of the \(y\)-axis the graph is on.</p>
+        <div class="math">\[f(x)=x^2-2x\]</div>
+        <p>The linear term adds to outputs on the left, where \(x\) is negative, and subtracts from outputs on the right, where \(x\) is positive.</p>
+        <p>This means everything on the left is raised up, while everything on the right is pulled down.</p>
         <iframe class="poly-widget" src="polynomials/roughwork/moves-widget.html" title="Interactive: the outputs of x squared at the inputs -3 to 4, each moved by -2x; trace the original parabola through the grey dots, or the new parabola, x squared minus 2x, through the moved dots" style="height: 380px" scrolling="no" loading="lazy"></iframe>
-        <iframe class="poly-widget" src="polynomials/roughwork/axis-widget.html" title="Interactive: grey arrows rise from the x-axis to each output of x squared; add -2x to move them, or go step by step, where x squared changes by -5, -3, -1, +1, +3, +5, +7 and -2x by -2 each time" style="height: 420px" scrolling="no" loading="lazy"></iframe>
+        <p>The amount an output is raised or pulled depends on its input, but each step to the right it changes by the same amount: two less every time.</p>
+        <div class="math">\[+6,\;+4,\;+2,\;0,\;-2,\;-4,\;-6,\;-8\]</div>
+        <p>Because the linear term's contribution changes at a constant rate, the moved outputs don't scatter. They land on a new parabola with exactly the same shape.</p>
+        <p>Trace both curves to compare them: the new one is the old one moved \(1\) right and \(1\) down, with its vertex at \((1,-1)\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="axis">
+        <h2 id="axis">Measuring From the \(x\)-Axis</h2>
+        <p>To see why the vertex ends up where it does, we need the \(x\)-axis, so we can measure what each term contributes.</p>
+        <p>The blue arrows are \(x^2\): each rises from the axis to that input's square. Add \(-2x\) and the amber arrows carry on from there.</p>
+        <iframe class="poly-widget" src="polynomials/roughwork/axis-widget.html" title="Interactive: blue arrows rise from the x-axis to each output of x squared; add -2x to move them, or go step by step, where x squared changes by -5, -3, -1, +1, +3, +5, +7 and -2x by -2 each time" style="height: 420px" scrolling="no" loading="lazy"></iframe>
+        <p>On the right, \(-2x\) pulls down, and at first it wins. At \(x=1\), \(x^2\) gives \(1\) but \(-2x\) takes away \(2\), so the output drops below the axis to \(-1\).</p>
+        <p>But the pull only grows by \(2\) each step, while \(x^2\) grows by more and more: \(1\), then \(3\), then \(5\), then \(7\).</p>
+        <p>From \(0\) to \(1\), \(x^2\) adds \(1\) and \(-2x\) takes \(2\), so the output falls. From \(1\) to \(2\), \(x^2\) adds \(3\), more than the \(2\) taken away, so the output rises, and it rises by more at every step after.</p>
+        <p>That's why the graph doesn't keep falling: it turns at \(x=1\), at its lowest output, \(-1\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="gaps">
+        <h2 id="gaps">Filling in the Gaps</h2>
+        <p>The dots so far sit at whole numbers, but the same thing happens at every input in between.</p>
+        <p>With many more inputs, the outputs of \(x^2\) read as a continuous curve. Slide the linear term in and every output moves at once: the left side lifts, the right side sinks, and the whole curve moves down and to the right without changing shape.</p>
         <iframe class="poly-widget" src="polynomials/roughwork/dense-widget.html" title="Interactive: blue stems rise from the x-axis to x squared at many inputs; slide to add -2x, and amber lines grow from each output, up on the left and down on the right" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section class="col" aria-labelledby="any">
+        <h2 id="any">Any Linear Term</h2>
+        <p>The linear term can be any size, positive or negative.</p>
+        <p>The bigger it is, either way, the further the vertex moves from the \(y\)-axis and the deeper it drops below the \(x\)-axis. A negative linear term moves the vertex right; a positive one moves it left.</p>
         <iframe class="poly-widget" src="polynomials/roughwork/wide-widget.html" title="Interactive: blue stems rise from the x-axis to x squared; slide the linear term from -4x to +4x, and amber lines grow from each output; the bigger the term, the deeper the lowest point sinks below the x-axis" style="height: 420px" scrolling="no" loading="lazy"></iframe>
+        <p>With \(-4x\) the vertex reaches \((2,-4)\), twice as far across as with \(-2x\) but four times as deep.</p>
+        <p>The depth grows faster than the distance: doubling the linear term doubles how far the vertex moves sideways, but quadruples how far it drops.</p>
+      </section>
+
+      <section class="col" aria-labelledby="turn">
+        <h2 id="turn">Where Exactly Does It Turn?</h2>
+        <div class="math">\[f(x)=x^2-4x\]</div>
+        <p>You might expect the graph to turn where the two terms are the same size.</p>
+        <p>But at \(x=4\), where \(x^2=16\) and \(4x=16\), the terms cancel completely and the output is \(0\): the graph is back on the \(x\)-axis.</p>
+        <p>It actually turns at \(x=2\), where the linear term (\(8\)) is twice the size of \(x^2\) (\(4\)).</p>
         <iframe class="poly-widget" src="polynomials/roughwork/turn-widget.html" title="Interactive: x squared minus 4x at the inputs -1 to 5; the sizes view labels each term, the changes view shows how much each term changes per step; it turns at x = 2, where x squared starts growing by more than 4 a step" style="height: 520px" scrolling="no" loading="lazy"></iframe>
+        <p>The reason is in the changes, not the sizes.</p>
+        <p>Each step to the right, \(-4x\) takes away \(4\), while \(x^2\) adds \(1\), then \(3\), then \(5\), and so on.</p>
+        <p>While \(x^2\) adds less than \(4\), the output falls. Once it adds more, the output rises.</p>
+        <p>So the graph turns where \(x^2\) is growing at the same rate as the linear term is taking away. Over a step centred on any input \(x\), \(x^2\) grows by exactly \(2x\): from \(1.5\) to \(2.5\) it goes from \(2.25\) to \(6.25\), which is \(4\).</p>
+        <div class="math">\[2x=4 \qquad x=2\]</div>
+        <p>For any \(x^2-bx\), the turn comes where \(2x=b\), at half of \(b\).</p>
+        <p>Put that input into each term:</p>
+        <div class="math">\[x=\frac{b}{2} \qquad bx=\frac{b^2}{2} \qquad x^2=\frac{b^2}{4}\]</div>
+        <p>That's why the linear term is always twice the size of \(x^2\) at the turn.</p>
+        <p>The two terms only become equal further along, at \(x=b\), where the output is back to \(0\).</p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
