@@ -53,6 +53,17 @@
 
     ul { list-style: none; }
 
+    section + section { margin-top: 2.4rem; }
+
+    h2 {
+      margin-bottom: 0.95rem;
+      color: #e8a33d;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
     li + li { margin-top: 0.7rem; }
 
     a {
@@ -98,17 +109,30 @@
   <main>
     <h1>Polynomials</h1>
     <nav aria-label="Polynomials pages">
-      <ul>
-        <li><a href="polynomials-addition-multiplication-squaring.html">Addition, Multiplication, Squaring</a></li>
-        <li><a href="polynomials-why-only-like-terms-can-be-combined.html">Why Only Like Terms Can Be Combined</a></li>
-        <li><a href="polynomials-equations-and-general-solution-formulas.html">Equations and General Solution Formulas</a></li>
-        <li><a href="polynomials-constructing-classes-of-equations.html">Polynomials</a></li>
-        <li><a href="polynomials-where-do-multiple-different-solutions-come-from.html">Quadratics: Where Do Multiple Solutions Come From?</a></li>
-        <li><a href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a></li>
-        <li><a href="polynomials-multiple-solutions-2.html">Multiple Solutions (2)</a></li>
-        <li><a href="polynomials-sums-and-products.html">Sums and Products: Two Ways to Write the Same Thing</a></li>
-        <li><a href="polynomials-roots.html">Roots</a></li>
-      </ul>
+      <section aria-labelledby="g1">
+        <h2 id="g1">Algebraic Principles</h2>
+        <ul>
+          <li><a href="polynomials-addition-multiplication-squaring.html">Addition, Multiplication, Squaring</a></li>
+          <li><a href="polynomials-why-only-like-terms-can-be-combined.html">Why Only Like Terms Can Be Combined</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="g2">
+        <h2 id="g2">Conceptual Understanding</h2>
+        <ul>
+          <li><a href="polynomials-equations-and-general-solution-formulas.html">Equations and General Solution Formulas</a></li>
+          <li><a href="polynomials-constructing-classes-of-equations.html">Polynomials</a></li>
+          <li><a href="polynomials-where-do-multiple-different-solutions-come-from.html">Quadratics: Where Do Multiple Solutions Come From?</a></li>
+          <li><a href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a></li>
+          <li><a href="polynomials-multiple-solutions-2.html">Multiple Solutions (2)</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="g3">
+        <h2 id="g3">Methods and Techniques</h2>
+        <ul>
+          <li><a href="polynomials-sums-and-products.html">Sums and Products: Two Ways to Write the Same Thing</a></li>
+          <li><a href="polynomials-roots.html">Roots</a></li>
+        </ul>
+      </section>
     </nav>
     <a class="back" href="index.html#math">← Math</a>
   </main>
