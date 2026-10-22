@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The step is the square root of the depth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { display: flex; justify-content: center; align-items: baseline; gap: 0 1.6em; flex-wrap: wrap; white-space: nowrap; font-size: clamp(1.15rem, 5vw, 1.55rem); color: var(--txt); }
+  .expr .disc { color: var(--dim); }
+  .expr .disc b { font-weight: 400; color: var(--txt); }
+  .expr .disc b.zero { color: #ff5d5d; }
+  svg { display: block; width: 100%; overflow: visible; margin: 0.4rem 0 0.5rem; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+  svg text.step { fill: var(--const); }
+  svg text.depth { fill: var(--sq); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr" aria-hidden="true"><span id="eq"></span><span class="disc">Δ = <b id="d"></b></span></div>
+  <svg id="fig" role="img"></svg>
+  <input id="c" type="range" min="0" max="24" step="1" value="7" aria-label="The constant term" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // x² − 4x + c, which is (x − 2)² − Δ/4 with Δ = 16 − 4c. The lowest point sits Δ/4 below the
+  // axis (blue); the curve climbs t² over a step t, so it meets the axis a step √(Δ/4) either side
+  // of x = 2 (amber). The slider holds c in quarters, so Δ is always whole and c = 4 (Δ = 0) is a stop.
+  const slider = document.getElementById("c");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const PAD = 12, H = 220, XR = [-1, 5], YR = [-4.6, 3.2];
+  const AMB = "#e8a33d", BLUE = "#7aa7ff", RED = "#ff5d5d";
+  const fmt = (n) => { const v = +n.toFixed(2); return (v < 0 ? "−" : "") + Math.abs(v); };
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const c = +slider.value / 4, D = 16 - 4 * c, depth = D / 4;
+    document.getElementById("eq").innerHTML = `<span class="v">x</span>² − 4<span class="v">x</span>`
+      + (c === 0 ? "" : ` ${c < 0 ? "−" : "+"} <span class="k-const">${fmt(Math.abs(c))}</span>`);
+    const dEl = document.getElementById("d");
+    dEl.textContent = fmt(D); dEl.className = D === 0 ? "zero" : "";
+
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (x) => PAD + ((x - XR[0]) / (XR[1] - XR[0])) * (W - 2 * PAD);
+    const sy = (y) => H - 6 - ((y - YR[0]) / (YR[1] - YR[0])) * (H - 12);
+    const defs = el("defs", {});
+    const clip = el("clipPath", { id: "plot" }, undefined, defs);
+    el("rect", { x: 0, y: 0, width: W, height: H }, undefined, clip);
+    const mk = el("marker", { id: "head", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, undefined, defs);
+    el("path", { d: "M0 1 L10 5 L0 9 z", fill: AMB }, undefined, mk);
+
+    const y0 = sy(0), xm = sx(2);
+    el("line", { x1: PAD, x2: W - PAD, y1: y0, y2: y0, stroke: "rgba(238,242,252,0.45)", "stroke-width": 1.2 });
+    el("line", { x1: xm, x2: xm, y1: 4, y2: H - 4, stroke: "rgba(238,242,252,0.22)", "stroke-dasharray": "3 4" });
+    let d = "";
+    for (let i = 0; i <= 160; i++) {
+      const x = XR[0] + ((XR[1] - XR[0]) * i) / 160;
+      d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(x * x - 4 * x + c).toFixed(1);
+    }
+    el("path", { d, fill: "none", stroke: "rgba(244,246,255,0.85)", "stroke-width": 1.8, "clip-path": "url(#plot)" });
+
+    // the depth: from the lowest point up (or down) to the axis
+    const yv = sy(-depth);
+    if (D !== 0) el("line", { x1: xm, x2: xm, y1: yv, y2: y0, stroke: BLUE, "stroke-width": 2.2 });
+    if (Math.abs(yv - y0) >= 8) {
+      // below the lowest point when it is under the axis, beside the bar when it is above
+      if (D > 0) el("text", { x: xm, y: yv + 17, "text-anchor": "middle", class: "depth" }, fmt(depth));
+      else el("text", { x: xm + 8, y: (yv + y0) / 2 + 4, class: "depth" }, fmt(depth));
+    }
+
+    if (D > 0) {
+      // the step, both ways from the axis
+      const s = Math.sqrt(depth), L = sx(2 + s) - xm, txt = fmt(s), w = 7 * txt.length;
+      if (L > 12) for (const side of [-1, 1]) {
+        el("line", { x1: xm, x2: xm + side * (L - 6), y1: y0, y2: y0, stroke: AMB, "stroke-width": 2.4, "marker-end": "url(#head)" });
+      }
+      if (L > w + 14) for (const side of [-1, 1]) {
+        el("text", { x: xm + side * L / 2, y: y0 - 9, "text-anchor": "middle", class: "step" }, txt);
+      }
+      for (const side of [-1, 1]) el("circle", { cx: xm + side * L, cy: y0, r: 5, fill: RED });
+    }
+    el("circle", { cx: xm, cy: yv, r: D === 0 ? 5.5 : 4, fill: D === 0 ? RED : BLUE,
+                   style: D === 0 ? "filter: drop-shadow(0 0 6px rgba(255,93,93,0.8))" : "" });
+
+    svg.setAttribute("aria-label", D > 0
+      ? `x squared minus 4x ${c < 0 ? "minus" : "plus"} ${fmt(Math.abs(c))}: discriminant ${fmt(D)}. The lowest point is ${fmt(depth)} below the axis, and the curve meets the axis ${fmt(Math.sqrt(depth))} either side of 2.`
+      : D === 0 ? "x squared minus 4x plus 4: discriminant 0. The lowest point sits on the axis, at 2: one solution."
+      : `x squared minus 4x plus ${fmt(c)}: discriminant ${fmt(D)}. The lowest point is ${fmt(-depth)} above the axis, so the curve never meets it: no real solutions.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

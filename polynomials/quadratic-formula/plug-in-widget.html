@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>One formula, every quadratic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  :root { --a: #7aa7ff; --b: #64c8a0; --c: #e8a33d; --root: #ff5d5d; }
+  .widget {
+    max-width: 660px; margin: 0 auto;
+    display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 1rem clamp(1.6rem, 6vw, 3.6rem);
+    font-size: clamp(1.05rem, 3.4vw, 1.35rem);
+  }
+  .a { color: var(--a); } .b { color: var(--b); } .c { color: var(--c); }
+
+  .cases { display: flex; flex-direction: column; gap: 0.5rem; }
+  .cases button {
+    font: inherit; font-size: 0.92em; background: none; border: 0; cursor: pointer; text-align: left; white-space: nowrap;
+    color: var(--txt); opacity: 0.32; padding: 0.15rem 0 0.15rem 0.9rem;
+    border-left: 1.5px solid transparent;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+  }
+  .cases button:hover { opacity: 0.6; }
+  .cases button[aria-pressed="true"] { opacity: 1; border-left-color: var(--faint); }
+  .cases button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+
+  .work { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; gap: 0.55rem 0.4em; color: var(--txt); }
+  .work .rhs { display: flex; align-items: center; white-space: nowrap; }
+  .tmpl { opacity: 0.55; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.2; margin-left: 0.3em; }
+  .frac > span:first-child { border-bottom: 1.2px solid currentColor; padding: 0 0.2em 0.1em; }
+  .frac > span:last-child { padding-top: 0.1em; }
+  .rt { white-space: nowrap; }
+  .rt .rad { display: inline-block; line-height: 1; border-top: 1.2px solid currentColor; padding: 0.1em 0.08em 0 0.05em; margin-left: 0.02em; }
+  .ans { color: var(--root); }
+  .none { color: var(--dim); font-style: italic; }
+  .step { transition: opacity 0.3s ease, transform 0.3s ease; }
+  .step.swap { opacity: 0; transform: translateY(5px); }
+
+  @media (max-width: 560px) {
+    .widget { grid-template-columns: 1fr; justify-items: center; gap: 1.1rem; }
+    .cases { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.3rem 1rem; font-size: 0.95em; }
+    .cases button { padding: 0.15rem 0 0.2rem; border-left: 0; border-bottom: 1.5px solid transparent; }
+    .cases button[aria-pressed="true"] { border-bottom-color: var(--faint); }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="cases" role="group" aria-label="Choose an equation"></div>
+
+  <div class="work" aria-live="polite">
+    <span class="v">x</span>
+    <span class="rhs tmpl">=<span class="frac"><span>−<span class="v b">b</span> ± <span class="rt">√<span class="rad"><span class="v b">b</span>² − 4<span class="v a">a</span><span class="v c">c</span></span></span></span><span>2<span class="v a">a</span></span></span></span>
+    <span></span><span class="rhs step" id="s1"></span>
+    <span></span><span class="rhs step" id="s2"></span>
+    <span></span><span class="rhs step" id="s3"></span>
+    <span></span><span class="rhs step" id="s4"></span>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The five equations from the page. Each line is the formula one step further on: the numbers put
+  // in where the letters were (each in brackets, coloured by its letter), the arithmetic done, the
+  // answer read as centre ± step, and the solutions. The last two lines are written out by hand so
+  // the surd stays exact; every line was checked against the quadratic itself.
+  const V = '<span class="v">x</span>';
+  const CASES = [
+    { a: 1, b: -5, c: 6,  frac: ["5 ± √1", "2"],   cs: "2.5 ± 0.5",  ans: `${V} = 2 &nbsp;or&nbsp; ${V} = 3` },
+    { a: 2, b: -3, c: -5, frac: ["3 ± √49", "4"],   cs: "0.75 ± 1.75", ans: `${V} = −1 &nbsp;or&nbsp; ${V} = 2.5` },
+    { a: 1, b: -2, c: -1, frac: ["2 ± √8", "2"],  cs: "1 ± √2",     ans: `${V} = 1 − √2 &nbsp;or&nbsp; ${V} = 1 + √2` },
+    { a: 1, b: 6,  c: 9,  frac: ["−6 ± √0", "2"],  cs: "−3 ± 0",     ans: `${V} = −3` },
+    { a: 1, b: -5, c: 7,  frac: ["5 ± √−3", "2"], cs: null,         ans: null },
+  ];
+  const sgn = (n) => (n < 0 ? "−" : "") + Math.abs(n);
+  const num = (n, k) => `<span class="${k}">(${sgn(n)})</span>`;
+  const term = (coef, pow, first) => {
+    if (coef === 0) return "";
+    const mag = Math.abs(coef) === 1 && pow ? "" : Math.abs(coef);
+    const sign = first ? (coef < 0 ? "−" : "") : (coef < 0 ? " − " : " + ");
+    return sign + mag + (pow === 2 ? `${V}²` : pow === 1 ? V : "");
+  };
+  const label = (q) => term(q.a, 2, true) + term(q.b, 1) + term(q.c, 0) + " = 0";
+  const frac = (top, bottom) => `=<span class="frac"><span>${top}</span><span>${bottom}</span></span>`;
+  const surd = (s) => s.replace(/√(−?\d+)/g, '<span class="rt">√<span class="rad">$1</span></span>');
+
+  const group = document.querySelector(".cases");
+  const lines = ["s1", "s2", "s3", "s4"].map((id) => document.getElementById(id));
+  let current = 0;
+
+  function show(i, instant) {
+    current = i;
+    const q = CASES[i], D = q.b * q.b - 4 * q.a * q.c;
+    const out = [
+      frac(`−${num(q.b, "b")} ± <span class="rt">√<span class="rad">${num(q.b, "b")}² − 4${num(q.a, "a")}${num(q.c, "c")}</span></span>`, `2${num(q.a, "a")}`),
+      frac(surd(q.frac[0]), q.frac[1]),
+      q.cs ? "= " + surd(q.cs) : `<span class="none">√${sgn(D)} is not a real number</span>`,
+      q.ans ? `<span class="ans">${surd(q.ans)}</span>` : `<span class="none">no real solutions</span>`,
+    ];
+    group.querySelectorAll("button").forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false"));
+    if (instant) { lines.forEach((el, j) => { el.innerHTML = out[j]; }); return; }
+    lines.forEach((el, j) => {
+      el.classList.add("swap");
+      setTimeout(() => { el.innerHTML = out[j]; el.classList.remove("swap"); if (j === 3 && window.postWidgetHeight) window.postWidgetHeight(); }, 160);
+    });
+  }
+
+  CASES.forEach((q, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.innerHTML = label(q);
+    b.addEventListener("click", () => { if (i !== current) show(i); });
+    group.appendChild(b);
+  });
+  show(0, true);
+</script>
+</body>
+</html>
