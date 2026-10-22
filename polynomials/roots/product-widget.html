@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Two factors and their product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .expr { text-align: center; white-space: nowrap; font-size: clamp(1.05rem, 4.6vw, 1.5rem); color: var(--txt); }
+  .expr .f { color: var(--lin); }
+  .expr .zero { color: #ff5d5d; }
+  .expr.form { color: var(--dim); font-size: clamp(0.95rem, 4vw, 1.2rem); margin-bottom: 0.1rem; }
+  svg { display: block; width: 100%; overflow: visible; margin: 0.4rem 0 0.5rem; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
+  svg text.root { fill: #ff5d5d; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="expr form" aria-hidden="true">(<span class="v">x</span> − 2)(<span class="v">x</span> − 5)</div>
+  <div class="expr" id="expr" aria-hidden="true"></div>
+  <svg id="fig" role="img"></svg>
+  <input id="x" type="range" min="0" max="7" step="0.1" value="3.5" aria-label="Value of x" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The two factors x − 2 and x − 5 as straight lines (green) and their product (x − 2)(x − 5) as a
+  // curve. The slider moves x; the readout multiplies the two factor values. The product is 0 exactly
+  // where one of the lines crosses the axis, at x = 2 and x = 5 (red), and nowhere else.
+  const slider = document.getElementById("x");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const PAD = 12, H = 260, XR = [-0.4, 7.4], YR = [-5.5, 10.5];
+  const fmt = (n) => { const v = +n.toFixed(2); return (v < 0 ? "−" : "") + Math.abs(v); };
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const x = Math.round(+slider.value * 10) / 10, a = +(x - 2).toFixed(1), b = +(x - 5).toFixed(1), p = +(a * b).toFixed(2);
+    const fac = (v) => `<span class="f${v === 0 ? " zero" : ""}">(${fmt(v)})</span>`;
+    document.getElementById("expr").innerHTML = `${fac(a)}${fac(b)} = <span class="${p === 0 ? "zero" : ""}">${fmt(p)}</span>`;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (v) => PAD + ((v - XR[0]) / (XR[1] - XR[0])) * (W - 2 * PAD);
+    const sy = (v) => H - 6 - ((v - YR[0]) / (YR[1] - YR[0])) * (H - 12);
+
+    el("line", { x1: PAD, x2: W - PAD, y1: sy(0), y2: sy(0), stroke: "rgba(238,242,252,0.45)", "stroke-width": 1.2 });
+    // the factors, straight lines through their roots (x − 5 dashed); each is told apart by where it crosses
+    for (const [r, dash] of [[2, ""], [5, "6 4"]]) {
+      const x0 = Math.max(XR[0], r + YR[0] + 0.2), x1 = Math.min(7.2, r + YR[1] - 0.2);
+      el("line", { x1: sx(x0), x2: sx(x1), y1: sy(x0 - r), y2: sy(x1 - r), stroke: "#64c8a0", "stroke-width": 1.6, opacity: 0.75, "stroke-dasharray": dash });
+    }
+    let d = "";
+    for (let i = 0; i <= 140; i++) {
+      const v = 0.2 + (6.6 * i) / 140;
+      d += (i ? "L" : "M") + sx(v).toFixed(1) + " " + sy((v - 2) * (v - 5)).toFixed(1);
+    }
+    el("path", { d, fill: "none", stroke: "rgba(244,246,255,0.85)", "stroke-width": 1.8 });
+    for (const r of [2, 5]) {
+      el("circle", { cx: sx(r), cy: sy(0), r: 5, fill: "#ff5d5d" });
+      el("text", { x: sx(r), y: sy(0) + 18, "text-anchor": "middle", class: "root" }, String(r));
+    }
+    // the current x: a faint guide, the two factor values and the product
+    el("line", { x1: sx(x), x2: sx(x), y1: 4, y2: H - 4, stroke: "rgba(238,242,252,0.22)", "stroke-dasharray": "3 4" });
+    el("circle", { cx: sx(x), cy: sy(a), r: 3.5, fill: "#64c8a0" });
+    el("circle", { cx: sx(x), cy: sy(b), r: 3.5, fill: "#64c8a0" });
+    el("circle", { cx: sx(x), cy: sy(p), r: 5, fill: p === 0 ? "#ff5d5d" : "#f4f6ff" });
+    svg.setAttribute("aria-label", `At x = ${fmt(x)}, x − 2 is ${fmt(a)} and x − 5 is ${fmt(b)}, so the product is ${fmt(p)}.` + (p === 0 ? " One factor is 0, so the product is 0." : ""));
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
