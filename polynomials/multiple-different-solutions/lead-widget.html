@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>x² against 5x</title>
+<title>x² against 4x</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -13,8 +13,9 @@
   svg { display: block; width: 100%; overflow: visible; }
   svg text { font-family: "IBM Plex Mono", monospace; font-size: 11px; }
   svg .name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 19px; }
-  svg .gap { font-family: "Spectral", Georgia, serif; font-size: 19px; fill: var(--const); transition: filter 0.25s ease; }
-  svg .gap.hit { filter: drop-shadow(0 0 6px rgba(232,163,61,0.9)); }
+  svg .gap { font-family: "Spectral", Georgia, serif; font-size: 19px; fill: var(--txt); transition: filter 0.25s ease; }
+  svg .gap.hit { filter: drop-shadow(0 0 6px rgba(244,246,255,0.9)); }
+  svg .gap.peak { fill: #ff5d5d; }
   svg .tick { fill: var(--dim); font-size: 10px; }
   svg .tick.on { fill: var(--txt); }
 </style>
@@ -22,19 +23,21 @@
 <body>
 <div class="widget">
   <svg id="bars" aria-hidden="true"></svg>
-  <input id="x" type="range" min="0" max="5" step="0.1" value="0.6" aria-label="Value of x" />
+  <input id="x" type="range" min="0" max="5" step="0.1" value="0.4" aria-label="Value of x" />
   <svg id="ticks" aria-hidden="true"></svg>
 </div>
 
 <script src="../widget-base.js"></script>
 <script>
-  // The same x fed to two processes: squared (blue) and multiplied by 5 (green).
-  // The amber band is how far 5x is ahead: 5x − x². Units are hundredths, so 6 is exact.
+  // The same x fed to two processes: squared (blue) and multiplied by 4 (amber, as the linear term is
+  // elsewhere on the page). The band is how far 4x is ahead: 4x − x², which glows at 3 (x = 1 and x = 3,
+  // the solutions of x² − 4x = −3) and turns red at its peak, 4, at the turning point x = 2.
+  // Units are hundredths, so 3 and 4 are exact.
   const NS = "http://www.w3.org/2000/svg";
   const bars = document.getElementById("bars"), ticks = document.getElementById("ticks");
   const slider = document.getElementById("x");
   const fmt = (n) => (n < 0 ? "−" : "") + String(+Math.abs(n).toFixed(2));
-  const SQ = "#7aa7ff", LIN = "#64c8a0", AMB = "#e8a33d";
+  const SQ = "#7aa7ff", LIN = "#e8a33d";
 
   function el(name, attrs, parent) {
     const e = document.createElementNS(NS, name);
@@ -47,7 +50,7 @@
 
   function render() {
     const t = Math.round(+slider.value * 10);
-    const sq = t * t, lin = 50 * t, gap = lin - sq;     // hundredths
+    const sq = t * t, lin = 40 * t, gap = lin - sq;     // hundredths
     const W = bars.clientWidth || 560;
     bars.setAttribute("viewBox", `0 0 ${W} ${H}`); bars.setAttribute("height", H);
     bars.textContent = "";
@@ -55,17 +58,17 @@
     const sx = (v) => x0 + (v / 2500) * (x1 - x0);
 
     el("text", { x: 0, y: R1 + BH - 2, class: "name", fill: SQ }, bars).textContent = "x²";
-    el("text", { x: 0, y: R2 + BH - 2, class: "name", fill: LIN }, bars).textContent = "5x";
+    el("text", { x: 0, y: R2 + BH - 2, class: "name", fill: LIN }, bars).textContent = "4x";
     for (const y of [R1, R2]) el("rect", { x: x0, y, width: x1 - x0, height: BH, rx: 2, fill: "rgba(238,242,252,0.04)" }, bars);
 
-    // the lead 5x has over x², spanning the space between the two bars
+    // the lead 4x has over x², spanning the space between the two bars
     if (gap > 0) {
       el("rect", { x: sx(sq), y: R1 + BH, width: sx(lin) - sx(sq), height: R2 - R1 - BH,
-                   fill: gap === 600 ? "rgba(232,163,61,0.22)" : "rgba(232,163,61,0.1)" }, bars);
-      for (const v of [sq, lin]) el("line", { x1: sx(v), x2: sx(v), y1: R1 + BH, y2: R2, stroke: "rgba(232,163,61,0.55)", "stroke-dasharray": "3 3" }, bars);
+                   fill: gap === 300 ? "rgba(238,242,252,0.16)" : "rgba(238,242,252,0.07)" }, bars);
+      for (const v of [sq, lin]) el("line", { x1: sx(v), x2: sx(v), y1: R1 + BH, y2: R2, stroke: "rgba(238,242,252,0.4)", "stroke-dasharray": "3 3" }, bars);
       if (sx(lin) - sx(sq) > 26)
         el("text", { x: (sx(sq) + sx(lin)) / 2, y: (R1 + BH + R2) / 2 + 6, "text-anchor": "middle",
-                     class: "gap" + (gap === 600 ? " hit" : "") }, bars).textContent = fmt(gap / 100);
+                     class: "gap" + (gap === 300 ? " hit" : gap === 400 ? " peak" : "") }, bars).textContent = fmt(gap / 100);
     }
 
     el("rect", { x: x0, y: R1, width: sx(sq) - x0, height: BH, rx: 2, fill: SQ, opacity: 0.85 }, bars);
