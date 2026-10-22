@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roots | Polynomials | Sam Kirwan</title>
-  <meta name="description" content="What the roots of a quadratic are, why setting an equation equal to zero helps, and how to build a quadratic from its roots with the zero-product law." />
+  <meta name="description" content="What a root is, how roots line up with solutions when an equation equals zero, and how to build a quadratic from its roots with the zero-product property." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -276,6 +276,19 @@
     .data.cases td:last-child { width: auto; text-align: center; }
     .data.cases th:last-child { text-align: center; }
     /* ---------- widgets and figures ---------- */
+    figure.graph { margin: 1.4rem 0; }
+    figure.graph svg { display: block; width: 100%; max-width: 420px; height: auto; margin-inline: auto; overflow: visible; }
+    figure.graph text { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--txt-3); }
+    figure.graph text.name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 16px; fill: var(--txt); }
+    figure.graph .ax { stroke: rgba(238,242,252,0.32); stroke-width: 1.2; }
+    figure.graph .fn { stroke: rgba(244,246,255,0.88); stroke-width: 2; }
+    figure.graph .guide { stroke: rgba(232,163,61,0.55); stroke-width: 1.2; stroke-dasharray: 4 4; }
+    figure.graph circle.out { fill: #e8a33d; }
+    figure.graph text.out { fill: #e8a33d; }
+    figure.graph circle.root { fill: #ff5d5d; }
+    figure.graph text.root { fill: #ff5d5d; }
+    .identity { margin: 1.2rem 0; }
+    @media (max-width: 420px) { .identity { font-size: 1rem; } }
     iframe.poly-widget { display: block; width: 100%; border: 0; margin: 1.6rem 0 1.8rem; overflow: hidden; background: transparent; }
     .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 clamp(1.5rem, 4vw, 3rem); align-items: center; margin: 0.95rem 0; }
     .pair > :first-child { margin-top: 0; }
@@ -348,44 +361,86 @@
       <h1 style="margin-top: clamp(1.2rem, 4vh, 2.4rem);">Roots</h1>
     </header>
     <main>
-      <section class="col" aria-labelledby="from-roots">
-        <h2 id="from-roots">Creating Quadratic Equations from Roots</h2>
-        <p>The roots of a quadratic function are the values of \(x\) that output \(0\).</p>
-        <p>We can rearrange a quadratic equation to give a quadratic function where the solutions for \(x\) align with the roots of the function.</p>
-        <p>For example:</p>
+      <section class="col" aria-labelledby="what-is">
+        <h2 id="what-is">What Is a Root?</h2>
+        <p>A function's roots are the input values that make its output equal zero.</p>
+        <p>Roots correspond to points that lie on the \(x\)-axis.</p>
+        <p>Imagine:</p>
+        <div class="math">\[2x=10\]</div>
+        <figure class="graph">
+          <svg viewBox="0 0 360 230" role="img" aria-label="The line f(x) = 2x. Its output is 10 at x = 5, marked in amber; it crosses the x-axis at 0, its root, marked in red.">
+            <line x1="14" x2="346" y1="182.3" y2="182.3" class="ax"/>
+            <line x1="76.2" x2="76.2" y1="14" y2="216" class="ax"/>
+            <line x1="26.5" y1="214.7" x2="333.6" y2="15.3" class="fn"/>
+            <line x1="76.2" x2="283.8" y1="47.7" y2="47.7" class="guide"/>
+            <line x1="283.8" x2="283.8" y1="47.7" y2="182.3" class="guide"/>
+            <text x="69.2" y="51.7" text-anchor="end" class="out">10</text>
+            <text x="283.8" y="198.3" text-anchor="middle">5</text>
+            <circle cx="283.8" cy="47.7" r="5" class="out"/>
+            <circle cx="76.2" cy="182.3" r="5" class="root"/>
+            <text x="85.2" y="198.3" class="root">root 0</text>
+            <text x="175.8" y="163.5" class="name">f(x) = 2x</text>
+          </svg>
+        </figure>
+        <p>If we rearrange it to equal zero, the solution remains the same, but the root of the corresponding function is now also \(5\).</p>
+        <div class="math">\[2x-10=0\]</div>
+        <figure class="graph">
+          <svg viewBox="0 0 360 230" role="img" aria-label="The line f(x) = 2x minus 10. It crosses the x-axis at 5, its root, marked in red.">
+            <line x1="14" x2="346" y1="47.7" y2="47.7" class="ax"/>
+            <line x1="76.2" x2="76.2" y1="14" y2="216" class="ax"/>
+            <line x1="26.5" y1="214.7" x2="333.6" y2="15.3" class="fn"/>
+            <circle cx="283.8" cy="47.7" r="5" class="root"/>
+            <text x="274.8" y="38.7" text-anchor="end" class="root">root 5</text>
+            <text x="200.8" y="189.1" class="name">f(x) = 2x − 10</text>
+          </svg>
+        </figure>
+        <p>Roots can be synonymous with solutions if the function corresponds to an equation equal to zero.</p>
+        <p>A quadratic example:</p>
         <p>\(f(x)=x^2\) is a quadratic function with a root at \(0\).</p>
         <p>\(x^2=9\) is a quadratic equation with solutions at \(3\) and \(-3\).</p>
         <p>\(f(x)=x^2-9\) is a quadratic function with roots at \(3\) and \(-3\).</p>
         <p>\(x^2-9=0\) is a quadratic equation with solutions at \(3\) and \(-3\).</p>
-        <p>Notice that subtracting \(9\) from \(x^2\) just lowered every output by \(9\).</p>
-        <p>So while \(9\) was the previous target output, it is now \(9-9\), so \(0\).</p>
-        <p>The new target outputs are \(0\), and our outputs correspond to height on the \(y\)-axis, so our new target outputs occur if and where the graph meets the \(x\)-axis.</p>
+        <p>Subtracting \(9\) lowers every output by \(9\), bringing both solutions onto the \(x\)-axis.</p>
         <iframe class="poly-widget" src="polynomials/roots/target-widget.html" title="Interactive: subtract from both sides of x squared = 9; the curve and the target line drop together and always meet at -3 and 3, until the target is 0, the x-axis" style="height: 320px" scrolling="no" loading="lazy"></iframe>
-        <p>While this geometric interpretation is nice, it's not the mechanistic reason that setting the equation equal to zero is so helpful.</p>
-        <p>Rather, it is a special property of multiplication called the zero-product rule that aids our solving methods so much.</p>
+        <p>Both solutions become roots of the function.</p>
       </section>
 
-      <section class="col" style="margin-top: 2.6rem; padding-top: 2.2rem; border-top: 1px solid var(--line);">
-        <p>Al-Khwarizmi used to refer to the base number in a squared term as a root.</p>
-        <div class="math">\[3^2=9\]</div>
-        <p>\(3\) was the root because from it grew the larger \(9\).</p>
-        <p>Roots in quadratics are special because from them the whole quadratic can be constructed.</p>
-        <p>If we know that a quadratic has roots:</p>
+      <section class="col" aria-labelledby="constructing">
+        <h2 id="constructing">Constructing Equations from Roots</h2>
+        <p>Roots are also special because quadratic equations can be constructed from them.</p>
+        <p>Let's say we need a quadratic that has roots:</p>
         <div class="math">\[x=2 \qquad x=5\]</div>
-        <p>We want to construct an equation that is satisfied by <strong>either</strong> of these values for \(x\).</p>
+        <p>We want to construct an equation that is satisfied by either of these values for \(x\).</p>
         <div class="math">\[x-2=0 \;\rightarrow\; \text{satisfied when } x=2\]</div>
         <div class="math">\[x-5=0 \;\rightarrow\; \text{satisfied when } x=5\]</div>
         <p>But we want one equation that can be satisfied by either!</p>
-        <p>We can use the <strong>zero-product law</strong>.</p>
-        <p>If two factors are multiplied, the output will be zero if and only if at least one of the factors is \(0\).</p>
+        <p>We can use the <strong>zero-product property</strong> of multiplication.</p>
+        <p>If two factors are multiplied, the output will be zero if and only if at least one of the factors is zero.</p>
         <blockquote class="note"><p>There are no two non-zero numbers that can be multiplied and produce \(0\).</p></blockquote>
-        <p>We can use these linear expressions as factors.</p>
-        <p>\((x-2)(x-5)\) can therefore become \(0\) if either factor is \(0\). That means there are two solutions to make \((x-2)(x-5)=0\):</p>
+        <p>We can use the linear expressions from our linear equations as factors.</p>
+        <p>\((x-2)(x-5)\) can therefore become zero if either factor is zero.</p>
+        <p>That means there are two solutions to make \((x-2)(x-5)=0\):</p>
         <div class="math">\[x=2 \qquad x=5\]</div>
         <iframe class="poly-widget" src="polynomials/roots/product-widget.html" title="Interactive: slide x; the factors x - 2 and x - 5 are straight lines and their product is a curve, which is 0 only where one of the lines crosses the axis, at 2 and 5" style="height: 330px" scrolling="no" loading="lazy"></iframe>
         <p>If we expand the product to give the sum of terms, it will look like a standard form quadratic.</p>
-        <div class="math">\[(x-2)(x-5)=x^2-7x+10\]</div>
+        <div class="math">\[x^2-7x+10\]</div>
         <p>We have created a quadratic whose roots are \(2\) and \(5\).</p>
+      </section>
+
+      <section class="col" aria-labelledby="product-vs-sum">
+        <h2 id="product-vs-sum">The Product vs. the Sum of Powers</h2>
+        <p>We have just seen that:</p>
+        <div class="math">\[(x-2)(x-5)=x^2-7x+10\]</div>
+        <p>One expresses the quadratic as a product of factors built from the roots; the other as a sum of powers of \(x\).</p>
+        <p>It looks like this \(-7\) and \(10\) just came out of nowhere.</p>
+        <p>But distributing the product reveals that:</p>
+        <ul>
+          <li>The \(-7\) comes from adding \(-2\) and \(-5\).</li>
+          <li>The \(10\) comes from multiplying \(-2\) and \(-5\).</li>
+        </ul>
+        <div class="math">\[\begin{aligned}&(x-2)(x-5)\\ &= x^2-5x-2x+10\\ &= x^2-7x+10\end{aligned}\]</div>
+        <p><strong>Product of Binomials with a Common Term</strong> identity:</p>
+        <div class="math identity">\[\boxed{(x+p)(x+q)=x^2+(p+q)x+pq}\]</div>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
