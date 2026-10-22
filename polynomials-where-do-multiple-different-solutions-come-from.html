@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Where Do Multiple Different Solutions Come From? | Polynomials | Sam Kirwan</title>
-  <meta name="description" content="Adding, multiplying and squaring every number at once, why x squared is symmetric, and how a linear term moves the axis of symmetry of any quadratic." />
+  <meta name="description" content="Why equations with one unknown usually have one solution, why x squared gives two, and how a linear term moves the turning point so a quadratic can have two different, non-opposite solutions." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -360,127 +360,83 @@
         <p>All the copies of \(x\) grow at the same rate and in the same direction, so they can only pass each constant once.</p>
         <div class="math">\[x=9\qquad 2x=9\qquad 3x=9\qquad 4x=9\]</div>
         <iframe class="poly-widget" src="polynomials/why-quadratics-are-tricky/copies-widget.html?mode=linear" title="Interactive: slide x; one, two, three and four copies of x laid end to end each reach 9 at exactly one value of x" style="height: 240px" scrolling="no" loading="lazy"></iframe>
+        <p>\(x^2-2x=8\) has one unknown but <strong>two different, non-opposite solutions</strong> (\(-2\) and \(4\)).</p>
+        <p>How can this be?</p>
       </section>
 
-      <section class="col" aria-labelledby="two-non-opposite">
-        <h2 id="two-non-opposite">How Can an Equation With One Unknown Have Two Non-Opposite Solutions?</h2>
-        <p>\(x^2\) can have two solutions, but they are always additive inverses: \(x^2=9\) is solved by \(3\) and \(-3\).</p>
-        <iframe class="poly-widget" src="polynomials/multiple-different-solutions/square-hit-widget.html" title="Interactive: slide x from -4 to 4; x times x shrinks to 0 and grows again, reaching 9 at x = -3 and again at x = 3" style="height: 150px" scrolling="no" loading="lazy"></iframe>
-        <p>\(x^2-5x=6\) has one unknown but <strong>two different, non-opposite solutions</strong> (\(-1\) and \(6\)).</p>
-        <p>There are four questions to unpack:</p>
-        <ol>
-          <li>Why does an \(x^2\) term produce symmetry?</li>
-          <li>Why does this symmetry have its turning point at \((0,0)\)?</li>
-          <li>Why does adding a constant to the function move it vertically?</li>
-          <li>How can adding a linear term move the turning point sideways?</li>
-        </ol>
-        <p>The linear term distinguishes between positive and negative inputs, so the function is no longer symmetric about zero. \(x^2\) gives opposite inputs the same output, but a linear term gives them opposite outputs: \(-2x\) is \(-6\) at \(x=3\) and \(+6\) at \(x=-3\). Added together, each opposite pair no longer lands on the same output.</p>
-
-        <h3 class="expr-h">\(x^2\)</h3>
-        <p>Squaring treats positive and negative values identically.</p>
-        <p>Every output except \(0\) therefore comes from two inputs.</p>
-        <p>Moving from negative inputs to positive ones, we pass every positive output twice.</p>
+      <section class="col" aria-labelledby="two-solutions">
+        <h2 id="two-solutions">How Can an Equation With One Unknown Have Two Solutions?</h2>
+        <p>\(x^2=c\) can have two solutions, but they are always additive inverses.</p>
+        <p>Two different inputs can give the same output for \(x^2\) because the negative and positive inputs are treated as identical.</p>
+        <p>This explains the symmetrical curve we see for \(f(x)=x^2\).</p>
         <figure class="plain">
           <svg viewBox="0 0 300 200" role="img" aria-label="The graph of x squared, with a vertical line down its middle: each half is the mirror image of the other.">
             <line x1="150" x2="150" y1="6" y2="196" stroke="rgba(232,163,61,0.7)" stroke-width="1.3" stroke-dasharray="3 4"/>
             <path d="M15.6 11.9 L17.8 17.7 L20.1 23.3 L22.3 28.9 L24.6 34.4 L26.8 39.7 L29.0 45.0 L31.3 50.2 L33.5 55.2 L35.8 60.2 L38.0 65.1 L40.2 69.9 L42.5 74.6 L44.7 79.2 L47.0 83.7 L49.2 88.1 L51.4 92.4 L53.7 96.6 L55.9 100.7 L58.2 104.7 L60.4 108.6 L62.6 112.5 L64.9 116.2 L67.1 119.8 L69.4 123.3 L71.6 126.8 L73.8 130.1 L76.1 133.3 L78.3 136.5 L80.6 139.5 L82.8 142.5 L85.0 145.3 L87.3 148.1 L89.5 150.7 L91.8 153.3 L94.0 155.8 L96.2 158.1 L98.5 160.4 L100.7 162.6 L103.0 164.7 L105.2 166.7 L107.4 168.5 L109.7 170.3 L111.9 172.0 L114.2 173.6 L116.4 175.1 L118.6 176.5 L120.9 177.8 L123.1 179.0 L125.4 180.1 L127.6 181.2 L129.8 182.1 L132.1 182.9 L134.3 183.6 L136.6 184.3 L138.8 184.8 L141.0 185.2 L143.3 185.6 L145.5 185.8 L147.8 186.0 L150.0 186.0 L152.2 186.0 L154.5 185.8 L156.7 185.6 L159.0 185.2 L161.2 184.8 L163.4 184.3 L165.7 183.6 L167.9 182.9 L170.2 182.1 L172.4 181.2 L174.6 180.1 L176.9 179.0 L179.1 177.8 L181.4 176.5 L183.6 175.1 L185.8 173.6 L188.1 172.0 L190.3 170.3 L192.6 168.5 L194.8 166.7 L197.0 164.7 L199.3 162.6 L201.5 160.4 L203.8 158.1 L206.0 155.8 L208.2 153.3 L210.5 150.7 L212.7 148.1 L215.0 145.3 L217.2 142.5 L219.4 139.5 L221.7 136.5 L223.9 133.3 L226.2 130.1 L228.4 126.8 L230.6 123.3 L232.9 119.8 L235.1 116.2 L237.4 112.5 L239.6 108.6 L241.8 104.7 L244.1 100.7 L246.3 96.6 L248.6 92.4 L250.8 88.1 L253.0 83.7 L255.3 79.2 L257.5 74.6 L259.8 69.9 L262.0 65.1 L264.2 60.2 L266.5 55.2 L268.7 50.2 L271.0 45.0 L273.2 39.7 L275.4 34.4 L277.7 28.9 L279.9 23.3 L282.2 17.7 L284.4 11.9" fill="none" stroke="rgba(244,246,255,0.85)" stroke-width="1.8"/>
           </svg>
         </figure>
-        <p>As we move from left to right on the number line, the numbers increase, but their size (absolute value) decreases before increasing after 0.</p>
-        <p>That's because \(-4&lt;-3\), but \(4&gt;3\) (\(-4\) is the smaller number, but has the bigger size).</p>
-        <figure class="plain">
-          <svg viewBox="0 0 340 176" role="img" aria-label="Inputs from -4 to 4 with bars for their squares: 16, 9, 4, 1, 0, 1, 4, 9, 16. The bars shrink to 0, then grow again in the same sizes.">
-            <line x1="12" x2="328" y1="134" y2="134" stroke="rgba(238,242,252,0.2)"/>
-            <rect x="17" y="34.8" width="18" height="99.2" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="26" y="28.8" text-anchor="middle" class="out">16</text>
-            <text x="26" y="152" text-anchor="middle">−4</text>
-            <rect x="53" y="78.2" width="18" height="55.8" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="62" y="72.2" text-anchor="middle" class="out">9</text>
-            <text x="62" y="152" text-anchor="middle">−3</text>
-            <rect x="89" y="109.2" width="18" height="24.8" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="98" y="103.2" text-anchor="middle" class="out">4</text>
-            <text x="98" y="152" text-anchor="middle">−2</text>
-            <rect x="125" y="127.8" width="18" height="6.2" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="134" y="121.8" text-anchor="middle" class="out">1</text>
-            <text x="134" y="152" text-anchor="middle">−1</text>
-            <circle cx="170" cy="134" r="3.4" fill="#e8a33d"/>
-            <text x="170" y="128.0" text-anchor="middle" class="out">0</text>
-            <text x="170" y="152" text-anchor="middle">0</text>
-            <rect x="197" y="127.8" width="18" height="6.2" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="206" y="121.8" text-anchor="middle" class="out">1</text>
-            <text x="206" y="152" text-anchor="middle">1</text>
-            <rect x="233" y="109.2" width="18" height="24.8" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="242" y="103.2" text-anchor="middle" class="out">4</text>
-            <text x="242" y="152" text-anchor="middle">2</text>
-            <rect x="269" y="78.2" width="18" height="55.8" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="278" y="72.2" text-anchor="middle" class="out">9</text>
-            <text x="278" y="152" text-anchor="middle">3</text>
-            <rect x="305" y="34.8" width="18" height="99.2" rx="1.5" fill="#7aa7ff" opacity="0.85"/>
-            <text x="314" y="28.8" text-anchor="middle" class="out">16</text>
-            <text x="314" y="152" text-anchor="middle">4</text>
-            <text x="170" y="174" text-anchor="middle" class="axis">input</text>
-          </svg>
-          <figcaption>Each successive negative input has a smaller output. Each successive positive input has a bigger output. The outputs are the same, their order is reversed.</figcaption>
-        </figure>
-        <p>Squaring ignores the sign, so the outputs decrease as we move toward 0 and then begin increasing again after 0.</p>
-        <p>This means the turning point of \(f(x)=x^2\) must occur at the \(x\)-coordinate 0.</p>
-        <p>The position on the \(y\)-axis is determined by the lowest output. Given the smallest square we can make is \(0\), that is where the \(y\)-coordinate must be.</p>
-        <p>The turning point, or vertex, of \(f(x)=x^2\) occurs at \((0,0)\).</p>
-        <p>Because opposite inputs give the same output, the symmetry is across the \(y\)-axis (but the axis of symmetry need not only be here!).</p>
-        <div class="scroll-x">
-          <table class="data htable">
-            <tbody>
-              <tr><th scope="row">Input</th><td>−5</td><td>−4</td><td class="hl"><strong>−3</strong></td><td>−2</td><td>−1</td><td>0</td><td>1</td><td>2</td><td class="hl"><strong>3</strong></td><td>4</td><td>5</td></tr>
-              <tr><th scope="row">Output</th><td>25</td><td>16</td><td class="hl"><strong>9</strong></td><td>4</td><td>1</td><td>0</td><td>1</td><td>4</td><td class="hl"><strong>9</strong></td><td>16</td><td>25</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <p>Although negatives and positives are treated identically, their order is reversed on the number line. We essentially have:</p>
+        <div class="math">\[5,\;4,\;3,\;2,\;1,\;0,\;1,\;2,\;3,\;4,\;5\]</div>
+        <p>Consequently, the outputs fall and rise in value.</p>
+        <p>Moving from negative inputs to positive ones, we pass every positive output twice.</p>
+        <p>The turning point occurs at the minimum (or maximum) output. The vertical line that runs through this point is the axis of symmetry, as the outputs on either side are symmetrical.</p>
+        <p>However, notice that the minimum or maximum output only occurs once. Its input is therefore the only input whose output isn't shared with any other input.</p>
+        <p>As outputs correspond to position on the \(y\)-axis, the lowest output of an upward-opening curve must have the lowest \(y\)-coordinate.</p>
+        <p>Here, the lowest output is \(0\) and this is given by the input \(0\).</p>
+        <p>Therefore the turning point (the lowest or highest point on the curve) is \((0,0)\).</p>
+        <blockquote class="note"><p>Remember that the input axis is the \(x\)-axis.</p></blockquote>
 
         <h3 class="expr-h">\(x^2+4\)</h3>
-        <p>Adding a constant value to every output lifts everything up or down.</p>
-        <p>It changes the \(y\)-coordinate, but not the \(x\)-coordinate of the lowest output value.</p>
-        <p>Technically it changes the \(y\)-coordinate, but not the \(x\)-coordinate, of every point on the graph!</p>
-        <p>So the turning point moves from \((0,0)\) to \((0,4)\), and the axis of symmetry stays at \(x=0\).</p>
+        <p>Adding a constant value lifts the graph up or down.</p>
+        <p>This is because it affects the graph uniformly. It adds \(4\) to an output whether the original value was \(2\), \(20\), or \(200\).</p>
+        <p>The axis of symmetry remains aligned with the \(y\)-axis, so opposite inputs still produce identical outputs. Those outputs are simply \(4\) greater than before.</p>
         <iframe class="poly-widget" src="polynomials/multiple-different-solutions/lift-widget.html" title="Interactive: slide the constant c; the graph of x squared plus c moves straight up or down, its turning point stays on the line x = 0" style="height: 270px" scrolling="no" loading="lazy"></iframe>
-
-        <h3 class="expr-h">\(x^2-2x\)</h3>
-        <p>The reason adding a constant just lifts everything up or down is because it affects the graph uniformly.</p>
-        <p>It adds 4 to an output whether the output would be \(2\), \(20\), or \(200\).</p>
-        <p>However, when \(x\) is also involved in another term, it is going to affect the output in proportion to the input's value.</p>
-        <p>But because the linear term is proportional to the input, its contribution changes at a constant rate.</p>
-        <p>If we increase the input by 1:</p>
-        <ul>
-          <li>\(-2x\) contributes 2 less to the output.</li>
-          <li>\(x^2\) changes by 2 more than it did on the previous step.</li>
-        </ul>
-        <p>Consider what happens when we combine these contributions:</p>
-        <div class="scroll-x">
-          <table class="data compact">
-            <thead><tr><th>Input movement</th><th>Change from \(x^2\)</th><th>Change from \(-2x\)</th><th>Total change</th></tr></thead>
-            <tbody>
-              <tr><td>−2 → −1</td><td class="c-sq">−3</td><td class="c-lin">−2</td><td>−5</td></tr>
-              <tr><td>−1 → 0</td><td class="c-sq">−1</td><td class="c-lin">−2</td><td>−3</td></tr>
-              <tr><td>0 → 1</td><td class="c-sq">+1</td><td class="c-lin">−2</td><td>−1</td></tr>
-              <tr><td>1 → 2</td><td class="c-sq">+3</td><td class="c-lin">−2</td><td>+1</td></tr>
-              <tr><td>2 → 3</td><td class="c-sq">+5</td><td class="c-lin">−2</td><td>+3</td></tr>
-              <tr><td>3 → 4</td><td class="c-sq">+7</td><td class="c-lin">−2</td><td>+5</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>Notice that the total changes still increase by 2 each time. <strong>The linear term changes the size of each change, but not the difference between successive changes.</strong></p>
-        <p>This explains why the parabola retains its shape.</p>
-        <iframe class="poly-widget" src="polynomials/multiple-different-solutions/changes-widget.html" title="Interactive: choose x squared, x squared minus 2x or x squared minus 5x; one bar per step shows the change in the output, the bars slide together, and the turn moves to x = 0, 1 or 2.5" style="height: 270px" scrolling="no" loading="lazy"></iframe>
       </section>
 
-      <section class="col" aria-labelledby="back-to-two">
-        <h2 id="back-to-two">Back to Two Different Solutions</h2>
-        <p>Read down the total change column: \(-5,-3,-1\), then \(+1,+3,+5\).</p>
-        <p>The outputs fall until \(x=1\), then rise by the same steps in reverse.</p>
-        <p>So the turning point has moved from \(0\) to \(1\), and the outputs now mirror each other around \(x=1\) instead of around \(0\).</p>
-        <p>Inputs the same distance either side of \(1\) give the same output: \(x^2-2x\) is \(3\) at both \(x=-1\) and \(x=3\).</p>
-        <p>So \(x^2-2x=3\) has two different, non-opposite solutions.</p>
-        <p>\(x^2-5x=6\) works the same way. With \(-5x\), each step's total change is \(5\) less than the change in \(x^2\): \(-2\) from \(1\) to \(2\), \(0\) from \(2\) to \(3\), \(+2\) from \(3\) to \(4\). The outputs at \(2\) and \(3\) are equal, so the turning point sits halfway between, at \(x=2.5\).</p>
-        <p>The solutions, \(-1\) and \(6\), are \(3.5\) either side of it.</p>
+      <section class="col" aria-labelledby="two-non-opposite">
+        <h2 id="two-non-opposite">How Can an Equation With One Unknown Have Two Different, Non-Opposite Solutions?</h2>
+        <p>It's relatively straightforward to sense how \(x^2\) can have this symmetrical effect. It treats positives and negatives as the same thing.</p>
+        <p>The outputs become reflections across the \(y\)-axis.</p>
+        <p>A constant just bumps everything up or down the \(y\)-axis by increasing or decreasing every output by the same amount.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-different-solutions/constant-widget.html" title="Interactive: blue stems rise from the x-axis to x squared; slide to add a constant up to 5, and an amber line of the same length rises from every output, lifting the whole curve and its red vertex straight up" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+        <p>Linear terms, however, add to outputs on one side while subtracting from those on the other.</p>
+        <p>A negative one raises the left side up, while pulling the right side down.</p>
+        <p>Take:</p>
+        <div class="math">\[f(x)=x^2-2x\]</div>
+        <p>Negative inputs lead to positive additions to the left side.</p>
+        <p>Positive inputs lead to subtractions on the right side.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-different-solutions/dense-widget.html" title="Interactive: blue stems rise from the x-axis to x squared at many inputs; slide to add -2x, and amber lines grow from each output, up on the left and down on the right" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+        <p>The amount an output is raised or pulled depends on its input, but each step to the right it changes by the same amount: two less every time.</p>
+        <div class="math">\[+6,\;+4,\;+2,\;0,\;-2,\;-4,\;-6,\;-8\]</div>
+        <iframe class="poly-widget" src="polynomials/multiple-different-solutions/moves-widget.html" title="Interactive: the outputs of x squared at the inputs -3 to 4, each moved by -2x; trace the original parabola through the grey dots, or the new parabola, x squared minus 2x, through the moved dots" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+        <p>At \(-3\): The output \(9\) is raised to \(15\).</p>
+        <p>However, at each successive step, the linear term's contribution decreases at a constant rate. The \(x^2\) term's contribution also decreases.</p>
+        <p>At \(-2\): The output \(4\) is raised to \(8\).</p>
+        <p>At \(-1\): The output \(1\) is raised to \(3\).</p>
+        <p>At \(0\): The output \(0\) has nothing added to it as \(-2(0)=0\).</p>
+        <p>There is then a period after \(0\) in which the \(x^2\) term does not contribute more positive output than the linear term contributes negative output.</p>
+        <p>At \(1\): The output \(1\) is pulled down to \(-1\).</p>
+        <p>Here, \(1^2=1\) was not strong enough to counteract the pulling down of \(-2(1)=-2\).</p>
+        <p>At \(2\): The output \(4\) is pulled down to \(0\).</p>
+        <p>At \(3\): The output \(9\) is pulled down to \(3\).</p>
+        <p>At \(4\): The output \(16\) is pulled down to \(8\).</p>
+        <p>The \(x^2\) term then begins to overtake the contribution of the linear term as it grows at a much faster rate. However, its output is still pulled down by the linear term.</p>
+
+        <h3 id="turn">Where Does the Graph Turn?</h3>
+        <p>The turning point will always be the point at which the linear term is twice the magnitude of the \(x^2\) term.</p>
+        <p>While the linear term grows at a constant rate, the \(x^2\) term accelerates.</p>
+        <p>After \(0\), typically, the \(x^2\) term will have a slower rate of change than the linear term. It will soon surpass it. The point at which the rate of change between the two is the same is the point at which the linear term's lead over the squared term is greatest.</p>
+        <div class="math">\[x^2-4x\]</div>
+        <p>The output is literally telling us the difference between the two terms.</p>
+        <p>For the most part the difference is positive as the \(x^2\) term will be greater.</p>
+        <p>However, after \(0\), we often see a period where the \(x^2\) term produces only a small output. Its rate of change is small but increasing.</p>
+        <p>The point at which the difference in rates of change between the two terms is \(0\) is the turning point. From here, \(x^2\) will only ever grow faster than the linear term.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-different-solutions/turn-widget.html" title="Interactive: x squared minus 4x at the inputs -1 to 5; the sizes view labels each term, the changes view shows how much each term changes per step; it turns at x = 2, where x squared starts growing by more than 4 a step" style="height: 520px" scrolling="no" loading="lazy"></iframe>
+        <p>See how greater or smaller linear terms affect the graph.</p>
+        <iframe class="poly-widget" src="polynomials/multiple-different-solutions/wide-widget.html" title="Interactive: blue stems rise from the x-axis to x squared; slide the linear term from -4x to +4x, and amber lines grow from each output; the bigger the term, the deeper the lowest point sinks below the x-axis" style="height: 420px" scrolling="no" loading="lazy"></iframe>
+        <p>Notice that the bigger it is, either way, the further the vertex moves from the \(y\)-axis and the deeper it drops below the \(x\)-axis. A negative linear term moves the vertex right; a positive one moves it left.</p>
+        <p>With \(-4x\) the vertex reaches \((2,-4)\), twice as far across as with \(-2x\) but four times as deep.</p>
+        <p>The depth grows faster than the distance: doubling the linear term doubles how far the vertex moves sideways, but quadruples how far it drops.</p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
