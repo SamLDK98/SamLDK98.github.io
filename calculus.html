@@ -7,61 +7,56 @@
   <title>Calculus | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="calculus.css" />
   <style>
-    body { display: flex; align-items: center; }
     body::before { height: 100%; }
+
+    /* a point closing in on a hole from both sides, and back again, across the whole screen */
+    .motif {
+      position: relative; z-index: 1;
+      display: block; width: 100%; height: clamp(170px, 30vh, 280px);
+      margin-top: clamp(1.5rem, 6vh, 3.5rem);
+    }
 
     main {
       position: relative; z-index: 1;
       width: min(40rem, calc(100% - 3rem));
-      margin-left: clamp(1.5rem, 11vw, 10rem);
-      padding: clamp(3rem, 9vh, 5.5rem) 0;
+      margin: 0 auto;
+      padding: clamp(1.8rem, 5vh, 3rem) 0 clamp(3rem, 9vh, 5rem);
+      text-align: center;
     }
 
-    h1 { margin-top: 0; font-size: clamp(3.6rem, 12vw, 6.6rem); }
+    h1 { margin-top: 0; font-size: clamp(3rem, 10vw, 5.6rem); }
 
-    /* a point closing in on a hole from both sides, and back again */
-    .motif { display: block; width: min(100%, 300px); height: auto; margin-top: 1.6rem; overflow: visible; }
-
-    nav { margin-top: clamp(2.2rem, 6vh, 3.6rem); }
+    nav { margin-top: clamp(2rem, 5vh, 3.2rem); }
     ul { list-style: none; }
     h2 {
       margin: 0 0 0.95rem;
-      font-family: "DM Mono", monospace;
+      font-family: "JetBrains Mono", monospace;
       font-size: 0.7rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
       color: var(--out);
     }
-    h2::before { content: none; }
     li + li { margin-top: 0.7rem; }
     nav a {
       display: inline-block;
-      font-family: "Newsreader", Georgia, serif;
-      font-size: clamp(1.15rem, 2vw, 1.35rem);
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-weight: 300;
+      font-size: clamp(1.2rem, 2vw, 1.4rem);
       color: var(--ink); text-decoration: none;
-      transition: color 180ms ease, transform 180ms ease;
+      transition: color 180ms ease;
     }
-    nav a:hover, nav a:focus-visible { color: var(--in); outline: none; transform: translateX(3px); }
+    nav a:hover, nav a:focus-visible { color: var(--in); outline: none; }
 
-    .back { display: inline-block; margin-top: 2.6rem; }
+    .back { display: inline-block; margin-top: 2.8rem; }
 
-    @media (max-width: 560px) { main { margin-left: 1.5rem; } }
     @media (prefers-reduced-motion: reduce) { nav a { transition: none; } }
   </style>
 </head>
 <body>
+  <svg class="motif" id="motif" aria-hidden="true"></svg>
   <main>
     <h1>Calculus</h1>
-    <svg class="motif" id="motif" viewBox="0 0 300 70" aria-hidden="true">
-      <line x1="0" x2="300" y1="62" y2="62" stroke="rgba(235,232,225,0.16)" stroke-width="1" />
-      <path d="M0 52 C 60 50, 110 12, 150 12 S 240 50, 300 52" fill="none" stroke="#ebe8e1" stroke-opacity="0.7" stroke-width="1.6" />
-      <line id="tl" x1="0" x2="0" y1="58" y2="66" stroke="#a99cff" stroke-width="1.8" />
-      <line id="tr" x1="0" x2="0" y1="58" y2="66" stroke="#a99cff" stroke-width="1.8" />
-      <circle id="dl" r="3.4" fill="#ebe8e1" />
-      <circle id="dr" r="3.4" fill="#ebe8e1" />
-      <circle cx="150" cy="12" r="4.4" fill="#0b0d11" stroke="#ebe8e1" stroke-width="1.5" />
-    </svg>
     <nav aria-label="Calculus pages">
       <section aria-labelledby="g1">
         <h2 id="g1">Foundations</h2>
@@ -73,30 +68,67 @@
     <a class="crumb back" href="index.html#math">Math</a>
   </main>
   <script>
-    // The motif's curve is a cubic pair; find the height above any x by bisecting each half.
+    // A bell-shaped curve across the full width with a hole at its peak. Two points slide in
+    // toward the hole from either side, ease back out, and never touch it; lilac ticks on the
+    // axis mark the inputs, coral ticks on the left mark their heights.
     (function () {
-      const seg = [[[0, 52], [60, 50], [110, 12], [150, 12]], [[150, 12], [190, 12], [240, 50], [300, 52]]];
-      const bez = (p, t, i) => { const u = 1 - t; return u*u*u*p[0][i] + 3*u*u*t*p[1][i] + 3*u*t*t*p[2][i] + t*t*t*p[3][i]; };
-      function yAt(x) {
-        const p = seg[x < 150 ? 0 : 1];
-        let lo = 0, hi = 1;
-        for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; if (bez(p, m, 0) < x) lo = m; else hi = m; }
-        return bez(p, lo, 1);
+      const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("motif");
+      const INK = "#ebe8e1", IN = "#a99cff", OUT = "#ff8c69";
+      let W, H, base, curveY, parts;
+
+      function el(name, attrs) {
+        const e = document.createElementNS(NS, name);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        svg.appendChild(e);
+        return e;
       }
-      const ids = ["dl", "dr", "tl", "tr"].map((id) => document.getElementById(id));
-      function place(gap) {
-        [150 - gap, 150 + gap].forEach((x, i) => {
-          ids[i].setAttribute("cx", x); ids[i].setAttribute("cy", yAt(x));
-          ids[i + 2].setAttribute("x1", x); ids[i + 2].setAttribute("x2", x);
+
+      function build() {
+        W = svg.clientWidth || 1000; H = svg.clientHeight || 220;
+        svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+        svg.textContent = "";
+        base = H - 26;
+        const top = 22, sig = Math.max(W * 0.13, 70);
+        curveY = (x) => base - 8 - (base - 8 - top) * Math.exp(-((x - W / 2) ** 2) / (2 * sig * sig));
+        el("line", { x1: 0, x2: W, y1: base, y2: base, stroke: "rgba(235,232,225,0.16)", "stroke-width": 1 });
+        let d = "";
+        for (let i = 0; i <= 240; i++) { const x = (W * i) / 240; d += (i ? "L" : "M") + x.toFixed(1) + " " + curveY(x).toFixed(1); }
+        el("path", { d, fill: "none", stroke: INK, "stroke-opacity": 0.75, "stroke-width": 1.6 });
+        parts = [-1, 1].map(() => ({
+          guide: el("line", { stroke: OUT, "stroke-opacity": 0.35, "stroke-dasharray": "2 4" }),
+          drop: el("line", { stroke: IN, "stroke-opacity": 0.35, "stroke-dasharray": "2 4" }),
+          tick: el("line", { stroke: IN, "stroke-width": 1.8 }),
+          mark: el("line", { stroke: OUT, "stroke-width": 1.8 }),
+          dot: el("circle", { r: 4, fill: INK }),
+        }));
+        el("circle", { cx: W / 2, cy: curveY(W / 2), r: 5.5, fill: "#0b0d11", stroke: INK, "stroke-width": 1.6 });
+      }
+
+      const set = (e, a) => { for (const k in a) e.setAttribute(k, a[k]); };
+      function place(k) {
+        // k = 1 far out, 0 resting against the hole's rim
+        const gap = 11 + k * Math.min(W * 0.3, 340), rail = 14;
+        [-1, 1].forEach((s, i) => {
+          const x = W / 2 + s * gap, y = curveY(x), p = parts[i];
+          set(p.dot, { cx: x, cy: y });
+          set(p.tick, { x1: x, x2: x, y1: base - 5, y2: base + 5 });
+          set(p.drop, { x1: x, x2: x, y1: y, y2: base });
+          set(p.mark, { x1: rail - 5, x2: rail + 5, y1: y, y2: y });
+          set(p.guide, { x1: rail, x2: x, y1: y, y2: y });
         });
       }
-      place(42);
+
+      let k = 0.45;
+      build(); place(k);
+      let rt;
+      window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { build(); place(k); }, 60); });
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const t0 = performance.now();
       (function tick(now) {
-        // ease in toward the hole, pause, drift back out: never touching it
-        const s = ((now - t0) / 5200) % 1, e = 0.5 - 0.5 * Math.cos(2 * Math.PI * s);
-        place(9 + 67 * Math.pow(1 - e, 1.6));
+        // ease in toward the hole, linger, drift back out
+        const s = ((now - t0) / 6400) % 1, e = 0.5 - 0.5 * Math.cos(2 * Math.PI * s);
+        k = Math.pow(1 - e, 1.6);
+        place(k);
         requestAnimationFrame(tick);
       })(t0);
     })();

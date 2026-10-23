@@ -23,7 +23,7 @@ body {
   min-height: 100svh;
   background: var(--bg);
   color: var(--body);
-  font-family: "Newsreader", Georgia, serif;
+  font-family: "Source Serif 4", Georgia, serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -48,7 +48,7 @@ body::before {
 header { padding: clamp(2rem, 7vh, 3.6rem) 0 clamp(1.4rem, 4vh, 2.2rem); }
 
 .crumb {
-  font-family: "DM Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--dim); text-decoration: none;
   transition: color 0.2s ease;
@@ -57,32 +57,22 @@ header { padding: clamp(2rem, 7vh, 3.6rem) 0 clamp(1.4rem, 4vh, 2.2rem); }
 .crumb:hover, .crumb:focus-visible { color: var(--ink); outline: none; }
 
 h1 {
-  font-family: "Instrument Serif", Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(3.2rem, 11vw, 5.8rem);
-  line-height: 0.95; letter-spacing: -0.015em;
+  font-family: "Inter Tight", system-ui, sans-serif;
+  font-weight: 300;
+  font-size: clamp(2.9rem, 10vw, 5rem);
+  line-height: 1; letter-spacing: -0.035em;
   color: var(--ink);
   margin-top: clamp(1.6rem, 5vh, 2.8rem);
 }
 
 /* ---------- prose ---------- */
-section { counter-increment: sec; }
-main { counter-reset: sec; }
-
 h2 {
-  font-family: "Instrument Serif", Georgia, serif;
+  font-family: "Inter Tight", system-ui, sans-serif;
   font-weight: 400;
-  font-size: clamp(1.75rem, 4.4vw, 2.35rem);
-  line-height: 1.1;
+  font-size: clamp(1.45rem, 3.6vw, 1.9rem);
+  line-height: 1.15; letter-spacing: -0.02em;
   color: var(--ink);
-  margin: clamp(3rem, 8vh, 4.4rem) 0 1.1rem;
-}
-h2::before {
-  content: counter(sec, decimal-leading-zero);
-  display: block;
-  font-family: "DM Mono", monospace;
-  font-size: 0.62rem; letter-spacing: 0.2em;
-  color: var(--dim); margin-bottom: 0.7rem;
+  margin: clamp(3rem, 8vh, 4.4rem) 0 1rem;
 }
 section:first-of-type h2 { margin-top: 0.6rem; }
 
@@ -131,7 +121,7 @@ mjx-container { color: inherit; }
 /* ---------- figures and widgets ---------- */
 figure.graph { margin: 1.6rem 0; }
 figure.graph svg { display: block; width: 100%; max-width: 400px; height: auto; margin-inline: auto; overflow: visible; }
-figure.graph text { font-family: "DM Mono", monospace; font-size: 12px; fill: var(--dim); }
+figure.graph text { font-family: "JetBrains Mono", monospace; font-size: 12px; fill: var(--dim); }
 figure.graph .ax { stroke: var(--faint); stroke-width: 1.2; }
 figure.graph .fn { stroke: var(--ink); stroke-width: 2; fill: none; stroke-linecap: round; }
 figure.graph .hole { fill: var(--bg); stroke: var(--ink); stroke-width: 1.8; }
@@ -153,7 +143,7 @@ iframe.calc-widget {
   padding: 1.5rem 0 3rem;
 }
 .foot-nav a {
-  font-family: "DM Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--dim); text-decoration: none;
   transition: color 0.2s ease;
