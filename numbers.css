@@ -1,0 +1,145 @@
+/* Numbers: the shared look for the section.
+   Near-black ground, warm white type in one family (Geist), and one accent:
+   yellow marks the column being worked on, and nothing else.
+   The only ornament is the place-value column itself, drawn as a faint rule. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #0f0f10;
+  --ink:   #f1eee7;
+  --body:  rgba(241, 238, 231, 0.82);
+  --dim:   rgba(241, 238, 231, 0.48);
+  --faint: rgba(241, 238, 231, 0.14);
+  --hair:  rgba(241, 238, 231, 0.07);
+  --hi:    #f2c14e;   /* the column being worked on */
+  --measure: 38rem;
+}
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--bg); }
+
+body {
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--body);
+  font-family: "Geist", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.sheet { width: min(var(--measure), 100% - 2.4rem); margin: 0 auto; }
+
+/* ---------- masthead ---------- */
+h1 {
+  font-weight: 300;
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  line-height: 1.06; letter-spacing: -0.035em;
+  color: var(--ink);
+  padding-top: clamp(2.8rem, 10vh, 5.5rem);
+}
+
+/* A numeral set in its columns. The rules fade at both ends, so they read as
+   columns rather than a box. */
+.hero {
+  display: flex; align-items: baseline;
+  margin: clamp(1.8rem, 5vh, 2.8rem) 0 clamp(1.6rem, 4vh, 2.4rem);
+  font-weight: 200;
+  font-size: clamp(4rem, 18.5vw, 8.4rem);
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.hero .d {
+  position: relative;
+  width: 0.8em; padding: 0.34em 0;
+  text-align: center;
+}
+.hero .d::before, .hero .d:last-child::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 1px;
+  background: linear-gradient(180deg, transparent, var(--faint) 28%, var(--faint) 72%, transparent);
+}
+.hero .d:last-child::after { left: auto; right: 0; }
+.hero .sep { width: 0; overflow: visible; font-size: 0.5em; color: var(--dim); transform: translateX(-0.24em); }
+
+/* ---------- prose ---------- */
+h2 {
+  font-weight: 400;
+  font-size: clamp(1.35rem, 3.3vw, 1.7rem);
+  line-height: 1.2; letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: clamp(3rem, 8vh, 4.2rem) 0 1rem;
+}
+
+p, li {
+  font-size: clamp(1.04rem, 2.3vw, 1.13rem);
+  line-height: 1.7;
+}
+p + p, ul + p, p + ul { margin-top: 0.95rem; }
+strong { color: var(--ink); font-weight: 500; }
+em { font-style: italic; }
+
+ul { list-style: none; }
+li { position: relative; padding-left: 1.15rem; }
+li + li { margin-top: 0.3rem; }
+li::before {
+  content: ""; position: absolute; left: 0; top: 0.86em;
+  width: 0.5rem; height: 1px; background: var(--dim);
+}
+
+/* a line of arithmetic, set like the prose but in ink */
+.eq {
+  margin: 1.15rem 0;
+  font-size: clamp(1.08rem, 2.6vw, 1.2rem);
+  line-height: 1.75;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-x: auto; overflow-y: hidden;
+}
+.eq span.row { display: block; white-space: nowrap; }
+.eq .ghost { visibility: hidden; }
+.eq sup { font-size: 0.66em; line-height: 0; }
+.eq + p, figure + p, iframe + p { margin-top: 0.95rem; }
+
+/* ---------- figures ---------- */
+iframe.num-widget {
+  display: block; width: 100%;
+  border: 0; overflow: hidden; background: transparent;
+  margin: 2rem 0;
+}
+
+/* Without a zero, a gap is the only clue; at the end there isn't even that. */
+figure.zero {
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 0.5rem clamp(1.6rem, 6vw, 3rem); align-items: baseline;
+  margin: 2rem 0;
+  font-weight: 300;
+  font-size: clamp(1.35rem, 4.4vw, 1.65rem);
+  line-height: 1.4;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+figure.zero .h {
+  font: 400 0.7rem "Geist Mono", ui-monospace, monospace;
+  letter-spacing: 0.04em; color: var(--dim);
+  padding-bottom: 0.35rem;
+}
+figure.zero .gap { display: inline-block; width: 0.6em; }
+figure.zero .alts { display: flex; flex-wrap: wrap; gap: 0 1.1em; }
+figure.zero .z { color: var(--hi); }
+
+/* ---------- footer nav ---------- */
+.foot-nav {
+  display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  border-top: 1px solid var(--hair);
+  margin-top: clamp(3rem, 8vh, 4.6rem);
+  padding: 1.5rem 0 3rem;
+}
+.foot-nav a {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 0.72rem; letter-spacing: 0.04em;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.2s ease;
+}
+.foot-nav a:hover, .foot-nav a:focus-visible { color: var(--ink); outline: none; }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>One number, four ways</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="n" type="range" min="0" max="1000" step="1" value="707" aria-label="The number to write" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // One number written four ways. Each row is drawn from its own sign list, and the count
+  // at the right is the length of that list, so the drawing and the count can't disagree.
+  // The slider is logarithmic over 1 to 3,999 (the largest standard Roman numeral).
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("n");
+  const NMAX = 3999, INK = "#f1eee7";
+  let n = 352;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  const ROMAN = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
+                 [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
+  function roman(v) {
+    let s = "";
+    for (const [k, t] of ROMAN) while (v >= k) { s += t; v -= k; }
+    return s;
+  }
+  // Egyptian: one sign per unit of each power of ten, largest first
+  function egyptian(v) {
+    return [["lotus", 1000], ["rope", 100], ["heel", 10], ["stroke", 1]]
+      .map(([g, p]) => ({ g, k: Math.floor(v / p) % 10 }))
+      .filter((c) => c.k > 0);
+  }
+
+  // the four Egyptian signs, drawn upward from (x, y) in a box s tall
+  const GW = { stroke: 4, heel: 12, rope: 13, lotus: 14 };
+  function glyph(g, x, y, s, parent) {
+    const a = { fill: "none", stroke: INK, "stroke-width": 1.35, "stroke-linecap": "round", "stroke-linejoin": "round" };
+    let d = "";
+    if (g === "stroke") d = `M${x + 2} ${y} V${y - s}`;
+    else if (g === "heel") d = `M${x} ${y} V${y - s * 0.45} C${x} ${y - s * 1.06} ${x + 12} ${y - s * 1.06} ${x + 12} ${y - s * 0.45} V${y}`;
+    else if (g === "rope") {
+      // a coil: a spiral of about one and a half turns, with its tail running down
+      const cx = x + 6.5, cy = y - s * 0.6;
+      for (let t = 0; t <= 3 * Math.PI; t += 0.2) {
+        const r = 0.9 + t * 0.6;
+        d += (t ? "L" : "M") + (cx + r * Math.cos(t)).toFixed(2) + " " + (cy + r * Math.sin(t) * 0.92).toFixed(2);
+      }
+      d += ` Q${x} ${y - s * 0.25} ${x + 4.5} ${y}`;
+    } else {
+      // a lotus: stem, a leaf, and a flower opening at the top
+      const cx = x + 6.5;
+      d = `M${cx} ${y} V${y - s * 0.62}` +
+          ` M${cx} ${y - s * 0.3} Q${cx + 6} ${y - s * 0.42} ${cx + 6.5} ${y - s * 0.1}` +
+          ` M${cx - 5} ${y - s * 0.98} Q${cx - 4} ${y - s * 0.6} ${cx} ${y - s * 0.62} Q${cx + 4} ${y - s * 0.6} ${cx + 5} ${y - s * 0.98}` +
+          ` M${cx} ${y - s * 0.62} V${y - s * 1.04}`;
+    }
+    el("path", Object.assign({ d }, a), undefined, parent);
+  }
+
+  function render() {
+    const W = svg.clientWidth || 560;
+    svg.textContent = "";
+    const LAB = 11, GAP_LAB = 10, GAP_ROW = 24;
+    let y = LAB;
+    const rows = [];
+    const label = (name, count) => {
+      el("text", { x: 0, y }, name);
+      el("text", { x: W, y, "text-anchor": "end" }, count === 1 ? "1 sign" : count.toLocaleString("en-GB") + " signs");
+    };
+
+    // tally: fives, four strokes and a slash, wrapped; after four lines the record fades out
+    label("Tally", n);
+    {
+      const sp = 3.2, pitch = 3 * sp + 8.2, hgt = 12, lineH = 19;
+      const perLine = Math.max(1, Math.floor((W + 8.2) / pitch));
+      const groups = Math.ceil(n / 5), lines = Math.ceil(groups / perLine);
+      // up to four lines are drawn in full; a longer tally shows two, then fades away
+      const CAP = 4, FADE = lines > CAP ? [1, 1, 0.42, 0.14] : [1, 1, 1, 1], shown = Math.min(lines, CAP);
+      const top = y + GAP_LAB;
+      for (let L = 0; L < shown; L++) {
+        const g = el("g", { stroke: INK, "stroke-width": 1.3, "stroke-linecap": "round", opacity: FADE[L] });
+        let d = "";
+        for (let j = 0; j < perLine; j++) {
+          const gi = L * perLine + j, left = n - gi * 5;
+          if (left <= 0) break;
+          const gx = j * pitch + 1.5, gy = top + L * lineH;
+          for (let k = 0; k < Math.min(4, left); k++) d += `M${(gx + k * sp).toFixed(1)} ${gy} v${hgt}`;
+          if (left >= 5) d += `M${(gx - 1.5).toFixed(1)} ${gy + hgt * 0.82} L${(gx + 3 * sp + 1.5).toFixed(1)} ${gy + hgt * 0.18}`;
+        }
+        el("path", { d }, undefined, g);
+      }
+      // the block keeps its full height whatever the number, so the page never jumps
+      y = top + CAP * lineH - (lineH - hgt);
+    }
+
+    // Egyptian: like signs grouped in up to two rows, as scribes stacked them
+    y += GAP_ROW + LAB;
+    const eg = egyptian(n);
+    label("Egyptian", eg.reduce((a, c) => a + c.k, 0));
+    {
+      const s = 17, rowGap = 5, top = y + GAP_LAB;
+      const base1 = top + s, base2 = top + 2 * s + rowGap;
+      let x = 0;
+      const g = el("g", {});
+      for (const c of eg) {
+        const upper = c.k > 4 ? Math.ceil(c.k / 2) : c.k, lower = c.k - upper, pitch = GW[c.g] + 3;
+        const mid = lower === 0 ? top + 1.5 * s + rowGap / 2 : base1;   // a single row sits mid-block
+        for (let i = 0; i < upper; i++) glyph(c.g, x + i * pitch, lower ? base1 : mid, s, g);
+        const off = (upper - lower) * pitch / 2;
+        for (let i = 0; i < lower; i++) glyph(c.g, x + off + i * pitch, base2, s, g);
+        x += upper * pitch + 9;
+      }
+      y = base2;
+    }
+
+    // Roman
+    y += GAP_ROW + LAB;
+    const r = roman(n);
+    label("Roman", r.length);
+    el("text", { x: 0, y: y + GAP_LAB + 17, style: `font: 300 21px Geist, system-ui, sans-serif; letter-spacing: 0.06em; fill: ${INK}` }, r);
+    y += GAP_LAB + 17;
+
+    // ours
+    y += GAP_ROW + LAB;
+    const h = String(n);
+    label("Hindu-Arabic", h.length);
+    el("text", { x: 0, y: y + GAP_LAB + 17, style: `font: 300 21px Geist, system-ui, sans-serif; letter-spacing: 0.02em; fill: ${INK}; font-variant-numeric: tabular-nums` }, h);
+    y += GAP_LAB + 17;
+
+    const H = Math.ceil(y + 6);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.setAttribute("aria-label", `${n} written four ways: as a tally of ${n} strokes, in Egyptian hieroglyphs with ${eg.reduce((a, c) => a + c.k, 0)} signs, in Roman numerals as ${r}, and in Hindu-Arabic digits as ${h}.`);
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  const toN = (t) => Math.max(1, Math.min(NMAX, Math.round(Math.exp((t / 1000) * Math.log(NMAX)))));
+  slider.addEventListener("input", () => { n = toN(+slider.value); render(); });
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+</script>
+</body>
+</html>

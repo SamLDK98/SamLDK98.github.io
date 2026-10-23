@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Hindu-Arabic Number System | Numbers | Sam Kirwan</title>
+  <meta name="description" content="How counting became writing, how grouping became place value, and why ten digits and a zero turn arithmetic into a procedure." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,200;0,300;0,400;0,500;1,400&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="numbers.css" />
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <h1>The Hindu-Arabic Number System</h1>
+      <p class="hero" aria-label="36,952"><span class="d">3</span><span class="d">6</span><span class="sep" aria-hidden="true">,</span><span class="d">9</span><span class="d">5</span><span class="d">2</span></p>
+    </header>
+
+    <main>
+      <section aria-label="Introduction">
+        <p>Thirty-six thousand, nine hundred and fifty-two.</p>
+
+        <p>This is a single quantity.</p>
+
+        <p>It is represented here by five digits, in a particular order.</p>
+
+        <p>This representation is a numeral of the <strong>Hindu-Arabic number system</strong>.</p>
+
+        <ul>
+          <li><strong>Digits</strong> are the elementary symbols.</li>
+          <li><strong>Numerals</strong> are written representations of numbers.</li>
+          <li><strong>Numbers</strong> are the concept of the quantity itself.</li>
+        </ul>
+
+        <p>
+          Our familiarity with this system hides how impressive a technology it is.
+          To understand how clever it is, let's consider how numbers came to be.
+        </p>
+      </section>
+
+      <section aria-labelledby="one-to-one">
+        <h2 id="one-to-one">Counting by One-to-One Correspondence</h2>
+
+        <p>
+          While we lack a detailed account of how the ability to count developed,
+          it's generally believed that physical representations of numbers were
+          used before symbolic ones.
+        </p>
+
+        <p>
+          Without relying on some physical apparatus, early humans may only have had
+          a sense of one, two, three, and many.
+        </p>
+
+        <p>
+          Tallying might have involved notching marks into bone or tying knots in
+          string to represent the quantity of another group of things.
+        </p>
+
+        <p>
+          Alternatively, imagine a shepherd placing a pebble in a bag for each sheep
+          he lets out to graze. When the flock returns, he takes a pebble back out for
+          each sheep he sees. If there are pebbles remaining, he knows he is missing
+          that many sheep.
+        </p>
+
+        <p>
+          This type of counting physically implements a <strong>one-to-one
+          correspondence</strong>, but does not require the counter to possess any
+          mental representation of numbers as they do so.
+        </p>
+
+        <p>
+          Notched bones may be the oldest evidence of it we have. The Lebombo bone, a
+          baboon fibula from the border of Eswatini and South Africa, carries 29 notches
+          and is about 44,000 years old. A hyena bone from Les Pradelles in France,
+          notched by Neanderthals around 60,000 years ago, may be older still.
+        </p>
+
+        <p>
+          A notch on its own is weak evidence, since it can come from butchery or
+          decoration. The case for counting rests on regularity: notches of one form,
+          evenly spaced, sometimes grouped, like the columns of marks on the Ishango
+          bone from central Africa, about 20,000 years old.
+        </p>
+      </section>
+
+      <section aria-labelledby="oral">
+        <h2 id="oral">Oral Counting</h2>
+
+        <p>
+          Humans probably began with words for quantities of specific things. There
+          may have been a word for three sheep and another word for three apples, but
+          not a word for the abstract idea of three.
+        </p>
+
+        <p>
+          English keeps a trace of this. A brace of pheasants and a yoke of oxen are
+          both two, but you cannot have a brace of oxen.
+        </p>
+
+        <p>
+          However, at some stage in prehistory, we must have developed spoken words
+          for quantities in the abstract, generalised beyond specific instances.
+        </p>
+      </section>
+
+      <section aria-labelledby="written">
+        <h2 id="written">Written Counting</h2>
+
+        <p>Numbers were likely among the very first things to be written down.</p>
+
+        <p>
+          In the Near East, from about 8,000 BCE, accounts were kept with small clay
+          tokens. A token's shape gave the commodity, a cone for a measure of grain,
+          say, but the count was still one-to-one: seven measures, seven cones.
+        </p>
+
+        <p>
+          In the fourth millennium BCE, the tokens for a deal were sealed inside a clay
+          envelope, and pressed into its surface first, so the contents could be read
+          without breaking it open. The marks now did the job of the tokens. Around
+          3,300 BCE, scribes at Uruk dropped the tokens and pressed the marks straight
+          into flat tablets. They wrote the quantity with one sign and the commodity
+          with another: five sheep was no longer five sheep-signs, but a sign for five
+          beside a sign for sheep.
+        </p>
+
+        <p>We call the early systems <strong>sign-value</strong> systems.</p>
+
+        <p>A sign, or symbol, denotes an abstract quantity: its value.</p>
+
+        <p>
+          The simplest sign-value system has one symbol for 1, say a line, and writes
+          every other number as that many lines. This is just a slight extension of
+          the physical one-to-one mapping that preceded it.
+        </p>
+
+        <p>
+          Clearly, this still requires the reader to count the lines in their head,
+          using the words they have for the numbers.
+        </p>
+
+        <p>
+          At the other extreme, imagine a system where every quantity had its own
+          unique symbol.
+        </p>
+
+        <p>
+          Then looking at any symbol would immediately tell you what quantity it
+          represented. That is, <em>if</em> you had memorised the quantity
+          associated with that symbol.
+        </p>
+
+        <p>
+          This might be feasible for numbers up to 30 or so, but memorising unique
+          symbols clearly has a low ceiling.
+        </p>
+      </section>
+
+      <section aria-labelledby="grouping">
+        <h2 id="grouping">Grouping</h2>
+
+        <p>
+          Grouping is older than writing. The Věstonice wolf bone, over 30,000 years
+          old, has its notches cut in groups of five, so the eye can take the count in
+          chunks. But a group of five strokes is still five strokes.
+        </p>
+
+        <p>
+          The breakthrough was to give unique symbols to only some quantities, and
+          build the rest by addition. The Sumerian number signs echo the token shapes:
+          a small cone-shaped mark for 1, a small circle for 10 and a large cone-shaped
+          mark for 60. To write 86 you need only those three symbols, and instead of
+          counting 86 marks you count nine:
+        </p>
+
+        <p class="eq"><span class="row">86 = 60 + 10 + 10 + 1 + 1 + 1 + 1 + 1 + 1</span></p>
+
+        <p>
+          These are <strong>additive</strong> systems: the reader adds up the values of
+          the signs. The signs that stand for those fixed values are the system's
+          <strong>base symbols</strong>.
+        </p>
+
+        <p>
+          Egypt, by about 3,000 BCE, used one sign for each power of ten: a stroke for
+          1, a heel bone for 10, a coiled rope for 100 and a lotus for 1,000. Shang
+          China also wrote numbers in tens, as have many cultures, probably because we
+          have ten fingers. <em>Digit</em> still means finger.
+        </p>
+
+        <p>
+          The Romans used letters: I for 1, V for 5, X for 10, L for 50, C for 100, D
+          for 500 and M for 1,000. IV is 4 and XC is 90: a smaller numeral just before
+          a larger one is subtracted. The Romans themselves often wrote IIII.
+        </p>
+
+        <p>Every sign in an additive numeral has to be written, read and added up.</p>
+
+        <iframe class="num-widget" src="numbers/hindu-arabic-number-system/number-systems-widget.html" title="Interactive: slide to choose a number from 1 to 3,999; it is written as a tally, in Egyptian hieroglyphs, in Roman numerals and in Hindu-Arabic digits, with the number of signs each one needs" style="height: 330px" scrolling="no" loading="lazy"></iframe>
+
+        <p>
+          In an additive system each base symbol has a fixed value: a heel bone means
+          ten wherever it sits. The values are simply added, so the order of the signs
+          carries no information. To write larger numbers there are only two options:
+          keep inventing new symbols, or keep repeating the ones you have. Roman
+          numerals stop at 3,999; there is no standard way to write 4,000.
+        </p>
+      </section>
+
+      <section aria-labelledby="positional">
+        <h2 id="positional">Positional Notation</h2>
+
+        <p>
+          The Hindu-Arabic system does neither. It reuses the same small set of
+          symbols indefinitely, by giving each symbol's value another dimension: its
+          <strong>position</strong>.
+        </p>
+
+        <p>
+          We have a symbol for each of the numbers 1 to 9. To represent ten, instead
+          of creating a new symbol, we start counting groups of ten, and open a new
+          column to hold that count: 10. The 1 now means one group of ten.
+        </p>
+
+        <p>
+          But the 1 needs something to its right, or it would just read as one. That
+          is the job of the tenth symbol, 0: it marks a column that is empty, and holds
+          the other digits in their places.
+        </p>
+
+        <p>
+          At 20 we have two groups of ten. After 99 the tens column is full too, so we
+          open a third column, for groups of one hundred: 100. In 111, each 1 counts a
+          different size of group: one hundred, one ten and one one.
+        </p>
+
+        <iframe class="num-widget" src="numbers/hindu-arabic-number-system/counting-widget.html" title="Interactive: press plus or minus to count; each column holds up to nine dots, and the tenth turns into one dot in the next column to the left" style="height: 300px" scrolling="no" loading="lazy"></iframe>
+
+        <p>So in the numeral 352 the digit 3 counts hundreds, the 5 tens and the 2 ones:</p>
+
+        <p class="eq">
+          <span class="row">352 = 3 × 100 + 5 × 10 + 2 × 1</span>
+          <span class="row"><span class="ghost">352</span> = 3 × 10<sup>2</sup> + 5 × 10<sup>1</sup> + 2 × 10<sup>0</sup></span>
+        </p>
+
+        <p>
+          A numeral is still a sum, as in the additive systems, but each term is a
+          digit multiplied by the value of its column. The position of a digit is the
+          power of ten it multiplies.
+        </p>
+
+        <p>
+          This is an enormous compression. Egyptian needs ten signs to write 352 and
+          Roman six; we need three. Ten symbols are enough for any number at all, and a
+          number a thousand times larger needs only three more digits.
+        </p>
+
+        <p>
+          How many a column can hold before it passes one to the left is the
+          <strong>base</strong>. Ours is ten, so a column fills at 9. Nothing in the
+          method needs ten: in base two a column fills at 1, which is why computers,
+          built from switches that are either on or off, use it.
+        </p>
+      </section>
+
+      <section aria-labelledby="zero">
+        <h2 id="zero">Zero</h2>
+
+        <p>
+          Position was not India's invention. Babylonian scribes used it before 2,000
+          BCE, in base 60, with just two signs: a wedge for 1 and a corner-shaped wedge
+          for 10, combined to write each digit from 1 to 59. We still count minutes and
+          seconds in sixties.
+        </p>
+
+        <p>
+          What they lacked was a zero. An empty column was simply left as a gap, so a
+          single wedge could mean 1, 60 or 3,600, and the reader had to tell from
+          context. Later scribes wrote a separator sign inside numbers, but never at
+          the end, where a gap is invisible.
+        </p>
+
+        <figure class="zero" aria-label="Without zero, 1 space 1 could be 101 or 1001, and 11 could be 11, 110 or 1100. With zero, each is written differently.">
+          <span class="h">without zero</span><span class="h">with zero</span>
+          <span>1<span class="gap"></span>1</span>
+          <span class="alts"><span>1<span class="z">0</span>1</span><span>1<span class="z">00</span>1</span></span>
+          <span>11</span>
+          <span class="alts"><span>11</span><span>11<span class="z">0</span></span><span>11<span class="z">00</span></span></span>
+        </figure>
+
+        <p>
+          The Maya wrote a zero, a shell glyph, and used it as a placeholder in their
+          base-20 counts. English still counts in twenties when it says <em>score</em>.
+        </p>
+
+        <p>
+          India put the pieces together. By the seventh century, Indian mathematicians
+          wrote numbers with nine digits, place value in base ten, and a zero that was
+          more than a placeholder: a number in its own right, with rules for adding and
+          multiplying it, set out by Brahmagupta in 628.
+        </p>
+
+        <p>
+          The system reached the Islamic world, where al-Khwārizmī wrote a book on
+          calculating with Hindu numerals in the ninth century. Europe learned it from
+          Arabic texts, largely through Fibonacci's <em>Liber Abaci</em> of 1202, which
+          is why it carries both names. It was slow to be trusted. In 1299 Florence's
+          money-changers banned the new numerals from their accounts, partly because a
+          0 is easy to alter into a 6 or a 9. Roman numerals stayed in European ledgers
+          for centuries.
+        </p>
+      </section>
+
+      <section aria-labelledby="arithmetic">
+        <h2 id="arithmetic">Arithmetic by Columns</h2>
+
+        <p>
+          The new numerals won in the end because of arithmetic. Try multiplying
+          MCMXCIX by XLII: the signs tell you nothing about how to begin. Positional
+          notation turns arithmetic into a <strong>procedure</strong>, a fixed set of
+          small steps that works the same way on numbers of any size.
+        </p>
+
+        <p>
+          Because every column means a power of ten, two numbers can be lined up by
+          their right-hand ends and each column handled on its own. Adding a column
+          only ever involves two single digits, so you need just one hundred facts,
+          0 + 0 up to 9 + 9, and one rule for when a column overflows: carry one ten
+          into the next column.
+        </p>
+
+        <iframe class="num-widget" src="numbers/hindu-arabic-number-system/column-addition-widget.html" title="Interactive: press Step to add two numbers one column at a time; each step lights the single fact it uses in a ten-by-ten table of all one hundred digit sums, and the carry moves to the next column" style="height: 320px" scrolling="no" loading="lazy"></iframe>
+
+        <p>
+          Multiplication works the same way, with the times table. And multiplying by
+          ten is just a shift: every digit moves one place left, and a 0 fills the
+          units column.
+        </p>
+
+        <p>
+          Additive systems had arithmetic too. To add Egyptian numerals, pool the
+          signs and swap every ten strokes for a heel bone. The Egyptians multiplied by
+          repeated doubling, and Roman merchants calculated on a counting board and
+          wrote down only the result.
+        </p>
+
+        <p>
+          What positional notation adds is a method that is <strong>uniform</strong>,
+          <strong>local</strong> and <strong>bounded</strong>. Uniform, because every
+          column is handled the same way. Local, because each step looks at only a
+          couple of digits. Bounded, because the facts you need fit in two ten-by-ten
+          tables, however large the numbers get. That is what lets a child learn long
+          multiplication, and what lets the same procedure run on a machine. The word
+          <em>algorithm</em> comes from al-Khwārizmī's name.
+        </p>
+
+        <p>
+          A good notation does some of your thinking for you. The numeral 36,952 lays
+          the structure of the number out where the eye and the pencil can work on it
+          directly: three ten-thousands, six thousands, nine hundreds, five tens and two
+          ones, one column at a time.
+        </p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="numbers.html">← All Numbers pages</a>
+        <a href="index.html#math">Math →</a>
+      </nav>
+    </main>
+  </div>
+
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "numbers-widget-height") return;
+      document.querySelectorAll("iframe.num-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

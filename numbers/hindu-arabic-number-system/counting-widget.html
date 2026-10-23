@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Counting in columns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@200;400&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .ctls { display: flex; justify-content: center; gap: 0.9rem; margin-top: 0.9rem; }
+  button.ctl.round { width: 44px; height: 44px; padding: 0; font: 300 22px Geist, system-ui, sans-serif; line-height: 1; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  svg text.digit { font-family: Geist, system-ui, sans-serif; font-weight: 200; font-size: 64px; fill: var(--ink); transition: fill 0.6s ease; }
+  svg text.digit.hi { fill: var(--hi); transition: none; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" aria-hidden="true"></svg>
+  <div class="ctls">
+    <button class="ctl round" id="down" type="button" aria-label="Count down by one">−</button>
+    <button class="ctl round" id="up" type="button" aria-label="Count up by one">+</button>
+  </div>
+  <span class="sr" id="live" aria-live="polite"></span>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Three columns: hundreds, tens, ones. A column holds up to nine dots, its digit beneath.
+  // Adding one to a full column gathers its ten dots into one, which moves a column left.
+  // Dots grow a step per column, since a dot further left stands for a bigger group.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const up = document.getElementById("up"), down = document.getElementById("down"), live = document.getElementById("live");
+  const INK = "#f1eee7", HI = "#f2c14e", MAX = 999;
+  const P = 18, GY = 30, H = 194, R = [3.4, 4.6, 5.8];   // grid pitch, top row, height, dot radius by column
+  const NAMES = ["ones", "tens", "hundreds"];
+  let n = 7, W = 560, cw = 120, x0 = 0;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const digitsOf = (v) => [v % 10, Math.floor(v / 10) % 10, Math.floor(v / 100) % 10];
+  const cx = (j) => x0 + (2 - j + 0.5) * cw;               // column j = 0 is ones, at the right
+  // slot k of column j: nine places in a 3 × 3 block, filled from the bottom row up;
+  // slot 9 is the tenth dot, which arrives just above a full block
+  function slot(j, k) {
+    if (k >= 9) return [cx(j), GY - P * 0.95];
+    return [cx(j) + ((k % 3) - 1) * P, GY + (2 - Math.floor(k / 3)) * P];
+  }
+  const centre = (j) => [cx(j), GY + P];
+  const ease = (s) => (s <= 0 ? 0 : s >= 1 ? 1 : s * s * (3 - 2 * s));
+  const lerp = (a, b, s) => a + (b - a) * s;
+
+  // How the transition m → m+1 unfolds. u runs over [0, 1 + 2.6c], c = number of carries.
+  function plan(m) {
+    const d = digitsOf(m);
+    let c = 0;
+    while (c < 3 && d[c] === 9) c++;
+    return { d, c, U: c ? 1 + 2.6 * c : 1 };
+  }
+
+  // Draw the scene: dots of each column, digits, column rules. t in [0, 1] runs m → m+1;
+  // t = 0 is m at rest. hiCol lights a digit.
+  function draw(m, t, hiCol) {
+    svg.textContent = "";
+    W = svg.clientWidth || 560;
+    cw = Math.max(84, Math.min(128, W / 3.4));
+    x0 = (W - 3 * cw) / 2;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+
+    const defs = el("defs", {});
+    const lg = el("linearGradient", { id: "fade", gradientUnits: "userSpaceOnUse", x1: 0, y1: 0, x2: 0, y2: H }, undefined, defs);
+    [[0, 0], [0.25, 0.14], [0.75, 0.14], [1, 0]].forEach(([o, a]) =>
+      el("stop", { offset: o, "stop-color": INK, "stop-opacity": a }, undefined, lg));
+    for (let j = 0; j <= 3; j++) el("line", { x1: x0 + j * cw, x2: x0 + j * cw, y1: 0, y2: H, stroke: "url(#fade)", "stroke-width": 1 });
+
+    const { d, c, U } = plan(m);
+    const u = t * U;
+    // what each column shows: a list of dots [x, y, r, opacity] and a digit
+    const show = [0, 1, 2].map((j) => ({ dots: [], digit: d[j], lit: hiCol === j }));
+    for (let j = 0; j < 3; j++) {
+      // columns beyond the carry chain, and columns not yet reached, sit still
+      for (let k = 0; k < d[j]; k++) { const [x, y] = slot(j, k); show[j].dots.push([x, y, R[j], 1]); }
+    }
+    if (t > 0) {
+      if (c === 0) {
+        // no carry: one new dot grows into the next free slot of the ones column
+        const s = ease(u);
+        const [x, y] = slot(0, d[0]);
+        show[0].dots.push([x, y, R[0] * lerp(0.2, 1, s), s]);
+        if (s >= 1) show[0].digit = d[0] + 1;
+        show[0].lit = true;
+      } else {
+        // the tenth unit appears above the full ones block
+        const a = ease(u);
+        let mover = null;                                   // the dot travelling between columns
+        const [tx, ty] = slot(0, 9);
+        if (u < 1) show[0].dots.push([tx, ty, R[0] * lerp(0.2, 1, a), a]);
+        for (let i = 0; i < c; i++) {
+          const u0 = 1 + 2.6 * i, sm = ease((u - u0) / 1.3), sf = ease((u - u0 - 1.3) / 1.3);
+          if (u < u0) {
+            // this column hasn't been reached yet: if a dot is on its way it shows as the tenth
+            continue;
+          }
+          show[i].lit = u < u0 + 1.3;
+          // the ten dots of column i gather into its centre
+          const [mx, my] = centre(i);
+          const ten = [];
+          for (let k = 0; k < 10; k++) {
+            const [x, y] = slot(i, k);
+            ten.push([lerp(x, mx, sm), lerp(y, my, sm), lerp(R[i], R[Math.min(i + 1, 2)], sm), k === 0 ? 1 : 1 - sm]);
+          }
+          show[i].dots = sm < 1 ? ten : [];
+          if (sm >= 1) show[i].digit = 0;
+          // then the one dot that's left travels to the next column
+          if (sm >= 1 && i + 1 < 3) {
+            const [ex, ey] = slot(i + 1, d[i + 1]);
+            if (sf < 1) mover = [lerp(mx, ex, sf), lerp(my, ey, sf) - Math.sin(Math.PI * sf) * 16, R[i + 1], 1];
+            else {
+              show[i + 1].dots.push([ex, ey, R[i + 1], 1]);
+              if (i + 1 >= c) { show[i + 1].digit = d[i + 1] + 1; show[i + 1].lit = true; }
+            }
+          }
+        }
+        if (mover) show[0].dots.push(mover);
+      }
+    }
+
+    // digits: a column shows its digit once anything at or left of it is non-zero (the ones
+    // always show); mid-carry, a column that was showing keeps showing
+    const leadOf = (v) => (v[2] ? 2 : v[1] ? 1 : 0);
+    const lead = Math.max(leadOf(show.map((s) => s.digit)), leadOf(d));
+    for (let j = 0; j < 3; j++) {
+      for (const [x, y, r, o] of show[j].dots) el("circle", { cx: x.toFixed(2), cy: y.toFixed(2), r: r.toFixed(2), fill: INK, "fill-opacity": o.toFixed(3) });
+      if (j <= lead) el("text", { x: cx(j), y: 150, "text-anchor": "middle", class: "digit" + (show[j].lit ? " hi" : "") }, String(show[j].digit));
+      el("text", { x: cx(j), y: 186, "text-anchor": "middle" }, NAMES[j]);
+    }
+  }
+
+  let anim = null, settle = null;
+  function finish() {
+    if (!anim) return;
+    cancelAnimationFrame(anim.raf);
+    n = anim.target; anim = null;
+    draw(n, 0, null);
+  }
+  function setN(v, animate) {
+    finish();
+    clearTimeout(settle);
+    v = Math.max(0, Math.min(MAX, v));
+    if (v === n) return;
+    const dir = v > n ? 1 : -1, m = dir > 0 ? n : v, { U } = plan(m);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!animate || reduce || Math.abs(v - n) !== 1) {
+      n = v; draw(n, 0, null);
+    } else {
+      const dur = 170 * U, t0 = performance.now();
+      anim = { target: v, raf: 0 };
+      const tick = (now) => {
+        const s = Math.min(1, (now - t0) / dur);
+        draw(m, dir > 0 ? s : 1 - s, null);
+        if (s < 1) anim.raf = requestAnimationFrame(tick);
+        else {
+          n = v; anim = null;
+          // light the column that changed last, then let it fade back to ink
+          const ch = changed(dir > 0 ? m : v);
+          draw(n, 0, dir > 0 ? ch : 0);
+          settle = setTimeout(() => { const ds = svg.querySelectorAll("text.digit.hi"); ds.forEach((e) => e.classList.remove("hi")); }, 60);
+        }
+      };
+      anim.raf = requestAnimationFrame(tick);
+    }
+    up.disabled = (anim ? anim.target : n) >= MAX;
+    down.disabled = (anim ? anim.target : n) <= 0;
+    live.textContent = String(anim ? anim.target : n);
+  }
+  // the leftmost column touched by the step m → m+1
+  const changed = (m) => plan(m).c;
+
+  // press for one step; hold to keep counting, faster the longer you hold
+  function holdable(btn, dir) {
+    let timer = null, delay = 0;
+    const stop = () => { clearTimeout(timer); timer = null; };
+    const rep = () => { setN((anim ? anim.target : n) + dir, false); delay = Math.max(28, delay * 0.86); timer = setTimeout(rep, delay); };
+    btn.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault(); btn.setPointerCapture(e.pointerId);
+      setN((anim ? anim.target : n) + dir, true);
+      delay = 120; timer = setTimeout(rep, 430);
+    });
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach((ev) => btn.addEventListener(ev, stop));
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setN((anim ? anim.target : n) + dir, !e.repeat); }
+    });
+  }
+  holdable(up, 1); holdable(down, -1);
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { finish(); draw(n, 0, null); }, 60); });
+  draw(n, 0, null);
+  live.textContent = String(n);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!anim) draw(n, 0, null); });
+</script>
+</body>
+</html>

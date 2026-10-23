@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adding by columns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .ctls { display: flex; justify-content: center; margin-top: 0.9rem; }
+  button.ctl { min-width: 7.5rem; }
+  svg text.dg { font-family: Geist, system-ui, sans-serif; font-weight: 300; font-size: 30px; fill: var(--ink); font-variant-numeric: tabular-nums; }
+  svg text.cy { font-family: Geist, system-ui, sans-serif; font-weight: 400; font-size: 14px; fill: var(--hi); }
+  svg text.fact { font-size: 12px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" aria-hidden="true"></svg>
+  <div class="ctls"><button class="ctl" id="step" type="button">Step</button></div>
+  <span class="sr" id="live" aria-live="polite"></span>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Two numbers added one column at a time, right to left. Each step uses one fact from the
+  // 10 × 10 table of digit sums (lit in yellow) and perhaps a carry of 1. Facts used before stay
+  // faintly lit, across every sum, so the table fills in while the numbers keep changing.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const btn = document.getElementById("step"), live = document.getElementById("live");
+  const INK = "#f1eee7", HI = "#f2c14e";
+  const used = new Set();
+  let A = 36952, B = 8479, steps = [], k = 0;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const key in attrs) e.setAttribute(key, attrs[key]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  // the working, worked out in advance: one step per column, plus one to write a final carry
+  function work(a, b) {
+    const da = String(a).split("").reverse().map(Number), db = String(b).split("").reverse().map(Number);
+    const cols = Math.max(da.length, db.length), out = [];
+    let carry = 0;
+    for (let i = 0; i < cols; i++) {
+      const x = da[i] || 0, y = db[i] || 0, s = x + y + carry;
+      out.push({ col: i, x, y, cin: carry, sum: s, digit: s % 10, cout: s >= 10 ? 1 : 0 });
+      carry = s >= 10 ? 1 : 0;
+    }
+    if (carry) out.push({ col: cols, carry: true, digit: 1 });
+    return out;
+  }
+  function fresh() {
+    // two numbers of different lengths, so short columns and carries both turn up
+    const len = () => 2 + Math.floor(Math.random() * 5);
+    const num = (l) => Math.floor(10 ** (l - 1) + Math.random() * 9 * 10 ** (l - 1));
+    let a, b;
+    do { a = num(len()); b = num(len()); } while (work(a, b).filter((s) => s.cout).length < 2);
+    return [a, b];
+  }
+
+  function render() {
+    svg.textContent = "";
+    const W = svg.clientWidth || 560;
+    const da = String(A).split("").reverse(), db = String(B).split("").reverse();
+    const cols = Math.max(da.length, db.length) + 1;           // room for a final carry
+    const CW = 32, SUMW = cols * CW + 24, GRID = 15, GW = 10 * GRID + 16;
+    const side = W >= SUMW + GW + 70;
+    const sx = side ? Math.max(0, (W - (SUMW + GW + 60)) / 2) + 24 : (W - SUMW) / 2 + 24;   // left of the sum's columns
+    const colX = (i) => sx + (cols - 1 - i) * CW;              // left edge of column i (0 = ones)
+    const Y = { carry: 24, a: 64, b: 106, rule: 119, ans: 158 }, SH = 174;
+
+    const defs = el("defs", {});
+    const lg = el("linearGradient", { id: "fade", gradientUnits: "userSpaceOnUse", x1: 0, y1: 0, x2: 0, y2: SH }, undefined, defs);
+    [[0, 0], [0.2, 0.14], [0.8, 0.14], [1, 0]].forEach(([o, a]) => el("stop", { offset: o, "stop-color": INK, "stop-opacity": a }, undefined, lg));
+
+    const cur = k > 0 ? steps[k - 1] : null;
+    // column rules; the column being worked on is ruled in yellow
+    for (let i = 0; i <= cols; i++) el("line", { x1: colX(i - 1) , x2: colX(i - 1), y1: 0, y2: SH, stroke: "url(#fade)" });
+    if (cur) {
+      const L = colX(cur.col), Rr = L + CW;
+      el("rect", { x: L, y: 4, width: CW, height: SH - 8, fill: HI, "fill-opacity": 0.07 });
+      for (const x of [L, Rr]) el("line", { x1: x, x2: x, y1: 4, y2: SH - 4, stroke: HI, "stroke-opacity": 0.55 });
+    }
+    // the two numbers, the plus, the rule
+    da.forEach((d, i) => el("text", { x: colX(i) + CW / 2, y: Y.a, "text-anchor": "middle", class: "dg" }, d));
+    db.forEach((d, i) => el("text", { x: colX(i) + CW / 2, y: Y.b, "text-anchor": "middle", class: "dg" }, d));
+    el("text", { x: colX(db.length) + CW / 2, y: Y.b, "text-anchor": "middle", class: "dg", style: "fill: rgba(241,238,231,0.48)" }, "+");
+    el("line", { x1: colX(cols - 1) + 4, x2: colX(-1) - 4, y1: Y.rule, y2: Y.rule, stroke: INK, "stroke-opacity": 0.5 });
+    // what has been written so far: answer digits, and carries above the columns they go to
+    for (let j = 0; j < k; j++) {
+      const s = steps[j];
+      el("text", { x: colX(s.col) + CW / 2, y: Y.ans, "text-anchor": "middle", class: "dg" }, String(s.digit));
+      if (s.cout && j + 1 < steps.length && !steps[j + 1].carry) el("text", { x: colX(s.col + 1) + CW / 2, y: Y.carry, "text-anchor": "middle", class: "cy" }, "1");
+    }
+
+    // the table of all one hundred digit sums: row = top digit, column = bottom digit
+    const gx = side ? sx - 24 + SUMW + 60 + 16 : (W - GW) / 2 + 16, gy = side ? 22 : SH + 40;
+    for (let i = 0; i < 10; i++) {
+      el("text", { x: gx + i * GRID + GRID / 2, y: gy - 8, "text-anchor": "middle" }, String(i));
+      el("text", { x: gx - 9, y: gy + i * GRID + GRID / 2 + 4, "text-anchor": "middle" }, String(i));
+    }
+    for (let r = 0; r < 10; r++) for (let c = 0; c < 10; c++) {
+      const on = used.has(r * 10 + c);
+      el("circle", { cx: gx + c * GRID + GRID / 2, cy: gy + r * GRID + GRID / 2, r: on ? 2.4 : 1.6, fill: INK, "fill-opacity": on ? 0.55 : 0.18 });
+    }
+    let fact = "";
+    if (cur && !cur.carry) {
+      el("circle", { cx: gx + cur.y * GRID + GRID / 2, cy: gy + cur.x * GRID + GRID / 2, r: 4.2, fill: HI });
+      fact = `${cur.x} + ${cur.y}` + (cur.cin ? " + 1" : "") + ` = ${cur.sum}`;
+    } else if (cur) fact = "carry 1";
+    if (fact) el("text", { x: gx + 5 * GRID, y: gy + 10 * GRID + 22, "text-anchor": "middle", class: "fact", style: `fill: ${cur && !cur.carry ? HI : "rgba(241,238,231,0.48)"}` }, fact);
+
+    const H = Math.ceil(side ? Math.max(SH, gy + 10 * GRID + 30) : gy + 10 * GRID + 30);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    btn.textContent = k < steps.length ? "Step" : "New sum";
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  function begin(a, b) { A = a; B = b; steps = work(A, B); k = 0; render(); live.textContent = `${A} plus ${B}`; }
+  btn.addEventListener("click", () => {
+    if (k >= steps.length) { begin(...fresh()); return; }
+    const s = steps[k++];
+    if (!s.carry) used.add(s.x * 10 + s.y);
+    render();
+    live.textContent = s.carry ? "Write the carried 1." :
+      `${s.x} plus ${s.y}${s.cin ? " plus the carried 1" : ""} is ${s.sum}: write ${s.digit}${s.cout ? ", carry 1" : ""}.` +
+      (k === steps.length ? ` ${A} plus ${B} is ${A + B}.` : "");
+  });
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  begin(A, B);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+</script>
+</body>
+</html>

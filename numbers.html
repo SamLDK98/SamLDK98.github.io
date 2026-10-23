@@ -3,105 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Where numbers came from and what they became — interactive explanations by Sam Kirwan." />
-  <title>Numbers</title>
+  <meta name="description" content="How we came to write numbers the way we do, and why it works so well: interactive explanations by Sam Kirwan." />
+  <title>Numbers | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@200;300&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="numbers.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #08090b;
-      --text: #f4f5f8;
+    /* A counter across the whole screen: empty columns to the left, a number at the right
+       that counts up one at a time, its digits rolling over as each column fills. */
+    .counter {
+      display: flex; justify-content: flex-end;
+      height: clamp(170px, 30vh, 280px);
+      margin-top: clamp(1.5rem, 6vh, 3.5rem);
+      padding-right: clamp(1rem, 6vw, 5rem);
+      overflow: hidden;
+      font-weight: 200;
+      font-size: clamp(3.6rem, 11vw, 7.4rem);
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
     }
-
-    html, body { min-height: 100%; }
-
-    body {
-      min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-x: hidden;
-      background:
-        radial-gradient(circle at 15% 38%, rgba(226, 232, 255, 0.05), transparent 25rem),
-        radial-gradient(circle at 24% 70%, rgba(96, 116, 190, 0.07), transparent 28rem),
-        var(--bg);
-      color: var(--text);
-      font-family: "Space Grotesk", system-ui, sans-serif;
-      -webkit-font-smoothing: antialiased;
+    .counter .c {
+      position: relative; flex: none;
+      width: 0.8em; height: 100%;
     }
+    .counter .c::before, .counter .c:last-child::after {
+      content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 1px;
+      background: linear-gradient(180deg, transparent, var(--faint) 25%, var(--faint) 75%, transparent);
+    }
+    .counter .c:last-child::after { left: auto; right: 0; }
+    .counter .g {
+      position: absolute; left: 0; right: 0; top: 50%;
+      text-align: center; line-height: 1;
+      transform: translateY(-50%);
+      transition: transform 520ms cubic-bezier(0.3, 0.7, 0.2, 1), opacity 520ms ease;
+    }
+    .counter .g.out { transform: translateY(-120%); opacity: 0; }
+    .counter .g.in { transform: translateY(20%); opacity: 0; transition: none; }
 
     main {
-      width: min(46rem, calc(100% - 2rem));
-      margin-left: clamp(2rem, 11vw, 10rem);
-      padding: clamp(3rem, 9vh, 5.5rem) 0;
-      text-align: left;
+      width: min(40rem, calc(100% - 3rem));
+      margin: 0 auto;
+      padding: clamp(1.8rem, 5vh, 3rem) 0 clamp(3rem, 9vh, 5rem);
+      text-align: center;
     }
-
-    h1 {
-      font-size: clamp(3rem, 7vw, 5.4rem);
-      font-weight: 300;
-      line-height: 0.96;
-      letter-spacing: -0.045em;
-    }
-
-    nav { margin-top: clamp(2.4rem, 6vh, 4rem); }
-
-    ul { list-style: none; }
-
-    li + li { margin-top: 0.7rem; }
-
-    a {
+    main h1 { padding-top: 0; font-size: clamp(3rem, 10vw, 5.4rem); }
+    nav { margin-top: clamp(2rem, 5vh, 3rem); }
+    nav li { padding-left: 0; }
+    nav li::before { content: none; }
+    nav a {
       display: inline-block;
-      color: var(--text);
-      font-size: clamp(1rem, 1.65vw, 1.25rem);
-      font-weight: 300;
-      line-height: 1.35;
-      text-decoration: none;
-      transition: color 180ms ease, transform 180ms ease;
+      font-weight: 300; font-size: clamp(1.2rem, 2vw, 1.4rem);
+      color: var(--ink); text-decoration: none;
+      transition: color 180ms ease;
     }
-
-    a:hover,
-    a:focus-visible {
-      color: #cfd8ff;
-      outline: none;
-      transform: translateX(3px);
+    nav a:hover, nav a:focus-visible { color: var(--hi); outline: none; }
+    .back {
+      display: inline-block; margin-top: 2.8rem;
+      font: 400 0.72rem "Geist Mono", ui-monospace, monospace; letter-spacing: 0.04em;
+      color: var(--dim); text-decoration: none; transition: color 0.2s ease;
     }
+    .back:hover, .back:focus-visible { color: var(--ink); outline: none; }
 
-    @media (max-height: 720px) and (min-width: 600px) {
-      main { padding-block: 2rem; }
-      nav { margin-top: 2rem; }
-      li + li { margin-top: 0.45rem; }
-    }
-
-    @media (max-width: 560px) {
-      main {
-        width: min(27rem, calc(100% - 4rem));
-        margin-left: 2rem;
-      }
-
-      h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
-      nav { margin-top: 2.6rem; }
-      li + li { margin-top: 0.8rem; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      a { transition: none; }
-    }
+    @media (prefers-reduced-motion: reduce) { .counter .g, nav a { transition: none; } }
   </style>
 </head>
 <body>
+  <div class="counter" id="counter" aria-hidden="true"></div>
   <main>
     <h1>Numbers</h1>
     <nav aria-label="Numbers pages">
       <ul>
-        <li><a href="numbers-the-origins-of-counting.html">The Origins of Counting</a></li>
-        <li><a href="numbers-the-history-of-numbers.html">The History of Numbers</a></li>
-        <li><a href="numbers-the-hindu-arabic-number-system.html">The Hindu-Arabic Number System</a></li>
+        <li><a href="numbers-hindu-arabic-number-system.html">The Hindu-Arabic Number System</a></li>
       </ul>
     </nav>
+    <a class="back" href="index.html#math">← Math</a>
   </main>
+  <script>
+    (function () {
+      const box = document.getElementById("counter");
+      let n = 36952, cells = [];
+
+      function build() {
+        // as many columns as fit across the screen, at least one more than the number needs
+        box.textContent = "";
+        const em = parseFloat(getComputedStyle(box).fontSize);
+        const pad = parseFloat(getComputedStyle(box).paddingRight);
+        const count = Math.max(String(n).length + 1, Math.floor((box.clientWidth - pad) / (0.8 * em)));
+        cells = [];
+        for (let i = 0; i < count; i++) {
+          const c = document.createElement("div");
+          c.className = "c";
+          box.appendChild(c);
+          cells.push(c);
+        }
+        show(false);
+      }
+      function show(roll) {
+        const s = String(n);
+        cells.forEach((c, i) => {
+          const d = s[s.length - (cells.length - i)] || "";
+          const cur = c.querySelector(".g:not(.out)");
+          if (cur && cur.textContent === d) return;
+          if (!roll) { c.innerHTML = d ? `<span class="g">${d}</span>` : ""; return; }
+          // the old digit rolls up and away; the new one rises into its place
+          if (cur) { cur.classList.add("out"); setTimeout(() => cur.remove(), 560); }
+          if (d) {
+            const g = document.createElement("span");
+            g.className = "g in"; g.textContent = d;
+            c.appendChild(g);
+            g.getBoundingClientRect();
+            g.classList.remove("in");
+          }
+        });
+      }
+
+      build();
+      let rt;
+      window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 80); });
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      setInterval(() => { n += 1; show(true); }, 1300);
+    })();
+  </script>
 </body>
 </html>
