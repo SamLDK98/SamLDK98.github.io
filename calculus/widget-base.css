@@ -1,0 +1,53 @@
+/* Shared look for the Calculus widgets: no frame, no title, no panel.
+   The widget sits on the page's own background and carries one control.
+   Lilac marks inputs, coral marks outputs, as in the prose. */
+:root {
+  --ink:   #ebe8e1;
+  --dim:   rgba(235, 232, 225, 0.5);
+  --faint: rgba(235, 232, 225, 0.16);
+  --hair:  rgba(235, 232, 225, 0.08);
+  --bg:    #0b0d11;
+  --in:    #a99cff;
+  --out:   #ff8c69;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: transparent; }
+
+body {
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.widget { width: 100%; max-width: 600px; margin: 0 auto; padding: 0.3rem 0 0.6rem; }
+
+svg { display: block; width: 100%; overflow: visible; }
+svg text { font-family: "DM Mono", monospace; font-size: 11px; fill: var(--dim); }
+svg text.in  { fill: var(--in); }
+svg text.out { fill: var(--out); }
+
+/* the one control: a thin track and a small chalk thumb */
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  display: block; width: min(100%, 420px); margin: 0.9rem auto 0;
+  height: 20px; background: transparent; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 1.5px; background: var(--faint); }
+input[type="range"]::-moz-range-track { height: 1.5px; background: var(--faint); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; margin-top: -6.25px; border-radius: 50%;
+  background: var(--ink); box-shadow: 0 0 0 4px rgba(235, 232, 225, 0.08);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border: 0; border-radius: 50%;
+  background: var(--ink); box-shadow: 0 0 0 4px rgba(235, 232, 225, 0.08);
+}
+input[type="range"]:focus-visible { outline: 1px solid var(--dim); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

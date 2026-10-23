@@ -1,0 +1,168 @@
+/* Calculus: the shared look for every page in the section.
+   Graphite ground, warm chalk type, and only two colours with meaning:
+   lilac for inputs (x, and the point a it closes in on),
+   coral for outputs (f(x), and the value L it closes in on). */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #0b0d11;
+  --ink:   #ebe8e1;
+  --body:  rgba(235, 232, 225, 0.86);
+  --dim:   rgba(235, 232, 225, 0.5);
+  --faint: rgba(235, 232, 225, 0.14);
+  --hair:  rgba(235, 232, 225, 0.08);
+  --in:    #a99cff;   /* inputs */
+  --out:   #ff8c69;   /* outputs */
+  --measure: 40rem;
+}
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--bg); }
+
+body {
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--body);
+  font-family: "Newsreader", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* A faint grid of points, like graph paper seen in the dark, fading out down the page. */
+body::before {
+  content: "";
+  position: absolute; inset: 0 0 auto 0; height: 46rem; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(235, 232, 225, 0.11) 1px, transparent 1.3px);
+  background-size: 26px 26px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+}
+
+.sheet {
+  position: relative; z-index: 1;
+  width: min(var(--measure), 100% - 2.4rem);
+  margin: 0 auto;
+}
+
+/* ---------- masthead ---------- */
+header { padding: clamp(2rem, 7vh, 3.6rem) 0 clamp(1.4rem, 4vh, 2.2rem); }
+
+.crumb {
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.2s ease;
+}
+.crumb::before { content: "← "; }
+.crumb:hover, .crumb:focus-visible { color: var(--ink); outline: none; }
+
+h1 {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3.2rem, 11vw, 5.8rem);
+  line-height: 0.95; letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-top: clamp(1.6rem, 5vh, 2.8rem);
+}
+
+/* ---------- prose ---------- */
+section { counter-increment: sec; }
+main { counter-reset: sec; }
+
+h2 {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 4.4vw, 2.35rem);
+  line-height: 1.1;
+  color: var(--ink);
+  margin: clamp(3rem, 8vh, 4.4rem) 0 1.1rem;
+}
+h2::before {
+  content: counter(sec, decimal-leading-zero);
+  display: block;
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem; letter-spacing: 0.2em;
+  color: var(--dim); margin-bottom: 0.7rem;
+}
+section:first-of-type h2 { margin-top: 0.6rem; }
+
+p, li {
+  font-size: clamp(1.1rem, 2.4vw, 1.22rem);
+  line-height: 1.68;
+}
+p + p { margin-top: 0.9rem; }
+p strong { color: var(--ink); font-weight: 500; }
+em { font-style: italic; }
+
+.in  { color: var(--in); }
+.out { color: var(--out); }
+
+a.inline {
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid var(--faint);
+  transition: border-color 0.2s ease;
+}
+a.inline:hover, a.inline:focus-visible { border-bottom-color: var(--ink); outline: none; }
+
+/* ---------- maths ---------- */
+mjx-container { color: inherit; }
+.math {
+  overflow-x: auto; overflow-y: hidden;
+  margin: 1.1rem 0; padding: 0.15rem 0;
+  font-size: clamp(1.1rem, 2.4vw, 1.22rem);
+  color: var(--ink);
+}
+.math mjx-container[display="true"] { text-align: left !important; margin: 0 !important; }
+.math + p, figure + p, iframe + p, .def + p { margin-top: 0.9rem; }
+.mjx-in  { color: var(--in); }
+.mjx-out { color: var(--out); }
+
+/* the one statement worth keeping, set apart by a hairline */
+.def {
+  margin: 1.5rem 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--faint);
+  border-radius: 2px;
+}
+.def .math { margin: 0; }
+.def .math + p { margin-top: 0.8rem; }
+.def p + .math { margin-top: 0.5rem; }
+
+/* ---------- figures and widgets ---------- */
+figure.graph { margin: 1.6rem 0; }
+figure.graph svg { display: block; width: 100%; max-width: 400px; height: auto; margin-inline: auto; overflow: visible; }
+figure.graph text { font-family: "DM Mono", monospace; font-size: 12px; fill: var(--dim); }
+figure.graph .ax { stroke: var(--faint); stroke-width: 1.2; }
+figure.graph .fn { stroke: var(--ink); stroke-width: 2; fill: none; stroke-linecap: round; }
+figure.graph .hole { fill: var(--bg); stroke: var(--ink); stroke-width: 1.8; }
+figure.graph .stray { fill: var(--ink); }
+figure.graph .tick-out { stroke: var(--out); stroke-width: 2; }
+figure.graph text.out { fill: var(--out); }
+
+iframe.calc-widget {
+  display: block; width: 100%;
+  border: 0; overflow: hidden; background: transparent;
+  margin: 1.8rem 0;
+}
+
+/* ---------- footer nav ---------- */
+.foot-nav {
+  display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  border-top: 1px solid var(--hair);
+  margin-top: clamp(3rem, 8vh, 4.6rem);
+  padding: 1.5rem 0 3rem;
+}
+.foot-nav a {
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.2s ease;
+}
+.foot-nav a:hover, .foot-nav a:focus-visible { color: var(--ink); outline: none; }
+
+@media (max-width: 420px) {
+  .def { padding: 0.9rem 0.85rem; }
+  .def .math { font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

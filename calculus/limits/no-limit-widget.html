@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Three ways to have no limit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="h" type="range" min="0" max="1000" step="1" value="160" aria-label="How close the inputs are to 0" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Three functions, all approached at x = 0 by the same pair of inputs, −h and +h (lilac).
+  // Their outputs (coral, on each panel's left rail) do three different wrong things:
+  // settle on two different heights, run off the top, or never settle at all.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("h");
+  const HMAX = 0.8, HMIN = 0.001;
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1", AX = "rgba(235,232,225,0.22)";
+
+  const PANELS = [
+    { name: "jump",    f: (x) => (x < 0 ? 1 : 2) + 0.4 * x, yr: [-0.2, 3],   holes: [[0, 1], [0, 2]] },
+    { name: "blow-up", f: (x) => 0.12 / (x * x),             yr: [-0.2, 3],   holes: [] },
+    { name: "wobble",  f: (x) => Math.sin(1 / x),            yr: [-1.35, 1.35], holes: [] },
+  ];
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  // sample each side from the edge in to the middle; for the wobble, step evenly in 1/x
+  // so every swing gets the same number of points however tight it is
+  function side(p, sign) {
+    const pts = [];
+    if (p.name === "wobble") for (let i = 0; i <= 2400; i++) { const u = 1 + (i / 2400) * 399; pts.push(sign / u); }
+    else for (let i = 0; i <= 200; i++) pts.push(sign * (1 - i / 200 * 0.998));
+    return pts;
+  }
+
+  function render() {
+    const h = HMAX * Math.pow(HMIN / HMAX, +slider.value / 1000);
+    const W = svg.clientWidth || 560;
+    const gap = W < 420 ? 14 : 30, pw = (W - 2 * gap) / 3, ph = Math.round(Math.min(190, pw * 1.05)), H = ph + 26;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const defs = el("defs", {});
+
+    PANELS.forEach((p, k) => {
+      const ox = k * (pw + gap), inset = 10;
+      const sx = (x) => ox + inset + ((x + 1) / 2) * (pw - inset);
+      const sy = (y) => 6 + ((p.yr[1] - y) / (p.yr[1] - p.yr[0])) * (ph - 12);
+      const clip = el("clipPath", { id: "c" + k }, undefined, defs);
+      el("rect", { x: ox, y: 0, width: pw, height: ph }, undefined, clip);
+      const g = el("g", { "clip-path": `url(#c${k})` });
+
+      const y0 = sy(0);
+      el("line", { x1: ox + inset, x2: ox + pw, y1: y0, y2: y0, stroke: AX, "stroke-width": 1.2 }, undefined, g);
+      el("line", { x1: ox + inset, x2: ox + inset, y1: 4, y2: ph - 4, stroke: AX, "stroke-width": 1.2 }, undefined, g);
+
+      for (const s of [-1, 1]) {
+        const d = side(p, s).map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + Math.max(-40, Math.min(ph + 40, sy(p.f(x)))).toFixed(1)).join("");
+        el("path", { d, fill: "none", stroke: INK, "stroke-opacity": p.name === "wobble" ? 0.42 : 0.85,
+                     "stroke-width": p.name === "wobble" ? 0.9 : 1.8, "stroke-linejoin": "round" }, undefined, g);
+      }
+      p.holes.forEach(([x, y]) => el("circle", { cx: sx(x), cy: sy(y), r: 4, fill: "#0b0d11", stroke: INK, "stroke-width": 1.6 }, undefined, g));
+
+      for (const s of [-1, 1]) {
+        const x = s * h, y = p.f(x), px = sx(x), py = sy(y), off = py < 2;
+        el("line", { x1: px, x2: px, y1: y0 - 4, y2: y0 + 4, stroke: IN, "stroke-width": 2 }, undefined, g);
+        if (off) {
+          // the output has left the panel: a coral caret at the top of the rail says where it went
+          el("path", { d: `M${ox + inset - 5} 9 L${ox + inset} 2 L${ox + inset + 5} 9`, fill: "none", stroke: OUT, "stroke-width": 2, "stroke-linejoin": "round" });
+          continue;
+        }
+        el("line", { x1: ox + inset, x2: px, y1: py, y2: py, stroke: OUT, "stroke-opacity": 0.45, "stroke-dasharray": "2 3" }, undefined, g);
+        el("line", { x1: ox + inset - 4, x2: ox + inset + 4, y1: py, y2: py, stroke: OUT, "stroke-width": 2 }, undefined, g);
+        // beside a hole, the dot rests against its rim rather than covering it
+        const cx = p.holes.length ? sx(0) + s * Math.max(Math.abs(px - sx(0)), 8) : px;
+        el("circle", { cx, cy: py, r: 3.4, fill: INK }, undefined, g);
+      }
+      el("text", { x: ox + inset + (pw - inset) / 2, y: ph + 20, "text-anchor": "middle" }, p.name);
+    });
+
+    const j = PANELS.map((p) => [p.f(-h), p.f(h)]);
+    const r = (v) => (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString("en-GB") : v.toFixed(2));
+    svg.setAttribute("aria-label", `Inputs ${r(-h)} and ${r(h)}, either side of 0. Jump: outputs ${r(j[0][0])} and ${r(j[0][1])}, near 1 and 2. Blow-up: both outputs ${r(j[1][0])}. Wobble: outputs ${r(j[2][0])} and ${r(j[2][1])}.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

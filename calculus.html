@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Calculus from the ground up: limits, and the ideas built on them — explanations by Sam Kirwan." />
+  <title>Calculus | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="calculus.css" />
+  <style>
+    body { display: flex; align-items: center; }
+    body::before { height: 100%; }
+
+    main {
+      position: relative; z-index: 1;
+      width: min(40rem, calc(100% - 3rem));
+      margin-left: clamp(1.5rem, 11vw, 10rem);
+      padding: clamp(3rem, 9vh, 5.5rem) 0;
+    }
+
+    h1 { margin-top: 0; font-size: clamp(3.6rem, 12vw, 6.6rem); }
+
+    /* a point closing in on a hole from both sides, and back again */
+    .motif { display: block; width: min(100%, 300px); height: auto; margin-top: 1.6rem; overflow: visible; }
+
+    nav { margin-top: clamp(2.2rem, 6vh, 3.6rem); }
+    ul { list-style: none; }
+    h2 {
+      margin: 0 0 0.95rem;
+      font-family: "DM Mono", monospace;
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--out);
+    }
+    h2::before { content: none; }
+    li + li { margin-top: 0.7rem; }
+    nav a {
+      display: inline-block;
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(1.15rem, 2vw, 1.35rem);
+      color: var(--ink); text-decoration: none;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+    nav a:hover, nav a:focus-visible { color: var(--in); outline: none; transform: translateX(3px); }
+
+    .back { display: inline-block; margin-top: 2.6rem; }
+
+    @media (max-width: 560px) { main { margin-left: 1.5rem; } }
+    @media (prefers-reduced-motion: reduce) { nav a { transition: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Calculus</h1>
+    <svg class="motif" id="motif" viewBox="0 0 300 70" aria-hidden="true">
+      <line x1="0" x2="300" y1="62" y2="62" stroke="rgba(235,232,225,0.16)" stroke-width="1" />
+      <path d="M0 52 C 60 50, 110 12, 150 12 S 240 50, 300 52" fill="none" stroke="#ebe8e1" stroke-opacity="0.7" stroke-width="1.6" />
+      <line id="tl" x1="0" x2="0" y1="58" y2="66" stroke="#a99cff" stroke-width="1.8" />
+      <line id="tr" x1="0" x2="0" y1="58" y2="66" stroke="#a99cff" stroke-width="1.8" />
+      <circle id="dl" r="3.4" fill="#ebe8e1" />
+      <circle id="dr" r="3.4" fill="#ebe8e1" />
+      <circle cx="150" cy="12" r="4.4" fill="#0b0d11" stroke="#ebe8e1" stroke-width="1.5" />
+    </svg>
+    <nav aria-label="Calculus pages">
+      <section aria-labelledby="g1">
+        <h2 id="g1">Foundations</h2>
+        <ul>
+          <li><a href="calculus-limits.html">Limits</a></li>
+        </ul>
+      </section>
+    </nav>
+    <a class="crumb back" href="index.html#math">Math</a>
+  </main>
+  <script>
+    // The motif's curve is a cubic pair; find the height above any x by bisecting each half.
+    (function () {
+      const seg = [[[0, 52], [60, 50], [110, 12], [150, 12]], [[150, 12], [190, 12], [240, 50], [300, 52]]];
+      const bez = (p, t, i) => { const u = 1 - t; return u*u*u*p[0][i] + 3*u*u*t*p[1][i] + 3*u*t*t*p[2][i] + t*t*t*p[3][i]; };
+      function yAt(x) {
+        const p = seg[x < 150 ? 0 : 1];
+        let lo = 0, hi = 1;
+        for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; if (bez(p, m, 0) < x) lo = m; else hi = m; }
+        return bez(p, lo, 1);
+      }
+      const ids = ["dl", "dr", "tl", "tr"].map((id) => document.getElementById(id));
+      function place(gap) {
+        [150 - gap, 150 + gap].forEach((x, i) => {
+          ids[i].setAttribute("cx", x); ids[i].setAttribute("cy", yAt(x));
+          ids[i + 2].setAttribute("x1", x); ids[i + 2].setAttribute("x2", x);
+        });
+      }
+      place(42);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const t0 = performance.now();
+      (function tick(now) {
+        // ease in toward the hole, pause, drift back out: never touching it
+        const s = ((now - t0) / 5200) % 1, e = 0.5 - 0.5 * Math.cos(2 * Math.PI * s);
+        place(9 + 67 * Math.pow(1 - e, 1.6));
+        requestAnimationFrame(tick);
+      })(t0);
+    })();
+  </script>
+</body>
+</html>

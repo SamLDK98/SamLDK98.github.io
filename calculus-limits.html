@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Limits | Calculus | Sam Kirwan</title>
+  <meta name="description" content="What a limit is: the value a function heads toward as its input closes in on a point, why the point itself doesn't matter, when a limit fails to exist, and what 'as close as we like' means." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="calculus.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="calculus.html">Calculus</a>
+      <h1>Limits</h1>
+    </header>
+    <main>
+      <section aria-labelledby="heading">
+        <h2 id="heading">Heading Toward a Value</h2>
+        <p>Consider the function:</p>
+        <div class="math">\[f(x)=\frac{x^2-1}{x-1}\]</div>
+        <p>At \(x=1\), the top is \(0\) and the bottom is \(0\).</p>
+        <p>\(\frac{0}{0}\) has no value, so \(f(1)\) does not exist.</p>
+        <p>But we can still ask what happens <em>near</em> \(1\).</p>
+        <p>An input of \(\class{mjx-in}{0.9}\) gives \(\class{mjx-out}{1.9}\). An input of \(\class{mjx-in}{0.99}\) gives \(\class{mjx-out}{1.99}\). An input of \(\class{mjx-in}{0.999}\) gives \(\class{mjx-out}{1.999}\).</p>
+        <p>From the other side, \(\class{mjx-in}{1.1}\) gives \(\class{mjx-out}{2.1}\), and \(\class{mjx-in}{1.01}\) gives \(\class{mjx-out}{2.01}\).</p>
+        <p>As the <span class="in">input</span> closes in on \(1\), the <span class="out">output</span> closes in on \(2\).</p>
+        <iframe class="calc-widget" src="calculus/limits/approach-widget.html" title="Interactive: slide to bring two inputs closer to 1 from either side; their outputs close in on 2, while the graph has a hole at 1 itself" style="height: 300px" scrolling="no" loading="lazy"></iframe>
+        <p>The output never reaches \(2\), because the input is never allowed to reach \(1\).</p>
+        <p>Yet the value it is heading for is perfectly clear.</p>
+        <p>That value is called the <strong>limit</strong>.</p>
+        <div class="math">\[\lim_{x\to \class{mjx-in}{1}} f(x)=\class{mjx-out}{2}\]</div>
+        <p>We read this as “the limit of \(f(x)\) as \(x\) approaches \(1\) is \(2\)”.</p>
+      </section>
+
+      <section aria-labelledby="point">
+        <h2 id="point">The Point Itself Doesn't Matter</h2>
+        <p><a class="inline" href="polynomials-factorisation.html">Factorising</a> the top shows where the hole comes from.</p>
+        <div class="math">\[\frac{x^2-1}{x-1}=\frac{(x-1)(x+1)}{x-1}=x+1 \quad (x\neq1)\]</div>
+        <p>Everywhere except \(x=1\), \(f\) is simply the line \(x+1\). Only one point is missing.</p>
+        <p>A limit only looks at inputs <em>near</em> \(1\), never at \(1\) itself.</p>
+        <p>So if we filled the hole with some other value, say \(f(1)=4\), the limit would still be \(2\).</p>
+        <figure class="graph">
+          <svg viewBox="0 0 360 210" role="img" aria-label="The line x plus 1 with a hole at x = 1, height 2, and a single stray point above it at height 4. Every nearby point on the line is still heading for 2.">
+            <line x1="34" x2="348" y1="182.3" y2="182.3" class="ax"/>
+            <line x1="88.1" x2="88.1" y1="10" y2="192" class="ax"/>
+            <line x1="40" y1="162.7" x2="348" y2="37.4" class="fn"/>
+            <line x1="83.1" x2="93.1" y1="104" y2="104" class="tick-out"/>
+            <circle cx="184.4" cy="104" r="5" class="hole"/>
+            <circle cx="184.4" cy="25.7" r="4.4" class="stray"/>
+            <text x="76" y="108" text-anchor="end" class="out">2</text>
+            <text x="76" y="29.7" text-anchor="end">4</text>
+            <text x="184.4" y="200" text-anchor="middle">1</text>
+          </svg>
+        </figure>
+        <p>The function now has a value at \(1\), but everything around it is still heading for \(2\).</p>
+        <p>When the value at a point <em>does</em> match the limit there, the function is called <strong>continuous</strong> at that point: no hole, and no stray dot.</p>
+        <p>For a continuous function, the limit is found just by substituting.</p>
+        <div class="math">\[\lim_{x\to3}\,(x+1)=3+1=4\]</div>
+        <p>Polynomials, sine and cosine are continuous everywhere. Limits only become interesting where substituting fails.</p>
+      </section>
+
+      <section aria-labelledby="sides">
+        <h2 id="sides">Both Sides Must Agree</h2>
+        <p>An input can approach \(1\) from below or from above.</p>
+        <p>Each direction gives a <strong>one-sided limit</strong>:</p>
+        <div class="math">\[\lim_{x\to1^-} f(x)=2 \qquad \lim_{x\to1^+} f(x)=2\]</div>
+        <p>The minus means from below, and the plus means from above.</p>
+        <p>The limit exists only when both sides settle on the same number.</p>
+        <p>Here are three functions where they don't, each approached at \(x=0\).</p>
+        <iframe class="calc-widget" src="calculus/limits/no-limit-widget.html" title="Interactive: slide to bring two inputs closer to 0 from either side, for three functions at once. In the jump, the outputs settle on two different heights; in the blow-up, they run off the top; in the wobble, they never settle" style="height: 250px" scrolling="no" loading="lazy"></iframe>
+        <p>In the <strong>jump</strong>, each side settles, but on a different number: \(1\) from below, \(2\) from above.</p>
+        <p>In the <strong>blow-up</strong>, the outputs grow without end. There is no number to settle on.</p>
+        <p>In the <strong>wobble</strong>, \(\sin\frac{1}{x}\), the outputs keep swinging between \(-1\) and \(1\), however close the input gets.</p>
+        <p>None of these has a limit at \(0\).</p>
+      </section>
+
+      <section aria-labelledby="close">
+        <h2 id="close">As Close as We Like</h2>
+        <p>So far, “heading for” has been doing a lot of work.</p>
+        <p>\(1.9,\ 1.99,\ 1.999\) are getting closer to \(2\). But they are also getting closer to \(3\), and to \(100\).</p>
+        <p>Getting closer is not enough. What makes \(2\) special is that the outputs get <em>as close to \(2\) as we like</em>.</p>
+        <p>This matters most when there is nothing to cancel. Take this function, with \(x\) in radians:</p>
+        <div class="math">\[g(x)=\frac{\sin x}{x}\]</div>
+        <p>At \(x=0\) it is \(\frac{0}{0}\) again, and no factor removes the hole.</p>
+        <p>Nearby, \(g(\class{mjx-in}{0.1})=\class{mjx-out}{0.99833\ldots}\) and \(g(\class{mjx-in}{0.01})=\class{mjx-out}{0.99998\ldots}\).</p>
+        <p>To claim the limit is \(1\), set a challenge. Draw a band around \(1\), as thin as you like.</p>
+        <p>There must be a window around \(0\) where every input, other than \(0\) itself, gives an output inside the band.</p>
+        <iframe class="calc-widget" src="calculus/limits/band-widget.html" title="Interactive: slide to make a band around the output 1 thinner; a window around the input 0 narrows with it, and every output inside the window stays inside the band" style="height: 300px" scrolling="no" loading="lazy"></iframe>
+        <p>A thinner band needs a narrower window, but a window can always be found.</p>
+        <p>That is exactly what a limit means. The band's half-width is called \(\varepsilon\) (epsilon), and the window's half-width \(\delta\) (delta).</p>
+        <div class="def">
+          <div class="math">\[\lim_{x\to \class{mjx-in}{a}} f(x)=\class{mjx-out}{L}\]</div>
+          <p>means that for every \(\varepsilon>0\) there is a \(\delta>0\) such that</p>
+          <div class="math">\[0<|x-\class{mjx-in}{a}|<\delta \;\implies\; |f(x)-\class{mjx-out}{L}|<\varepsilon\]</div>
+        </div>
+        <p>The \(0<\) on the left leaves out \(x=a\) itself. The hole is allowed.</p>
+      </section>
+
+      <section aria-labelledby="why">
+        <h2 id="why">Why Calculus Starts Here</h2>
+        <p>Calculus studies change, and the rate of change at a single instant is a \(\frac{0}{0}\) problem.</p>
+        <p>The slope of \(x^2\) between \(x=1\) and \(x=1+h\) is the rise over the run:</p>
+        <div class="math">\[\frac{(1+h)^2-1}{h}\]</div>
+        <p>At \(h=0\), this is \(\frac{0}{0}\): the slope between a point and itself.</p>
+        <p>For any other \(h\), it tidies up:</p>
+        <div class="math">\[\frac{2h+h^2}{h}=2+h\]</div>
+        <p>As \(h\) closes in on \(0\), the slope closes in on \(2\).</p>
+        <div class="math">\[\lim_{h\to0}\frac{(1+h)^2-1}{h}=2\]</div>
+        <p>That limit is the slope of \(x^2\) at the single point \(x=1\).</p>
+        <p>Every derivative is a limit of exactly this kind.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="calculus.html">← All Calculus pages</a>
+        <a href="index.html#math">Math →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "calc-widget-height") return;
+      document.querySelectorAll("iframe.calc-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

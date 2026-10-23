@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>However thin the band</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="e" type="range" min="0" max="1000" step="1" value="260" aria-label="How thin the band around 1 is" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // sin(x)/x, with a hole at x = 0. The slider thins a band around the output 1 (coral);
+  // the widget finds the widest window around the input 0 (lilac) whose outputs all stay
+  // inside that band. On (0, 4.49) the curve only falls, so the window's edge is the first
+  // place it leaves the band; the function is even, so the window is the same both ways.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("e");
+  const H = 240, XR = [-5.6, 5.6], YR = [-0.42, 1.42], EMAX = 0.5, EMIN = 0.004;
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1";
+  const f = (x) => Math.sin(x) / x;
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+  function windowFor(eps) {
+    let lo = 1e-9, hi = 4.49;
+    for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (1 - f(m) < eps) lo = m; else hi = m; }
+    return lo;
+  }
+  const two = (v) => +v.toPrecision(2) + "";
+
+  function render() {
+    const eps = EMAX * Math.pow(EMIN / EMAX, +slider.value / 1000), del = windowFor(eps);
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const P = 8, B = 30;
+    const sx = (x) => P + ((x - XR[0]) / (XR[1] - XR[0])) * (W - 2 * P);
+    const sy = (y) => P + ((YR[1] - y) / (YR[1] - YR[0])) * (H - P - B);
+    const y0 = sy(0), xa = sx(0);
+
+    // the band around 1, then the window around 0
+    const bt = sy(1 + eps), bb = sy(1 - eps), wl = sx(-del), wr = sx(del);
+    el("rect", { x: P, y: bt, width: W - 2 * P, height: Math.max(bb - bt, 0.8), fill: OUT, "fill-opacity": 0.13 });
+    for (const y of [bt, bb]) el("line", { x1: P, x2: W - P, y1: y, y2: y, stroke: OUT, "stroke-opacity": 0.55, "stroke-width": 1 });
+    el("rect", { x: wl, y: P, width: wr - wl, height: y0 - P, fill: IN, "fill-opacity": 0.12 });
+    for (const x of [wl, wr]) el("line", { x1: x, x2: x, y1: P, y2: y0 + 5, stroke: IN, "stroke-opacity": 0.6, "stroke-width": 1 });
+
+    el("line", { x1: P, x2: W - P, y1: y0, y2: y0, stroke: "rgba(235,232,225,0.22)", "stroke-width": 1.2 });
+    let d = "";
+    for (let i = 0; i <= 400; i++) {
+      const x = XR[0] + ((XR[1] - XR[0]) * i) / 400 + 1e-7;
+      d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(f(x)).toFixed(1);
+    }
+    el("path", { d, fill: "none", stroke: INK, "stroke-opacity": 0.85, "stroke-width": 1.8, "stroke-linejoin": "round" });
+    el("circle", { cx: xa, cy: sy(1), r: 4.2, fill: "#0b0d11", stroke: INK, "stroke-width": 1.6 });
+
+    el("text", { x: W - P, y: bt - 7, "text-anchor": "end", class: "out" }, `1 ± ${two(eps)}`);
+    el("text", { x: xa, y: y0 + 20, "text-anchor": "middle", class: "in" }, `0 ± ${two(del)}`);
+
+    svg.setAttribute("aria-label", `A band of 1 plus or minus ${two(eps)} around the output. Every input within ${two(del)} of 0, apart from 0 itself, gives an output inside it.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

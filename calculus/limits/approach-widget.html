@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Closing in on the hole</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="h" type="range" min="0" max="1000" step="1" value="160" aria-label="How close the inputs are to 1" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // f(x) = (x² − 1)/(x − 1), which is the line x + 1 with a hole at x = 1.
+  // Two inputs close in on 1 from either side, 1 − h and 1 + h (lilac, on the x-axis),
+  // and their outputs close in on 2 (coral, on the y-axis). The slider is logarithmic,
+  // so the last few thousandths get as much travel as the first few tenths.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("h");
+  const H = 250, XR = [-0.45, 2.75], YR = [-0.3, 3.75], HMAX = 0.8, HMIN = 0.001;
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1";
+  const f = (x) => (x * x - 1) / (x - 1);
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+  // enough decimals to tell the number from 1 (or 2), and no trailing zeros
+  function fmt(v, h) {
+    const d = Math.max(1, Math.ceil(-Math.log10(h) + 1e-9) + 1);
+    return v.toFixed(d).replace(/0+$/, "").replace(/\.$/, "");
+  }
+  // push two labels apart until they no longer touch, keeping them centred on their pair
+  function spread(a, b, gap) {
+    const mid = (a + b) / 2, half = Math.max(Math.abs(b - a) / 2, gap / 2);
+    return a < b ? [mid - half, mid + half] : [mid + half, mid - half];
+  }
+
+  function render() {
+    const h = HMAX * Math.pow(HMIN / HMAX, +slider.value / 1000);
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 46, R = 12, T = 8, B = 30;
+    const sx = (x) => L + ((x - XR[0]) / (XR[1] - XR[0])) * (W - L - R);
+    const sy = (y) => T + ((YR[1] - y) / (YR[1] - YR[0])) * (H - T - B);
+    const x0 = sx(0), y0 = sy(0);
+
+    el("line", { x1: L - 6, x2: W - R, y1: y0, y2: y0, stroke: "rgba(235,232,225,0.22)", "stroke-width": 1.2 });
+    el("line", { x1: x0, x2: x0, y1: T, y2: H - B + 6, stroke: "rgba(235,232,225,0.22)", "stroke-width": 1.2 });
+    el("line", { x1: sx(XR[0]), y1: sy(XR[0] + 1), x2: sx(XR[1]), y2: sy(XR[1] + 1),
+                 stroke: INK, "stroke-opacity": 0.85, "stroke-width": 2, "stroke-linecap": "round" });
+
+    const xs = [1 - h, 1 + h], ys = xs.map(f);
+    xs.forEach((x, i) => {
+      const px = sx(x), py = sy(ys[i]);
+      el("line", { x1: px, x2: px, y1: py, y2: y0, stroke: IN, "stroke-opacity": 0.45, "stroke-dasharray": "2 4" });
+      el("line", { x1: x0, x2: px, y1: py, y2: py, stroke: OUT, "stroke-opacity": 0.45, "stroke-dasharray": "2 4" });
+      el("line", { x1: px, x2: px, y1: y0 - 5, y2: y0 + 5, stroke: IN, "stroke-width": 2 });
+      el("line", { x1: x0 - 5, x2: x0 + 5, y1: py, y2: py, stroke: OUT, "stroke-width": 2 });
+    });
+
+    // the hole, drawn over the line so it reads as a gap; once the inputs are closer than the
+    // screen can show, the dots rest against its rim instead of covering it (the numbers stay exact)
+    const hx = sx(1), hy = sy(2), ux = sx(2) - hx, uy = sy(3) - hy, un = Math.hypot(ux, uy), RIM = 10;
+    el("circle", { cx: hx, cy: hy, r: 5, fill: "#0b0d11", stroke: INK, "stroke-width": 1.8 });
+    xs.forEach((x, i) => {
+      const s = i ? 1 : -1, dist = Math.max(Math.hypot(sx(x) - hx, sy(ys[i]) - hy), RIM);
+      el("circle", { cx: hx + s * dist * ux / un, cy: hy + s * dist * uy / un, r: 4.2, fill: INK });
+    });
+
+    const xl = xs.map((x) => fmt(x, h)), yl = ys.map((y) => fmt(y, h));
+    const wx = 7 * Math.max(xl[0].length, xl[1].length);
+    const [ax, bx] = spread(sx(xs[0]), sx(xs[1]), wx + 10);
+    el("text", { x: ax, y: y0 + 19, "text-anchor": "middle", class: "in" }, xl[0]);
+    el("text", { x: bx, y: y0 + 19, "text-anchor": "middle", class: "in" }, xl[1]);
+    const [ay, by] = spread(sy(ys[0]), sy(ys[1]), 15);
+    el("text", { x: x0 - 9, y: ay + 4, "text-anchor": "end", class: "out" }, yl[0]);
+    el("text", { x: x0 - 9, y: by + 4, "text-anchor": "end", class: "out" }, yl[1]);
+
+    svg.setAttribute("aria-label", `Inputs ${xl[0]} and ${xl[1]}, either side of 1, give outputs ${yl[0]} and ${yl[1]}, either side of 2. At 1 itself the graph has a hole.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
