@@ -4,12 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Radians Around a Circle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <style>
     :root {
       --text: #ece2d1;
       --dim: #a89c87;
-      --blue: #6dd3c4;
-      --orange: #e8a13b;
+      --accent: #d4b888;
+      --gold: #f1c66e;
+      --cream: rgba(236, 226, 209, 0.55);
     }
 
     * {
@@ -46,43 +50,42 @@
     }
 
     .circle {
-      fill: rgba(0, 0, 0, 0.08);
-      stroke: var(--orange);
-      stroke-width: 3;
+      fill: rgba(236, 226, 209, 0.025);
+      stroke: rgba(236, 226, 209, 0.3);
+      stroke-width: 1.6;
     }
 
     .axis {
-      stroke: rgba(168, 156, 135, 0.45);
-      stroke-width: 1.4;
-      stroke-dasharray: 4 5;
+      stroke: rgba(168, 156, 135, 0.3);
+      stroke-width: 1.2;
+      stroke-dasharray: 3 5;
     }
 
     .radian-label {
-      fill: var(--text);
-      font-family: "Courier New", monospace;
+      fill: var(--dim);
+      font-family: "JetBrains Mono", "Courier New", monospace;
       font-size: 21px;
-      font-weight: 700;
+      font-weight: 400;
     }
 
     .fraction-bar {
-      stroke: var(--text);
-      stroke-width: 1.6;
+      stroke: var(--dim);
+      stroke-width: 1.2;
       stroke-linecap: round;
     }
 
     .tick-point {
-      fill: var(--blue);
-      stroke: rgba(0, 0, 0, 0.42);
-      stroke-width: 1.8;
+      fill: var(--cream);
+      stroke: none;
     }
 
     .tick-point.angle-45 {
-      stroke: rgba(0, 0, 0, 0.56);
-      stroke-width: 2.2;
+      fill: var(--accent, #d4b888);
+      stroke: none;
     }
 
     .angle-sector {
-      fill: rgba(110, 167, 255, 0.16);
+      fill: rgba(241, 198, 110, 0.1);
       stroke: none;
     }
 
@@ -90,20 +93,26 @@
     .angle-ray,
     .base-ray {
       fill: none;
-      stroke: var(--blue);
+      stroke: var(--gold);
       stroke-linecap: round;
-      stroke-width: 2.6;
+      stroke-width: 2.4;
+    }
+
+    .base-ray {
+      stroke: var(--cream);
+      stroke-width: 1.8;
     }
 
     .angle-ray {
-      filter: drop-shadow(0 0 5px rgba(110, 167, 255, 0.36));
+      filter: drop-shadow(0 0 6px rgba(241, 198, 110, 0.3));
     }
 
     .handle {
-      fill: var(--blue);
-      stroke: var(--text);
+      fill: var(--gold);
+      stroke: #161311;
       stroke-width: 2;
       cursor: grab;
+      filter: drop-shadow(0 0 6px rgba(241, 198, 110, 0.34));
     }
 
     .handle:active {
@@ -130,8 +139,11 @@
     <div class="stage">
       <svg id="circleSvg" viewBox="0 0 430 420" role="img" aria-label="Interactive circle labelled with radians">
         <defs>
-          <marker id="blueArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-            <path d="M 0 0 L 8 4 L 0 8 Z" fill="#6dd3c4"></path>
+          <marker id="goldArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M 0 0 L 8 4 L 0 8 Z" fill="#f1c66e"></path>
+          </marker>
+          <marker id="creamArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M 0 0 L 8 4 L 0 8 Z" fill="rgba(236, 226, 209, 0.55)"></path>
           </marker>
         </defs>
 
@@ -141,9 +153,9 @@
 
         <g id="ticks"></g>
         <path class="angle-sector" id="sector"></path>
-        <line class="base-ray" x1="225" y1="205" x2="380" y2="205" marker-end="url(#blueArrow)" />
+        <line class="base-ray" x1="225" y1="205" x2="380" y2="205" marker-end="url(#creamArrow)" />
         <path class="angle-arc" id="arc"></path>
-        <line class="angle-ray" id="ray" x1="225" y1="205" x2="0" y2="0" marker-end="url(#blueArrow)" />
+        <line class="angle-ray" id="ray" x1="225" y1="205" x2="0" y2="0" marker-end="url(#goldArrow)" />
         <circle class="handle" id="handle" cx="0" cy="0" r="10" tabindex="0" aria-label="Drag or use arrow keys to change the angle" />
       </svg>
     </div>
