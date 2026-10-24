@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A square growing by h</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="h" type="range" min="0" max="1000" step="1" value="0" aria-label="How much each side of the square grows" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // A square of side 1 grows by h along two sides: two coral strips, each 1 long and h thick, and
+  // a faint corner, h by h. Underneath, the growth divided by h is laid out as one bar: each strip
+  // becomes a piece as long as the side, and the corner a piece only h long, so the bar's length
+  // is 2 + h. The slider is logarithmic, as in the other Calculus widgets.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("h");
+  const HMAX = 0.5, HMIN = 0.001;
+  const OUT = "#ff8c69", INK = "#ebe8e1";
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+  // enough decimals to tell the number from 2, and no trailing zeros
+  function fmt(v, h) {
+    const d = Math.max(1, Math.ceil(-Math.log10(h) + 1e-9) + 1);
+    return v.toFixed(d).replace(/0+$/, "").replace(/\.$/, "");
+  }
+
+  function render() {
+    const h = HMAX * Math.pow(HMIN / HMAX, +slider.value / 1000);
+    const W = svg.clientWidth || 560;
+    const LAB = 46, u = Math.min(150, (W - 16 - LAB) / (2 + HMAX));
+    const L = Math.round((W - (2 + HMAX) * u - LAB) / 2), base = 14 + (1 + HMAX) * u;
+    const barY = base + 46, BT = 10, H = barY + BT + 10;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const t = h * u, edge = Math.min(1, t);
+
+    // the square, then what it gains: two strips and the corner between them
+    el("rect", { x: L, y: base - u, width: u, height: u, fill: INK, "fill-opacity": 0.05, stroke: INK, "stroke-opacity": 0.7, "stroke-width": 1.4 });
+    el("rect", { x: L + u, y: base - u, width: t, height: u, fill: OUT, "fill-opacity": 0.4, stroke: OUT, "stroke-width": edge });
+    el("rect", { x: L, y: base - u - t, width: u, height: t, fill: OUT, "fill-opacity": 0.4, stroke: OUT, "stroke-width": edge });
+    el("rect", { x: L + u, y: base - u - t, width: t, height: t, fill: INK, "fill-opacity": 0.2, stroke: INK, "stroke-opacity": 0.5, "stroke-width": edge });
+    el("text", { x: L + u / 2, y: base + 17, "text-anchor": "middle", class: "in" }, "1");
+    el("text", { x: L + u + Math.max(t, 0) / 2, y: base + 17, "text-anchor": "middle", class: "in" }, "h");
+
+    // the growth divided by h: the two strips laid end to end, then the corner
+    el("text", { x: L, y: barY - 8 }, "÷ h");
+    el("rect", { x: L, y: barY, width: u - 1.5, height: BT, fill: OUT, "fill-opacity": 0.75 });
+    el("rect", { x: L + u + 1.5, y: barY, width: u - 1.5, height: BT, fill: OUT, "fill-opacity": 0.75 });
+    el("rect", { x: L + 2 * u, y: barY, width: t, height: BT, fill: INK, "fill-opacity": 0.35 });
+    el("line", { x1: L + 2 * u, x2: L + 2 * u, y1: barY - 5, y2: barY + BT + 5, stroke: INK, "stroke-opacity": 0.35, "stroke-dasharray": "2 2" });
+    const v = fmt(2 + h, h);
+    el("text", { x: L + 2 * u + t + 8, y: barY + BT / 2 + 4, class: "out" }, v);
+
+    svg.setAttribute("aria-label", `Each side of a square of side 1 grows by ${fmt(h, h)}. The area gains two strips and a corner. Divided by ${fmt(h, h)}, the gain is ${v}: 2 from the strips and ${fmt(h, h)} from the corner.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

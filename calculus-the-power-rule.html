@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Power Rule | Calculus | Sam Kirwan</title>
+  <meta name="description" content="Why the slope of x to the n is n times x to the n minus 1: a pattern in the first few slopes, a growing square and cube that show where it comes from, other powers, multiples and sums, and a stone thrown upward." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="calculus.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="calculus.html">Calculus</a>
+      <h1>The Power Rule</h1>
+    </header>
+    <main>
+      <section aria-labelledby="pattern">
+        <h2 id="pattern">A Pattern</h2>
+        <p>On <a class="inline" href="calculus-the-derivative.html">The Derivative</a>, finding a slope meant working out a limit. The answers follow a pattern, and the pattern can be explained.</p>
+        <p>Here are the slopes of the first three powers. The line \(x\) is its own tangent, \(x^2\) came from The Derivative, and \(x^3\) takes the same limit, worked out in the next section.</p>
+        <div class="math">\[\begin{array}{c|ccc} f(x) & x & x^2 & x^3 \\ \hline f'(x) & 1 & 2x & 3x^2 \end{array}\]</div>
+        <p>Each time, the old power comes down in front, and the new power is one lower.</p>
+        <div class="def">
+          <p>For any whole number <span class="nw">\(n\),</span></p>
+          <div class="math">\[f(x)=x^n \quad\Longrightarrow\quad \class{mjx-out}{f'(x)}=nx^{n-1}\]</div>
+        </div>
+        <p>Even a constant fits. \(1\) is <span class="nw">\(x^0\),</span> and the rule brings down a <span class="nw">\(0\):</span> a flat graph has slope <span class="nw">\(0\).</span></p>
+        <p>This is the <strong>power rule</strong>. But why should the power come down?</p>
+      </section>
+
+      <section aria-labelledby="why">
+        <h2 id="why">Why the Power Comes Down</h2>
+        <p>Think of \(x^2\) as the area of a square with sides \(x\) long.</p>
+        <p>Grow each side by a small amount <span class="nw">\(h\).</span> The area grows by two strips, each \(x\) long and \(h\) thick, and a small corner square, \(h\) by <span class="nw">\(h\).</span></p>
+        <p>In symbols, this is the <a class="inline" href="polynomials-expansion.html">square of a sum</a>:</p>
+        <div class="math">\[(x+h)^2=x^2+2xh+h^2\]</div>
+        <p>Divide the growth by <span class="nw">\(h\):</span> the strips give <span class="nw">\(2x\),</span> and the corner gives just <span class="nw">\(h\).</span></p>
+        <p>As \(h\) closes in on <span class="nw">\(0\),</span> the corner's share vanishes and the strips' share stays. The area grows at \(2x\) per unit of side, and that is the slope.</p>
+        <p>Here the square has sides of <span class="nw">\(1\),</span> so the growth per unit of \(h\) is <span class="nw">\(\class{mjx-out}{2+h}\):</span> the slope Limits ended with. Its \(+\,h\) was the corner all along.</p>
+        <iframe class="calc-widget" src="calculus/the-power-rule/square-widget.html" title="Interactive: slide to shrink how much each side of a square of side 1 grows. The two strips it gains stay as long as the side while the corner shrinks away, so the growth divided by h closes in on 2" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+        <p>A cube works the same way. \(x^3\) is the volume of a cube with sides \(x\) long.</p>
+        <p>Grow each side by <span class="nw">\(h\),</span> and three faces push out. Each adds a slab \(x\) by \(x\) by <span class="nw">\(h\).</span> Along the edges between them sit three thin rods, and in the corner a tiny cube.</p>
+        <p>Below, the pieces are pulled apart so that each one shows.</p>
+        <figure class="cube">
+          <svg viewBox="-157.6 -158.0 295.3 316.0" role="img" aria-label="A cube of side x, grown by h along each edge and pulled apart: three slabs, each x by x by h, sit against three of its faces; three thin rods, each x by h by h, sit along the edges between them; and a tiny cube, h by h by h, sits in the corner.">
+            <polygon class="core" fill-opacity="0.1" points="-86.6,50.0 0.0,100.0 0.0,0.0 -86.6,-50.0"/>
+            <polygon class="core" fill-opacity="0.14" points="86.6,50.0 86.6,-50.0 0.0,0.0 0.0,100.0"/>
+            <polygon class="core" fill-opacity="0.2" points="0.0,-100.0 86.6,-50.0 0.0,0.0 -86.6,-50.0"/>
+            <polygon class="slab" fill-opacity="0.2" points="19.1,111.0 45.0,126.0 45.0,26.0 19.1,11.0"/>
+            <polygon class="slab" fill-opacity="0.28" points="131.6,76.0 131.6,-24.0 45.0,26.0 45.0,126.0"/>
+            <polygon class="slab" fill-opacity="0.4" points="105.7,-39.0 131.6,-24.0 45.0,26.0 19.1,11.0"/>
+            <polygon class="slab" fill-opacity="0.2" points="-86.6,-72.0 0.0,-22.0 0.0,-52.0 -86.6,-102.0"/>
+            <polygon class="slab" fill-opacity="0.28" points="86.6,-72.0 86.6,-102.0 0.0,-52.0 0.0,-22.0"/>
+            <polygon class="slab" fill-opacity="0.4" points="0.0,-152.0 86.6,-102.0 0.0,-52.0 -86.6,-102.0"/>
+            <polygon class="slab" fill-opacity="0.2" points="-131.6,76.0 -45.0,126.0 -45.0,26.0 -131.6,-24.0"/>
+            <polygon class="slab" fill-opacity="0.28" points="-19.1,111.0 -19.1,11.0 -45.0,26.0 -45.0,126.0"/>
+            <polygon class="slab" fill-opacity="0.4" points="-105.7,-39.0 -19.1,11.0 -45.0,26.0 -131.6,-24.0"/>
+            <polygon class="rod" fill-opacity="0.06" points="19.1,-11.0 45.0,4.0 45.0,-26.0 19.1,-41.0"/>
+            <polygon class="rod" fill-opacity="0.09" points="131.6,-46.0 131.6,-76.0 45.0,-26.0 45.0,4.0"/>
+            <polygon class="rod" fill-opacity="0.14" points="105.7,-91.0 131.6,-76.0 45.0,-26.0 19.1,-41.0"/>
+            <polygon class="rod" fill-opacity="0.06" points="-26.0,137.0 0.0,152.0 0.0,52.0 -26.0,37.0"/>
+            <polygon class="rod" fill-opacity="0.09" points="26.0,137.0 26.0,37.0 0.0,52.0 0.0,152.0"/>
+            <polygon class="rod" fill-opacity="0.14" points="0.0,22.0 26.0,37.0 0.0,52.0 -26.0,37.0"/>
+            <polygon class="rod" fill-opacity="0.06" points="-131.6,-46.0 -45.0,4.0 -45.0,-26.0 -131.6,-76.0"/>
+            <polygon class="rod" fill-opacity="0.09" points="-19.1,-11.0 -19.1,-41.0 -45.0,-26.0 -45.0,4.0"/>
+            <polygon class="rod" fill-opacity="0.14" points="-105.7,-91.0 -19.1,-41.0 -45.0,-26.0 -131.6,-76.0"/>
+            <polygon class="rod" fill-opacity="0.06" points="-26.0,15.0 0.0,30.0 0.0,0.0 -26.0,-15.0"/>
+            <polygon class="rod" fill-opacity="0.09" points="26.0,15.0 26.0,-15.0 0.0,0.0 0.0,30.0"/>
+            <polygon class="rod" fill-opacity="0.14" points="0.0,-30.0 26.0,-15.0 0.0,0.0 -26.0,-15.0"/>
+            <polygon class="hidden" points="-86.6,50.0 0.0,100.0 0.0,0.0 -86.6,-50.0"/>
+            <polygon class="hidden" points="86.6,50.0 86.6,-50.0 0.0,0.0 0.0,100.0"/>
+            <polygon class="hidden" points="0.0,-100.0 86.6,-50.0 0.0,0.0 -86.6,-50.0"/>
+            <text x="-140.6" y="31.0" text-anchor="end">x</text>
+            <text x="-140.6" y="-56.0" text-anchor="end">h</text>
+          </svg>
+        </figure>
+        <div class="math">\[(x+h)^3=x^3+3x^2h+3xh^2+h^3\]</div>
+        <p>Divided by <span class="nw">\(h\),</span> the slabs give <span class="nw">\(3x^2\).</span> The rods and the tiny cube still carry an <span class="nw">\(h\),</span> so they vanish.</p>
+        <p>Past three dimensions there is no picture, but the counting carries on. \((x+h)^n\) is \(n\) brackets multiplied together.</p>
+        <p>A term with exactly one \(h\) takes it from one bracket and \(x\) from all the others. There are \(n\) brackets to choose from, so there are \(n\) such terms, each <span class="nw">\(x^{n-1}h\).</span> For the square they were the two strips, and for the cube the three slabs.</p>
+        <p>That is where \(nx^{n-1}\) comes from. Every other term has at least <span class="nw">\(h^2\).</span> After dividing by \(h\) it still has an <span class="nw">\(h\),</span> so it vanishes as \(h\) closes in on <span class="nw">\(0\).</span></p>
+      </section>
+
+      <section aria-labelledby="other">
+        <h2 id="other">Other Powers</h2>
+        <p>The counting above only works for whole-number powers. Yet the rule holds for other powers too, wherever its formula gives a value.</p>
+        <p>Take <span class="nw">\(\frac{1}{x}\),</span> which is <span class="nw">\(x^{-1}\).</span> The rule predicts a slope of <span class="nw">\(-1\cdot x^{-2}\),</span> or <span class="nw">\(-\frac{1}{x^2}\).</span> The definition agrees:</p>
+        <div class="math">\[\frac{\frac{1}{x+h}-\frac{1}{x}}{h}=\frac{x-(x+h)}{x(x+h)h}=\frac{-1}{x(x+h)}\]</div>
+        <p>As \(h\) closes in on <span class="nw">\(0\),</span> this closes in on <span class="nw">\(-\frac{1}{x^2}\).</span></p>
+        <p>\(\sqrt{x}=x^{1/2}\) has slope <span class="nw">\(\frac{1}{2}x^{-1/2}\),</span> or <span class="nw">\(\frac{1}{2\sqrt{x}}\).</span></p>
+        <p>\(\sqrt[3]{x}=x^{1/3}\) gets <span class="nw">\(\frac{1}{3}x^{-2/3}\).</span> That has no value at \(0\) and grows without end near it: the vertical tangent from The Derivative.</p>
+        <p>Proving the rule for every power needs more tools than this page has.</p>
+      </section>
+
+      <section aria-labelledby="sums">
+        <h2 id="sums">Multiples and Sums</h2>
+        <p>Stretching a graph upward by \(5\) makes every rise \(5\) times bigger, while the runs stay the same. So every slope is \(5\) times bigger too.</p>
+        <p>That is why \(5t^2\) has slope <span class="nw">\(5\cdot2t=10t\),</span> the stone's speed on The Derivative.</p>
+        <p>Adding two functions adds their rises over the same run. So the slope of a sum is the sum of the slopes, and a polynomial's slope can be found one term at a time.</p>
+        <div class="math">\[\begin{aligned} f(x)&=ax^2+bx+c\\ f'(x)&=2ax+b \end{aligned}\]</div>
+        <p>The \(c\) only lifts the graph, so it adds nothing to the slope.</p>
+        <p><a class="inline" href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a> found the turning point of a quadratic where <span class="nw">\(2ax+b=0\),</span> by watching the sign of a small change. That expression is the slope: a parabola turns where its slope is <span class="nw">\(0\).</span></p>
+      </section>
+
+      <section aria-labelledby="stone">
+        <h2 id="stone">A Stone Thrown Upward</h2>
+        <p>Throw a stone straight up at about \(20\) metres per second, and \(t\) seconds later it is about \(20t-5t^2\) metres above your hand.</p>
+        <iframe class="calc-widget" src="calculus/the-power-rule/throw-widget.html" title="Interactive: slide through the four seconds of a stone's flight. Its upward speed, an arrow on the height axis, falls from 20 through 0 at the top to minus 20, and matches the slope of the height graph" style="height: 305px" scrolling="no" loading="lazy"></iframe>
+        <p>Term by term, its upward speed is \(\class{mjx-out}{20-10t}\) metres per second. A negative upward speed means it is falling.</p>
+        <p>At \(t=0\) it leaves at <span class="nw">\(20\).</span> The speed drops to \(0\) at <span class="nw">\(t=2\),</span> the top of the throw, about \(20\) metres up. By \(t=4\) it is back at your hand, falling at about <span class="nw">\(20\).</span></p>
+        <p>The slope of \(20-10t\) is <span class="nw">\(-10\),</span> at every moment. Gravity takes about \(10\) metres per second off the upward speed every second, on the way up and on the way down.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="calculus-the-derivative.html">← The Derivative</a>
+        <a href="calculus.html">All Calculus pages →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "calc-widget-height") return;
+      document.querySelectorAll("iframe.calc-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -132,6 +132,16 @@ figure.graph .stray { fill: var(--ink); }
 figure.graph .tick-out { stroke: var(--out); stroke-width: 2; }
 figure.graph text.out { fill: var(--out); }
 
+/* an exploded cube: the core, three slabs, three rods and a corner (The Power Rule) */
+figure.cube { margin: 1.6rem 0; }
+figure.cube svg { display: block; width: 100%; max-width: 240px; height: auto; margin-inline: auto; overflow: visible; }
+figure.cube polygon { stroke-linejoin: round; }
+figure.cube .core { fill: var(--ink); stroke: var(--ink); stroke-opacity: 0.8; stroke-width: 1.2; }
+figure.cube .slab { fill: var(--out); stroke: var(--out); stroke-opacity: 0.9; stroke-width: 1.2; }
+figure.cube .rod  { fill: var(--ink); stroke: var(--ink); stroke-opacity: 0.4; stroke-width: 1; }
+figure.cube .hidden { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1; stroke-dasharray: 3 3; }
+figure.cube text  { font-family: "JetBrains Mono", monospace; font-size: 16px; fill: var(--in); }
+
 iframe.calc-widget {
   display: block; width: 100%;
   border: 0; overflow: hidden; background: transparent;
