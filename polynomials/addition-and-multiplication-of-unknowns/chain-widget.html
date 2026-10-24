@@ -24,9 +24,8 @@
   <div class="choices" role="group" aria-label="Calculation">
     <button aria-pressed="true">4<span class="v">x</span> + 3</button>
     <button aria-pressed="false">−2<span class="v">x</span> + 5</button>
-    <button aria-pressed="false"><span class="v">x</span> · <span class="v">x</span></button>
-    <button aria-pressed="false"><span class="v">x</span>² + 2<span class="v">x</span></button>
-    <button aria-pressed="false"><span class="v">x</span> · <span class="v">x</span> · <span class="v">x</span></button>
+    <button aria-pressed="false"><span class="v">x</span>²</button>
+    <button aria-pressed="false"><span class="v">x</span>³</button>
   </div>
   <svg id="chain" role="img"></svg>
   <span class="tag" id="tag" aria-live="polite"></span>
@@ -36,30 +35,30 @@
 <script>
   // A handful of numbers followed through every step of a calculation, one number line per step.
   // Each dot keeps the colour of the number it started as, and a thread joins it from line to line,
-  // so threads that cross show the order reversing and threads that meet show two inputs landing
-  // together. All the lines of one calculation share a scale, so stretches look like stretches.
-  // "× itself" squares the current value; "× x" multiplies by the original input.
+  // so threads that cross show the order reversing. All the lines of one calculation share a scale,
+  // so stretches look like stretches. Once a step folds the left side over onto the right, the
+  // numbers that began negative ride on a second row just beneath the first, so each pair sits
+  // side by side instead of hiding one behind the other; "unfold" sends them back to the left.
   const CHAINS = [
     { inputs: [-3, -2, -1, 0, 1, 2, 3], steps: [
       { op: "× 4", f: (v) => 4 * v, expr: "4x" },
       { op: "+ 3", f: (v) => v + 3, expr: "4x + 3" } ] },
     { inputs: [-3, -2, -1, 0, 1, 2, 3], steps: [
-      { op: "× (−2)", f: (v) => -2 * v, expr: "−2x" },
+      { op: "flip", f: (v) => -v, expr: "−x" },
+      { op: "× 2", f: (v) => 2 * v, expr: "−2x" },
       { op: "+ 5", f: (v) => v + 5, expr: "−2x + 5" } ] },
     { inputs: [-3, -2, -1, 0, 1, 2, 3], steps: [
-      { op: "× itself", f: (v) => v * v, expr: "x · x" } ] },
-    { inputs: [-4, -3, -2, -1, 0, 1, 2], steps: [
-      { op: "+ 1", f: (v) => v + 1, expr: "x + 1" },
-      { op: "× itself", f: (v) => v * v, expr: "(x + 1)²" },
-      { op: "− 1", f: (v) => v - 1, expr: "(x + 1)² − 1" } ] },
+      { op: "fold", f: (v) => Math.abs(v), expr: "|x|", rows: 2 },
+      { op: "× itself", f: (v) => v * v, expr: "x²", rows: 2 } ] },
     { inputs: [-2, -1, 0, 1, 2], steps: [
-      { op: "× itself", f: (v) => v * v, expr: "x · x" },
-      { op: "× x", f: (v, x) => v * x, expr: "x · x · x" } ] },
+      { op: "fold", f: (v) => Math.abs(v), expr: "|x|", rows: 2 },
+      { op: "unfold", f: (v, x) => Math.sign(x) * v, expr: "x" },
+      { op: "× x²", f: (v, x) => v * x * x, expr: "x³" } ] },
   ];
   const STOPS = [[122, 167, 255], [100, 200, 160], [232, 163, 61]];   // blue → green → amber, by starting order
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("chain");
-  const PAD = 12, TOP = 26, GAP = 64, SIDE = 100;   // SIDE: a column on the right for the step labels
+  const PAD = 12, TOP = 26, GAP = 64, SIDE = 100, ROW = 13;   // ROW: the folded row sits this far below   // SIDE: a column on the right for the step labels
   const fmt = (n) => (n < 0 ? "−" : "") + Math.abs(n);
   let pick = 0;
 
@@ -90,7 +89,10 @@
     const stages = [C.inputs.slice()];
     C.steps.forEach((s) => stages.push(stages[stages.length - 1].map((v, i) => s.f(v, C.inputs[i]))));
     const all = stages.flat(), lo = Math.min(...all, 0) - 0.6, hi = Math.max(...all, 0) + 0.6;
-    const H = TOP + GAP * (stages.length - 1) + 30;
+    // which row each dot sits on at each stage: the second row only on folded stages, for inputs below 0
+    const rows = [1].concat(C.steps.map((st) => st.rows || 1));
+    const dy = (k, i) => (rows[k] === 2 && C.inputs[i] < 0 ? ROW : 0);
+    const H = TOP + GAP * (stages.length - 1) + 30 + (rows[rows.length - 1] === 2 ? ROW : 0);
     const W = svg.clientWidth || 560;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
     svg.textContent = "";
@@ -99,13 +101,14 @@
 
     // threads first, so the dots sit on top of them
     for (let k = 1; k < stages.length; k++)
-      stages[k].forEach((v, i) => el("line", { x1: sx(stages[k - 1][i]), y1: Y(k - 1), x2: sx(v), y2: Y(k),
+      stages[k].forEach((v, i) => el("line", { x1: sx(stages[k - 1][i]), y1: Y(k - 1) + dy(k - 1, i), x2: sx(v), y2: Y(k) + dy(k, i),
         stroke: colour(i, n), "stroke-width": 1.2, opacity: 0.45 }));
 
     stages.forEach((vals, k) => {
       const y = Y(k);
       el("line", { x1: PAD, x2: R, y1: y, y2: y, stroke: "rgba(238,242,252,0.2)" });
-      el("line", { x1: sx(0), x2: sx(0), y1: y - 5, y2: y + 5, stroke: "rgba(238,242,252,0.45)" });
+      if (rows[k] === 2) el("line", { x1: PAD, x2: R, y1: y + ROW, y2: y + ROW, stroke: "rgba(238,242,252,0.1)" });
+      el("line", { x1: sx(0), x2: sx(0), y1: y - 5, y2: y + 5 + (rows[k] === 2 ? ROW : 0), stroke: "rgba(238,242,252,0.45)" });
       el("text", { x: PAD, y: y - 13, class: "expr" }, k === 0 ? "x" : C.steps[k - 1].expr);
       if (k > 0) {
         el("text", { x: R + 8, y: y - 4, class: "step" }, C.steps[k - 1].op);
@@ -114,15 +117,16 @@
       }
       const seen = new Map();
       vals.forEach((v, i) => {
-        const again = seen.has(v);
+        // on a single row, a number landing where another already sits is drawn as a ring around it
+        const again = rows[k] === 1 && seen.has(v);
         seen.set(v, true);
         if (again) el("circle", { cx: sx(v), cy: y, r: 8.5, fill: "none", stroke: colour(i, n), "stroke-width": 2 });
-        else el("circle", { cx: sx(v), cy: y, r: 5, fill: colour(i, n), stroke: "#0e0e11", "stroke-width": 1 });
+        else el("circle", { cx: sx(v), cy: y + dy(k, i), r: 5, fill: colour(i, n), stroke: "#0e0e11", "stroke-width": 1 });
       });
     });
 
     // number labels under the last line only, skipping any that would collide
-    const last = stages[stages.length - 1], yl = Y(stages.length - 1) + 18;
+    const last = stages[stages.length - 1], yl = Y(stages.length - 1) + 18 + (rows[rows.length - 1] === 2 ? ROW : 0);
     let lastX = -Infinity;
     [...new Set(last)].sort((a, b) => a - b).forEach((v) => {
       if (sx(v) - lastX < 18) return;

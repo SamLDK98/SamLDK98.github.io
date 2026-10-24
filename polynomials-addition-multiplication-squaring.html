@@ -357,16 +357,30 @@
 
       <section class="col" aria-labelledby="following-a-calculation-step-by-step">
         <h2 id="following-a-calculation-step-by-step">Following a Calculation Step by Step</h2>
-        <p>Most expressions are built from several steps, not one. We can follow a handful of numbers through every step, one number line at a time. Each number keeps its colour, and a thread joins it from one line to the next.</p>
-        <p>In \(4x+3\), the numbers are stretched, then slid. Neither step lets two numbers meet, so seven inputs give seven different outputs, and \(4x+3=11\) has one solution.</p>
-        <p>In \(-2x+5\), the stretch is also a flip. The threads all cross and the order is reversed, but still nothing meets.</p>
-        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/chain-widget.html" title="Interactive: choose a calculation and follow a handful of numbers through each of its steps; threads that meet show two inputs landing on one output" style="height: 300px" scrolling="no" loading="lazy"></iframe>
-        <p>In \(x\cdot x\), the threads from opposite numbers meet in pairs.</p>
-        <p>\(x^2+2x\) can be built in three steps: slide by \(1\), multiply by itself, then slide back.</p>
-        <div class="math">\[(x+1)^2-1=x^2+2x+1-1=x^2+2x\]</div>
-        <p>The squaring step still folds at \(0\), but the numbers that are at \(0\) when they reach it started at \(x=-1\). So the pairs meet around \(-1\) instead.</p>
-        <p>\(x\cdot x\cdot x\) folds and then unfolds. Its last step multiplies the negative numbers by a negative again, which sends them back to the left. Nothing ends up together, which is why \(x^3=8\) has only one real solution, \(2\).</p>
-        <p><a class="inline" href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a> looks more closely at why the fold moves to \(-1\), and finds where it sits for any quadratic.</p>
+        <p>When we want to understand how adding a term into a function will affect the overall output, it can help to think of the function in terms of each operational step.</p>
+        <iframe class="poly-widget" src="polynomials/addition-and-multiplication-of-unknowns/chain-widget.html" title="Interactive: choose a function and follow a handful of numbers through each of its steps, one number line per step" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+        <p>In \(f(x)=4x+3\) the numbers are:</p>
+        <ol>
+          <li>Stretched out by a factor of \(4\).</li>
+          <li>Slid up by \(3\) places.</li>
+        </ol>
+        <p>In \(f(x)=-2x+5\) the numbers are:</p>
+        <ol>
+          <li>Flipped.</li>
+          <li>Stretched out by a factor of \(2\).</li>
+          <li>Slid up by \(5\) places.</li>
+        </ol>
+        <p>In \(f(x)=x^2\) the numbers are:</p>
+        <ol>
+          <li>The left side is folded on top of the right side.</li>
+          <li>All numbers are stretched in proportion to themselves.</li>
+        </ol>
+        <p>In \(f(x)=x^3\) the numbers are:</p>
+        <ol>
+          <li>Folded one way.</li>
+          <li>Folded the other.</li>
+          <li>Increased in proportion to themselves.</li>
+        </ol>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
