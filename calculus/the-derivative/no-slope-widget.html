@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Three ways to have no slope</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="h" type="range" min="0" max="1000" step="1" value="160" aria-label="How close the second points are to 0" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Three curves through the origin, each with a point either side of 0 at −h and +h (lilac).
+  // The secants from the origin to those points are coral. In the corner they stay two different
+  // lines, in the vertical one they stand up without end, and in the wobble they never settle.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("h");
+  const HMAX = 0.8, HMIN = 0.001, YR = [-1.15, 1.15];
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1", AX = "rgba(235,232,225,0.22)";
+
+  const PANELS = [
+    { name: "corner",   f: (x) => Math.abs(x) },
+    { name: "vertical", f: (x) => Math.cbrt(x) },
+    { name: "wobble",   f: (x) => (x === 0 ? 0 : x * Math.sin(1 / x)) },
+  ];
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  // sample from −1 to 1; for the wobble, step evenly in 1/x on each side so every swing gets
+  // the same number of points however tight it is
+  function samples(p) {
+    const xs = [];
+    if (p.name === "wobble") {
+      for (let i = 0; i <= 2400; i++) xs.push(-1 / (1 + (i / 2400) * 399));
+      xs.push(0);
+      for (let i = 2400; i >= 0; i--) xs.push(1 / (1 + (i / 2400) * 399));
+    } else for (let i = -600; i <= 600; i++) xs.push(i / 600);
+    return xs;
+  }
+
+  function render() {
+    const h = HMAX * Math.pow(HMIN / HMAX, +slider.value / 1000);
+    const W = svg.clientWidth || 560;
+    const gap = W < 420 ? 14 : 30, pw = (W - 2 * gap) / 3, ph = Math.round(Math.min(190, pw * 1.05)), H = ph + 26;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const defs = el("defs", {});
+    const slopes = [];
+
+    PANELS.forEach((p, k) => {
+      const ox = k * (pw + gap);
+      const sx = (x) => ox + ((x + 1) / 2) * pw;
+      const sy = (y) => 6 + ((YR[1] - y) / (YR[1] - YR[0])) * (ph - 12);
+      const clip = el("clipPath", { id: "c" + k }, undefined, defs);
+      el("rect", { x: ox, y: 0, width: pw, height: ph }, undefined, clip);
+      const g = el("g", { "clip-path": `url(#c${k})` });
+
+      const cx = sx(0), cy = sy(0);
+      el("line", { x1: ox, x2: ox + pw, y1: cy, y2: cy, stroke: AX, "stroke-width": 1.2 }, undefined, g);
+      el("line", { x1: cx, x2: cx, y1: 4, y2: ph - 4, stroke: AX, "stroke-width": 1.2 }, undefined, g);
+
+      // secants first, the curve over them: the corner's secants lie along its own arms
+      const ms = [-1, 1].map((s) => p.f(s * h) / (s * h));
+      slopes.push(ms);
+      ms.forEach((m) => el("line", { x1: sx(-1), y1: sy(-m), x2: sx(1), y2: sy(m), stroke: OUT, "stroke-opacity": 0.9, "stroke-width": 1.5 }, undefined, g));
+
+      const d = samples(p).map((x, i) => (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(p.f(x)).toFixed(1)).join("");
+      el("path", { d, fill: "none", stroke: INK, "stroke-opacity": p.name === "wobble" ? 0.55 : 0.9,
+                   "stroke-width": p.name === "wobble" ? 1 : 1.8, "stroke-linejoin": "round" }, undefined, g);
+
+      // the two points, resting against the origin's rim once they are closer than the screen can show
+      [-1, 1].forEach((s) => {
+        const x = s * h, dx = sx(x) - cx, dy = sy(p.f(x)) - cy, n = Math.hypot(dx, dy), q = Math.max(n, 7) / n;
+        el("line", { x1: sx(x), x2: sx(x), y1: cy - 4, y2: cy + 4, stroke: IN, "stroke-width": 2 }, undefined, g);
+        el("circle", { cx: cx + dx * q, cy: cy + dy * q, r: 3, fill: INK }, undefined, g);
+      });
+      el("circle", { cx, cy, r: 3.4, fill: INK }, undefined, g);
+      el("text", { x: ox + pw / 2, y: ph + 20, "text-anchor": "middle" }, p.name);
+    });
+
+    const r = (v) => (Math.abs(v) >= 100 ? Math.round(v) : +v.toFixed(2)) + "";
+    svg.setAttribute("aria-label", `Secants from the origin to points at ${r(-h)} and ${r(h)}. Corner: slopes ${r(slopes[0][0])} and ${r(slopes[0][1])}. Vertical: both ${r(slopes[1][1])}. Wobble: ${r(slopes[2][0])} and ${r(slopes[2][1])}.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

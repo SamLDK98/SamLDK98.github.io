@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Straight up close</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="z" type="range" min="0" max="1000" step="1" value="0" aria-label="How far to zoom in on (1, 1)" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // y = x² seen through a window centred on (1, 1). The slider shrinks the window, up to a
+  // thousand times; both directions shrink together, so the tangent (a coral band, slope 2, wider
+  // than the curve so it still shows once they coincide) keeps its angle while the curve
+  // straightens out along it.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("z");
+  const H = 230, HX = 1.3, HY = 1.9, ZMAX = 1000;
+  const OUT = "#ff8c69", INK = "#ebe8e1", AX = "rgba(235,232,225,0.22)";
+  const f = (x) => x * x;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const times = (k) => "×" + (k < 9.95 ? +k.toFixed(1) : Math.round(k));
+
+  function render() {
+    const k = Math.pow(ZMAX, +slider.value / 1000);
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const P = 8, hx = HX / k, hy = HY / k, xa = 1 - hx, xb = 1 + hx, ya = 1 - hy, yb = 1 + hy;
+    const sx = (x) => P + ((x - xa) / (xb - xa)) * (W - 2 * P);
+    const sy = (y) => P + ((yb - y) / (yb - ya)) * (H - 2 * P);
+
+    const clip = el("clipPath", { id: "view" }, undefined, el("defs", {}));
+    el("rect", { x: P, y: P, width: W - 2 * P, height: H - 2 * P }, undefined, clip);
+    const g = el("g", { "clip-path": "url(#view)" });
+
+    // the axes, for as long as they are in view
+    if (ya < 0 && 0 < yb) el("line", { x1: P, x2: W - P, y1: sy(0), y2: sy(0), stroke: AX, "stroke-width": 1.2 }, undefined, g);
+    if (xa < 0 && 0 < xb) el("line", { x1: sx(0), x2: sx(0), y1: P, y2: H - P, stroke: AX, "stroke-width": 1.2 }, undefined, g);
+
+    el("line", { x1: sx(xa), y1: sy(2 * xa - 1), x2: sx(xb), y2: sy(2 * xb - 1),
+                 stroke: OUT, "stroke-opacity": 0.7, "stroke-width": 3.4, "stroke-linecap": "round" }, undefined, g);
+    let d = "";
+    for (let i = 0; i <= 240; i++) { const x = xa + ((xb - xa) * i) / 240; d += (i ? "L" : "M") + sx(x).toFixed(2) + " " + sy(f(x)).toFixed(2); }
+    el("path", { d, fill: "none", stroke: INK, "stroke-opacity": 0.9, "stroke-width": 1.6, "stroke-linejoin": "round" }, undefined, g);
+    el("circle", { cx: sx(1), cy: sy(1), r: 3.6, fill: INK });
+
+    el("text", { x: W - P, y: H - P - 2, "text-anchor": "end" }, times(k));
+
+    // how far, in pixels, the curve strays from its tangent at the edge of the window
+    const gap = (hx * hx) / (yb - ya) * (H - 2 * P);
+    svg.setAttribute("aria-label", `Zoomed in ${times(k).slice(1)} times on (1, 1). ` +
+      (gap < 1 ? "The curve y = x² and its tangent, of slope 2, can no longer be told apart."
+               : "The curve y = x² still bends away from its tangent, of slope 2."));
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

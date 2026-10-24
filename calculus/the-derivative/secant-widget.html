@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Secants closing in on the tangent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="h" type="range" min="0" max="1000" step="1" value="60" aria-label="How close the second points are to (1, 1)" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // y = x², a fixed point P = (1, 1), and a second point on either side of it, at 1 − h and
+  // 1 + h (lilac, on the x-axis). The secant through P and each one is coral, and its slope,
+  // 2 − h or 2 + h, sits on the rail where it leaves the plot. The slider is logarithmic, as in
+  // the Limits widgets, so the last few thousandths get as much travel as the first few tenths.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("h");
+  const H = 250, XR = [-0.3, 2.3], YR = [-0.15, 4.9], HMAX = 0.8, HMIN = 0.001;
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1", AX = "rgba(235,232,225,0.22)";
+  const f = (x) => x * x;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // enough decimals to tell the number from its neighbour at 0, and no trailing zeros
+  function fmt(v, h) {
+    const d = Math.max(1, Math.ceil(-Math.log10(h) + 1e-9) + 1);
+    return v.toFixed(d).replace(/0+$/, "").replace(/\.$/, "");
+  }
+  // push two labels apart until they no longer touch, keeping them centred on their pair
+  function spread(a, b, gap) {
+    const mid = (a + b) / 2, half = Math.max(Math.abs(b - a) / 2, gap / 2);
+    return a < b ? [mid - half, mid + half] : [mid + half, mid - half];
+  }
+
+  function render() {
+    const h = HMAX * Math.pow(HMIN / HMAX, +slider.value / 1000);
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 10, R = 48, T = 8, B = 30;
+    const sx = (x) => L + ((x - XR[0]) / (XR[1] - XR[0])) * (W - L - R);
+    const sy = (y) => T + ((YR[1] - y) / (YR[1] - YR[0])) * (H - T - B);
+    const x0 = sx(0), y0 = sy(0), xr = sx(XR[1]);
+
+    // everything above the x-axis, so the secants never run through the labels beneath it
+    const clip = el("clipPath", { id: "plot" }, undefined, el("defs", {}));
+    el("rect", { x: L, y: T, width: xr - L, height: y0 - T }, undefined, clip);
+
+    el("line", { x1: L, x2: xr, y1: y0, y2: y0, stroke: AX, "stroke-width": 1.2 });
+    el("line", { x1: x0, x2: x0, y1: T, y2: y0 + 6, stroke: AX, "stroke-width": 1.2 });
+    let d = "";
+    for (let i = 0; i <= 240; i++) { const x = XR[0] + ((XR[1] - XR[0]) * i) / 240; d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(f(x)).toFixed(1); }
+    el("path", { d, fill: "none", stroke: INK, "stroke-opacity": 0.85, "stroke-width": 2, "clip-path": "url(#plot)" });
+
+    const xs = [1 - h, 1 + h], ms = xs.map((x) => (f(x) - 1) / (x - 1));
+    xs.forEach((x, i) => {
+      const m = ms[i];
+      el("line", { x1: sx(XR[0]), y1: sy(1 + m * (XR[0] - 1)), x2: xr, y2: sy(1 + m * (XR[1] - 1)),
+                   stroke: OUT, "stroke-opacity": 0.9, "stroke-width": 1.6, "clip-path": "url(#plot)" });
+      const px = sx(x), py = sy(f(x));
+      el("line", { x1: px, x2: px, y1: py, y2: y0, stroke: IN, "stroke-opacity": 0.45, "stroke-dasharray": "2 4" });
+      el("line", { x1: px, x2: px, y1: y0 - 5, y2: y0 + 5, stroke: IN, "stroke-width": 2 });
+    });
+
+    // P, and the two points beside it; once they are closer than the screen can show, they rest
+    // against P's rim instead of covering it (the numbers stay exact)
+    const Px = sx(1), Py = sy(1), RIM = 10;
+    xs.forEach((x) => {
+      const dx = sx(x) - Px, dy = sy(f(x)) - Py, n = Math.hypot(dx, dy), k = Math.max(n, RIM) / n;
+      el("circle", { cx: Px + dx * k, cy: Py + dy * k, r: 3.6, fill: INK });
+    });
+    el("circle", { cx: Px, cy: Py, r: 4.4, fill: INK });
+
+    const xl = xs.map((x) => fmt(x, h)), ml = ms.map((m) => fmt(m, h));
+    const wx = 7 * Math.max(xl[0].length, xl[1].length);
+    const [ax, bx] = spread(sx(xs[0]), sx(xs[1]), wx + 10);
+    el("text", { x: ax, y: y0 + 19, "text-anchor": "middle", class: "in" }, xl[0]);
+    el("text", { x: bx, y: y0 + 19, "text-anchor": "middle", class: "in" }, xl[1]);
+    const [ay, by] = spread(sy(1 + ms[0] * (XR[1] - 1)), sy(1 + ms[1] * (XR[1] - 1)), 15);
+    el("text", { x: xr + 8, y: ay + 4, class: "out" }, ml[0]);
+    el("text", { x: xr + 8, y: by + 4, class: "out" }, ml[1]);
+
+    svg.setAttribute("aria-label", `Points on the curve at ${xl[0]} and ${xl[1]}, either side of 1. The secants through (1, 1) have slopes ${ml[0]} and ${ml[1]}, either side of 2.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

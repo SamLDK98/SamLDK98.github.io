@@ -87,6 +87,9 @@ em { font-style: italic; }
 .in  { color: var(--in); }
 .out { color: var(--out); }
 
+/* keeps a formula and the punctuation after it on one line */
+.nw { white-space: nowrap; }
+
 a.inline {
   color: var(--ink); text-decoration: none;
   border-bottom: 1px solid var(--faint);

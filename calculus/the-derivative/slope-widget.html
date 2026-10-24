@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A slope at every point</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="x" type="range" min="-200" max="200" step="1" value="100" aria-label="Where the point sits on the curve" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Above: y = x², a point on it at x (lilac, on the axis) and its tangent (coral).
+  // Below, on the same x-axis: the slope of that tangent, plotted as a height. The slope line
+  // 2x is dashed from the start; the coral dot rides it, and the stretch it has covered turns
+  // solid, so moving the point draws the derivative.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("x");
+  const XR = [-2.3, 2.3], Y1 = [-0.45, 5.0], Y2 = [-4.9, 4.9];
+  const H1 = 140, GAP = 26, H2 = 118, T = 4, H = T + H1 + GAP + H2 + 4;
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1", AX = "rgba(235,232,225,0.22)";
+  const f = (x) => x * x, df = (x) => 2 * x;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const num = (v) => (Math.abs(v) < 5e-9 ? "0" : (+v.toFixed(2) + "").replace("-", "−"));
+  let lo = +slider.value / 100, hi = lo;
+
+  function render() {
+    const a = +slider.value / 100;
+    lo = Math.min(lo, a); hi = Math.max(hi, a);
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const P = 8, top2 = T + H1 + GAP;
+    const sx = (x) => P + ((x - XR[0]) / (XR[1] - XR[0])) * (W - 2 * P);
+    const s1 = (y) => T + ((Y1[1] - y) / (Y1[1] - Y1[0])) * H1;
+    const s2 = (y) => top2 + ((Y2[1] - y) / (Y2[1] - Y2[0])) * H2;
+    const defs = el("defs", {});
+    [[T, H1], [top2, H2]].forEach(([y, h], i) => el("rect", { x: P, y, width: W - 2 * P, height: h }, undefined, el("clipPath", { id: "p" + i }, undefined, defs)));
+    const g1 = el("g", { "clip-path": "url(#p0)" }), g2 = el("g", { "clip-path": "url(#p1)" });
+
+    // axes
+    const xa = sx(0), y1 = s1(0), y2 = s2(0);
+    el("line", { x1: P, x2: W - P, y1, y2: y1, stroke: AX, "stroke-width": 1.2 });
+    el("line", { x1: xa, x2: xa, y1: T, y2: y1, stroke: AX, "stroke-width": 1.2 });
+    el("line", { x1: P, x2: W - P, y1: y2, y2, stroke: AX, "stroke-width": 1.2 });
+
+    // the curve and its tangent at x = a
+    let d = "";
+    for (let i = 0; i <= 240; i++) { const x = XR[0] + ((XR[1] - XR[0]) * i) / 240; d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + s1(f(x)).toFixed(1); }
+    el("path", { d, fill: "none", stroke: INK, "stroke-opacity": 0.85, "stroke-width": 1.8 }, undefined, g1);
+    const m = df(a), tan = (x) => f(a) + m * (x - a);
+    el("line", { x1: sx(XR[0]), y1: s1(tan(XR[0])), x2: sx(XR[1]), y2: s1(tan(XR[1])), stroke: OUT, "stroke-opacity": 0.9, "stroke-width": 1.6 }, undefined, g1);
+
+    // the slope line, dashed, and solid where the point has been
+    el("line", { x1: sx(XR[0]), y1: s2(df(XR[0])), x2: sx(XR[1]), y2: s2(df(XR[1])), stroke: OUT, "stroke-opacity": 0.5, "stroke-width": 1.3, "stroke-dasharray": "3 4" }, undefined, g2);
+    if (hi > lo) el("line", { x1: sx(lo), y1: s2(df(lo)), x2: sx(hi), y2: s2(df(hi)), stroke: OUT, "stroke-opacity": 0.9, "stroke-width": 1.8, "stroke-linecap": "round" }, undefined, g2);
+
+    // lilac: where the point is, on each axis
+    const px = sx(a), py = s1(f(a)), qy = s2(m);
+    el("line", { x1: px, x2: px, y1: py, y2: y1, stroke: IN, "stroke-opacity": 0.45, "stroke-dasharray": "2 4" });
+    el("line", { x1: px, x2: px, y1: y2, y2: qy, stroke: IN, "stroke-opacity": 0.45, "stroke-dasharray": "2 4" });
+    el("line", { x1: px, x2: px, y1: y1 - 5, y2: y1 + 5, stroke: IN, "stroke-width": 2 });
+    el("line", { x1: px, x2: px, y1: y2 - 5, y2: y2 + 5, stroke: IN, "stroke-width": 2 });
+    el("text", { x: px, y: y1 + 19, "text-anchor": "middle", class: "in" }, num(a));
+
+    el("circle", { cx: px, cy: py, r: 4.2, fill: INK });
+    el("circle", { cx: px, cy: qy, r: 4.2, fill: OUT });
+    // the slope line always rises to the right, so the clear sides of the dot are up-left and
+    // down-right; take whichever is away from the axis
+    const up = m >= 0;
+    el("text", { x: px + (up ? -8 : 8), y: qy + (up ? -8 : 14), "text-anchor": up ? "end" : "start", class: "out" }, num(m));
+    el("text", { x: P + 2, y: top2 + 11 }, "slope");
+
+    svg.setAttribute("aria-label", `At x = ${num(a)}, the tangent to y = x² has slope ${num(m)}. Below, the slopes at every point lie on the straight line 2x.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Derivative | Calculus | Sam Kirwan</title>
+  <meta name="description" content="What a derivative is: the slope of a curve at a single point, found as a limit of slopes between two points; the derivative as a new function; where it fails to exist; and what it measures." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="calculus.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="calculus.html">Calculus</a>
+      <h1>The Derivative</h1>
+    </header>
+    <main>
+      <section aria-labelledby="two">
+        <h2 id="two">Slope Needs Two Points</h2>
+        <p>Slope measures steepness: the rise divided by the run between two points.</p>
+        <p>A curve's steepness changes as you move along it, so its slope has to be found at a single point. But a single point has no run.</p>
+        <p>The way round this was on <a class="inline" href="calculus-limits.html">Limits</a> from the start. Its first function was a slope.</p>
+        <div class="math">\[\frac{x^2-1}{x-1}\]</div>
+        <p>It is the rise over the run from \((1,1)\) to a second point on the curve <span class="nw">\(y=x^2\),</span> at <span class="nw">\((x,x^2)\).</span> Write \(x\) as \(1+h\) and it becomes the slope Limits ended with.</p>
+        <p>The line through two points of a curve is called a <strong>secant</strong>.</p>
+        <p>At \(x=1\) the two points are one point, and the slope is <span class="nw">\(\frac{0}{0}\).</span> Nearby, the slopes were \(\class{mjx-out}{1.9},\ \class{mjx-out}{1.99},\ \class{mjx-out}{1.999}\) from below and \(\class{mjx-out}{2.1},\ \class{mjx-out}{2.01}\) from above.</p>
+        <iframe class="calc-widget" src="calculus/the-derivative/secant-widget.html" title="Interactive: slide to bring two points on the curve y = x squared closer to (1, 1) from either side; the secants through them close in on one line, and their slopes close in on 2" style="height: 300px" scrolling="no" loading="lazy"></iframe>
+        <p>From both sides, the <span class="out">secants</span> close in on one line through <span class="nw">\((1,1)\),</span> with slope <span class="nw">\(\class{mjx-out}{2}\).</span></p>
+        <p>That line is the <strong>tangent</strong>. Its slope is what we mean by the slope of the curve at that point.</p>
+      </section>
+
+      <section aria-labelledby="close">
+        <h2 id="close">Straight Up Close</h2>
+        <p>There is a second way to find the tangent. Zoom in on <span class="nw">\((1,1)\),</span> and the curve itself straightens out.</p>
+        <iframe class="calc-widget" src="calculus/the-derivative/zoom-widget.html" title="Interactive: slide to zoom in on the point (1, 1) of y = x squared, up to a thousand times; the curve straightens out along its tangent" style="height: 280px" scrolling="no" loading="lazy"></iframe>
+        <p>Close enough, the curve and its <span class="out">tangent</span> cannot be told apart.</p>
+        <p>This is what makes a line a tangent: not touching the curve once, but matching it up close.</p>
+        <p>A straight line looks the same at every zoom. It is its own tangent, with the same slope everywhere.</p>
+      </section>
+
+      <section aria-labelledby="every">
+        <h2 id="every">A Slope at Every Point</h2>
+        <p>Nothing above needed the first point to be at <span class="nw">\(1\).</span> Put it at any <span class="nw">\(x\),</span> and the second point a distance \(h\) away, at <span class="nw">\(x+h\).</span></p>
+        <div class="math">\[\frac{(x+h)^2-x^2}{h}=\frac{2xh+h^2}{h}=2x+h\]</div>
+        <p>As \(h\) closes in on <span class="nw">\(0\),</span> the slope closes in on <span class="nw">\(2x\).</span></p>
+        <p>So the slope of \(x^2\) at \(x\) is <span class="nw">\(2x\):</span> \(\class{mjx-out}{-2}\) at <span class="nw">\(x=\class{mjx-in}{-1}\),</span> \(\class{mjx-out}{0}\) at the bottom of the curve, \(\class{mjx-out}{4}\) at <span class="nw">\(x=\class{mjx-in}{2}\).</span></p>
+        <iframe class="calc-widget" src="calculus/the-derivative/slope-widget.html" title="Interactive: slide a point along y = x squared; its tangent rides with it, and below, the slope of that tangent is plotted, tracing the straight line 2x" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+        <p>The slope at one point is a number. The slopes at every point form a new function: the <strong>derivative</strong>.</p>
+        <div class="def">
+          <p>The derivative of \(f\) is the function</p>
+          <div class="math">\[\class{mjx-out}{f'(x)}=\lim_{\class{mjx-in}{h}\to0}\frac{f(x+\class{mjx-in}{h})-f(x)}{\class{mjx-in}{h}}\]</div>
+          <p>wherever this limit exists.</p>
+        </div>
+        <p>\(f'(x)\) is read “f prime of x”. So for <span class="nw">\(f(x)=x^2\),</span> <span class="nw">\(f'(x)=2x\),</span> and <span class="nw">\(f'(1)=2\).</span></p>
+        <p>Writing <span class="nw">\(y=f(x)\),</span> another notation is <span class="nw">\(\frac{dy}{dx}\),</span> read “dee y by dee x”. It keeps the picture of rise over run, but it means the limit of that fraction, not a fraction.</p>
+        <p>The other <span class="nw">\(\frac{0}{0}\)</span> function on Limits was a slope too. With \(x\) in radians, \(\frac{\sin h}{h}\) is the slope of \(y=\sin x\) between \(0\) and <span class="nw">\(h\).</span> So the derivative of \(\sin x\) at \(0\) is <span class="nw">\(1\).</span></p>
+      </section>
+
+      <section aria-labelledby="none">
+        <h2 id="none">Where There Is No Slope</h2>
+        <p>A derivative is a limit, so it can fail in the same ways a limit can.</p>
+        <p>On Limits, a limit failed in three ways: a jump, a blow-up and a wobble. Each has a slope version, here at <span class="nw">\(x=0\).</span></p>
+        <iframe class="calc-widget" src="calculus/the-derivative/no-slope-widget.html" title="Interactive: slide to bring two points closer to 0 on three curves at once. In the corner, the secants stay two different lines; in the vertical one, they stand up without end; in the wobble, they never settle" style="height: 250px" scrolling="no" loading="lazy"></iframe>
+        <p>\(|x|\) has a <strong>corner</strong>. Its slope between \(0\) and \(h\) is \(-1\) for negative \(h\) and \(1\) for positive <span class="nw">\(h\):</span> a jump.</p>
+        <p>\(\sqrt[3]{x}\) stands <strong>vertical</strong> at <span class="nw">\(0\).</span> Its slope between \(0\) and \(h\) is <span class="nw">\(\frac{1}{\sqrt[3]{h^2}}\),</span> which grows without end: a blow-up. Its tangent is a vertical line, which has no slope.</p>
+        <p><span class="nw">\(x\sin\frac{1}{x}\),</span> with its value at \(0\) set to <span class="nw">\(0\),</span> <strong>wobbles</strong>. Its slope between \(0\) and \(h\) is <span class="nw">\(\sin\frac{1}{h}\),</span> the wobble itself.</p>
+        <p>A function with a slope at a point is called <strong>differentiable</strong> there. All three are continuous at <span class="nw">\(0\),</span> with no hole and no jump, but none is differentiable.</p>
+        <p>And a function with a hole or a jump is never differentiable there. A hole leaves no point to measure from. Across a jump, the rise stays near the size of the jump while the run shrinks to nothing.</p>
+      </section>
+
+      <section aria-labelledby="rates">
+        <h2 id="rates">Rates of Change</h2>
+        <p>Slope is a rate: how much the output changes per unit of input.</p>
+        <p>A dropped stone falls about \(5t^2\) metres in \(t\) seconds.</p>
+        <p>Between \(t=1\) and <span class="nw">\(t=1+h\),</span> its average speed is the distance fallen over the time taken:</p>
+        <div class="math">\[\frac{5(1+h)^2-5}{h}=\frac{10h+5h^2}{h}=10+5h\]</div>
+        <p>As \(h\) closes in on <span class="nw">\(0\),</span> this closes in on <span class="nw">\(10\).</span> At one second, the stone is falling at about \(10\) metres per second.</p>
+        <p>This is the speed at one instant, the number a speedometer shows. Speed is the derivative of distance.</p>
+        <p>Repeating this at any time \(t\) gives a speed of <span class="nw">\(10t\).</span> Its slope, <span class="nw">\(10\),</span> is the stone's acceleration: its speed grows by about \(10\) metres per second, every second.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="calculus-limits.html">← Limits</a>
+        <a href="calculus.html">All Calculus pages →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "calc-widget-height") return;
+      document.querySelectorAll("iframe.calc-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
