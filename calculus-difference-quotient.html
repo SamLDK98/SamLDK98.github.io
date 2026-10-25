@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Difference Quotient | Calculus | Sam Kirwan</title>
+  <meta name="description" content="The slope between two points of x squared, worked out one step at a time: the rise as a gap between two heights, its expansion as two strips and a corner, and the division by the run as the rise for one unit of run." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="calculus.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="calculus.html">Calculus</a>
+      <h1>Difference Quotient</h1>
+    </header>
+    <main>
+      <section aria-labelledby="rise">
+        <h2 id="rise">Rise Over Run</h2>
+        <p>The steepness of a graph between two points is the <span class="out">rise</span> divided by the <span class="in">run</span>.</p>
+        <p>\(\Delta\), the Greek letter delta, means “change in”. The run is <span class="nw">\(\Delta x\),</span> the change in input, and the rise is <span class="nw">\(\Delta y\),</span> the change in output.</p>
+        <p>Let the first point have input <span class="nw">\(x\),</span> and the second have input <span class="nw">\(x+h\),</span> where \(h\) is their horizontal separation.</p>
+        <p>For <span class="nw">\(f(x)=x^2\):</span></p>
+        <div class="math">\[\Delta y=(x+h)^2-x^2\]</div>
+        <iframe class="calc-widget" src="calculus/difference-quotient/rise-widget.html" title="Interactive: slide to change h, the horizontal separation of two points on y = x squared; the rise between them is the gap between the heights x squared and (x + h) squared" style="height: 289px" scrolling="no" loading="lazy"></iframe>
+        <p>The rise is the gap between the two heights.</p>
+      </section>
+
+      <section aria-labelledby="expand">
+        <h2 id="expand">Two Strips and a Corner</h2>
+        <p>Expanding:</p>
+        <div class="math">\[\Delta y=2xh+h^2\]</div>
+        <p>Each height is the area of a square. Grow the sides of a square from \(x\) to <span class="nw">\(x+h\),</span> and \(\Delta y\) is the area it gains.</p>
+        <iframe class="calc-widget" src="calculus/difference-quotient/squares-widget.html" title="Interactive: slide to change h; a square of side x grows to side x + h, gaining two strips, each x by h, and a corner, h by h" style="height: 307px" scrolling="no" loading="lazy"></iframe>
+        <p>It gains two <span class="out">strips</span>, each \(x\) by <span class="nw">\(h\),</span> and a small corner, \(h\) by <span class="nw">\(h\).</span> This is the <a class="inline" href="polynomials-expansion.html">square of a sum</a>, with the \(x^2\) taken away.</p>
+      </section>
+
+      <section aria-labelledby="divide">
+        <h2 id="divide">Per Unit of Run</h2>
+        <p>Dividing by the horizontal change:</p>
+        <div class="math">\[\frac{\Delta y}{\Delta x}=\frac{2xh+h^2}{h}\]</div>
+        <p>For <span class="nw">\(h\neq 0\),</span> we can simplify:</p>
+        <div class="math">\[\boxed{\frac{\Delta y}{\Delta x}=2x+h}\]</div>
+        <p>At <span class="nw">\(x=2\),</span> this becomes:</p>
+        <div class="math">\[\frac{\Delta y}{\Delta x}=4+h\]</div>
+        <iframe class="calc-widget" src="calculus/difference-quotient/per-unit-widget.html" title="Interactive: slide to change h; the straight line through two points of y = x squared, at 2 and 2 + h, is carried on to a run of 1, where it rises 4 plus h. At h = 0 there is only 0 divided by 0" style="height: 289px" scrolling="no" loading="lazy"></iframe>
+        <p>Dividing by \(h\) gives the rise for a run of <span class="nw">\(1\).</span> The straight line through the two points keeps its steepness, so every part of the rise is scaled alike: \(4h\) becomes <span class="nw">\(\class{mjx-out}{4}\),</span> and \(h^2\) becomes <span class="nw">\(h\).</span></p>
+        <p>The same fraction can be made for any function <span class="nw">\(f\).</span> It is called the <strong>difference quotient</strong>.</p>
+        <div class="def">
+          <div class="math">\[\frac{\Delta y}{\Delta x}=\frac{f(x+\class{mjx-in}{h})-f(x)}{\class{mjx-in}{h}}\]</div>
+        </div>
+        <p>Only \(h=0\) is ruled out. Then the two points are one point, and the fraction is <span class="nw">\(\frac{0}{0}\).</span></p>
+        <p>What happens as \(h\) closes in on \(0\) is where calculus begins, on <a class="inline" href="calculus-limits.html">Limits</a>.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="calculus.html">← All Calculus pages</a>
+        <a href="calculus-limits.html">Next: Limits →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "calc-widget-height") return;
+      document.querySelectorAll("iframe.calc-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

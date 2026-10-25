@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The rise between two points</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="h" type="range" min="0" max="100" step="1" value="60" aria-label="The horizontal separation h between the two points" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Two points on y = x², at x and x + h. The run between them is lilac and the rise coral; dashed
+  // levels carry each height across to the y-axis, so the rise reads as the gap between x² and
+  // (x + h)². The first point stays at 2; the slider sets h.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("h");
+  const X = 2, HMIN = 0.25, HMAX = 1.2, XMAX = 3.6, YMAX = 11, H = 240;
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1";
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const h = HMIN + (HMAX - HMIN) * slider.value / 100;
+    const W = svg.clientWidth || 560;
+    const pw = Math.min(W - 66, 340), L = Math.round((W - pw) / 2) + 26, T = 12, base = H - 30;
+    const px = x => L + x / XMAX * pw, py = y => base - y / YMAX * (base - T);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+
+    el("line", { x1: L - 6, x2: L + pw, y1: base, y2: base, stroke: INK, "stroke-opacity": 0.16 });
+    el("line", { x1: L, x2: L, y1: T, y2: base + 6, stroke: INK, "stroke-opacity": 0.16 });
+    let d = "";
+    for (let i = 0; i <= 80; i++) { const x = Math.sqrt(YMAX) * i / 80; d += (i ? "L" : "M") + px(x).toFixed(1) + " " + py(x * x).toFixed(1); }
+    el("path", { d, fill: "none", stroke: INK, "stroke-opacity": 0.7, "stroke-width": 1.6 });
+
+    const x2 = X + h, y1 = X * X, y2 = x2 * x2;
+    for (const [x, y] of [[X, y1], [x2, y2]]) {
+      el("line", { x1: L, x2: px(x), y1: py(y), y2: py(y), stroke: INK, "stroke-opacity": 0.3, "stroke-dasharray": "2 4" });
+      el("line", { x1: px(x), x2: px(x), y1: base - 4, y2: base + 4, stroke: IN, "stroke-width": 1.6 });
+    }
+    el("line", { x1: px(X), x2: px(x2), y1: py(y1), y2: py(y1), stroke: IN, "stroke-width": 2.2 });
+    el("line", { x1: px(x2), x2: px(x2), y1: py(y1), y2: py(y2), stroke: OUT, "stroke-width": 2.6 });
+    el("circle", { cx: px(X), cy: py(y1), r: 4.5, fill: INK });
+    el("circle", { cx: px(x2), cy: py(y2), r: 4.5, fill: INK });
+
+    el("text", { x: px(X), y: base + 18, "text-anchor": "middle", class: "in" }, "x");
+    el("text", { x: px(x2), y: base + 18, "text-anchor": "middle", class: "in" }, "x+h");
+    el("text", { x: L - 8, y: py(y1) + 4, "text-anchor": "end" }, "x²");
+    el("text", { x: L - 8, y: py(y2) + 4, "text-anchor": "end" }, "(x+h)²");
+    el("text", { x: (px(X) + px(x2)) / 2, y: py(y1) + 16, "text-anchor": "middle", class: "in" }, "h");
+    el("text", { x: px(x2) + 9, y: (py(y1) + py(y2)) / 2 + 4, class: "out" }, "Δy");
+
+    svg.setAttribute("aria-label", `Two points on the curve y = x squared, at x and x + h, with h = ${h.toFixed(2)}. The run between them is h, and the rise, delta y, is the gap between the heights x squared and (x + h) squared.`);
+  }
+
+  slider.addEventListener("input", render);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
