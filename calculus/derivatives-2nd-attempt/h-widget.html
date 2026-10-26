@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Two points, h apart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="s" type="range" min="0" max="300" step="1" value="230" aria-label="The horizontal displacement h, from −1.5 to 1.5" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("s");
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // a frame for a plot: px and py map maths to pixels, clip keeps lines inside it
+  function frame(W, H, xr, yr, pad) {
+    const L = pad.l, R = W - pad.r, T = pad.t, B = H - pad.b;
+    const px = x => L + (x - xr[0]) / (xr[1] - xr[0]) * (R - L);
+    const py = y => B - (y - yr[0]) / (yr[1] - yr[0]) * (B - T);
+    const cp = el("clipPath", { id: "clip" });
+    el("rect", { x: L, y: T, width: R - L, height: B - T }, null, cp);
+    const g = el("g", { "clip-path": "url(#clip)" });
+    return { L, R, T, B, px, py, g };
+  }
+  function curve(F, f, a, b, attrs) {
+    let d = "";
+    for (let i = 0; i <= 120; i++) { const x = a + (b - a) * i / 120; d += (i ? "L" : "M") + F.px(x).toFixed(1) + " " + F.py(f(x)).toFixed(1); }
+    return el("path", Object.assign({ d, fill: "none", stroke: INK, "stroke-opacity": 0.7, "stroke-width": 1.6 }, attrs || {}), null, F.g);
+  }
+  const minus = s => String(s).replace("-", "−");
+  const round = (v, d) => minus(+v.toFixed(d));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+
+  // Any smooth curve, a first point at x and a second at x + h. The slider runs h from −1.5 to 1.5:
+  // positive h puts the second point to the right, negative to the left. The run is h (lilac) and
+  // the rise f(x + h) − f(x) (coral). Labels that would crowd are pushed apart; their dashed
+  // levels stay true.
+  const f = x => 0.1 * x * x * x - 0.6 * x * x + 2 * x + 0.5, X = 3.2, H = 250;
+
+  function render() {
+    const h = (slider.value - 150) / 100;
+    const W = svg.clientWidth || 300;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const F = frame(W, H, [0, 5], [0, 8.5], { l: 50, r: 12, t: 26, b: 44 });
+    el("line", { x1: F.L - 4, x2: F.R, y1: F.B, y2: F.B, stroke: INK, "stroke-opacity": 0.16 });
+    el("line", { x1: F.L, x2: F.L, y1: F.T, y2: F.B + 4, stroke: INK, "stroke-opacity": 0.16 });
+    curve(F, f, 0, 5);
+
+    const x2 = X + h, y1 = f(X), y2 = f(x2);
+    const pts = h === 0 ? [[X, y1]] : [[X, y1], [x2, y2]];
+    for (const [x, y] of pts) {
+      el("line", { x1: F.L, x2: F.px(x), y1: F.py(y), y2: F.py(y), stroke: INK, "stroke-opacity": 0.3, "stroke-dasharray": "2 4" });
+      el("line", { x1: F.px(x), x2: F.px(x), y1: F.B - 4, y2: F.B + 4, stroke: IN, "stroke-width": 1.6 });
+    }
+    // axis labels: the second row and the pushed-apart heights keep them clear of each other
+    const near = Math.abs(F.px(x2) - F.px(X)) < 36;
+    el("text", { x: F.px(X), y: F.B + 17, "text-anchor": "middle", class: "in" }, "x");
+    let ly1 = F.py(y1) + 4, ly2 = F.py(y2) + 4;
+    if (h !== 0) {
+      el("text", { x: F.px(x2), y: F.B + (near ? 32 : 17), "text-anchor": "middle", class: "in" }, "x+h");
+      const gap = 16 - Math.abs(ly2 - ly1);
+      if (gap > 0) { const s = Math.sign(ly2 - ly1) || -1; ly1 -= s * gap / 2; ly2 += s * gap / 2; }
+      el("text", { x: F.L - 7, y: ly2, "text-anchor": "end" }, "f(x+h)");
+      el("line", { x1: F.px(X), x2: F.px(x2), y1: F.py(y1), y2: F.py(y1), stroke: IN, "stroke-width": 2.2 });
+      el("line", { x1: F.px(x2), x2: F.px(x2), y1: F.py(y1), y2: F.py(y2), stroke: OUT, "stroke-width": 2.6 });
+      const up = h > 0;
+      if (Math.abs(F.py(y2) - F.py(y1)) >= 18) el("text", { x: F.px(x2) + (up ? 9 : -9), y: (F.py(y1) + F.py(y2)) / 2 + 4, "text-anchor": up ? "start" : "end", class: "out" }, "Δy");
+      el("circle", { cx: F.px(x2), cy: F.py(y2), r: 4.5, fill: INK });
+    }
+    el("text", { x: F.L - 7, y: ly1, "text-anchor": "end" }, "f(x)");
+    el("circle", { cx: F.px(X), cy: F.py(y1), r: 4.5, fill: INK });
+    el("text", { x: F.L, y: 14, class: "in" }, `h = ${minus(h.toFixed(2))}`);
+
+    svg.setAttribute("aria-label", h === 0
+      ? "With h = 0 the two points on the curve are one point, at x."
+      : `Points on a curve at x and x + h, with h = ${minus(h.toFixed(2))}, so the second point is to the ${h > 0 ? "right" : "left"}. The run is h, and the rise, delta y, is f(x + h) − f(x).`);
+  }
+  render();
+</script>
+</body>
+</html>

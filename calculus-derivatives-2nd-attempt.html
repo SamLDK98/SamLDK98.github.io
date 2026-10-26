@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Derivatives (2nd attempt) | Calculus | Sam Kirwan</title>
+  <meta name="description" content="A second attempt at Derivatives: the instantaneous rate of change, from the slope of a straight line through secants on x squared and the difference quotient to the limit definition of the derivative." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="calculus.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="calculus.html">Calculus</a>
+      <h1>Derivatives (2nd attempt)</h1>
+    </header>
+    <main>
+      <section aria-label="Opening">
+        <div class="side">
+          <div>
+            <p>The derivative is a measure of the <strong>instantaneous rate of change</strong> of a function at a particular point.</p>
+            <p>It tells us how sensitive the output is to a change in the input at that point.</p>
+            <p>Geometrically, it is the slope of the tangent line at that point.</p>
+            <p>Differentiation is the process of finding the derivative.</p>
+          </div>
+          <aside class="note" aria-labelledby="slope">
+            <h3 id="slope">Slope</h3>
+            <p>The change in output for a change in input.</p>
+            <svg viewBox="0 0 180 112" role="img" aria-label="A right-angled triangle under a sloping line: its horizontal side is the run, and its vertical side the rise.">
+              <line x1="14" y1="86" x2="136" y2="86" stroke="#a99cff" stroke-width="2"/>
+              <line x1="136" y1="86" x2="136" y2="22" stroke="#ff8c69" stroke-width="2.4"/>
+              <line x1="4" y1="91.2" x2="148" y2="15.7" stroke="#ebe8e1" stroke-opacity="0.7" stroke-width="1.6"/>
+              <circle cx="14" cy="86" r="3.6" fill="#ebe8e1"/>
+              <circle cx="136" cy="22" r="3.6" fill="#ebe8e1"/>
+              <text x="75" y="104" text-anchor="middle" class="in">Run</text>
+              <text x="144" y="58" class="out">Rise</text>
+            </svg>
+            <div class="math">\[\Large \frac{\text{Rise}}{\text{Run}}\]</div>
+            <div class="math">\[\boxed{m=\frac{\Delta y}{\Delta x}}\]</div>
+          </aside>
+        </div>
+
+        <div class="side flip">
+          <div>
+            <p>Geometrically, we move the second point of a secant line closer and closer to an original point until the distance between them approaches zero.</p>
+            <p>Algebraically, we evaluate the function at \(x\) and <span class="nw">\(x+h\),</span> then simplify the difference quotient formula:</p>
+            <div class="math">\[\frac{f(x+h)-f(x)}{h}\]</div>
+            <p>The simplified expression is the secant slope between the two points.</p>
+          </div>
+          <figure class="graph">
+            <svg viewBox="0 0 340 230" role="img" aria-label="A curve with a fixed point on it. Straight lines join the point to second points further along the curve, each closer than the last, and fainter the further away. An arrow beside the curve shows the second point moving in. They close in on the tangent at the point, drawn in coral.">
+              <line x1="14.0" x2="326.0" y1="202.8" y2="202.8" class="ax"/>
+              <line x1="14.0" x2="14.0" y1="14.0" y2="216.0" class="ax"/>
+              <path d="M14.0 202.8 L19.1 202.8 L24.3 202.6 L29.4 202.4 L34.5 202.0 L39.7 201.6 L44.8 201.0 L50.0 200.4 L55.1 199.6 L60.2 198.8 L65.4 197.8 L70.5 196.8 L75.6 195.6 L80.8 194.4 L85.9 193.0 L91.0 191.6 L96.2 190.0 L101.3 188.4 L106.5 186.6 L111.6 184.8 L116.7 182.8 L121.9 180.8 L127.0 178.6 L132.1 176.4 L137.3 174.0 L142.4 171.6 L147.6 169.0 L152.7 166.4 L157.8 163.6 L163.0 160.8 L168.1 157.8 L173.2 154.8 L178.4 151.6 L183.5 148.4 L188.6 145.0 L193.8 141.6 L198.9 138.0 L204.1 134.3 L209.2 130.6 L214.3 126.7 L219.5 122.8 L224.6 118.7 L229.7 114.6 L234.9 110.3 L240.0 106.0 L245.1 101.5 L250.3 97.0 L255.4 92.3 L260.6 87.6 L265.7 82.7 L270.8 77.8 L276.0 72.7 L281.1 67.6 L286.2 62.3 L291.4 57.0 L296.5 51.5 L301.6 46.0 L306.8 40.3 L311.9 34.6 L317.1 28.7 L322.2 22.8" class="fn"/>
+              <line x1="85.2" y1="208.3" x2="329.8" y2="21.3" class="sec" stroke-opacity="0.32"/>
+              <circle cx="310.8" cy="35.8" r="3.4" class="dot" fill-opacity="0.52"/>
+              <line x1="78.0" y1="208.3" x2="261.3" y2="91.9" class="sec" stroke-opacity="0.46"/>
+              <circle cx="242.3" cy="104.0" r="3.4" class="dot" fill-opacity="0.66"/>
+              <line x1="70.6" y1="208.3" x2="211.9" y2="131.9" class="sec" stroke-opacity="0.6"/>
+              <circle cx="192.8" cy="142.2" r="3.4" class="dot" fill-opacity="0.80"/>
+              <line x1="63.8" y1="208.3" x2="177.6" y2="154.1" class="sec" stroke-opacity="0.76"/>
+              <circle cx="158.6" cy="163.2" r="3.4" class="dot" fill-opacity="0.96"/>
+              <line x1="44.4" y1="212.0" x2="272.7" y2="119.8" class="tan"/>
+              <circle cx="120.5" cy="181.3" r="4.4" class="dot"/>
+              <text x="278.7" y="123.8" class="out">tangent</text>
+              <path d="M292.0 72.2 L289.1 75.1 L286.2 78.0 L283.3 80.9 L280.4 83.8 L277.5 86.6 L274.6 89.4 L271.7 92.2 L268.8 94.9 L265.9 97.6 L263.0 100.3 L260.1 102.9 L257.2 105.5 L254.3 108.1 L251.4 110.7 L248.5 113.2 L245.6 115.7 L242.7 118.1 L239.8 120.5 L236.9 122.9 L234.0 125.3 L231.1 127.6 L228.2 130.0 L225.3 132.2 L222.3 134.5 L219.4 136.7 L216.5 138.9 L213.6 141.0 L210.7 143.1 L207.8 145.2 L204.8 147.3 L201.9 149.3 L199.0 151.3 L196.1 153.3 L193.2 155.2 L190.2 157.1 L187.3 159.0 L184.4 160.8 L181.5 162.6 L178.5 164.4 L175.6 166.2" class="move"/>
+              <polygon points="171.3,168.8 179.4,168.6 175.2,161.7" class="move-head"/>
+            </svg>
+          </figure>
+        </div>
+      </section>
+
+      <section aria-labelledby="line">
+        <h2 id="line">The Slope of a Straight Line</h2>
+        <div class="side">
+          <div>
+            <p>Imagine:</p>
+            <div class="math">\[f(x)=2x+3\]</div>
+            <p>We evaluate two points:</p>
+            <div class="math">\[f(1)=2+3=5 \qquad f(2)=2(2)+3=7\]</div>
+            <p>And find their slope:</p>
+            <div class="math">\[\frac{7-5}{2-1}=\frac{2}{1}=2\]</div>
+          </div>
+          <iframe class="calc-widget" src="calculus/derivatives-2nd-attempt/line-widget.html" title="Interactive: slide the second of two points along the line y = 2x + 3; the run and the rise between them change, but the slope is always 2" style="height: 279px" scrolling="no" loading="lazy"></iframe>
+        </div>
+        <p>Linear functions have a constant rate of change. The slope between any two points tells us the derivative of the function at any point:</p>
+        <div class="math">\[\boxed{f'(x)=2}\]</div>
+        <p><span class="nw">\(f'(x)\),</span> read “f prime of x”, is the derivative of \(f\) at <span class="nw">\(x\).</span></p>
+      </section>
+
+      <section aria-labelledby="curve">
+        <h2 id="curve">The Slope of a Curve</h2>
+        <div class="side">
+          <div>
+            <div class="math">\[f(x)=x^2\]</div>
+            <p>The rate of change now varies: the curve gets steeper as \(x\) grows, so each point has its own slope.</p>
+            <p>To know the slope at <span class="nw">\(x=4\),</span> we could select a second point on the curve, connect a secant line, and find its slope to give an approximation.</p>
+            <p>We could then move the second point closer to \((4,16)\) and take an even better approximation.</p>
+          </div>
+          <iframe class="calc-widget" src="calculus/derivatives-2nd-attempt/secant-widget.html" title="Interactive: slide to bring a second point down the curve y = x squared from an output of 20 to 16, past the table's four rows; the secant through it and (4, 16) flattens, and its slope falls from about 8.47 towards 8" style="height: 279px" scrolling="no" loading="lazy"></iframe>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Input (approx.)</th><th>Output</th><th>Secant slope (approx.) between (input, output) and (4, 16)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">4.472</td><td class="num">20</td><td class="num">8.47</td></tr>
+            <tr><td class="num">4.359</td><td class="num">19</td><td class="num">8.36</td></tr>
+            <tr><td class="num">4.243</td><td class="num">18</td><td class="num">8.24</td></tr>
+            <tr><td class="num">4.123</td><td class="num">17</td><td class="num">8.12</td></tr>
+            <tr><td class="num">4</td><td class="num">16</td><td class="num">?</td></tr>
+          </tbody>
+        </table>
+        <p>As we move the second point closer to <span class="nw">\((4,16)\),</span> the secant slopes appear to approach <span class="nw">\(8\).</span></p>
+        <p>But how do we know that they approach exactly \(8\)? Could they continue decreasing towards <span class="nw">\(7.95\),</span> or some other value?</p>
+        <p>We need something more reliable than observing a numerical pattern.</p>
+      </section>
+
+      <section aria-labelledby="dq">
+        <h2 id="dq">The Difference Quotient</h2>
+        <div class="side flip">
+          <div>
+            <p>Our inputs:</p>
+            <ol>
+              <li>\(x\)</li>
+              <li>\(x+h\)</li>
+            </ol>
+            <p>Our outputs:</p>
+            <ol>
+              <li>\(f(x)\)</li>
+              <li>\(f(x+h)\)</li>
+            </ol>
+            <p>We use \(h\) as it references ‘horizontal displacement’.</p>
+            <ul>
+              <li>If <span class="nw">\(h>0\),</span> the second point lies to the right of the first.</li>
+              <li>If <span class="nw">\(h<0\),</span> it lies to the left.</li>
+            </ul>
+          </div>
+          <iframe class="calc-widget" src="calculus/derivatives-2nd-attempt/h-widget.html" title="Interactive: slide h from minus 1.5 to 1.5; the second point sits at x + h, to the right of the first when h is positive and to the left when it is negative, and the rise between them is f(x + h) − f(x)" style="height: 299px" scrolling="no" loading="lazy"></iframe>
+        </div>
+        <p>The slope between the two points is the rise over the run:</p>
+        <div class="math">\[\frac{\Delta y}{\Delta x}\]</div>
+        <p>Our change in inputs, <span class="nw">\(\Delta x\),</span> is just <span class="nw">\(h\):</span></p>
+        <div class="math">\[(x+h)-x=h\]</div>
+        <p>Our change in outputs, <span class="nw">\(\Delta y\),</span> is:</p>
+        <div class="math">\[f(x+h)-f(x)\]</div>
+        <p>The general formula for the secant slope is therefore the <strong>difference quotient</strong>:</p>
+        <div class="math">\[\boxed{\frac{f(x+h)-f(x)}{h}}\]</div>
+      </section>
+
+      <section aria-labelledby="dqx2">
+        <h2 id="dqx2">The Difference Quotient of \(x^2\)</h2>
+        <div class="math">\[f(x)=x^2\]</div>
+        <div class="side">
+          <div>
+            <p>Evaluate the function algebraically at \(x\) and <span class="nw">\(x+h\):</span></p>
+            <ol>
+              <li>\(f(x)=x^2\)</li>
+              <li>\(f(x+h)=(x+h)^2=x^2+2hx+h^2\)</li>
+            </ol>
+            <p>The second is the <a class="inline" href="polynomials-expansion.html">square of a sum</a>, drawn beside.</p>
+          </div>
+          <figure class="graph small">
+            <svg viewBox="0 0 180 186" role="img" aria-label="A square of side x + h. In its corner sits the square x squared; along two sides lie two strips, each h by x, and in the far corner a small square, h by h.">
+              <rect x="14" y="46.0" width="116.0" height="116.0" class="sq"/>
+              <rect x="130.0" y="46.0" width="36.0" height="116.0" class="strip"/>
+              <rect x="14" y="10" width="116.0" height="36.0" class="strip"/>
+              <rect x="130.0" y="10" width="36.0" height="36.0" class="corner"/>
+              <text x="72.0" y="109.0" text-anchor="middle" class="lab">x²</text>
+              <text x="148.0" y="109.0" text-anchor="middle" class="lab">hx</text>
+              <text x="72.0" y="33.0" text-anchor="middle" class="lab">hx</text>
+              <text x="148.0" y="33.0" text-anchor="middle" class="lab">h²</text>
+              <text x="72.0" y="180.0" text-anchor="middle" class="in">x</text>
+              <text x="148.0" y="180.0" text-anchor="middle" class="in">h</text>
+            </svg>
+          </figure>
+        </div>
+        <p>The difference quotient becomes:</p>
+        <div class="math">\[\frac{x^2+2hx+h^2-x^2}{h}=\frac{2hx+h^2}{h}\]</div>
+        <p>We can cancel the <span class="nw">\(h\):</span></p>
+        <div class="math">\[\boxed{2x+h}\]</div>
+        <p>This is the formula for the secant slope between any two points on the function <span class="nw">\(f(x)=x^2\).</span></p>
+        <p>We are curious about the slope at <span class="nw">\(x=4\).</span> The secant slope between \(x=4\) and some other point must be:</p>
+        <div class="math">\[2(4)+h=8+h\]</div>
+        <div class="side">
+          <div>
+            <p>If \(h\) is positive:</p>
+            <ul>
+              <li>As we increase <span class="nw">\(h\),</span> the second point moves further away.</li>
+              <li>As we decrease <span class="nw">\(h\),</span> the second point moves closer and closer.</li>
+            </ul>
+            <p>We can move it as close as we like: really close to <span class="nw">\(0\),</span> but not \(0\) itself, say <span class="nw">\(0.00000001\).</span></p>
+            <div class="math">\[m=8.00000001\]</div>
+            <p>For a positive <span class="nw">\(h\),</span> we can't go as low as \(8\) itself. For a negative <span class="nw">\(h\),</span> \(8+h\) is below <span class="nw">\(8\),</span> and closes in from below.</p>
+          </div>
+          <iframe class="calc-widget" src="calculus/derivatives-2nd-attempt/rail-widget.html" title="Interactive: step h from 1 down through 0.5, 0.1, 0.01 and on to 0.00000001, from either side of x = 4 on y = x squared; the view zooms in as h shrinks, and each secant slope, 8 + h, is marked on a rail, above 8 from the right and below it from the left" style="height: 319px" scrolling="no" loading="lazy"></iframe>
+        </div>
+        <p>We call \(8\) the limit of the secant slopes of the function at this point: the value they close in on. The next page, <a class="inline" href="calculus-limits.html">Limits</a>, makes this precise.</p>
+        <ul>
+          <li>From the right, the secant slopes stay above <span class="nw">\(8\),</span> but get as close to it as we like.</li>
+          <li>From the left, they stay below <span class="nw">\(8\),</span> and get as close to it as we like.</li>
+        </ul>
+        <p>This limiting value is the derivative of \(f(x)=x^2\) at <span class="nw">\(x=4\):</span></p>
+        <div class="math">\[\boxed{f'(4)=8}\]</div>
+      </section>
+
+      <section aria-labelledby="definition">
+        <h2 id="definition">The Limit Definition</h2>
+        <p>We can express the entire process of finding a derivative using a single mathematical formula:</p>
+        <div class="def">
+          <div class="math">\[f'(x)=\lim_{h\to0}\frac{f(x+h)-f(x)}{h}\]</div>
+        </div>
+        <p>This is called the <strong>limit definition of the derivative</strong>, or <em>differentiation from first principles</em>.</p>
+        <table>
+          <thead>
+            <tr><th>Notation</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>\(f'(x)\)</td><td>The derivative of the function \(f\) at input <span class="nw">\(x\).</span></td></tr>
+            <tr><td>\(\lim\)</td><td>The limit: the value an expression approaches.</td></tr>
+            <tr><td>\(h\to0\)</td><td>The horizontal separation between our two points approaches zero.</td></tr>
+            <tr><td>\(f(x)\)</td><td>The output at our first point.</td></tr>
+            <tr><td>\(f(x+h)\)</td><td>The output at our second point.</td></tr>
+            <tr><td>\(f(x+h)-f(x)\)</td><td>The difference between the outputs, <span class="nw">\(\Delta y\).</span></td></tr>
+            <tr><td>\(h\)</td><td>The difference between the inputs, <span class="nw">\(\Delta x\).</span></td></tr>
+          </tbody>
+        </table>
+        <p>The expression inside the limit is our familiar difference quotient, which calculates the secant slope between two points.</p>
+        <p>The limit tells us to investigate what this slope approaches as the separation between those points approaches zero.</p>
+        <p>Provided this limit exists as a finite number, its value is the derivative.</p>
+
+        <h3>Applying the Notation</h3>
+        <p>For <span class="nw">\(f(x)=x^2\),</span> we write:</p>
+        <div class="math">\[f'(x)=\lim_{h\to0}\frac{(x+h)^2-x^2}{h}\]</div>
+        <p>Simplifying the difference quotient:</p>
+        <div class="math">\[f'(x)=\lim_{h\to0}(2x+h)\]</div>
+        <p>As \(h\) approaches zero, the expression approaches <span class="nw">\(2x\).</span></p>
+        <p>For the functions we will initially work with, we can often simplify the difference quotient into an expression that is defined at <span class="nw">\(h=0\).</span> Substituting \(h=0\) into that simplified expression then gives us the limit, and therefore the derivative. Here, \(2x+h\) at \(h=0\) is <span class="nw">\(2x\).</span> Therefore:</p>
+        <div class="math">\[\boxed{f'(x)=2x}\]</div>
+        <p>If we want the derivative at a particular input, such as <span class="nw">\(x=4\),</span> we evaluate this derivative function:</p>
+        <div class="math">\[f'(4)=2(4)=8\]</div>
+        <p>We have now expressed our original procedure in a general mathematical form that can be applied to other functions.</p>
+
+        <hr />
+        <p><strong>This was all rather untroublesome thanks to how easy it was to simplify the difference quotient for <span class="nw">\(f(x)=x^2\).</span> However, the difficulty increases when our functions result in more complicated algebraic expressions in the numerator of the difference quotient.</strong></p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="calculus-derivatives.html">← Derivatives</a>
+        <a href="calculus-limits.html">Next: Limits →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "calc-widget-height") return;
+      document.querySelectorAll("iframe.calc-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
