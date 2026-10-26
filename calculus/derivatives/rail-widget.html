@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Secant slopes from both sides of 8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="s" type="range" min="-10" max="10" step="1" value="10" aria-label="The horizontal displacement h: from −1 at the left end, through smaller and smaller sizes, to 0 in the middle, and up to 1 at the right end" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("s");
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // a frame for a plot: px and py map maths to pixels, clip keeps lines inside it
+  function frame(W, H, xr, yr, pad) {
+    const L = pad.l, R = W - pad.r, T = pad.t, B = H - pad.b;
+    const px = x => L + (x - xr[0]) / (xr[1] - xr[0]) * (R - L);
+    const py = y => B - (y - yr[0]) / (yr[1] - yr[0]) * (B - T);
+    const cp = el("clipPath", { id: "clip" });
+    el("rect", { x: L, y: T, width: R - L, height: B - T }, null, cp);
+    const g = el("g", { "clip-path": "url(#clip)" });
+    return { L, R, T, B, px, py, g };
+  }
+  function curve(F, f, a, b, attrs) {
+    let d = "";
+    for (let i = 0; i <= 120; i++) { const x = a + (b - a) * i / 120; d += (i ? "L" : "M") + F.px(x).toFixed(1) + " " + F.py(f(x)).toFixed(1); }
+    return el("path", Object.assign({ d, fill: "none", stroke: INK, "stroke-opacity": 0.7, "stroke-width": 1.6 }, attrs || {}), null, F.g);
+  }
+  const minus = s => String(s).replace("-", "−");
+  const round = (v, d) => minus(+v.toFixed(d));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+
+  // y = x² at x = 4, and a second point h away. The slider steps h through 1, 0.5, 0.1, 0.01 and
+  // on down to 0.00000001, from the left at one end and the right at the other; the middle is
+  // h = 0. Below, each secant slope, 8 + h, is marked on a rail from 7 to 9: from the right they
+  // stay above 8, from the left below it, and every visit leaves a faint mark.
+  const f = x => x * x, H = 270;
+  const STEPS = [1, 0.5, 0.1, 0.01, 0.001, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8];
+  const seen = new Set();
+  // decimals that show a step exactly: 0.5 needs 1, 0.01 needs 2, 1 and 0 need none
+  const decimals = a => a === 0 || a >= 1 ? 0 : a === 0.5 ? 1 : Math.round(-Math.log10(a));
+
+  function render() {
+    const v = +slider.value, a = v === 0 ? 0 : STEPS[10 - Math.abs(v)], h = Math.sign(v) * a;
+    const d = decimals(a);
+    const W = svg.clientWidth || 300;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const F = frame(W, H - 84, [2.75, 5.25], [6, 28], { l: 10, r: 10, t: 26, b: 6 });
+    curve(F, f, 2.75, 5.25);
+
+    if (h !== 0) {
+      const m = 8 + h;
+      el("line", { x1: F.px(2.75), x2: F.px(5.25), y1: F.py(16 - 1.25 * m), y2: F.py(16 + 1.25 * m), stroke: OUT, "stroke-opacity": 0.8, "stroke-width": 1.4 }, null, F.g);
+      el("circle", { cx: F.px(4 + h), cy: F.py(f(4 + h)), r: 4.5, fill: INK });
+      seen.add(v);
+    }
+    el("circle", { cx: F.px(4), cy: F.py(16), r: 4.5, fill: INK });
+    el("text", { x: F.L, y: 14, class: "in" }, `h = ${minus(h.toFixed(d))}`);
+
+    // the rail of secant slopes
+    const ry = H - 38, rl = 18, rr = W - 18, rx = s => rl + (s - 7) / 2 * (rr - rl);
+    el("line", { x1: rl, x2: rr, y1: ry, y2: ry, stroke: INK, "stroke-opacity": 0.22 });
+    for (const s of [7, 8, 9]) {
+      el("line", { x1: rx(s), x2: rx(s), y1: ry - (s === 8 ? 9 : 4), y2: ry + (s === 8 ? 9 : 4), stroke: INK, "stroke-opacity": s === 8 ? 0.6 : 0.3, "stroke-dasharray": s === 8 ? "2 2" : "none" });
+      el("text", { x: rx(s), y: ry + 24, "text-anchor": "middle" }, String(s));
+    }
+    for (const k of seen) {
+      const hk = Math.sign(k) * STEPS[10 - Math.abs(k)];
+      el("circle", { cx: rx(8 + hk), cy: ry, r: 3, fill: OUT, "fill-opacity": 0.3 });
+    }
+    if (h !== 0) {
+      const m = (8 + h).toFixed(d);
+      el("circle", { cx: rx(8 + h), cy: ry, r: 5, fill: OUT });
+      const lw = m.length * 6.6, lx = Math.min(Math.max(rx(8 + h), rl + lw / 2), rr - lw / 2);
+      el("text", { x: lx, y: ry - 14, "text-anchor": "middle", class: "out" }, m);
+    } else {
+      el("text", { x: rx(8), y: ry - 14, "text-anchor": "middle", class: "out" }, "?");
+    }
+
+    svg.setAttribute("aria-label", h === 0
+      ? "h = 0: both points of y = x squared are at (4, 16), and there is no secant slope."
+      : `Points on y = x squared at x = 4 and x = 4 + h, with h = ${minus(h.toFixed(d))}. The secant slope is ${minus((8 + h).toFixed(d))}, marked on a rail from 7 to 9.`);
+  }
+  render();
+</script>
+</body>
+</html>

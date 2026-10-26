@@ -131,6 +131,9 @@ figure.graph .hole { fill: var(--bg); stroke: var(--ink); stroke-width: 1.8; }
 figure.graph .stray { fill: var(--ink); }
 figure.graph .tick-out { stroke: var(--out); stroke-width: 2; }
 figure.graph text.out { fill: var(--out); }
+figure.graph .sec { stroke: var(--ink); stroke-width: 1.4; }
+figure.graph .tan { stroke: var(--out); stroke-width: 2; stroke-linecap: round; }
+figure.graph .dot { fill: var(--ink); }
 
 /* an exploded cube: the core, three slabs, three rods and a corner (The Power Rule) */
 figure.cube { margin: 1.6rem 0; }
@@ -146,6 +149,72 @@ iframe.calc-widget {
   display: block; width: 100%;
   border: 0; overflow: hidden; background: transparent;
   margin: 1.8rem 0;
+}
+
+/* ---------- text beside a figure (Derivatives) ----------
+   As on Trigonometry's first page: a widget or figure sits beside the paragraphs it belongs to,
+   so the text keeps moving. On a wide screen the figure reaches out past the text column, into
+   the margin on its own side, while the text keeps the column's edge; on a narrow one the pair
+   stacks, text first. .flip puts the figure on the left. */
+.side {
+  --reach: min(14rem, (100vw - 100%) / 2 - 1.6rem);
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  gap: clamp(1.4rem, 3vw, 2.2rem); align-items: center;
+  width: calc(100% + var(--reach));
+  margin: 1.8rem 0;
+}
+.side.flip { grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); margin-left: calc(-1 * var(--reach)); }
+.side.flip > :last-child { grid-column: 1; grid-row: 1; }
+.side > div > :first-child { margin-top: 0; }
+.side > div > :last-child { margin-bottom: 0; }
+.side iframe.calc-widget, .side figure { margin: 0; }
+
+/* a side note: a quiet card that can be skipped without losing the thread */
+aside.note {
+  border-left: 1px solid var(--faint);
+  padding: 0.2rem 0 0.2rem 1.1rem;
+}
+aside.note h3 {
+  font-family: "JetBrains Mono", monospace; font-weight: 400;
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 0.6rem;
+}
+aside.note p { font-size: 1.02rem; line-height: 1.6; }
+aside.note .math { font-size: 1.02rem; margin: 0.7rem 0; }
+aside.note > svg { display: block; width: 100%; max-width: 180px; height: auto; margin: 0.4rem 0 0.2rem; overflow: visible; }
+aside.note > svg text { font-family: "JetBrains Mono", monospace; font-size: 12px; fill: var(--dim); }
+aside.note > svg text.in { fill: var(--in); }
+aside.note > svg text.out { fill: var(--out); }
+
+h3 {
+  font-family: "Inter Tight", system-ui, sans-serif; font-weight: 400;
+  font-size: clamp(1.15rem, 2.8vw, 1.35rem); color: var(--ink);
+  margin: 2.4rem 0 0.8rem;
+}
+
+main > section ul, main > section ol { margin: 0.9rem 0 0.9rem 1.3rem; }
+main > section li + li { margin-top: 0.35rem; }
+main > section li::marker { color: var(--dim); }
+
+table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+th, td {
+  padding: 0.5rem 0.75rem 0.5rem 0; text-align: left; vertical-align: top;
+  border-bottom: 1px solid var(--hair);
+  font-size: clamp(0.98rem, 2.2vw, 1.06rem); line-height: 1.5;
+}
+th {
+  font-family: "JetBrains Mono", monospace; font-weight: 400;
+  font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim);
+  border-bottom-color: var(--faint);
+}
+td.num { font-family: "JetBrains Mono", monospace; font-size: 0.92rem; }
+table + p { margin-top: 0.9rem; }
+
+hr { border: 0; border-top: 1px solid var(--hair); margin: 2.6rem 0 1.6rem; }
+
+@media (max-width: 760px) {
+  .side, .side.flip { grid-template-columns: 1fr; width: auto; margin-left: 0; }
+  .side.flip > :last-child { grid-column: auto; grid-row: auto; }
 }
 
 /* ---------- footer nav ---------- */

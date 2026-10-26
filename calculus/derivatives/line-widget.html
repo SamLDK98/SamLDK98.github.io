@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The slope of a straight line</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="s" type="range" min="0" max="90" step="1" value="50" aria-label="Where the second point sits on the line" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("s");
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // a frame for a plot: px and py map maths to pixels, clip keeps lines inside it
+  function frame(W, H, xr, yr, pad) {
+    const L = pad.l, R = W - pad.r, T = pad.t, B = H - pad.b;
+    const px = x => L + (x - xr[0]) / (xr[1] - xr[0]) * (R - L);
+    const py = y => B - (y - yr[0]) / (yr[1] - yr[0]) * (B - T);
+    const cp = el("clipPath", { id: "clip" });
+    el("rect", { x: L, y: T, width: R - L, height: B - T }, null, cp);
+    const g = el("g", { "clip-path": "url(#clip)" });
+    return { L, R, T, B, px, py, g };
+  }
+  function curve(F, f, a, b, attrs) {
+    let d = "";
+    for (let i = 0; i <= 120; i++) { const x = a + (b - a) * i / 120; d += (i ? "L" : "M") + F.px(x).toFixed(1) + " " + F.py(f(x)).toFixed(1); }
+    return el("path", Object.assign({ d, fill: "none", stroke: INK, "stroke-opacity": 0.7, "stroke-width": 1.6 }, attrs || {}), null, F.g);
+  }
+  const minus = s => String(s).replace("-", "−");
+  const round = (v, d) => minus(+v.toFixed(d));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+
+  // The straight line f(x) = 2x + 3. The first point stays at x = 1; the slider moves the second.
+  // The run (lilac) and the rise (coral) change with it, but their ratio is always 2. When the two
+  // points are one point there is no run, and the slope is a question mark. Close together, the
+  // run and rise go unlabelled; the slope still reads 2.
+  const f = x => 2 * x + 3, A = 1, H = 230;
+
+  function render() {
+    const b = -0.5 + slider.value * 0.05;
+    const W = svg.clientWidth || 300;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const F = frame(W, H, [-1.3, 4.4], [-0.6, 12.6], { l: 10, r: 10, t: 26, b: 12 });
+    el("line", { x1: F.L, x2: F.R, y1: F.py(0), y2: F.py(0), stroke: INK, "stroke-opacity": 0.16 });
+    curve(F, f, -1.3, 4.4);
+
+    const run = +(b - A).toFixed(2), rise = +(2 * run).toFixed(2);
+    if (run !== 0) {
+      el("line", { x1: F.px(A), x2: F.px(b), y1: F.py(f(A)), y2: F.py(f(A)), stroke: IN, "stroke-width": 2.2 });
+      el("line", { x1: F.px(b), x2: F.px(b), y1: F.py(f(A)), y2: F.py(f(b)), stroke: OUT, "stroke-width": 2.6 });
+      const up = run > 0, roomy = Math.abs(F.px(b) - F.px(A)) >= 48;
+      if (roomy) el("text", { x: (F.px(A) + F.px(b)) / 2, y: F.py(f(A)) + (up ? 16 : -8), "text-anchor": "middle", class: "in" }, minus(run));
+      if (roomy) el("text", { x: F.px(b) + (up ? 9 : -9), y: (F.py(f(A)) + F.py(f(b))) / 2 + 4, "text-anchor": up ? "start" : "end", class: "out" }, minus(rise));
+    }
+    el("circle", { cx: F.px(A), cy: F.py(f(A)), r: 4.5, fill: INK });
+    el("circle", { cx: F.px(b), cy: F.py(f(b)), r: 4.5, fill: INK });
+    el("text", { x: F.L, y: 14, class: "out" }, run !== 0 ? "m = 2" : "m = ?");
+
+    svg.setAttribute("aria-label", run !== 0
+      ? `The line y = 2x + 3, with points at x = 1 and x = ${minus(b.toFixed(2))}. The run is ${minus(run)} and the rise ${minus(rise)}, so the slope is 2.`
+      : "The line y = 2x + 3, with both points at x = 1. There is no run, so the slope cannot be found from these two points.");
+  }
+  render();
+</script>
+</body>
+</html>

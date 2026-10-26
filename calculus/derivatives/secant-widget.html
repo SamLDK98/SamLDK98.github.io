@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A secant closing in on (4, 16)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="s" type="range" min="0" max="100" step="1" value="0" aria-label="The output of the second point, from 20 down to 16" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("s");
+  const IN = "#a99cff", OUT = "#ff8c69", INK = "#ebe8e1";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // a frame for a plot: px and py map maths to pixels, clip keeps lines inside it
+  function frame(W, H, xr, yr, pad) {
+    const L = pad.l, R = W - pad.r, T = pad.t, B = H - pad.b;
+    const px = x => L + (x - xr[0]) / (xr[1] - xr[0]) * (R - L);
+    const py = y => B - (y - yr[0]) / (yr[1] - yr[0]) * (B - T);
+    const cp = el("clipPath", { id: "clip" });
+    el("rect", { x: L, y: T, width: R - L, height: B - T }, null, cp);
+    const g = el("g", { "clip-path": "url(#clip)" });
+    return { L, R, T, B, px, py, g };
+  }
+  function curve(F, f, a, b, attrs) {
+    let d = "";
+    for (let i = 0; i <= 120; i++) { const x = a + (b - a) * i / 120; d += (i ? "L" : "M") + F.px(x).toFixed(1) + " " + F.py(f(x)).toFixed(1); }
+    return el("path", Object.assign({ d, fill: "none", stroke: INK, "stroke-opacity": 0.7, "stroke-width": 1.6 }, attrs || {}), null, F.g);
+  }
+  const minus = s => String(s).replace("-", "−");
+  const round = (v, d) => minus(+v.toFixed(d));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+
+  // y = x² near (4, 16). The slider brings the second point down the curve from an output of 20
+  // to 16, through the table's 19, 18 and 17. The secant through the two points flattens as it
+  // comes, and its slope falls from about 8.47 towards 8. At 16 the two points are one point.
+  // The second point's coordinates sit top right, as in the table.
+  const f = x => x * x, H = 230;
+
+  function render() {
+    const yq = 20 - 4 * slider.value / 100, xq = Math.sqrt(yq);
+    const W = svg.clientWidth || 300;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const F = frame(W, H, [2.7, 4.9], [6.5, 23.5], { l: 10, r: 10, t: 26, b: 12 });
+    curve(F, f, 2.7, 4.9);
+
+    const same = yq <= 16 + 1e-9, m = same ? null : (yq - 16) / (xq - 4);
+    if (!same) {
+      el("line", { x1: F.px(2.7), x2: F.px(4.9), y1: F.py(16 + m * (2.7 - 4)), y2: F.py(16 + m * 0.9), stroke: OUT, "stroke-opacity": 0.8, "stroke-width": 1.4 }, null, F.g);
+      el("circle", { cx: F.px(xq), cy: F.py(yq), r: 4.5, fill: INK });
+      el("text", { x: W - 10, y: 14, "text-anchor": "end" }, `(${xq.toFixed(3)}, ${round(yq, 2)})`);
+    }
+    el("circle", { cx: F.px(4), cy: F.py(16), r: 4.5, fill: INK });
+    el("text", { x: F.px(4) - 10, y: F.py(16) - 9, "text-anchor": "end" }, "(4, 16)");
+    el("text", { x: F.L, y: 14, class: "out" }, same ? "m = ?" : `m ≈ ${m.toFixed(2)}`);
+
+    svg.setAttribute("aria-label", same
+      ? "Both points on y = x squared are at (4, 16). There is no secant, and no slope to find."
+      : `Points on y = x squared at (4, 16) and (${xq.toFixed(3)}, ${round(yq, 2)}). The secant through them has slope about ${m.toFixed(2)}.`);
+  }
+  render();
+</script>
+</body>
+</html>
