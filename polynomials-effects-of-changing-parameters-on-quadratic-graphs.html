@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Effects of Changing Parameters on Quadratic Graphs | Polynomials | Sam Kirwan</title>
+  <meta name="description" content="Explore quadratic graphs with interactive sliders. Start with x squared, then discover how constants, linear terms and other parameters change a parabola.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="polynomials/changing-parameters/style.css">
+  <script src="polynomials/changing-parameters/explore.js" defer></script>
+</head>
+<body>
+<div class="sheet">
+  <header>
+    <a class="crumb" href="polynomials.html">← Polynomials</a>
+    <h1>The Effects of Changing Parameters on <em>Quadratic Graphs</em></h1>
+    <p class="standfirst">One curve. One change at a time.</p>
+  </header>
+  <main>
+    <noscript><p>Enable JavaScript to explore the graphs.</p></noscript>
+    <nav class="steps" role="tablist" aria-label="Explore quadratic parameters">
+      <button type="button" role="tab" id="tab-squaring" aria-controls="squaring" aria-selected="true" tabindex="0"><span class="step-number">01</span>Square</button>
+      <button type="button" role="tab" id="tab-constant" aria-controls="constant" aria-selected="false" tabindex="-1"><span class="step-number">02</span>Shift</button>
+      <button type="button" role="tab" id="tab-scale" aria-controls="scale" aria-selected="false" tabindex="-1"><span class="step-number">03</span>Stretch</button>
+      <button type="button" role="tab" id="tab-linear" aria-controls="linear" aria-selected="false" tabindex="-1"><span class="step-number">04</span>Linear term</button>
+      <button type="button" role="tab" id="tab-together" aria-controls="together" aria-selected="false" tabindex="-1"><span class="step-number">05</span>Combine</button>
+      <button type="button" role="tab" id="tab-vertex" aria-controls="vertex" aria-selected="false" tabindex="-1"><span class="step-number">06</span>Vertex form</button>
+    </nav>
+    <section id="squaring" role="tabpanel" aria-labelledby="tab-squaring">
+      <div class="section-intro"><h2>Start with a square</h2><p>Squaring a number gives its height on the curve. Move x to explore.</p></div>
+      <div class="explorer" data-kind="base" aria-label="Start with a square"></div>
+      <p class="note">Opposite inputs, equal heights. The turning point is (0, 0).</p>
+    </section>
+    <section id="constant" role="tabpanel" aria-labelledby="tab-constant" hidden>
+      <div class="section-intro"><h2>Add a constant</h2><p>Add c to every output.</p></div>
+      <div class="explorer" data-kind="constant" aria-label="Add a constant"></div>
+      <p class="note">Positive c moves the curve up; negative c moves it down.</p>
+    </section>
+    <section id="scale" role="tabpanel" aria-labelledby="tab-scale" hidden>
+      <div class="section-intro"><h2>Multiply the square</h2><p>Multiply every output by a.</p></div>
+      <div class="explorer" data-kind="scale" aria-label="Multiply the square"></div>
+      <p class="note">Larger |a| makes the curve narrower. Negative a turns it upside down.</p>
+    </section>
+    <section id="linear" role="tabpanel" aria-labelledby="tab-linear" hidden>
+      <div class="section-intro"><h2>Add a linear term</h2><p>Add bx. Watch the turning point.</p></div>
+      <div class="explorer" data-kind="linear" aria-label="Add a linear term"></div>
+      <p class="note">The shape stays the same. The vertex moves, while (0, 0) stays on the curve.</p>
+    </section>
+    <section id="together" role="tabpanel" aria-labelledby="tab-together" hidden>
+      <div class="section-intro"><h2>Bring them together</h2><p>Change a, b and c, one at a time.</p></div>
+      <div class="explorer" data-kind="general" aria-label="Bring them together"></div>
+      <p class="note">a sets the opening and width; a and b set the horizontal position; c sets the y-intercept.</p>
+    </section>
+    <section id="vertex" role="tabpanel" aria-labelledby="tab-vertex" hidden>
+      <div class="section-intro"><h2>Control the vertex directly</h2><p>Write the same curve as a(x − h)² + k.</p></div>
+      <div class="explorer" data-kind="vertex" aria-label="Control the vertex directly"></div>
+      <p class="note">The vertex is (h, k). Move it with h and k; reshape the curve with a.</p>
+    </section>
+    <div class="progress"><button type="button" class="previous">← Previous</button><span class="step-count">01 / 06</span><button type="button" class="next">Add a constant →</button></div>
+  </main>
+  <footer><a class="crumb" href="polynomials.html">← Polynomials</a><a href="polynomials-axis-of-symmetry.html">More on symmetry ↗</a></footer>
+</div>
+</body>
+</html>
