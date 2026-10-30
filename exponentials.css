@@ -13,6 +13,7 @@
   --hair:  rgba(238, 242, 252, 0.08);
   --base:  #e8a33d;   /* the base */
   --exp:   #7aa7ff;   /* the exponent */
+  --power: #c4a1e8;   /* the whole expression */
   --measure: 40rem;
 }
 
@@ -143,6 +144,14 @@ figure.anatomy .exp  { fill: var(--exp); }
 figure.anatomy .lead { stroke: var(--faint); stroke-width: 1; fill: none; }
 figure.anatomy .lead.base { stroke: var(--base); stroke-opacity: 0.55; }
 figure.anatomy .lead.exp  { stroke: var(--exp); stroke-opacity: 0.6; }
+figure.anatomy text.power { fill: var(--power); }
+figure.anatomy .lead.power { stroke: var(--power); stroke-opacity: 0.65; }
+
+/* The opening example: a centred graphic, followed by its explanation. */
+.power-intro { margin: 1.8rem 0; text-align: center; }
+.power-intro figure.anatomy { margin: 0 0 1.2rem; }
+.power-intro .math mjx-container[display="true"] { text-align: center !important; }
+
 
 iframe.expo-widget {
   display: block; width: 100%;
