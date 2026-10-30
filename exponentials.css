@@ -169,6 +169,7 @@ iframe.expo-widget {
 .side > div > :first-child { margin-top: 0; }
 .side > div > :last-child { margin-bottom: 0; }
 .side iframe.expo-widget, .side figure, .side table { margin: 0; }
+.side > table { justify-self: start; }   /* a table keeps its own width, next to its text */
 
 /* a side note: a quiet card that can be skipped without losing the thread */
 aside.note {
@@ -207,6 +208,8 @@ td.step { font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; color: va
 table.powers td:first-child, table.powers th:first-child { padding-left: 0.7rem; }
 table.powers tr.lit td:first-child { box-shadow: inset 2px 0 0 var(--base); }
 table.powers tr.lit td { color: var(--ink); }
+/* a value not yet known */
+td .q { color: var(--dim); }
 
 hr { border: 0; border-top: 1px solid var(--hair); margin: 2.8rem 0 1.8rem; }
 
@@ -218,6 +221,7 @@ table.laws td:first-child { color: var(--ink); }
   .side, .side.flip, .side.lead { grid-template-columns: 1fr; width: auto; margin-left: 0; }
   .side.flip > :last-child { grid-column: auto; grid-row: auto; }
   .side.lead > :first-child { justify-self: start; }
+  .side.lead > figure:first-child { justify-self: stretch; }
 }
 
 @media (max-width: 560px) {

@@ -29,14 +29,8 @@
       <h1>Positive and Negative Integer Exponents</h1>
     </header>
     <main>
-      <section aria-labelledby="positive">
-        <h2 id="positive">Positive Integer Exponents</h2>
-        <div class="side flip">
-          <div>
-            <p>We could start by thinking of exponents as denoting how many copies of the base to include in a product expression.</p>
-            <p>\(4^6\) means: take six copies of four as factors in a product expression:</p>
-            <div class="math">\[4\cdot4\cdot4\cdot4\cdot4\cdot4\]</div>
-          </div>
+      <section aria-label="Base, exponent and power">
+        <div class="side lead">
           <figure class="anatomy">
             <svg viewBox="0 0 320 186" role="img" aria-label="The power 3 to the 4: the 3 is the base, the raised 4 is the exponent, and the whole expression is the power.">
               <text x="112" y="120" class="glyph big base">3</text>
@@ -49,71 +43,90 @@
               <text x="151.5" y="162" text-anchor="middle">power</text>
             </svg>
           </figure>
+          <div>
+            <p>The power \(3^4\) denotes the product of four copies of three:</p>
+            <div class="math">\[3\cdot3\cdot3\cdot3\]</div>
+          </div>
         </div>
       </section>
 
-      <section aria-labelledby="zero">
-        <h2 id="zero">The Zero Exponent</h2>
-        <p>However, what does this mean for \(0\) as an exponent?</p>
-        <p>We could say that \(4^0\) means: take no copies of four and put them in a product expression, but that would mean it must equal <span class="nw">\(0\).</span></p>
-        <p>Any number multiplied by \(0\) equals \(0\), so this might seem to make sense.</p>
-        <p>But we need \(4^0\) to equal <span class="nw">\(1\).</span></p>
-        <p>If we observe the following pattern, we see that each time we raise the exponent by \(1\), from \(a^n\) to <span class="nw">\(a^{n+1}\),</span> the value of the previous power is multiplied by the base:</p>
-        <div class="math">\[\begin{array}{ccccc}
-          4^{\class{mjx-exp}{1}} & \overset{\class{mjx-base}{\times 4}}{\longrightarrow} & 4^{\class{mjx-exp}{2}} & \overset{\class{mjx-base}{\times 4}}{\longrightarrow} & 4^{\class{mjx-exp}{3}} \\[2pt]
-          4 && 16 && 64
-        \end{array}\]</div>
-        <p>In reverse, when we decrease the exponent by \(1\), from \(a^n\) to <span class="nw">\(a^{n-1}\),</span> we divide the value of the power by the base:</p>
-        <div class="math">\[\begin{array}{ccccccc}
-          4^{\class{mjx-exp}{3}} & \overset{\class{mjx-base}{\div 4}}{\longrightarrow} & 4^{\class{mjx-exp}{2}} & \overset{\class{mjx-base}{\div 4}}{\longrightarrow} & 4^{\class{mjx-exp}{1}} & \overset{\class{mjx-base}{\div 4}}{\longrightarrow} & 4^{\class{mjx-exp}{0}} \\[2pt]
-          64 && 16 && 4 && ?
-        \end{array}\]</div>
-        <p>Following from this, decreasing the exponent from \(1\) to \(0\) must result in \(1\), as we would be dividing one copy of the base by itself:</p>
-        <div class="math">\[4^0=\frac{4}{4}=1\]</div>
-        <p>This holds for any base \(a\) except \(0\), since we cannot divide by <span class="nw">\(0\):</span></p>
-        <div class="math">\[\boxed{a^0=1}\]</div>
-
-        <div class="side">
+      <section aria-labelledby="positive">
+        <h2 id="positive">Positive Integer Exponents</h2>
+        <p>We could start by thinking of exponents as denoting how many copies of the base must appear as factors in a product.</p>
+        <p>\(4^6\) means six copies of four as factors in a product:</p>
+        <div class="math">\[4\cdot4\cdot4\cdot4\cdot4\cdot4\]</div>
+        <p id="zero">However, what does this mean for \(1\) and \(0\) as exponents?</p>
+        <p>It gets a little confusing to think in terms of a natural language definition. Instead we can observe the patterns in successive powers to work out how the operation should behave in less intuitive situations.</p>
+        <div class="side lead">
+          <table class="powers">
+            <thead>
+              <tr><th>Power</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\(4^0\)</td><td><span class="q">?</span></td></tr>
+              <tr><td>\(4^1\)</td><td><span class="q">?</span></td></tr>
+              <tr><td>\(4^2\)</td><td>\(16\)</td></tr>
+              <tr><td>\(4^3\)</td><td>\(64\)</td></tr>
+              <tr><td>\(4^4\)</td><td>\(256\)</td></tr>
+              <tr><td>\(4^5\)</td><td>\(1{,}024\)</td></tr>
+            </tbody>
+          </table>
           <div>
-            <p>We could keep trying to think of exponents in natural language; however, the definition becomes more complicated than just pointing to the rules. If you want a cleaner, more complete understanding of why \(x\cdot0=0\) and why <span class="nw">\(x^0=1\),</span> you can look into the idea of identity elements. For now, however, we will shift towards thinking about the rules of exponents rather than any geometric or conceptual meaning.</p>
+            <p>We can see that raising \(4\) to successive powers multiplies the previous power's value by <span class="nw">\(4\).</span></p>
+            <p>Likewise, decreasing the exponent divides the previous power's value by <span class="nw">\(4\).</span></p>
+            <p>To find \(4^1\) we divide \(16\) by \(4\) to give <span class="nw">\(4\).</span></p>
+            <p>To find \(4^0\) we divide \(4\) by \(4\) to give <span class="nw">\(1\).</span></p>
           </div>
-          <aside class="note" aria-labelledby="identity">
-            <h3 id="identity">Identity elements</h3>
-            <p>Adding \(0\) changes nothing, and multiplying by \(1\) changes nothing: \(0\) is the identity for addition, and \(1\) the identity for multiplication.</p>
-            <p>Taking no copies leaves the identity. A sum of no copies of \(x\) is \(0\), so <span class="nw">\(x\cdot0=0\).</span> A product of no copies of \(x\) is \(1\), so <span class="nw">\(x^0=1\).</span></p>
-          </aside>
+        </div>
+        <div class="side lead">
+          <table class="powers">
+            <thead>
+              <tr><th>Power</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr class="lit"><td>\(4^0\)</td><td>\(1\)</td></tr>
+              <tr class="lit"><td>\(4^1\)</td><td>\(4\)</td></tr>
+              <tr><td>\(4^2\)</td><td>\(16\)</td></tr>
+              <tr><td>\(4^3\)</td><td>\(64\)</td></tr>
+              <tr><td>\(4^4\)</td><td>\(256\)</td></tr>
+              <tr><td>\(4^5\)</td><td>\(1{,}024\)</td></tr>
+            </tbody>
+          </table>
+          <div>
+            <p>In general, any nonzero number raised to the power of zero equals <span class="nw">\(1\).</span></p>
+            <div class="math">\[\boxed{a^0=1 \qquad (a \ne 0)}\]</div>
+          </div>
         </div>
       </section>
 
       <section aria-labelledby="negative">
         <h2 id="negative">Negative Integer Exponents</h2>
-        <p>If we continue dividing the preceding value by the base, negative exponents represent \(1\) divided by copies of the base multiplied together.</p>
+        <p>If we continue dividing the preceding value by the base, negative exponents represent \(1\) divided by some multiplication of the base.</p>
         <div class="side lead">
           <table class="powers">
             <thead>
-              <tr><th>Power</th><th>Value</th><th><span hidden>Step</span></th></tr>
+              <tr><th>Power</th><th>Value</th></tr>
             </thead>
             <tbody>
-              <tr><td>\(5^5\)</td><td>\(3{,}125\)</td><td class="step"></td></tr>
-              <tr><td>\(5^4\)</td><td>\(625\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^3\)</td><td>\(125\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^2\)</td><td>\(25\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^1\)</td><td>\(5\)</td><td class="step">÷ 5</td></tr>
-              <tr class="lit"><td>\(5^0\)</td><td>\(1\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^{-1}\)</td><td>\(\frac{1}{5}\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^{-2}\)</td><td>\(\frac{1}{25}\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^{-3}\)</td><td>\(\frac{1}{125}\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^{-4}\)</td><td>\(\frac{1}{625}\)</td><td class="step">÷ 5</td></tr>
-              <tr><td>\(5^{-5}\)</td><td>\(\frac{1}{3{,}125}\)</td><td class="step">÷ 5</td></tr>
+              <tr><td>\(4^{5}\)</td><td>\(1{,}024\)</td></tr>
+              <tr><td>\(4^{4}\)</td><td>\(256\)</td></tr>
+              <tr><td>\(4^{3}\)</td><td>\(64\)</td></tr>
+              <tr><td>\(4^{2}\)</td><td>\(16\)</td></tr>
+              <tr><td>\(4^{1}\)</td><td>\(4\)</td></tr>
+              <tr class="lit"><td>\(4^{0}\)</td><td>\(1\)</td></tr>
+              <tr><td>\(4^{-1}\)</td><td>\(\frac{1}{4}\)</td></tr>
+              <tr><td>\(4^{-2}\)</td><td>\(\frac{1}{16}\)</td></tr>
+              <tr><td>\(4^{-3}\)</td><td>\(\frac{1}{64}\)</td></tr>
+              <tr><td>\(4^{-4}\)</td><td>\(\frac{1}{256}\)</td></tr>
+              <tr><td>\(4^{-5}\)</td><td>\(\frac{1}{1{,}024}\)</td></tr>
             </tbody>
           </table>
           <div>
-            <p>\(a^{-1}\):</p>
-            <div class="math">\[\frac{1}{a}\]</div>
-            <p>\(a^{-3}\):</p>
-            <div class="math">\[\frac{1}{a}\times\frac{1}{a}\times\frac{1}{a}\qquad\text{or}\qquad\frac{1}{a^3}\]</div>
-            <p>In general, for any base \(a\) except <span class="nw">\(0\):</span></p>
-            <div class="math">\[\boxed{a^{-n}=\frac{1}{a^n}}\]</div>
+            <p>Algebraically:</p>
+            <div class="math">\[a^{-1} \ = \ \frac{1}{a}\]</div>
+            <div class="math">\[a^{-3} =\frac{1}{a} \times \frac{1}{a} \times \frac{1}{a} = \frac{1}{a^3}\]</div>
+            <p>Generally:</p>
+            <div class="math">\[\boxed{a^{-n} = \frac{1}{a^n} \qquad (a \ne 0)}\]</div>
           </div>
         </div>
       </section>
