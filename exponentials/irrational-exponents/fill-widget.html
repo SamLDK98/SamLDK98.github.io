@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Filling the gaps in 2 to the x</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="choices" role="group" aria-label="Step between exponents">
+    <button type="button" data-level="0" aria-pressed="true">1</button>
+    <button type="button" data-level="1" aria-pressed="false">½</button>
+    <button type="button" data-level="2" aria-pressed="false">¼</button>
+    <button type="button" data-level="3" aria-pressed="false">⅛</button>
+    <button type="button" data-level="4" aria-pressed="false">1/16</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const buttons = [...document.querySelectorAll(".choices button")];
+  const INK = "#f4f6ff", EXP = "#7aa7ff";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  let level = 0, rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  buttons.forEach(b => b.addEventListener("click", () => {
+    level = +b.dataset.level;
+    buttons.forEach(o => o.setAttribute("aria-pressed", o === b ? "true" : "false"));
+    render();
+  }));
+
+  // The powers of 2 at every exponent from −2 to 3 in steps of 1, ½, ¼, ⅛ or 1/16. Each halving of the
+  // step adds a point between every pair (blue), and the straight lines of the step before are kept,
+  // dashed: every new point sits just below the old line, because a half step multiplies by a factor
+  // (√2 for the first halving) rather than adding half the difference. The joined points become a curve.
+  const X0 = -2, X1 = 3, Y1 = 8.6, H = 236;
+  const pts = s => { const a = []; for (let x = X0; x <= X1 + 1e-9; x += s) a.push(x); return a; };
+  const path = (xs, px, py) => xs.map((x, i) => (i ? "L" : "M") + px(x).toFixed(1) + " " + py(Math.pow(2, x)).toFixed(1)).join(" ");
+
+  function render() {
+    const W = svg.clientWidth || 300;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 22, R = W - 8, T = 8, B = H - 22;
+    const px = x => L + (x - X0) / (X1 - X0) * (R - L);
+    const py = y => B - y / Y1 * (B - T);
+
+    // axes: the x-axis, and a faint upright at x = 0; values 1, 2, 4, 8 marked at the left edge
+    el("line", { x1: L, x2: R, y1: py(0), y2: py(0), stroke: INK, "stroke-opacity": 0.2 });
+    el("line", { x1: px(0), x2: px(0), y1: T, y2: py(0), stroke: INK, "stroke-opacity": 0.12 });
+    for (let x = X0; x <= X1; x++) el("text", { x: px(x), y: B + 16, "text-anchor": "middle" }, String(x).replace("-", "−"));
+    [1, 2, 4, 8].forEach(v => {
+      el("line", { x1: L - 3, x2: L + 3, y1: py(v), y2: py(v), stroke: INK, "stroke-opacity": 0.25 });
+      el("text", { x: L - 7, y: py(v) + 4, "text-anchor": "end" }, String(v));
+    });
+
+    const step = Math.pow(2, -level), now = pts(step);
+    if (level > 0) el("path", { d: path(pts(step * 2), px, py), fill: "none", stroke: INK, "stroke-opacity": 0.4, "stroke-width": 1, "stroke-dasharray": "3 4" });
+    el("path", { d: path(now, px, py), fill: "none", stroke: INK, "stroke-opacity": level > 0 ? 0.3 : 0.4, "stroke-width": 1.2 });
+
+    const r = [3.6, 3.2, 2.7, 2.2, 1.8][level];
+    now.forEach((x, i) => {
+      const fresh = level > 0 && i % 2 === 1;
+      el("circle", { cx: px(x), cy: py(Math.pow(2, x)), r, fill: fresh ? EXP : INK });
+    });
+
+    const names = ["1", "a half", "a quarter", "an eighth", "a sixteenth"];
+    svg.setAttribute("aria-label", `The powers of 2 at exponents from −2 to 3 in steps of ${names[level]}: ${now.length} points.` +
+      (level ? " The new points, in blue, each sit just below the dashed straight line of the step before, and the points line up along a smooth curve." : " Each step of 1 doubles the value, and straight lines join the points."));
+  }
+  render();
+</script>
+</body>
+</html>

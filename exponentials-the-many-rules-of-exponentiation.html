@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Many Rules of Exponentiation | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="The product, quotient, power of a power, power of a product and power of a quotient rules, each seen by counting copies of the base, with a summary of every rule." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>The Many Rules of Exponentiation</h1>
+    </header>
+    <main>
+      <section aria-label="Opening">
+        <p>The power \(3^4\) denotes the product of four copies of three:</p>
+        <div class="math">\[3\cdot3\cdot3\cdot3\]</div>
+      </section>
+
+      <section aria-labelledby="product">
+        <h2 id="product">Product of Powers Rule</h2>
+        <p>We can observe something interesting if we write up the sequential powers of a number in a table.</p>
+        <div class="side lead">
+          <table class="powers">
+            <thead>
+              <tr><th>Power</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\(5^1\)</td><td>\(5\)</td></tr>
+              <tr class="lit"><td>\(5^2\)</td><td>\(25\)</td></tr>
+              <tr class="lit"><td>\(5^3\)</td><td>\(125\)</td></tr>
+              <tr><td>\(5^4\)</td><td>\(625\)</td></tr>
+              <tr class="lit"><td>\(5^5\)</td><td>\(3{,}125\)</td></tr>
+              <tr><td>\(5^6\)</td><td>\(15{,}625\)</td></tr>
+              <tr><td>\(5^7\)</td><td>\(78{,}125\)</td></tr>
+              <tr><td>\(5^8\)</td><td>\(390{,}625\)</td></tr>
+              <tr><td>\(5^9\)</td><td>\(1{,}953{,}125\)</td></tr>
+              <tr><td>\(5^{10}\)</td><td>\(9{,}765{,}625\)</td></tr>
+            </tbody>
+          </table>
+          <div>
+            <p>Multiplying powers of the same base gives the same value as raising the base number to the sum of their exponents.</p>
+            <p>\(5^2\times5^3\) is the same thing as <span class="nw">\(5^5\):</span></p>
+            <div class="math">\[25\cdot125=3{,}125\]</div>
+            <p>Counting copies shows why: two copies of \(5\) and three more make five.</p>
+            <div class="math">\[5^2\times5^3=(5\cdot5)\times(5\cdot5\cdot5)=5^5\]</div>
+          </div>
+        </div>
+        <p>This is captured by the <strong>product of powers rule</strong>:</p>
+        <div class="math">\[\boxed{a^{\class{mjx-exp}{m}}\times a^{\class{mjx-exp}{n}}=a^{\class{mjx-exp}{m+n}}}\]</div>
+        <p>Notice the base must be identical!</p>
+        <p>The rule holds for the exponents of the earlier pages too. <span class="nw">\(5^{\frac{1}{2}}\times5^{\frac{1}{2}}=5^{\frac{1}{2}+\frac{1}{2}}=5^1\)</span> is the equation that gave \(5^{\frac{1}{2}}=\sqrt{5}\) in <a class="inline" href="exponentials-the-root-rule.html">The Root Rule</a>.</p>
+      </section>
+
+      <section aria-labelledby="quotient">
+        <h2 id="quotient">Quotient of Powers Rule</h2>
+        <p>Similarly, dividing powers with the same base behaves the same as subtracting their exponents.</p>
+        <p>Dividing cancels copies:</p>
+        <div class="math">\[\frac{5^5}{5^2}=\frac{\cancel{5}\cdot\cancel{5}\cdot5\cdot5\cdot5}{\cancel{5}\cdot\cancel{5}}=5^3\]</div>
+        <p>This is captured by the <strong>quotient of powers rule</strong> (for a nonzero base <span class="nw">\(a\)):</span></p>
+        <div class="math">\[\boxed{\frac{a^{\class{mjx-exp}{m}}}{a^{\class{mjx-exp}{n}}}=a^{\class{mjx-exp}{m-n}}}\]</div>
+        <p>When <span class="nw">\(m=n\),</span> it gives <span class="nw">\(\frac{a^n}{a^n}=a^0=1\).</span> When <span class="nw">\(m&lt;n\),</span> it gives a negative exponent: <span class="nw">\(\frac{5^2}{5^5}=5^{-3}=\frac{1}{5^3}\).</span> These are the meanings from <a class="inline" href="exponentials-positive-and-negative-integer-exponents.html">the first page</a>: they are the ones that keep this rule true.</p>
+      </section>
+
+      <section aria-labelledby="power-power">
+        <h2 id="power-power">Power of a Power Rule</h2>
+        <p>\((5^2)^3\) is three copies of <span class="nw">\(5^2\),</span> each holding two copies of <span class="nw">\(5\):</span></p>
+        <div class="math">\[\begin{aligned}(5^2)^3&amp;=5^2\cdot5^2\cdot5^2\\&amp;=(5\cdot5)(5\cdot5)(5\cdot5)=5^6\end{aligned}\]</div>
+        <div class="math">\[\boxed{\left(a^{\class{mjx-exp}{m}}\right)^{\class{mjx-exp}{n}}=a^{\class{mjx-exp}{mn}}}\]</div>
+        <p>This also gives the two ways of writing a fractional exponent:</p>
+        <div class="math">\[\begin{aligned}a^{\frac{m}{n}}&amp;=\left(a^{\frac{1}{n}}\right)^m=\left(\sqrt[n]{a}\right)^m\\a^{\frac{m}{n}}&amp;=\left(a^m\right)^{\frac{1}{n}}=\sqrt[n]{a^m}\end{aligned}\]</div>
+      </section>
+
+      <section aria-labelledby="power-product">
+        <h2 id="power-product">Power of a Product Rule</h2>
+        <p>Three copies of \(ab\) hold three copies of \(a\) and three of <span class="nw">\(b\):</span></p>
+        <div class="math">\[\begin{aligned}(ab)^3&amp;=ab\cdot ab\cdot ab\\&amp;=a\cdot a\cdot a\cdot b\cdot b\cdot b=a^3b^3\end{aligned}\]</div>
+        <div class="math">\[\boxed{(ab)^{\class{mjx-exp}{n}}=a^{\class{mjx-exp}{n}}b^{\class{mjx-exp}{n}}}\]</div>
+      </section>
+
+      <section aria-labelledby="power-quotient">
+        <h2 id="power-quotient">Power of a Quotient Rule</h2>
+        <p>Likewise for a quotient:</p>
+        <div class="math">\[\left(\frac{a}{b}\right)^3=\frac{a}{b}\cdot\frac{a}{b}\cdot\frac{a}{b}=\frac{a\cdot a\cdot a}{b\cdot b\cdot b}=\frac{a^3}{b^3}\]</div>
+        <p>For <span class="nw">\(b\ne0\):</span></p>
+        <div class="math">\[\boxed{\left(\frac{a}{b}\right)^{\class{mjx-exp}{n}}=\frac{a^{\class{mjx-exp}{n}}}{b^{\class{mjx-exp}{n}}}}\]</div>
+      </section>
+
+      <section aria-labelledby="summary">
+        <h2 id="summary">Summary</h2>
+        <table class="laws">
+          <thead>
+            <tr><th>Rule</th><th>Formula</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Product of Powers</td><td>\(a^m\cdot a^n=a^{m+n}\)</td><td>\(5^2\cdot5^3=5^{5}\)</td></tr>
+            <tr><td>Quotient of Powers</td><td>\(\frac{a^m}{a^n}=a^{m-n}\)</td><td>\(\frac{7^9}{7^5}=7^{4}\)</td></tr>
+            <tr><td>Power of a Power</td><td>\((a^m)^n=a^{mn}\)</td><td>\((8^4)^3=8^{12}\)</td></tr>
+            <tr><td>Power of a Product</td><td>\((ab)^n=a^nb^n\)</td><td>\((9\cdot2)^5=9^5\,2^5\)</td></tr>
+            <tr><td>Power of a Quotient</td><td>\(\left(\frac{a}{b}\right)^n=\frac{a^n}{b^n}\)</td><td>\(\left(\frac{3}{4}\right)^2=\frac{3^2}{4^2}\)</td></tr>
+            <tr><td>Zero Exponent</td><td>\(a^0=1\)</td><td>\(9^0=1\)</td></tr>
+            <tr><td>Negative Exponent</td><td>\(a^{-n}=\frac{1}{a^n}\)</td><td>\(2^{-3}=\frac{1}{2^3}\)</td></tr>
+            <tr><td>Fractional Exponent</td><td>\(a^{\frac{m}{n}}=\sqrt[n]{a^m}\)</td><td>\(3^{\frac{8}{4}}=\sqrt[4]{3^8}=9\)</td></tr>
+            <tr><td>Root Rule (Special Case)</td><td>\(a^{\frac{1}{n}}=\sqrt[n]{a}\)</td><td>\(27^{\frac{1}{3}}=\sqrt[3]{27}=3\)<br />\(a^{\frac{1}{2}}=\sqrt{a}\)</td></tr>
+          </tbody>
+        </table>
+        <p><a class="inline" href="exponentials-the-root-rule.html">The Root Rule</a> is very tricky. It's worth spending the extra time to understand. It requires understanding the nature of multiplicative relationships.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-the-root-rule.html">← The Root Rule</a>
+        <a href="exponentials-irrational-exponents.html">Next: Irrational Exponents →</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>

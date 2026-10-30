@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Exponents and exponential functions: what an exponent means, from whole numbers to fractions and irrationals, and the rules they follow — explanations by Sam Kirwan." />
+  <title>Exponentials | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #08090b;
+      --text: #f4f5f8;
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 15% 38%, rgba(226, 232, 255, 0.05), transparent 25rem),
+        radial-gradient(circle at 24% 70%, rgba(96, 116, 190, 0.07), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* y = 2^x as a hairline in the corner: each dot doubles the one before */
+    .motif {
+      position: fixed; right: 0; bottom: 0; z-index: 0;
+      width: min(58vw, 680px); height: auto;
+      pointer-events: none;
+    }
+
+    main {
+      position: relative; z-index: 1;
+      width: min(46rem, calc(100% - 2rem));
+      margin-left: clamp(2rem, 11vw, 10rem);
+      padding: clamp(3rem, 9vh, 5.5rem) 0;
+      text-align: left;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 7vw, 5.4rem);
+      font-weight: 300;
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+    }
+
+    .back { margin-top: 2.6rem; font-size: 0.85rem; color: #a5adc1; }
+
+    nav { margin-top: clamp(2.4rem, 6vh, 4rem); }
+
+    ul { list-style: none; }
+
+    section + section { margin-top: 2.4rem; }
+
+    h2 {
+      margin-bottom: 0.95rem;
+      color: #e8a33d;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    li + li { margin-top: 0.7rem; }
+
+    a {
+      display: inline-block;
+      color: var(--text);
+      font-size: clamp(1rem, 1.65vw, 1.25rem);
+      font-weight: 300;
+      line-height: 1.35;
+      text-decoration: none;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #cfd8ff;
+      outline: none;
+      transform: translateX(3px);
+    }
+
+    @media (max-height: 720px) and (min-width: 600px) {
+      main { padding-block: 2rem; }
+      nav { margin-top: 2rem; }
+      li + li { margin-top: 0.45rem; }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(27rem, calc(100% - 4rem));
+        margin-left: 2rem;
+      }
+
+      h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
+      nav { margin-top: 2.6rem; }
+      li + li { margin-top: 0.8rem; }
+      .motif { width: 86vw; opacity: 0.7; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="motif" viewBox="0 0 680 420" aria-hidden="true">
+    <path d="M0.0 412.8 L13.6 412.7 L27.2 412.5 L40.8 412.2 L54.4 412.0 L68.0 411.7 L81.6 411.3 L95.2 410.9 L108.8 410.5 L122.4 410.0 L136.0 409.4 L149.6 408.7 L163.2 407.9 L176.8 407.0 L190.4 405.9 L204.0 404.8 L217.6 403.4 L231.2 401.8 L244.8 400.0 L258.4 397.9 L272.0 395.5 L285.6 392.7 L299.2 389.6 L312.8 386.0 L326.4 381.8 L340.0 377.0 L353.6 371.5 L367.2 365.2 L380.8 357.9 L394.4 349.6 L408.0 340.0 L421.6 329.0 L435.2 316.4 L448.8 301.8 L462.4 285.2 L476.0 266.0 L489.6 244.0 L503.2 218.7 L516.8 189.7 L530.4 156.3 L544.0 118.0 L550.8 96.8 L557.6 74.0 L564.4 49.6 L571.2 23.4" fill="none" stroke="rgba(244,245,248,0.13)" stroke-width="1.2"/>
+    <circle cx="204.0" cy="404.8" r="2.4" fill="rgba(232,163,61,0.5)"/>
+    <circle cx="272.0" cy="395.5" r="2.4" fill="rgba(232,163,61,0.5)"/>
+    <circle cx="340.0" cy="377.0" r="2.4" fill="rgba(232,163,61,0.5)"/>
+    <circle cx="408.0" cy="340.0" r="2.4" fill="rgba(232,163,61,0.5)"/>
+    <circle cx="476.0" cy="266.0" r="2.4" fill="rgba(232,163,61,0.5)"/>
+    <circle cx="544.0" cy="118.0" r="2.4" fill="rgba(232,163,61,0.5)"/>
+  </svg>
+  <main>
+    <h1>Exponentials</h1>
+    <nav aria-label="Exponentials pages">
+      <section aria-labelledby="g1">
+        <h2 id="g1">What Are Exponents?</h2>
+        <ul>
+          <li><a href="exponentials-positive-and-negative-integer-exponents.html">Positive and Negative Integer Exponents</a></li>
+          <li><a href="exponentials-the-root-rule.html">The Root Rule</a></li>
+          <li><a href="exponentials-the-many-rules-of-exponentiation.html">The Many Rules of Exponentiation</a></li>
+          <li><a href="exponentials-irrational-exponents.html">Irrational Exponents</a></li>
+        </ul>
+      </section>
+    </nav>
+    <a class="back" href="functions.html">← Functions</a>
+  </main>
+</body>
+</html>

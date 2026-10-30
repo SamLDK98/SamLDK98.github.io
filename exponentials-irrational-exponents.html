@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Irrational Exponents | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Powers at fractions fill in a smooth curve, and an exponent like the square root of 2 is pinned between fractions. So 2 to the x has a value for every real x: the exponential function." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Irrational Exponents</h1>
+    </header>
+    <main>
+      <section aria-labelledby="gaps">
+        <h2 id="gaps">Filling the Gaps</h2>
+        <div class="side">
+          <div>
+            <p>We now know what \(2^x\) means when \(x\) is a whole number, zero, a negative integer, or a fraction.</p>
+            <p>With whole-number exponents, the points are spread out: each step of \(1\) doubles the value.</p>
+            <p>Halving the step fills the gaps. Each half step multiplies by <span class="nw">\(\sqrt{2}\approx1.414\),</span> so each new point sits a little below the straight line between its neighbours.</p>
+            <p>Each time we halve the step again, the new points fill the gaps, and they line up along a smooth curve.</p>
+          </div>
+          <iframe class="expo-widget" src="exponentials/irrational-exponents/fill-widget.html" title="Interactive: choose the step between exponents, from 1 down to a sixteenth; the powers of 2 from 2 to the minus 2 up to 2 cubed fill in, each new point just below the straight line of the step before, until they trace a smooth curve" style="height: 290px" scrolling="no" loading="lazy"></iframe>
+        </div>
+      </section>
+
+      <section aria-labelledby="between">
+        <h2 id="between">Between the Fractions</h2>
+        <p>Some numbers are not fractions. \(\sqrt{2}=1.41421\ldots\) cannot be written as <span class="nw">\(\frac{m}{n}\),</span> so the root rule gives no meaning to <span class="nw">\(2^{\sqrt{2}}\).</span></p>
+        <p>But \(\sqrt{2}\) lies between fractions as close to it as we like. Larger exponents give larger powers of \(2\), since each step up multiplies by a factor greater than \(1\). So \(2^{\sqrt{2}}\) must lie between their powers:</p>
+        <table class="powers">
+          <thead>
+            <tr><th>Below</th><th>Above</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>\(2^{1.4}\approx2.639\)</td><td>\(2^{1.5}\approx2.828\)</td></tr>
+            <tr><td>\(2^{1.41}\approx2.657\)</td><td>\(2^{1.42}\approx2.676\)</td></tr>
+            <tr><td>\(2^{1.414}\approx2.6647\)</td><td>\(2^{1.415}\approx2.6666\)</td></tr>
+            <tr><td>\(2^{1.4142}\approx2.66512\)</td><td>\(2^{1.4143}\approx2.66530\)</td></tr>
+          </tbody>
+        </table>
+        <p>The two columns close in on a single number. That number is what we mean by <span class="nw">\(2^{\sqrt{2}}\):</span></p>
+        <div class="math">\[2^{\sqrt{2}}=2.66514\ldots\]</div>
+      </section>
+
+      <section aria-labelledby="function">
+        <h2 id="function">The Exponential Function</h2>
+        <p>The same squeeze works for any irrational exponent, such as <span class="nw">\(2^{\pi}\).</span> So \(2^x\) now has exactly one value for every real number \(x\): it is a function of its exponent.</p>
+        <div class="math">\[f(x)=2^x\]</div>
+        <p>This is an <strong>exponential function</strong>. Its input is the exponent, and its base, <span class="nw">\(2\),</span> stays fixed.</p>
+        <p>On <a class="inline" href="exponentials-positive-and-negative-integer-exponents.html">the first page</a>, the exponent began by counting copies, so only counting numbers made sense as inputs. The function's <a class="inline" href="functions-what-is-a-function.html#allowed-inputs">domain</a> has now grown to every real number.</p>
+        <p>Every output is positive. Each step to the left halves the value, so the curve gets closer and closer to \(0\) but never reaches it.</p>
+        <p>Any positive base can be squeezed in the same way, so \(a^x\) has a value for every real \(x\) whenever <span class="nw">\(a&gt;0\).</span></p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-the-many-rules-of-exponentiation.html">← The Many Rules of Exponentiation</a>
+        <a href="exponentials.html">All Exponentials pages →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

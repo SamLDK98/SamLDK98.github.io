@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Root Rule | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Why 5 to the power of a half is the square root of 5, not 2.5: two equal half steps must make one whole step. Then cube roots, the root rule, and any fraction as an exponent." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>The Root Rule</h1>
+    </header>
+    <main>
+      <section aria-labelledby="fractional">
+        <h2 id="fractional">Fractional Exponents</h2>
+        <p>What does \(a^{\frac{1}{2}}\) even mean?</p>
+        <p>So far:</p>
+        <ul>
+          <li>Increasing the exponent by \(1\) means we multiply the previous power's value by the base.</li>
+          <li>Decreasing the exponent by \(1\) means we divide the previous power's value by the base.</li>
+        </ul>
+        <p>Let's say we have:</p>
+        <div class="math">\[5^{\frac{1}{2}}\]</div>
+        <p>If \(5^0=1\) and <span class="nw">\(5^1=5\)...</span></p>
+        <p>To go from an exponent of \(0\) to \(1\), we multiplied the previous power's value (\(1\)) by the base <span class="nw">(\(5\)).</span></p>
+        <p>Perhaps we could multiply the previous power's value by half the base?</p>
+        <p>We know that increasing the exponent by \(1\) results in multiplying the previous power's value by the base.</p>
+        <p>So perhaps if we only increase the exponent halfway, we should be multiplying the previous power's value by only half as strong a factor?</p>
+        <p>By this logic we would multiply \(1\) by <span class="nw">\(2.5\).</span></p>
+      </section>
+
+      <section aria-labelledby="not-half">
+        <h2 id="not-half">Why Not 2.5?</h2>
+        <p>However, a key thing to realise about exponentiation is why \(5^{\frac{1}{2}}\) does not equal <span class="nw">\(2.5\),</span> but instead equals <span class="nw">\(\sqrt{5}\).</span></p>
+        <p>The mistake in thinking \(5^{\frac{1}{2}}=2.5\) comes from treating exponents as if they were about <em>how much</em> to multiply by, rather than <em>how many times</em>.</p>
+        <p>If the exponent \(3\) means we are creating three copies of the base, then it would make sense to think that the exponent \(3.5\) means we should take three and a half copies of the base and multiply them together.</p>
+        <p>\(5^{3.5}\):</p>
+        <div class="math">\[5\cdot5\cdot5\cdot2.5\]</div>
+        <p>But this would be treating exponents as linear, like addition.</p>
+        <p>In fact, exponentiation is multiplicative. The steps are not spaced evenly: they are scaled.</p>
+        <p>So the difference between \(5^0\) and \(5^{\frac{1}{2}}\) is not the same as the difference between \(5^{\frac{1}{2}}\) and <span class="nw">\(5^1\).</span> What stays the same is the factor: each half step multiplies by the same number.</p>
+      </section>
+
+      <section aria-labelledby="square-root">
+        <h2 id="square-root">The Square Root</h2>
+        <div class="side">
+          <div>
+            <p>So why does <span class="nw">\(5^{\frac{1}{2}}=\sqrt{5}\)?</span></p>
+            <p>Because whatever the value of the halfway point is, multiplying by an equal factor again must give the base.</p>
+            <p>Therefore we need a number that multiplied by itself would equal the base.</p>
+            <p>So this must be true:</p>
+            <div class="math">\[a^{\frac{1}{2}}\times a^{\frac{1}{2}}=a^1=a\]</div>
+          </div>
+          <iframe class="expo-widget" src="exponentials/the-root-rule/half-step-widget.html" title="Interactive: choose the factor for each of two equal half steps from 1. Half the base, 2.5, lands on 6.25, past 5; only the square root of 5, about 2.236, lands exactly on 5" style="height: 178px" scrolling="no" loading="lazy"></iframe>
+        </div>
+        <p>Therefore, \(a^{\frac{1}{2}}\) isn’t “half the base,” it’s the number that, when multiplied by itself, gives the base — i.e. the square root of the base.</p>
+        <div class="math">\[\boxed{a^{\frac{1}{2}}=\sqrt{a}}\]</div>
+      </section>
+
+      <section aria-labelledby="other">
+        <h2 id="other">Other Fractions</h2>
+        <p>The same argument works for other fractions.</p>
+        <p>Three thirds make a whole, so three equal factors of \(a^{\frac{1}{3}}\) must give the base:</p>
+        <div class="math">\[a^{\frac{1}{3}}\times a^{\frac{1}{3}}\times a^{\frac{1}{3}}=a^1=a\]</div>
+        <p>\(a^{\frac{1}{3}}\) is the number that gives the base when three copies of it are multiplied together: the cube root, <span class="nw">\(\sqrt[3]{a}\).</span> For example, <span class="nw">\(8^{\frac{1}{3}}=2\),</span> since <span class="nw">\(2\cdot2\cdot2=8\).</span></p>
+        <p>In the same way, \(n\) equal steps of \(\frac{1}{n}\) make one whole step, so \(n\) equal factors of \(a^{\frac{1}{n}}\) must give the base. This is the <strong>root rule</strong>:</p>
+        <div class="math">\[\boxed{a^{\frac{1}{n}}=\sqrt[n]{a}}\]</div>
+        <p>Other fractions are made of these steps. \(a^{\frac{2}{3}}\) is two steps of a third:</p>
+        <div class="math">\[a^{\frac{2}{3}}=a^{\frac{1}{3}}\times a^{\frac{1}{3}}=\left(\sqrt[3]{a}\right)^2\]</div>
+        <p>For example, <span class="nw">\(8^{\frac{2}{3}}=2\cdot2=4\).</span> In general, <span class="nw">\(a^{\frac{m}{n}}=\left(\sqrt[n]{a}\right)^m\).</span></p>
+        <p>A negative fraction steps down instead, dividing as with <a class="inline" href="exponentials-positive-and-negative-integer-exponents.html#negative">negative integer exponents</a>: <span class="nw">\(a^{-\frac{1}{2}}=\frac{1}{\sqrt{a}}\).</span></p>
+        <p>For fractional exponents we take the base to be positive. No real number multiplied by itself gives <span class="nw">\(-4\),</span> so \((-4)^{\frac{1}{2}}\) has no real value.</p>
+      </section>
+
+      <hr />
+      <aside class="note" aria-labelledby="history">
+        <h3 id="history">A note on the historical development of exponents</h3>
+        <p>The level of abstraction we are now at is far removed from geometric intuition. It was a difficult progression for mathematicians to work towards historically.</p>
+        <p>\(a^{1/n}=\sqrt[n]{a}\) belongs to the Newton–Euler era. John Wallis showed how useful negative and fractional exponents could be in the 1650s, and Isaac Newton used them in his binomial series of 1676.</p>
+        <p>From then on, exponents weren’t just “times you multiply”: they became part of a continuous number system that could describe roots, fractions, and even irrationals. In 1748 Euler placed \(a^{\sqrt{7}}\) between \(a^2\) and <span class="nw">\(a^3\).</span></p>
+        <p>By the 18th century, through the work of mathematicians such as Euler (1707–1783), exponents had been fully unified:</p>
+        <ul>
+          <li>\(a^0=1\)</li>
+          <li>\(a^{-n}=\frac{1}{a^n}\)</li>
+          <li>\(a^{1/n}=\sqrt[n]{a}\)</li>
+        </ul>
+        <p>Euler’s <em>Elements of Algebra</em> (1770) reaches \(a^0=1\) just as <a class="inline" href="exponentials-positive-and-negative-integer-exponents.html#zero">the previous page</a> does: dividing by \(a\) lowers the exponent by <span class="nw">\(1\).</span></p>
+      </aside>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-positive-and-negative-integer-exponents.html">← Positive and Negative Integer Exponents</a>
+        <a href="exponentials-the-many-rules-of-exponentiation.html">Next: The Many Rules of Exponentiation →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

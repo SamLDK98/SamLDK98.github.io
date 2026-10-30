@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Two equal half steps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="k" type="range" min="1.9" max="2.7" step="0.01" value="2.5" aria-label="The factor for each half step" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("k");
+  const INK = "#f4f6ff", BASE = "#e8a33d";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+
+  // Two half steps from 5^0 = 1. Each multiplies by the same factor k, so they land on k·k, and
+  // together they must make one whole step, to 5^1 = 5. The slider starts at "half the base", 2.5,
+  // which lands on 6.25. Near √5 it snaps, so the second hop ends exactly in the amber ring at 5.
+  // The hops are drawn on an ordinary number line: the same factor makes the second hop longer.
+  const ROOT = Math.sqrt(5), H = 132, AX = 82, X1 = 7.5;
+  const CH = 6.9;   // width of one mono character at 11.5px
+
+  function render() {
+    let k = +slider.value;
+    const hit = Math.abs(k - ROOT) < 0.0065;   // 2.23 and 2.24 both snap
+    if (hit) k = ROOT;
+    const W = svg.clientWidth || 300;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 10, R = W - 14;
+    const px = v => L + v / X1 * (R - L);
+
+    // the number line, with a tick at each whole number
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.2 });
+    for (let i = 0; i <= 7; i++) el("line", { x1: px(i), x2: px(i), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.22 });
+
+    // two hops, each ×k: an arc over the line, an arrowhead where it lands, the factor over its top
+    const stops = [1, k, k * k];
+    const tags = [];
+    for (let j = 0; j < 2; j++) {
+      const a = px(stops[j]), b = px(stops[j + 1]), span = b - a;
+      const lift = Math.max(12, Math.min(40, span * 0.32)), y0 = AX - 7, cy = y0 - 2 * lift;
+      el("path", { d: `M${a.toFixed(1)} ${y0} Q${((a + b) / 2).toFixed(1)} ${cy} ${b.toFixed(1)} ${y0}`, fill: "none", stroke: INK, "stroke-opacity": 0.6, "stroke-width": 1.3 });
+      // arrowhead along the curve's direction at its end
+      const dx = b - (a + b) / 2, dy = y0 - cy, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+      const tip = [b, y0], back = [b - 7 * ux, y0 - 7 * uy], nx = -uy * 3.2, ny = ux * 3.2;
+      el("path", { d: `M${tip[0].toFixed(1)} ${tip[1].toFixed(1)} L${(back[0] + nx).toFixed(1)} ${(back[1] + ny).toFixed(1)} L${(back[0] - nx).toFixed(1)} ${(back[1] - ny).toFixed(1)} Z`, fill: INK, "fill-opacity": 0.75 });
+      tags.push({ x: (a + b) / 2, y: y0 - lift - 7 });
+    }
+    const factor = hit ? "×√5" : "×" + k.toFixed(2);
+    const w = factor.length * CH;
+    // if the two factors would touch, lift the second clear of the first
+    if (tags[1].x - tags[0].x < w + 6 && Math.abs(tags[1].y - tags[0].y) < 13) tags[1].y = Math.min(tags[1].y, tags[0].y - 13);
+    tags.forEach(t => el("text", { x: t.x, y: t.y, "text-anchor": "middle", class: "ink", "font-size": 11.5 }, factor));
+
+    // the target, 5, in amber; the start, 1; and the two landing points
+    el("circle", { cx: px(5), cy: AX, r: 7.5, fill: "none", stroke: BASE, "stroke-width": 1.5 });
+    el("circle", { cx: px(1), cy: AX, r: 4, fill: INK });
+    el("circle", { cx: px(k), cy: AX, r: 3.6, fill: INK, "fill-opacity": 0.85 });
+    el("circle", { cx: px(k * k), cy: AX, r: 4.5, fill: hit ? BASE : INK });
+
+    const row = AX + 22;
+    el("text", { x: px(0), y: row, "text-anchor": "middle" }, "0");
+    el("text", { x: px(1), y: row, "text-anchor": "middle" }, "1");
+    el("text", { x: px(5), y: row, "text-anchor": "middle", class: "base" }, "5");
+    el("text", { x: px(k), y: row, "text-anchor": "middle", class: hit ? "ink" : "" }, hit ? "√5" : k.toFixed(2));
+    if (!hit) {
+      const end = (k * k).toFixed(2), we = end.length * CH;
+      const clash = Math.abs(px(k * k) - px(5)) < we / 2 + CH / 2 + 5;
+      el("text", { x: px(k * k), y: clash ? row + 15 : row, "text-anchor": "middle", class: "ink" }, end);
+    }
+
+    svg.setAttribute("aria-label", hit
+      ? "Starting at 1, two steps that each multiply by the square root of 5 land exactly on 5."
+      : `Starting at 1, two steps that each multiply by ${k.toFixed(2)} land on ${(k * k).toFixed(2)}, ${k * k > 5 ? "past" : "short of"} 5.`);
+  }
+  render();
+</script>
+</body>
+</html>

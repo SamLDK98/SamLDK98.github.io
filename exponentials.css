@@ -1,0 +1,249 @@
+/* Exponentials: the shared look for every page in the section.
+   The soot ground and Spectral type of the Functions pages, and only two colours with meaning:
+   amber for the base, the number being multiplied, and blue for the exponent, the count. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #0e0e11;
+  --ink:   #f4f6ff;
+  --body:  rgba(243, 246, 255, 0.88);
+  --dim:   rgba(238, 242, 252, 0.5);
+  --faint: rgba(238, 242, 252, 0.15);
+  --hair:  rgba(238, 242, 252, 0.08);
+  --base:  #e8a33d;   /* the base */
+  --exp:   #7aa7ff;   /* the exponent */
+  --measure: 40rem;
+}
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--bg); }
+
+body {
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--body);
+  font-family: "Spectral", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Fine grain, as on the Functions pages: a flat dark colour reads as a glossy void, the noise as matte paper. */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.sheet {
+  position: relative; z-index: 1;
+  width: min(var(--measure), 100% - 2.4rem);
+  margin: 0 auto;
+}
+
+/* ---------- masthead ---------- */
+header { padding: clamp(2rem, 7vh, 3.6rem) 0 clamp(1.6rem, 4vh, 2.4rem); }
+
+/* a short amber rule under the title: the one flourish */
+header::after {
+  content: ""; display: block;
+  width: 2.4rem; height: 1px; margin-top: clamp(1.2rem, 3vh, 1.6rem);
+  background: var(--base); opacity: 0.85;
+}
+
+.crumb {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.66rem; letter-spacing: 0.17em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.2s ease;
+}
+.crumb::before { content: "← "; }
+.crumb:hover, .crumb:focus-visible { color: var(--ink); outline: none; }
+
+h1 {
+  font-family: "Spectral", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(2.3rem, 7.4vw, 3.9rem);
+  line-height: 1.06; letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-top: clamp(1.4rem, 4.5vh, 2.4rem);
+  overflow-wrap: break-word;
+}
+
+/* ---------- prose ---------- */
+h2 {
+  font-family: "Spectral", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.45rem, 3.6vw, 1.9rem);
+  line-height: 1.18; letter-spacing: -0.012em;
+  color: var(--ink);
+  margin: clamp(3rem, 8vh, 4.2rem) 0 1rem;
+}
+main > section:first-child h2 { margin-top: 0.4rem; }
+
+h3 {
+  font-family: "Spectral", Georgia, serif; font-weight: 400;
+  font-size: clamp(1.15rem, 2.8vw, 1.32rem); color: var(--ink);
+  margin: 2.4rem 0 0.8rem;
+}
+
+p, li {
+  font-size: clamp(1.1rem, 2.4vw, 1.22rem);
+  line-height: 1.7;
+}
+p + p { margin-top: 0.9rem; }
+p strong, li strong { color: var(--ink); font-weight: 500; }
+em { font-style: italic; }
+
+.base { color: var(--base); }
+.exp  { color: var(--exp); }
+
+/* keeps a formula and the punctuation after it on one line */
+.nw { white-space: nowrap; }
+
+a.inline {
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid var(--faint);
+  transition: border-color 0.2s ease;
+}
+a.inline:hover, a.inline:focus-visible { border-bottom-color: var(--ink); outline: none; }
+
+main > section ul, main > section ol { margin: 0.9rem 0 0.9rem 1.3rem; }
+main > section li + li { margin-top: 0.35rem; }
+main > section li::marker { color: var(--dim); }
+
+/* ---------- maths ---------- */
+mjx-container { color: inherit; }
+.math {
+  overflow-x: auto; overflow-y: hidden;
+  margin: 1.1rem 0; padding: 0.15rem 0;
+  font-size: clamp(1.1rem, 2.4vw, 1.22rem);
+  color: var(--ink);
+}
+.math mjx-container[display="true"] { text-align: left !important; margin: 0 !important; }
+.math + p, figure + p, iframe + p, table + p, .side + p { margin-top: 0.9rem; }
+.mjx-base { color: var(--base); }
+.mjx-exp  { color: var(--exp); }
+
+/* ---------- figures and widgets ---------- */
+figure { margin: 1.6rem 0; }
+figure svg { display: block; width: 100%; height: auto; margin-inline: auto; overflow: visible; }
+
+/* base, exponent and power, named on a single power (first page) */
+figure.anatomy { margin: 0.4rem 0 0.6rem; }
+figure.anatomy svg { max-width: 400px; }
+figure.anatomy text { font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: 0.08em; fill: var(--dim); }
+figure.anatomy text.glyph { font-family: "Spectral", Georgia, serif; font-weight: 300; letter-spacing: 0; }
+figure.anatomy text.big { font-size: 96px; }
+figure.anatomy text.sup { font-size: 50px; }
+figure.anatomy .base { fill: var(--base); }
+figure.anatomy .exp  { fill: var(--exp); }
+figure.anatomy .lead { stroke: var(--faint); stroke-width: 1; fill: none; }
+figure.anatomy .lead.base { stroke: var(--base); stroke-opacity: 0.55; }
+figure.anatomy .lead.exp  { stroke: var(--exp); stroke-opacity: 0.6; }
+
+iframe.expo-widget {
+  display: block; width: 100%;
+  border: 0; overflow: hidden; background: transparent;
+  margin: 1.8rem 0;
+}
+
+/* ---------- text beside a figure ----------
+   As on Trigonometry's first page: a widget, figure or table sits beside the paragraphs it belongs to,
+   so the text keeps moving. On a wide screen the figure reaches out past the text column, into the
+   margin on its own side, while the text keeps the column's edge; on a narrow one the pair stacks,
+   text first. .flip puts the figure on the left. */
+.side {
+  --reach: min(14rem, (100vw - 100%) / 2 - 1.6rem);
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  gap: clamp(1.4rem, 3vw, 2.2rem); align-items: center;
+  width: calc(100% + var(--reach));
+  margin: 1.8rem 0;
+}
+.side.flip { grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); margin-left: calc(-1 * var(--reach)); }
+.side.flip > :last-child { grid-column: 1; grid-row: 1; }
+/* .lead: the figure comes first in the source, so on a phone it stacks above the text it supports
+   (a table the text reads from); on a wide screen it sits on the left, as with .flip */
+.side.lead { grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); margin-left: calc(-1 * var(--reach)); }
+.side.lead > :first-child { justify-self: end; }
+.side > div > :first-child { margin-top: 0; }
+.side > div > :last-child { margin-bottom: 0; }
+.side iframe.expo-widget, .side figure, .side table { margin: 0; }
+
+/* a side note: a quiet card that can be skipped without losing the thread */
+aside.note {
+  border-left: 1px solid var(--faint);
+  padding: 0.2rem 0 0.2rem 1.1rem;
+}
+aside.note h3 {
+  font-family: "IBM Plex Mono", monospace; font-weight: 400;
+  font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--dim); margin: 0 0 0.6rem;
+}
+aside.note p { font-size: 1.02rem; line-height: 1.6; }
+aside.note p + p { margin-top: 0.6rem; }
+aside.note ul { margin: 0.6rem 0 0.6rem 1.2rem; }
+aside.note li { font-size: 1.02rem; line-height: 1.6; }
+aside.note li::marker { color: var(--dim); }
+aside.note .math { font-size: 1.02rem; margin: 0.7rem 0; }
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; margin: 1.5rem 0; font-variant-numeric: tabular-nums; }
+th, td {
+  padding: 0.45rem 1.4rem 0.45rem 0; text-align: left; vertical-align: baseline;
+  border-bottom: 1px solid var(--hair);
+  font-size: clamp(1rem, 2.2vw, 1.08rem); line-height: 1.5;
+}
+th:last-child, td:last-child { padding-right: 0; }
+th {
+  font-family: "IBM Plex Mono", monospace; font-weight: 400;
+  font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim);
+  border-bottom-color: var(--faint);
+}
+td.num { font-family: "IBM Plex Mono", monospace; font-size: 0.92rem; color: var(--ink); }
+/* the division that leads to each row, quiet beside its value */
+td.step { font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; color: var(--dim); white-space: nowrap; }
+/* a table of powers: a row the text picks out carries a short amber bar at its edge */
+table.powers td:first-child, table.powers th:first-child { padding-left: 0.7rem; }
+table.powers tr.lit td:first-child { box-shadow: inset 2px 0 0 var(--base); }
+table.powers tr.lit td { color: var(--ink); }
+
+hr { border: 0; border-top: 1px solid var(--hair); margin: 2.8rem 0 1.8rem; }
+
+/* the summary of every rule: a plain table on a wide screen, one card per rule on a phone */
+table.laws { width: 100%; }
+table.laws td:first-child { color: var(--ink); }
+
+@media (max-width: 760px) {
+  .side, .side.flip, .side.lead { grid-template-columns: 1fr; width: auto; margin-left: 0; }
+  .side.flip > :last-child { grid-column: auto; grid-row: auto; }
+  .side.lead > :first-child { justify-self: start; }
+}
+
+@media (max-width: 560px) {
+  table.laws thead { display: none; }
+  table.laws, table.laws tbody, table.laws tr, table.laws td { display: block; width: 100%; }
+  table.laws tr { padding: 0.75rem 0; border-bottom: 1px solid var(--hair); }
+  table.laws td { border: 0; padding: 0.12rem 0; }
+  table.laws td:first-child {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--dim); padding-bottom: 0.3rem;
+  }
+}
+
+/* ---------- footer nav ---------- */
+.foot-nav {
+  display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  border-top: 1px solid var(--hair);
+  margin-top: clamp(3rem, 8vh, 4.6rem);
+  padding: 1.5rem 0 3rem;
+}
+.foot-nav a {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.2s ease;
+}
+.foot-nav a:hover, .foot-nav a:focus-visible { color: var(--ink); outline: none; }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
