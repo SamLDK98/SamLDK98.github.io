@@ -182,6 +182,16 @@ iframe.expo-widget {
 .side iframe.expo-widget, .side figure, .side table { margin: 0; }
 .side > table { justify-self: start; }   /* a table keeps its own width, next to its text */
 
+/* Keep the integer-power tables inside the prose measure, with matching columns. */
+.side.lead.power-table {
+  grid-template-columns: 9rem minmax(0, 1fr);
+  align-items: start;
+  width: 100%;
+  margin-left: 0;
+}
+.side.lead.power-table > table { justify-self: stretch; }
+
+
 /* a side note: a quiet card that can be skipped without losing the thread */
 aside.note {
   border-left: 1px solid var(--faint);
@@ -229,6 +239,9 @@ table.laws { width: 100%; }
 table.laws td:first-child { color: var(--ink); }
 
 @media (max-width: 760px) {
+  .side.lead.power-table { grid-template-columns: 1fr; }
+  .side.lead.power-table > table { justify-self: start; }
+
   .side, .side.flip, .side.lead { grid-template-columns: 1fr; width: auto; margin-left: 0; }
   .side.flip > :last-child { grid-column: auto; grid-row: auto; }
   .side.lead > :first-child { justify-self: start; }
