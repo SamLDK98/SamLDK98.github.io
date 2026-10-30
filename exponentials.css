@@ -183,14 +183,16 @@ iframe.expo-widget {
 .side iframe.expo-widget, .side figure, .side table { margin: 0; }
 .side > table { justify-self: start; }   /* a table keeps its own width, next to its text */
 
-/* Keep the integer-power tables inside the prose measure, with matching columns. */
+/* Keep integer-power tables inside the prose measure and centre accompanying text vertically. */
 .side.lead.power-table {
   grid-template-columns: 9rem minmax(0, 1fr);
-  align-items: start;
+  align-items: center;
   width: 100%;
   margin-left: 0;
 }
 .side.lead.power-table > table { justify-self: stretch; }
+.power-table .table-takeaway { margin-left: 1.3rem; }
+.power-table .table-takeaway strong { font-weight: 700; }
 @media (min-width: 761px) {
   .side.lead.power-table-centered {
     column-gap: clamp(3rem, 5vw, 5rem);
