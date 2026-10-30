@@ -150,7 +150,8 @@ figure.anatomy .lead.power { stroke: var(--power); stroke-opacity: 0.65; }
 /* The opening example: a centred graphic, followed by its explanation. */
 .power-intro { margin: 1.8rem 0; text-align: center; }
 .power-intro figure.anatomy { margin: 0 0 1.2rem; }
-.power-intro .math mjx-container[display="true"] { text-align: center !important; }
+.power-intro-copy { text-align: center; }
+.power-intro-copy .math mjx-container[display="true"] { text-align: center !important; }
 
 
 iframe.expo-widget {
@@ -190,6 +191,13 @@ iframe.expo-widget {
   margin-left: 0;
 }
 .side.lead.power-table > table { justify-self: stretch; }
+@media (min-width: 761px) {
+  .side.lead.power-table-centered {
+    column-gap: clamp(3rem, 5vw, 5rem);
+    align-items: center;
+  }
+}
+
 
 
 /* a side note: a quiet card that can be skipped without losing the thread */

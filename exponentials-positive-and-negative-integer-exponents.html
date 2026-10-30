@@ -44,8 +44,10 @@
             </svg>
           </figure>
         </div>
-        <p>The power \(3^4\) denotes the product of four copies of three:</p>
-        <div class="math">\[3\cdot3\cdot3\cdot3\]</div>
+        <div class="power-intro-copy">
+          <p>The power \(3^4\) denotes the product of four copies of three:</p>
+          <div class="math">\[3\cdot3\cdot3\cdot3\]</div>
+        </div>
       </section>
 
       <section aria-labelledby="positive">
@@ -60,24 +62,28 @@
         <h2 id="zero">The Zero Exponent</h2>
         <p>But what does this mean for \(0\) as an exponent?</p>
         <p>It gets a little confusing to think in terms of a natural language definition. Instead we can observe the patterns in successive powers to work out how the operation should behave in less intuitive situations.</p>
-        <table class="powers">
-          <thead>
-            <tr><th scope="col">Power</th><th scope="col">Value</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>\(4^0\)</td><td><span class="q">?</span></td></tr>
-            <tr><td>\(4^1\)</td><td>\(4\)</td></tr>
-            <tr><td>\(4^2\)</td><td>\(16\)</td></tr>
-            <tr><td>\(4^3\)</td><td>\(64\)</td></tr>
-            <tr><td>\(4^4\)</td><td>\(256\)</td></tr>
-            <tr><td>\(4^5\)</td><td>\(1{,}024\)</td></tr>
-          </tbody>
-        </table>
-        <ul>
-          <li>Increasing the exponent multiplies the previous power's value by <span class="nw">\(4\).</span></li>
-          <li>Decreasing the exponent divides the previous power's value by <span class="nw">\(4\).</span></li>
-        </ul>
-        <p>To find \(4^0\) we just divide \(4\) by \(4\) to get <span class="nw">\(1\).</span></p>
+        <div class="side lead power-table">
+          <table class="powers">
+            <thead>
+              <tr><th scope="col">Power</th><th scope="col">Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\(4^0\)</td><td><span class="q">?</span></td></tr>
+              <tr><td>\(4^1\)</td><td>\(4\)</td></tr>
+              <tr><td>\(4^2\)</td><td>\(16\)</td></tr>
+              <tr><td>\(4^3\)</td><td>\(64\)</td></tr>
+              <tr><td>\(4^4\)</td><td>\(256\)</td></tr>
+              <tr><td>\(4^5\)</td><td>\(1{,}024\)</td></tr>
+            </tbody>
+          </table>
+          <div>
+            <ul>
+              <li>Increasing the exponent multiplies the previous power's value by <span class="nw">\(4\).</span></li>
+              <li>Decreasing the exponent divides the previous power's value by <span class="nw">\(4\).</span></li>
+            </ul>
+            <p>To find \(4^0\) we just divide \(4\) by \(4\) to get <span class="nw">\(1\).</span></p>
+          </div>
+        </div>
         <p>In general, any nonzero number raised to the power of zero equals <span class="nw">\(1\).</span></p>
         <div class="math">\[\boxed{a^0=1 \qquad (a \ne 0)}\]</div>
       </section>
@@ -85,7 +91,7 @@
       <section aria-labelledby="negative">
         <h2 id="negative">Negative Integer Exponents</h2>
         <p>If we continue dividing the preceding value by the base, negative exponents represent the reciprocal of the base raised to the positive power.</p>
-        <div class="side lead power-table">
+        <div class="side lead power-table power-table-centered">
           <table class="powers">
             <thead>
               <tr><th>Power</th><th>Value</th></tr>
