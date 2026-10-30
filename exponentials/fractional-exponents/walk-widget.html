@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From 1 to 100, by adding and by multiplying</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="s" type="range" min="0" max="4" step="1" value="0" aria-label="How many of the four equal steps to take" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("s");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff";
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+
+  // Two walkers go from 1 to 100 in four equal steps, on the same ordinary number line. The adder adds
+  // 24.75 each step, so its footprints are evenly spaced. The multiplier multiplies by √10 (about
+  // 3.16) each step, so its first footprints bunch up near 1 and its last step is the longest. The
+  // slider is the number of steps taken; both walkers take them together.
+  const STEPS = 4, H = 150, A = 52, M = 118;
+  const fmt = v => v >= 99.995 ? "100" : String(+v.toPrecision(v < 10 ? 3 : 3));
+  const rows = [
+    { y: A, name: "adding", each: "+24.75 each step", at: k => 1 + 99 * k / STEPS, color: INK, cls: "ink" },
+    { y: M, name: "multiplying", each: "×3.16 each step", at: k => Math.pow(100, k / STEPS), color: BASE, cls: "base" },
+  ];
+
+  function render() {
+    const k = +slider.value;
+    const W = svg.clientWidth || 320;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 12, R = W - 12, px = v => L + (v - 1) / 99 * (R - L);
+
+    el("text", { x: W / 2, y: 13, "text-anchor": "middle", class: "exp" }, `${k} of ${STEPS} steps`);
+    rows.forEach(row => {
+      el("text", { x: L, y: row.y - 22 }, row.name);
+      el("text", { x: R, y: row.y - 22, "text-anchor": "end" }, row.each);
+      el("line", { x1: px(1), x2: px(100), y1: row.y, y2: row.y, stroke: INK, "stroke-opacity": 0.18 });
+      for (const v of [1, 100]) el("line", { x1: px(v), x2: px(v), y1: row.y - 4, y2: row.y + 4, stroke: INK, "stroke-opacity": 0.35 });
+      // the ground covered so far, then a footprint for every step taken
+      if (k > 0) el("line", { x1: px(1), x2: px(row.at(k)), y1: row.y, y2: row.y, stroke: row.color, "stroke-opacity": 0.55, "stroke-width": 2 });
+      for (let j = 0; j <= k; j++) el("circle", { cx: px(row.at(j)), cy: row.y, r: j === k ? 5 : 3, fill: row.color, "fill-opacity": j === k ? 1 : 0.45 });
+      const v = row.at(k), x = Math.min(Math.max(px(v), L + 14), R - 14);
+      el("text", { x, y: row.y + 20, "text-anchor": "middle", class: row.cls }, fmt(v));
+    });
+
+    const a = rows[0].at(k), m = rows[1].at(k);
+    svg.setAttribute("aria-label", `After ${k} of 4 equal steps from 1 to 100: adding 24.75 each step reaches ${fmt(a)}; multiplying by about 3.16 each step reaches ${fmt(m)}.`);
+  }
+  render();
+</script>
+</body>
+</html>

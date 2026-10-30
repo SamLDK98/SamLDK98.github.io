@@ -52,17 +52,18 @@
 
       <section aria-label="Adding and multiplying">
         <p>The deeper thing to realise is what it means to say that exponentiation is multiplicative.</p>
-        <p>Think about the distance between \(1\) and <span class="nw">\(100\).</span></p>
-        <p>We start at \(1\) rather than \(0\): multiplying \(0\) by anything leaves <span class="nw">\(0\),</span> so we could never move away from it by multiplying.</p>
-        <p>If we were to move additively across the number line from left to right, each step would cover the same distance. We travel \(1\) unit at a time.</p>
-        <p>If we were to move multiplicatively, the steps are not spaced evenly.</p>
-        <p>Each step multiplies by the same factor, so each one covers more distance than the step before.</p>
-        <iframe class="expo-widget" src="exponentials/fractional-exponents/steps-widget.html" title="Interactive: choose how many equal steps to take from 1 to 100. Adding, the points are evenly spaced; multiplying, they bunch up near 1 and spread out towards 100. With an even number of steps the middle point is marked: 50.5 by adding, 10 by multiplying" style="height: 168px" scrolling="no" loading="lazy"></iframe>
-        <p>Take two equal steps from \(1\) to <span class="nw">\(100\):</span></p>
-        <div class="math">\[1 \overset{+49.5}{\longrightarrow} 50.5 \overset{+49.5}{\longrightarrow} 100\]</div>
-        <div class="math">\[1 \overset{\times 10}{\longrightarrow} 10 \overset{\times 10}{\longrightarrow} 100\]</div>
-        <p>Adding, the halfway point is <span class="nw">\(50.5\).</span> Multiplying, it is <span class="nw">\(10\):</span> the number that gives \(100\) when multiplied by itself.</p>
-        <div class="math">\[100^{\frac{1}{2}}=\sqrt{100}=10\]</div>
+        <p>Think about getting from \(1\) to \(100\) in equal steps. (We start at \(1\) rather than <span class="nw">\(0\):</span> multiplying \(0\) by anything leaves <span class="nw">\(0\).)</span></p>
+        <p>If the steps are additive, each step adds the same amount. Four steps of \(+24.75\) land on <span class="nw">\(25.75\),</span> <span class="nw">\(50.5\),</span> \(75.25\) and <span class="nw">\(100\).</span> They are evenly spaced.</p>
+        <p>If the steps are multiplicative, each step multiplies by the same factor. Four steps of \(\times\sqrt{10}\) (about <span class="nw">\(3.16\))</span> land on about <span class="nw">\(3.16\),</span> <span class="nw">\(10\),</span> \(31.6\) and <span class="nw">\(100\).</span> The steps are equal, but each one covers more distance than the step before.</p>
+        <iframe class="expo-widget" src="exponentials/fractional-exponents/walk-widget.html" title="Interactive: take four equal steps from 1 to 100 two ways at once. Adding 24.75 each step, the footprints are evenly spaced. Multiplying by about 3.16 each step, they bunch up near 1 and the last step is the longest. Halfway, adding has reached 50.5 and multiplying only 10" style="height: 198px" scrolling="no" loading="lazy"></iframe>
+        <p>Halfway through the steps, adding has reached <span class="nw">\(50.5\).</span> Multiplying has reached only <span class="nw">\(10\).</span></p>
+        <p>An exponent counts multiplicative steps.</p>
+        <p>\(100^0=1\) is the start, with no steps taken. \(100^1=100\) is one whole step: <span class="nw">\(\times100\).</span></p>
+        <p>So \(100^{\frac{1}{2}}\) is half of that step: a factor that, taken twice, makes <span class="nw">\(\times100\).</span> By the product rule:</p>
+        <div class="math">\[100^{\frac{1}{2}}\times100^{\frac{1}{2}}=100^{\frac{1}{2}+\frac{1}{2}}=100^1=100\]</div>
+        <p>That factor is <span class="nw">\(10\),</span> the square root of <span class="nw">\(100\).</span></p>
+        <iframe class="expo-widget" src="exponentials/fractional-exponents/exponent-widget.html" title="Interactive: slide the exponent x evenly from 0 to 1; below, 100 to the power x moves along a number line from 1 to 100. Equal quarters of the exponent land on 1, 3.16, 10, 31.6 and 100, so halfway, x = 1/2, lands on 10" style="height: 206px" scrolling="no" loading="lazy"></iframe>
+        <p>As the exponent moves evenly from \(0\) to <span class="nw">\(1\),</span> the value does not. It creeps up to \(10\) by the halfway point, then covers the remaining \(90\) in the second half.</p>
         <p>An exponent of \(\frac{1}{2}\) means halfway in steps, not halfway in distance.</p>
       </section>
 
