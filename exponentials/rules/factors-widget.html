@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Combining factors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  svg text.tok { font-family: "Spectral", Georgia, serif; font-size: 21px; fill: var(--base); }
+  svg text.tok.v { font-style: italic; }
+  svg text.tok.cut { fill-opacity: 0.4; }
+  svg text.sym { font-family: "Spectral", Georgia, serif; font-size: 21px; fill: var(--dim); }
+  svg text.one { font-family: "Spectral", Georgia, serif; font-size: 21px; fill: var(--ink); }
+  svg text.lab { font-family: "Spectral", Georgia, serif; font-size: 17px; fill: var(--ink); }
+  svg text.lab tspan.v { font-style: italic; }
+  svg text.lab tspan.e { fill: var(--exp); font-size: 12px; }
+  svg .cut { stroke: var(--ink); stroke-opacity: 0.5; stroke-width: 1.2; }
+  svg .bar { stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.1; }
+  svg .link { stroke: var(--ink); stroke-opacity: 0.14; stroke-width: 1; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="n" type="range" min="1" max="4" step="1" value="3" aria-label="The exponent" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("n");
+
+  // One widget for each rule on the page, picked by ?rule=. Each writes a power out as its factors twice:
+  // grouped as the left-hand side has them, then combined, so the count of factors gives the exponent.
+  // Faint lines join each factor to where it lands. The slider sets one exponent; the other stays fixed.
+  const rule = new URLSearchParams(location.search).get("rule") || "product";
+  const SET = {
+    product:          [1, 4, 3, "The exponent of the second power"],
+    quotient:         [1, 7, 2, "The exponent of the power we divide by"],
+    power:            [1, 4, 3, "The outer exponent"],
+    "product-power":  [1, 4, 3, "The exponent"],
+    "quotient-power": [1, 4, 3, "The exponent"],
+  }[rule];
+  slider.min = SET[0]; slider.max = SET[1]; slider.value = SET[2];
+  slider.setAttribute("aria-label", SET[3]);
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+
+  // the pieces a row is built from, and their widths at full size
+  const dot = { k: "dot" }, open = { k: "open" }, close = { k: "close" }, times = { k: "op", s: "×" }, one = { k: "one" };
+  const five = (id, cut) => ({ k: "tok", s: "5", id, cut });
+  const v = (s, id) => ({ k: "tok", s, id, v: true });
+  const frac = (num, den) => ({ k: "frac", num, den });
+  const chain = toks => toks.flatMap((t, i) => i ? [dot, t] : [t]);
+  const range = n => [...Array(n).keys()];
+  const WID = { tok: 13, one: 13, dot: 10, op: 22, open: 8, close: 8 };
+  const width = items => items.reduce((w, it) => w + (it.k === "frac" ? Math.max(width(it.num), width(it.den)) + 6 : WID[it.k]), 0);
+  const minus = x => String(x).replace("-", "−");
+
+  function build(n) {
+    if (rule === "product") {
+      const A = range(2).map(i => "a" + i), B = range(n).map(i => "b" + i);
+      return {
+        rows: [[open, ...chain(A.map(id => five(id))), close, times, open, ...chain(B.map(id => five(id))), close],
+               chain([...A, ...B].map(id => five(id)))],
+        labels: [[["5"], ["2", "e"], [" × 5"], [n, "e"]], [["5"], [2 + n, "e"]]],
+        links: [...A, ...B],
+        aria: `5 squared times 5 to the ${n}: two factors of 5 and ${n} more, taken together, are ${2 + n} factors of 5, which is 5 to the ${2 + n}.`,
+      };
+    }
+    if (rule === "quotient") {
+      const c = Math.min(n, 5), N = range(5).map(i => "n" + i), D = range(n).map(i => "d" + i);
+      const row2 = n < 5 ? chain(N.slice(c).map(id => five(id))) : n === 5 ? [one] : [frac([one], chain(D.slice(c).map(id => five(id))))];
+      return {
+        frac: true,
+        rows: [[frac(chain(N.map((id, i) => five(id, i < c))), chain(D.map((id, i) => five(id, i < c))))], row2],
+        labels: [[["5"], ["5", "e"], [" ÷ 5"], [n, "e"]], [["5"], [minus(5 - n), "e"]]],
+        links: [],
+        aria: `5 to the 5 divided by 5 to the ${n}: ${c} factors of 5 cancel above and below, ` +
+          (n < 5 ? `leaving ${5 - n}, which is 5 to the ${5 - n}.` : n === 5 ? "leaving 1, which is 5 to the 0." : `leaving 1 over ${n - 5}, which is 5 to the minus ${n - 5}.`),
+      };
+    }
+    if (rule === "power") {
+      const groups = range(n).map(g => range(2).map(i => `g${g}${i}`));
+      return {
+        rows: [groups.flatMap(ids => [open, ...chain(ids.map(id => five(id))), close]), chain(groups.flat().map(id => five(id)))],
+        labels: [[["(5"], ["2", "e"], [")"], [n, "e"]], [["5"], [2 * n, "e"]]],
+        links: groups.flat(),
+        aria: `5 squared, to the ${n}: ${n} groups of two factors of 5 make ${2 * n} factors, which is 5 to the ${2 * n}.`,
+      };
+    }
+    if (rule === "product-power") {
+      const pairs = range(n).map(i => ["a" + i, "b" + i]);
+      return {
+        rows: [pairs.flatMap(([a, b]) => [open, v("a", a), dot, v("b", b), close]),
+               chain([...pairs.map(p => v("a", p[0])), ...pairs.map(p => v("b", p[1]))])],
+        labels: [[["("], ["ab", "v"], [")"], [n, "e"]], [["a", "v"], [n, "e"], ["b", "v"], [n, "e"]]],
+        links: pairs.flat(),
+        aria: `a b, to the ${n}: ${n} copies of a times b, regrouped as ${n} factors of a and ${n} of b, which is a to the ${n} times b to the ${n}.`,
+      };
+    }
+    // quotient-power
+    return {
+      frac: true,
+      rows: [range(n).flatMap(i => [...(i ? [dot] : []), frac([v("a")], [v("b")])]),
+             [frac(chain(range(n).map(() => v("a"))), chain(range(n).map(() => v("b"))))]],
+      labels: [[["("], ["a", "v"], ["/"], ["b", "v"], [")"], [n, "e"]], [["a", "v"], [n, "e"], ["/"], ["b", "v"], [n, "e"]]],
+      links: [],
+      aria: `a over b, to the ${n}: ${n} copies of a over b multiply to ${n} factors of a over ${n} factors of b, which is a to the ${n} over b to the ${n}.`,
+    };
+  }
+
+  // y is the baseline of plain pieces; a fraction's bar sits on the maths axis, 7 above it
+  function draw(items, x, y, g, spots) {
+    for (const it of items) {
+      if (it.k === "frac") {
+        const w = Math.max(width(it.num), width(it.den)) + 6;
+        el("line", { x1: x, x2: x + w, y1: y - 7, y2: y - 7, class: "bar" }, null, g);
+        draw(it.num, x + (w - width(it.num)) / 2, y - 11, g, spots);
+        draw(it.den, x + (w - width(it.den)) / 2, y + 12, g, spots);
+        x += w;
+        continue;
+      }
+      const w = WID[it.k], cx = x + w / 2;
+      if (it.k === "tok") {
+        el("text", { x: cx, y, "text-anchor": "middle", class: "tok" + (it.v ? " v" : "") + (it.cut ? " cut" : "") }, it.s, g);
+        if (it.cut) el("line", { x1: cx - 6, y1: y + 2, x2: cx + 6, y2: y - 15, class: "cut" }, null, g);
+        if (it.id) spots[it.id] = { x: cx, y };
+      } else {
+        const s = { one: "1", dot: "·", op: it.s, open: "(", close: ")" }[it.k];
+        el("text", { x: cx, y, "text-anchor": "middle", class: it.k === "one" ? "one" : "sym" }, s, g);
+      }
+      x += w;
+    }
+  }
+
+  // a label in power notation: plain parts, letters in italic, exponents raised in blue
+  function label(parts, y, g) {
+    const t = el("text", { x: 0, y, "text-anchor": "end", class: "lab" }, null, g);
+    let up = false;
+    for (const [s, kind] of parts) {
+      const a = { dy: kind === "e" ? (up ? 0 : -7) : (up ? 7 : 0) };
+      if (kind) a.class = kind;
+      el("tspan", a, String(s), t);
+      up = kind === "e";
+    }
+    return t;
+  }
+
+  function render() {
+    const n = +slider.value, spec = build(n);
+    const W = svg.clientWidth || 300;
+    svg.textContent = "";
+    const g = el("g", {});
+    const y1 = spec.frac ? 46 : 32, y2 = spec.frac ? 126 : 98, H0 = spec.frac ? 150 : 108;
+    const l1 = label(spec.labels[0], y1, g), l2 = label(spec.labels[1], y2, g);
+    const lw = Math.max(l1.getComputedTextLength(), l2.getComputedTextLength());
+    const rw = Math.max(width(spec.rows[0]), width(spec.rows[1]));
+    const total = lw + 20 + rw, s = Math.min(1, (W - 8) / total), ox = (W - total * s) / 2;
+    l1.setAttribute("x", lw); l2.setAttribute("x", lw);
+    const top = {}, bottom = {}, rx = lw + 20;
+    draw(spec.rows[0], rx + (rw - width(spec.rows[0])) / 2, y1, g, top);
+    draw(spec.rows[1], rx + (rw - width(spec.rows[1])) / 2, y2, g, bottom);
+    spec.links.forEach(id => {
+      const p = top[id], q = bottom[id];
+      if (p && q) g.insertBefore(el("line", { x1: p.x, y1: p.y + 6, x2: q.x, y2: q.y - 19, class: "link" }, null, g), g.firstChild);
+    });
+    g.setAttribute("transform", `translate(${ox.toFixed(1)} 0) scale(${s.toFixed(3)})`);
+    const H = Math.ceil(H0 * s);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.setAttribute("aria-label", spec.aria);
+    if (window.postWidgetHeight) window.postWidgetHeight();   // a narrow frame can shrink some states
+  }
+  render();
+</script>
+</body>
+</html>
