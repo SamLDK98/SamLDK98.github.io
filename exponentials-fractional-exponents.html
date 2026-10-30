@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fractional Exponents | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Why a to the power of a half is the square root of a, from the power of a power rule, and what it means for exponentiation to be multiplicative: equal multiplying steps are not evenly spaced." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Fractional Exponents</h1>
+    </header>
+    <main>
+      <section aria-label="The rational exponent rule">
+        <p>Understanding the <strong>rational exponent rule</strong> is essential for understanding exponents.</p>
+        <div class="math">\[\boxed{a^{\class{mjx-exp}{\frac{m}{n}}}=(\sqrt[n]{a})^{\class{mjx-exp}{m}}}\]</div>
+        <p>Let's first understand why:</p>
+        <div class="math">\[a^{\frac{1}{2}}=\sqrt{a}\]</div>
+        <p>The <a class="inline" href="exponentials-the-many-rules-of-exponentiation.html#power-power">power of a power rule</a> reveals why.</p>
+        <div class="math">\[(a^{\class{mjx-exp}{m}})^{\class{mjx-exp}{n}}=a^{\class{mjx-exp}{mn}}\]</div>
+        <p>Imagine:</p>
+        <div class="math">\[16^{\frac{1}{2}}\]</div>
+        <p>If we raise this to the power of two:</p>
+        <div class="math">\[(16^{\frac{1}{2}})^2\]</div>
+        <p>The exponents multiply:</p>
+        <div class="math">\[\frac{1}{2} \cdot 2 = 1\]</div>
+        <p>So the term equals <span class="nw">\(16\):</span></p>
+        <div class="math">\[(16^{\frac{1}{2}})^2 = 16\]</div>
+        <p>That means that whatever the value of \(16^{\frac{1}{2}}\) is, when it is squared, it must equal <span class="nw">\(16\).</span></p>
+        <p>It therefore must be the square root of \(16\), i.e. <span class="nw">\(4\).</span></p>
+        <p>Generally, raising a number to the power of \(\frac{1}{2}\) is equivalent to taking its principal square root.</p>
+        <div class="math">\[\boxed{a^{\frac{1}{2}} = \sqrt{a}}\]</div>
+      </section>
+
+      <section aria-label="Adding and multiplying">
+        <p>The deeper thing to realise is what it means to say that exponentiation is multiplicative.</p>
+        <p>Think about the distance between \(1\) and <span class="nw">\(100\).</span></p>
+        <p>We start at \(1\) rather than \(0\): multiplying \(0\) by anything leaves <span class="nw">\(0\),</span> so we could never move away from it by multiplying.</p>
+        <p>If we were to move additively across the number line from left to right, each step would cover the same distance. We travel \(1\) unit at a time.</p>
+        <p>If we were to move multiplicatively, the steps are not spaced evenly.</p>
+        <p>Each step multiplies by the same factor, so each one covers more distance than the step before.</p>
+        <iframe class="expo-widget" src="exponentials/fractional-exponents/steps-widget.html" title="Interactive: choose how many equal steps to take from 1 to 100. Adding, the points are evenly spaced; multiplying, they bunch up near 1 and spread out towards 100. With an even number of steps the middle point is marked: 50.5 by adding, 10 by multiplying" style="height: 168px" scrolling="no" loading="lazy"></iframe>
+        <p>Take two equal steps from \(1\) to <span class="nw">\(100\):</span></p>
+        <div class="math">\[1 \overset{+49.5}{\longrightarrow} 50.5 \overset{+49.5}{\longrightarrow} 100\]</div>
+        <div class="math">\[1 \overset{\times 10}{\longrightarrow} 10 \overset{\times 10}{\longrightarrow} 100\]</div>
+        <p>Adding, the halfway point is <span class="nw">\(50.5\).</span> Multiplying, it is <span class="nw">\(10\):</span> the number that gives \(100\) when multiplied by itself.</p>
+        <div class="math">\[100^{\frac{1}{2}}=\sqrt{100}=10\]</div>
+        <p>An exponent of \(\frac{1}{2}\) means halfway in steps, not halfway in distance.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-the-root-rule.html">← The Root Rule</a>
+        <a href="exponentials-irrational-exponents.html">Next: Irrational Exponents →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

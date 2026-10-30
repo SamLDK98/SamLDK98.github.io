@@ -80,6 +80,8 @@ h2 {
   margin: clamp(3rem, 8vh, 4.2rem) 0 1rem;
 }
 main > section:first-child h2 { margin-top: 0.4rem; }
+/* a new section that opens with prose rather than a heading still gets a pause before it */
+main > section + section > p:first-child { margin-top: 2.4rem; }
 
 h3 {
   font-family: "Spectral", Georgia, serif; font-weight: 400;
