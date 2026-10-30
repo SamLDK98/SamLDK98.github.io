@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Many Rules of Exponentiation | Exponentials | Sam Kirwan</title>
-  <meta name="description" content="The product, quotient, power of a power, power of a product and power of a quotient rules, each with a widget that writes the powers out as their factors and combines them." />
+  <meta name="description" content="The product, quotient, power of a power, power of a product and power of a quotient rules, with factor diagrams and interactive widgets showing how the rules work." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -31,39 +31,50 @@
     <main>
       <section aria-labelledby="product">
         <h2 id="product">Product of Powers Rule</h2>
-        <p>We can observe something interesting if we write up the sequential powers of a number in a table.</p>
-        <div class="side lead">
-          <table class="powers">
-            <thead>
-              <tr><th>Power</th><th>Value</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>\(5^1\)</td><td>\(5\)</td></tr>
-              <tr class="lit"><td>\(5^2\)</td><td>\(25\)</td></tr>
-              <tr class="lit"><td>\(5^3\)</td><td>\(125\)</td></tr>
-              <tr><td>\(5^4\)</td><td>\(625\)</td></tr>
-              <tr class="lit"><td>\(5^5\)</td><td>\(3{,}125\)</td></tr>
-              <tr><td>\(5^6\)</td><td>\(15{,}625\)</td></tr>
-              <tr><td>\(5^7\)</td><td>\(78{,}125\)</td></tr>
-              <tr><td>\(5^8\)</td><td>\(390{,}625\)</td></tr>
-              <tr><td>\(5^9\)</td><td>\(1{,}953{,}125\)</td></tr>
-              <tr><td>\(5^{10}\)</td><td>\(9{,}765{,}625\)</td></tr>
-            </tbody>
-          </table>
-          <div>
-            <p>Multiplying powers of the same base gives the same value as raising the base number to the addition of their exponents.</p>
-            <p>\(5^2 \times 5^3\) is the same thing as <span class="nw">\(5^5\):</span></p>
-            <div class="math">\[25 \cdot 125 = 3{,}125\]</div>
-          </div>
-        </div>
-        <div class="side lead">
-          <iframe class="expo-widget" src="exponentials/rules/factors-widget.html?rule=product" title="Interactive: 5 squared times 5 to the n, for n from 1 to 4. Both powers are written out as factors of 5, two in one bracket and n in the other; taken together they are 2 + n factors of 5, which is 5 to the 2 + n" style="height: 156px" scrolling="no" loading="lazy"></iframe>
-          <div>
-            <p>This is captured by the <strong>product of powers rule</strong>:</p>
-            <div class="math">\[\boxed{a^{\class{mjx-exp}{m}} \times a^{\class{mjx-exp}{n}} = a^{\class{mjx-exp}{m + n}}}\]</div>
-            <p>Notice the base must be identical!</p>
-          </div>
-        </div>
+        <div class="math">\[\boxed{a^{\class{mjx-exp}{m}} \times a^{\class{mjx-exp}{n}} = a^{\class{mjx-exp}{m + n}}}\]</div>
+        <p>Multiplying powers with <strong>identical bases</strong></p>
+        <div class="math">\[5^2 \cdot 5^3\]</div>
+        <p>Gives the same value as raising the base to the sum of their exponents</p>
+        <div class="math">\[5^{2+3}=5^5\]</div>
+        <figure class="factor-combination">
+          <svg viewBox="0 0 560 235" role="img" aria-labelledby="product-factors-title product-factors-desc">
+            <title id="product-factors-title">Combining two factors and three factors makes five factors</title>
+            <desc id="product-factors-desc">5 squared times 5 cubed expands to (5 times 5) times (5 times 5 times 5). Each factor connects to one of the five factors below, giving 5 to the fifth power.</desc>
+            <g class="connections">
+              <path d="M213 90 L243 163 M261 90 L293 163 M375 90 L343 163 M424 90 L393 163 M473 90 L443 163"/>
+            </g>
+            <g class="powers">
+              <text x="20" y="76">5<tspan class="exponent" dy="-17" font-size="21">2</tspan></text>
+              <text x="67" y="76" class="operator">×</text>
+              <text x="98" y="76">5<tspan class="exponent" dy="-17" font-size="21">3</tspan></text>
+              <text x="80" y="205">5<tspan class="exponent" dy="-17" font-size="21">5</tspan></text>
+            </g>
+            <g class="factors">
+              <text x="181" y="76" class="operator">(</text>
+              <text x="205" y="76">5</text>
+              <text x="230" y="76" class="operator">·</text>
+              <text x="253" y="76">5</text>
+              <text x="277" y="76" class="operator">)</text>
+              <text x="310" y="76" class="operator">×</text>
+              <text x="343" y="76" class="operator">(</text>
+              <text x="367" y="76">5</text>
+              <text x="392" y="76" class="operator">·</text>
+              <text x="416" y="76">5</text>
+              <text x="441" y="76" class="operator">·</text>
+              <text x="465" y="76">5</text>
+              <text x="489" y="76" class="operator">)</text>
+              <text x="235" y="205">5</text>
+              <text x="260" y="205" class="operator">·</text>
+              <text x="285" y="205">5</text>
+              <text x="310" y="205" class="operator">·</text>
+              <text x="335" y="205">5</text>
+              <text x="360" y="205" class="operator">·</text>
+              <text x="385" y="205">5</text>
+              <text x="410" y="205" class="operator">·</text>
+              <text x="435" y="205">5</text>
+            </g>
+          </svg>
+        </figure>
       </section>
 
       <section aria-labelledby="quotient">
