@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Twenty units, early and late</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="choices" role="group" aria-label="Which stretch of the number line">
+    <button type="button" data-a="20" aria-pressed="true">20 → 40</button>
+    <button type="button" data-a="80" aria-pressed="false">80 → 100</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // a text whose number carries a raised exponent: base, then exponent, then the rest
+  function powerText(attrs, base, exponent, rest) {
+    const t = el("text", attrs);
+    t.appendChild(document.createTextNode(base));
+    el("tspan", { dy: -5, "font-size": 9, fill: EXP }, exponent, t);
+    el("tspan", { dy: 5 }, rest, t);
+    return t;
+  }
+  // a hop from x1 to x2 on the line at y: a shallow arc above it
+  function hop(x1, x2, y, attrs) {
+    const h = Math.min(11, Math.abs(x2 - x1) * 0.45), mx = (x1 + x2) / 2;
+    return el("path", Object.assign({ d: `M${x1.toFixed(1)} ${y} Q${mx.toFixed(1)} ${(y - 2 * h).toFixed(1)} ${x2.toFixed(1)} ${y}`, fill: "none" }, attrs));
+  }
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+
+  // The same 20 units of the number line, early (20 to 40) or late (80 to 100), crossed two ways.
+  // Adding 5 at every step takes 4 steps either way. Multiplying by 1.25 at every step, starting at the
+  // stretch's left end, takes about 3.1 steps early on but exactly 1 step late on: each multiplicative
+  // step covers more ground than the one before. A step only partly needed is drawn dashed.
+  const H = 140, ADD = 50, MUL = 104, F = 1.25, D = 5;
+  let a = 20;
+  document.querySelectorAll(".choices button").forEach(b => b.addEventListener("click", () => {
+    a = +b.dataset.a;
+    document.querySelectorAll(".choices button").forEach(c => c.setAttribute("aria-pressed", c === b));
+    render();
+  }));
+  const one = v => String(+v.toFixed(1));
+
+  function render() {
+    const W = svg.clientWidth || 320;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 14, R = W - 14, px = v => L + v / 100 * (R - L), b = a + 20;
+
+    // the stretch, as a faint band across both rows
+    el("rect", { x: px(a), y: ADD - 26, width: px(b) - px(a), height: MUL - ADD + 34, fill: INK, "fill-opacity": 0.05 });
+
+    const nAdd = 20 / D, nMul = Math.log(b / a) / Math.log(F);
+    const rows = [
+      { y: ADD, name: "adding", say: `${nAdd} steps of +5`, cls: "ink", color: INK },
+      { y: MUL, name: "multiplying", say: `${Math.abs(nMul - Math.round(nMul)) < 0.01 ? Math.round(nMul) : one(nMul)} step${Math.abs(nMul - 1) < 0.01 ? "" : "s"} of ×1.25`, cls: "base", color: BASE },
+    ];
+    rows.forEach(row => {
+      el("text", { x: L, y: row.y - 32 }, row.name);
+      el("text", { x: R, y: row.y - 32, "text-anchor": "end", class: row.cls }, row.say);
+      el("line", { x1: px(0), x2: px(100), y1: row.y, y2: row.y, stroke: INK, "stroke-opacity": 0.18 });
+    });
+
+    // adding: four equal hops of 5
+    for (let k = 0; k < nAdd; k++) {
+      hop(px(a + D * k), px(a + D * (k + 1)), ADD, { stroke: INK, "stroke-width": 1.4, "stroke-opacity": 0.85 });
+      el("circle", { cx: px(a + D * (k + 1)), cy: ADD, r: 2.6, fill: INK });
+    }
+    // multiplying: whole hops of ×1.25 while they fit, then the part of a hop still needed, dashed
+    let v = a;
+    while (v * F <= b + 1e-9) {
+      hop(px(v), px(v * F), MUL, { stroke: BASE, "stroke-width": 1.4 });
+      v *= F;
+      el("circle", { cx: px(v), cy: MUL, r: 2.6, fill: BASE });
+    }
+    if (b - v > 1e-6) hop(px(v), px(b), MUL, { stroke: BASE, "stroke-width": 1.4, "stroke-dasharray": "2 2" });
+    for (const y of [ADD, MUL]) el("circle", { cx: px(a), cy: y, r: 3.4, fill: y === ADD ? INK : BASE });
+
+    // where the stretch starts and ends, and the ends of the line unless the stretch is there
+    el("text", { x: px(a), y: MUL + 20, "text-anchor": "middle", class: "ink" }, String(a));
+    el("text", { x: px(b), y: MUL + 20, "text-anchor": "middle", class: "ink" }, String(b));
+    if (a > 0) el("text", { x: px(0), y: MUL + 20, "text-anchor": "middle" }, "0");
+    if (b < 100) el("text", { x: px(100), y: MUL + 20, "text-anchor": "middle" }, "100");
+
+    svg.setAttribute("aria-label", `From ${a} to ${b}: adding 5 at each step takes 4 steps; multiplying by 1.25 at each step takes ${one(nMul)}.`);
+  }
+  render();
+</script>
+</body>
+</html>

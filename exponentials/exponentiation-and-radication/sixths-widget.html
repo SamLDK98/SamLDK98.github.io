@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sixths of 64, by adding and by multiplying</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="s" type="range" min="0" max="6" step="1" value="4" aria-label="How many of the six equal parts to take" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // a text whose number carries a raised exponent: base, then exponent, then the rest
+  function powerText(attrs, base, exponent, rest) {
+    const t = el("text", attrs);
+    t.appendChild(document.createTextNode(base));
+    el("tspan", { dy: -5, "font-size": 9, fill: EXP }, exponent, t);
+    el("tspan", { dy: 5 }, rest, t);
+    return t;
+  }
+  // a hop from x1 to x2 on the line at y: a shallow arc above it
+  function hop(x1, x2, y, attrs) {
+    const h = Math.min(11, Math.abs(x2 - x1) * 0.45), mx = (x1 + x2) / 2;
+    return el("path", Object.assign({ d: `M${x1.toFixed(1)} ${y} Q${mx.toFixed(1)} ${(y - 2 * h).toFixed(1)} ${x2.toFixed(1)} ${y}`, fill: "none" }, attrs));
+  }
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+
+  // 64 split into six equal parts two ways, as in the table on this page: six parts of 10.67 that add
+  // (from 0) and six factors of 2 that multiply (from 1). The slider takes k of the six. Taking k sixths
+  // by adding gives k/6 of 64; by multiplying it gives 64 to the power k/6, the same as taking k sixth
+  // roots: 64^(2/3) = 16, where two thirds of 64 is 42.67.
+  const slider = document.getElementById("s");
+  slider.addEventListener("input", render);
+  const H = 160, ADD = 62, MUL = 122, N = 6;
+  const FRAC = ["0", "1/6", "1/3", "1/2", "2/3", "5/6", "1"];
+  const num = v => String(+v.toFixed(2));
+
+  function render() {
+    const k = +slider.value;
+    const W = svg.clientWidth || 320;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 14, R = W - 14, px = v => L + v / 64 * (R - L);
+
+    el("text", { x: W / 2, y: 12, "text-anchor": "middle", class: "exp" }, `${k} of ${N} parts` + (k > 0 && k < N && FRAC[k] !== `${k}/6` ? ` = ${FRAC[k]}` : ""));
+    const rows = [
+      { y: ADD, name: "adding", at: j => 64 * j / N, color: INK, cls: "ink" },
+      { y: MUL, name: "multiplying", at: j => Math.pow(2, j), color: BASE, cls: "base" },
+    ];
+    rows.forEach((row, i) => {
+      el("text", { x: L, y: row.y - 26 }, row.name);
+      el("line", { x1: px(i ? 1 : 0), x2: px(64), y1: row.y, y2: row.y, stroke: INK, "stroke-opacity": 0.18 });
+      for (let j = 0; j < N; j++) {
+        const taken = j < k;
+        hop(px(row.at(j)), px(row.at(j + 1)), row.y, { stroke: row.color, "stroke-width": taken ? 1.5 : 1, "stroke-opacity": taken ? 0.95 : 0.2 });
+      }
+      for (let j = 0; j <= k; j++) el("circle", { cx: px(row.at(j)), cy: row.y, r: j === k ? 4.5 : 2.4, fill: row.color, "fill-opacity": j === k ? 1 : 0.6 });
+    });
+    // what k of the six parts comes to, each way
+    const f = FRAC[k];
+    el("text", { x: R, y: ADD - 26, "text-anchor": "end", class: "ink" }, (k === 0 ? "0" : k === N ? "64" : `${f} × 64 = ${num(64 * k / N)}`));
+    powerText({ x: R, y: MUL - 26, "text-anchor": "end", class: "base" }, "64", f, ` = ${Math.pow(2, k)}`);
+    // where each row starts (0 for adding, 1 for multiplying) and where both end
+    el("text", { x: px(0), y: ADD + 18, "text-anchor": "middle" }, "0");
+    el("text", { x: px(1), y: MUL + 20, "text-anchor": "middle" }, "1");
+    el("text", { x: px(64), y: MUL + 20, "text-anchor": "middle" }, "64");
+
+    svg.setAttribute("aria-label", `${k} of 6 equal parts of 64. Adding: ${f} of 64 is ${num(64 * k / N)}. Multiplying: 64 to the power ${f} is ${Math.pow(2, k)}.`);
+  }
+  render();
+</script>
+</body>
+</html>

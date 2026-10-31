@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Deeper Understanding of Exponentiation and Radication | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Division splits a number into equal parts that add; radication splits it into equal factors that multiply. Following additive and multiplicative steps, and where their halfway points fall, shows what a fractional exponent counts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>A Deeper Understanding of Exponentiation and Radication</h1>
+    </header>
+    <main>
+      <section aria-label="Introduction">
+        <p>To gain a clear understanding of fractional exponents, we need to deepen our understanding of exponentiation and radication.</p>
+        <p>First we need to understand that division breaks numbers down into additive parts, while radication breaks numbers down into multiplicative parts.</p>
+        <p>We will then consider how the journey of moving from one value to another differs when the steps are additive and when they are multiplicative.</p>
+        <p>Finally, we will consider exponents and radicals in light of what we have discussed.</p>
+      </section>
+
+      <section aria-labelledby="parts">
+        <h2 id="parts">Equal Parts and Equal Factors</h2>
+
+        <h3>Division: equal parts that add</h3>
+        <p>Division decomposes a number into a sum of identical values.</p>
+        <p>The number of values in that sum is given by the number we are dividing by.</p>
+        <p>Take <span class="nw">\(64\).</span> We want two equal numbers that, when added, give it.</p>
+        <div class="math">\[x+x=64\]</div>
+        <p>We divide the number by <span class="nw">\(2\),</span> of course.</p>
+        <div class="math">\[2x=64 \qquad x=\frac{64}{2}=32\]</div>
+        <p>If we were to divide by <span class="nw">\(4\),</span> the result would be the value of which four copies add up to the original number.</p>
+        <p>But what if we want the value of which a given number of copies, <em>multiplied</em> together, make the original number?</p>
+
+        <h3>Radication: equal factors that multiply</h3>
+        <p>Radication decomposes a number into a product of identical values.</p>
+        <p>The number of factors in that product is given by the root's index: the small number in front of the root sign, such as the \(3\) in <span class="nw">\(\sqrt[3]{64}\).</span></p>
+        <p>Imagine we want to decompose \(64\) into two identical values that, when multiplied, give it.</p>
+        <div class="math">\[x\cdot x=64 \qquad x^2=64\]</div>
+        <p>Taking the square root gives this value:</p>
+        <div class="math">\[x=\sqrt{64}=8\]</div>
+        <p><strong>Just as division finds the value of equal additive parts, radication finds the value of equal multiplicative factors.</strong></p>
+        <table class="parts">
+          <thead>
+            <tr><th scope="col">Equal pieces</th><th scope="col">Division: parts that add</th><th scope="col">Radication: factors that multiply</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">2</td><td>\(\frac{64}{2}=32\)</td><td>\(\sqrt{64}=8\)</td></tr>
+            <tr><td class="num">3</td><td>\(\frac{64}{3}\approx21.33\)</td><td>\(\sqrt[3]{64}=4\)</td></tr>
+            <tr><td class="num">4</td><td>\(\frac{64}{4}=16\)</td><td>\(\sqrt[4]{64}\approx2.83\)</td></tr>
+            <tr><td class="num">5</td><td>\(\frac{64}{5}=12.8\)</td><td>\(\sqrt[5]{64}\approx2.30\)</td></tr>
+            <tr><td class="num">6</td><td>\(\frac{64}{6}\approx10.67\)</td><td>\(\sqrt[6]{64}=2\)</td></tr>
+          </tbody>
+        </table>
+        <p>Six equal parts of \(64\) add up to it; six equal factors multiply to it:</p>
+        <div class="math">\[\underbrace{10.\overline{6}+10.\overline{6}+\cdots+10.\overline{6}}_{\text{six parts}}=64\]</div>
+        <div class="math">\[2\cdot2\cdot2\cdot2\cdot2\cdot2=64\]</div>
+      </section>
+
+      <section aria-labelledby="change">
+        <h2 id="change">Additive and Multiplicative Change</h2>
+        <p>Let's say we start at \(1\) and move towards <span class="nw">\(100\).</span></p>
+        <p>If we move by the same amount at each step, that is <strong>additive change</strong>.</p>
+        <p>Equal distances along the number line then take the same number of steps. For example, moving from \(20\) to \(40\) takes as many steps as moving from \(80\) to <span class="nw">\(100\).</span></p>
+        <p>If we move by a constant multiplication factor instead, that is <strong>multiplicative change</strong>.</p>
+        <p>As we move from left to right, the distance covered by each step increases (assuming our multiplication factor is greater than <span class="nw">\(1\)).</span></p>
+        <p>This means that moving from \(20\) to \(40\) takes more multiplicative steps than moving from \(80\) to <span class="nw">\(100\).</span></p>
+        <p>Compare the two stretches, stepping by \(+5\) and by <span class="nw">\(\times1.25\):</span></p>
+        <iframe class="expo-widget" src="exponentials/exponentiation-and-radication/stretch-widget.html" title="Interactive: choose the stretch from 20 to 40 or from 80 to 100. Adding 5 at each step crosses either in 4 steps; multiplying by 1.25 at each step takes about 3.1 steps from 20 to 40, but a single step from 80 to 100" style="height: 198px" scrolling="no" loading="lazy"></iframe>
+        <p>Late in the journey, one step of \(\times1.25\) covers \(80\) to <span class="nw">\(100\).</span> Early on, the same \(20\) units take just over three.</p>
+
+        <p>Increasing the coefficient is an example of additive change. Increasing the exponent is an example of multiplicative change.</p>
+        <div class="table-pair">
+          <table class="powers">
+            <thead>
+              <tr><th scope="col">Term</th><th scope="col">\(x=5\)</th><th scope="col">Change</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\(2x\)</td><td class="num">10</td><td class="num">–</td></tr>
+              <tr><td>\(3x\)</td><td class="num">15</td><td class="num">+5</td></tr>
+              <tr><td>\(4x\)</td><td class="num">20</td><td class="num">+5</td></tr>
+              <tr><td>\(5x\)</td><td class="num">25</td><td class="num">+5</td></tr>
+            </tbody>
+          </table>
+          <table class="powers">
+            <thead>
+              <tr><th scope="col">Term</th><th scope="col">\(x=5\)</th><th scope="col">Change</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\(x^1\)</td><td class="num">5</td><td class="num">–</td></tr>
+              <tr><td>\(x^2\)</td><td class="num">25</td><td class="num">×5</td></tr>
+              <tr><td>\(x^3\)</td><td class="num">125</td><td class="num">×5</td></tr>
+              <tr><td>\(x^4\)</td><td class="num">625</td><td class="num">×5</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Let's first think about what happens when we increase the coefficient of a linear term.</p>
+        <p>Say we move from <span class="nw">\(2x \to 3x\),</span> and let <span class="nw">\(x=5\).</span></p>
+        <p>We know that we are moving from <span class="nw">\(10 \to 15\),</span> but what happens along the way?</p>
+        <table class="powers zoom">
+          <thead>
+            <tr><th scope="col">Term</th><th scope="col">\(x=5\)</th><th scope="col">Each step</th><th scope="col">From \(2x\)</th></tr>
+          </thead>
+          <tbody>
+              <tr><td>\(2.0x\)</td><td class="num">10</td><td class="num">–</td><td class="num">–</td></tr>
+              <tr><td>\(2.1x\)</td><td class="num">10.5</td><td class="num">+0.5</td><td class="num">+0.5</td></tr>
+              <tr><td>\(2.2x\)</td><td class="num">11</td><td class="num">+0.5</td><td class="num">+1</td></tr>
+              <tr><td>\(2.3x\)</td><td class="num">11.5</td><td class="num">+0.5</td><td class="num">+1.5</td></tr>
+              <tr><td>\(2.4x\)</td><td class="num">12</td><td class="num">+0.5</td><td class="num">+2</td></tr>
+              <tr class="lit"><td>\(2.5x\)</td><td class="num">12.5</td><td class="num">+0.5</td><td class="num">+2.5</td></tr>
+              <tr><td>\(2.6x\)</td><td class="num">13</td><td class="num">+0.5</td><td class="num">+3</td></tr>
+              <tr><td>\(2.7x\)</td><td class="num">13.5</td><td class="num">+0.5</td><td class="num">+3.5</td></tr>
+              <tr><td>\(2.8x\)</td><td class="num">14</td><td class="num">+0.5</td><td class="num">+4</td></tr>
+              <tr><td>\(2.9x\)</td><td class="num">14.5</td><td class="num">+0.5</td><td class="num">+4.5</td></tr>
+              <tr><td>\(3.0x\)</td><td class="num">15</td><td class="num">+0.5</td><td class="num">+5</td></tr>
+          </tbody>
+        </table>
+        <p>We are moving in additive steps: each step of \(0.1\) in the coefficient adds <span class="nw">\(0.5\).</span></p>
+        <p>Now let's look at what happens when we increase the exponent by <span class="nw">\(1\).</span></p>
+        <p>Say we move from <span class="nw">\(x^2 \to x^3\),</span> and let <span class="nw">\(x=5\).</span></p>
+        <p>We know that we are moving from <span class="nw">\(25 \to 125\),</span> but what happens along the way?</p>
+        <table class="powers zoom">
+          <thead>
+            <tr><th scope="col">Term</th><th scope="col">\(x=5\)</th><th scope="col">Each step</th><th scope="col">From \(x^2\)</th></tr>
+          </thead>
+          <tbody>
+              <tr><td>\(x^{2.0}\)</td><td class="num">25.00</td><td class="num">–</td><td class="num">–</td></tr>
+              <tr><td>\(x^{2.1}\)</td><td class="num">29.37</td><td class="num">×1.175</td><td class="num">×1.175</td></tr>
+              <tr><td>\(x^{2.2}\)</td><td class="num">34.49</td><td class="num">×1.175</td><td class="num">×1.380</td></tr>
+              <tr><td>\(x^{2.3}\)</td><td class="num">40.52</td><td class="num">×1.175</td><td class="num">×1.621</td></tr>
+              <tr><td>\(x^{2.4}\)</td><td class="num">47.59</td><td class="num">×1.175</td><td class="num">×1.904</td></tr>
+              <tr class="lit"><td>\(x^{2.5}\)</td><td class="num">55.90</td><td class="num">×1.175</td><td class="num">×2.236</td></tr>
+              <tr><td>\(x^{2.6}\)</td><td class="num">65.66</td><td class="num">×1.175</td><td class="num">×2.627</td></tr>
+              <tr><td>\(x^{2.7}\)</td><td class="num">77.13</td><td class="num">×1.175</td><td class="num">×3.085</td></tr>
+              <tr><td>\(x^{2.8}\)</td><td class="num">90.60</td><td class="num">×1.175</td><td class="num">×3.624</td></tr>
+              <tr><td>\(x^{2.9}\)</td><td class="num">106.42</td><td class="num">×1.175</td><td class="num">×4.257</td></tr>
+              <tr><td>\(x^{3.0}\)</td><td class="num">125.00</td><td class="num">×1.175</td><td class="num">×5.000</td></tr>
+          </tbody>
+        </table>
+        <p>We are moving in multiplicative steps: each step of \(0.1\) in the exponent multiplies by about <span class="nw">\(1.175\).</span></p>
+
+        <h3>Halfway</h3>
+        <p>The key realisation is that the halfway point between two numbers in terms of addition is simply the halfway value between them. Between \(25\) and <span class="nw">\(125\),</span> it is <span class="nw">\(75\).</span></p>
+        <p>The halfway point in terms of multiplication, however, is less straightforward.</p>
+        <p>Halfway means the two halves of the journey are equal steps. By adding, the two halves add the same amount. By multiplying, they multiply by the same factor.</p>
+        <p>Move the middle point until the two halves are equal. There are two such places.</p>
+        <iframe class="expo-widget" src="exponentials/exponentiation-and-radication/halfway-widget.html" title="Interactive: move a middle point between 25 and 125. Above it, the two halves of the journey are read as amounts added and as factors multiplied. At 75 the two amounts match, plus 50 and plus 50: halfway by adding. At 55.90 the two factors match, about 2.24 each: halfway by multiplying, which is 5 to the 2.5" style="height: 206px" scrolling="no" loading="lazy"></iframe>
+        <p>By adding, halfway is <span class="nw">\(75\):</span> \(+50\) and then <span class="nw">\(+50\).</span> By multiplying, halfway is about <span class="nw">\(55.90\):</span> \(\times2.236\) and then \(\times2.236\) again.</p>
+        <p>And \(55.90\) is <span class="nw">\(5^{2.5}\),</span> the middle row of the table above. Halfway in the exponent is halfway by multiplying.</p>
+      </section>
+
+      <section aria-labelledby="exponents">
+        <h2 id="exponents">Exponents and Radicals</h2>
+        <p>An exponent counts multiplicative steps. Starting from <span class="nw">\(1\),</span> \(5^3\) takes three steps of <span class="nw">\(\times5\):</span></p>
+        <div class="math">\[1 \xrightarrow{\times5} 5 \xrightarrow{\times5} 25 \xrightarrow{\times5} 125\]</div>
+        <p>\(5^0=1\) is the start, with no steps taken. Adding \(1\) to the exponent takes one more step, which is why adding to the exponent multiplies the value.</p>
+        <p>So what is a fraction of a step?</p>
+        <p>Half a step of \(\times5\) is a factor that, taken twice, makes <span class="nw">\(\times5\).</span> Finding it means splitting \(5\) into two equal factors: radication.</p>
+        <div class="math">\[5^{\frac{1}{2}}\cdot5^{\frac{1}{2}}=5^1 \qquad 5^{\frac{1}{2}}=\sqrt{5}\approx2.236\]</div>
+        <p>It is the factor we found at halfway. Two whole steps and a half step from \(1\) land on <span class="nw">\(55.90\):</span></p>
+        <div class="math">\[5^{2.5}=5^2\cdot5^{\frac{1}{2}}=25\sqrt{5}\approx55.90\]</div>
+        <p>In general, for <span class="nw">\(a&gt;0\),</span> \(\frac{1}{n}\) of a step of \(\times a\) is one of the \(n\) equal factors of <span class="nw">\(a\),</span> and \(m\) such pieces are \(m\) of them:</p>
+        <div class="math">\[a^{\frac{1}{n}}=\sqrt[n]{a} \qquad \boxed{a^{\frac{m}{n}}=\left(\sqrt[n]{a}\right)^m}\]</div>
+        <p>This is the multiplicative twin of taking a fraction of a number. Two of three equal parts of \(64\) are <span class="nw">\(\frac{2}{3}\times64\approx42.67\).</span> Two of three equal factors are <span class="nw">\(\left(\sqrt[3]{64}\right)^2=4^2=16\).</span></p>
+        <table class="parts">
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Parts that add</th><th scope="col">Factors that multiply</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>One of \(n\)</td><td>\(\frac{64}{n}\)</td><td>\(\sqrt[n]{64}=64^{\frac{1}{n}}\)</td></tr>
+            <tr><td>\(m\) of \(n\)</td><td>\(\frac{m}{n}\times64\)</td><td>\(\left(\sqrt[n]{64}\right)^m=64^{\frac{m}{n}}\)</td></tr>
+          </tbody>
+        </table>
+        <p>Take some of the six equal parts of <span class="nw">\(64\):</span></p>
+        <iframe class="expo-widget" src="exponentials/exponentiation-and-radication/sixths-widget.html" title="Interactive: take from 0 to 6 of the six equal parts of 64. Adding, each part is 10.67, so four sixths, two thirds, of 64 is 42.67. Multiplying, each factor is 2, so 64 to the two thirds is 16" style="height: 208px" scrolling="no" loading="lazy"></iframe>
+        <p>Radication and exponentiation undo each other. Multiplying the \(n\) equal factors of \(a\) back together gives \(a\) again:</p>
+        <div class="math">\[\left(\sqrt[n]{a}\right)^n=a^{\frac{n}{n}}=a\]</div>
+        <p>One question is left: how many steps of \(\times5\) make <span class="nw">\(125\)?</span> Counting steps is the job of the logarithm, for a later page.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-the-root-rule.html">← The Root Rule</a>
+        <a href="exponentials-fractional-exponents.html">Next: Fractional Exponents →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
