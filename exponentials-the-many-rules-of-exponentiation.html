@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Many Rules of Exponentiation | Exponentials | Sam Kirwan</title>
-  <meta name="description" content="The product, quotient, power of a power, power of a product and power of a quotient rules, with factor diagrams and interactive widgets showing how the rules work." />
+  <title>The Laws of Exponents | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="The product, quotient, power of a power, power of a product and power of a quotient rules, with worked examples and factor diagrams showing why the laws work." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -26,15 +26,18 @@
   <div class="sheet">
     <header>
       <a class="crumb" href="exponentials.html">Exponentials</a>
-      <h1>The Many Rules of Exponentiation</h1>
+      <h1>The Laws of Exponents</h1>
     </header>
     <main>
+        <p>The following laws allow us to simplify our calculations involving multiplication, division or raising powers to other powers.</p>
+        <p>These laws are not arbitrary. They follow from the properties of multiplication, as we can demonstrate by expanding and rearranging the factors.</p>
+
       <section aria-labelledby="product">
         <h2 id="product">Product of Powers Rule</h2>
-        <div class="math">\[\boxed{a^{\class{mjx-exp}{m}} \times a^{\class{mjx-exp}{n}} = a^{\class{mjx-exp}{m + n}}}\]</div>
-        <p>Multiplying powers with <strong>identical bases</strong></p>
-        <div class="math">\[5^2 \cdot 5^3\]</div>
-        <p>Gives the same value as raising the base to the sum of their exponents</p>
+        <div class="math">\[\boxed{a^m \times a^n = a^{m+n}}\]</div>
+        <p>When multiplying powers with identical bases, we combine their factors into a single product.</p>
+        <div class="math">\[5^2\cdot5^3=(5\cdot5)(5\cdot5\cdot5)=5^5\]</div>
+        <p>The resulting exponent is the sum of the original exponents.</p>
         <div class="math">\[5^{2+3}=5^5\]</div>
         <figure class="factor-combination">
           <svg viewBox="0 0 560 235" role="img" aria-labelledby="product-factors-title product-factors-desc">
@@ -78,45 +81,163 @@
       </section>
 
       <section aria-labelledby="quotient">
-        <h2 id="quotient">Quotient Rule</h2>
-        <div class="side">
-          <div>
-            <p>Similarly, dividing powers with the same base behaves the same as subtracting their exponents.</p>
-            <p>This is captured by the <strong>quotient of powers rule</strong> (for a nonzero base <span class="nw">\(a\)):</span></p>
-            <div class="math">\[\frac{a^{\class{mjx-exp}{m}}}{a^{\class{mjx-exp}{n}}} = a^{\class{mjx-exp}{m-n}} \qquad (a \ne 0)\]</div>
-          </div>
-          <iframe class="expo-widget" src="exponentials/rules/factors-widget.html?rule=quotient" title="Interactive: 5 to the 5 divided by 5 to the n, for n from 1 to 7. The factors cancel in pairs above and below; what is left is 5 to the 5 minus n, down to 1 when n is 5 and a fraction when n is larger" style="height: 198px" scrolling="no" loading="lazy"></iframe>
-        </div>
+        <h2 id="quotient">Quotient of Powers Rule</h2>
+        <div class="math">\[\boxed{\frac{a^m}{a^n}=a^{m-n}\qquad(a\ne0)}\]</div>
+        <p>When dividing powers with <strong>identical bases</strong>, matching factors in the numerator and denominator cancel.</p>
+        <p>The number of factors remaining is determined by subtracting the denominator’s exponent from the numerator’s exponent.</p>
+        <p>For example:</p>
+        <div class="math">\[\frac{3^5}{3^2}=3^{5-2}=3^3\]</div>
+        <p>Expanding the powers shows why:</p>
+        <div class="math">\[\frac{3\times3\times3\times3\times3}{3\times3}\]</div>
+        <p>Two factors in the numerator cancel with two in the denominator, leaving three factors of 3.</p>
+        <div class="math">\[=3\times3\times3=3^3\]</div>
+        <figure class="law-diagram">
+          <svg viewBox="0 0 560 270" role="img" aria-labelledby="cancel-title cancel-desc">
+            <title id="cancel-title">Cancel two matching pairs</title>
+            <desc id="cancel-desc">7 to the fourth divided by 7 squared. Two factors of 7 cancel above and below the fraction bar, leaving 7 times 7, or 7 squared.</desc>
+            <text class="diagram-label" x="20" y="30">7⁴ ÷ 7²</text>
+            <g class="factor-token cancelled"><circle cx="120" cy="75" r="19"/><text x="120" y="83">7</text></g>
+            <path class="cancel-mark" d="M104 95 L136 55"/>
+            <text class="multiply" x="148" y="82">·</text>
+            <g class="factor-token cancelled"><circle cx="176" cy="75" r="19"/><text x="176" y="83">7</text></g>
+            <path class="cancel-mark" d="M160 95 L192 55"/>
+            <text class="multiply" x="204" y="82">·</text>
+            <g class="factor-token"><circle cx="232" cy="75" r="19"/><text x="232" y="83">7</text></g>
+            <text class="multiply" x="260" y="82">·</text>
+            <g class="factor-token"><circle cx="288" cy="75" r="19"/><text x="288" y="83">7</text></g>
+            <g class="factor-token cancelled"><circle cx="120" cy="140" r="19"/><text x="120" y="148">7</text></g>
+            <path class="cancel-mark" d="M104 160 L136 120"/>
+            <text class="multiply" x="148" y="147">·</text>
+            <g class="factor-token cancelled"><circle cx="176" cy="140" r="19"/><text x="176" y="148">7</text></g>
+            <path class="cancel-mark" d="M160 160 L192 120"/>
+            <path class="fraction-bar" d="M90 108 H310"/>
+            <text class="diagram-label" x="360" y="80">Two pairs</text>
+            <text class="diagram-label" x="360" y="103">cancel</text>
+            <g class="factor-token"><circle cx="120" cy="220" r="19"/><text x="120" y="228">7</text></g>
+            <text class="multiply" x="148" y="227">·</text>
+            <g class="factor-token"><circle cx="176" cy="220" r="19"/><text x="176" y="228">7</text></g>
+            <text class="diagram-label" x="285" y="228">= 7²</text>
+
+          </svg>
+          <figcaption>\(7^4 \div 7^2 = 7^{4-2} = 7^2\). Each crossed-out pair has a quotient of 1.</figcaption>
+        </figure>
       </section>
 
       <section aria-labelledby="power-power">
         <h2 id="power-power">Power of a Power Rule</h2>
-        <div class="side flip">
-          <div>
-            <div class="math">\[\left(a^{\class{mjx-exp}{m}}\right)^{\class{mjx-exp}{n}}=a^{\class{mjx-exp}{mn}}\]</div>
-          </div>
-          <iframe class="expo-widget" src="exponentials/rules/factors-widget.html?rule=power" title="Interactive: 5 squared, to the n, for n from 1 to 4: n brackets of two factors of 5 make 2n factors, which is 5 to the 2n" style="height: 156px" scrolling="no" loading="lazy"></iframe>
-        </div>
+        <div class="math">\[\boxed{(a^m)^n=a^{mn}}\]</div>
+        <p>Raising a power to another power means repeating the entire original product. The total number of factors is therefore the product of the two exponents.</p>
+        <p>For example:</p>
+        <div class="math">\[(2^3)^2\]</div>
+        <p>We know that \(2^3\) represents three copies of 2 multiplied together:</p>
+        <div class="math">\[2^3=2\times2\times2\]</div>
+        <p>Raising this entire expression to the power of 2 means taking two copies of that product:</p>
+        <div class="math">\[(2\times2\times2)\times(2\times2\times2)\]</div>
+        <p>We now have two groups of three factors, giving six factors altogether:</p>
+        <div class="math">\[(2^3)^2=2^{3\times2}=2^6\]</div>
+        <figure class="law-diagram">
+          <svg viewBox="0 0 560 240" role="img" aria-labelledby="repeat-title repeat-desc">
+            <title id="repeat-title">Three groups of two factors</title>
+            <desc id="repeat-desc">4 squared raised to the third power makes three groups of two factors of 4. Six factors altogether give 4 to the sixth power.</desc>
+            <text class="diagram-label" x="20" y="30">(4²)³</text>
+            <rect class="factor-group" x="20" y="52" width="146" height="58" rx="9"/>
+            <text class="diagram-label" x="40" y="88">4 · 4</text>
+            <rect class="factor-group" x="205" y="52" width="146" height="58" rx="9"/>
+            <text class="diagram-label" x="225" y="88">4 · 4</text>
+            <rect class="factor-group" x="390" y="52" width="146" height="58" rx="9"/>
+            <text class="diagram-label" x="410" y="88">4 · 4</text>
+            <text class="diagram-label" x="20" y="146">3 groups × 2 factors = 6 factors</text>
+            <g class="factor-token"><circle cx="70" cy="195" r="19"/><text x="70" y="203">4</text></g>
+            <text class="multiply" x="98" y="202">·</text>
+            <g class="factor-token"><circle cx="126" cy="195" r="19"/><text x="126" y="203">4</text></g>
+            <text class="multiply" x="154" y="202">·</text>
+            <g class="factor-token"><circle cx="182" cy="195" r="19"/><text x="182" y="203">4</text></g>
+            <text class="multiply" x="210" y="202">·</text>
+            <g class="factor-token"><circle cx="238" cy="195" r="19"/><text x="238" y="203">4</text></g>
+            <text class="multiply" x="266" y="202">·</text>
+            <g class="factor-token"><circle cx="294" cy="195" r="19"/><text x="294" y="203">4</text></g>
+            <text class="multiply" x="322" y="202">·</text>
+            <g class="factor-token"><circle cx="350" cy="195" r="19"/><text x="350" y="203">4</text></g>
+            <text class="diagram-label" x="460" y="203">= 4⁶</text>
+
+          </svg>
+          <figcaption>\((4^2)^3 = 4^{2\times3} = 4^6\): three copies of a two-factor product.</figcaption>
+        </figure>
       </section>
 
       <section aria-labelledby="power-product">
         <h2 id="power-product">Power of a Product Rule</h2>
-        <div class="side">
-          <div>
-            <div class="math">\[(ab)^{\class{mjx-exp}{n}}= a^{\class{mjx-exp}{n}} b^{\class{mjx-exp}{n}}\]</div>
-          </div>
-          <iframe class="expo-widget" src="exponentials/rules/factors-widget.html?rule=product-power" title="Interactive: a b, to the n, for n from 1 to 4: n brackets of a times b, regrouped with the a's together and the b's together, which is a to the n times b to the n" style="height: 156px" scrolling="no" loading="lazy"></iframe>
-        </div>
+        <div class="math">\[\boxed{(ab)^n=a^nb^n}\]</div>
+        <p>Raising a product to a power is equivalent to raising each factor to that power and then multiplying the results together.</p>
+        <p>For example:</p>
+        <div class="math">\[(2\cdot3)^3\]</div>
+        <p>This means taking three copies of the entire product:</p>
+        <div class="math">\[(2\cdot3)(2\cdot3)(2\cdot3)\]</div>
+        <p>We can rearrange the factors to group identical numbers together:</p>
+        <div class="math">\[(2\cdot2\cdot2)(3\cdot3\cdot3)\]</div>
+        <p>Therefore:</p>
+        <div class="math">\[(2\cdot3)^3=2^3\cdot3^3\]</div>
+        <figure class="law-diagram">
+          <svg viewBox="0 0 560 270" role="img" aria-labelledby="regroup-title regroup-desc">
+            <title id="regroup-title">Regroup matching factors</title>
+            <desc id="regroup-desc">Two copies of 3 times 5 contain two factors of 3 and two factors of 5. Rearranging gives 3 squared times 5 squared.</desc>
+            <text class="diagram-label" x="20" y="30">(3 × 5)²</text>
+            <g class="factor-token"><circle cx="140" cy="80" r="19"/><text x="140" y="88">3</text></g>
+            <text class="multiply" x="168" y="87">·</text>
+            <g class="factor-token"><circle cx="196" cy="80" r="19"/><text x="196" y="88">5</text></g>
+            <text class="multiply" x="224" y="87">·</text>
+            <g class="factor-token"><circle cx="252" cy="80" r="19"/><text x="252" y="88">3</text></g>
+            <text class="multiply" x="280" y="87">·</text>
+            <g class="factor-token"><circle cx="308" cy="80" r="19"/><text x="308" y="88">5</text></g>
+            <path class="factor-link" d="M140 103 L140 162"/>
+            <path class="factor-link" d="M196 103 L252 162"/>
+            <path class="factor-link" d="M252 103 L196 162"/>
+            <path class="factor-link" d="M308 103 L308 162"/>
+            <g class="factor-token"><circle cx="140" cy="185" r="19"/><text x="140" y="193">3</text></g>
+            <text class="multiply" x="168" y="192">·</text>
+            <g class="factor-token"><circle cx="196" cy="185" r="19"/><text x="196" y="193">3</text></g>
+            <text class="multiply" x="224" y="192">·</text>
+            <g class="factor-token"><circle cx="252" cy="185" r="19"/><text x="252" y="193">5</text></g>
+            <text class="multiply" x="280" y="192">·</text>
+            <g class="factor-token"><circle cx="308" cy="185" r="19"/><text x="308" y="193">5</text></g>
+            <text class="diagram-label" x="155" y="246">3² × 5²</text>
+
+          </svg>
+          <figcaption>\((3\cdot5)^2 = (3\cdot3)(5\cdot5) = 3^2\cdot5^2\). The factors change order; their product stays the same.</figcaption>
+        </figure>
       </section>
 
       <section aria-labelledby="power-quotient">
         <h2 id="power-quotient">Power of a Quotient Rule</h2>
-        <div class="side flip">
-          <div>
-            <div class="math">\[\left( \frac{a}{b} \right)^{\class{mjx-exp}{n}} = \frac{a^{\class{mjx-exp}{n}}}{b^{\class{mjx-exp}{n}}} \qquad (b \ne 0)\]</div>
-          </div>
-          <iframe class="expo-widget" src="exponentials/rules/factors-widget.html?rule=quotient-power" title="Interactive: a over b, to the n, for n from 1 to 4: n copies of a over b multiply to n factors of a over n factors of b, which is a to the n over b to the n" style="height: 198px" scrolling="no" loading="lazy"></iframe>
-        </div>
+        <div class="math">\[\boxed{\left(\frac{a}{b}\right)^n=\frac{a^n}{b^n}\qquad(b\ne0)}\]</div>
+        <p>Raising a quotient to a power is equivalent to raising the numerator and denominator separately to that power.</p>
+        <p>For example:</p>
+        <div class="math">\[\left(\frac{2}{3}\right)^3\]</div>
+        <p>This means multiplying three copies of the fraction together:</p>
+        <div class="math">\[\frac{2}{3}\cdot\frac{2}{3}\cdot\frac{2}{3}\]</div>
+        <p>When multiplying fractions, we multiply their numerators together and their denominators together:</p>
+        <div class="math">\[\frac{2\cdot2\cdot2}{3\cdot3\cdot3}\]</div>
+        <p>Therefore:</p>
+        <div class="math">\[\left(\frac{2}{3}\right)^3=\frac{2^3}{3^3}=\frac{8}{27}\]</div>
+        <figure class="law-diagram">
+          <svg viewBox="0 0 560 270" role="img" aria-labelledby="fraction-title fraction-desc">
+            <title id="fraction-title">Square the numerator and denominator</title>
+            <desc id="fraction-desc">Two copies of 3 over 4 multiply to 3 times 3 over 4 times 4, giving 3 squared over 4 squared, or 9 over 16.</desc>
+            <text class="diagram-label" x="20" y="30">(3/4)²</text>
+            <g class="factor-token"><circle cx="140" cy="80" r="19"/><text x="140" y="88">3</text></g>
+            <text class="multiply" x="168" y="87">·</text>
+            <g class="factor-token"><circle cx="196" cy="80" r="19"/><text x="196" y="88">3</text></g>
+            <g class="factor-token"><circle cx="140" cy="145" r="19"/><text x="140" y="153">4</text></g>
+            <text class="multiply" x="168" y="152">·</text>
+            <g class="factor-token"><circle cx="196" cy="145" r="19"/><text x="196" y="153">4</text></g>
+            <path class="fraction-bar" d="M110 112 H226"/>
+            <text class="diagram-label" x="290" y="85">2 numerator factors</text>
+            <text class="diagram-label" x="290" y="151">2 denominator factors</text>
+            <text class="diagram-label" x="140" y="225">3² / 4² = 9/16</text>
+
+          </svg>
+          <figcaption>\(\left(\frac{3}{4}\right)^2 = \frac{3\cdot3}{4\cdot4} = \frac{9}{16}\).</figcaption>
+        </figure>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
@@ -125,14 +246,5 @@
       </nav>
     </main>
   </div>
-  <script>
-    // Each widget reports its own height, so no frame ever scrolls.
-    window.addEventListener("message", function (e) {
-      if (!e.data || e.data.type !== "expo-widget-height") return;
-      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
-        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
-      });
-    });
-  </script>
 </body>
 </html>

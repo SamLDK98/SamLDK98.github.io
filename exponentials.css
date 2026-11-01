@@ -302,3 +302,17 @@ table.laws td:first-child { color: var(--ink); }
 .foot-nav a:hover, .foot-nav a:focus-visible { color: var(--ink); outline: none; }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Factor illustrations for The Laws of Exponents. */
+.law-diagram { padding: 1rem 0; border-block: 1px solid var(--hair); }
+.law-diagram svg { max-width: 560px; }
+.law-diagram .diagram-label { fill: var(--body); font: 20px "Spectral", Georgia, serif; }
+.law-diagram .factor-token circle { fill: var(--bg); stroke: var(--base); stroke-opacity: 0.5; }
+.law-diagram .factor-token text { fill: var(--base); text-anchor: middle; font: 27px "Spectral", Georgia, serif; }
+.law-diagram .multiply { fill: var(--dim); text-anchor: middle; font-size: 24px; }
+.law-diagram .cancelled { opacity: 0.45; }
+.law-diagram .cancel-mark { stroke: var(--exp); stroke-width: 2; }
+.law-diagram .fraction-bar { stroke: var(--body); stroke-width: 1.5; }
+.law-diagram .factor-group { fill: none; stroke: var(--exp); stroke-opacity: 0.6; }
+.law-diagram .factor-link { stroke: var(--faint); stroke-width: 1.5; fill: none; }
+.law-diagram figcaption { margin-top: 0.7rem; color: var(--dim); font-size: 1rem; line-height: 1.6; }
