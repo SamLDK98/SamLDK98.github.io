@@ -1,0 +1,25 @@
+html.standalone, html.standalone body { background: var(--bg); }
+.widget { max-width: 520px; padding: 0.5rem 0.2rem 0.8rem; }
+.reading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; font: 0.72rem "IBM Plex Mono", monospace; color: var(--dim); }
+.reading strong { color: var(--base); font-weight: 400; }
+#step { color: var(--exp); }
+#square-scene { width: min(100%, 360px); margin: 0.3rem auto 0; }
+.square { fill: var(--base); fill-opacity: 0.13; stroke: var(--base); stroke-width: 1.1; vector-effect: non-scaling-stroke; transition: x 350ms ease, y 350ms ease, width 350ms ease, height 350ms ease, opacity 350ms ease; }
+#frame { opacity: 0; transition: opacity 300ms ease; }
+#frame rect, #frame path { stroke: var(--exp); stroke-width: 1; fill: none; vector-effect: non-scaling-stroke; }
+#frame rect { stroke-dasharray: 4 5; }
+.copy { opacity: 0; }
+#side-label { font-size: 12px; }
+.journey { display: flex; justify-content: center; align-items: baseline; list-style: none; gap: 0; margin: 0.6rem 0 1rem; font: 0.83rem "IBM Plex Mono", monospace; }
+.journey li { color: var(--dim); white-space: nowrap; }
+.journey li + li::before { content: "→"; display: inline-block; margin: 0 clamp(0.3rem, 2vw, 0.9rem); color: var(--faint); }
+.journey li[aria-current="step"] { color: var(--base); }
+.explanation { min-height: 3.5em; font-size: 1.08rem; line-height: 1.6; }
+.comparison { min-height: 2.8em; margin-top: 0.35rem; color: var(--dim); font: 0.75rem/1.7 "IBM Plex Mono", monospace; }
+.controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 0.7rem; }
+.controls button { min-height: 44px; padding: 0.6rem 0.8rem; border: 1px solid var(--faint); color: var(--ink); background: transparent; font: 0.73rem "IBM Plex Mono", monospace; cursor: pointer; }
+.controls #next { border-color: var(--base); }
+.controls button:hover:enabled { background: rgba(232,163,61,0.08); }
+.controls button:focus-visible { outline: 2px solid var(--exp); outline-offset: 3px; }
+.controls button:disabled { cursor: default; opacity: 0.35; }
+@media (max-width: 350px) { .controls { gap: 0.35rem; } .controls button { padding-inline: 0.5rem; } }

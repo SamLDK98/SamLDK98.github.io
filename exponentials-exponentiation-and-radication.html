@@ -74,6 +74,20 @@
         <div class="math">\[2\cdot2\cdot2\cdot2\cdot2\cdot2=64\]</div>
       </section>
 
+      <section aria-labelledby="square-ratios">
+        <h2 id="square-ratios">Seeing the Ratio</h2>
+        <p>What does it mean to grow by the same factor at every step? Start with a square of area \(1\). Imagine a \(2\times2\) frame, with each of its four spaces large enough to hold a copy of that square.</p>
+        <p>Place one copy in each space, then let the frame disappear. The four copies form a larger square. Repeat, using the whole new square as the piece you copy.</p>
+        <iframe class="expo-widget" src="exponentials/exponentiation-and-radication/square-ratio-widget.html" title="Interactive: grow a square from area 1 to 256 in four steps, placing four identical copies in a two by two frame at each step" style="height: 560px" scrolling="no" loading="lazy"></iframe>
+        <p>Each new square has <strong>four times the area</strong> of the previous one. Both side lengths double, so the area is multiplied by \(2\times2=4\). The amount of area added changes, but the ratio stays the same.</p>
+        <p>Now start with the square of area \(256\), and reverse the process. Halve both side lengths and keep one of the four equal squares. Repeat with the square that remains.</p>
+        <iframe class="expo-widget" src="exponentials/exponentiation-and-radication/square-ratio-widget.html?mode=shrink" title="Interactive: start with a sixteen by sixteen square of area 256 and keep one quarter at each of four steps, reaching areas 64, 16, 4 and 1" style="height: 560px" scrolling="no" loading="lazy"></iframe>
+        <p>Each remaining square occupies the same proportion of the previous square: one quarter. After two of the four reductions, the area is \(16\). We have completed half the steps, although the area is far less than half of \(256\).</p>
+        <p>Taking the fourth root asks: <strong>what positive factor, used four times starting from \(1\), gives \(256\)?</strong> The enlargements show the answer:</p>
+        <div class="math">\[\underbrace{4\times4\times4\times4}_{\text{four equal factors}}=256\qquad\sqrt[4]{256}=4\]</div>
+        <p>The root here is the factor by which the <em>area</em> grows at each step. The side lengths grow by a factor of \(2\).</p>
+      </section>
+
       <section aria-labelledby="change">
         <h2 id="change">Additive and Multiplicative Change</h2>
         <p>Let's say we start at \(1\) and move towards <span class="nw">\(100\).</span></p>
@@ -196,8 +210,8 @@
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
-        <a href="exponentials-the-root-rule.html">← The Root Rule</a>
-        <a href="exponentials-fractional-exponents.html">Next: Fractional Exponents →</a>
+        <a href="exponentials-fractional-exponents.html">← Fractional Exponents</a>
+        <a href="exponentials-irrational-exponents.html">Next: Irrational Exponents →</a>
       </nav>
     </main>
   </div>

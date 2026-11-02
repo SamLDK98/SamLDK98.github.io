@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fractional Exponents | Exponentials | Sam Kirwan</title>
-  <meta name="description" content="Why a to the power of a half is the square root of a, from the power of a power rule, and what it means for exponentiation to be multiplicative: equal multiplying steps are not evenly spaced." />
+  <meta name="description" content="A coefficient grows by equal differences, an exponent by equal ratios. The geometric midpoint, unit fraction exponents as roots, and the rational exponent rule: the denominator sets the step, the numerator counts the steps." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -29,12 +29,117 @@
       <h1>Fractional Exponents</h1>
     </header>
     <main>
-      <section aria-label="The rational exponent rule">
-        <p>Understanding the <strong>rational exponent rule</strong> is essential for understanding exponents.</p>
-        <div class="math">\[\boxed{a^{\class{mjx-exp}{\frac{m}{n}}}=(\sqrt[n]{a})^{\class{mjx-exp}{m}}}\]</div>
-        <p>Let's first understand why:</p>
-        <div class="math">\[a^{\frac{1}{2}}=\sqrt{a}\]</div>
-        <p>The <a class="inline" href="exponentials-the-many-rules-of-exponentiation.html#power-power">power of a power rule</a> reveals why.</p>
+      <section aria-labelledby="coefficient">
+        <h2 id="coefficient">As a Coefficient Increases by 1</h2>
+        <div class="side lead">
+          <table class="powers">
+            <thead>
+              <tr><th scope="col">Term</th><th scope="col">\(x=8\)</th><th scope="col">Change</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\(1x\)</td><td class="num">8</td><td class="step">–</td></tr>
+              <tr><td>\(1.1x\)</td><td class="num">8.8</td><td class="step">+0.8</td></tr>
+              <tr class="lit"><td>\(1.2x\)</td><td class="num">9.6</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.3x\)</td><td class="num">10.4</td><td class="step">+0.8</td></tr>
+              <tr class="lit"><td>\(1.4x\)</td><td class="num">11.2</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.5x\)</td><td class="num">12</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.6x\)</td><td class="num">12.8</td><td class="step">+0.8</td></tr>
+              <tr class="lit"><td>\(1.7x\)</td><td class="num">13.6</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.8x\)</td><td class="num">14.4</td><td class="step">+0.8</td></tr>
+              <tr class="lit"><td>\(1.9x\)</td><td class="num">15.2</td><td class="step">+0.8</td></tr>
+              <tr><td>\(2x\)</td><td class="num">16</td><td class="step">+0.8</td></tr>
+            </tbody>
+          </table>
+          <div>
+            <p>If <span class="nw">\(x=8\):</span></p>
+            <p>When we are moving from <span class="nw">\(x \to 2x\),</span> we are moving from <span class="nw">\(8 \to 16\).</span></p>
+            <p>But how does this change occur along the journey from <span class="nw">\(8 \to 16\)?</span></p>
+            <p>It occurs at a constant rate.</p>
+            <p>It changes <strong>additively</strong>.</p>
+            <p>The difference in value between moving from \(1.2x \to 1.4x\) is the same as moving from <span class="nw">\(1.7x \to 1.9x\).</span></p>
+            <p>It's \(+1.6\) in both cases.</p>
+          </div>
+        </div>
+        <iframe class="expo-widget" src="exponentials/fractional-exponents/coefficient-widget.html" title="Interactive: slide the coefficient from 1 to 2 in steps of 0.1; on a number line from 8 to 16, each step adds the same 0.8, so the stops are evenly spaced" style="height: 170px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section aria-labelledby="exponent">
+        <h2 id="exponent">As an Exponent Increases by 1</h2>
+        <div class="side lead">
+          <table class="powers">
+            <thead>
+              <tr><th scope="col">Term</th><th scope="col">\(x=8\)</th><th scope="col">Change</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\(x^{\class{mjx-exp}{1}}\)</td><td class="num">8</td><td class="step">–</td></tr>
+              <tr><td>\(x^{\class{mjx-exp}{1.1}}\)</td><td class="num">9.849</td><td class="step">+1.849</td></tr>
+              <tr class="lit"><td>\(x^{\class{mjx-exp}{1.2}}\)</td><td class="num">12.126</td><td class="step">+2.277</td></tr>
+              <tr><td>\(x^{\class{mjx-exp}{1.3}}\)</td><td class="num">14.929</td><td class="step">+2.803</td></tr>
+              <tr class="lit"><td>\(x^{\class{mjx-exp}{1.4}}\)</td><td class="num">18.379</td><td class="step">+3.450</td></tr>
+              <tr><td>\(x^{\class{mjx-exp}{1.5}}\)</td><td class="num">22.627</td><td class="step">+4.248</td></tr>
+              <tr><td>\(x^{\class{mjx-exp}{1.6}}\)</td><td class="num">27.858</td><td class="step">+5.231</td></tr>
+              <tr class="lit"><td>\(x^{\class{mjx-exp}{1.7}}\)</td><td class="num">34.297</td><td class="step">+6.439</td></tr>
+              <tr><td>\(x^{\class{mjx-exp}{1.8}}\)</td><td class="num">42.224</td><td class="step">+7.927</td></tr>
+              <tr class="lit"><td>\(x^{\class{mjx-exp}{1.9}}\)</td><td class="num">51.984</td><td class="step">+9.760</td></tr>
+              <tr><td>\(x^{\class{mjx-exp}{2}}\)</td><td class="num">64</td><td class="step">+12.016</td></tr>
+            </tbody>
+          </table>
+          <div>
+            <p>If <span class="nw">\(x=8\):</span></p>
+            <p>When we are moving from <span class="nw">\(x^{\class{mjx-exp}{1}} \to x^{\class{mjx-exp}{2}}\),</span> we are moving from <span class="nw">\(8 \to 64\).</span></p>
+            <p>But how does this change occur along the journey?</p>
+            <p>The change occurs at a constant ratio.</p>
+            <p>It changes <strong>multiplicatively</strong>.</p>
+          </div>
+        </div>
+        <p>The difference between <span class="nw">\(x^{\class{mjx-exp}{1.2}} \to x^{\class{mjx-exp}{1.4}}\):</span></p>
+        <div class="math">\[18.379 - 12.126 = \boxed{6.253}\]</div>
+        <p>While the difference between \(x^{\class{mjx-exp}{1.7}}\) and <span class="nw">\(x^{\class{mjx-exp}{1.9}}\):</span></p>
+        <div class="math">\[51.984 - 34.297 = \boxed{17.687}\]</div>
+        <p>Although the exponent increases by exactly \(0.2\) in both cases, the absolute increase in the output is much larger in the second case.</p>
+        <p>However, the ratio between the two is identical:</p>
+        <div class="math">\[\frac{18.379}{12.126} \approx 1.5157\]</div>
+        <div class="math">\[\frac{51.984}{34.297} \approx 1.5157\]</div>
+      </section>
+
+      <section aria-labelledby="halfway">
+        <h2 id="halfway">The Halfway Point of an Additive Versus a Multiplicative Journey</h2>
+        <p>Looking at the value of the halfway point (in terms of steps) highlights the difference in how these processes grow.</p>
+        <p>Additive growth: <span class="nw">\(8 \to 16\).</span></p>
+        <p>The halfway point was \(1.5x\) with a value of <span class="nw">\(12\).</span></p>
+        <p>\(12\) is halfway between \(8\) and <span class="nw">\(16\).</span></p>
+        <p>Multiplicative growth: <span class="nw">\(8 \to 64\).</span></p>
+        <p>The halfway point was \(x^{\class{mjx-exp}{1.5}}\) with a value of approximately <span class="nw">\(22.627\).</span></p>
+        <p><strong>So when we are halfway in terms of multiplicative steps, we are not halfway in terms of value.</strong></p>
+        <p>However, look at how much we have multiplied \(8\) by to reach <span class="nw">\(22.627\):</span></p>
+        <div class="math">\[\frac{22.627}{8} \approx \boxed{2.828}\]</div>
+        <p>What happens if we multiply \(22.627\) by the same thing we multiplied \(8\) by?</p>
+        <div class="math">\[22.627 \times 2.828 \approx 63.99\]</div>
+        <p>(If our factors were more precisely approximated this would be <span class="nw">\(64\).)</span></p>
+        <p><strong>So in terms of multiplicative steps, we are in fact halfway to \(64\) when we are at <span class="nw">\(22.627\)!</span></strong></p>
+        <p>The arithmetic midpoint divides the difference into two equal parts.</p>
+        <p>The geometric midpoint divides the ratio into two equal factors.</p>
+      </section>
+
+      <section aria-labelledby="square-root">
+        <h2 id="square-root">Divided into Two Equal Factors? That Sounds Like a Square Root…</h2>
+        <p>Taking roots finds the value that, multiplied by itself a given number of times, produces the target number.</p>
+        <p>The second root of \(9\) is the number that multiplied by itself twice gives <span class="nw">\(9\).</span></p>
+        <p>\(3\) is the geometric midpoint between \(1\) and <span class="nw">\(9\).</span></p>
+        <p>Raising \(9\) to the power \(0.5\) (or as we would typically write it, <span class="nw">\(9^{\class{mjx-exp}{\frac{1}{2}}}\))</span> therefore gives the square root of the number.</p>
+        <p>A fractional exponent with \(1\) in the numerator is asking for the number that, when multiplied by itself the number of times specified in the denominator, gives the base.</p>
+        <p>We are dividing the multiplicative change into smaller, equal multiplicative steps.</p>
+        <ul>
+          <li>\(x^{\class{mjx-exp}{\frac{1}{2}}}\) finds the square root.</li>
+          <li>\(x^{\class{mjx-exp}{\frac{1}{3}}}\) finds the cube root.</li>
+          <li>\(x^{\class{mjx-exp}{\frac{1}{8}}}\) finds the value that, when multiplied by itself \(8\) times, gives <span class="nw">\(x\).</span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="power-power">
+        <h2 id="power-power">This All Follows from the Power of a Power Rule</h2>
+        <p>The <a class="inline" href="exponentials-the-many-rules-of-exponentiation.html#power-power">power of a power rule</a> can further help illustrate why fractional exponents work the way they do.</p>
+        <p>Remember:</p>
         <div class="math">\[(a^{\class{mjx-exp}{m}})^{\class{mjx-exp}{n}}=a^{\class{mjx-exp}{mn}}\]</div>
         <p>Imagine:</p>
         <div class="math">\[16^{\frac{1}{2}}\]</div>
@@ -44,32 +149,67 @@
         <div class="math">\[\frac{1}{2} \cdot 2 = 1\]</div>
         <p>So the term equals <span class="nw">\(16\):</span></p>
         <div class="math">\[(16^{\frac{1}{2}})^2 = 16\]</div>
-        <p>That means that whatever the value of \(16^{\frac{1}{2}}\) is, when it is squared, it must equal <span class="nw">\(16\).</span></p>
-        <p>It therefore must be the square root of \(16\), i.e. <span class="nw">\(4\).</span></p>
-        <p>Generally, raising a number to the power of \(\frac{1}{2}\) is equivalent to taking its principal square root.</p>
-        <div class="math">\[\boxed{a^{\frac{1}{2}} = \sqrt{a}}\]</div>
+        <p><strong>That means that whatever the value of \(16^{\frac{1}{2}}\) is, when it is squared, it must equal <span class="nw">\(16\).</span></strong> So it must be <span class="nw">\(\sqrt{16}=4\).</span></p>
       </section>
 
-      <section aria-label="Adding and multiplying">
-        <p>The deeper thing to realise is what it means to say that exponentiation is multiplicative.</p>
-        <p>Think about getting from \(1\) to \(100\) in equal steps. (We start at \(1\) rather than <span class="nw">\(0\):</span> multiplying \(0\) by anything leaves <span class="nw">\(0\).)</span></p>
-        <p>If the steps are additive, each step adds the same amount. Four steps of \(+24.75\) land on <span class="nw">\(25.75\),</span> <span class="nw">\(50.5\),</span> \(75.25\) and <span class="nw">\(100\).</span> They are evenly spaced.</p>
-        <p>If the steps are multiplicative, each step multiplies by the same factor. Four steps of \(\times\sqrt{10}\) (about <span class="nw">\(3.16\))</span> land on about <span class="nw">\(3.16\),</span> <span class="nw">\(10\),</span> \(31.6\) and <span class="nw">\(100\).</span> The steps are equal, but each one covers more distance than the step before.</p>
-        <iframe class="expo-widget" src="exponentials/fractional-exponents/walk-widget.html" title="Interactive: take four equal steps from 1 to 100 two ways at once. Adding 24.75 each step, the footprints are evenly spaced. Multiplying by about 3.16 each step, they bunch up near 1 and the last step is the longest. Halfway, adding has reached 50.5 and multiplying only 10" style="height: 198px" scrolling="no" loading="lazy"></iframe>
-        <p>Halfway through the steps, adding has reached <span class="nw">\(50.5\).</span> Multiplying has reached only <span class="nw">\(10\).</span></p>
-        <p>An exponent counts multiplicative steps.</p>
-        <p>\(100^0=1\) is the start, with no steps taken. \(100^1=100\) is one whole step: <span class="nw">\(\times100\).</span></p>
-        <p>So \(100^{\frac{1}{2}}\) is half of that step: a factor that, taken twice, makes <span class="nw">\(\times100\).</span> By the product rule:</p>
-        <div class="math">\[100^{\frac{1}{2}}\times100^{\frac{1}{2}}=100^{\frac{1}{2}+\frac{1}{2}}=100^1=100\]</div>
-        <p>That factor is <span class="nw">\(10\),</span> the square root of <span class="nw">\(100\).</span></p>
-        <iframe class="expo-widget" src="exponentials/fractional-exponents/exponent-widget.html" title="Interactive: slide the exponent x evenly from 0 to 1; below, 100 to the power x moves along a number line from 1 to 100. Equal quarters of the exponent land on 1, 3.16, 10, 31.6 and 100, so halfway, x = 1/2, lands on 10" style="height: 206px" scrolling="no" loading="lazy"></iframe>
-        <p>As the exponent moves evenly from \(0\) to <span class="nw">\(1\),</span> the value does not. It creeps up to \(10\) by the halfway point, then covers the remaining \(90\) in the second half.</p>
-        <p>An exponent of \(\frac{1}{2}\) means halfway in steps, not halfway in distance.</p>
+      <section aria-labelledby="unit-fraction">
+        <h2 id="unit-fraction">The Unit Fraction Exponent</h2>
+        <p>Let's now formalise what we have conceptually covered.</p>
+        <p>When we raise a number to a unit fraction, we are looking for the number that, when multiplied by itself the number of times denoted by the denominator, gives the base.</p>
+        <p>This is exactly the same as taking the root of the number, with the denominator as the index in radical notation.</p>
+        <div class="math">\[\boxed{a^{\class{mjx-exp}{1/n}} = \sqrt[n]{a}}\]</div>
+        <p>But what about when we have a numerator that is not <span class="nw">\(1\)?</span></p>
+      </section>
+
+      <section aria-labelledby="rational">
+        <h2 id="rational">The Rational Exponent Rule</h2>
+        <div class="math">\[\boxed{a^{\class{mjx-exp}{\frac{m}{n}}}=(\sqrt[n]{a})^{\class{mjx-exp}{m}}}\]</div>
+        <p>Consider:</p>
+        <div class="math">\[16^{\class{mjx-exp}{\frac{3}{4}}}\]</div>
+        <p>The denominator tells us how many multiplicative steps to divide the journey from \(1\) to \(16\) into.</p>
+        <p>In this case:</p>
+        <ul>
+          <li>The journey is from <span class="nw">\(1 \to 16\).</span></li>
+          <li>There are \(4\) multiplicative steps to be taken: <span class="nw">\(x \cdot x \cdot x \cdot x = 16\).</span></li>
+        </ul>
+        <p>If the numerator was \(1\), then we would just be looking for the fourth root of <span class="nw">\(16\):</span></p>
+        <div class="math">\[x^4 = 16\]</div>
+        <div class="math">\[x = \sqrt[4]{16}\]</div>
+        <div class="math">\[x = 2\]</div>
+        <p>The resulting value is the ratio by which we must multiply to reach \(16\) in four steps from <span class="nw">\(1\).</span></p>
+        <p>The numerator indicates how many of these steps to take.</p>
+        <p>If the exponent was <span class="nw">\(\frac{4}{4}\),</span> then we would be taking four of these multiplicative steps and would reach <span class="nw">\(16\).</span></p>
+        <p>This makes sense, as <span class="nw">\(\frac{4}{4} = 1\):</span></p>
+        <div class="math">\[16^{\class{mjx-exp}{1}}=16\]</div>
+        <p>When the numerator is <span class="nw">\(1\),</span> we are taking only one multiplicative step.</p>
+        <p>The first step multiplies \(1\) by the common ratio, so it will always just equal the common ratio.</p>
+        <div class="math">\[16^{\class{mjx-exp}{\frac{1}{4}}} = 2\]</div>
+        <p>When the numerator is <span class="nw">\(3\),</span> it means we must take three multiplicative steps.</p>
+        <p>That's <span class="nw">\(1 \cdot 2 \cdot 2 \cdot 2 = 8\).</span></p>
+        <p>We can express this by finding the common ratio first, and then raising it to the exponent that counts how many times we multiply by it.</p>
+        <p>So, to find the common ratio:</p>
+        <div class="math">\[\sqrt[4]{16}=2\]</div>
+        <p>To multiply by the common ratio three times:</p>
+        <div class="math">\[(\sqrt[4]{16})^{\class{mjx-exp}{3}}\]</div>
+        <p>This gives:</p>
+        <div class="math">\[2 \cdot 2 \cdot 2 = 8\]</div>
+        <p><strong>The denominator determines the common ratio of the steps.</strong></p>
+        <p><strong>The numerator determines how many of those steps we take.</strong></p>
+        <div class="math">\[\boxed{a^{\class{mjx-exp}{\frac{m}{n}}}=(\sqrt[n]{a})^{\class{mjx-exp}{m}}}\]</div>
+        <p>What if the numerator is greater than the denominator?</p>
+        <p>Consider:</p>
+        <div class="math">\[16^{\class{mjx-exp}{\frac{5}{4}}}\]</div>
+        <p>We still divide the multiplicative journey into fourth-root steps, each with a ratio of <span class="nw">\(2\).</span></p>
+        <p>But now we take five steps rather than four:</p>
+        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32\]</div>
+        <p>Therefore:</p>
+        <div class="math">\[16^{\class{mjx-exp}{\frac{5}{4}}} = 32\]</div>
+        <p>This demonstrates something important: fractional exponents do not necessarily produce smaller values. They specify a number of multiplicative steps, which may be fewer or greater than the number needed to reach the base.</p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
-        <a href="exponentials-exponentiation-and-radication.html">← A Deeper Understanding of Exponentiation and Radication</a>
-        <a href="exponentials-irrational-exponents.html">Next: Irrational Exponents →</a>
+        <a href="exponentials-the-many-rules-of-exponentiation.html">← The Laws of Exponents</a>
+        <a href="exponentials-exponentiation-and-radication.html">Next: A Deeper Understanding of Exponentiation and Radication →</a>
       </nav>
     </main>
   </div>

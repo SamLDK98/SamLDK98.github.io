@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A coefficient grows by equal differences</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="c" type="range" min="10" max="20" step="1" value="14" aria-label="The coefficient, from 1 to 2 in steps of 0.1" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // x = 8. The coefficient runs from 1 to 2 in steps of 0.1, so the value runs from 8 to 16.
+  // Every step is one hop of +0.8 on an ordinary number line: equal steps, equal distances.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("c");
+  const INK = "#f4f6ff";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) {
+      if (attrs[k] === null || attrs[k] === undefined) continue;
+      if (k === "font-size") e.style.fontSize = attrs[k] + "px"; else e.setAttribute(k, attrs[k]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const val = k => (8 * k / 10).toFixed(1).replace(/\.0$/, "");   // k = 10 × coefficient, kept whole
+  const coef = k => (k / 10).toFixed(1).replace(/\.0$/, "") + "x";
+
+  function render() {
+    const n = +slider.value;
+    const W = svg.clientWidth || 560, H = 112, AX = 62;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const L = 16, R = W - 16;
+    const px = k => L + (k - 10) / 10 * (R - L);
+    const every = (R - L) / 10 < 40 ? 2 : 1;   // on a narrow screen, label every other stop
+
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.2 });
+    for (let k = 10; k <= 20; k++) {
+      const on = k <= n;
+      el("line", { x1: px(k), x2: px(k), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.25 });
+      if ((k - 10) % every === 0 || k === n) {
+        el("text", { x: px(k), y: AX + 20, "text-anchor": "middle", class: k === n ? "ink" : "", "fill-opacity": on || k === n ? null : 0.5 }, val(k));
+      }
+    }
+
+    // a hop of +0.8 for every step taken so far
+    for (let k = 10; k < n; k++) {
+      const a = px(k), b = px(k + 1), lift = Math.min(14, (b - a) * 0.35), y0 = AX - 6;
+      el("path", { d: `M${a.toFixed(1)} ${y0} Q${((a + b) / 2).toFixed(1)} ${y0 - 2 * lift} ${b.toFixed(1)} ${y0}`, fill: "none", stroke: INK, "stroke-opacity": k === n - 1 ? 0.75 : 0.35, "stroke-width": 1.2 });
+    }
+    if (n > 10) el("text", { x: (px(n - 1) + px(n)) / 2, y: AX - 26, "text-anchor": "middle", class: "ink" }, "+0.8");
+
+    el("circle", { cx: px(10), cy: AX, r: 3.5, fill: INK, "fill-opacity": 0.6 });
+    el("circle", { cx: px(n), cy: AX, r: 4.5, fill: INK });
+
+    // the readout
+    const t = el("text", { x: W / 2, y: H - 4, "text-anchor": "middle", "font-size": 13 });
+    el("tspan", { fill: INK }, coef(n) + " = " + val(n), t);
+    el("tspan", { fill: INK, "fill-opacity": 0.5 }, `   ${n - 10} step${n - 10 === 1 ? "" : "s"} of +0.8 from 8`, t);
+
+    svg.setAttribute("aria-label", `With x = 8, ${coef(n)} = ${val(n)}: ${n - 10} equal steps of 0.8 from 8.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

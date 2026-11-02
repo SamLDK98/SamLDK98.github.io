@@ -1,0 +1,29 @@
+/* The quiz uses the lesson's type, colours and open layout. */
+.laws-quiz { margin-top: 3rem; padding-top: 0.5rem; border-top: 1px solid var(--faint); }
+.laws-quiz .quiz-intro { color: var(--dim); font-size: 1.05rem; }
+.quiz-progress { margin: 1.8rem 0 1rem; color: var(--dim); font: 0.7rem "IBM Plex Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+.quiz-form fieldset { border: 0; min-width: 0; }
+.quiz-form legend { width: 100%; font-size: 1.22rem; line-height: 1.6; }
+.quiz-options { display: grid; gap: 0.6rem; margin: 1.4rem 0; }
+.quiz-option { display: flex; align-items: baseline; gap: 0.8rem; padding: 0.8rem 1rem; border: 1px solid var(--faint); cursor: pointer; font-size: 1.1rem; line-height: 1.6; overflow-wrap: anywhere; }
+.quiz-option input { flex: 0 0 auto; accent-color: var(--base); }
+.quiz-option span { min-width: 0; }
+.quiz-option:hover, .quiz-option:focus-within { border-color: var(--base); }
+.quiz-option:has(input:checked) { background: rgba(232, 163, 61, 0.06); border-color: var(--base); }
+.quiz-option.is-correct { border-color: var(--exp); }
+.quiz-option.is-correct::after { content: "✓"; color: var(--exp); margin-left: auto; }
+.quiz-option.is-incorrect::after { content: "×"; color: var(--base); margin-left: auto; }
+.quiz-option:has(input:disabled) { cursor: default; }
+.quiz-action { display: inline-block; border: 1px solid var(--faint); background: transparent; color: var(--ink); padding: 0.7rem 1rem; font: 0.78rem "IBM Plex Mono", monospace; cursor: pointer; min-height: 44px; }
+.quiz-action:hover { border-color: var(--base); }
+.quiz-action:focus-visible, .quiz-review summary:focus-visible { outline: 2px solid var(--exp); outline-offset: 4px; }
+.laws-quiz [hidden] { display: none !important; }
+.quiz-feedback { margin: 1.2rem 0; padding-left: 1rem; border-left: 1px solid var(--exp); }
+.quiz-feedback p, .quiz-review p { font-size: 1.05rem; }
+.quiz-result { font-size: 2.6rem; margin: 0 0 0.8rem; }
+.quiz-review { border-bottom: 1px solid var(--hair); padding: 1rem 0; }
+.quiz-review summary { cursor: pointer; color: var(--body); font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; }
+.quiz-review p { margin-top: 0.8rem; }
+.quiz-review a { display: inline-block; margin-top: 0.8rem; }
+.quiz-restart { margin-top: 1.5rem; }
+.quiz-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

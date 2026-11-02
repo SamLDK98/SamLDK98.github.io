@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Four copies, one constant ratio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../widget-base.css" />
+  <link rel="stylesheet" href="square-ratio-widget.css" />
+  <script defer src="square-ratio-widget.js"></script>
+</head>
+<body>
+  <div class="widget">
+    <div class="reading"><span id="step">Step 0 / 4</span><span>Area <strong id="area">1</strong> · side <strong id="side">1</strong></span></div>
+    <svg id="square-scene" viewBox="0 0 360 304" role="img" aria-labelledby="scene-title scene-desc">
+      <title id="scene-title">A square growing by four copies at each step</title>
+      <desc id="scene-desc">The initial square has side length 1 and area 1.</desc>
+      <g id="frame" aria-hidden="true">
+        <rect id="frame-outline" />
+        <path id="frame-cross" />
+      </g>
+      <rect id="square" class="square" />
+      <g id="copies" aria-hidden="true">
+        <rect class="square copy" />
+        <rect class="square copy" />
+        <rect class="square copy" />
+      </g>
+      <text id="side-label" text-anchor="middle"></text>
+    </svg>
+    <ol class="journey" aria-label="Areas at each step"></ol>
+    <p class="explanation" id="explanation" role="status" aria-live="polite" aria-atomic="true">Start with one square of area 1.</p>
+    <p class="comparison" id="comparison">Every square uses the same scale.</p>
+    <div class="controls" aria-label="Square animation controls">
+      <button id="back" type="button" disabled>Back</button>
+      <button id="next" type="button">Make four copies →</button>
+      <button id="reset" type="button">Reset</button>
+    </div>
+    <noscript><p>Enable JavaScript to explore the squares. The areas grow as 1 → 4 → 16 → 64 → 256. Each side doubles, so each area is four times the previous area.</p></noscript>
+  </div>
+  <script src="../widget-base.js"></script>
+</body>
+</html>

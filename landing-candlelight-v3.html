@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Explanations | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #070504;
+      --ink: rgba(255, 240, 220, 0.94);
+      --dim: rgba(255, 226, 190, 0.46);
+      --glow: 255, 140, 50;
+      --lx: 50vw; --ly: 50vh;            /* only used by the no-WebGL fallback */
+    }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "EB Garamond", Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    canvas#desk, canvas#flat, .ember-field, .veil {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      display: block; pointer-events: none; z-index: 0;
+    }
+    canvas#flat { display: none; }
+    body.nogl canvas#desk { display: none; }
+    body.nogl canvas#flat {
+      display: block; opacity: 0.85;
+      -webkit-mask-image: radial-gradient(circle 38vmax at var(--lx) var(--ly), #000 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.06) 100%);
+      mask-image: radial-gradient(circle 38vmax at var(--lx) var(--ly), #000 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.06) 100%);
+    }
+
+    /* a little shade behind the words, so they stay readable wherever the candle is */
+    .veil {
+      background: radial-gradient(ellipse 44vmax 52vmax at 14% 50%, rgba(0,0,0,0.5), transparent 70%);
+    }
+    @media (max-aspect-ratio: 1/1) {
+      .veil { background: radial-gradient(ellipse 80vw 30vh at 30% 50%, rgba(0,0,0,0.55), transparent 75%); }
+    }
+
+    .ember-field { overflow: hidden; mix-blend-mode: screen; z-index: 1; }
+    .ember {
+      position: absolute; left: 0; top: 0;
+      width: var(--size, 2px); height: var(--size, 2px);
+      border-radius: 50%;
+      background: rgba(255, 190, 100, 0.85);
+      box-shadow: 0 0 6px rgba(255, 140, 40, 0.7);
+      opacity: 0;
+      transform: translate3d(var(--x), var(--y), 0);
+      animation: drift var(--life, 1.4s) ease-out forwards;
+    }
+    @keyframes drift {
+      0%   { opacity: 0; transform: translate3d(var(--x), var(--y), 0) scale(1); }
+      12%  { opacity: var(--alpha, 0.7); }
+      100% { opacity: 0; transform: translate3d(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy)), 0) scale(0.4); }
+    }
+
+    main {
+      position: relative; z-index: 2;
+      min-height: 100svh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: clamp(1.5rem, 6vh, 4rem) clamp(1.5rem, 7vw, 7rem);
+      max-width: 34rem;
+    }
+    h1 {
+      font-weight: 400;
+      font-size: clamp(2.4rem, 5.4vw, 4.4rem);
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.85), 0 0 40px rgba(var(--glow), 0.18);
+    }
+    .sub {
+      font-family: "Caveat", cursive;
+      font-size: clamp(1.15rem, 2vw, 1.5rem);
+      color: rgba(255, 205, 140, 0.62);
+      margin-top: 0.7rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+    }
+    nav { margin-top: clamp(1.6rem, 5vh, 2.8rem); display: grid; gap: clamp(0.9rem, 2.6vh, 1.4rem); }
+    .group-label {
+      font-family: "Caveat", cursive;
+      font-size: 1.05rem; letter-spacing: 0.04em;
+      color: rgba(255, 190, 110, 0.55);
+      margin-bottom: 0.15rem;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+    }
+    nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0.15rem 1.3rem; }
+    nav a {
+      color: var(--dim);
+      text-decoration: none;
+      font-size: clamp(1.1rem, 1.9vw, 1.42rem);
+      line-height: 1.35;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.95);
+      transition: color 0.35s ease, text-shadow 0.35s ease;
+    }
+    nav a:hover, nav a:focus-visible {
+      outline: none;
+      color: #fff4e4;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.9), 0 0 18px rgba(var(--glow), 0.65), 0 0 46px rgba(var(--glow), 0.35);
+    }
+
+    @media (max-aspect-ratio: 1/1) {
+      main { max-width: none; padding-top: 22vh; padding-bottom: 24vh; justify-content: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ember-field { display: none; }
+      nav a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="desk" aria-hidden="true"></canvas>
+  <canvas id="flat" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
+  <div class="ember-field" id="embers" aria-hidden="true"></div>
+
+  <main>
+    <h1>Interactive Explanations</h1>
+    <p class="sub">notes carved into an old study desk</p>
+    <nav aria-label="Sections">
+      <div>
+        <p class="group-label">Mathematics</p>
+        <ul>
+          <li><a href="numbers.html">Numbers</a></li>
+          <li><a href="trigonometry.html">Trigonometry</a></li>
+          <li><a href="complex-numbers.html">Complex Numbers</a></li>
+          <li><a href="algebra.html">Algebra</a></li>
+          <li><a href="linear-algebra.html">Linear Algebra</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="group-label">Sciences</p>
+        <ul>
+          <li><a href="neurophysiology.html">Neurophysiology</a></li>
+          <li><a href="field-theories.html">Field Theories</a></li>
+          <li><a href="active-inference.html">Active Inference</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="group-label">Elsewhere</p>
+        <ul>
+          <li><a href="calendars.html">Calendars</a></li>
+          <li><a href="apps.html">Apps</a></li>
+        </ul>
+      </div>
+    </nav>
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const deskCv = document.getElementById("desk");
+  const flatCv = document.getElementById("flat");
+  const emberField = document.getElementById("embers");
+
+  const HAND = '"Caveat", cursive';
+  const MATH = '"EB Garamond", Georgia, serif';
+  const MATH_I = 'italic "EB Garamond", Georgia, serif';
+
+  /* ==================================================================
+     The carvings. Each one is drawn in its own local coordinates
+     (roughly design pixels, origin at its centre) and placed on the
+     desk by the layout below. Strokes become grooves in a height map.
+     ================================================================== */
+
+  // canvas wants the style before the size: "italic 30px Font", never "30px italic Font"
+  function fontOf(size, font) {
+    font = font || HAND;
+    return font.startsWith("italic ") ? "italic " + size + "px " + font.slice(7) : size + "px " + font;
+  }
+
+  function makePen(ctx) {
+    const pen = {
+      w: 2.6,
+      line(x1, y1, x2, y2, w) { ctx.lineWidth = w || pen.w; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); },
+      poly(pts, w) { ctx.lineWidth = w || pen.w; ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); },
+      circle(x, y, r, w) { ctx.lineWidth = w || pen.w; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke(); },
+      arc(x, y, r, a0, a1, w, ccw) { ctx.lineWidth = w || pen.w; ctx.beginPath(); ctx.arc(x, y, r, a0, a1, !!ccw); ctx.stroke(); },
+      ell(x, y, rx, ry, a0, a1, w, ccw) { ctx.lineWidth = w || pen.w; ctx.beginPath(); ctx.ellipse(x, y, Math.abs(rx), ry, 0, a0, a1, !!ccw); ctx.stroke(); },
+      path(d, w) { ctx.lineWidth = w || pen.w; ctx.stroke(new Path2D(d)); },
+      dashed(x1, y1, x2, y2, w) { ctx.setLineDash([7, 7]); pen.line(x1, y1, x2, y2, w || 1.7); ctx.setLineDash([]); },
+      arrow(x1, y1, x2, y2, w) {
+        pen.line(x1, y1, x2, y2, w);
+        const a = Math.atan2(y2 - y1, x2 - x1), h = 11;
+        pen.poly([[x2 - h * Math.cos(a - 0.42), y2 - h * Math.sin(a - 0.42)], [x2, y2], [x2 - h * Math.cos(a + 0.42), y2 - h * Math.sin(a + 0.42)]], w);
+      },
+      fn(f, x0, x1, step, w) { const pts = []; for (let x = x0; x <= x1 + 1e-6; x += step) pts.push([x, f(x)]); pen.poly(pts, w); },
+      text(s, x, y, size, font, align) {
+        ctx.font = fontOf(size, font);
+        ctx.textAlign = align || "left"; ctx.textBaseline = "alphabetic";
+        ctx.fillText(s, x, y);
+      },
+      // a run of pieces: [text, size, raise, font]; superscripts are just smaller and raised
+      rich(x, y, pieces, align) {
+        let total = 0;
+        const widths = pieces.map((p) => { ctx.font = fontOf(p[1], p[3] || MATH); return ctx.measureText(p[0]).width; });
+        total = widths.reduce((a, b) => a + b, 0);
+        let cx = align === "center" ? x - total / 2 : x;
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        pieces.forEach((p, i) => { ctx.font = fontOf(p[1], p[3] || MATH); ctx.fillText(p[0], cx, y - (p[2] || 0)); cx += widths[i]; });
+        return total;
+      },
+    };
+    return pen;
+  }
+
+  const CARVINGS = {
+    // trigonometry: the unit circle
+    unitCircle(p) {
+      const r = 112, a = 40 * Math.PI / 180, px = r * Math.cos(a), py = -r * Math.sin(a);
+      p.line(-148, 0, 148, 0, 1.8); p.line(0, 148, 0, -148, 1.8);
+      p.circle(0, 0, r);
+      p.line(0, 0, px, py);
+      p.dashed(px, py, px, 0);
+      p.arc(0, 0, 30, 0, -a, 1.8, true);
+      p.text("θ", 38, -12, 26, MATH_I);
+      p.text("cos θ", px / 2, 30, 26, MATH_I, "center");
+      p.text("sin θ", px + 10, py / 2 + 8, 26, MATH_I);
+      p.text("1", px / 2 - 22, py / 2 - 2, 24, MATH_I);
+      p.rich(0, 196, [["x", 30, 0, MATH_I], ["2", 19, 13], [" + ", 30], ["y", 30, 0, MATH_I], ["2", 19, 13], [" = 1", 30]], "center");
+    },
+
+    // trigonometry: a sine wave over two periods
+    sineWave(p) {
+      const L = 180;                      // one period, 2π
+      p.line(-190, 0, 200, 0, 1.8); p.line(-180, 70, -180, -80, 1.8);
+      p.fn((x) => -55 * Math.sin((x + 180) / L * 2 * Math.PI), -180, 180, 3);
+      [["π", -90], ["2π", 0], ["3π", 90], ["4π", 180]].forEach(([t, x]) => { p.line(x, -5, x, 5, 1.6); p.text(t, x, 28, 22, MATH_I, "center"); });
+      p.rich(30, -86, [["y = sin ", 28, 0, MATH_I], ["x", 28, 0, MATH_I]]);
+    },
+
+    // complex numbers: Euler's identity
+    euler(p) {
+      p.rich(0, 0, [["e", 58, 0, MATH_I], ["iπ", 34, 26, MATH_I], [" + 1 = 0", 58]], "center");
+      p.line(-150, 22, 150, 26, 1.5);
+    },
+
+    // complex numbers: polar form on the complex plane
+    complexPlane(p) {
+      p.arrow(-120, 0, 140, 0, 1.8); p.arrow(0, 110, 0, -130, 1.8);
+      p.text("Re", 146, 8, 22, HAND); p.text("Im", 8, -132, 22, HAND);
+      const zx = 96, zy = -78;
+      p.arrow(0, 0, zx, zy);
+      p.circle(zx, zy, 3.5, 3);
+      p.dashed(zx, zy, zx, 0); p.dashed(zx, zy, 0, zy);
+      p.arc(0, 0, 28, 0, Math.atan2(zy, zx), 1.8, true);
+      p.text("θ", 34, -10, 24, MATH_I);
+      p.text("r", zx / 2 - 18, zy / 2 - 6, 26, MATH_I);
+      p.rich(zx + 10, zy - 14, [["z = r", 30, 0, MATH_I], ["e", 30, 0, MATH_I], ["iθ", 20, 13, MATH_I]]);
+      // a spiral of powers of a complex number, fading inward
+      const pts = []; for (let t = 0; t < 9.4; t += 0.08) { const rr = 74 * Math.exp(-0.17 * t); pts.push([-60 + rr * Math.cos(-t), 66 + rr * Math.sin(-t) * 0.9]); }
+      p.poly(pts, 1.5);
+    },
+
+    // linear algebra: two vectors, the parallelogram they span, the determinant
+    matrix(p) {
+      const u = [128, -26], v = [42, -104];
+      p.arrow(0, 0, u[0], u[1]); p.arrow(0, 0, v[0], v[1]);
+      p.dashed(u[0], u[1], u[0] + v[0], u[1] + v[1]); p.dashed(v[0], v[1], u[0] + v[0], u[1] + v[1]);
+      p.text("u", u[0] + 8, u[1] + 22, 28, MATH_I); p.text("v", v[0] - 22, v[1] + 4, 28, MATH_I);
+      p.text("area", 70, -58, 20, HAND, "center");
+      // the matrix, with hand-cut brackets
+      const bx = -150, by = 46;
+      p.path(`M${bx + 10},${by - 34} h-10 v84 h10`, 2.2);
+      p.path(`M${bx + 84},${by - 34} h10 v84 h-10`, 2.2);
+      p.text("a", bx + 24, by - 4, 30, MATH_I, "center"); p.text("b", bx + 68, by - 4, 30, MATH_I, "center");
+      p.text("c", bx + 24, by + 38, 30, MATH_I, "center"); p.text("d", bx + 68, by + 38, 30, MATH_I, "center");
+      p.text("det = ad − bc", -30, 72, 32, MATH_I, "left");
+    },
+
+    // algebra: the quadratic formula, and a parabola cutting the axis at its roots
+    quadratic(p) {
+      p.text("x =", -168, 10, 36, MATH_I, "right");
+      const w = p.rich(-150, -10, [["−b ± ", 34, 0, MATH], ["", 34]]);
+      // the radical, cut as a single stroke over b² − 4ac
+      const rx = -150 + w;
+      const after = p.rich(rx + 26, -10, [["b", 34, 0, MATH_I], ["2", 22, 14], [" − 4", 34], ["ac", 34, 0, MATH_I]]);
+      p.poly([[rx + 2, -24], [rx + 9, -20], [rx + 17, -2], [rx + 24, -46], [rx + 30 + after, -46]], 2.0);
+      p.line(-156, 2, rx + 34 + after, 2, 2.2);
+      p.text("2a", (-156 + rx + 34 + after) / 2, 42, 34, MATH_I, "center");
+      // parabola
+      const ox = 150, oy = 0;
+      p.line(ox - 70, oy, ox + 90, oy, 1.6);
+      p.fn((x) => oy + 0.012 * (x - ox - 10) * (x - ox - 10) - 42, ox - 60, ox + 80, 3, 2.2);
+      [ox + 10 - 59.2, ox + 10 + 59.2].forEach((x) => p.circle(x, oy, 3.2, 2.4));
+    },
+
+    // neurophysiology: an action potential
+    spike(p) {
+      p.line(-150, 0, 170, 0, 1.6);
+      p.line(-150, 40, -150, -170, 1.6);
+      p.poly([[-150, 0], [-80, 0], [-62, -12], [-52, -40], [-40, -150], [-32, -158], [-22, -130], [-6, -30], [6, 14], [24, 22], [56, 12], [100, 3], [170, 0]], 2.6);
+      p.dashed(-150, -24, -60, -24, 1.4);
+      p.text("−70 mV", -160, 6, 22, MATH, "right");
+      p.text("threshold", -146, -32, 19, HAND);
+      p.text("t", 176, 20, 24, MATH_I);
+    },
+
+    // numbers: tallies, struck through in fives
+    tally(p) {
+      for (let g = 0; g < 3; g += 1) {
+        const x0 = g * 74;
+        for (let i = 0; i < 4; i += 1) p.line(x0 + i * 13, -34 + (i % 2), x0 + i * 13 + 2, 34, 2.6);
+        p.line(x0 - 8, 24, x0 + 50, -26, 2.6);
+      }
+      p.line(222, -34, 224, 34, 2.6); p.line(235, -33, 237, 34, 2.6);
+      p.text("17", 268, 12, 32, HAND);
+    },
+
+    // numbers: place value
+    placeValue(p) {
+      p.rich(0, 0, [["352 = 3·10", 40], ["2", 25, 17], [" + 5·10", 40], ["1", 25, 17], [" + 2·10", 40], ["0", 25, 17]], "center");
+    },
+
+    // calendars: the phases of the moon
+    moon(p) {
+      const phases = [-1, -0.5, 0, 0.5, 1];       // terminator bulge as a fraction of the radius
+      phases.forEach((k, i) => {
+        const x = -150 + i * 75, r = 24;
+        p.circle(x, 0, r, 2.2);
+        if (i === 0) { // new moon: hatch it
+          for (let h = -16; h <= 16; h += 8) p.line(x + h - 6, 10 + Math.abs(h) * 0.2, x + h + 6, -10 - Math.abs(h) * 0.2, 1.3);
+        } else if (i < 4) p.ell(x, 0, r * Math.abs(k) + 0.01, r, -Math.PI / 2, Math.PI / 2, 1.8, k < 0);
+      });
+      p.text("29.5 days", 0, 58, 26, HAND, "center");
+    },
+
+    // field theories: field lines between two charges, and Gauss's law
+    field(p) {
+      const a = -80, b = 80;
+      p.circle(a, 0, 16, 2.2); p.circle(b, 0, 16, 2.2);
+      p.line(a - 8, 0, a + 8, 0, 2.2); p.line(a, -8, a, 8, 2.2);
+      p.line(b - 8, 0, b + 8, 0, 2.2);
+      [-1, -0.55, -0.22, 0.22, 0.55, 1].forEach((k) => {
+        const h = 92 * k;
+        p.path(`M${a + 14},${-6 * Math.sign(k)} C${a + 40},${h} ${b - 40},${h} ${b - 14},${-6 * Math.sign(k)}`, 1.6);
+      });
+      p.line(a + 16, 0, b - 16, 0, 1.6);
+      p.rich(0, 138, [["∇·", 34, 0, MATH], ["E", 34, 0, MATH_I], [" = ", 34], ["ρ", 34, 0, MATH_I], [" / ", 34], ["ε", 34, 0, MATH_I], ["0", 21, -7]], "center");
+    },
+
+    // geometry: Pythagoras
+    pythagoras(p) {
+      p.poly([[-80, 50], [80, 50], [-80, -70], [-80, 50]]);
+      p.poly([[-80, 32], [-62, 32], [-62, 50]], 1.6);
+      p.text("a", -100, -4, 28, MATH_I); p.text("b", 0, 80, 28, MATH_I, "center"); p.text("c", 12, -18, 28, MATH_I);
+      p.rich(0, 132, [["a", 32, 0, MATH_I], ["2", 20, 13], [" + ", 32], ["b", 32, 0, MATH_I], ["2", 20, 13], [" = ", 32], ["c", 32, 0, MATH_I], ["2", 20, 13]], "center");
+    },
+
+    // statistical mechanics
+    entropy(p) { p.rich(0, 0, [["S = k ", 38, 0, MATH_I], ["log ", 38], ["W", 38, 0, MATH_I]], "center"); },
+
+    // a compass construction someone left half-finished
+    compass(p) {
+      p.circle(-40, 0, 70, 1.5); p.circle(40, 0, 70, 1.5);
+      p.line(0, -82, 0, 82, 1.8); p.line(-40, 0, 40, 0, 1.8);
+      p.circle(-40, 0, 2.5, 2.5); p.circle(40, 0, 2.5, 2.5);
+    },
+  };
+
+  /* Where each carving sits: [u, v] as a fraction of the screen, a turn in
+     degrees, and a size. Landscape and portrait get separate layouts; on a
+     phone most of the desk is out of frame, so fewer carvings, placed in the
+     bands above and below the words. */
+  const LAYOUT = {
+    land: [
+      ["placeValue",   0.21, 0.065, -1, 0.8],
+      ["euler",        0.52, 0.09, -2, 0.95],
+      ["sineWave",     0.81, 0.13, -1, 1.0],
+      ["unitCircle",   0.54, 0.43,  3, 1.0],
+      ["complexPlane", 0.83, 0.45, -3, 1.0],
+      ["field",        0.44, 0.77,  2, 0.95],
+      ["matrix",       0.68, 0.79,  2, 0.95],
+      ["spike",        0.91, 0.80,  0, 0.8],
+      ["quadratic",    0.22, 0.90, -2, 0.85],
+      ["tally",        0.60, 0.955, -3, 0.7],
+      ["moon",         0.84, 0.955, 1, 0.7],
+    ],
+    port: [
+      ["euler",        0.30, 0.055, -3, 0.85],
+      ["unitCircle",   0.76, 0.13,  4, 0.75],
+      ["tally",        0.22, 0.155, -5, 0.7],
+      ["matrix",       0.62, 0.865, 2, 0.8],
+      ["moon",         0.42, 0.965, 1, 0.65],
+    ],
+  };
+
+  /* ==================================================================
+     Height map: draw every carving crisp, then soften it so each cut has
+     a V-shaped profile. Brighter = deeper.
+     ================================================================== */
+
+  let W = 0, H = 0, DPR = 1, S = 1;     // CSS size, pixel ratio, layout scale
+
+  function measure() {
+    W = innerWidth; H = innerHeight;
+    DPR = Math.min(1.5, window.devicePixelRatio || 1);
+    const portrait = H > W;
+    S = portrait ? Math.min(W / 560, H / 1150) : Math.min(W / 1400, H / 900);
+    return portrait;
+  }
+
+  function drawCarvings(ctx, portrait, colour) {
+    ctx.save();
+    ctx.scale(DPR, DPR);
+    ctx.strokeStyle = colour; ctx.fillStyle = colour;
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    const pen = makePen(ctx);
+    for (const [name, u, v, rot, size] of LAYOUT[portrait ? "port" : "land"]) {
+      if (!size) continue;
+      ctx.save();
+      ctx.translate(u * W, v * H);
+      ctx.rotate(rot * Math.PI / 180);
+      ctx.scale(S * size, S * size);
+      CARVINGS[name](pen);
+      ctx.restore();
+    }
+    // stray knife scratches: the desk has been used
+    let seed = 7;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    ctx.globalAlpha = 0.35;
+    for (let i = 0; i < 26; i += 1) {
+      const x = rnd() * W, y = rnd() * H, a = (rnd() - 0.5) * 0.7, l = 20 + rnd() * 70;
+      ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function buildHeight(portrait, maxTex) {
+    let pw = Math.round(W * DPR), ph = Math.round(H * DPR);
+    const k = Math.min(1, maxTex / Math.max(pw, ph));
+    if (k < 1) { DPR *= k; pw = Math.round(W * DPR); ph = Math.round(H * DPR); }
+    const crisp = document.createElement("canvas");
+    crisp.width = pw; crisp.height = ph;
+    const c = crisp.getContext("2d");
+    c.fillStyle = "#000"; c.fillRect(0, 0, pw, ph);
+    drawCarvings(c, portrait, "#fff");
+
+    const soft = document.createElement("canvas");
+    soft.width = pw; soft.height = ph;
+    const s = soft.getContext("2d");
+    s.fillStyle = "#000"; s.fillRect(0, 0, pw, ph);
+    s.filter = "blur(" + (1.15 * S * DPR + 0.6).toFixed(2) + "px)";
+    s.drawImage(crisp, 0, 0);
+    s.filter = "none";
+    s.globalCompositeOperation = "lighter";
+    s.globalAlpha = 0.45;                      // a sharper floor to every cut
+    s.drawImage(crisp, 0, 0);
+    return soft;
+  }
+
+  /* ==================================================================
+     WebGL: wood is rendered once into a texture; every frame then lights
+     wood + grooves from the candle, with normals taken from the height map.
+     ================================================================== */
+
+  const VERT = "attribute vec2 a; varying vec2 v; void main(){ v = a*0.5+0.5; gl_Position = vec4(a,0.,1.); }";
+
+  const NOISE = `
+    float hash(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
+    float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
+      return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y); }
+    float fbm(vec2 p){ float s = 0., a = .5; for(int i=0;i<5;i++){ s += a*noise(p); p = p*2.03 + 17.1; a *= .5; } return s; }
+  `;
+
+  const WOOD = `
+    precision highp float;
+    uniform vec2 uRes; uniform float uScale;
+    ${NOISE}
+    void main(){
+      vec2 p = gl_FragCoord.xy / uScale;            // design units, so the grain scales with the layout
+      float plankH = 230.;
+      float id = floor(p.y / plankH);
+      float off = hash(vec2(id, 3.1)) * 400.;
+      float local = p.y - id*plankH;
+      vec2 q = vec2(p.x + off, p.y);
+      // long grain: strongly stretched along x, gently warped
+      float warp = fbm(vec2(q.x*0.0010, q.y*0.004 + id)) * 2.6;
+      float rings = fbm(vec2(q.x*0.0024, q.y*0.085 + warp));
+      float fine  = fbm(vec2(q.x*0.008, q.y*0.75 + warp*2.));
+      float pores = noise(vec2(q.x*0.09, q.y*1.6));
+      float g = smoothstep(0.25, 0.75, rings);
+      vec3 dark  = vec3(0.105, 0.058, 0.030);
+      vec3 mid   = vec3(0.215, 0.125, 0.064);
+      vec3 light = vec3(0.330, 0.205, 0.105);
+      vec3 col = mix(dark, mid, g);
+      col = mix(col, light, smoothstep(0.55, 0.85, fine) * 0.45);
+      col *= 0.86 + 0.18*pores;
+      col *= 0.9 + 0.2*hash(vec2(id, 9.7));          // each plank a slightly different board
+      // seams between planks
+      float seam = min(local, plankH - local);
+      col *= mix(0.25, 1., smoothstep(0.5, 3.5, seam));
+      // wear: a paler, smoother patch where elbows have rested
+      float wear = fbm(p*0.0022 + 4.);
+      col = mix(col, col*1.18, smoothstep(0.55, 0.75, wear) * 0.5);
+      float height = rings*0.6 + fine*0.3 + smoothstep(0.5, 3.5, seam)*0.4;
+      gl_FragColor = vec4(col, height);
+    }
+  `;
+
+  const LIGHT = `
+    precision highp float;
+    varying vec2 v;
+    uniform sampler2D uWood, uCarve;
+    uniform vec2 uRes;
+    uniform vec3 uLight;        // x, y in device pixels (y up), height above the desk
+    uniform float uR, uI, uAmb, uDepth, uTime;
+    ${NOISE}
+    void main(){
+      vec2 px = 1. / uRes;
+      float c  = texture2D(uCarve, v).r;
+      float cl = texture2D(uCarve, v - vec2(px.x, 0.)).r;
+      float cr = texture2D(uCarve, v + vec2(px.x, 0.)).r;
+      float cd = texture2D(uCarve, v - vec2(0., px.y)).r;
+      float cu = texture2D(uCarve, v + vec2(0., px.y)).r;
+      vec4 wood = texture2D(uWood, v);
+      float wl = texture2D(uWood, v - vec2(px.x, 0.)).a, wr = texture2D(uWood, v + vec2(px.x, 0.)).a;
+      float wd = texture2D(uWood, v - vec2(0., px.y)).a, wu = texture2D(uWood, v + vec2(0., px.y)).a;
+
+      // surface height = -depth of cut; normal from its slope, in pixel units
+      vec2 slope = vec2(cr - cl, cu - cd) * 0.5 * uDepth - vec2(wr - wl, wu - wd) * 0.5 * 1.4;
+      vec3 N = normalize(vec3(slope, 1.));
+
+      vec2 p = gl_FragCoord.xy;
+      vec3 toL = vec3(uLight.xy - p, uLight.z);
+      float d = length(toL.xy);
+      vec3 L = normalize(toL);
+      float diff = max(dot(N, L), 0.);
+
+      // candlelight falls off fast and has a soft edge
+      float att = 1. / (1. + pow(d / uR, 2.) * 3.4);
+      att *= 1. - smoothstep(uR * 0.7, uR * 1.9, d);
+
+      // freshly cut wood is paler and warmer than the old surface around it
+      float cut = smoothstep(0.04, 0.45, c);
+      vec3 albedo = mix(wood.rgb, vec3(0.62, 0.40, 0.19), cut * 0.75);
+      float ao = 1. - smoothstep(0.35, 1.0, c) * 0.45;   // the floor of a deep cut sees less light
+
+      vec3 lightCol = vec3(1.0, 0.63, 0.30) * uI;
+      vec3 Hh = normalize(L + vec3(0., 0., 1.));
+      float spec = pow(max(dot(N, Hh), 0.), 28.) * 0.10 * (1. - cut);   // old varnish
+
+      vec3 col = albedo * ao * (uAmb + diff * att * lightCol * 2.3) + spec * att * lightCol;
+
+      // a whisper of ambient warmth so the room is never pitch black
+      col += albedo * vec3(0.035, 0.02, 0.012) * (1. - smoothstep(0., 1.4, length(v - 0.5)));
+
+      col = 1. - exp(-col * 1.35);                         // gentle tone curve
+      col = pow(col, vec3(0.95));
+      col += (hash(p + uTime) - 0.5) / 255.;                // dither against banding
+      gl_FragColor = vec4(col, 1.);
+    }
+  `;
+
+  let gl = null, progLight = null, progWood = null, texWood = null, texCarve = null, fbo = null, quad = null;
+
+  function compile(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); throw new Error("shader"); }
+    return s;
+  }
+  function program(fs) {
+    const p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+    gl.bindAttribLocation(p, 0, "a");
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(p)); throw new Error("link"); }
+    return p;
+  }
+  function texture() {
+    const t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return t;
+  }
+
+  function initGL() {
+    try {
+      gl = deskCv.getContext("webgl", { antialias: false, premultipliedAlpha: false, preserveDrawingBuffer: false });
+      if (!gl) return false;
+      progWood = program(WOOD);
+      progLight = program(LIGHT);
+      quad = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+      texWood = texture(); texCarve = texture();
+      fbo = gl.createFramebuffer();
+      return true;
+    } catch (e) { gl = null; return false; }
+  }
+
+  function u(p, name) { return gl.getUniformLocation(p, name); }
+
+  function rebuildGL(height) {
+    const pw = height.width, ph = height.height;
+    deskCv.width = pw; deskCv.height = ph;
+    gl.viewport(0, 0, pw, ph);
+
+    // carve map
+    gl.bindTexture(gl.TEXTURE_2D, texCarve);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, height);
+
+    // wood, rendered once
+    gl.bindTexture(gl.TEXTURE_2D, texWood);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, pw, ph, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texWood, 0);
+    gl.useProgram(progWood);
+    gl.uniform2f(u(progWood, "uRes"), pw, ph);
+    gl.uniform1f(u(progWood, "uScale"), S * DPR);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    gl.useProgram(progLight);
+    gl.uniform1i(u(progLight, "uWood"), 0);
+    gl.uniform1i(u(progLight, "uCarve"), 1);
+    gl.uniform2f(u(progLight, "uRes"), pw, ph);
+    gl.uniform1f(u(progLight, "uDepth"), 5.5 * S * DPR + 2.0);
+    gl.uniform1f(u(progLight, "uAmb"), 0.02);
+  }
+
+  function renderGL(lx, ly, r, intensity, t) {
+    gl.useProgram(progLight);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texWood);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texCarve);
+    gl.uniform3f(u(progLight, "uLight"), lx * DPR, (H - ly) * DPR, r * 0.5 * DPR);
+    gl.uniform1f(u(progLight, "uR"), r * DPR);
+    gl.uniform1f(u(progLight, "uI"), intensity);
+    gl.uniform1f(u(progLight, "uTime"), t % 100);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  /* ---- no-WebGL fallback: amber line-art revealed by a CSS mask ---- */
+  function buildFlat(portrait) {
+    flatCv.width = Math.round(W * DPR); flatCv.height = Math.round(H * DPR);
+    const c = flatCv.getContext("2d");
+    c.fillStyle = "#1c1009"; c.fillRect(0, 0, flatCv.width, flatCv.height);
+    drawCarvings(c, portrait, "rgba(214, 160, 96, 0.85)");
+  }
+
+  /* ==================================================================
+     The candle
+     ================================================================== */
+
+  const hasGL = initGL();
+  if (!hasGL) document.body.classList.add("nogl");
+
+  let lightX = 0, lightY = 0, ptrX = 0, ptrY = 0;
+  let touched = false, pointerSeen = false, flare = 0, jitter = 0, pop = 0;
+  let lastX = 0, lastY = 0, lastEmber = 0, nextCrackle = 0;
+  const t0 = performance.now();
+
+  async function build() {
+    const portrait = measure();
+    try {
+      await Promise.race([
+        Promise.all([`500 40px "Caveat"`, `400 40px "EB Garamond"`, `italic 400 40px "EB Garamond"`].map((f) => document.fonts.load(f, "θπρε∇±√·−² aAx"))),
+        new Promise((r) => setTimeout(r, 2500)),
+      ]);
+    } catch (e) { /* draw with whatever is available */ }
+    if (hasGL) {
+      const maxTex = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE), 3072);
+      rebuildGL(buildHeight(portrait, maxTex));
+    } else buildFlat(portrait);
+    if (!pointerSeen) { ptrX = lightX = W * (portrait ? 0.62 : 0.66); ptrY = lightY = H * (portrait ? 0.2 : 0.4); }
+    frame(performance.now(), true);       // one frame now: never blank, even in a background tab
+  }
+
+  addEventListener("pointermove", (e) => {
+    ptrX = e.clientX; ptrY = e.clientY; pointerSeen = true;
+    touched = e.pointerType === "touch";
+  }, { passive: true });
+  addEventListener("pointerdown", (e) => {
+    ptrX = e.clientX; ptrY = e.clientY; pointerSeen = true; touched = e.pointerType === "touch";
+    flare = 1;
+  }, { passive: true });
+
+  let rt;
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 180); });
+
+  function spawn(x, y, n, speed, dirx, diry) {
+    for (let i = 0; i < n; i += 1) {
+      const s = document.createElement("span");
+      s.className = "ember";
+      const a = Math.atan2(diry, dirx) + Math.PI + (Math.random() - 0.5) * 2.2;
+      const r0 = 4 + Math.random() * 22;
+      const drift = 18 + Math.random() * 46 + Math.min(speed, 80) * 0.35;
+      s.style.setProperty("--x", (x + Math.cos(a) * r0) + "px");
+      s.style.setProperty("--y", (y + Math.sin(a) * r0 - 10) + "px");
+      s.style.setProperty("--dx", (Math.cos(a) * drift * 0.6 + (Math.random() - 0.5) * 30) + "px");
+      s.style.setProperty("--dy", (-26 - Math.random() * 60) + "px");     // sparks rise
+      s.style.setProperty("--size", (1 + Math.random() * 2.2).toFixed(2) + "px");
+      s.style.setProperty("--alpha", (0.45 + Math.random() * 0.45).toFixed(2));
+      s.style.setProperty("--life", (0.7 + Math.random() * 1.0).toFixed(2) + "s");
+      emberField.appendChild(s);
+      s.addEventListener("animationend", () => s.remove(), { once: true });
+    }
+  }
+
+  function frame(now, once) {
+    const t = (now - t0) / 1000;
+    let tx = ptrX, ty = ptrY;
+    // the candle wanders by itself only until someone picks it up, or on touch screens after a pause
+    if (!pointerSeen || (touched && now - lastTouch() > 4000)) {
+      tx = W * 0.6 + Math.sin(t * 0.13) * W * 0.25;
+      ty = H * 0.45 + Math.sin(t * 0.09 + 1.7) * H * 0.3;
+    }
+    const ease = pointerSeen ? 0.16 : 0.03;
+    const vx = tx - lightX, vy = ty - lightY;
+    lightX += vx * (reduced ? 1 : ease);
+    lightY += vy * (reduced ? 1 : ease);
+
+    // flicker: a few slow sines, a decaying random walk, and the odd crackle
+    let f = 1;
+    if (!reduced) {
+      jitter = (jitter + (Math.random() - 0.5) * 0.06) * 0.9;
+      f += 0.045 * Math.sin(t * 13.1) + 0.03 * Math.sin(t * 7.3 + 2.1) + 0.025 * Math.sin(t * 2.2 + 5.0) + Math.max(-0.1, Math.min(0.1, jitter));
+      if (now > nextCrackle) {
+        nextCrackle = now + 450 + Math.random() * 1700;
+        pop = 0.12 + Math.random() * 0.12;
+        if (!document.hidden && Math.random() < 0.7) spawn(lightX, lightY, 1 + Math.floor(Math.random() * 3), 0, 0, 1);
+      }
+      pop *= 0.82;
+      f += pop;
+    }
+    flare *= 0.93;
+    const lit = Math.min(1, t / 1.4), ramp = 1 - (1 - lit) * (1 - lit);   // the candle catching
+
+    const R = Math.min(W, H) * 0.38 * (1 + flare * 0.25) * (0.97 + (f - 1) * 0.35);
+    const I = ramp * f * (1 + flare * 0.2);
+    const ox = reduced ? 0 : Math.sin(t * 5.7) * 1.8 + Math.sin(t * 3.1 + 1) * 1.2;
+    const oy = reduced ? 0 : Math.cos(t * 4.9) * 1.6;
+
+    if (hasGL) renderGL(lightX + ox, lightY + oy, R, I, t);
+    else { document.documentElement.style.setProperty("--lx", lightX + "px"); document.documentElement.style.setProperty("--ly", lightY + "px"); }
+
+    if (pointerSeen && !reduced) {
+      const sp = Math.hypot(ptrX - lastX, ptrY - lastY);
+      if (sp > 4 && now - lastEmber > 45) { lastEmber = now; spawn(lightX, lightY, Math.min(4, 1 + Math.floor(sp / 30)), sp, ptrX - lastX, ptrY - lastY); }
+      lastX = ptrX; lastY = ptrY;
+    }
+
+    if (!once && !reduced) requestAnimationFrame(frame);
+  }
+  let lastTouchAt = 0;
+  addEventListener("pointermove", (e) => { if (e.pointerType === "touch") lastTouchAt = performance.now(); }, { passive: true });
+  const lastTouch = () => lastTouchAt;
+
+
+  build().then(() => { if (!reduced) requestAnimationFrame(frame); });
+})();
+</script>
+</body>
+</html>
