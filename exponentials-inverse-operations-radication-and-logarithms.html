@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inverse Operations: Radication and Logarithms | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Division undoes multiplication whichever factor is unknown, because multiplication is commutative. Exponentiation is not, so it has two inverses: radication recovers the base, logarithms recover the exponent." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Inverse Operations: Radication and Logarithms</h1>
+    </header>
+    <main>
+      <section aria-labelledby="reversing-multiplication">
+        <h2 id="reversing-multiplication">Reversing Multiplication</h2>
+        <p>An inverse operation reverses the effect of another operation.</p>
+        <p>We start with:</p>
+        <div class="math">\[4\]</div>
+        <p>We multiply it by <span class="nw">\(3\):</span></p>
+        <div class="math">\[4 \times 3 = \boxed{12}\]</div>
+        <p>But we can undo this by dividing by <span class="nw">\(3\):</span></p>
+        <div class="math">\[\frac{12}{3} = \boxed{4}\]</div>
+        <p>We could just as easily have started with:</p>
+        <div class="math">\[3\]</div>
+        <p>And multiplied by <span class="nw">\(4\):</span></p>
+        <div class="math">\[3 \times 4 = \boxed{12}\]</div>
+        <p>And divided by <span class="nw">\(4\):</span></p>
+        <div class="math">\[\frac{12}{4} = \boxed{3}\]</div>
+      </section>
+
+      <section aria-labelledby="commutativity">
+        <h2 id="commutativity">Why Commutativity Matters</h2>
+        <p>A number can be made by multiplying two factors.</p>
+        <p>One factor will denote the number of copies of the other factor we have.</p>
+        <p>The second factor will denote the value of each copy.</p>
+        <p>We could have \(a\) groups of \(b\) or \(b\) groups of <span class="nw">\(a\).</span></p>
+        <figure class="groups">
+          <svg viewBox="0 0 520 168" role="img" aria-label="The same twelve dots, arranged in four rows of three, grouped two ways. On the left each row is a group: 4 groups of 3. On the right each column is a group: 3 groups of 4. Both make 12.">
+            <style>
+              .groups svg { max-width: 520px; }
+              .groups .grp { fill: none; stroke: var(--faint); stroke-width: 1.2; }
+              .groups circle { fill: var(--ink); }
+              .groups text { font-family: "IBM Plex Mono", monospace; font-size: 13px; fill: var(--dim); text-anchor: middle; }
+              .groups text.sum { font-family: "Spectral", Georgia, serif; font-size: 20px; fill: var(--ink); }
+            </style>
+            <rect class="grp" x="85" y="16" width="66" height="20" rx="10"/><rect class="grp" x="85" y="38" width="66" height="20" rx="10"/><rect class="grp" x="85" y="60" width="66" height="20" rx="10"/><rect class="grp" x="85" y="82" width="66" height="20" rx="10"/>
+            <circle cx="96" cy="26" r="4.5"/><circle cx="118" cy="26" r="4.5"/><circle cx="140" cy="26" r="4.5"/><circle cx="96" cy="48" r="4.5"/><circle cx="118" cy="48" r="4.5"/><circle cx="140" cy="48" r="4.5"/><circle cx="96" cy="70" r="4.5"/><circle cx="118" cy="70" r="4.5"/><circle cx="140" cy="70" r="4.5"/><circle cx="96" cy="92" r="4.5"/><circle cx="118" cy="92" r="4.5"/><circle cx="140" cy="92" r="4.5"/>
+            <rect class="grp" x="366" y="15" width="20" height="88" rx="10"/><rect class="grp" x="388" y="15" width="20" height="88" rx="10"/><rect class="grp" x="410" y="15" width="20" height="88" rx="10"/>
+            <circle cx="376" cy="26" r="4.5"/><circle cx="376" cy="48" r="4.5"/><circle cx="376" cy="70" r="4.5"/><circle cx="376" cy="92" r="4.5"/><circle cx="398" cy="26" r="4.5"/><circle cx="398" cy="48" r="4.5"/><circle cx="398" cy="70" r="4.5"/><circle cx="398" cy="92" r="4.5"/><circle cx="420" cy="26" r="4.5"/><circle cx="420" cy="48" r="4.5"/><circle cx="420" cy="70" r="4.5"/><circle cx="420" cy="92" r="4.5"/>
+            <text class="sum" x="118" y="132">4 × 3 = 12</text>
+            <text x="118" y="156">4 groups of 3</text>
+            <text class="sum" x="398" y="132">3 × 4 = 12</text>
+            <text x="398" y="156">3 groups of 4</text>
+          </svg>
+        </figure>
+        <p>Multiplication is <strong>commutative</strong>, meaning that changing the order of the factors does not change their product.</p>
+        <div class="math">\[\boxed{a \times b = b \times a}\]</div>
+        <p>So…</p>
+        <p>Suppose we know:</p>
+        <ul>
+          <li>Two factors multiply to produce <span class="nw">\(12\).</span></li>
+          <li>One factor is <span class="nw">\(3\).</span></li>
+        </ul>
+        <p>There are two possible situations.</p>
+        <p>The first factor is unknown:</p>
+        <div class="math">\[x \times 3 = 12\]</div>
+        <p>The second factor is unknown:</p>
+        <div class="math">\[3 \times x = 12\]</div>
+        <p>But because multiplication is commutative:</p>
+        <div class="math">\[3 \times x = x \times 3\]</div>
+        <p>Division gives us the answer to both situations:</p>
+        <div class="math">\[x = \frac{12}{3} = \boxed{4}\]</div>
+      </section>
+
+      <section aria-labelledby="reversing-exponentiation">
+        <h2 id="reversing-exponentiation">Reversing Exponentiation</h2>
+        <p>For multiplication:</p>
+        <div class="math">\[a \times b = b \times a\]</div>
+        <p>The two inputs are interchangeable.</p>
+        <p>Therefore, whether the unknown is the first or second factor, we can recover it by dividing the product by the known factor (provided it is nonzero).</p>
+        <p>For exponentiation:</p>
+        <div class="math">\[\class{mjx-base}{a}^{\class{mjx-exp}{b}} \neq \class{mjx-base}{b}^{\class{mjx-exp}{a}} \quad \text{in general}\]</div>
+        <p>The inputs are not interchangeable. Moreover, the <span class="base">base</span> and <span class="exp">exponent</span> participate in fundamentally different ways, and recovering each requires a different mathematical procedure.</p>
+        <p>Consider:</p>
+        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{3}} = 8\]</div>
+        <p>Working backwards from the result of exponentiation has two different inverse operations, depending on whether we know the base or the exponent.</p>
+        <p>Knowing the exponent requires <strong>radication</strong>.</p>
+        <div class="math">\[\class{mjx-base}{x}^{\class{mjx-exp}{3}} = 8 \qquad \sqrt[\class{mjx-exp}{3}]{8}=\class{mjx-base}{2}\]</div>
+        <p>Knowing the base requires <strong>logarithms</strong>.</p>
+        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{x}} = 8 \qquad \log_{\class{mjx-base}{2}}(8) =\class{mjx-exp}{3}\]</div>
+      </section>
+
+      <section aria-labelledby="radication">
+        <h2 id="radication">Radication: Recovering the Base</h2>
+        <div class="math">\[\class{mjx-base}{x}^{\class{mjx-exp}{3}} = 8\]</div>
+        <p>We know that we are taking three multiplicative steps to reach <span class="nw">\(8\).</span></p>
+        <div class="math">\[\class{mjx-base}{x} \cdot \class{mjx-base}{x} \cdot \class{mjx-base}{x} = 8\]</div>
+        <p>We do not know what the factors are in this product.</p>
+        <p>We can recover the factor by taking the cube root of <span class="nw">\(8\):</span></p>
+        <div class="math">\[\class{mjx-base}{x} = \sqrt[\class{mjx-exp}{3}]{8} = \boxed{\class{mjx-base}{2}}\]</div>
+        <p>More generally, for a positive base:</p>
+        <div class="math">\[\boxed{\class{mjx-base}{a}^{\class{mjx-exp}{n}} = b \iff \class{mjx-base}{a} = \sqrt[\class{mjx-exp}{n}]{b}}\]</div>
+      </section>
+
+      <section aria-labelledby="logarithms">
+        <h2 id="logarithms">Logarithms: Recovering the Exponent</h2>
+        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{x}} = 8\]</div>
+        <p>We know:</p>
+        <ul>
+          <li>Our common ratio is multiplication by <span class="nw">\(\class{mjx-base}{2}\).</span></li>
+          <li>We must reach <span class="nw">\(8\).</span></li>
+        </ul>
+        <p>We don't know:</p>
+        <ul>
+          <li>How many multiplicative steps will this take?</li>
+        </ul>
+        <p>We can recover it by “taking the logarithm of \(8\) to base <span class="nw">\(\class{mjx-base}{2}\)”:</span></p>
+        <div class="math">\[\class{mjx-exp}{x} = \log_{\class{mjx-base}{2}}(8) = \boxed{\class{mjx-exp}{3}}\]</div>
+        <p>More generally:</p>
+        <div class="math">\[\boxed{\class{mjx-base}{a}^{\class{mjx-exp}{x}} = b \iff \class{mjx-exp}{x} = \log_{\class{mjx-base}{a}}(b)}\]</div>
+        <p>For real logarithms, <span class="nw">\(a &gt; 0\),</span> <span class="nw">\(a \neq 1\),</span> and <span class="nw">\(b &gt; 0\).</span></p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-fractional-exponents.html">← Fractional Exponents</a>
+        <a href="exponentials-exponentiation-and-radication.html">Next: A Deeper Understanding of Exponentiation and Radication →</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>
