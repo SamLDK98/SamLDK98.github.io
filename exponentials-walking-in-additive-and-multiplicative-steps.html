@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Walking in Additive and Multiplicative Steps | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Reaching 256 in steps of equal distance, then in steps of equal ratio: division counts additive steps, logarithms count multiplicative steps, and roots find the ratio for a given number of steps." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Walking in Additive and Multiplicative Steps</h1>
+    </header>
+    <main>
+      <section aria-labelledby="additive">
+        <h2 id="additive">Additive Steps</h2>
+        <div class="math">\[256\]</div>
+        <p>Let's say we want to take steps of equal distance to reach this number.</p>
+        <p>We start at <span class="nw">\(0\).</span></p>
+        <ul>
+          <li>If our steps are a distance of \(1\), it will take \(256\) steps.</li>
+          <li>If our steps are a distance of \(2\), it will take \(128\) steps.</li>
+          <li>If our steps are a distance of \(4\), it will take \(64\) steps.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="division">
+        <h2 id="division">Division</h2>
+        <p>Division finds the number of steps of equal distance required to reach a number, given the distance of each step.</p>
+        <div class="math">\[\frac{256}{2}\]</div>
+        <p>If we move in steps of distance <span class="nw">\(2\),</span> how many must be taken to reach <span class="nw">\(256\)?</span></p>
+      </section>
+
+      <section aria-labelledby="multiplicative">
+        <h2 id="multiplicative">Multiplicative Steps</h2>
+        <div class="math">\[256\]</div>
+        <p>Let's say we want to take steps of equal ratios to reach this number.</p>
+        <p>Each step must always be \(x\) times as big as the previous number.</p>
+        <p>We start at <span class="nw">\(1\).</span></p>
+        <p>If our steps must have a ratio of <span class="nw">\(2\),</span> it will take \(8\) steps.</p>
+        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32 \to 64 \to 128 \to 256\]</div>
+        <p>If our steps must have a ratio of <span class="nw">\(4\),</span> it will take \(4\) steps.</p>
+        <div class="math">\[1 \to 4 \to 16 \to 64 \to 256\]</div>
+        <p>If our steps must have a ratio of <span class="nw">\(16\),</span> it will take \(2\) steps.</p>
+        <div class="math">\[1 \to 16 \to 256\]</div>
+      </section>
+
+      <section aria-labelledby="logarithms">
+        <h2 id="logarithms">Logarithms</h2>
+        <div class="side">
+          <div>
+            <p>A logarithm finds the number of steps of equal ratios required to reach a number, given the ratio.</p>
+            <div class="math">\[\log_{\class{mjx-base}{4}}(256)\]</div>
+            <p>If we move in steps with a ratio of \(\class{mjx-base}{4}\) between them, how many must be taken to reach <span class="nw">\(256\)?</span></p>
+          </div>
+          <iframe class="expo-widget" src="exponentials/walking-in-steps/growing-square-widget.html" title="Animation: a square marked 1 is copied into a two-by-two grid, merges into one square marked 4, and shrinks back to its original size; repeating this, a step counter reaches 4 steps when the square reads 256" style="height: 300px" scrolling="no" loading="lazy"></iframe>
+        </div>
+      </section>
+
+      <section aria-labelledby="radication">
+        <h2 id="radication">Radication</h2>
+        <div class="side">
+          <div>
+            <p>Taking the root finds the common ratio needed to reach a number, given the number of steps.</p>
+            <div class="math">\[\sqrt[\class{mjx-exp}{3}]{27}=\ ?\]</div>
+            <p>Here we know that we want to take \(\class{mjx-exp}{3}\) multiplicative steps and our target value is <span class="nw">\(27\),</span> so what must our common ratio be?</p>
+          </div>
+          <iframe class="expo-widget" src="exponentials/walking-in-steps/cube-root-widget.html" title="Interactive: a vertical number line from 0 to 27. Starting at 27, divide by the same factor three times; only a factor of 3 lands exactly on 1" style="height: 420px" scrolling="no" loading="lazy"></iframe>
+        </div>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-irrational-exponents.html">← Irrational Exponents</a>
+        <a href="exponentials.html">All Exponentials pages →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

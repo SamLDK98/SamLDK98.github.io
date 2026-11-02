@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Three equal steps down from 27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="d" type="range" min="1.5" max="5" step="0.01" value="2" aria-label="The factor to divide by at each step" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // A vertical number line from 0 to 27, drawn to scale. Start at 27 and divide by the same factor d
+  // three times: 27 → 27/d → 27/d² → 27/d³. The aim is to land on 1. Near d = 3 the slider snaps,
+  // and the last hop ends exactly in the ring at 1: three steps of ratio 3 join 1 and 27, so ∛27 = 3.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("d");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff";
+  const TOP = 27, CH = 6.9;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) {
+      if (attrs[k] === null || attrs[k] === undefined) continue;
+      // a size set here must beat the stylesheet's svg text rule, so it goes in as a style
+      if (k === "font-size") e.style.fontSize = attrs[k] + "px"; else e.setAttribute(k, attrs[k]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const fmt = x => Math.abs(x - Math.round(x)) < 1e-9 ? String(Math.round(x)) : x >= 10 ? x.toFixed(1) : x.toFixed(2);
+
+  function render() {
+    let d = +slider.value;
+    const hit = Math.abs(d - 3) < 0.025;
+    if (hit) d = 3;
+    const W = svg.clientWidth || 280;
+    const top = 22, yb = 318, H = yb + 62;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const lx = Math.round(W / 2 - 12);
+    const py = v => yb - v / TOP * (yb - top);
+
+    // the line, a tick at every whole number, longer at 0, 9, 18 and 27
+    el("line", { x1: lx, x2: lx, y1: top - 8, y2: yb, stroke: INK, "stroke-opacity": 0.2 });
+    for (let i = 0; i <= TOP; i++) {
+      const long = i % 9 === 0;
+      el("line", { x1: lx - (long ? 5 : 2.5), x2: lx + (long ? 5 : 2.5), y1: py(i), y2: py(i), stroke: INK, "stroke-opacity": long ? 0.3 : 0.16 });
+    }
+    el("text", { x: lx - 10, y: yb + 4, "text-anchor": "end" }, "0");
+
+    const pts = [TOP, TOP / d, TOP / d / d, TOP / d / d / d];
+    const fac = "÷" + (hit ? "3" : d.toFixed(2));
+
+    // three hops down the left side of the line, each an arc with an arrowhead
+    for (let j = 0; j < 3; j++) {
+      const a = py(pts[j]), b = py(pts[j + 1]), span = b - a;
+      const x0 = lx - 6, bulge = Math.max(8, Math.min(46, span * 0.42)), cx = x0 - 2 * bulge;
+      el("path", { d: `M${x0} ${a.toFixed(1)} Q${cx.toFixed(1)} ${((a + b) / 2).toFixed(1)} ${x0} ${b.toFixed(1)}`, fill: "none", stroke: INK, "stroke-opacity": 0.55, "stroke-width": 1.3 });
+      const dx = x0 - cx, dy = b - (a + b) / 2, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+      const back = [x0 - 6.5 * ux, b - 6.5 * uy], nx = -uy * 3, ny = ux * 3;
+      el("path", { d: `M${x0} ${b.toFixed(1)} L${(back[0] + nx).toFixed(1)} ${(back[1] + ny).toFixed(1)} L${(back[0] - nx).toFixed(1)} ${(back[1] - ny).toFixed(1)} Z`, fill: INK, "fill-opacity": 0.7 });
+      if (span >= 22) el("text", { x: x0 - bulge - 6, y: (a + b) / 2 + 4, "text-anchor": "end", class: "base" }, fac);
+    }
+
+    // the target, 1: a ring, solid once the third hop lands in it
+    el("circle", { cx: lx, cy: py(1), r: 7.5, fill: "none", stroke: INK, "stroke-opacity": hit ? 0.9 : 0.45, "stroke-width": 1.3, "stroke-dasharray": hit ? null : "2 2.5" });
+    pts.forEach((v, i) => el("circle", { cx: lx, cy: py(v), r: i === 0 || i === 3 ? 4.2 : 3.6, fill: INK, "fill-opacity": i === 3 && !hit ? 0.75 : 1 }));
+
+    // labels on the right, pushed apart where the points crowd together
+    const labels = pts.map((v, i) => ({ y: py(v), text: fmt(v), cls: i === 0 || i === 3 ? "ink" : "" }));
+    if (!hit) labels.push({ y: py(1), text: "1", cls: "", target: true });
+    labels.sort((p, q) => q.y - p.y);   // bottom first
+    let floor = yb + 4;
+    labels.forEach(l => { l.ly = Math.min(l.y + 4, floor); floor = l.ly - 14; });
+    const tx = lx + 26;
+    labels.forEach(l => {
+      if (Math.abs(l.ly - 4 - l.y) > 1.5) el("line", { x1: lx + 8, y1: l.y, x2: tx - 4, y2: l.ly - 4, stroke: INK, "stroke-opacity": 0.2 });
+      el("text", { x: tx, y: l.ly, class: l.cls, "fill-opacity": l.target ? 0.55 : null }, l.target ? "1  target" : l.text);
+    });
+
+    // the sum written out
+    const ry = yb + 30;
+    const sum = el("text", { x: W / 2, y: ry, "text-anchor": "middle", "font-size": 12 });
+    el("tspan", { fill: INK }, "27", sum);
+    for (let j = 0; j < 3; j++) el("tspan", { fill: BASE }, " " + fac.replace("÷", "÷ "), sum);
+    el("tspan", { fill: INK, "fill-opacity": 0.5 }, " = ", sum);
+    el("tspan", { fill: INK }, fmt(pts[3]), sum);
+    if (hit) {
+      const s2 = el("text", { x: W / 2, y: ry + 22, "text-anchor": "middle", "font-size": 12 });
+      el("tspan", { fill: INK, "fill-opacity": 0.5 }, "so  ", s2);
+      el("tspan", { fill: INK }, "∛27 = ", s2);
+      el("tspan", { fill: BASE }, "3", s2);
+    } else {
+      el("text", { x: W / 2, y: ry + 22, "text-anchor": "middle", "font-size": 11 }, pts[3] > 1 ? "short of 1: divide by more" : "past 1: divide by less");
+    }
+
+    svg.setAttribute("aria-label", hit
+      ? "Starting at 27, three steps that each divide by 3 land exactly on 1: 27, 9, 3, 1."
+      : `Starting at 27, three steps that each divide by ${d.toFixed(2)} land on ${fmt(pts[3])}, ${pts[3] > 1 ? "short of" : "past"} 1.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

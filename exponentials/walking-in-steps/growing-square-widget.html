@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Growing by a ratio of 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .choices { margin-top: 0.2rem; }
+  svg text.num { font-family: "Spectral", Georgia, serif; fill: var(--ink); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="choices"><button id="btn" type="button" aria-pressed="false">Pause</button></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // One square marked 1. A 2×2 grid appears around it, three unmarked copies fill the other cells,
+  // the grid goes, the inner borders dissolve and the merged square reads 4. It then shrinks back
+  // to the original size, landing in the corner cell of the next grid, and the cycle repeats:
+  // 1 → 4 → 16 → 64 → 256. The counter shows how many ×4 steps have been taken: log₄ of the number.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const btn = document.getElementById("btn");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff";
+  const STEPS = 4, CH = 6.9;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) {
+      if (attrs[k] === null || attrs[k] === undefined) continue;
+      // a size set here must beat the stylesheet's svg text rule, so it goes in as a style
+      if (k === "font-size") e.style.fontSize = attrs[k] + "px"; else e.setAttribute(k, attrs[k]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const clamp = x => Math.max(0, Math.min(1, x));
+  const ease = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+
+  // the phases of one ×4 step, in ms
+  const PH = [["gridIn", 600], ["copies", 1100], ["gridOut", 450], ["merge", 850], ["hold", 550], ["shrink", 950], ["rest", 450]];
+  const D = PH.reduce((s, p) => s + p[1], 0), IDLE = 900, TOTAL = IDLE + STEPS * D;
+
+  function stateAt(t) {
+    if (t < IDLE) return { c: 0, ph: "idle", f: 0 };
+    let u = t - IDLE;
+    const c = Math.floor(u / D);
+    if (c >= STEPS) return { c: STEPS, ph: "done", f: 0 };
+    u -= c * D;
+    for (const [name, len] of PH) { if (u < len) return { c, ph: name, f: u / len }; u -= len; }
+    return { c, ph: "rest", f: 1 };
+  }
+  const order = PH.map(p => p[0]);
+  const after = (ph, name) => order.indexOf(ph) > order.indexOf(name);
+
+  function draw(t) {
+    const W = svg.clientWidth || 300;
+    const S = Math.min(64, Math.floor((W - 40) / 2));
+    const gy = 18, H = gy + 2 * S + 78;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const gx = W / 2 - S, ax = gx, ay = gy + 2 * S;   // grid's top-left, and its bottom-left anchor
+    const st = stateAt(t);
+    let { c, ph, f } = st;
+    const done = ph === "done";
+    if (done) { c = STEPS - 1; ph = "rest"; f = 1; }
+    const v = Math.pow(4, c), nv = v * 4;
+
+    const cells = [[0, 0], [1, 0], [0, 1], [1, 1]].map(([col, row]) => ({ x: gx + col * S, y: gy + S - row * S }));
+    const idle = ph === "idle";
+    const merging = ph === "merge", merged = !idle && after(ph, "merge");
+
+    // the dashed grid
+    let gA = 0;
+    if (ph === "gridIn") gA = ease(f); else if (ph === "copies") gA = 1; else if (ph === "gridOut") gA = 1 - ease(f);
+    if (gA > 0) {
+      const ext = 10, g = el("g", { stroke: INK, "stroke-opacity": 0.42 * gA, "stroke-dasharray": "3 4" });
+      for (let i = 0; i <= 2; i++) {
+        el("line", { x1: gx + i * S, x2: gx + i * S, y1: gy - ext, y2: gy + 2 * S + ext }, null, g);
+        el("line", { y1: gy + i * S, y2: gy + i * S, x1: gx - ext, x2: gx + 2 * S + ext }, null, g);
+      }
+    }
+
+    const fillA = 0.14;
+    if (!merging && !merged) {
+      // the original, marked, plus copies fading in
+      cells.forEach((cell, i) => {
+        let a = 1, s = 1;
+        if (i > 0) {
+          if (idle || ph === "gridIn") a = 0;
+          else if (ph === "copies") { a = ease(clamp((f - (i - 1) * 0.27) / 0.42)); s = 0.82 + 0.18 * a; }
+        }
+        if (a <= 0) return;
+        const cx = cell.x + S / 2, cy = cell.y + S / 2, w = S * s;
+        el("rect", { x: cx - w / 2, y: cy - w / 2, width: w, height: w, fill: BASE, "fill-opacity": fillA * a, stroke: BASE, "stroke-opacity": 0.9 * a, "stroke-width": 1.4 });
+      });
+      label(cells[0].x + S / 2, cells[0].y + S / 2, S, v, 1);
+    } else {
+      // one square: inner borders dissolve, the number changes, then it shrinks to the anchor corner
+      let k = 1;
+      if (ph === "shrink") k = 1 - 0.5 * ease(f); else if (ph === "rest") k = 0.5;
+      const g = el("g", { transform: `translate(${ax} ${ay}) scale(${k}) translate(${-ax} ${-ay})` });
+      el("rect", { x: gx, y: gy, width: 2 * S, height: 2 * S, fill: BASE, "fill-opacity": fillA, stroke: BASE, "stroke-opacity": 0.9, "stroke-width": 1.4 / k }, null, g);
+      const inner = merging ? 1 - ease(f) : 0;
+      if (inner > 0) {
+        el("line", { x1: gx + S, x2: gx + S, y1: gy, y2: gy + 2 * S, stroke: BASE, "stroke-opacity": 0.9 * inner, "stroke-width": 1.4 }, null, g);
+        el("line", { y1: gy + S, y2: gy + S, x1: gx, x2: gx + 2 * S, stroke: BASE, "stroke-opacity": 0.9 * inner, "stroke-width": 1.4 }, null, g);
+      }
+      if (merging) {
+        label(cells[0].x + S / 2, cells[0].y + S / 2, S, v, 1 - clamp(f * 2), g);
+        label(gx + S, gy + S, 2 * S, nv, clamp(f * 2 - 1), g);
+      } else label(gx + S, gy + S, 2 * S, nv, 1, g);
+    }
+
+    // the step counter: steps taken so far, and the trail of values
+    const n = done ? STEPS : c + ((merging && f >= 0.5) || merged ? 1 : 0);
+    const vals = [1, 4, 16, 64, 256];
+    const ty = gy + 2 * S + 34;
+    const trail = el("text", { x: W / 2, y: ty, "text-anchor": "middle", "font-size": 12 });
+    vals.forEach((x, i) => {
+      if (i) el("tspan", { fill: INK, "fill-opacity": i <= n ? 0.45 : 0.18 }, " → ", trail);
+      el("tspan", { fill: i === n ? BASE : INK, "fill-opacity": i < n ? 0.6 : i === n ? 1 : 0.22 }, String(x), trail);
+    });
+    const cy = ty + 28;
+    const line = el("text", { x: W / 2, y: cy, "text-anchor": "middle", "font-size": 12 });
+    el("tspan", { fill: INK, "fill-opacity": 0.5 }, "steps of ×4 taken  ", line);
+    el("tspan", { fill: EXP, "font-size": 16 }, String(n), line);
+
+    svg.setAttribute("aria-label", `The square reads ${vals[n]} after ${n} step${n === 1 ? "" : "s"} of multiplying by 4.`);
+  }
+
+  function label(x, y, size, value, a, parent) {
+    if (a <= 0) return;
+    const str = String(value);
+    const fs = size * (str.length >= 3 ? 0.36 : 0.42);
+    el("text", { x, y: y + fs * 0.34, "text-anchor": "middle", class: "num", "font-size": fs, "fill-opacity": a }, str, parent);
+  }
+
+  // playback: starts when the widget scrolls into view; pause, play, replay
+  let t = 0, last = null, playing = false, started = false, raf = null;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function frame(now) {
+    if (last !== null) t += now - last;
+    last = now;
+    if (t >= TOTAL) { t = TOTAL; playing = false; setBtn(); draw(t); return; }
+    draw(t);
+    raf = requestAnimationFrame(frame);
+  }
+  function play() { playing = true; last = null; setBtn(); raf = requestAnimationFrame(frame); }
+  function pause() { playing = false; cancelAnimationFrame(raf); setBtn(); }
+  function setBtn() { btn.textContent = playing ? "Pause" : t >= TOTAL ? "Replay" : "Play"; }
+
+  btn.addEventListener("click", () => {
+    if (playing) pause();
+    else { if (t >= TOTAL) t = 0; started = true; play(); }
+  });
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => draw(t), 60); });
+
+  draw(0);
+  setBtn();
+  if (reduce) { t = TOTAL; draw(t); setBtn(); }
+  else if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries, obs) => {
+      if (entries.some(e => e.isIntersecting) && !started) { started = true; obs.disconnect(); play(); }
+    }, { threshold: 0.5 }).observe(svg);
+  } else { started = true; play(); }
+</script>
+</body>
+</html>
