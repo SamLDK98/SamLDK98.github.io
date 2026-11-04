@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Additive and multiplicative steps to 64</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="choices" role="group" aria-label="Step size and ratio">
+    <button type="button" data-k="2" aria-pressed="true">2</button>
+    <button type="button" data-k="4" aria-pressed="false">4</button>
+    <button type="button" data-k="8" aria-pressed="false">8</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Two copies of the same number line, 0 to 64, drawn to scale.
+  // Above: walk from 0 in steps of +k. Every hop is the same distance; division counts them: 64 ÷ k.
+  // Below: walk from 1 in steps of ×k. Every hop is the same ratio; the logarithm counts them: log_k(64).
+  // Equal ratios are not equal distances: the multiplicative hops crowd near 0 and stretch near 64.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const buttons = [...document.querySelectorAll(".choices button")];
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff";
+  const TOP = 64, CH = 6.6;
+  let k = 2;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function hops(stops, px, axis, maxLift, color, strong) {
+    for (let i = 0; i + 1 < stops.length; i++) {
+      const a = px(stops[i]), b = px(stops[i + 1]), lift = Math.max(2.5, Math.min(maxLift, (b - a) * 0.38)), y0 = axis - 5;
+      el("path", { d: `M${a.toFixed(1)} ${y0} Q${((a + b) / 2).toFixed(1)} ${(y0 - 2 * lift).toFixed(1)} ${b.toFixed(1)} ${y0}`, fill: "none", stroke: color, "stroke-opacity": strong, "stroke-width": 1.2 });
+    }
+    stops.forEach(v => el("circle", { cx: px(v), cy: axis, r: 2.6, fill: color }));
+  }
+
+  function axisLine(px, y, L, R) {
+    el("line", { x1: L, x2: R, y1: y, y2: y, stroke: INK, "stroke-opacity": 0.2 });
+    for (let v = 0; v <= TOP; v += 8) el("line", { x1: px(v), x2: px(v), y1: y - 2.5, y2: y + 2.5, stroke: INK, "stroke-opacity": 0.2 });
+  }
+
+  // labels under the stops, dropping any that would touch the one to their right (the ends always stay)
+  function labels(stops, px, y, cls) {
+    const placed = [];
+    for (let i = stops.length - 1; i >= 0; i--) {
+      const v = stops[i], x = px(v), w = String(v).length * CH;
+      const last = placed[placed.length - 1];
+      const end = i === 0 || i === stops.length - 1;
+      if (last && x + w / 2 + 6 > last.x - last.w / 2 && !end) continue;
+      if (last && i === 0 && x + w / 2 + 4 > last.x - last.w / 2) placed.pop();
+      placed.push({ x, w, v });
+    }
+    placed.forEach(p => el("text", { x: p.x, y, "text-anchor": "middle", class: cls }, String(p.v)));
+  }
+
+  function render() {
+    const W = svg.clientWidth || 560;
+    const H = 214, L = 14, R = W - 14;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = v => L + v / TOP * (R - L);
+
+    // additive: 0, k, 2k, … 64
+    const A = 64;
+    const add = []; for (let v = 0; v <= TOP; v += k) add.push(v);
+    el("text", { x: L, y: 18, class: "ink", "font-size": 12 }, `steps of +${k}`);
+    el("text", { x: R, y: 18, "text-anchor": "end", "font-size": 12 }, `64 ÷ ${k} = ${TOP / k} steps`);
+    axisLine(px, A, L, R);
+    hops(add, px, A, 12, INK, 0.5);
+    labels(add.filter(v => v % 16 === 0), px, A + 17, "");
+
+    // multiplicative: 1, k, k², … 64
+    const M = 168;
+    const mul = []; for (let v = 1; v <= TOP; v *= k) mul.push(v);
+    const n = mul.length - 1;
+    const t1 = el("text", { x: L, y: 116, "font-size": 12 });
+    el("tspan", { fill: INK }, "steps of ×", t1); el("tspan", { fill: BASE }, String(k), t1);
+    const t2 = el("text", { x: R, y: 116, "text-anchor": "end", "font-size": 12 });
+    el("tspan", { fill: INK, "fill-opacity": 0.5 }, "log", t2);
+    el("tspan", { fill: BASE, "font-size": 9, dy: 3 }, String(k), t2);
+    el("tspan", { fill: INK, "fill-opacity": 0.5, dy: -3 }, "(64) = ", t2);
+    el("tspan", { fill: EXP }, String(n), t2);
+    el("tspan", { fill: INK, "fill-opacity": 0.5 }, n === 1 ? " step" : " steps", t2);
+    axisLine(px, M, L, R);
+    hops(mul, px, M, 34, BASE, 0.8);
+    labels([0, ...mul.filter(v => v !== 1 || px(1) - px(0) >= 10)], px, M + 17, "ink");
+    if (px(1) - px(0) < 10) el("text", { x: px(1) + 3, y: M - 9, "font-size": 10 }, "1");
+
+    svg.setAttribute("aria-label", `From 0, steps of ${k} reach 64 in ${TOP / k} equal hops. From 1, steps of times ${k} reach 64 in ${n} hops that start tiny near 0 and grow longer each time.`);
+  }
+
+  buttons.forEach(b => b.addEventListener("click", () => {
+    k = +b.dataset.k;
+    buttons.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    render();
+  }));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

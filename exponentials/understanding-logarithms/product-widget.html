@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adding logarithms multiplies numbers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .pair { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 0.9rem; width: min(100%, 460px); margin: 0.5rem auto 0; }
+  .pair label { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--dim); min-width: 4.6em; }
+  .pair label b { font-weight: 400; color: var(--ink); }
+  .pair input[type="range"] { margin: 0; width: 100%; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="pair">
+    <label for="x">x = <b id="xv">17</b></label><input id="x" type="range" min="0" max="2" step="0.001" />
+    <label for="y">y = <b id="yv">43</b></label><input id="y" type="range" min="0" max="2" step="0.001" />
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // A ruler marked in powers of 10, where distance along it is the exponent: the logarithm.
+  // log₁₀(x) is a length from 1 to x. Laying log₁₀(y) on the end of it lands on xy,
+  // because adding the exponents multiplies the numbers: log₁₀(x) + log₁₀(y) = log₁₀(xy).
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const sx = document.getElementById("x"), sy = document.getElementById("y");
+  const xv = document.getElementById("xv"), yv = document.getElementById("yv");
+  const INK = "#f4f6ff", EXP = "#7aa7ff";
+  const DEC = 4;   // the ruler runs from 10⁰ to 10⁴
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const whole = s => Math.max(1, Math.min(100, Math.round(Math.pow(10, +s))));
+  sx.value = Math.log10(17); sy.value = Math.log10(43);
+
+  function render() {
+    const x = whole(sx.value), y = whole(sy.value), p = x * y;
+    xv.textContent = x; yv.textContent = y;
+    const lx = Math.log10(x), ly = Math.log10(y), lp = lx + ly;
+    const W = svg.clientWidth || 560, H = 196, L = 16, R = W - 22, AX = 132;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = e => L + e / DEC * (R - L);   // position = exponent
+
+    // the ruler: numbers below, at each power of 10 and the multiples between
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.25 });
+    for (let d = 0; d <= DEC; d++) {
+      el("line", { x1: px(d), x2: px(d), y1: AX - 6, y2: AX + 6, stroke: INK, "stroke-opacity": 0.45 });
+      el("text", { x: px(d), y: AX + 21, "text-anchor": "middle" }, String(Math.pow(10, d)));
+      if (d < DEC) for (let m = 2; m <= 9; m++) {
+        const e = d + Math.log10(m);
+        el("line", { x1: px(e), x2: px(e), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.2 });
+      }
+    }
+    // exponents above, in blue: distance along the ruler
+    for (let d = 0; d <= DEC; d++) el("text", { x: px(d), y: AX - 12, "text-anchor": "middle", class: "exp", "font-size": 10, "fill-opacity": 0.6 }, String(d));
+
+    // the two lengths, end to end
+    const y1 = 64, y2 = 86;
+    el("line", { x1: px(0), x2: px(lx), y1, y2: y1, stroke: EXP, "stroke-width": 5, "stroke-linecap": "butt" });
+    el("line", { x1: px(lx), x2: px(lp), y1: y2, y2, stroke: EXP, "stroke-opacity": 0.55, "stroke-width": 5, "stroke-linecap": "butt" });
+    el("line", { x1: px(lx), x2: px(lx), y1: y1 - 4, y2: y2 + 4, stroke: INK, "stroke-opacity": 0.3, "stroke-dasharray": "2 2" });
+    el("line", { x1: px(lp), x2: px(lp), y1: y2, y2: AX, stroke: INK, "stroke-opacity": 0.45, "stroke-dasharray": "2 3" });
+    const cap = (a, b, yy, s) => {
+      const mid = (px(a) + px(b)) / 2, w = s.length * 6.6;
+      if (px(b) - px(a) > w + 6) el("text", { x: mid, y: yy - 8, "text-anchor": "middle", class: "exp" }, s);
+    };
+    cap(0, lx, y1, `log₁₀ ${x}`);
+    cap(lx, lp, y2, `log₁₀ ${y}`);
+
+    // where it lands: x times y
+    el("circle", { cx: px(lp), cy: AX, r: 4.5, fill: INK });
+    el("circle", { cx: px(lx), cy: AX, r: 2.6, fill: INK, "fill-opacity": 0.55 });
+    const anchor = px(lp) > R - 30 ? "end" : "middle";
+    el("text", { x: px(lp), y: AX + 38, "text-anchor": anchor, class: "ink", "font-size": 12 }, `${x} × ${y} = ${p}`);
+
+    // the sum, written out: the numbers on one line, the exponents on the next
+    const t = el("text", { x: W / 2, y: 14, "text-anchor": "middle", "font-size": 12, class: "ink" });
+    t.textContent = `log₁₀(${x}) + log₁₀(${y}) = log₁₀(${p})`;
+    el("text", { x: W / 2, y: 31, "text-anchor": "middle", "font-size": 12, class: "exp" },
+      `${lx.toFixed(4)} + ${ly.toFixed(4)} ≈ ${lp.toFixed(4)}`);
+
+    svg.setAttribute("aria-label", `On a ruler marked in powers of ten, the length log ${x} followed by the length log ${y} lands at ${p}: ${lx.toFixed(3)} plus ${ly.toFixed(3)} is ${lp.toFixed(3)}, the logarithm of ${x} times ${y}.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  sx.addEventListener("input", render); sy.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

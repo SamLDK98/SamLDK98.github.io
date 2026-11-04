@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Understanding Logarithms | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Division counts equal additive steps; a logarithm counts equal multiplicative steps. From the product of powers rule to the product rule for logarithms: adding logarithms multiplies numbers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Understanding Logarithms</h1>
+    </header>
+    <main>
+      <section aria-labelledby="counting">
+        <h2 id="counting">Logarithms Count the Multiplicative Steps Along the Number Line</h2>
+        <p>Imagine a number on the number line:</p>
+        <div class="math">\[64\]</div>
+        <p>Division counts the number of additive steps needed to walk from \(0\) to <span class="nw">\(64\).</span></p>
+        <div class="math">\[\frac{64}{2}=32 \ \text{steps}\]</div>
+        <p>Logarithms count the number of multiplicative steps needed to walk from \(1\) to <span class="nw">\(64\).</span></p>
+        <div class="math">\[\log_{\class{mjx-base}{2}}(64)=\class{mjx-exp}{6} \ \text{steps}\]</div>
+        <p>While additive steps are of equal distance, multiplicative steps are of equal ratio.</p>
+        <iframe class="expo-widget" src="exponentials/understanding-logarithms/steps-widget.html" title="Interactive: two number lines from 0 to 64, drawn to scale. Above, steps of plus 2, 4 or 8 from 0 are all the same length: 64 divided by the step. Below, steps of times 2, 4 or 8 from 1 crowd together near 0 and stretch out towards 64: the logarithm counts them" style="height: 260px" scrolling="no" loading="lazy"></iframe>
+        <p>When you look at a power, you can think of each element like this:</p>
+        <figure class="anatomy steps-anatomy">
+          <svg viewBox="0 0 520 200" role="img" aria-label="2 cubed equals 8. The base, 2, is the multiplicative factor. The exponent, 3, is the number of equal multiplicative steps. The output, 8, is the destination.">
+            <style>
+              .steps-anatomy svg { max-width: 460px; }
+              .steps-anatomy text.out { fill: var(--ink); }
+            </style>
+            <text x="210" y="135" class="glyph big base">2</text>
+            <text x="262" y="87" class="glyph sup exp">3</text>
+            <text x="300" y="135" class="glyph big out">=</text>
+            <text x="372" y="135" class="glyph big out">8</text>
+            <line x1="170" y1="103" x2="204" y2="103" class="lead base"/>
+            <text x="164" y="107.5" text-anchor="end" class="base">base: the factor</text>
+            <line x1="275" y1="48" x2="275" y2="30" class="lead exp"/>
+            <text x="275" y="21" text-anchor="middle" class="exp">exponent: the number of steps</text>
+            <path d="M373 150 V157 H419 V150" class="lead"/>
+            <text x="396" y="182" text-anchor="middle">output: the destination</text>
+          </svg>
+        </figure>
+        <ul>
+          <li><span class="base">Base</span> → the multiplicative factor.</li>
+          <li><span class="exp">Exponent</span> → the number of equal multiplicative steps.</li>
+          <li>Output → the destination.</li>
+        </ul>
+        <p>When we compute a logarithm, we are finding the numerical value of the exponent.</p>
+      </section>
+
+      <section aria-labelledby="adding">
+        <h2 id="adding">Just as Adding Exponents Corresponds to Multiplying Outputs, So Too Does Adding Logarithms</h2>
+        <p>The <a class="inline" href="exponentials-the-many-rules-of-exponentiation.html#product">product of powers rule</a> shows that multiplication in the world of powers corresponds to addition in the world of exponents.</p>
+        <div class="math">\[\boxed{\class{mjx-base}{b}^{\class{mjx-exp}{m}} \cdot \class{mjx-base}{b}^{\class{mjx-exp}{n}} = \class{mjx-base}{b}^{\class{mjx-exp}{m+n}}}\]</div>
+        <p>We can express the same thing in terms of logarithms:</p>
+        <div class="math">\[b^{\log_{b}(x)} \cdot b^{\log_{b}(y)} = b^{\log_{b}(x)+\log_{b}(y)}\]</div>
+        <aside class="note" aria-labelledby="why-logs">
+          <h3 id="why-logs">Where the logarithms come from</h3>
+          <p>Since:</p>
+          <div class="math">\[\class{mjx-exp}{m} = \log_{b}(x), \qquad \class{mjx-exp}{n} =\log_{b}(y)\]</div>
+          <p>\(x\) and \(y\) are just the unknown outputs of \(b^{\class{mjx-exp}{m}}\) and <span class="nw">\(b^{\class{mjx-exp}{n}}\):</span></p>
+          <div class="math">\[b^{\class{mjx-exp}{m}} = x \qquad \text{and} \qquad b^{\class{mjx-exp}{n}} = y\]</div>
+        </aside>
+        <p>Further, we can express this relationship between multiplication and addition without the relationship only existing within the exponents.</p>
+        <p>Let's rearrange our equation.</p>
+
+        <h3>The Left Hand Side</h3>
+        <div class="math">\[b^{\log_{b}(x)} \cdot b^{\log_{b}(y)}\]</div>
+        <p>Recall the first identity showing that exponentiation undoes logarithms:</p>
+        <div class="math">\[\boxed{a^{\log_{a}(b)}=b}\]</div>
+        <p>The logarithm \(\log_{a}(b)\) gives the value of the exponent required to raise \(a\) to equal <span class="nw">\(b\).</span></p>
+        <p>Since this value is what \(a\) is being raised to, the term must equal <span class="nw">\(b\)!</span></p>
+        <p>We can apply this logic to each of the factors on the left hand side here.</p>
+        <div class="math">\[b^{\log_{b}(x)} = x \qquad b^{\log_{b}(y)} = y\]</div>
+        <p>The LHS therefore simplifies to:</p>
+        <div class="math">\[xy\]</div>
+
+        <h3>The Right Hand Side</h3>
+        <div class="math">\[b^{\log_{b}(x)+\log_{b}(y)}\]</div>
+        <p>We want to remove exponents from our equation.</p>
+        <p>Logarithms undo exponentiation, as we saw in the second identity:</p>
+        <div class="math">\[\boxed{\log_{a}(a^x)=x}\]</div>
+        <p>The base here is \(b\), so we must take the logarithm to the base <span class="nw">\(b\).</span> Then the exponent of the input, which is the expression <span class="nw">\(\log_{b}(x) + \log_{b}(y)\),</span> becomes the output:</p>
+        <div class="math">\[\log_{b}\!\left(b^{\log_{b}(x)+\log_{b}(y)}\right) = \log_{b}(x)+\log_{b}(y)\]</div>
+
+        <h3>Both Sides</h3>
+        <p>Since we applied a logarithm to one side, we have to apply it to the other:</p>
+        <div class="math">\[\boxed{\log_b(xy) = \log_b(x) + \log_b(y)}\]</div>
+        <p>This is called the <strong>product rule for logarithms</strong>.</p>
+        <p>It applies for <span class="nw">\(x, y &gt; 0\),</span> where \(b &gt; 0\) and <span class="nw">\(b \neq 1\).</span></p>
+      </section>
+
+      <section aria-labelledby="why">
+        <h2 id="why">Why Bother with Logarithms?</h2>
+        <p>If we know exponents can convert multiplication problems into addition, why bother with expressing them in terms of logarithms like this?</p>
+        <p>The advantage is that logarithms allow us to start with any positive numbers, even when their exponents are unknown.</p>
+        <p>For example, we know that <span class="nw">\(17 \times 43 = 731\),</span> but neither \(17\) nor \(43\) is an obvious integer power of <span class="nw">\(10\).</span></p>
+        <p>Logarithms allow us to find the exponents that represent these numbers in a common base:</p>
+        <div class="math">\[\log_{10}(17)+\log_{10}(43)=\log_{10}(731)\]</div>
+        <iframe class="expo-widget" src="exponentials/understanding-logarithms/product-widget.html" title="Interactive: a ruler marked 1, 10, 100, 1000, 10000, where distance along it is the exponent of 10. Choose x and y; the length log x laid end to end with the length log y lands on x times y. With 17 and 43 it lands on 731" style="height: 290px" scrolling="no" loading="lazy"></iframe>
+        <p>We can therefore work with the exponents directly, without first having to express the original numbers as powers.</p>
+        <p>This is the significance of logarithms: they provide a general correspondence between multiplication of positive numbers and addition of real numbers.</p>
+        <p>The product of powers rule establishes this relationship; logarithms allow us to use it starting from the numbers themselves.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-inverse-operations-radication-and-logarithms.html">← Inverse Operations: Radication and Logarithms</a>
+        <a href="exponentials-exponentiation-and-radication.html">Next: A Deeper Understanding of Exponentiation and Radication →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
