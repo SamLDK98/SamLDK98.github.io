@@ -121,6 +121,83 @@
         <p>The product of powers rule establishes this relationship; logarithms allow us to use it starting from the numbers themselves.</p>
       </section>
 
+      <hr />
+
+      <section aria-labelledby="bonus">
+        <h2 id="bonus">Bonus: Why Convert the Product of Powers Rule at All?</h2>
+        <p>The product rule for logarithms does not introduce a new relationship. It takes one we already had and makes it usable in the other direction.</p>
+        <p>Removing the exponent notation is not, by itself, what makes logarithms useful. The real advantage is that logarithms give us a systematic way to turn a multiplication of <em>any</em> positive numbers into an addition.</p>
+
+        <h3>What the Exponent Rule Already Tells Us</h3>
+        <p>Consider:</p>
+        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{3}}\cdot\class{mjx-base}{2}^{\class{mjx-exp}{4}}=\class{mjx-base}{2}^{\class{mjx-exp}{3+4}}=\class{mjx-base}{2}^{\class{mjx-exp}{7}}\]</div>
+        <p>Multiplication becomes addition here because both numbers are already written as powers of the same base.</p>
+        <p>But consider a different problem:</p>
+        <div class="math">\[17\times43\]</div>
+        <p>How would we use the product of powers rule here?</p>
+        <p>We would first need to find exponents \(\class{mjx-exp}{m}\) and \(\class{mjx-exp}{n}\) such that:</p>
+        <div class="math">\[\class{mjx-base}{10}^{\class{mjx-exp}{m}}=17,\qquad\class{mjx-base}{10}^{\class{mjx-exp}{n}}=43\]</div>
+        <p>The exponent rule then tells us that:</p>
+        <div class="math">\[17\times43=\class{mjx-base}{10}^{\class{mjx-exp}{m+n}}\]</div>
+        <p>But the exponent rule does not tell us how to find \(\class{mjx-exp}{m}\) and <span class="nw">\(\class{mjx-exp}{n}\).</span></p>
+        <p><strong>That is the missing capability.</strong> Try finding them by sliding the exponent, then let the logarithm find them for you.</p>
+        <iframe class="expo-widget" src="exponentials/understanding-logarithms/exponent-hunt-widget.html" title="Interactive: slide an exponent m so that 10 to the m reaches 17, then 43. Sliding only gets close; the log button finds each exponent directly. Once both are found, 10 to the power of their sum is about 731, which is 17 times 43" style="height: 250px" scrolling="no" loading="lazy"></iframe>
+
+        <h3>Logarithms Provide the Missing Capability</h3>
+        <p>A logarithm is precisely the operation that finds those exponents.</p>
+        <div class="math">\[\class{mjx-exp}{m}=\log_{\class{mjx-base}{10}}(17)\approx1.23045\]</div>
+        <div class="math">\[\class{mjx-exp}{n}=\log_{\class{mjx-base}{10}}(43)\approx1.63347\]</div>
+        <p>We can now add them:</p>
+        <div class="math">\[\class{mjx-exp}{m+n}\approx2.86392\]</div>
+        <p>And recover the product:</p>
+        <div class="math">\[\class{mjx-base}{10}^{\class{mjx-exp}{2.86392}}\approx731\]</div>
+        <p>So we have calculated \(17\times43=731\) using logarithms and addition.</p>
+        <p>Notice the difference:</p>
+        <ul>
+          <li>The exponent rule establishes that adding exponents corresponds to multiplying powers.</li>
+          <li>The logarithm finds the relevant exponents for numbers we already have.</li>
+        </ul>
+        <p>The second capability is what makes the first useful as a general method of calculation.</p>
+
+        <h3>Why This Mattered Historically</h3>
+        <p>Before electronic calculators, people used tables of logarithms to carry out difficult multiplications.</p>
+        <p>Instead of a lengthy multiplication of two many-digit numbers, you could:</p>
+        <ol>
+          <li>Look up the logarithm of each number in a table.</li>
+          <li>Add the logarithms.</li>
+          <li>Look up the number whose logarithm is that sum (the <strong>antilogarithm</strong>).</li>
+        </ol>
+        <p>The difficult multiplication was replaced by one addition and three table lookups.</p>
+        <p>A table only needs to list the logarithms of numbers from \(1\) to <span class="nw">\(10\).</span> Every other positive number is one of these multiplied by a power of <span class="nw">\(10\),</span> and by the product rule, multiplying by \(10^{c}\) just adds \(c\) to the logarithm: <span class="nw">\(\log_{10}(17) = 1 + \log_{10}(1.7)\).</span></p>
+        <iframe class="expo-widget" src="exponentials/understanding-logarithms/log-table-widget.html" title="Interactive: step through a multiplication done with a four-figure table of logarithms. Look up the log of each number, add them, then look the sum up in reverse. 17 times 43 gives 731; 3.142 times 2.718 gives 8.539, against the exact 8.539956, because the table carries only four figures" style="height: 330px" scrolling="no" loading="lazy"></iframe>
+        <p>Of course, calculating logarithms from scratch would often be more work than multiplying directly. Their computational advantage depended on having the logarithms already worked out and tabulated.</p>
+
+        <h3>A Deeper Significance</h3>
+        <p>The computational use is only one consequence of a more general property.</p>
+        <p>Consider how multiplication behaves:</p>
+        <div class="math">\[2\times3\times5\times7=210\]</div>
+        <p>Now consider their logarithms:</p>
+        <div class="math">\[\log_b(2)+\log_b(3)+\log_b(5)+\log_b(7)=\log_b(210)\]</div>
+        <p>A multiplicative relationship between positive numbers has become an additive relationship between real numbers.</p>
+        <p>This works whether the numbers are whole numbers, fractions, irrational numbers or any other positive real numbers. A factor less than \(1\) has a negative logarithm, so multiplying by it steps backwards.</p>
+        <iframe class="expo-widget" src="exponentials/understanding-logarithms/factors-widget.html" title="Interactive: choose factors from 2, 3, 5, 7, one half, root 2 and pi. Their logarithms are laid end to end on a ruler marked in powers of 10, and the chain always ends at the product. One half has a negative logarithm, so its length runs backwards" style="height: 260px" scrolling="no" loading="lazy"></iframe>
+        <p>This is not just a convenient computational trick. The logarithm preserves the structure of multiplication while representing it through addition.</p>
+        <p>In abstract algebra, this is an example of an <strong>isomorphism</strong>: a reversible correspondence between two mathematical systems that preserves their operations.</p>
+
+        <h3>Three Successive Discoveries</h3>
+        <p><strong>First: the product of powers rule.</strong></p>
+        <div class="math">\[\class{mjx-base}{b}^{\class{mjx-exp}{m}}\class{mjx-base}{b}^{\class{mjx-exp}{n}}=\class{mjx-base}{b}^{\class{mjx-exp}{m+n}}\]</div>
+        <p>Multiplying powers with a common base corresponds to adding their exponents.</p>
+        <p><strong>Second: the logarithm.</strong></p>
+        <div class="math">\[\class{mjx-exp}{m}=\log_{\class{mjx-base}{b}}(x)\]</div>
+        <p>Given any positive number and a valid base, we can find the exponent that represents that number as a power of the base.</p>
+        <p><strong>Third: the product rule for logarithms.</strong></p>
+        <div class="math">\[\boxed{\log_b(xy)=\log_b(x)+\log_b(y)}\]</div>
+        <p>We can now describe multiplication between any positive numbers directly as addition between their logarithms.</p>
+        <p>The third result follows from the first two. It is not a new, independent principle.</p>
+        <p><strong>The deeper insight is that the multiplicative structure of the positive real numbers can be represented exactly by the additive structure of the real numbers. Logarithms are the function that establishes this correspondence.</strong></p>
+      </section>
+
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="exponentials-inverse-operations-radication-and-logarithms.html">← Inverse Operations: Radication and Logarithms</a>
         <a href="exponentials-exponentiation-and-radication.html">Next: A Deeper Understanding of Exponentiation and Radication →</a>

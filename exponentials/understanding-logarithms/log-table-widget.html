@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multiplying with a table of logarithms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  .problem { text-align: center; font-size: 1.35rem; color: var(--ink); margin-bottom: 0.7rem; }
+  .problem .ans { color: var(--dim); }
+  .board { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.2rem; align-items: start; min-height: 172px; }
+  @media (max-width: 460px) { .board { grid-template-columns: 1fr; } }
+  ol.work { list-style: none; font-size: 12.5px; line-height: 1.55; color: var(--dim); }
+  ol.work li { padding: 0.28rem 0 0.28rem 0.7rem; border-left: 2px solid transparent; opacity: 0.16; transition: opacity 0.25s ease, border-color 0.25s ease; }
+  ol.work li.done { opacity: 0.6; }
+  ol.work li.now { opacity: 1; color: var(--ink); border-left-color: var(--exp); }
+  ol.work .tag { display: block; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+  .exp { color: var(--exp); }
+  .base { color: var(--base); }
+  .card { border: 1px solid var(--faint); padding: 0.5rem 0.75rem 0.55rem; min-width: 11.5rem; transition: opacity 0.25s ease; }
+  .card .cap { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 0.3rem; }
+  .card table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  .card th { font-weight: 400; text-align: left; color: var(--dim); padding: 0.1rem 0.9rem 0.25rem 0; border-bottom: 1px solid var(--hair); font-size: 11px; }
+  .card td { padding: 0.12rem 0.9rem 0.12rem 0; color: var(--dim); }
+  .card th:last-child, .card td:last-child { padding-right: 0; text-align: right; }
+  .card tr.hit td { color: var(--ink); }
+  .card tr.hit td:last-child { color: var(--exp); }
+  .card .note { margin-top: 0.4rem; font-size: 11px; color: var(--dim); }
+  .card.off { opacity: 0; }
+  .nav { display: flex; justify-content: center; align-items: center; gap: 1.2rem; margin-top: 0.7rem; }
+  .nav button { font: inherit; font-size: 1.05rem; background: none; border: 0; color: var(--ink); cursor: pointer; padding: 0.15rem 0.2rem; }
+  .nav button:disabled { color: var(--faint); cursor: default; }
+  .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+  .nav .count { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--dim); min-width: 5.5em; text-align: center; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="problem" id="problem"></div>
+  <div class="board">
+    <ol class="work mono" id="work"></ol>
+    <div class="card mono" id="card"></div>
+  </div>
+  <div class="nav">
+    <button type="button" id="back" aria-label="Previous step">←</button>
+    <span class="count" id="count"></span>
+    <button type="button" id="next" aria-label="Next step">→</button>
+  </div>
+  <div class="choices" role="group" aria-label="Which multiplication">
+    <button type="button" data-i="0" aria-pressed="true">17 × 43</button>
+    <button type="button" data-i="1" aria-pressed="false">3.142 × 2.718</button>
+    <button type="button" data-i="2" aria-pressed="false">48.73 × 615.2</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Multiplying the way it was done before calculators, with a four-figure table of logarithms.
+  // The table lists log N for N from 1.000 to 9.999. Any positive number is N × 10^c, so its log is c + log N.
+  // Look up both logs, add them, then look the sum's fractional part up in reverse (the antilogarithm).
+  // Four-figure tables carry about four significant figures, so the answer can be off in the last place.
+  const PAIRS = [[17, 43], [3.142, 2.718], [48.73, 615.2]];
+  let pair = 0, step = 0;
+  const STEPS = 4;
+  const $ = id => document.getElementById(id);
+  const r4 = v => Math.round(v * 1e4) / 1e4;
+  const f4 = v => v.toFixed(4);
+
+  // a number as N × 10^c with 1 ≤ N < 10, rounded to four significant figures as the table lists it
+  function split(x) {
+    const c = Math.floor(Math.log10(x));
+    const N = Math.round(x / Math.pow(10, c) * 1000) / 1000;
+    return { c, N };
+  }
+  const tableLog = N => r4(Math.log10(N));
+  // reverse lookup: the table entry whose log is nearest the mantissa
+  function antilog(mant) {
+    // several entries can share the same four-figure log; take the one nearest the true value, as a reader would
+    const t = Math.pow(10, mant), N = Math.round(t * 1000) / 1000;
+    let best = N, bestErr = Infinity, bestGap = Infinity;
+    for (let d = -3; d <= 3; d++) {
+      const n = Math.round((N + d / 1000) * 1000) / 1000, e = Math.abs(tableLog(n) - mant), g = Math.abs(n - t);
+      if (n < 1 || n >= 10) continue;
+      if (e < bestErr - 1e-12 || (Math.abs(e - bestErr) < 1e-12 && g < bestGap)) { best = n; bestErr = e; bestGap = g; }
+    }
+    return best;
+  }
+  const fmtN = N => N.toFixed(3);
+  const sup = c => String(c).replace(/-/g, "⁻").replace(/\d/g, d => "⁰¹²³⁴⁵⁶⁷⁸⁹"[d]);
+  const plain = v => String(+v.toPrecision(6));
+
+  function rows(N, hit) {
+    let h = `<table><thead><tr><th>N</th><th>log N</th></tr></thead><tbody>`;
+    for (let d = -2; d <= 2; d++) {
+      const n = Math.round((N + d / 1000) * 1000) / 1000;
+      if (n < 1 || n >= 10) continue;
+      h += `<tr class="${d === 0 ? "hit" : ""}"><td>${fmtN(n)}</td><td>${f4(tableLog(n))}</td></tr>`;
+    }
+    return h + `</tbody></table>`;
+  }
+
+  function render() {
+    const [x, y] = PAIRS[pair];
+    const a = split(x), b = split(y);
+    const la = a.c + tableLog(a.N), lb = b.c + tableLog(b.N);
+    const sum = r4(la + lb);
+    const c = Math.floor(sum), mant = r4(sum - c);
+    const N = antilog(mant);
+    const result = N * Math.pow(10, c);
+    const exact = x * y;
+
+    $("problem").innerHTML = `${plain(x)} × ${plain(y)} = <span class="ans">${step === STEPS ? `≈ ${plain(+result.toPrecision(4))}` : "?"}</span>`;
+
+    const lines = [
+      `<span class="tag">1 · look up</span>log ${plain(x)} = ${a.c} + log ${fmtN(a.N)} = <span class="exp">${f4(la)}</span>`,
+      `<span class="tag">2 · look up</span>log ${plain(y)} = ${b.c} + log ${fmtN(b.N)} = <span class="exp">${f4(lb)}</span>`,
+      `<span class="tag">3 · add</span><span class="exp">${f4(la)} + ${f4(lb)} = ${f4(sum)}</span>`,
+      `<span class="tag">4 · look up in reverse</span>${f4(sum)} = ${c} + ${f4(mant)} → ${fmtN(N)} × 10${sup(c)} = ${plain(+result.toPrecision(4))}`
+    ];
+    $("work").innerHTML = lines.map((l, i) => `<li class="${i + 1 < step ? "done" : i + 1 === step ? "now" : ""}">${l}</li>`).join("");
+
+    const card = $("card");
+    card.classList.toggle("off", step === 0 || step === 3);
+    if (step === 1) card.innerHTML = `<div class="cap">table of logarithms</div>${rows(a.N)}`;
+    else if (step === 2) card.innerHTML = `<div class="cap">table of logarithms</div>${rows(b.N)}`;
+    else if (step === 4) card.innerHTML = `<div class="cap">find ${f4(mant)} in the table</div>${rows(N)}<div class="note">exact: ${plain(exact)}</div>`;
+    else if (!card.innerHTML) card.innerHTML = `<div class="cap">table of logarithms</div>${rows(a.N)}`;
+
+    $("count").textContent = step === 0 ? "start" : `step ${step} of ${STEPS}`;
+    $("back").disabled = step === 0;
+    $("next").disabled = step === STEPS;
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  $("next").addEventListener("click", () => { if (step < STEPS) { step++; render(); } });
+  $("back").addEventListener("click", () => { if (step > 0) { step--; render(); } });
+  document.querySelectorAll("button[data-i]").forEach(btn => btn.addEventListener("click", () => {
+    pair = +btn.dataset.i; step = 0;
+    document.querySelectorAll("button[data-i]").forEach(x => x.setAttribute("aria-pressed", x === btn ? "true" : "false"));
+    render();
+  }));
+  render();
+</script>
+</body>
+</html>

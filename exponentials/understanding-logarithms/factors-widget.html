@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multiplying factors, adding their logarithms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .choices { gap: 0.2rem 1rem; }
+  .choices button { font-family: "Spectral", Georgia, serif; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="choices" role="group" aria-label="Factors to multiply" id="chips"></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Choose any positive factors: whole numbers, a fraction, irrationals. Above, their product.
+  // Below, each factor's logarithm laid end to end on a ruler marked in powers of 10: multiplying the
+  // factors adds the lengths, and the chain ends exactly at the product. A factor below 1 has a
+  // negative logarithm, so its length runs backwards. Choosing nothing multiplies nothing: 1, and log 1 = 0.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const chips = document.getElementById("chips");
+  const INK = "#f4f6ff", EXP = "#7aa7ff";
+  const F = [
+    { s: "2", v: 2, on: true }, { s: "3", v: 3, on: true }, { s: "5", v: 5, on: true }, { s: "7", v: 7, on: true },
+    { s: "½", v: 0.5 }, { s: "√2", v: Math.SQRT2 }, { s: "π", v: Math.PI }
+  ];
+  const LO = -1, HI = 3;   // the ruler runs from 10⁻¹ to 10³
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  F.forEach((f, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = f.s; b.setAttribute("aria-pressed", f.on ? "true" : "false");
+    b.setAttribute("aria-label", "factor " + f.s);
+    b.addEventListener("click", () => { f.on = !f.on; b.setAttribute("aria-pressed", f.on ? "true" : "false"); render(); });
+    chips.appendChild(b);
+  });
+
+  const isWhole = v => Math.abs(v - Math.round(v)) < 1e-9;
+  const show = v => isWhole(v) ? String(Math.round(v)) : "≈ " + (+v.toPrecision(4));
+  const sgn = v => (v < 0 ? "−" : "") + Math.abs(v).toFixed(3);
+
+  function render() {
+    const on = F.filter(f => f.on);
+    const prod = on.reduce((p, f) => p * f.v, 1);
+    const logs = on.map(f => Math.log10(f.v)), total = logs.reduce((s, l) => s + l, 0);
+    const W = svg.clientWidth || 560, L = 16, R = W - 16;
+    const BAR0 = 52, GAP = 13, AX = BAR0 + Math.max(on.length, 1) * GAP + 30, H = AX + 50;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = e => L + (e - LO) / (HI - LO) * (R - L);
+
+    // the multiplication, written out
+    const top = el("text", { x: W / 2, y: 18, "text-anchor": "middle", "font-size": 16, class: "ink" });
+    top.style.fontFamily = "Spectral, Georgia, serif";
+    top.textContent = on.length ? `${on.map(f => f.s).join(" × ")} ${isWhole(prod) ? "=" : ""} ${show(prod)}` : "nothing multiplied: 1";
+    // and the addition it becomes
+    el("text", { x: W / 2, y: 36, "text-anchor": "middle", class: "exp", "font-size": 11.5 },
+      on.length ? `sum of the logs = ${sgn(total)} = log₁₀(${isWhole(prod) ? Math.round(prod) : +prod.toPrecision(4)})` : "nothing added: 0 = log₁₀(1)");
+
+    // the ruler
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.25 });
+    for (let d = LO; d <= HI; d++) {
+      el("line", { x1: px(d), x2: px(d), y1: AX - 6, y2: AX + 6, stroke: INK, "stroke-opacity": 0.45 });
+      el("text", { x: px(d), y: AX + 21, "text-anchor": "middle" }, d < 0 ? "0.1" : String(Math.pow(10, d)));
+      el("text", { x: px(d), y: AX - 11, "text-anchor": "middle", class: "exp", "font-size": 10, "fill-opacity": 0.55 }, String(d).replace("-", "−"));
+      if (d < HI) for (let k = 2; k <= 9; k++) el("line", { x1: px(d + Math.log10(k)), x2: px(d + Math.log10(k)), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.18 });
+    }
+    // from 1, each log as a length, end to end, one row each
+    let at = 0;
+    on.forEach((f, i) => {
+      const y = BAR0 + i * GAP, a = px(at), b = px(at + logs[i]);
+      el("line", { x1: a, x2: b, y1: y, y2: y, stroke: EXP, "stroke-width": 4, "stroke-opacity": i % 2 ? 0.55 : 0.95 });
+      el("line", { x1: b, x2: b, y1: y - 4, y2: y + 4, stroke: EXP, "stroke-opacity": 0.6 });
+      const label = `×${f.s}`, right = logs[i] >= 0;
+      el("text", { x: right ? b + 6 : b - 6, y: y + 4, "text-anchor": right ? "start" : "end", "font-size": 10.5, class: "ink", "fill-opacity": 0.8 }, label);
+      at += logs[i];
+    });
+    el("line", { x1: px(total), x2: px(total), y1: BAR0 - 4, y2: AX, stroke: INK, "stroke-opacity": 0.35, "stroke-dasharray": "2 3" });
+    el("circle", { cx: px(0), cy: AX, r: 2.8, fill: INK, "fill-opacity": 0.6 });
+    el("circle", { cx: px(total), cy: AX, r: 4.6, fill: INK });
+    el("text", { x: px(total), y: AX + 38, "text-anchor": px(total) > R - 30 ? "end" : "middle", class: "ink", "font-size": 12 }, show(prod).replace("≈ ", "≈"));
+
+    svg.setAttribute("aria-label", on.length
+      ? `${on.map(f => f.s).join(" times ")} is ${show(prod)}. Their logarithms, laid end to end from 1, add to ${total.toFixed(3)} and end at the product.`
+      : "No factors chosen: the product is 1 and the sum of logarithms is 0.");
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
