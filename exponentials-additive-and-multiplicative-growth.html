@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Additive and Multiplicative Growth | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Additive growth adds the same amount each step; multiplicative growth multiplies by the same factor. Halfway through the steps means halfway in distance for one, and halfway in ratio for the other: the geometric mean." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Additive and Multiplicative Growth</h1>
+    </header>
+    <main>
+      <section aria-label="Additive and multiplicative growth">
+        <p>In <strong>additive</strong> growth, each step adds the same amount. The distance between each step is equal.</p>
+        <div class="math">\[1 \to 3 \to 5 \to 7 \to 9\]</div>
+        <p>In <strong>multiplicative</strong> growth, each step multiplies by the same factor.</p>
+        <p>The distance between each step is not equal.</p>
+        <p>However, the ratio between steps is always constant.</p>
+        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16\]</div>
+        <p>Let's visualise growing by a constant factor of <span class="nw">\(\class{mjx-base}{4}\).</span></p>
+        <p>Imagine a square.</p>
+        <p>A grid with four cells appears and the square occupies one of its cells.</p>
+        <p>A copy of the square then fills each empty cell.</p>
+        <p>We have grown from <span class="nw">\(1 \to 4\).</span></p>
+        <p>The grid then vanishes while the square of area \(4\) remains.</p>
+        <p>The grid then appears again. Our new, bigger square occupies one of its cells.</p>
+        <p>The grid then fills in again with three more copies of the bigger square.</p>
+        <p>The square has grown from <span class="nw">\(4 \to 16\).</span></p>
+        <p>Although the absolute increase from one square to the next varies, the next square is always \(\class{mjx-base}{4}\) times as big as the previous one.</p>
+        <p>The grid could have any number of cells to represent any multiplicative factor.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/grid-growth-widget.html" title="Animation: a square of area 1 sits in one cell of a 2 by 2 grid; copies fill the other cells and merge into a square of area 4. The view zooms out as the grid appears again, and the square grows to 16, then 64. The amount added grows each time, 3, 12, 48, but the factor is always 4. Buttons switch to a 3 by 3 or 4 by 4 grid, for a factor of 9 or 16" style="height: 340px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section aria-labelledby="additive-progress">
+        <h2 id="additive-progress">Progress in Additive Journeys</h2>
+        <p>Say we start at:</p>
+        <div class="math">\[0\]</div>
+        <p>We want to reach:</p>
+        <div class="math">\[256\]</div>
+        <p>We must take steps to get there.</p>
+        <p>As we progress, we will increase our steps taken and our current output.</p>
+        <p>If our steps are of equal distance, the percentage of steps we have taken will correspond exactly to the percentage of the output we have reached.</p>
+        <p>For example:</p>
+        <ul>
+          <li>If each step travels <span class="nw">\(+4\),</span> it will take \(\class{mjx-exp}{64}\) steps to reach <span class="nw">\(256\).</span></li>
+          <li>If we have taken \(25\%\) of our steps, our output will be \(25\%\) of the target.</li>
+        </ul>
+        <div class="math">\[\frac{\class{mjx-exp}{16}}{\class{mjx-exp}{64}} \text{ steps} \to 64\]</div>
+        <p>Since our steps are of an equal distance, the value of the output when we have taken \(50\%\) of our steps will be \(50\%\) of the value of the target output.</p>
+        <p>So adding the value of the output after \(50\%\) of our steps to itself will give \(100\%\) of the target output.</p>
+        <div class="math">\[128 + 128 = 256\]</div>
+      </section>
+
+      <section aria-labelledby="multiplicative-progress">
+        <h2 id="multiplicative-progress">Progress in Multiplicative Journeys</h2>
+        <p>Say we start at:</p>
+        <div class="math">\[1\]</div>
+        <p>We want to reach:</p>
+        <div class="math">\[256\]</div>
+        <p>We must take steps to get there.</p>
+        <p>As we progress, we will increase our steps taken and our current output.</p>
+        <p>If our steps are of an equal ratio, the percentage of steps we have taken will not correspond to the percentage of the output we have reached (at least not directly).</p>
+        <p>If each step multiplies our previous output by a factor of <span class="nw">\(\class{mjx-base}{2}\),</span> it will take \(\class{mjx-exp}{8}\) steps.</p>
+        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32 \to 64 \to 128 \to 256\]</div>
+        <p>If we take \(25\%\) of our steps (\(\class{mjx-exp}{2}\) steps), our output will be <span class="nw">\(4\),</span> while \(25\%\) of the target output is <span class="nw">\(64\).</span></p>
+        <p>When we have taken \(50\%\) of our steps, our output is still only <span class="nw">\(16\)!</span></p>
+        <p>In fact, we will not have reached the halfway point of our output (\(128\)) until we have taken \(87.5\%\) of our multiplicative journey's steps.</p>
+        <p>However, although we are not halfway to our output in absolute distance, we are halfway in another sense.</p>
+        <p>In an additive journey, halfway through the steps means halfway to the output in terms of <strong>distance</strong>.</p>
+        <p>In a multiplicative journey, halfway through the steps means halfway to the output in terms of <strong>ratio</strong>.</p>
+        <p>The ratio from the beginning of the journey to the halfway point will be the same as the ratio from the halfway point to the end.</p>
+        <div class="math">\[\frac{16}{1} = \frac{256}{16} = 16\]</div>
+        <p>That means multiplying the output at the halfway point by itself will reach the target output.</p>
+        <div class="math">\[16 \times 16 = 256\]</div>
+        <p>We call the output at the halfway point of multiplicative steps the <strong>geometric mean</strong>.</p>
+      </section>
+
+      <section aria-labelledby="takeaway">
+        <h2 id="takeaway">Main Takeaway</h2>
+        <p>We can think of journeys between values as comprised of steps.</p>
+        <p>These steps can be additive or multiplicative.</p>
+        <p>Additive steps have a direct correspondence with the distance from the target output.</p>
+        <p>If we add the output that we reach when we have taken half our additive steps to itself, we will reach the target output.</p>
+        <p>Multiplicative steps still have a correspondence with the distance from the target output, although it does not match one-to-one.</p>
+        <p>If we multiply the output that we reach when we have taken half our multiplicative steps by itself, we will reach the target output.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-the-many-rules-of-exponentiation.html">← Laws of Exponents</a>
+        <a href="exponentials-moving-between-exponents.html">Next: Moving Between Exponents →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

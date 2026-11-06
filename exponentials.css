@@ -14,6 +14,7 @@
   --base:  #e8a33d;   /* the base */
   --exp:   #7aa7ff;   /* the exponent */
   --power: #c4a1e8;   /* the whole expression */
+  --value: #7fcf9a;   /* the value a power works out to */
   --measure: 40rem;
 }
 
@@ -100,6 +101,7 @@ em { font-style: italic; }
 
 .base { color: var(--base); }
 .exp  { color: var(--exp); }
+.value { color: var(--value); }
 
 /* keeps a formula and the punctuation after it on one line */
 .nw { white-space: nowrap; }
@@ -127,6 +129,7 @@ mjx-container { color: inherit; }
 .math + p, figure + p, iframe + p, table + p, .side + p { margin-top: 0.9rem; }
 .mjx-base { color: var(--base); }
 .mjx-exp  { color: var(--exp); }
+.mjx-value { color: var(--value); }
 
 /* ---------- figures and widgets ---------- */
 figure { margin: 1.6rem 0; }
@@ -156,11 +159,12 @@ figure.anatomy .lead.power { stroke: var(--power); stroke-opacity: 0.65; }
 
 /* A static factor diagram shares the lesson's base and exponent colours. */
 figure.factor-combination { margin: 1.8rem 0; }
-.factor-combination svg { max-width: 560px; }
+.factor-combination svg { max-width: 640px; }
 .factor-combination text { font-family: "Spectral", Georgia, serif; font-weight: 400; font-size: 36px; fill: var(--ink); }
 .factor-combination .factors text { font-size: 40px; fill: var(--base); }
 .factor-combination text.exponent, .factor-combination tspan.exponent { fill: var(--exp); }
 .factor-combination text.operator { fill: var(--dim); }
+.factor-combination text.value { fill: var(--value); }
 .factor-combination .connections path { stroke: var(--faint); stroke-width: 1.5; fill: none; }
 
 iframe.expo-widget {

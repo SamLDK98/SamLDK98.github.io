@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moving Between Exponents | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="What happens to the value of a power as we move continuously between two exponents?" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Moving Between Exponents</h1>
+    </header>
+    <main>
+      <section aria-label="The question">
+        <div class="power-intro-copy">
+          <p><strong><em>What happens to the value of a power as we move continuously between two exponents?</em></strong></p>
+        </div>
+        <div class="power-intro">
+          <figure class="anatomy journey">
+            <svg viewBox="0 0 400 170" role="img" aria-label="3 raised to an exponent moving from 1 to 2: what value does it take along the way?">
+              <style>
+                .journey .q { fill: var(--value); }
+                .journey .arrow { stroke: var(--exp); stroke-width: 2; fill: none; }
+                .journey text.eq { fill: var(--dim); }
+              </style>
+              <text x="92" y="130" class="glyph big base">3</text>
+              <text x="146" y="78" class="glyph sup exp">1</text>
+              <path class="arrow" d="M176 64 H222 M214 57 L222 64 L214 71"/>
+              <text x="230" y="78" class="glyph sup exp">2</text>
+              <text x="278" y="130" class="glyph big q">?</text>
+            </svg>
+          </figure>
+        </div>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-additive-and-multiplicative-growth.html">← Additive and Multiplicative Growth</a>
+        <a href="exponentials-fractional-exponents.html">Next: Fractional Exponents →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
