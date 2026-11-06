@@ -17,11 +17,7 @@
 <body>
 <div class="widget">
   <svg id="fig" role="img"></svg>
-  <div class="choices" role="group" aria-label="Grid and playback">
-    <button type="button" data-g="2" aria-pressed="true">×4</button>
-    <button type="button" data-g="3" aria-pressed="false">×9</button>
-    <button type="button" data-g="4" aria-pressed="false">×16</button>
-    <span class="sep"></span>
+  <div class="choices" role="group" aria-label="Playback">
     <button type="button" class="play" id="play">Play</button>
   </div>
 </div>
@@ -68,7 +64,7 @@
 
   function draw(t) {
     const W = svg.clientWidth || 360;
-    const BOX = Math.min(220, W - 40), top = 14, H = top + BOX + 86;
+    const BOX = Math.min(220, W - 40), top = 14, H = top + BOX + 16;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
     svg.textContent = "";
     const st = stateAt(t), { c, ph, f } = st;
@@ -85,10 +81,10 @@
     let gA = 0;
     if (ph === "gridIn") gA = ease(clamp((f - 0.3) / 0.7)); else if (ph === "copies") gA = 1; else if (ph === "merge") gA = 1 - ease(f);
     if (gA > 0) {
-      const gg = el("g", { stroke: INK, "stroke-opacity": 0.4 * gA, "stroke-dasharray": "3 4" });
+      const gg = el("g", { stroke: INK, "stroke-opacity": 0.32 * gA, "stroke-width": 1 });
       for (let i = 0; i <= g; i++) {
-        el("line", { x1: X(i * s), x2: X(i * s), y1: Y(0) + 8, y2: Y(E1) - 8 }, null, gg);
-        el("line", { y1: Y(i * s), y2: Y(i * s), x1: X(0) - 8, x2: X(E1) + 8 }, null, gg);
+        el("line", { x1: X(i * s), x2: X(i * s), y1: Y(0), y2: Y(E1) }, null, gg);
+        el("line", { y1: Y(i * s), y2: Y(i * s), x1: X(0), x2: X(E1) }, null, gg);
       }
     }
 
@@ -107,11 +103,16 @@
         if (a <= 0) continue;
         const cx = X(col * s + s / 2), cy = Y(row * s + s / 2), w = s * k * sc;
         el("rect", { x: cx - w / 2, y: cy - w / 2, width: w, height: w, fill: BASE, "fill-opacity": fillA * a, stroke: BASE, "stroke-opacity": 0.9 * a, "stroke-width": 1.4 });
+        label(cx, cy, w, s * s, a);
       }
-      label(X(s / 2), Y(s / 2), s * k, s * s, 1);
     } else {
       el("rect", { x: X(0), y: Y(E1), width: E1 * k, height: E1 * k, fill: BASE, "fill-opacity": fillA, stroke: BASE, "stroke-opacity": 0.9, "stroke-width": 1.4 });
       const inner = merging ? 1 - ease(f) : 0;
+      // while the inner borders dissolve, each copy's number fades with them
+      if (merging) for (let i = 1; i < g * g; i++) {
+        const col = i % g, row = Math.floor(i / g);
+        label(X(col * s + s / 2), Y(row * s + s / 2), s * k, s * s, 1 - clamp(f * 2));
+      }
       if (inner > 0) for (let i = 1; i < g; i++) {
         el("line", { x1: X(i * s), x2: X(i * s), y1: Y(0), y2: Y(E1), stroke: BASE, "stroke-opacity": 0.9 * inner, "stroke-width": 1.4 });
         el("line", { y1: Y(i * s), y2: Y(i * s), x1: X(0), x2: X(E1), stroke: BASE, "stroke-opacity": 0.9 * inner, "stroke-width": 1.4 });
@@ -119,37 +120,38 @@
       if (merging) {
         label(X(s / 2), Y(s / 2), s * k, s * s, 1 - clamp(f * 2));
         label(X(E1 / 2), Y(E1 / 2), E1 * k, E1 * E1, clamp(f * 2 - 1));
+      } else if (st.done) {
+        // at the end the corner holds the outlines of earlier squares, so the total sits in the open space beyond them
+        const sL = Math.pow(g, STEPS - 1), m = (sL + E1) / 2;
+        label(X(m), Y(m), (E1 - sL) * k * 1.25, E1 * E1, 1);
       } else label(X(E1 / 2), Y(E1 / 2), E1 * k, E1 * E1, 1);
     }
     // once the view has zoomed well out, mark the original square of area 1 in its corner: its size shows how far we have grown
-    if (k < 40 && ph !== "idle") {
+    if (st.done) {
+      // at the end, outline every earlier square in the corner it grew from: 1, then g², then g⁴ …
+      for (let i = 0; i < STEPS; i++) {
+        const side = Math.pow(g, i), u = side * k, area = side * side;
+        el("rect", { x: X(0), y: Y(side), width: u, height: u, fill: "none", stroke: INK, "stroke-opacity": 0.6, "stroke-width": 1 });
+        const inside = u >= 28;
+        const fs = inside ? Math.min(14, Math.max(10, u * 0.18)) : 11;
+        const l = el("text", inside
+          ? { x: X(side) - 5, y: Y(side) + fs + 3, "text-anchor": "end", "font-size": fs, "fill-opacity": 0.8 }
+          : { x: X(side) + 4, y: Y(side) - 3, "text-anchor": "start", "font-size": fs, "fill-opacity": 0.8 });
+        l.style.fontFamily = "Spectral, Georgia, serif"; l.style.fill = INK; l.textContent = fmt(area);
+      }
+    } else if (k < 40 && ph !== "idle") {
       const u = Math.max(2, k);
       el("rect", { x: X(0), y: Y(0) - u, width: u, height: u, fill: "none", stroke: INK, "stroke-opacity": 0.55, "stroke-width": 1 });
-      if (u >= 12) {
-        const l = el("text", { x: X(0) + u / 2, y: Y(0) - u / 2 + u * 0.17, "text-anchor": "middle", "font-size": u * 0.5, "fill-opacity": 0.7 });
-        l.style.fontFamily = "Spectral, Georgia, serif"; l.style.fill = INK; l.textContent = "1";
-      }
+      const inside = u >= 12;
+      const l = el("text", inside
+        ? { x: X(0) + u / 2, y: Y(0) - u / 2 + u * 0.17, "text-anchor": "middle", "font-size": u * 0.5, "fill-opacity": 0.75 }
+        : { x: X(0) + u + 4, y: Y(0) - u - 3, "text-anchor": "start", "font-size": 11, "fill-opacity": 0.75 });
+      l.style.fontFamily = "Spectral, Georgia, serif"; l.style.fill = INK; l.textContent = "1";
     }
 
-    // the record: areas so far, how much each step added, and the constant factor
+    // what has been reached so far, for the description read by screen readers
     const reached = c + ((merging && f >= 0.5) || merged ? 1 : 0);
     const areas = []; for (let i = 0; i <= STEPS; i++) areas.push(Math.pow(g * g, i));
-    const ty = by + 30;
-    const trail = el("text", { x: W / 2, y: ty, "text-anchor": "middle", "font-size": 12.5 });
-    areas.forEach((a, i) => {
-      if (i) el("tspan", { fill: INK, "fill-opacity": i <= reached ? 0.45 : 0.18 }, " → ", trail);
-      el("tspan", { fill: i === reached ? VAL : INK, "fill-opacity": i < reached ? 0.6 : i === reached ? 1 : 0.2 }, fmt(a), trail);
-    });
-    const adds = el("text", { x: W / 2, y: ty + 22, "text-anchor": "middle", "font-size": 11.5 });
-    el("tspan", { fill: INK, "fill-opacity": 0.5 }, "added: ", adds);
-    for (let i = 1; i <= STEPS; i++) {
-      el("tspan", { fill: INK, "fill-opacity": i <= reached ? 0.8 : 0.18 }, (i > 1 ? "   " : "") + "+" + fmt(areas[i] - areas[i - 1]), adds);
-    }
-    const fac = el("text", { x: W / 2, y: ty + 44, "text-anchor": "middle", "font-size": 11.5 });
-    el("tspan", { fill: INK, "fill-opacity": 0.5 }, "each step: ", fac);
-    el("tspan", { fill: BASE }, "×" + g * g, fac);
-    el("tspan", { fill: INK, "fill-opacity": 0.5 }, `   (a ${g} × ${g} grid)`, fac);
-
     svg.setAttribute("aria-label", `A square grown by a factor of ${g * g} per step. Its area so far: ${areas.slice(0, reached + 1).map(fmt).join(", ")}. Each step adds more than the last, but always multiplies by ${g * g}.`);
   }
 

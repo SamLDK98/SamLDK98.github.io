@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Progress in a multiplicative journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="n" type="range" min="0" max="8" step="1" value="0" aria-label="Steps taken, out of 8" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // From 1 to 256 in 8 steps of ×2. Two bars on the same scale: the share of the steps taken, and the
+  // share of the output reached. With equal ratios they do not match: half the steps reaches only 16,
+  // and half the output (128) is not reached until 7 of the 8 steps. But halfway through the steps is
+  // halfway in ratio: 1 to 16 is ×16, and 16 to 256 is ×16 again, so 16 × 16 = 256.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("n");
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a";
+  const STEPS = 8, RATIO = 2, TARGET = 256;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const pct = x => (Math.round(x * 10000) / 100) + "%";
+
+  function render() {
+    const n = +slider.value, out = Math.pow(RATIO, n), p = n / STEPS;
+    const W = svg.clientWidth || 560, L = 16, R = W - 16, H = 118;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = f => L + f * (R - L);
+    const half = n === STEPS / 2;
+    const BH = 18;
+
+    // two bars on the same scale: steps taken, output reached
+    el("rect", { x: L, y: 6, width: R - L, height: BH, fill: INK, "fill-opacity": 0.08 });
+    el("rect", { x: L, y: 6, width: px(p) - L, height: BH, fill: EXP });
+    el("rect", { x: L, y: 34, width: R - L, height: BH, fill: INK, "fill-opacity": 0.08 });
+    el("rect", { x: L, y: 34, width: px(out / TARGET) - L, height: BH, fill: VAL });
+    if (half) {
+      // halfway in steps: the same four steps again, the same ×16 again
+      el("rect", { x: px(0.5) + 1, y: 7, width: R - px(0.5) - 2, height: BH - 2, fill: "none", stroke: EXP, "stroke-opacity": 0.6, "stroke-dasharray": "5 4" });
+      el("text", { x: px(0.25), y: 6 + BH / 2 + 5, "text-anchor": "middle", "font-size": 13, fill: "#0e0e11" }, "×16").style.fill = "#0e0e11";
+      el("text", { x: px(0.75), y: 6 + BH / 2 + 5, "text-anchor": "middle", "font-size": 13 }, "×16").style.fill = EXP;
+    }
+
+    // the readings beneath: steps in blue, output in green, side by side
+    const cols = [
+      { x: W * 0.27, big: `${pct(p)} steps taken`, small: `${n} of ${STEPS}`, color: EXP },
+      { x: W * 0.73, big: `${pct(out / TARGET)} output reached`, small: half ? "16 × 16 = 256" : `${out} of ${TARGET}`, color: VAL },
+    ];
+    cols.forEach(c => {
+      const a = el("text", { x: c.x, y: 84, "text-anchor": "middle", "font-size": 17 }); a.textContent = c.big; a.style.fill = c.color;
+      const b = el("text", { x: c.x, y: 106, "text-anchor": "middle", "font-size": 14 }); b.textContent = c.small; b.style.fill = c.color; b.style.fillOpacity = 0.75;
+    });
+
+    svg.setAttribute("aria-label", `${n} of ${STEPS} steps of times 2 taken, ${pct(p)}; output ${out} of 256, ${pct(out / TARGET)}.` + (half ? " Halfway through the steps the output is 16: times 16 again reaches 256." : ""));
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>
