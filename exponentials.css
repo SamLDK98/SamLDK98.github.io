@@ -204,6 +204,11 @@ iframe.expo-widget {
   margin-left: 0;
 }
 .side.lead.power-table > table { justify-self: stretch; }
+/* .flush: a table beside its text that stays inside the text column, its left edge on the prose's left edge */
+@media (min-width: 761px) {
+  .side.lead.flush { grid-template-columns: auto minmax(0, 1fr); width: 100%; margin-left: 0; }
+  .side.lead.flush > table { justify-self: start; }
+}
 .power-table .table-takeaway { margin-left: 1.3rem; }
 .power-table .table-takeaway strong { font-weight: 700; }
 @media (min-width: 761px) {

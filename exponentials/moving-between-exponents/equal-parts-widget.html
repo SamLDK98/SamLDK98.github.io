@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Equal multiplicative parts of ×10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="a" type="range" min="1.2" max="6" step="0.01" value="5" aria-label="The factor for each part" />
+  <div class="choices" role="group" aria-label="How many parts">
+    <button type="button" data-n="2" aria-pressed="true">½ step</button>
+    <button type="button" data-n="4" aria-pressed="false">¼ step</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // One whole step of an exponent multiplies by x = 10. Split it into n equal parts (a half, a quarter):
+  // each part multiplies by the same factor a, and n of them must make ×10. Starting at 1, the hops land on
+  // a, a², … aⁿ. The slider starts at "that much of x" (10 ÷ n), which overshoots; near the n-th root of 10
+  // it snaps, and the last hop lands exactly on 10.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("a");
+  const btns = [...document.querySelectorAll("button[data-n]")];
+  const INK = "#f4f6ff", BASE = "#e8a33d", VAL = "#7fcf9a", RED = "#e8706a";
+  const X = 10;
+  let n = 2;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) {
+      if (attrs[k] === null || attrs[k] === undefined) continue;
+      if (k === "font-size") e.style.fontSize = attrs[k] + "px"; else e.setAttribute(k, attrs[k]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const f2 = v => (Math.abs(v - Math.round(v)) < 0.005 ? String(Math.round(v)) : v.toFixed(2));
+
+  function render() {
+    const root = Math.pow(X, 1 / n);
+    let a = +slider.value;
+    const hit = Math.abs(a - root) < 0.012;
+    if (hit) a = root;
+    const stops = [1]; for (let i = 0; i < n; i++) stops.push(stops[i] * a);
+    const end = stops[n];
+    const W = svg.clientWidth || 560, L = 14, R = W - 18, AX = 110, H = 168;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const top = Math.max(12, Math.ceil(end * 1.08));
+    const px = v => L + v / top * (R - L);
+    const FS = 13;
+
+    // the line, with a tick at every whole number when there is room, otherwise every 5 or 10
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.22 });
+    const every = (R - L) / top > 9 ? 1 : (R - L) / top > 3 ? 5 : 10;
+    for (let v = 0; v <= top; v += every) el("line", { x1: px(v), x2: px(v), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.22 });
+
+    // the hops, each ×a
+    const fac = hit ? (n === 2 ? "×√10" : "×∜10") : "×" + a.toFixed(2);
+    for (let i = 0; i < n; i++) {
+      const p = px(stops[i]), q = px(stops[i + 1]), span = q - p;
+      const lift = Math.max(6, Math.min(44, span * 0.4)), y0 = AX - 6;
+      el("path", { d: `M${p.toFixed(1)} ${y0} Q${((p + q) / 2).toFixed(1)} ${(y0 - 2 * lift).toFixed(1)} ${q.toFixed(1)} ${y0}`, fill: "none", stroke: INK, "stroke-opacity": 0.6, "stroke-width": 1.3 });
+      if (span > fac.length * 7.6 + 4) el("text", { x: (p + q) / 2, y: y0 - lift - 8, "text-anchor": "middle", "font-size": FS }, fac).style.fill = BASE;
+    }
+
+    // the target, 10, and where we land
+    el("circle", { cx: px(X), cy: AX, r: 8, fill: "none", stroke: RED, "stroke-width": 1.5 });
+    el("circle", { cx: px(1), cy: AX, r: 4.5, fill: VAL });
+    stops.slice(1, -1).forEach(v => el("circle", { cx: px(v), cy: AX, r: 3.2, fill: INK, "fill-opacity": 0.8 }));
+    el("circle", { cx: px(end), cy: AX, r: 4.8, fill: hit ? RED : INK });
+    el("text", { x: px(1), y: AX + 22, "text-anchor": "middle", "font-size": FS, class: "ink" }, "1");
+    el("text", { x: px(X), y: AX + 22, "text-anchor": "middle", "font-size": FS }, "10").style.fill = RED;
+    if (!hit && Math.abs(px(end) - px(X)) > 22) el("text", { x: px(end), y: AX + 22, "text-anchor": "middle", "font-size": FS, class: "ink" }, f2(end));
+
+    // the reading
+    const t = el("text", { x: W / 2, y: H - 4, "text-anchor": "middle", "font-size": FS + 1 });
+    const parts = n === 2 ? "twice" : "four times";
+    t.textContent = hit
+      ? `${fac} ${parts} = ×10: lands exactly on 10`
+      : `${fac} ${parts} = ×${f2(end)}: ${end > X ? "past" : "short of"} 10`;
+    t.style.fill = hit ? VAL : INK; t.style.fillOpacity = hit ? 1 : 0.7;
+
+    svg.setAttribute("aria-label", hit
+      ? `Starting at 1, ${n} equal hops of times the ${n === 2 ? "square" : "fourth"} root of 10 land exactly on 10.`
+      : `Starting at 1, ${n} hops of times ${a.toFixed(2)} land on ${f2(end)}, ${end > X ? "past" : "short of"} 10.`);
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  btns.forEach(b => b.addEventListener("click", () => {
+    n = +b.dataset.n;
+    btns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    // start each time at the tempting guess: that much of x
+    slider.min = n === 2 ? 1.5 : 1.2; slider.max = n === 2 ? 6 : 3;
+    slider.value = X / n;
+    render();
+  }));
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  slider.min = 1.5;
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Part of one step: coefficient against exponent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="t" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="How far through one step" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // x = 10. Move the coefficient from 3 to 4 and the exponent from 3 to 4 by the same fraction t of one step.
+  // (3 + t)x adds t·x: the value covers the same fraction t of the way from 30 to 40.
+  // x^(3 + t) multiplies by x^t: the value covers far less of the way from 1,000 to 10,000 at first.
+  // Halfway through the step: 35 is halfway, but 1,000 × √10 ≈ 3,162 is only about 24% of the way.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("t");
+  const INK = "#f4f6ff", BASE = "#e8a33d", VAL = "#7fcf9a";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) {
+      if (attrs[k] === null || attrs[k] === undefined) continue;
+      if (k === "font-size") e.style.fontSize = attrs[k] + "px"; else e.setAttribute(k, attrs[k]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const fmt = v => Math.round(v).toLocaleString("en-GB");
+  const pc = v => Math.round(v * 100) + "%";
+
+  function row(y, title, from, to, value, frac, note, W, L, R) {
+    const FS = 13.5;
+    const tl = el("text", { x: L, y, "font-size": FS, class: "ink" });
+    if (typeof title === "object") { el("tspan", {}, title.base, tl); el("tspan", { dy: -6, "font-size": FS - 3 }, title.sup, tl); }
+    else tl.textContent = title;
+    el("text", { x: R, y, "text-anchor": "end", "font-size": FS }, note).style.fill = BASE;
+    const by = y + 10, BH = 16;
+    el("rect", { x: L, y: by, width: R - L, height: BH, fill: INK, "fill-opacity": 0.08 });
+    el("rect", { x: L, y: by, width: (R - L) * frac, height: BH, fill: VAL });
+    el("text", { x: L, y: by + BH + 18, "font-size": FS - 1 }, fmt(from));
+    el("text", { x: R, y: by + BH + 18, "text-anchor": "end", "font-size": FS - 1 }, fmt(to));
+    const v = el("text", { x: (L + R) / 2, y: by + BH + 18, "text-anchor": "middle", "font-size": FS - 1 });
+    v.textContent = `${fmt(value)} · ${pc(frac)} of the way`; v.style.fill = VAL;
+  }
+
+  function render() {
+    const t = +slider.value;
+    const W = svg.clientWidth || 560, L = 16, R = W - 16, H = 176;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const tt = t.toFixed(2).replace(/\.?0+$/, "") || "0";
+
+    // the coefficient: 3x → 4x, adding t·10
+    row(18, `(3 + ${tt})x`, 30, 40, 30 + 10 * t, t, `+${(10 * t).toFixed(1).replace(/\.0$/, "")}`, W, L, R);
+    // the exponent: x³ → x⁴, multiplying by 10^t
+    const m = Math.pow(10, t);
+    row(108, { base: "x", sup: `3 + ${tt}` }, 1000, 10000, 1000 * m, (m - 1) / 9, `×${m.toFixed(3)}`, W, L, R);
+
+    svg.setAttribute("aria-label", `With x = 10, ${tt} of the way through one step: the coefficient gives ${fmt(30 + 10 * t)}, ${pc(t)} of the way from 30 to 40; the exponent multiplies by ${m.toFixed(3)} to give ${fmt(1000 * m)}, ${pc((m - 1) / 9)} of the way from 1,000 to 10,000.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>
