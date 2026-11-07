@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Journeys to 256</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="choices" role="group" aria-label="Step" id="choices"></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // A journey to 256 along a number line drawn to scale, in equal steps.
+  // ?mode=add: from 0, steps of +1, +2 or +4 (every hop the same length).
+  // ?mode=mul: from 1, steps of ×2, ×4 or ×16 (every hop the same ratio, so the hops grow).
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const MUL = new URLSearchParams(location.search).get("mode") === "mul";
+  const INK = "#f4f6ff", BASE = "#e8a33d", VAL = "#7fcf9a", RED = "#e8706a";
+  const TARGET = 256;
+  const OPTIONS = MUL ? [2, 4, 16] : [1, 2, 4];
+  let k = OPTIONS[MUL ? 0 : 2];
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  const box = document.getElementById("choices");
+  OPTIONS.forEach(o => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = (MUL ? "×" : "+") + o; b.dataset.k = o;
+    b.setAttribute("aria-pressed", o === k ? "true" : "false");
+    b.addEventListener("click", () => { k = o; [...box.children].forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false")); render(); });
+    box.appendChild(b);
+  });
+
+  function render() {
+    const W = svg.clientWidth || 560, L = 16, R = W - 18, AX = 104, H = 150, FS = 13;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = v => L + v / TARGET * (R - L);
+
+    const stops = [];
+    if (MUL) for (let v = 1; v <= TARGET; v *= k) stops.push(v);
+    else for (let v = 0; v <= TARGET; v += k) stops.push(v);
+    const steps = stops.length - 1;
+
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.22 });
+    for (let v = 0; v <= TARGET; v += 32) el("line", { x1: px(v), x2: px(v), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.25 });
+
+    // the hops: arcs while they are wide enough to see, otherwise just the stops
+    for (let i = 0; i < steps; i++) {
+      const a = px(stops[i]), b = px(stops[i + 1]), span = b - a;
+      if (span < 3) continue;
+      const lift = Math.max(2, Math.min(52, span * 0.42)), y0 = AX - 5;
+      el("path", { d: `M${a.toFixed(1)} ${y0} Q${((a + b) / 2).toFixed(1)} ${(y0 - 2 * lift).toFixed(1)} ${b.toFixed(1)} ${y0}`, fill: "none", stroke: INK, "stroke-opacity": 0.5, "stroke-width": 1.1 });
+      if (MUL && span > 34) el("text", { x: (a + b) / 2, y: y0 - lift - 8, "text-anchor": "middle", "font-size": FS }, "×" + k).style.fill = BASE;
+    }
+    if (!MUL && px(k) - px(0) >= 20) el("text", { x: (px(0) + px(k)) / 2, y: AX - 5 - Math.min(52, (px(k) - px(0)) * 0.42) - 8, "text-anchor": "middle", "font-size": FS }, "+" + k).style.fill = BASE;
+    stops.slice(1, -1).forEach(v => el("circle", { cx: px(v), cy: AX, r: steps > 70 ? 1.4 : 2.6, fill: INK, "fill-opacity": 0.85 }));
+    el("circle", { cx: px(stops[0]), cy: AX, r: 4.5, fill: VAL });
+    el("circle", { cx: px(TARGET), cy: AX, r: 4.5, fill: RED });
+    el("text", { x: px(stops[0]), y: AX + 22, "text-anchor": "middle", "font-size": FS, class: "ink" }, String(stops[0]));
+    el("text", { x: px(TARGET), y: AX + 22, "text-anchor": "middle", "font-size": FS, class: "ink" }, "256");
+
+    const t = el("text", { x: W / 2, y: H - 4, "text-anchor": "middle", "font-size": FS + 1 });
+    const s1 = el("tspan", {}, `${MUL ? "×" : "+"}${k}`, t); s1.style.fill = BASE;
+    const s2 = el("tspan", {}, `  ·  ${steps} steps`, t); s2.style.fill = INK;
+
+    svg.setAttribute("aria-label", MUL
+      ? `From 1 to 256 in steps of times ${k}: ${steps} steps, ${stops.join(", ")}. Each hop is ${k} times longer than the one before.`
+      : `From 0 to 256 in steps of plus ${k}: ${steps} equal steps.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

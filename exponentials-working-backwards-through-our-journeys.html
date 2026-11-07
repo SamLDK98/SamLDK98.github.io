@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Working Backwards Through Our Journeys | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Journeys to 256 in equal additive and multiplicative steps, then working backwards: division recovers either the step size or the number of steps; logarithms recover the number of steps and roots recover the step ratio." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Working Backwards Through Our Journeys</h1>
+    </header>
+    <main>
+      <section aria-label="Two journeys">
+        <p>Let's consider two journeys along the number line: one additive and one multiplicative (without reference to coefficients or exponents).</p>
+        <p>We just want to reach some target value:</p>
+        <div class="math">\[256\]</div>
+        <p>For an additive journey, we start at <span class="nw">\(0\),</span> the additive identity.</p>
+        <p>For a multiplicative journey, we start at <span class="nw">\(1\),</span> the multiplicative identity.</p>
+      </section>
+
+      <section aria-labelledby="additive">
+        <h2 id="additive">A Journey in Additive Steps</h2>
+        <p>Let's say we want to take steps of equal distance.</p>
+        <ul>
+          <li>If our steps cover a distance of <span class="nw">\(1\),</span> it will take \(256\) steps.</li>
+          <li>If our steps cover a distance of <span class="nw">\(2\),</span> it will take \(128\) steps.</li>
+          <li>If our steps cover a distance of <span class="nw">\(4\),</span> it will take \(64\) steps.</li>
+        </ul>
+        <iframe class="expo-widget" src="exponentials/working-backwards/journeys-widget.html?mode=add" title="Interactive: walk from 0 to 256 in equal steps of plus 1, plus 2 or plus 4, drawn to scale: 256, 128 or 64 steps, every one the same length" style="height: 210px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section aria-labelledby="multiplicative">
+        <h2 id="multiplicative">A Journey in Multiplicative Steps</h2>
+        <p>Let's say we take steps of equal ratios.</p>
+        <p>The next step must always be \(x\) times as big (or small) as the previous number.</p>
+        <p>We start at <span class="nw">\(1\).</span></p>
+        <p>If our steps must have a ratio of <span class="nw">\(2\),</span> it will take \(8\) steps.</p>
+        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32 \to 64 \to 128 \to 256\]</div>
+        <p>If our steps must have a ratio of <span class="nw">\(4\),</span> it will take \(4\) steps.</p>
+        <div class="math">\[1 \to 4 \to 16 \to 64 \to 256\]</div>
+        <p>If our steps must have a ratio of <span class="nw">\(16\),</span> it will take \(2\) steps.</p>
+        <div class="math">\[1 \to 16 \to 256\]</div>
+        <iframe class="expo-widget" src="exponentials/working-backwards/journeys-widget.html?mode=mul" title="Interactive: walk from 1 to 256 in equal steps of times 2, times 4 or times 16, drawn to scale: 8, 4 or 2 steps, each hop longer than the last" style="height: 210px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section aria-labelledby="backwards">
+        <h2 id="backwards">Working Backwards</h2>
+        <p>So far, we have considered how addition and multiplication allow us to move towards a target value in equal steps.</p>
+        <p>But what if we already know our target?</p>
+        <p>This is where <strong>inverse operations</strong> come into play.</p>
+
+        <h3>Going Backwards from an Additive Journey</h3>
+        <p>If we assume an additive journey to reach the target value, we can work out:</p>
+        <ul>
+          <li>The distance each step must travel.</li>
+          <li>The number of steps that must be taken.</li>
+        </ul>
+        <p>We can work this out using <strong>division</strong>.</p>
+        <p>If we know the step size:</p>
+        <div class="math">\[\frac{256}{32}=8 \qquad \qquad \frac{\text{output}}{\text{step size}}= \text{number of steps}\]</div>
+        <p>If we know the number of steps:</p>
+        <div class="math">\[\frac{256}{8}=32 \qquad \qquad \frac{\text{output}}{\text{number of steps}}= \text{step size}\]</div>
+        <p>Notice that we can use division to recover either of these values if we know the value of the other.</p>
+        <p>Examples:</p>
+        <div class="math">\[\begin{array}{c|c|c} \text{Target} & \text{Step Size} & \text{Number of Steps} \\ \hline 256 & +1 & \frac{256}{1}=256 \\ 256 & +2 & \frac{256}{2}=128 \\ 256 & +4 & \frac{256}{4}=64 \end{array}\]</div>
+        <div class="math">\[\begin{array}{c|c|c} \text{Target} & \text{Number of Steps} & \text{Step Size} \\ \hline 256 & 2 & \frac{256}{2}=128 \\ 256 & 4 & \frac{256}{4}=64 \\ 256 & 8 & \frac{256}{8}=32 \end{array}\]</div>
+
+        <h3>Going Backwards from a Multiplicative Journey</h3>
+        <p>If we assume a multiplicative journey, we require a different operation to recover each possible value: the step ratio and the number of steps taken.</p>
+        <p>If we know the step ratio, <strong>logarithms</strong> can identify the number of multiplicative steps needed to reach an output:</p>
+        <div class="math">\[\log_{2}(256)=8 \qquad \qquad \log_{\text{ratio}} (\text{output})= \text{number of steps}\]</div>
+        <p>If we know the number of multiplicative steps we need to take, but not the multiplicative factor, we use <strong>radication</strong> (taking roots).</p>
+        <p>The radicand tells us the target output we must reach. The index tells us how many multiplicative steps we must take. The result, known as the root, tells us what multiplicative factor we need at each step.</p>
+        <p>Let's say we want to reach \(27\) in three multiplicative steps. What is our step ratio?</p>
+        <div class="math">\[\sqrt[3]{27}=\ ?\]</div>
+        <div class="side">
+          <div>
+            <p>Here we know that we want to take three multiplicative steps and our target value is <span class="nw">\(27\),</span> so what must our common ratio be?</p>
+          </div>
+          <iframe class="expo-widget" src="exponentials/walking-in-steps/cube-root-widget.html" title="Interactive: a vertical number line from 0 to 27. Starting at 27, divide by the same factor three times; only a factor of 3 lands exactly on 1" style="height: 420px" scrolling="no" loading="lazy"></iframe>
+        </div>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-moving-between-exponents.html">← Moving Between Exponents</a>
+        <a href="exponentials-fractional-exponents.html">Next: Fractional Exponents →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

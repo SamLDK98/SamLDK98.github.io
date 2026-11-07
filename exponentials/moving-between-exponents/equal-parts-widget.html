@@ -13,9 +13,9 @@
 <div class="widget">
   <svg id="fig" role="img"></svg>
   <input id="a" type="range" min="1.2" max="6" step="0.01" value="5" aria-label="The factor for each part" />
-  <div class="choices" role="group" aria-label="How many parts">
-    <button type="button" data-n="2" aria-pressed="true">½ step</button>
-    <button type="button" data-n="4" aria-pressed="false">¼ step</button>
+  <div class="choices" role="group" aria-label="Factor for each half step">
+    <button type="button" data-a="5" aria-pressed="true">×5</button>
+    <button type="button" data-a="root" aria-pressed="false">×√10</button>
   </div>
 </div>
 
@@ -28,7 +28,7 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const slider = document.getElementById("a");
-  const btns = [...document.querySelectorAll("button[data-n]")];
+  const btns = [...document.querySelectorAll("button[data-a]")];
   const INK = "#f4f6ff", BASE = "#e8a33d", VAL = "#7fcf9a", RED = "#e8706a";
   const X = 10;
   let n = 2;
@@ -52,7 +52,7 @@
     if (hit) a = root;
     const stops = [1]; for (let i = 0; i < n; i++) stops.push(stops[i] * a);
     const end = stops[n];
-    const W = svg.clientWidth || 560, L = 14, R = W - 18, AX = 110, H = 168;
+    const W = svg.clientWidth || 560, L = 14, R = W - 18, AX = 110, H = 140;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
     svg.textContent = "";
     const top = Math.max(12, Math.ceil(end * 1.08));
@@ -82,28 +82,21 @@
     el("text", { x: px(X), y: AX + 22, "text-anchor": "middle", "font-size": FS }, "10").style.fill = RED;
     if (!hit && Math.abs(px(end) - px(X)) > 22) el("text", { x: px(end), y: AX + 22, "text-anchor": "middle", "font-size": FS, class: "ink" }, f2(end));
 
-    // the reading
-    const t = el("text", { x: W / 2, y: H - 4, "text-anchor": "middle", "font-size": FS + 1 });
-    const parts = n === 2 ? "twice" : "four times";
-    t.textContent = hit
-      ? `${fac} ${parts} = ×10: lands exactly on 10`
-      : `${fac} ${parts} = ×${f2(end)}: ${end > X ? "past" : "short of"} 10`;
-    t.style.fill = hit ? VAL : INK; t.style.fillOpacity = hit ? 1 : 0.7;
-
     svg.setAttribute("aria-label", hit
       ? `Starting at 1, ${n} equal hops of times the ${n === 2 ? "square" : "fourth"} root of 10 land exactly on 10.`
       : `Starting at 1, ${n} hops of times ${a.toFixed(2)} land on ${f2(end)}, ${end > X ? "past" : "short of"} 10.`);
+    mark(+slider.value);
     if (window.postWidgetHeight) window.postWidgetHeight();
   }
 
   btns.forEach(b => b.addEventListener("click", () => {
-    n = +b.dataset.n;
-    btns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    // start each time at the tempting guess: that much of x
-    slider.min = n === 2 ? 1.5 : 1.2; slider.max = n === 2 ? 6 : 3;
-    slider.value = X / n;
+    slider.value = b.dataset.a === "root" ? Math.sqrt(X) : 5;
     render();
   }));
+  // the buttons light up when the slider sits on their value
+  function mark(a) {
+    btns.forEach(b => b.setAttribute("aria-pressed", (b.dataset.a === "root" ? Math.abs(a - Math.sqrt(X)) < 0.012 : Math.abs(a - 5) < 0.005) ? "true" : "false"));
+  }
   let rt;
   window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
   slider.addEventListener("input", render);

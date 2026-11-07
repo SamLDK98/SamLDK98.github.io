@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moving Between Exponents | Exponentials | Sam Kirwan</title>
-  <meta name="description" content="What happens to the value of a power as we move continuously between two exponents? A coefficient grows by equal additions; an exponent grows by equal multiplications, so a fractional exponent multiplies by a root." />
+  <meta name="description" content="What happens to the value of a power as we move between two exponents? A coefficient grows by equal additions; an exponent grows by equal multiplications, so a fractional exponent multiplies by a root." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -24,6 +24,15 @@
   <style>
     /* the title runs past the text column on a wide screen rather than wrapping */
     header h1 { width: max-content; max-width: calc(100vw - 2.4rem); }
+    /* a key idea, set apart from the running text */
+    p.pull {
+      margin: 2.6rem 0 2rem;
+      font-family: "Spectral", Georgia, serif; font-style: italic; font-weight: 300;
+      font-size: clamp(1.4rem, 3.2vw, 1.65rem); line-height: 1.45; letter-spacing: 0.005em;
+      color: #c9cfd9;
+      background: linear-gradient(100deg, #eef1f6 0%, #b9c0cc 45%, #e3e7ee 70%, #a9b1be 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
   </style>
 </head>
 <body>
@@ -35,7 +44,7 @@
     <main>
       <section aria-label="The question">
         <div class="power-intro-copy">
-          <p><strong><em>What happens to the value of a power as we move continuously between two exponents?</em></strong></p>
+          <p><strong><em>What happens to the value of a power as we move between two exponents?</em></strong></p>
         </div>
         <div class="power-intro">
           <figure class="anatomy journey">
@@ -56,8 +65,8 @@
       </section>
 
       <section aria-label="Overview">
-        <p>Previously we saw that increasing a coefficient produces additive changes in the output, while increasing an exponent produces multiplicative changes in the output.</p>
-        <p>Let's take a closer look at this.</p>
+        <p>Previously, we saw that increasing a coefficient changes the output additively, while increasing an exponent changes it multiplicatively.</p>
+        <p>Let's explore this distinction further.</p>
       </section>
 
       <section aria-labelledby="coef-fraction">
@@ -65,29 +74,15 @@
         <p>Think of coefficients in terms of repeated addition:</p>
         <div class="math">\[3x = x + x + x\]</div>
         <p>Increasing by a whole number adds that many copies of <span class="nw">\(x\):</span></p>
-        <div class="math">\[(1+3)x = x + x + x + x\]</div>
+        <div class="math">\[(\class{mjx-value}{1}+3)x = x + x + x + \class{mjx-value}{x}\]</div>
         <p>Increasing a coefficient by a fraction <strong>adds that much of</strong> <span class="nw">\(x\).</span></p>
+        <div class="math">\[(\class{mjx-value}{0.25}+3)x = x + x + x +\ \class{mjx-value}{?}\]</div>
         <p>One quarter of an addition of \(x\) is the value that, <strong>added four times</strong>, gives <span class="nw">\(x\).</span></p>
         <div class="math">\[a + a + a + a = x\]</div>
         <p>Dividing by four is the operation that finds the value of one part if <strong>four equal additive parts</strong> must reach some value.</p>
         <div class="math">\[\frac{x}{4} = a\]</div>
         <p>So increasing the coefficient by a quarter looks like:</p>
         <div class="math">\[(0.25+3)x = x + x + x + \frac{x}{4}\]</div>
-        <figure class="blocks">
-          <svg viewBox="0 0 520 112" role="img" aria-label="Three blocks of length x, then a quarter of a fourth block: x plus x plus x plus x over 4. The rest of the fourth block is drawn as a faint outline.">
-            <style>
-              .blocks svg { max-width: 520px; }
-              .blocks .blk { fill: var(--ink); fill-opacity: 0.08; stroke: var(--ink); stroke-opacity: 0.45; }
-              .blocks .ghost { fill: none; stroke: var(--ink); stroke-opacity: 0.25; stroke-dasharray: 4 4; }
-              .blocks .qtr { fill: var(--value); fill-opacity: 0.35; stroke: var(--value); }
-              .blocks .cut { stroke: var(--ink); stroke-opacity: 0.12; }
-              .blocks .brace { fill: none; stroke: var(--dim); }
-              .blocks text { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 22px; fill: var(--ink); text-anchor: middle; }
-              .blocks text.q { font-size: 17px; fill: var(--value); }
-            </style>
-            <rect class="blk" x="20" y="30" width="120" height="44"/><text class="bl" x="80.0" y="58.0">x</text><rect class="blk" x="146" y="30" width="120" height="44"/><text class="bl" x="206.0" y="58.0">x</text><rect class="blk" x="272" y="30" width="120" height="44"/><text class="bl" x="332.0" y="58.0">x</text><rect class="ghost" x="398" y="30" width="120" height="44"/><rect class="qtr" x="398" y="30" width="30.0" height="44"/><text class="bl q" x="413.0" y="96">x/4</text><line class="cut" x1="428.0" x2="428.0" y1="30" y2="74"/><line class="cut" x1="458.0" x2="458.0" y1="30" y2="74"/><line class="cut" x1="488.0" x2="488.0" y1="30" y2="74"/><path class="brace" d="M20 22 V16 H428.0 V22"/>
-          </svg>
-        </figure>
       </section>
 
       <section aria-labelledby="exp-fraction">
@@ -95,8 +90,8 @@
         <p>Think of exponents in terms of repeated multiplication:</p>
         <div class="math">\[x^{3} = x \cdot x \cdot x\]</div>
         <p>Increasing by a whole number adds another factor of \(x\) to the product:</p>
-        <div class="math">\[x^{3+1} = x \cdot x \cdot x \cdot x\]</div>
-        <p>If increasing by a fraction added that much of \(x\) as a factor to the product, we would get something like this:</p>
+        <div class="math">\[x^{3+\class{mjx-value}{1}} = x \cdot x \cdot x \cdot \class{mjx-value}{x}\]</div>
+        <p>If increasing by a fraction added <em>that much of</em> \(x\) as a factor to the product, we would get something like this:</p>
         <div class="math">\[x^{3+0.5} = x \cdot x \cdot x \cdot \frac{x}{2}\]</div>
         <p>Imagine <span class="nw">\(x=10\):</span></p>
         <div class="math">\[10^{3+0.5} = 10 \cdot 10 \cdot 10 \cdot 5\]</div>
@@ -107,24 +102,22 @@
         <p>We forgot to appreciate that our exponents correspond to multiplicative growth.</p>
         <p>Increasing an exponent by a half does not take us halfway to the value of <span class="nw">\(x\);</span> it takes us halfway along the multiplicative journey to <span class="nw">\(x\).</span></p>
         <p>We therefore want to multiply by the factor that takes us halfway along this multiplicative journey.</p>
-        <iframe class="expo-widget" src="exponentials/moving-between-exponents/equal-parts-widget.html" title="Interactive: split one step of times 10 into two (or four) equal parts and choose the factor for each. Half of 10, times 5 twice, lands on 25, past 10; only times root 10 twice lands exactly on 10. With quarters, times 2.5 four times overshoots to 39; times the fourth root of 10 lands on 10" style="height: 240px" scrolling="no" loading="lazy"></iframe>
+        <iframe class="expo-widget" src="exponentials/moving-between-exponents/equal-parts-widget.html" title="Interactive: split one step of times 10 into two equal half steps and choose the factor for each. Times 5, half of 10, twice lands on 25, past 10; times root 10 twice lands exactly on 10" style="height: 240px" scrolling="no" loading="lazy"></iframe>
         <div class="math">\[a \cdot a = 10\]</div>
         <div class="math">\[a^2 = 10\]</div>
         <div class="math">\[a = \sqrt{10}\]</div>
         <p>Therefore:</p>
         <div class="math">\[10^{3+0.5} = 10 \cdot 10 \cdot 10 \cdot \sqrt{10}\]</div>
-        <p>Fractions can represent parts of an additive journey or a multiplicative journey.</p>
+        <p class="pull">Fractions can represent parts of an additive journey or a multiplicative journey.</p>
         <p>Let's say we are adding \(\frac{1}{4}\) to an exponent.</p>
         <p>One quarter of a multiplication by \(x\) is the value that, when multiplied by itself four times, gives <span class="nw">\(x\).</span></p>
         <div class="math">\[a \cdot a \cdot a \cdot a = x\]</div>
         <div class="math">\[a^4 = x\]</div>
-        <p>Radication (or taking roots) is the operation that finds <strong>the value of the multiplicative factor</strong> for a given output and number of <strong>equal multiplicative parts</strong>.</p>
+        <p><strong>Radication (or taking roots) is the operation that finds the value of the multiplicative factor for a given output and number of equal multiplicative parts.</strong></p>
         <p>The number of multiplicative parts (or steps) is denoted by the index above the radical:</p>
         <div class="math">\[a = \sqrt[4]{x}\]</div>
         <p>So increasing the exponent by a quarter looks like:</p>
         <div class="math">\[x^{3+0.25} = x \cdot x \cdot x \cdot \sqrt[4]{x}\]</div>
-        <p>Moving part of the way through a single step makes the difference clear. With \(x=10\):</p>
-        <iframe class="expo-widget" src="exponentials/moving-between-exponents/part-step-widget.html" title="Interactive: with x = 10, slide how far through one step to move. The coefficient, from 3x to 4x, covers that same share of the way from 30 to 40. The exponent, from x cubed to x to the fourth, multiplies by 10 to that power, so halfway through the step it has reached only about 3,162, about 24% of the way from 1,000 to 10,000" style="height: 230px" scrolling="no" loading="lazy"></iframe>
       </section>
 
       <section aria-labelledby="full-journey">
@@ -149,14 +142,14 @@
             <tbody>
               <tr><td>\(1x\)</td><td class="num">8</td><td class="step">–</td></tr>
               <tr><td>\(1.1x\)</td><td class="num">8.8</td><td class="step">+0.8</td></tr>
-              <tr class="lit"><td>\(1.2x\)</td><td class="num">9.6</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.2x\)</td><td class="num">9.6</td><td class="step">+0.8</td></tr>
               <tr><td>\(1.3x\)</td><td class="num">10.4</td><td class="step">+0.8</td></tr>
-              <tr class="lit"><td>\(1.4x\)</td><td class="num">11.2</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.4x\)</td><td class="num">11.2</td><td class="step">+0.8</td></tr>
               <tr><td>\(1.5x\)</td><td class="num">12</td><td class="step">+0.8</td></tr>
               <tr><td>\(1.6x\)</td><td class="num">12.8</td><td class="step">+0.8</td></tr>
-              <tr class="lit"><td>\(1.7x\)</td><td class="num">13.6</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.7x\)</td><td class="num">13.6</td><td class="step">+0.8</td></tr>
               <tr><td>\(1.8x\)</td><td class="num">14.4</td><td class="step">+0.8</td></tr>
-              <tr class="lit"><td>\(1.9x\)</td><td class="num">15.2</td><td class="step">+0.8</td></tr>
+              <tr><td>\(1.9x\)</td><td class="num">15.2</td><td class="step">+0.8</td></tr>
               <tr><td>\(2x\)</td><td class="num">16</td><td class="step">+0.8</td></tr>
             </tbody>
           </table>
@@ -166,7 +159,7 @@
           </div>
         </div>
         <figure class="growth">
-          <svg viewBox="0 0 560 300" role="img" aria-label="Graph of 8 times the coefficient as the coefficient runs from 1 to 2: a straight line from 8 to 16. Each step of 0.2 rises by the same 1.6, from 1.2 to 1.4 and from 1.7 to 1.9."><style>
+          <svg viewBox="0 0 560 300" role="img" aria-label="Graph of 8 times the coefficient as the coefficient runs from 1 to 2: a straight line from 8 to 16."><style>
               .growth svg { max-width: 560px; }
               .growth .ax { stroke: var(--faint); stroke-width: 1.2; }
               .growth .grid { stroke: var(--hair); }
@@ -181,7 +174,7 @@
               .growth .rise { stroke: var(--value); stroke-width: 2.5; }
               .growth .risel { fill: var(--value); }
               .growth .ratio { fill: var(--base); font-size: 11px; }
-            </style><line class="ax" x1="58" x2="540" y1="252" y2="252"/><line class="ax" x1="58" x2="58" y1="22" y2="252"/><line class="grid" x1="58" x2="540" y1="252.0" y2="252.0"/><text class="yl" x="50" y="256.0">0</text><line class="grid" x1="58" x2="540" y1="200.9" y2="200.9"/><text class="yl" x="50" y="204.9">4</text><line class="grid" x1="58" x2="540" y1="149.8" y2="149.8"/><text class="yl" x="50" y="153.8">8</text><line class="grid" x1="58" x2="540" y1="98.7" y2="98.7"/><text class="yl" x="50" y="102.7">12</text><line class="grid" x1="58" x2="540" y1="47.6" y2="47.6"/><text class="yl" x="50" y="51.6">16</text><text class="xl" x="58.0" y="270">1x</text><line class="tick" x1="58.0" x2="58.0" y1="252" y2="256"/><text class="xl" x="106.2" y="270"></text><line class="tick" x1="106.2" x2="106.2" y1="252" y2="256"/><text class="xl" x="154.4" y="270">1.2x</text><line class="tick" x1="154.4" x2="154.4" y1="252" y2="256"/><text class="xl" x="202.6" y="270"></text><line class="tick" x1="202.6" x2="202.6" y1="252" y2="256"/><text class="xl" x="250.8" y="270">1.4x</text><line class="tick" x1="250.8" x2="250.8" y1="252" y2="256"/><text class="xl" x="299.0" y="270"></text><line class="tick" x1="299.0" x2="299.0" y1="252" y2="256"/><text class="xl" x="347.2" y="270">1.6x</text><line class="tick" x1="347.2" x2="347.2" y1="252" y2="256"/><text class="xl" x="395.4" y="270"></text><line class="tick" x1="395.4" x2="395.4" y1="252" y2="256"/><text class="xl" x="443.6" y="270">1.8x</text><line class="tick" x1="443.6" x2="443.6" y1="252" y2="256"/><text class="xl" x="491.8" y="270"></text><line class="tick" x1="491.8" x2="491.8" y1="252" y2="256"/><text class="xl" x="540.0" y="270">2x</text><line class="tick" x1="540.0" x2="540.0" y1="252" y2="256"/><text class="axl" x="299.0" y="294">coefficient</text><polyline class="curve" points="58.0,149.8 62.8,148.8 67.6,147.7 72.5,146.7 77.3,145.7 82.1,144.7 86.9,143.6 91.7,142.6 96.6,141.6 101.4,140.6 106.2,139.6 111.0,138.5 115.8,137.5 120.7,136.5 125.5,135.5 130.3,134.4 135.1,133.4 139.9,132.4 144.8,131.4 149.6,130.4 154.4,129.3 159.2,128.3 164.0,127.3 168.9,126.3 173.7,125.2 178.5,124.2 183.3,123.2 188.1,122.2 193.0,121.2 197.8,120.1 202.6,119.1 207.4,118.1 212.2,117.1 217.1,116.0 221.9,115.0 226.7,114.0 231.5,113.0 236.3,112.0 241.2,110.9 246.0,109.9 250.8,108.9 255.6,107.9 260.4,106.8 265.3,105.8 270.1,104.8 274.9,103.8 279.7,102.8 284.5,101.7 289.4,100.7 294.2,99.7 299.0,98.7 303.8,97.6 308.6,96.6 313.5,95.6 318.3,94.6 323.1,93.6 327.9,92.5 332.7,91.5 337.6,90.5 342.4,89.5 347.2,88.4 352.0,87.4 356.8,86.4 361.7,85.4 366.5,84.4 371.3,83.3 376.1,82.3 380.9,81.3 385.8,80.3 390.6,79.2 395.4,78.2 400.2,77.2 405.0,76.2 409.9,75.2 414.7,74.1 419.5,73.1 424.3,72.1 429.1,71.1 434.0,70.0 438.8,69.0 443.6,68.0 448.4,67.0 453.2,66.0 458.1,64.9 462.9,63.9 467.7,62.9 472.5,61.9 477.3,60.8 482.2,59.8 487.0,58.8 491.8,57.8 496.6,56.8 501.4,55.7 506.3,54.7 511.1,53.7 515.9,52.7 520.7,51.6 525.5,50.6 530.4,49.6 535.2,48.6 540.0,47.6"/><path class="run" d="M154.4 129.3 H250.8"/><path class="rise" d="M250.8 129.3 V108.9"/><text class="risel" x="257.8" y="123.1">+1.6</text><path class="run" d="M395.4 78.2 H491.8"/><path class="rise" d="M491.8 78.2 V57.8"/><text class="risel" x="498.8" y="72.0">+1.6</text><circle cx="58.0" cy="149.8" r="3"/><circle cx="106.2" cy="139.6" r="3"/><circle cx="154.4" cy="129.3" r="3"/><circle cx="202.6" cy="119.1" r="3"/><circle cx="250.8" cy="108.9" r="3"/><circle cx="299.0" cy="98.7" r="3"/><circle cx="347.2" cy="88.4" r="3"/><circle cx="395.4" cy="78.2" r="3"/><circle cx="443.6" cy="68.0" r="3"/><circle cx="491.8" cy="57.8" r="3"/><circle cx="540.0" cy="47.6" r="3"/></svg>
+            </style><line class="ax" x1="58" x2="540" y1="252" y2="252"/><line class="ax" x1="58" x2="58" y1="22" y2="252"/><line class="grid" x1="58" x2="540" y1="252.0" y2="252.0"/><text class="yl" x="50" y="256.0">0</text><line class="grid" x1="58" x2="540" y1="200.9" y2="200.9"/><text class="yl" x="50" y="204.9">4</text><line class="grid" x1="58" x2="540" y1="149.8" y2="149.8"/><text class="yl" x="50" y="153.8">8</text><line class="grid" x1="58" x2="540" y1="98.7" y2="98.7"/><text class="yl" x="50" y="102.7">12</text><line class="grid" x1="58" x2="540" y1="47.6" y2="47.6"/><text class="yl" x="50" y="51.6">16</text><text class="xl" x="58.0" y="270">1x</text><line class="tick" x1="58.0" x2="58.0" y1="252" y2="256"/><text class="xl" x="106.2" y="270"></text><line class="tick" x1="106.2" x2="106.2" y1="252" y2="256"/><text class="xl" x="154.4" y="270">1.2x</text><line class="tick" x1="154.4" x2="154.4" y1="252" y2="256"/><text class="xl" x="202.6" y="270"></text><line class="tick" x1="202.6" x2="202.6" y1="252" y2="256"/><text class="xl" x="250.8" y="270">1.4x</text><line class="tick" x1="250.8" x2="250.8" y1="252" y2="256"/><text class="xl" x="299.0" y="270"></text><line class="tick" x1="299.0" x2="299.0" y1="252" y2="256"/><text class="xl" x="347.2" y="270">1.6x</text><line class="tick" x1="347.2" x2="347.2" y1="252" y2="256"/><text class="xl" x="395.4" y="270"></text><line class="tick" x1="395.4" x2="395.4" y1="252" y2="256"/><text class="xl" x="443.6" y="270">1.8x</text><line class="tick" x1="443.6" x2="443.6" y1="252" y2="256"/><text class="xl" x="491.8" y="270"></text><line class="tick" x1="491.8" x2="491.8" y1="252" y2="256"/><text class="xl" x="540.0" y="270">2x</text><line class="tick" x1="540.0" x2="540.0" y1="252" y2="256"/><polyline class="curve" points="58.0,149.8 62.8,148.8 67.6,147.7 72.5,146.7 77.3,145.7 82.1,144.7 86.9,143.6 91.7,142.6 96.6,141.6 101.4,140.6 106.2,139.6 111.0,138.5 115.8,137.5 120.7,136.5 125.5,135.5 130.3,134.4 135.1,133.4 139.9,132.4 144.8,131.4 149.6,130.4 154.4,129.3 159.2,128.3 164.0,127.3 168.9,126.3 173.7,125.2 178.5,124.2 183.3,123.2 188.1,122.2 193.0,121.2 197.8,120.1 202.6,119.1 207.4,118.1 212.2,117.1 217.1,116.0 221.9,115.0 226.7,114.0 231.5,113.0 236.3,112.0 241.2,110.9 246.0,109.9 250.8,108.9 255.6,107.9 260.4,106.8 265.3,105.8 270.1,104.8 274.9,103.8 279.7,102.8 284.5,101.7 289.4,100.7 294.2,99.7 299.0,98.7 303.8,97.6 308.6,96.6 313.5,95.6 318.3,94.6 323.1,93.6 327.9,92.5 332.7,91.5 337.6,90.5 342.4,89.5 347.2,88.4 352.0,87.4 356.8,86.4 361.7,85.4 366.5,84.4 371.3,83.3 376.1,82.3 380.9,81.3 385.8,80.3 390.6,79.2 395.4,78.2 400.2,77.2 405.0,76.2 409.9,75.2 414.7,74.1 419.5,73.1 424.3,72.1 429.1,71.1 434.0,70.0 438.8,69.0 443.6,68.0 448.4,67.0 453.2,66.0 458.1,64.9 462.9,63.9 467.7,62.9 472.5,61.9 477.3,60.8 482.2,59.8 487.0,58.8 491.8,57.8 496.6,56.8 501.4,55.7 506.3,54.7 511.1,53.7 515.9,52.7 520.7,51.6 525.5,50.6 530.4,49.6 535.2,48.6 540.0,47.6"/><circle cx="58.0" cy="149.8" r="3"/><circle cx="106.2" cy="139.6" r="3"/><circle cx="154.4" cy="129.3" r="3"/><circle cx="202.6" cy="119.1" r="3"/><circle cx="250.8" cy="108.9" r="3"/><circle cx="299.0" cy="98.7" r="3"/><circle cx="347.2" cy="88.4" r="3"/><circle cx="395.4" cy="78.2" r="3"/><circle cx="443.6" cy="68.0" r="3"/><circle cx="491.8" cy="57.8" r="3"/><circle cx="540.0" cy="47.6" r="3"/></svg>
         </figure>
 
         <h3 id="exponent">As an Exponent Increases by 1</h3>
@@ -200,14 +193,14 @@
           <tbody>
               <tr><td>\(x^{1}\)</td><td class="num">8</td><td class="step">–</td><td class="step">–</td></tr>
               <tr><td>\(x^{1.1}\)</td><td class="num">9.849</td><td class="step">+1.849</td><td class="step">×1.23114</td></tr>
-              <tr class="lit"><td>\(x^{1.2}\)</td><td class="num">12.126</td><td class="step">+2.277</td><td class="step">×1.23114</td></tr>
+              <tr><td>\(x^{1.2}\)</td><td class="num">12.126</td><td class="step">+2.277</td><td class="step">×1.23114</td></tr>
               <tr><td>\(x^{1.3}\)</td><td class="num">14.929</td><td class="step">+2.803</td><td class="step">×1.23114</td></tr>
-              <tr class="lit"><td>\(x^{1.4}\)</td><td class="num">18.379</td><td class="step">+3.450</td><td class="step">×1.23114</td></tr>
+              <tr><td>\(x^{1.4}\)</td><td class="num">18.379</td><td class="step">+3.450</td><td class="step">×1.23114</td></tr>
               <tr><td>\(x^{1.5}\)</td><td class="num">22.627</td><td class="step">+4.248</td><td class="step">×1.23114</td></tr>
               <tr><td>\(x^{1.6}\)</td><td class="num">27.858</td><td class="step">+5.231</td><td class="step">×1.23114</td></tr>
-              <tr class="lit"><td>\(x^{1.7}\)</td><td class="num">34.297</td><td class="step">+6.439</td><td class="step">×1.23114</td></tr>
+              <tr><td>\(x^{1.7}\)</td><td class="num">34.297</td><td class="step">+6.439</td><td class="step">×1.23114</td></tr>
               <tr><td>\(x^{1.8}\)</td><td class="num">42.224</td><td class="step">+7.927</td><td class="step">×1.23114</td></tr>
-              <tr class="lit"><td>\(x^{1.9}\)</td><td class="num">51.984</td><td class="step">+9.760</td><td class="step">×1.23114</td></tr>
+              <tr><td>\(x^{1.9}\)</td><td class="num">51.984</td><td class="step">+9.760</td><td class="step">×1.23114</td></tr>
               <tr><td>\(x^{2}\)</td><td class="num">64</td><td class="step">+12.016</td><td class="step">×1.23114</td></tr>
           </tbody>
         </table>
@@ -215,9 +208,7 @@
         <p>Increasing the exponent by \(\frac{1}{10}\) increases the output by a factor that can be multiplied by itself \(10\) times to give <span class="nw">\(x=8\).</span></p>
         <p>That is:</p>
         <div class="math">\[\sqrt[10]{8} \approx 1.2311\]</div>
-        <ul>
-          <li>If we increase the exponent by <span class="nw">\(0.1\),</span> we increase the current output by approximately <span class="nw">\(\times 1.2311\).</span></li>
-        </ul>
+        <p style="margin-bottom: 2.4rem;">If we increase the exponent by <span class="nw">\(0.1\),</span> we increase the current output by approximately <span class="nw">\(\times 1.2311\).</span></p>
         <p>Consider the difference between <span class="nw">\(x^{1.2} \to x^{1.4}\):</span></p>
         <div class="math">\[18.379 - 12.126 = \boxed{6.253}\]</div>
         <p>While the difference between \(x^{1.7}\) and <span class="nw">\(x^{1.9}\):</span></p>
@@ -227,13 +218,13 @@
         <div class="math">\[\frac{51.984}{34.297} \approx 1.5157\]</div>
         <p>Notice that the exponent increased by \(0.2\) in this example, hence the greater ratio: <span class="nw">\(1.2311 \times 1.2311 \approx 1.5157\).</span></p>
         <figure class="growth">
-          <svg viewBox="0 0 560 300" role="img" aria-label="Graph of 8 to the power of the exponent as the exponent runs from 1 to 2: a curve from 8 to 64 that steepens. The step from 1.2 to 1.4 rises by 6.253 and the step from 1.7 to 1.9 by 17.687, but both multiply the value by about 1.516."><line class="ax" x1="58" x2="540" y1="252" y2="252"/><line class="ax" x1="58" x2="58" y1="22" y2="252"/><line class="grid" x1="58" x2="540" y1="252.0" y2="252.0"/><text class="yl" x="50" y="256.0">0</text><line class="grid" x1="58" x2="540" y1="197.9" y2="197.9"/><text class="yl" x="50" y="201.9">16</text><line class="grid" x1="58" x2="540" y1="143.8" y2="143.8"/><text class="yl" x="50" y="147.8">32</text><line class="grid" x1="58" x2="540" y1="89.6" y2="89.6"/><text class="yl" x="50" y="93.6">48</text><line class="grid" x1="58" x2="540" y1="35.5" y2="35.5"/><text class="yl" x="50" y="39.5">64</text><text class="xl" x="58.0" y="270">1</text><line class="tick" x1="58.0" x2="58.0" y1="252" y2="256"/><text class="xl" x="106.2" y="270"></text><line class="tick" x1="106.2" x2="106.2" y1="252" y2="256"/><text class="xl" x="154.4" y="270">1.2</text><line class="tick" x1="154.4" x2="154.4" y1="252" y2="256"/><text class="xl" x="202.6" y="270"></text><line class="tick" x1="202.6" x2="202.6" y1="252" y2="256"/><text class="xl" x="250.8" y="270">1.4</text><line class="tick" x1="250.8" x2="250.8" y1="252" y2="256"/><text class="xl" x="299.0" y="270"></text><line class="tick" x1="299.0" x2="299.0" y1="252" y2="256"/><text class="xl" x="347.2" y="270">1.6</text><line class="tick" x1="347.2" x2="347.2" y1="252" y2="256"/><text class="xl" x="395.4" y="270"></text><line class="tick" x1="395.4" x2="395.4" y1="252" y2="256"/><text class="xl" x="443.6" y="270">1.8</text><line class="tick" x1="443.6" x2="443.6" y1="252" y2="256"/><text class="xl" x="491.8" y="270"></text><line class="tick" x1="491.8" x2="491.8" y1="252" y2="256"/><text class="xl" x="540.0" y="270">2</text><line class="tick" x1="540.0" x2="540.0" y1="252" y2="256"/><text class="axl" x="299.0" y="294">exponent</text><polyline class="curve" points="58.0,224.9 62.8,224.4 67.6,223.8 72.5,223.2 77.3,222.6 82.1,222.0 86.9,221.3 91.7,220.7 96.6,220.0 101.4,219.4 106.2,218.7 111.0,218.0 115.8,217.3 120.7,216.5 125.5,215.8 130.3,215.0 135.1,214.3 139.9,213.5 144.8,212.7 149.6,211.8 154.4,211.0 159.2,210.1 164.0,209.2 168.9,208.3 173.7,207.4 178.5,206.5 183.3,205.5 188.1,204.6 193.0,203.6 197.8,202.5 202.6,201.5 207.4,200.4 212.2,199.4 217.1,198.3 221.9,197.1 226.7,196.0 231.5,194.8 236.3,193.6 241.2,192.4 246.0,191.1 250.8,189.8 255.6,188.5 260.4,187.2 265.3,185.8 270.1,184.4 274.9,183.0 279.7,181.6 284.5,180.1 289.4,178.6 294.2,177.0 299.0,175.5 303.8,173.9 308.6,172.2 313.5,170.5 318.3,168.8 323.1,167.1 327.9,165.3 332.7,163.5 337.6,161.6 342.4,159.7 347.2,157.8 352.0,155.8 356.8,153.8 361.7,151.7 366.5,149.6 371.3,147.5 376.1,145.3 380.9,143.0 385.8,140.7 390.6,138.4 395.4,136.0 400.2,133.6 405.0,131.1 409.9,128.5 414.7,125.9 419.5,123.3 424.3,120.6 429.1,117.8 434.0,115.0 438.8,112.1 443.6,109.2 448.4,106.2 453.2,103.1 458.1,100.0 462.9,96.8 467.7,93.5 472.5,90.2 477.3,86.8 482.2,83.3 487.0,79.8 491.8,76.2 496.6,72.5 501.4,68.7 506.3,64.9 511.1,60.9 515.9,56.9 520.7,52.8 525.5,48.6 530.4,44.3 535.2,40.0 540.0,35.5"/><path class="run" d="M154.4 211.0 H250.8"/><path class="rise" d="M250.8 211.0 V189.8"/><text class="risel" x="257.8" y="204.4">+6.253</text><text class="ratio" x="202.6" y="227.0">×1.516</text><path class="run" d="M395.4 136.0 H491.8"/><path class="rise" d="M491.8 136.0 V76.2"/><text class="risel" x="498.8" y="110.1">+17.687</text><text class="ratio" x="443.6" y="152.0">×1.516</text><circle cx="58.0" cy="224.9" r="3"/><circle cx="106.2" cy="218.7" r="3"/><circle cx="154.4" cy="211.0" r="3"/><circle cx="202.6" cy="201.5" r="3"/><circle cx="250.8" cy="189.8" r="3"/><circle cx="299.0" cy="175.5" r="3"/><circle cx="347.2" cy="157.8" r="3"/><circle cx="395.4" cy="136.0" r="3"/><circle cx="443.6" cy="109.2" r="3"/><circle cx="491.8" cy="76.2" r="3"/><circle cx="540.0" cy="35.5" r="3"/></svg>
+          <svg viewBox="0 0 560 300" role="img" aria-label="Graph of 8 to the power of the exponent as the exponent runs from 1 to 2: a curve from 8 to 64 that steepens."><line class="ax" x1="58" x2="540" y1="252" y2="252"/><line class="ax" x1="58" x2="58" y1="22" y2="252"/><line class="grid" x1="58" x2="540" y1="252.0" y2="252.0"/><text class="yl" x="50" y="256.0">0</text><line class="grid" x1="58" x2="540" y1="197.9" y2="197.9"/><text class="yl" x="50" y="201.9">16</text><line class="grid" x1="58" x2="540" y1="143.8" y2="143.8"/><text class="yl" x="50" y="147.8">32</text><line class="grid" x1="58" x2="540" y1="89.6" y2="89.6"/><text class="yl" x="50" y="93.6">48</text><line class="grid" x1="58" x2="540" y1="35.5" y2="35.5"/><text class="yl" x="50" y="39.5">64</text><text class="xl" x="58.0" y="270">1</text><line class="tick" x1="58.0" x2="58.0" y1="252" y2="256"/><text class="xl" x="106.2" y="270"></text><line class="tick" x1="106.2" x2="106.2" y1="252" y2="256"/><text class="xl" x="154.4" y="270">1.2</text><line class="tick" x1="154.4" x2="154.4" y1="252" y2="256"/><text class="xl" x="202.6" y="270"></text><line class="tick" x1="202.6" x2="202.6" y1="252" y2="256"/><text class="xl" x="250.8" y="270">1.4</text><line class="tick" x1="250.8" x2="250.8" y1="252" y2="256"/><text class="xl" x="299.0" y="270"></text><line class="tick" x1="299.0" x2="299.0" y1="252" y2="256"/><text class="xl" x="347.2" y="270">1.6</text><line class="tick" x1="347.2" x2="347.2" y1="252" y2="256"/><text class="xl" x="395.4" y="270"></text><line class="tick" x1="395.4" x2="395.4" y1="252" y2="256"/><text class="xl" x="443.6" y="270">1.8</text><line class="tick" x1="443.6" x2="443.6" y1="252" y2="256"/><text class="xl" x="491.8" y="270"></text><line class="tick" x1="491.8" x2="491.8" y1="252" y2="256"/><text class="xl" x="540.0" y="270">2</text><line class="tick" x1="540.0" x2="540.0" y1="252" y2="256"/><polyline class="curve" points="58.0,224.9 62.8,224.4 67.6,223.8 72.5,223.2 77.3,222.6 82.1,222.0 86.9,221.3 91.7,220.7 96.6,220.0 101.4,219.4 106.2,218.7 111.0,218.0 115.8,217.3 120.7,216.5 125.5,215.8 130.3,215.0 135.1,214.3 139.9,213.5 144.8,212.7 149.6,211.8 154.4,211.0 159.2,210.1 164.0,209.2 168.9,208.3 173.7,207.4 178.5,206.5 183.3,205.5 188.1,204.6 193.0,203.6 197.8,202.5 202.6,201.5 207.4,200.4 212.2,199.4 217.1,198.3 221.9,197.1 226.7,196.0 231.5,194.8 236.3,193.6 241.2,192.4 246.0,191.1 250.8,189.8 255.6,188.5 260.4,187.2 265.3,185.8 270.1,184.4 274.9,183.0 279.7,181.6 284.5,180.1 289.4,178.6 294.2,177.0 299.0,175.5 303.8,173.9 308.6,172.2 313.5,170.5 318.3,168.8 323.1,167.1 327.9,165.3 332.7,163.5 337.6,161.6 342.4,159.7 347.2,157.8 352.0,155.8 356.8,153.8 361.7,151.7 366.5,149.6 371.3,147.5 376.1,145.3 380.9,143.0 385.8,140.7 390.6,138.4 395.4,136.0 400.2,133.6 405.0,131.1 409.9,128.5 414.7,125.9 419.5,123.3 424.3,120.6 429.1,117.8 434.0,115.0 438.8,112.1 443.6,109.2 448.4,106.2 453.2,103.1 458.1,100.0 462.9,96.8 467.7,93.5 472.5,90.2 477.3,86.8 482.2,83.3 487.0,79.8 491.8,76.2 496.6,72.5 501.4,68.7 506.3,64.9 511.1,60.9 515.9,56.9 520.7,52.8 525.5,48.6 530.4,44.3 535.2,40.0 540.0,35.5"/><circle cx="58.0" cy="224.9" r="3"/><circle cx="106.2" cy="218.7" r="3"/><circle cx="154.4" cy="211.0" r="3"/><circle cx="202.6" cy="201.5" r="3"/><circle cx="250.8" cy="189.8" r="3"/><circle cx="299.0" cy="175.5" r="3"/><circle cx="347.2" cy="157.8" r="3"/><circle cx="395.4" cy="136.0" r="3"/><circle cx="443.6" cy="109.2" r="3"/><circle cx="491.8" cy="76.2" r="3"/><circle cx="540.0" cy="35.5" r="3"/></svg>
         </figure>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="exponentials-additive-and-multiplicative-growth.html">← Additive and Multiplicative Growth</a>
-        <a href="exponentials-fractional-exponents.html">Next: Fractional Exponents →</a>
+        <a href="exponentials-working-backwards-through-our-journeys.html">Next: Working Backwards Through Our Journeys →</a>
       </nav>
     </main>
   </div>
