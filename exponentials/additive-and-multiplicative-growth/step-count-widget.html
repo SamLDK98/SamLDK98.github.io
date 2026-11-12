@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dividing an additive journey into steps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="choices" role="group" aria-label="Number of steps"></div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The same journey, 0 to 256, cut into 1, 2, 4, ... 64 equal steps. Fewer steps means bigger
+  // steps; the step size is always 256 divided by the number of steps, and the steps always add to 256.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const box = document.querySelector(".choices");
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a";
+  const TARGET = 256, OPTIONS = [1, 2, 4, 8, 16, 32, 64];
+  let n = 4;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  OPTIONS.forEach(k => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = k === 1 ? "1 step" : `${k} steps`;
+    b.addEventListener("click", () => { n = k; render(); });
+    box.appendChild(b);
+  });
+
+  function render() {
+    const size = TARGET / n;
+    const W = svg.clientWidth || 560, L = 18, R = W - 18, AX = 74, H = 132;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = v => L + (v / TARGET) * (R - L);
+
+    // the hops: each the same length; their height follows their width, capped
+    const hw = (R - L) / n, rise = Math.min(56, hw * 0.55);
+    for (let i = 0; i < n; i++) {
+      const a = px(i * size), b = px((i + 1) * size);
+      el("path", { d: `M${a} ${AX} Q${(a + b) / 2} ${AX - rise} ${b} ${AX}`, fill: "none", stroke: EXP, "stroke-opacity": 0.9, "stroke-width": 1.4 });
+    }
+    // the step size, written over the first hop when there is room for it
+    if (hw > 34) {
+      const t = el("text", { x: px(size / 2), y: AX - rise / 2 - 8, "text-anchor": "middle", "font-size": 12 }, `+${size}`);
+      t.style.fill = INK;
+    }
+
+    // the number line
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    for (let v = 0; v <= TARGET; v += 64) {
+      el("line", { x1: px(v), x2: px(v), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.2 });
+      el("text", { x: px(v), y: AX + 20, "text-anchor": "middle", "font-size": 12 }, v);
+    }
+    [0, TARGET].forEach(v => { const c = el("circle", { cx: px(v), cy: AX, r: 3.5 }); c.style.fill = VAL; });
+
+    // the reading: number of steps × step size = the whole journey
+    const r = el("text", { x: W / 2, y: 124, "text-anchor": "middle", "font-size": 15 });
+    const s1 = el("tspan", {}, `${n} ${n === 1 ? "step" : "steps"}`, r); s1.style.fill = EXP;
+    const s2 = el("tspan", {}, ` of +${size}:  ${n} × ${size} = `, r); s2.style.fill = INK;
+    const s3 = el("tspan", {}, `${TARGET}`, r); s3.style.fill = VAL;
+
+    box.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-pressed", OPTIONS[i] === n));
+    svg.setAttribute("aria-label", `The journey from 0 to 256 divided into ${n} equal ${n === 1 ? "step" : "steps"} of plus ${size}. ${n} times ${size} is 256.`);
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>
