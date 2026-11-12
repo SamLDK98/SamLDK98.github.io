@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eight additive steps always cover the same distance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="k" type="range" min="0" max="8" step="1" value="0" aria-label="Where the run of 8 steps starts, from step 0 to step 8" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // From 0 to 64 in 16 steps of +4. A run of 8 consecutive steps, highlighted, slides along the journey.
+  // Wherever it sits, it covers 8 × 4 = 32: half of the target. So the 8 steps that reach halfway
+  // and the 8 steps that finish the journey cover the same distance.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("k");
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a";
+  const STEPS = 16, STEP = 4, TARGET = 64, RUN = 8;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const k = +slider.value, from = k * STEP, to = (k + RUN) * STEP;
+    const W = svg.clientWidth || 560, L = 18, R = W - 18, H = 150, AX = 70;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = v => L + (v / TARGET) * (R - L);
+
+    // the bracket over the run of 8 steps, with the distance it covers
+    const bx1 = px(from), bx2 = px(to);
+    el("path", { d: `M${bx1} 22 V16 H${bx2} V22`, fill: "none", stroke: VAL, "stroke-opacity": 0.75, "stroke-width": 1.2 });
+    const lab = el("text", { x: (bx1 + bx2) / 2, y: 10, "text-anchor": "middle", "font-size": 14 }, `+${to - from}`);
+    lab.style.fill = VAL;
+
+    // hops: the run of 8 in blue, the rest faint
+    for (let i = 0; i < STEPS; i++) {
+      const a = px(i * STEP), b = px((i + 1) * STEP), lit = i >= k && i < k + RUN;
+      el("path", {
+        d: `M${a} ${AX} Q${(a + b) / 2} ${AX - 34} ${b} ${AX}`, fill: "none",
+        stroke: lit ? EXP : INK, "stroke-opacity": lit ? 0.95 : 0.22, "stroke-width": lit ? 1.6 : 1.2
+      });
+    }
+
+    // the number line
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    for (let v = 0; v <= TARGET; v += STEP) {
+      el("line", { x1: px(v), x2: px(v), y1: AX - 3, y2: AX + 3, stroke: INK, "stroke-opacity": 0.16 });
+      if (v % 16 === 0) el("text", { x: px(v), y: AX + 20, "text-anchor": "middle", "font-size": 12 }, v);
+    }
+    [from, to].forEach(v => { const c = el("circle", { cx: px(v), cy: AX, r: 3.5 }); c.style.fill = VAL; });
+
+    // the reading
+    const where = k === 0 ? " (the first half)" : k === STEPS - RUN ? " (the second half)" : "";
+    const t1 = el("text", { x: W / 2, y: 118, "text-anchor": "middle", "font-size": 15 }, `8 steps, from ${from} to ${to}${where}`);
+    t1.style.fill = EXP;
+    const t2 = el("text", { x: W / 2, y: 140, "text-anchor": "middle", "font-size": 14 }, `distance travelled: ${to - from}, half of ${TARGET}`);
+    t2.style.fill = VAL; t2.style.fillOpacity = 0.85;
+
+    svg.setAttribute("aria-label", `A run of 8 steps of plus 4, from ${from} to ${to}. It covers ${to - from}, half of 64, wherever it starts.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>
