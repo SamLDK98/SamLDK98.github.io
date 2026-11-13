@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>More steps, smaller steps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="n" type="range" min="1" max="64" step="1" value="1" aria-label="Number of steps, from 1 to 64" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The journey from 0 to 256, cut into however many equal steps the slider asks for.
+  // As the number of steps goes up, the step size needed to cover the same journey goes down: 256 ÷ steps.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("n");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a";
+  const TARGET = 256;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  // step sizes that are not whole numbers are shown to two decimal places
+  function fmtSize(x) {
+    if (Number.isInteger(x)) return String(x);
+    return "≈ " + (Math.round(x * 100) / 100).toFixed(2);
+  }
+
+  function render() {
+    const n = +slider.value, size = TARGET / n;
+    const W = svg.clientWidth || 560, L = 34, R = W - 46, AX = 66, H = 116;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = v => L + (v / TARGET) * (R - L);
+
+    // the hops: all the same length; their height follows their width, capped
+    const hw = (R - L) / n, rise = Math.min(46, hw * 0.55);
+    for (let i = 0; i < n; i++) {
+      const a = px(i * size), b = px((i + 1) * size);
+      el("path", { d: `M${a} ${AX} Q${(a + b) / 2} ${AX - rise} ${b} ${AX}`, fill: "none", stroke: EXP, "stroke-opacity": 0.9, "stroke-width": n > 40 ? 1.1 : 1.4 });
+    }
+
+    // the line, with the start in green and the target in red at either end
+    el("line", { x1: px(0), x2: px(TARGET), y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    const a = el("text", { x: px(0) - 12, y: AX + 6, "text-anchor": "end", "font-size": 18 }, "0");
+    a.style.fill = VAL; a.style.fontFamily = "Spectral, Georgia, serif";
+    const z = el("text", { x: px(TARGET) + 10, y: AX + 6, "text-anchor": "start", "font-size": 18 }, "256");
+    z.style.fill = RED; z.style.fontFamily = "Spectral, Georgia, serif";
+
+    // the two readings, side by side
+    [[W * 0.3, "Step size: ", fmtSize(size), BASE], [W * 0.7, "Number of steps: ", String(n), EXP]].forEach(([x, lab, val, col]) => {
+      const t = el("text", { x, y: 106, "text-anchor": "middle", "font-size": 14 });
+      const l = el("tspan", {}, lab, t); l.style.fill = INK; l.style.fillOpacity = 0.75;
+      const v = el("tspan", {}, val, t); v.style.fill = col;
+    });
+
+    svg.setAttribute("aria-label", `The journey from 0 to 256 in ${n} equal ${n === 1 ? "step" : "steps"}. Step size: ${fmtSize(size).replace("≈ ", "about ")}.`);
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

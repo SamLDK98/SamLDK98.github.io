@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Equal additive steps produce equal changes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <input id="k" type="range" min="0" step="1" value="0" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // 0 to 48 in 8 steps of +6. A run of RUN consecutive steps is highlighted (?run=1 or ?run=3);
+  // the slider moves it along the journey. Wherever it sits, the change across it is the same:
+  // 6 for one step, 6 + 6 + 6 = 18 for three.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const slider = document.getElementById("k");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a";
+  const STEPS = 8, STEP = 6, TARGET = STEPS * STEP;
+  const RUN = Math.max(1, Math.min(STEPS, +(new URLSearchParams(location.search).get("run")) || 1));
+  slider.max = STEPS - RUN;
+  slider.setAttribute("aria-label", RUN === 1 ? "Which step to highlight" : `Where the run of ${RUN} steps starts`);
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const k = +slider.value, from = k * STEP, to = (k + RUN) * STEP;
+    const W = svg.clientWidth || 560, L = 18, R = W - 18, AX = 74, H = 150;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = v => L + (v / TARGET) * (R - L);
+    const hw = (R - L) / STEPS, rise = Math.min(34, hw * 0.5);
+
+    // the hops: the run in blue, the rest faint
+    for (let i = 0; i < STEPS; i++) {
+      const a = px(i * STEP), b = px((i + 1) * STEP), lit = i >= k && i < k + RUN;
+      el("path", { d: `M${a} ${AX} Q${(a + b) / 2} ${AX - rise} ${b} ${AX}`, fill: "none",
+        stroke: lit ? EXP : INK, "stroke-opacity": lit ? 0.95 : 0.25, "stroke-width": lit ? 1.6 : 1.2 });
+    }
+
+    // the change across the run, bracketed above it in orange
+    const bx1 = px(from), bx2 = px(to), by = AX - rise - 10;
+    el("path", { d: `M${bx1} ${by + 5} V${by} H${bx2} V${by + 5}`, fill: "none", stroke: BASE, "stroke-opacity": 0.85, "stroke-width": 1.2 });
+    const sum = RUN === 1 ? `+${STEP}` : `+${Array(RUN).fill(STEP).join(" + ")} = +${RUN * STEP}`;
+    const lab = el("text", { x: (bx1 + bx2) / 2, y: by - 7, "text-anchor": "middle", "font-size": 13 }, sum);
+    lab.style.fill = BASE;
+
+    // the number line, every multiple of 6 marked; 0 green, 48 red
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    for (let i = 0; i <= STEPS; i++) {
+      const v = i * STEP, end = i === 0 || i === STEPS, onRun = v === from || v === to;
+      const t = el("text", { x: px(v), y: AX + 20, "text-anchor": "middle", "font-size": 12 }, v);
+      t.style.fill = i === 0 ? VAL : i === STEPS ? RED : INK;
+      t.style.fillOpacity = end || onRun ? 1 : 0.45;
+    }
+    [[0, VAL], [TARGET, RED]].forEach(([v, col]) => { const c = el("circle", { cx: px(v), cy: AX, r: 3.5 }); c.style.fill = col; });
+    [from, to].forEach(v => { if (v !== 0 && v !== TARGET) { const c = el("circle", { cx: px(v), cy: AX, r: 3.5 }); c.style.fill = INK; } });
+
+    // the subtraction: later output minus earlier output
+    const fs = W < 420 ? 17 : 20;
+    const r = el("text", { x: W / 2, y: 136, "text-anchor": "middle", "font-size": fs });
+    r.style.fontFamily = "Spectral, Georgia, serif";
+    const s1 = el("tspan", {}, `Step ${k + RUN} − Step ${k}:  ${to} − ${from} = `, r); s1.style.fill = INK;
+    const s2 = el("tspan", {}, `${to - from}`, r); s2.style.fill = BASE; s2.style.fontWeight = 500;
+
+    svg.setAttribute("aria-label", `${RUN === 1 ? "One step" : RUN + " steps"} of plus 6, from ${from} to ${to}: a change of ${to - from}, wherever ${RUN === 1 ? "the step is" : "the run sits"}.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  slider.addEventListener("input", render);
+  render();
+</script>
+</body>
+</html>

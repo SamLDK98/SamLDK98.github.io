@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reconstructing the target output from partial progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  :root { --val: #7fcf9a; }
+  .card { font-family: "Spectral", Georgia, serif; transition: opacity 0.18s ease; }
+  .card.fade { opacity: 0; }
+  .head { text-align: center; font-size: clamp(1.02rem, 3.5vw, 1.15rem); color: var(--dim); margin-bottom: 1rem; }
+  .head b { font-weight: 400; color: var(--ink); }
+  .pct { color: var(--exp); }
+  .x { color: var(--val); font-style: italic; }
+
+  .rows { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 0.7rem 0.9rem; }
+  .n { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--dim);
+       width: 1.5rem; height: 1.5rem; border: 1px solid var(--faint); border-radius: 50%;
+       display: inline-flex; align-items: center; justify-content: center; }
+  .eq { font-size: clamp(1.15rem, 4.2vw, 1.45rem); color: var(--ink); white-space: nowrap; }
+  .times { font-size: 0.72em; color: var(--dim); margin-left: 0.6em; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.05; margin: 0 0.1em; font-size: 0.75em; }
+  .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 0.15em; }
+
+  .nav { display: flex; justify-content: center; gap: 2.4rem; margin-top: 1.1rem; }
+  .nav button {
+    font: inherit; font-size: 1.3rem; line-height: 1; width: 2.4rem; height: 2.4rem; border-radius: 50%;
+    background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .nav button:hover:not(:disabled) { border-color: var(--dim); }
+  .nav button:disabled { opacity: 0.25; cursor: default; }
+  .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="card" id="card" aria-live="polite"></div>
+  <div class="nav">
+    <button id="prev" type="button" aria-label="Previous example">←</button>
+    <button id="next" type="button" aria-label="Next example">→</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Two steps, matching the list on the page:
+  // 1. how many times the percentage completed adds up to 100%;
+  // 2. the output added up the same number of times gives the target output.
+  const frac = (a, b) => `<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+  const P = v => `<span class="pct">${v}%</span>`;
+  const X = `<span class="x">x</span>`;
+  const CASES = [
+    { pct: 25,
+      one: `${P(25)} + ${P(25)} + ${P(25)} + ${P(25)} = 100%`, times: `4 times`,
+      two: `${X} + ${X} + ${X} + ${X} = 4${X}` },
+    { pct: 40,
+      one: `${P(40)} + ${P(40)} + ${P(20)} = 100%`, times: `2.5 times`,
+      two: `${X} + ${X} + ${frac(X, 2)} = 2.5${X}` },
+    { pct: 85,
+      one: `${P(85)} + ${P(15)} = 100%`, times: `${frac(20, 17)} times`,
+      two: `${X} + ${frac("3" + X, 17)} = ${frac(20, 17)}${X}` },
+  ];
+  let c = 0;
+  const card = document.getElementById("card");
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+
+  function draw() {
+    const k = CASES[c];
+    card.innerHTML = `
+      <div class="head">Steps completed: <span class="pct">${k.pct}%</span> &nbsp;·&nbsp; Current output: ${X}</div>
+      <div class="rows">
+        <span class="n">1</span><span class="eq">${k.one}<span class="times">(${k.times})</span></span>
+        <span class="n">2</span><span class="eq">${k.two}</span>
+      </div>`;
+    prev.disabled = c === 0; next.disabled = c === CASES.length - 1;
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+  function go(d) {
+    const j = c + d; if (j < 0 || j >= CASES.length) return;
+    card.classList.add("fade");
+    setTimeout(() => { c = j; draw(); card.classList.remove("fade"); }, 180);
+  }
+  prev.addEventListener("click", () => go(-1));
+  next.addEventListener("click", () => go(1));
+  draw();
+</script>
+</body>
+</html>

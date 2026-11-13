@@ -27,13 +27,13 @@
     p.lead-in + iframe.expo-widget { margin-top: 1.2rem; }
     p.centred { text-align: center; }
     /* two minimal graphs side by side: additive and multiplicative growth */
-    figure.growth-graphs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 4vw, 3rem); max-width: 600px; margin: 2rem auto; }
+    figure.growth-graphs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 4vw, 3rem); max-width: 600px; margin: 3rem auto 2rem; }
     @media (max-width: 520px) { figure.growth-graphs { grid-template-columns: 1fr; max-width: 300px; } }
     .growth-graphs .axis { stroke: var(--faint); stroke-width: 1.2; }
     .growth-graphs .path { fill: none; stroke: var(--ink); stroke-opacity: 0.35; stroke-width: 1.3; }
     .growth-graphs circle { fill: var(--ink); }
-    .growth-graphs text.t { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--dim); text-anchor: middle; }
-    .growth-graphs text.t.y { text-anchor: end; }
+    .growth-graphs text.t { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--ink); fill-opacity: 0.85; text-anchor: middle; }
+    .growth-graphs text.t.cap { font-size: 13px; fill: var(--base); fill-opacity: 1; letter-spacing: 0.04em; }
     /* how change accumulates: three steps of +6 against three steps of ×2 */
     figure.accumulate svg { max-width: 460px; }
     .accumulate text { font-family: "IBM Plex Mono", monospace; text-anchor: middle; }
@@ -45,6 +45,39 @@
     .accumulate .brace { fill: none; stroke: var(--value); stroke-opacity: 0.6; stroke-width: 1.1; }
     blockquote.aside-quote { margin: 1.4rem 0; padding-left: 1.1rem; border-left: 2px solid var(--faint); }
     blockquote.aside-quote p { color: var(--dim); }
+    /* a journey from a start to a target: start green, target red */
+    figure.journey { margin: 1.6rem 0; }
+    figure.journey svg { max-width: 260px; }
+    .journey text { font-family: "Spectral", Georgia, serif; font-size: 28px; text-anchor: middle; }
+    .journey text.from { fill: var(--value); }
+    .journey text.to { fill: #e8706a; }
+    .journey .hop { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.5; }
+    .journey .base { stroke: var(--ink); stroke-opacity: 0.16; stroke-width: 1.2; }
+    .journey .equal { fill: none; stroke: var(--base); stroke-opacity: 0.85; stroke-width: 1.3; }
+    .journey .ghost { stroke-dasharray: 4 4; stroke-opacity: 0.4; }
+    .journey text.xl { font-size: 20px; font-style: italic; fill: var(--value); }
+    .journey text.pct { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--exp); }
+    .journey text.tgt { font-size: 18px; text-anchor: start; fill: #e8706a; }
+    .journey .tick25 { stroke: var(--exp); stroke-width: 1.4; }
+    .journey .unequal { fill: none; stroke: var(--base); stroke-width: 2.2; stroke-linejoin: round; }
+    .journey .arrow { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .mjx-target { color: #e8706a; }   /* a target output, red as on the number lines */
+    p.lead-in + p.grid-note { margin-top: 0.3rem; }
+    /* words coloured to match the parts of a calculation beside them */
+    .c-steps { color: var(--exp); }
+    .c-target { color: #e8706a; }
+    .c-size { color: var(--base); }
+    /* two formulas side by side on one level */
+    .formula-pair { display: flex; flex-wrap: nowrap; justify-content: center; align-items: center; gap: clamp(1.2rem, 5vw, 4rem); margin: 2rem 0 0.6rem; }
+    .formula-pair .math { flex: 0 1 auto; }
+    /* a numbered list whose items carry their own worked maths */
+    ol.worked { margin: 1.8rem 0 1rem; }
+    ol.worked > li + li { margin-top: 3rem; }
+    ol.worked > li > p + p { margin-top: 1.4rem; }
+    ol.worked > li > .math { margin: 0.7rem 0 0; }
+    ol.worked > li > .math + p { margin-top: 1.6rem; }
+    ol.worked > li > .math + .math { margin-top: 0.7rem; }
+    figure.journey + p.journey-note { margin-top: -0.6rem; }
   </style>
 </head>
 <body>
@@ -58,7 +91,7 @@
         <p>Understanding the difference between additive and multiplicative growth is a key prerequisite for understanding exponentiation.</p>
         <p>In <strong>additive growth</strong>, each step adds the same amount to the current output.</p>
         <figure class="numline">
-          <svg viewBox="0 0 560 128" role="img" aria-label="A number line from 0 to 10. Steps from 1 to 3, 5, 7 and 9: each step adds 2, so every hop is the same length."><style>
+          <svg viewBox="0 0 560 128" role="img" aria-label="A number line from 0 to 10. Steps from 0 to 2, 4, 6, 8 and 10: each step adds 2, so every hop is the same length."><style>
               .numline svg { max-width: 560px; }
               .numline .axis { stroke: var(--faint); stroke-width: 1.2; }
               .numline .tick { stroke: var(--faint); }
@@ -73,101 +106,114 @@
               .numline text.op { fill: var(--base); }
               .numline text.dist { font-size: 12px; }
               .numline .brace { fill: none; stroke: var(--dim); stroke-width: 1.1; }
-            </style><line class="axis" x1="20" x2="540" y1="92" y2="92"/><line class="tick" x1="20.0" x2="20.0" y1="89" y2="95"/><line class="tick" x1="72.0" x2="72.0" y1="89" y2="95"/><line class="tick" x1="124.0" x2="124.0" y1="89" y2="95"/><line class="tick" x1="176.0" x2="176.0" y1="89" y2="95"/><line class="tick" x1="228.0" x2="228.0" y1="89" y2="95"/><line class="tick" x1="280.0" x2="280.0" y1="89" y2="95"/><line class="tick" x1="332.0" x2="332.0" y1="89" y2="95"/><line class="tick" x1="384.0" x2="384.0" y1="89" y2="95"/><line class="tick" x1="436.0" x2="436.0" y1="89" y2="95"/><line class="tick" x1="488.0" x2="488.0" y1="89" y2="95"/><line class="tick" x1="540.0" x2="540.0" y1="89" y2="95"/><path class="hop" d="M72.0 86 Q124.0 18.0 176.0 86"/><text class="add" x="124.0" y="44.0">+2</text><path class="hop" d="M176.0 86 Q228.0 18.0 280.0 86"/><text class="add" x="228.0" y="44.0">+2</text><path class="hop" d="M280.0 86 Q332.0 18.0 384.0 86"/><text class="add" x="332.0" y="44.0">+2</text><path class="hop" d="M384.0 86 Q436.0 18.0 488.0 86"/><text class="add" x="436.0" y="44.0">+2</text><circle class="start" cx="72.0" cy="92" r="4"/><text class="num" x="72.0" y="116">1</text><circle cx="176.0" cy="92" r="4"/><text class="num" x="176.0" y="116">3</text><circle cx="280.0" cy="92" r="4"/><text class="num" x="280.0" y="116">5</text><circle cx="384.0" cy="92" r="4"/><text class="num" x="384.0" y="116">7</text><circle class="end" cx="488.0" cy="92" r="4"/><text class="num" x="488.0" y="116">9</text><text class="num zero" x="20.0" y="116">0</text></svg>
+            </style><line class="axis" x1="20" x2="540" y1="92" y2="92"/><line class="tick" x1="20.0" x2="20.0" y1="89" y2="95"/><line class="tick" x1="72.0" x2="72.0" y1="89" y2="95"/><line class="tick" x1="124.0" x2="124.0" y1="89" y2="95"/><line class="tick" x1="176.0" x2="176.0" y1="89" y2="95"/><line class="tick" x1="228.0" x2="228.0" y1="89" y2="95"/><line class="tick" x1="280.0" x2="280.0" y1="89" y2="95"/><line class="tick" x1="332.0" x2="332.0" y1="89" y2="95"/><line class="tick" x1="384.0" x2="384.0" y1="89" y2="95"/><line class="tick" x1="436.0" x2="436.0" y1="89" y2="95"/><line class="tick" x1="488.0" x2="488.0" y1="89" y2="95"/><line class="tick" x1="540.0" x2="540.0" y1="89" y2="95"/><path class="hop" d="M20.0 86 Q72.0 18.0 124.0 86"/><text class="add" x="72.0" y="44.0">+2</text><path class="hop" d="M124.0 86 Q176.0 18.0 228.0 86"/><text class="add" x="176.0" y="44.0">+2</text><path class="hop" d="M228.0 86 Q280.0 18.0 332.0 86"/><text class="add" x="280.0" y="44.0">+2</text><path class="hop" d="M332.0 86 Q384.0 18.0 436.0 86"/><text class="add" x="384.0" y="44.0">+2</text><path class="hop" d="M436.0 86 Q488.0 18.0 540.0 86"/><text class="add" x="488.0" y="44.0">+2</text><circle class="start" cx="20.0" cy="92" r="4"/><text class="num" x="20.0" y="116">0</text><circle cx="124.0" cy="92" r="4"/><text class="num" x="124.0" y="116">2</text><circle cx="228.0" cy="92" r="4"/><text class="num" x="228.0" y="116">4</text><circle cx="332.0" cy="92" r="4"/><text class="num" x="332.0" y="116">6</text><circle cx="436.0" cy="92" r="4"/><text class="num" x="436.0" y="116">8</text><circle class="end" cx="540.0" cy="92" r="4"/><text class="num" x="540.0" y="116">10</text></svg>
         </figure>
         <p>In <strong>multiplicative growth</strong>, each step multiplies the current output by the same factor.</p>
         <figure class="numline">
           <svg viewBox="0 0 560 160" role="img" aria-label="A number line from 0 to 16. Steps from 1 to 2, 4, 8 and 16: each step multiplies by 2. The hops cover 1, 2, 4 and 8, so each is twice as long as the last."><line class="axis" x1="20" x2="540" y1="92" y2="92"/><line class="tick" x1="20.0" x2="20.0" y1="89" y2="95"/><line class="tick" x1="52.5" x2="52.5" y1="89" y2="95"/><line class="tick" x1="85.0" x2="85.0" y1="89" y2="95"/><line class="tick" x1="117.5" x2="117.5" y1="89" y2="95"/><line class="tick" x1="150.0" x2="150.0" y1="89" y2="95"/><line class="tick" x1="182.5" x2="182.5" y1="89" y2="95"/><line class="tick" x1="215.0" x2="215.0" y1="89" y2="95"/><line class="tick" x1="247.5" x2="247.5" y1="89" y2="95"/><line class="tick" x1="280.0" x2="280.0" y1="89" y2="95"/><line class="tick" x1="312.5" x2="312.5" y1="89" y2="95"/><line class="tick" x1="345.0" x2="345.0" y1="89" y2="95"/><line class="tick" x1="377.5" x2="377.5" y1="89" y2="95"/><line class="tick" x1="410.0" x2="410.0" y1="89" y2="95"/><line class="tick" x1="442.5" x2="442.5" y1="89" y2="95"/><line class="tick" x1="475.0" x2="475.0" y1="89" y2="95"/><line class="tick" x1="507.5" x2="507.5" y1="89" y2="95"/><line class="tick" x1="540.0" x2="540.0" y1="89" y2="95"/><path class="hop" d="M52.5 86 Q68.8 58.7 85.0 86"/><text class="op" x="68.8" y="64.3">×2</text><path class="hop" d="M85.0 86 Q117.5 31.4 150.0 86"/><text class="op" x="117.5" y="50.7">×2</text><path class="hop" d="M150.0 86 Q215.0 18.0 280.0 86"/><text class="op" x="215.0" y="44.0">×2</text><path class="hop" d="M280.0 86 Q410.0 18.0 540.0 86"/><text class="op" x="410.0" y="44.0">×2</text><circle class="start" cx="52.5" cy="92" r="4"/><text class="num" x="52.5" y="116">1</text><circle cx="85.0" cy="92" r="4"/><text class="num" x="85.0" y="116">2</text><circle cx="150.0" cy="92" r="4"/><text class="num" x="150.0" y="116">4</text><circle cx="280.0" cy="92" r="4"/><text class="num" x="280.0" y="116">8</text><circle class="end" cx="540.0" cy="92" r="4"/><text class="num" x="540.0" y="116">16</text><text class="num zero" x="20.0" y="116">0</text><path class="brace" d="M55.5 128 V134 H82.0 V128"/><text class="dist" x="68.8" y="152">+1</text><path class="brace" d="M88.0 128 V134 H147.0 V128"/><text class="dist" x="117.5" y="152">+2</text><path class="brace" d="M153.0 128 V134 H277.0 V128"/><text class="dist" x="215.0" y="152">+4</text><path class="brace" d="M283.0 128 V134 H537.0 V128"/><text class="dist" x="410.0" y="152">+8</text></svg>
         </figure>
-        <p class="lead-in">Let's visualise growing by a constant factor of <span class="nw">\(\class{mjx-base}{4}\).</span></p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/grid-growth-widget.html" title="Animation: a square of area 1 sits in one cell of a 2 by 2 grid; copies fill the other cells and merge into a square of area 4. The view zooms out as the grid appears again, and the square grows to 16, then 64. The amount added grows each time, 3, 12, 48, but the factor is always 4." style="height: 340px" scrolling="no" loading="lazy"></iframe>
-        <p class="centred">The grid represents the factor we are increasing by. It could have any number of cells to represent any factor, but here it was four. We can see that although the absolute increase from one square to the next varies, the next square is always \(4\) times as big as the previous one.</p>
+        <p class="lead-in">Growing by a constant factor of <span class="nw">\(\class{mjx-base}{4}\)</span></p>
+        <p class="centred grid-note"><em>The number of cells in the grid represents the factor we are growing by. Although the absolute increase from one square to the next varies, the next square is always \(4\) times as big.</em></p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/grid-growth-widget.html" title="Animation: a square of area 1 sits in one cell of a 2 by 2 grid; copies fill the other cells and merge into a square of area 4. The grid appears again around it, and the square grows on screen to 16, then 64, each drawn twice as wide as the last. The amount added grows each time, 3, 12, 48, but the factor is always 4." style="height: 340px" scrolling="no" loading="lazy"></iframe>
         <figure class="growth-graphs">
           <div class="growth-graph">
-            <svg viewBox="0 0 260 214" role="img" aria-label="Additive growth: outputs 1, 3, 5, 7, 9, 11 over five steps. The points lie on a straight line."><line class="axis" x1="34" y1="166" x2="250" y2="166"/><line class="axis" x1="34" y1="166" x2="34" y2="10"/><polyline class="path" points="34.0,153.7 76.0,129.0 118.0,104.3 160.0,79.7 202.0,55.0 244.0,30.3"/><circle cx="34.0" cy="153.7" r="3.6"/><circle cx="76.0" cy="129.0" r="3.6"/><circle cx="118.0" cy="104.3" r="3.6"/><circle cx="160.0" cy="79.7" r="3.6"/><circle cx="202.0" cy="55.0" r="3.6"/><circle cx="244.0" cy="30.3" r="3.6"/><text x="34.0" y="184" class="t">0</text><text x="76.0" y="184" class="t">1</text><text x="118.0" y="184" class="t">2</text><text x="160.0" y="184" class="t">3</text><text x="202.0" y="184" class="t">4</text><text x="244.0" y="184" class="t">5</text><text x="26" y="157.7" class="t y">1</text><text x="26" y="34.3" class="t y">11</text><text x="139" y="208" class="t">additive steps</text></svg>
+            <svg viewBox="0 0 260 214" role="img" aria-label="Additive growth: outputs 1, 3, 5, 7, 9, 11 over five steps. The points lie on a straight line."><line class="axis" x1="34" y1="166" x2="250" y2="166"/><line class="axis" x1="34" y1="166" x2="34" y2="10"/><polyline class="path" points="34.0,153.7 76.0,129.0 118.0,104.3 160.0,79.7 202.0,55.0 244.0,30.3"/><circle cx="34.0" cy="153.7" r="3.6"/><circle cx="76.0" cy="129.0" r="3.6"/><circle cx="118.0" cy="104.3" r="3.6"/><circle cx="160.0" cy="79.7" r="3.6"/><circle cx="202.0" cy="55.0" r="3.6"/><circle cx="244.0" cy="30.3" r="3.6"/><text x="34.0" y="184" class="t">0</text><text x="76.0" y="184" class="t">1</text><text x="118.0" y="184" class="t">2</text><text x="160.0" y="184" class="t">3</text><text x="202.0" y="184" class="t">4</text><text x="244.0" y="184" class="t">5</text><text x="139" y="208" class="t cap">additive steps</text></svg>
           </div>
           <div class="growth-graph">
-            <svg viewBox="0 0 260 214" role="img" aria-label="Multiplicative growth: outputs 1, 2, 4, 8, 16, 32 over five steps. The points curve upward, each rise twice the last."><line class="axis" x1="34" y1="166" x2="250" y2="166"/><line class="axis" x1="34" y1="166" x2="34" y2="10"/><polyline class="path" points="34.0,161.4 76.0,156.8 118.0,147.5 160.0,129.0 202.0,92.0 244.0,18.0"/><circle cx="34.0" cy="161.4" r="3.6"/><circle cx="76.0" cy="156.8" r="3.6"/><circle cx="118.0" cy="147.5" r="3.6"/><circle cx="160.0" cy="129.0" r="3.6"/><circle cx="202.0" cy="92.0" r="3.6"/><circle cx="244.0" cy="18.0" r="3.6"/><text x="34.0" y="184" class="t">0</text><text x="76.0" y="184" class="t">1</text><text x="118.0" y="184" class="t">2</text><text x="160.0" y="184" class="t">3</text><text x="202.0" y="184" class="t">4</text><text x="244.0" y="184" class="t">5</text><text x="26" y="165.4" class="t y">1</text><text x="26" y="22.0" class="t y">32</text><text x="139" y="208" class="t">multiplicative steps</text></svg>
+            <svg viewBox="0 0 260 214" role="img" aria-label="Multiplicative growth: outputs 1, 2, 4, 8, 16, 32 over five steps. The points curve upward, each rise twice the last."><line class="axis" x1="34" y1="166" x2="250" y2="166"/><line class="axis" x1="34" y1="166" x2="34" y2="10"/><polyline class="path" points="34.0,161.4 76.0,156.8 118.0,147.5 160.0,129.0 202.0,92.0 244.0,18.0"/><circle cx="34.0" cy="161.4" r="3.6"/><circle cx="76.0" cy="156.8" r="3.6"/><circle cx="118.0" cy="147.5" r="3.6"/><circle cx="160.0" cy="129.0" r="3.6"/><circle cx="202.0" cy="92.0" r="3.6"/><circle cx="244.0" cy="18.0" r="3.6"/><text x="34.0" y="184" class="t">0</text><text x="76.0" y="184" class="t">1</text><text x="118.0" y="184" class="t">2</text><text x="160.0" y="184" class="t">3</text><text x="202.0" y="184" class="t">4</text><text x="244.0" y="184" class="t">5</text><text x="139" y="208" class="t cap">multiplicative steps</text></svg>
           </div>
         </figure>
       </section>
 
       <section aria-labelledby="additive-progress">
         <h2 id="additive-progress">Progress in Additive Journeys</h2>
-        <p>Say we start at:</p>
-        <div class="math">\[0\]</div>
-        <p>We want to reach:</p>
-        <div class="math">\[256\]</div>
-        <p>Rather than jumping directly to <span class="nw">\(256\),</span> imagine travelling there, passing through all the intermediate values.</p>
-        <p>Although we can think of this journey as continuous, we can also divide it into discrete steps.</p>
+        <figure class="journey">
+          <svg viewBox="0 0 300 60" role="img" aria-label="A journey from 0 to 256."><text x="40" y="40" class="from">0</text><line x1="72" y1="31" x2="214" y2="31" class="arrow"/><path d="M206 25 L216 31 L206 37" class="arrow"/><text x="252" y="40" class="to">256</text></svg>
+        </figure>
+        <p>Imagine travelling from \(0\) to <span class="nw">\(256\),</span> passing through all the intermediate values.</p>
+        <p>Let's think of this continuous journey as being divided into discrete steps.</p>
+        <figure class="journey">
+          <svg viewBox="0 0 366 60" style="max-width: 317px" role="img" aria-label="The journey from 0 to 256 as a series of equal hops."><text x="40" y="45" class="from">0</text><line x1="72" y1="36" x2="298" y2="36" class="arrow"/><path d="M291 30.5 L298 36 L291 41.5" class="arrow"/><path d="M72 36 A18 18 0 0 1 108 36" class="hop"/><path d="M108 36 A18 18 0 0 1 144 36" class="hop"/><path d="M144 36 A18 18 0 0 1 180 36" class="hop"/><path d="M180 36 A18 18 0 0 1 216 36" class="hop"/><path d="M216 36 A18 18 0 0 1 252 36" class="hop"/><path d="M252 36 A18 18 0 0 1 288 36" class="hop"/><text x="330" y="45" class="to">256</text></svg>
+        </figure>
         <p>For an additive journey, the distance (i.e. the change in output) covered by each step must be equal.</p>
-        <p>Therefore, we can divide the journey into as many or as few steps as we wish, as long as we adjust the step size accordingly.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/step-count-widget.html" title="Interactive: the journey from 0 to 256 divided into 1, 2, 4, 8, 16, 32 or 64 equal steps. Fewer steps means bigger steps: the step size is 256 divided by the number of steps, and the steps always add up to 256." style="height: 190px" scrolling="no" loading="lazy"></iframe>
-        <p>For a target output, through division, we can find:</p>
-        <ul>
-          <li>The number of steps we must take (given a step size)</li>
-        </ul>
-        <div class="math">\[\frac{\text{target output}}{\text{step size}} = \text{total steps in the journey}\]</div>
-        <div class="math">\[\text{a) }\frac{200}{2} = 100 \text{ equally spaced steps}\]</div>
-        <div class="math">\[\text{b) }\frac{200}{50} = 4 \text{ equally spaced steps}\]</div>
-        <div class="math">\[\text{c) }\frac{200}{5} = 40 \text{ equally spaced steps}\]</div>
-        <ul>
-          <li>The step size (given a number of steps)</li>
-        </ul>
-        <div class="math">\[\frac{\text{target output}}{\text{total steps in the journey}} = \text{step size}\]</div>
-        <div class="math">\[\text{a) }\frac{200}{100} = 2 \text{ (step size)}\]</div>
-        <div class="math">\[\text{b) }\frac{200}{4} = 50 \text{ (step size)}\]</div>
-        <div class="math">\[\text{c) }\frac{200}{40} = 5 \text{ (step size)}\]</div>
+        <figure class="journey">
+          <svg viewBox="0 0 366 60" style="max-width: 317px" role="img" aria-label="The journey from 0 to 256 as six hops, each marked underneath with a bracket of the same length: every step covers an equal distance."><text x="40" y="45" class="from">0</text><line x1="72" y1="36" x2="298" y2="36" class="arrow"/><path d="M291 30.5 L298 36 L291 41.5" class="arrow"/><path d="M72 36 A18 18 0 0 1 108 36" class="hop"/><path d="M108 36 A18 18 0 0 1 144 36" class="hop"/><path d="M144 36 A18 18 0 0 1 180 36" class="hop"/><path d="M180 36 A18 18 0 0 1 216 36" class="hop"/><path d="M216 36 A18 18 0 0 1 252 36" class="hop"/><path d="M252 36 A18 18 0 0 1 288 36" class="hop"/><path d="M75 44 V48 H105 V44" class="equal"/><path d="M111 44 V48 H141 V44" class="equal"/><path d="M147 44 V48 H177 V44" class="equal"/><path d="M183 44 V48 H213 V44" class="equal"/><path d="M219 44 V48 H249 V44" class="equal"/><path d="M255 44 V48 H285 V44" class="equal"/><text x="330" y="45" class="to">256</text></svg>
+        </figure>
+        <p>We can divide the journey into as many or as few steps as we wish, as long as we adjust the step size accordingly.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/step-slider-widget.html" title="Interactive: slide to divide the journey from 0 to 256 into 1 to 64 equal steps. The hops redraw, and the step size needed, 256 divided by the number of steps, is shown alongside the number of steps." style="height: 170px" scrolling="no" loading="lazy"></iframe>
+        <p>Division can find the <span class="c-steps">number of steps</span> needed to reach a <span class="c-target">target output</span> for a given <span class="c-size">step size</span>.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/divide-steps-widget.html" title="Interactive: 256 divided by a step size gives the number of equally spaced steps. Use the arrows to step through step sizes of 4, 16, 32 and 64, giving 64, 16, 8 and 4 steps." style="height: 150px" scrolling="no" loading="lazy"></iframe>
+        <p>Division can find the <span class="c-size">step size</span> needed to reach a <span class="c-target">target output</span> for a given <span class="c-steps">number of steps</span>.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/divide-steps-widget.html?solve=size" title="Interactive: 256 divided by a number of steps gives the step size. Use the arrows to step through 4, 16, 32 and 64 steps, giving step sizes of 64, 16, 8 and 4." style="height: 150px" scrolling="no" loading="lazy"></iframe>
+        <div class="formula-pair">
+          <div class="math">\[\frac{\text{target output}}{\text{step size}} = \text{total steps}\]</div>
+          <div class="math">\[\frac{\text{target output}}{\text{total steps}} = \text{step size}\]</div>
+        </div>
 
-        <h3 id="equal-steps-equal-change">Equal Numbers of Additive Steps Produce Equal Changes in the Output</h3>
-        <p>In additive growth, every step changes the output by the same amount. Consequently, the difference between successive outputs is always the same (regardless of where we are in the journey).</p>
-        <p>For example, suppose each step adds \(6\) to the current output:</p>
-        <div class="math">\[0 \to 6 \to 12 \to 18 \to 24 \to 30 \to 36 \to 42 \to 48\]</div>
-        <div class="math">\[\text{Step 2} - \text{Step 1}: \quad 12 - 6 = \boxed{6}\]</div>
-        <div class="math">\[\text{Step 6} - \text{Step 5}: \quad 36 - 30 = \boxed{6}\]</div>
-        <p>Further, if we take \(x\) steps, the difference between the initial output and the final output will be the same. The change accumulates. Here, \(3\) steps covers a change of \(6 + 6 + 6 = 18\) in the output.</p>
-        <p>For example:</p>
-        <div class="math">\[\text{Step 4} - \text{Step 1}: \quad 24 - 6 = \boxed{18}\]</div>
-        <div class="math">\[\text{Step 8} - \text{Step 5}: \quad 48 - 30 = \boxed{18}\]</div>
+        <h3 id="additive-accumulation">How Additive Changes Accumulate</h3>
+        <p>The difference between successive outputs is always the same in additive growth, regardless of where we are in the journey.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-run-widget.html?run=1" title="Interactive: a journey from 0 to 48 in 8 steps of plus 6. Slide to highlight any one step; the difference between its outputs is always 6." style="height: 180px" scrolling="no" loading="lazy"></iframe>
+        <p>Further, the difference between \(x\) number of successive steps is always the same. The change accumulates through addition; for example, if one step adds \(6\) to the output, then \(3\) steps will add <span class="nw">\(6 + 6 + 6 = 18\),</span> regardless of where we are in the journey.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-run-widget.html?run=3" title="Interactive: a journey from 0 to 48 in 8 steps of plus 6. Slide a run of 3 steps along the journey; wherever it sits, it adds 6 + 6 + 6 = 18." style="height: 180px" scrolling="no" loading="lazy"></iframe>
+
 
         <h3 id="additive-relationship">The Relationship Between Additive Steps and Output</h3>
         <p>We can track two quantities as we progress in our growth journey:</p>
         <ul>
           <li>Steps taken</li>
-          <li>Corresponding output</li>
+          <li>Output</li>
         </ul>
-        <p>Because each step increases the output by the same amount:</p>
-        <div class="math">\[\text{steps taken }\% = \text{target output }\%\]</div>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/additive-progress-widget.html" title="Interactive: walk from 0 to 256 in 64 steps of plus 4. One bar shows the share of steps taken, another the share of the output reached; they always match. At 32 steps the output is 128, and the same distance again reaches 256" style="height: 200px" scrolling="no" loading="lazy"></iframe>
-        <p>Imagine the target output is <span class="nw">\(200\).</span></p>
-        <p>We divide our journey into:</p>
-        <div class="math">\[\text{a) } 100 \text{ steps of } +2\]</div>
-        <div class="math">\[\text{b) } 4 \text{ steps of } +50\]</div>
-        <div class="math">\[\text{c) } 40 \text{ steps of } +5\]</div>
-        <p>When we have taken \(25\%\) of our steps:</p>
-        <div class="math">\[\text{a) } 25\]</div>
-        <div class="math">\[\text{b) } 1\]</div>
-        <div class="math">\[\text{c) } 10\]</div>
-        <p>We will have covered \(25\%\) of the output:</p>
-        <div class="math">\[\text{a) } 25 \times 2 = 50\]</div>
-        <div class="math">\[\text{b) } 1 \times 50 = 50\]</div>
-        <div class="math">\[\text{c) } 10 \times 5 = 50\]</div>
+        <p>Because every step adds the same amount, the percentage of steps taken always equals the percentage of the target output reached, however we divide the journey.</p>
+        <div class="math">\[\text{total steps }\% = \text{target output }\%\]</div>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/split-progress-widget.html" title="Interactive: the journey from 0 to 256 divided three ways, into 4 steps of plus 64, 16 steps of plus 16 and 64 steps of plus 4. Use the arrows to take 0, 25, 50, 75 or 100 percent of the steps; every row reaches the same output, the same percentage of 256." style="height: 300px" scrolling="no" loading="lazy"></iframe>
+
 
         <h3 id="reconstructing-total">Reconstructing the Total from Partial Progress</h3>
-        <p>When a percentage divides evenly into \(100\%\), reconstructing the total output is straightforward.</p>
-        <p>For example, if we know the output after completing \(25\%\) of our steps is <span class="nw">\(x\),</span> then the target output must be <span class="nw">\(4x\),</span> because four groups of \(25\%\) make up the complete journey.</p>
-        <p>But what if we have completed \(40\%\) of our steps and reached an output of <span class="nw">\(80\)?</span></p>
-        <div class="math">\[40\% \text{ steps taken} \to \text{current output} = 80\]</div>
-        <p>We can calculate how many groups of \(40\%\) make up <span class="nw">\(100\%\):</span></p>
-        <div class="math">\[\frac{100}{40} = 2.5\]</div>
-        <p>Therefore, we multiply our current output by <span class="nw">\(2.5\):</span></p>
-        <div class="math">\[80 \times 2.5 = \boxed{200}\]</div>
-        <p>The same approach works for percentages greater than <span class="nw">\(50\%\).</span></p>
-        <p>Suppose we have completed \(85\%\) of our steps and reached an output of <span class="nw">\(170\).</span></p>
-        <div class="math">\[\frac{100}{85} = \frac{20}{17} \approx 1.17647\]</div>
-        <p>Therefore:</p>
-        <div class="math">\[170 \times \frac{20}{17} = \boxed{200}\]</div>
-        <p>We can generalise this relationship: if we know the output reached after completing a given percentage of an additive journey starting at zero, we can recover the target by multiplying that output by the number of times the completed percentage fits into <span class="nw">\(100\%\).</span></p>
+        <p>Because:</p>
+        <div class="math">\[\text{steps complete }\% = \text{target output }\%\]</div>
+        <p>Calculating the target output when we know the output reached after a given percentage of steps is straightforward.</p>
+        <ol class="worked">
+          <li>
+            <p>Work out how many times that percentage needs to be added to itself to reach <span class="nw">\(100\%\).</span></p>
+            <p>For <span class="nw">\(25\%\),</span> <span class="nw">\(40\%\),</span> and <span class="nw">\(85\%\):</span></p>
+            <div class="math">\[\frac{100}{25} = 4, \qquad \frac{100}{40} = 2.5, \qquad \frac{100}{85} \approx 1.17\]</div>
+          </li>
+          <li>
+            <p>This will correspond to the number of times we need to add the current output (<span class="nw">\(x\))</span> to itself to reach the target output.</p>
+            <p>For <span class="nw">\(25\%\):</span></p>
+            <div class="math">\[x + x + x + x = 4x\]</div>
+            <p>For <span class="nw">\(40\%\):</span></p>
+            <div class="math">\[x + x + 0.5x = 2.5x\]</div>
+            <p>For <span class="nw">\(85\%\):</span></p>
+            <div class="math">\[x + 0.17647x \approx 1.17647x\]</div>
+          </li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="multiplicative-progress-draft">
+        <h2 id="multiplicative-progress-draft">Progress in Multiplicative Journeys</h2>
+        <figure class="journey">
+          <svg viewBox="0 0 300 60" role="img" aria-label="A journey from 1 to 256."><text x="40" y="40" class="from">1</text><line x1="72" y1="31" x2="214" y2="31" class="arrow"/><path d="M206 25 L216 31 L206 37" class="arrow"/><text x="252" y="40" class="to">256</text></svg>
+        </figure>
+        <p class="centred journey-note"><em>Multiplicative journeys start at \(1\) instead of <span class="nw">\(0\).</span></em></p>
+        <p>This time we progress by multiplying the current output by a constant factor.</p>
+        <div class="math">\[1 \xrightarrow{\times 2} 2 \xrightarrow{\times 2} 4 \xrightarrow{\times 2} 8 \xrightarrow{\times 2} 16 \xrightarrow{\times 2} 32 \xrightarrow{\times 2} 64 \xrightarrow{\times 2} 128 \xrightarrow{\times 2} 256\]</div>
+
+        <h3 id="multiplicative-accumulation">How Multiplicative Changes Accumulate</h3>
+        <p>The change in output covered by each step is no longer equal. Consequently, neither are the differences between successive outputs.</p>
+        <figure class="journey">
+          <svg viewBox="0 0 520 106" style="max-width: 520px" role="img" aria-label="The journey from 1 to 256 as six hops that grow by the same ratio, each marked underneath with a bracket; the brackets are all different lengths: the change covered by each step is not equal."><text x="40" y="87" class="from">1</text><line x1="72" y1="78" x2="448" y2="78" class="arrow"/><path d="M441 72.5 L448 78 L441 83.5" class="arrow"/><path d="M72.0 78 A8.8 7.9 0 0 1 89.5 78" class="hop"/><path d="M89.5 78 A13.1 11.8 0 0 1 115.8 78" class="hop"/><path d="M115.8 78 A19.7 17.7 0 0 1 155.2 78" class="hop"/><path d="M155.2 78 A29.6 26.6 0 0 1 214.3 78" class="hop"/><path d="M214.3 78 A44.3 39.9 0 0 1 303.0 78" class="hop"/><path d="M303.0 78 A66.5 59.9 0 0 1 436.0 78" class="hop"/><path d="M74.0 88 V96 H87.5 V88" class="unequal"/><path d="M91.5 88 V96 H113.8 V88" class="unequal"/><path d="M117.8 88 V96 H153.2 V88" class="unequal"/><path d="M157.2 88 V96 H212.3 V88" class="unequal"/><path d="M216.3 88 V96 H301.0 V88" class="unequal"/><path d="M305.0 88 V96 H434.0 V88" class="unequal"/><text x="484" y="87" class="to">256</text></svg>
+        </figure>
+        <p>However, the ratios between successive outputs are equal.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=1&amp;drag=0" title="Interactive: a journey from 1 to 256 in 8 steps of times 2, spaced so that later steps cover more distance. Use the arrows to move along the steps; below the line, each step's two outputs as a ratio, which is always 2." style="height: 200px" scrolling="no" loading="lazy"></iframe>
+        <p>Recall that in additive growth, the changes produced by successive steps accumulate through addition. For example, three steps of \(+6\) produce a total increase of:</p>
+        <div class="math">\[6 + 6 + 6 = 18\]</div>
+        <p>In multiplicative growth, the factors combine through multiplication.</p>
+        <p>Three steps of \(\times 2\) produce a total factor of:</p>
+        <div class="math">\[2 \times 2 \times 2 = 8\]</div>
+        <p>Drag the white dots to select more steps, then use the arrows to slide them along the line. Each extra step multiplies the ratio by <span class="nw">\(2\),</span> but for a given number of steps, the ratio is the same wherever they sit.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=3" title="Interactive: a journey from 1 to 256 in 8 steps of times 2, spaced so that later steps cover more distance. Three steps are selected to begin with. Drag the dots at either end to select more or fewer steps, and use the arrows to slide the selection along. Below the line, the ratio of its end outputs: 2 for one step, 4 for two, 8 for three, wherever they sit." style="height: 200px" scrolling="no" loading="lazy"></iframe>
+        <p>Equal numbers of multiplicative steps produce equal ratios between outputs, regardless of where they occur along the journey.</p>
       </section>
 
       <section aria-labelledby="multiplicative-progress">

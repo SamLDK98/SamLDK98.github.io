@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The same share of steps, however the journey is divided</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .nav { display: flex; justify-content: center; gap: 2.4rem; margin-top: 0.6rem; }
+  .nav button {
+    font: inherit; font-size: 1.3rem; line-height: 1; width: 2.4rem; height: 2.4rem; border-radius: 50%;
+    background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .nav button:hover:not(:disabled) { border-color: var(--dim); }
+  .nav button:disabled { opacity: 0.25; cursor: default; }
+  .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="nav">
+    <button id="prev" type="button" aria-label="Take fewer steps">←</button>
+    <button id="next" type="button" aria-label="Take more steps">→</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The journey from 0 to 256, divided three ways: 4 steps of +64, 16 steps of +16, 64 steps of +4.
+  // The arrows set the share of steps taken (0, 25, 50, 75, 100%). Every row stops at the same
+  // point: the same share of the output. However the journey is divided, % of steps = % of output.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  let q = 1;   // quarters of the journey taken: 0 to 4
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a";
+  const TARGET = 256, SIZES = [64, 16, 4];   // biggest steps on top
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const serif = e => { e.style.fontFamily = "Spectral, Georgia, serif"; return e; };
+
+  function render() {
+    const pct = q * 25, out = TARGET * pct / 100;
+    prev.disabled = q === 0; next.disabled = q === 4;
+    const W = svg.clientWidth || 560, L = 18, R = W - 18, ROW = 66, TOP = 74;
+    const lastY = TOP + ROW * (SIZES.length - 1), H = lastY + 92;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const px = v => L + (v / TARGET) * (R - L);
+    const big = W < 420 ? 15 : 17;
+
+    // where every row has reached: one guide through all three, labelled with the output
+    if (pct > 0) {
+      el("line", { x1: px(out), x2: px(out), y1: 22, y2: lastY + 4, stroke: VAL, "stroke-opacity": 0.6, "stroke-width": 1.2, "stroke-dasharray": "4 4" });
+      const g = el("text", { x: px(out), y: 14, "text-anchor": "middle", "font-size": 13 }, out); g.style.fill = VAL;
+    }
+
+    SIZES.forEach((size, r) => {
+      const n = TARGET / size, taken = n * pct / 100, y = TOP + r * ROW;
+      const hw = (R - L) / n, rise = Math.min(22, hw * 0.5);
+      // the hops, all blue: those taken bright, the rest faint
+      for (let i = 0; i < n; i++) {
+        const a = px(i * size), b = px((i + 1) * size), lit = i < taken;
+        el("path", { d: `M${a} ${y} Q${(a + b) / 2} ${y - rise} ${b} ${y}`, fill: "none",
+          stroke: EXP, "stroke-opacity": lit ? 0.95 : 0.28, "stroke-width": n > 32 ? 1.1 : 1.4 });
+      }
+      el("line", { x1: L, x2: R, y1: y, y2: y, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+      // the steps taken, above the row's start
+      const c = serif(el("text", { x: L, y: y - Math.max(rise, 8) - 8, "text-anchor": "start", "font-size": big }));
+      const c1 = el("tspan", {}, `${taken}`, c); c1.style.fill = EXP; c1.style.fontWeight = 500;
+      const c2 = el("tspan", {}, ` of ${n} steps`, c); c2.style.fill = INK; c2.style.fillOpacity = 0.85;
+    });
+
+    // the ends of the journey, under the last row
+    const z = el("text", { x: px(0), y: lastY + 17, "text-anchor": "start", "font-size": 12 }, "0"); z.style.fill = VAL;
+    const t = el("text", { x: px(TARGET), y: lastY + 17, "text-anchor": "end", "font-size": 12 }, "256"); t.style.fill = RED;
+
+    // the reading: two shares, side by side
+    const fs = W < 420 ? 15 : 19;
+    [[W * 0.27, EXP, "steps taken"], [W * 0.73, VAL, "target output reached"]].forEach(([x, col, lab]) => {
+      const r = serif(el("text", { x, y: H - 14, "text-anchor": "middle", "font-size": fs }));
+      const a = el("tspan", {}, `${pct}%`, r); a.style.fill = col; a.style.fontWeight = 500;
+      const b = el("tspan", {}, ` of ${lab}`, r); b.style.fill = INK;
+    });
+
+    svg.setAttribute("aria-label", `The journey from 0 to 256 in steps of 64, 16 and 4. With ${pct}% of the steps taken, every row has reached ${out}: ${pct}% of the target output.`);
+  }
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  prev.addEventListener("click", () => { if (q > 0) { q--; render(); } });
+  next.addEventListener("click", () => { if (q < 4) { q++; render(); } });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Target output divided by step size</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .eq { display: flex; justify-content: center; align-items: center; gap: 0.9rem; font-family: "Spectral", Georgia, serif; font-size: clamp(1.5rem, 5vw, 2rem); }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; }
+  .frac .num { padding: 0 0.3rem 0.15rem; border-bottom: 1.5px solid var(--ink); color: #e8706a; }
+  .frac .den { padding-top: 0.15rem; color: var(--base); }
+  .res { color: var(--ink); }
+  .res .n { color: var(--exp); }
+  /* ?solve=size: the denominator is the number of steps (blue), the result is the step size (orange) */
+  body.solve-size .frac .den { color: var(--exp); }
+  body.solve-size .res .n { color: var(--base); }
+  .nav { display: flex; justify-content: center; gap: 2.4rem; margin-top: 1rem; }
+  .nav button {
+    font: inherit; font-size: 1.3rem; line-height: 1; width: 2.4rem; height: 2.4rem; border-radius: 50%;
+    background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .nav button:hover:not(:disabled) { border-color: var(--dim); }
+  .nav button:disabled { opacity: 0.25; cursor: default; }
+  .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+  .num, .den span, .res .n { display: inline-block; transition: opacity 0.18s ease; }
+  .fade { opacity: 0; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="eq" aria-live="polite">
+    <span class="frac">
+      <span class="num">256</span>
+      <span class="den"><span id="size">4</span></span>
+    </span>
+    <span class="res">= <span class="n" id="steps">64</span></span>
+  </div>
+  <div class="nav">
+    <button id="prev" type="button" aria-label="Previous">←</button>
+    <button id="next" type="button" aria-label="Next">→</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // 256 divided by a step size gives the number of equally spaced steps from 0 to 256.
+  // With ?solve=size it runs the other way: 256 divided by a number of steps gives the step size.
+  // Either way the denominators are 4, 16, 32, 64 and the results 64, 16, 8, 4.
+  const TARGET = 256, SIZES = [4, 16, 32, 64];
+  if (new URLSearchParams(location.search).get("solve") === "size") document.body.classList.add("solve-size");
+  let i = 0;
+  const sizeEl = document.getElementById("size"), stepsEl = document.getElementById("steps");
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+
+  function show() {
+    sizeEl.textContent = SIZES[i];
+    stepsEl.textContent = TARGET / SIZES[i];
+    prev.disabled = i === 0; next.disabled = i === SIZES.length - 1;
+  }
+  function go(d) {
+    const j = i + d;
+    if (j < 0 || j >= SIZES.length) return;
+    [sizeEl, stepsEl].forEach(e => e.classList.add("fade"));
+    setTimeout(() => { i = j; show(); [sizeEl, stepsEl].forEach(e => e.classList.remove("fade")); }, 180);
+  }
+  prev.addEventListener("click", () => go(-1));
+  next.addEventListener("click", () => go(1));
+  show();
+</script>
+</body>
+</html>
