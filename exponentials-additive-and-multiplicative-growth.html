@@ -34,15 +34,6 @@
     .growth-graphs circle { fill: var(--ink); }
     .growth-graphs text.t { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--ink); fill-opacity: 0.85; text-anchor: middle; }
     .growth-graphs text.t.cap { font-size: 13px; fill: var(--base); fill-opacity: 1; letter-spacing: 0.04em; }
-    /* how change accumulates: three steps of +6 against three steps of ×2 */
-    figure.accumulate svg { max-width: 460px; }
-    .accumulate text { font-family: "IBM Plex Mono", monospace; text-anchor: middle; }
-    .accumulate text.lab { font-size: 12px; letter-spacing: 0.08em; fill: var(--dim); }
-    .accumulate text.num { font-family: "Spectral", Georgia, serif; font-size: 22px; fill: var(--ink); }
-    .accumulate text.op { font-size: 13px; fill: var(--base); }
-    .accumulate text.tot { font-size: 14px; fill: var(--value); }
-    .accumulate .hop { fill: none; stroke: var(--ink); stroke-opacity: 0.45; stroke-width: 1.2; }
-    .accumulate .brace { fill: none; stroke: var(--value); stroke-opacity: 0.6; stroke-width: 1.1; }
     blockquote.aside-quote { margin: 1.4rem 0; padding-left: 1.1rem; border-left: 2px solid var(--faint); }
     blockquote.aside-quote p { color: var(--dim); }
     /* a journey from a start to a target: start green, target red */
@@ -61,7 +52,6 @@
     .journey .tick25 { stroke: var(--exp); stroke-width: 1.4; }
     .journey .unequal { fill: none; stroke: var(--base); stroke-width: 2.2; stroke-linejoin: round; }
     .journey .arrow { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-    .mjx-target { color: #e8706a; }   /* a target output, red as on the number lines */
     p.lead-in + p.grid-note { margin-top: 0.3rem; }
     /* words coloured to match the parts of a calculation beside them */
     .c-steps { color: var(--exp); }
@@ -190,8 +180,8 @@
         </ol>
       </section>
 
-      <section aria-labelledby="multiplicative-progress-draft">
-        <h2 id="multiplicative-progress-draft">Progress in Multiplicative Journeys</h2>
+      <section aria-labelledby="multiplicative-progress">
+        <h2 id="multiplicative-progress">Progress in Multiplicative Journeys</h2>
         <figure class="journey">
           <svg viewBox="0 0 300 60" role="img" aria-label="A journey from 1 to 256."><text x="40" y="40" class="from">1</text><line x1="72" y1="31" x2="214" y2="31" class="arrow"/><path d="M206 25 L216 31 L206 37" class="arrow"/><text x="252" y="40" class="to">256</text></svg>
         </figure>
@@ -214,41 +204,6 @@
         <p>Drag the white dots to select more steps, then use the arrows to slide them along the line. Each extra step multiplies the ratio by <span class="nw">\(2\),</span> but for a given number of steps, the ratio is the same wherever they sit.</p>
         <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=3" title="Interactive: a journey from 1 to 256 in 8 steps of times 2, spaced so that later steps cover more distance. Three steps are selected to begin with. Drag the dots at either end to select more or fewer steps, and use the arrows to slide the selection along. Below the line, the ratio of its end outputs: 2 for one step, 4 for two, 8 for three, wherever they sit." style="height: 200px" scrolling="no" loading="lazy"></iframe>
         <p>Equal numbers of multiplicative steps produce equal ratios between outputs, regardless of where they occur along the journey.</p>
-      </section>
-
-      <section aria-labelledby="multiplicative-progress">
-        <h2 id="multiplicative-progress">Progress in Multiplicative Journeys</h2>
-        <p>Multiplicative journeys start at \(1\) instead of <span class="nw">\(0\).</span></p>
-        <p>Say we start at:</p>
-        <div class="math">\[1\]</div>
-        <p>We want to reach:</p>
-        <div class="math">\[256\]</div>
-        <p>This time we progress by multiplying the current output by a constant factor.</p>
-        <p>Imagine we always multiply the current output by <span class="nw">\(\times\class{mjx-base}{2}\):</span></p>
-        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32 \to 64 \to 128 \to 256\]</div>
-        <p>As before, we can track:</p>
-        <ul>
-          <li>Steps taken</li>
-          <li>Corresponding output</li>
-        </ul>
-        <p>Unlike additive growth, the differences between successive outputs are not equal:</p>
-        <div class="math">\[\text{step 2} - \text{step 1: }\ 4 - 2 = \boxed{2}\]</div>
-        <div class="math">\[\text{step 6} - \text{step 5: }\ 64 - 32 = \boxed{32}\]</div>
-        <p>However, <strong>the ratios between them are</strong>:</p>
-        <div class="math">\[\frac{\text{step 2}}{\text{step 1}} \to\ \frac{4}{2} = \boxed{2}\]</div>
-        <div class="math">\[\frac{\text{step 6}}{\text{step 5}} \to\ \frac{64}{32} = \boxed{2}\]</div>
-        <p>Recall that in additive growth, the changes produced by successive steps accumulate through addition. For example, three steps of \(+6\) produce a total increase of:</p>
-        <div class="math">\[6 + 6 + 6 = 18\]</div>
-        <p>In multiplicative growth, the factors accumulate through multiplication.</p>
-        <p>Three steps of \(\times 2\) produce a total multiplicative change of:</p>
-        <div class="math">\[2 \times 2 \times 2 = 8\]</div>
-        <p>Therefore, <strong>equal numbers of multiplicative steps produce equal ratios between outputs</strong>, regardless of where they occur along the journey.</p>
-        <p>For example:</p>
-        <div class="math">\[\frac{\text{step 4}}{\text{step 1}} \to\ \frac{16}{2} = \boxed{8}\]</div>
-        <div class="math">\[\frac{\text{step 8}}{\text{step 5}} \to\ \frac{256}{32} = \boxed{8}\]</div>
-        <figure class="accumulate">
-          <svg viewBox="0 0 460 292" role="img" aria-label="Additive: 6, 12, 18, 24. Each step adds 6, and three steps add 6 plus 6 plus 6, which is 18. Multiplicative: 2, 4, 8, 16. Each step multiplies by 2, and three steps multiply by 2 times 2 times 2, which is 8."><text x="230" y="16" class="lab">additive</text><path class="hop" d="M94 72 Q130.0 46 166 72"/><text x="130" y="52" class="op">+6</text><path class="hop" d="M194 72 Q230.0 46 266 72"/><text x="230" y="52" class="op">+6</text><path class="hop" d="M294 72 Q330.0 46 366 72"/><text x="330" y="52" class="op">+6</text><text x="80" y="88" class="num">6</text><text x="180" y="88" class="num">12</text><text x="280" y="88" class="num">18</text><text x="380" y="88" class="num">24</text><path class="brace" d="M80 100 V106 H380 V100"/><text x="230" y="126" class="tot">+6 + 6 + 6 = +18</text><g transform="translate(0 22)"><text x="230" y="150" class="lab">multiplicative</text><path class="hop" d="M94 206 Q130.0 180 166 206"/><text x="130" y="186" class="op">×2</text><path class="hop" d="M194 206 Q230.0 180 266 206"/><text x="230" y="186" class="op">×2</text><path class="hop" d="M294 206 Q330.0 180 366 206"/><text x="330" y="186" class="op">×2</text><text x="80" y="222" class="num">2</text><text x="180" y="222" class="num">4</text><text x="280" y="222" class="num">8</text><text x="380" y="222" class="num">16</text><path class="brace" d="M80 234 V240 H380 V234"/><text x="230" y="260" class="tot">×2 × 2 × 2 = ×8</text></g></svg>
-        </figure>
 
         <h3 id="multiplicative-relationship">The Relationship Between Multiplicative Steps and Output</h3>
         <p>When each step changes the output by a constant factor:</p>
