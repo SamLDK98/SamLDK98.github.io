@@ -131,6 +131,7 @@
         </figure>
         <p>We can divide the journey into as many or as few steps as we wish, as long as we adjust the step size accordingly.</p>
         <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/step-slider-widget.html" title="Interactive: slide to divide the journey from 0 to 256 into 1 to 64 equal steps. The hops redraw, and the step size needed, 256 divided by the number of steps, is shown alongside the number of steps." style="height: 170px" scrolling="no" loading="lazy"></iframe>
+        <p>Notice that the steps always add up to 256. If we take \(n\) steps of size \(x\), then \(n \times x = 256\), so \(x = 256 \div n\).</p>
         <p>Division can find the <span class="c-steps">number of steps</span> needed to reach a <span class="c-target">target output</span> for a given <span class="c-size">step size</span>.</p>
         <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/divide-steps-widget.html" title="Interactive: 256 divided by a step size gives the number of equally spaced steps. Use the arrows to step through step sizes of 4, 16, 32 and 64, giving 64, 16, 8 and 4 steps." style="height: 150px" scrolling="no" loading="lazy"></iframe>
         <p>Division can find the <span class="c-size">step size</span> needed to reach a <span class="c-target">target output</span> for a given <span class="c-steps">number of steps</span>.</p>
@@ -204,6 +205,34 @@
         <p>Drag the white dots to select more steps, then use the arrows to slide them along the line. Each extra step multiplies the ratio by <span class="nw">\(2\),</span> but for a given number of steps, the ratio is the same wherever they sit.</p>
         <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=3" title="Interactive: a journey from 1 to 256 in 8 steps of times 2, spaced so that later steps cover more distance. Three steps are selected to begin with. Drag the dots at either end to select more or fewer steps, and use the arrows to slide the selection along. Below the line, the ratio of its end outputs: 2 for one step, 4 for two, 8 for three, wherever they sit." style="height: 200px" scrolling="no" loading="lazy"></iframe>
         <p>Equal numbers of multiplicative steps produce equal ratios between outputs, regardless of where they occur along the journey.</p>
+
+        <h3 id="multiplicative-relationship-draft">The Relationship Between Multiplicative Steps and Output</h3>
+        <p>Let's consider growth by a factor of <span class="nw">\(2\).</span></p>
+        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32 \to 64 \to 128 \to 256\]</div>
+        <p>It's clear that, unlike additive steps:</p>
+        <div class="math">\[\text{total steps }\% \ne \text{target output }\%\]</div>
+        <p>There are \(8\) steps, and the halfway point of the target output occurs at the <span class="nw">\(7\)th!</span></p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/steps-output-widget.html" title="Interactive: a journey from 1 to 256 in 8 steps of times 2. Use the arrows to take steps; two lines show the percentage of steps taken and the percentage of the target output reached. Half the steps reaches only 16, 6.25 percent of the target; half the target, 128, is reached at step 7." style="height: 200px" scrolling="no" loading="lazy"></iframe>
+        <p>The key insight here relates to the idea of equal additive steps increasing the output by the same addition, i.e.</p>
+        <p>If:</p>
+        <div class="math">\[\text{1 step} = +6\]</div>
+        <p>Then:</p>
+        <div class="math">\[\text{3 steps} = 6 + 6 + 6\]</div>
+        <div class="math">\[\text{3 steps} = +18\]</div>
+        <p>So if three steps were \(50\%\) of the total steps required to reach the target output, another three steps would add the same amount:</p>
+        <div class="math">\[\text{6 steps} = \text{3 steps} + \text{3 steps} = 18 + 18 = 36\]</div>
+        <p>And for multiplicative growth, equal multiplicative steps increase the output by the same multiplicative factor, i.e.</p>
+        <p>If:</p>
+        <div class="math">\[\text{1 step} = \times 2\]</div>
+        <p>Then:</p>
+        <div class="math">\[\text{4 steps} = 2 \times 2 \times 2 \times 2\]</div>
+        <div class="math">\[\text{4 steps} = \times 16\]</div>
+        <p>It might feel different because the additive steps, abstracted from their position on the number line, gave us a value, whereas this gives us an operation. But remember that the additive steps can be thought of as being added to \(0\), while the multiplicative steps are being multiplied by <span class="nw">\(1\):</span></p>
+        <div class="math">\[0 + 18 = 18\]</div>
+        <div class="math">\[1 \times 16 = 16\]</div>
+        <p>So if four steps were \(50\%\) of the total steps required to reach the target output, another four steps would multiply by the same factor:</p>
+        <div class="math">\[\text{8 steps} = \text{4 steps} \times \text{4 steps}\]</div>
+        <div class="math">\[\text{8 steps} = \times 16 \times 16 = \times 256\]</div>
 
         <h3 id="multiplicative-relationship">The Relationship Between Multiplicative Steps and Output</h3>
         <p>When each step changes the output by a constant factor:</p>
