@@ -12,7 +12,7 @@
 <body>
 <div class="widget">
   <svg id="fig" role="img"></svg>
-  <input id="n" type="range" min="1" max="64" step="1" value="1" aria-label="Number of steps, from 1 to 64" />
+  <input id="n" type="range" min="1" max="64" step="1" value="1" autocomplete="off" aria-label="Number of steps, from 1 to 64" />
 </div>
 
 <script src="../widget-base.js"></script>
@@ -77,6 +77,8 @@
   let rt;
   window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
   slider.addEventListener("input", render);
+  // always start at one step, even if the browser restores the slider from an earlier visit
+  slider.value = 1;
   render();
 </script>
 </body>

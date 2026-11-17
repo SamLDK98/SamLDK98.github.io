@@ -65,8 +65,8 @@
 
     // where every row has reached: one guide through all three, labelled with the output
     if (pct > 0) {
-      el("line", { x1: px(out), x2: px(out), y1: 22, y2: lastY + 4, stroke: VAL, "stroke-opacity": 0.6, "stroke-width": 1.2, "stroke-dasharray": "4 4" });
-      const g = el("text", { x: px(out), y: 14, "text-anchor": "middle", "font-size": 13 }, out); g.style.fill = VAL;
+      el("line", { x1: px(out), x2: px(out), y1: 22, y2: lastY + 4, stroke: BASE, "stroke-opacity": 0.6, "stroke-width": 1.2, "stroke-dasharray": "4 4" });
+      const g = el("text", { x: px(out), y: 14, "text-anchor": "middle", "font-size": 13 }, out); g.style.fill = BASE;
     }
 
     SIZES.forEach((size, r) => {
@@ -91,7 +91,7 @@
 
     // the reading: two shares, side by side
     const fs = W < 420 ? 15 : 19;
-    [[W * 0.27, EXP, "steps taken"], [W * 0.73, VAL, "target output reached"]].forEach(([x, col, lab]) => {
+    [[W * 0.27, EXP, "steps taken"], [W * 0.73, BASE, "target output reached"]].forEach(([x, col, lab]) => {
       const r = serif(el("text", { x, y: H - 14, "text-anchor": "middle", "font-size": fs }));
       const a = el("tspan", {}, `${pct}%`, r); a.style.fill = col; a.style.fontWeight = 500;
       const b = el("tspan", {}, ` of ${lab}`, r); b.style.fill = INK;

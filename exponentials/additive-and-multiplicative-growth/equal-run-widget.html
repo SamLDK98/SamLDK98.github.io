@@ -42,7 +42,7 @@
 
   function render() {
     const k = +slider.value, from = k * STEP, to = (k + RUN) * STEP;
-    const W = svg.clientWidth || 560, L = 18, R = W - 18, AX = 74, H = 150;
+    const W = svg.clientWidth || 560, L = 18, R = W - 18, AX = 74, H = 110;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
     svg.textContent = "";
     const px = v => L + (v / TARGET) * (R - L);
@@ -72,13 +72,6 @@
     }
     [[0, VAL], [TARGET, RED]].forEach(([v, col]) => { const c = el("circle", { cx: px(v), cy: AX, r: 3.5 }); c.style.fill = col; });
     [from, to].forEach(v => { if (v !== 0 && v !== TARGET) { const c = el("circle", { cx: px(v), cy: AX, r: 3.5 }); c.style.fill = INK; } });
-
-    // the subtraction: later output minus earlier output
-    const fs = W < 420 ? 17 : 20;
-    const r = el("text", { x: W / 2, y: 136, "text-anchor": "middle", "font-size": fs });
-    r.style.fontFamily = "Spectral, Georgia, serif";
-    const s1 = el("tspan", {}, `Step ${k + RUN} − Step ${k}:  ${to} − ${from} = `, r); s1.style.fill = INK;
-    const s2 = el("tspan", {}, `${to - from}`, r); s2.style.fill = BASE; s2.style.fontWeight = 500;
 
     svg.setAttribute("aria-label", `${RUN === 1 ? "One step" : RUN + " steps"} of plus 6, from ${from} to ${to}: a change of ${to - from}, wherever ${RUN === 1 ? "the step is" : "the run sits"}.`);
   }

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualising Different Types of Growth | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Ways of seeing growth: a square that grows by a constant factor, so that each new square is always the same multiple of the last." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    /* a line that introduces the widget beneath it */
+    p.lead-in { margin: 3.2rem 0 0.4rem; text-align: center; font-style: italic; font-size: clamp(1.3rem, 3vw, 1.5rem); color: var(--ink); }
+    p.lead-in + iframe.expo-widget { margin-top: 1.2rem; }
+    p.centred { text-align: center; }
+    /* two minimal graphs side by side: additive and multiplicative growth */
+    figure.growth-graphs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 4vw, 3rem); max-width: 600px; margin: 3rem auto 2rem; }
+    @media (max-width: 520px) { figure.growth-graphs { grid-template-columns: 1fr; max-width: 300px; } }
+    .growth-graphs .axis { stroke: var(--faint); stroke-width: 1.2; }
+    .growth-graphs .path { fill: none; stroke: var(--ink); stroke-opacity: 0.35; stroke-width: 1.3; }
+    .growth-graphs circle { fill: var(--ink); }
+    .growth-graphs text.t { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--ink); fill-opacity: 0.85; text-anchor: middle; }
+    .growth-graphs text.t.cap { font-size: 13px; fill: var(--base); fill-opacity: 1; letter-spacing: 0.04em; }
+    blockquote.aside-quote { margin: 1.4rem 0; padding-left: 1.1rem; border-left: 2px solid var(--faint); }
+    blockquote.aside-quote p { color: var(--dim); }
+    /* a journey from a start to a target: start green, target red */
+    figure.journey { margin: 1.6rem 0; }
+    figure.journey svg { max-width: 260px; }
+    .journey text { font-family: "Spectral", Georgia, serif; font-size: 28px; text-anchor: middle; }
+    .journey text.from { fill: var(--value); }
+    .journey text.to { fill: #e8706a; }
+    .journey .hop { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.5; }
+    .journey .base { stroke: var(--ink); stroke-opacity: 0.16; stroke-width: 1.2; }
+    .journey .equal { fill: none; stroke: var(--base); stroke-opacity: 0.85; stroke-width: 1.3; }
+    .journey .ghost { stroke-dasharray: 4 4; stroke-opacity: 0.4; }
+    .journey text.xl { font-size: 20px; font-style: italic; fill: var(--value); }
+    .journey text.pct { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--exp); }
+    .journey text.tgt { font-size: 18px; text-anchor: start; fill: #e8706a; }
+    .journey .tick25 { stroke: var(--exp); stroke-width: 1.4; }
+    .journey .unequal { fill: none; stroke: var(--base); stroke-width: 2.2; stroke-linejoin: round; }
+    .journey .arrow { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    p.lead-in + p.grid-note { margin-top: 0.3rem; }
+    /* words coloured to match the parts of a calculation beside them */
+    .c-steps { color: var(--exp); }
+    .c-target { color: #e8706a; }
+    .c-size { color: var(--base); }
+    /* two formulas side by side on one level */
+    .formula-pair { display: flex; flex-wrap: nowrap; justify-content: center; align-items: center; gap: clamp(1.2rem, 5vw, 4rem); margin: 2rem 0 0.6rem; }
+    .formula-pair .math { flex: 0 1 auto; }
+    /* a numbered list whose items carry their own worked maths */
+    ol.worked { margin: 1.8rem 0 1rem; }
+    ol.worked > li + li { margin-top: 3rem; }
+    ol.worked > li > p + p { margin-top: 1.4rem; }
+    ol.worked > li > .math { margin: 0.7rem 0 0; }
+    ol.worked > li > .math + p { margin-top: 1.6rem; }
+    ol.worked > li > .math + .math { margin-top: 0.7rem; }
+    figure.journey + p.journey-note { margin-top: -0.6rem; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Visualising Different Types of Growth</h1>
+    </header>
+    <main>
+      <section aria-label="Visualising multiplicative growth">
+        <p class="lead-in">Growing by a constant factor of <span class="nw">\(\class{mjx-base}{4}\)</span></p>
+        <p class="centred grid-note"><em>The number of cells in the grid represents the factor we are growing by. Although the absolute increase from one square to the next varies, the next square is always \(4\) times as big.</em></p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/grid-growth-widget.html" title="Animation: a square of area 1 sits in one cell of a 2 by 2 grid; copies fill the other cells and merge into a square of area 4. The grid appears again around it, and the square grows on screen to 16, then 64, each drawn twice as wide as the last. The amount added grows each time, 3, 12, 48, but the factor is always 4." style="height: 340px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-additive-and-multiplicative-growth.html">← Additive and Multiplicative Growth</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -57,6 +57,7 @@
     .c-steps { color: var(--exp); }
     .c-target { color: #e8706a; }
     .c-size { color: var(--base); }
+    .c-output { color: var(--value); }
     /* two formulas side by side on one level */
     .formula-pair { display: flex; flex-wrap: nowrap; justify-content: center; align-items: center; gap: clamp(1.2rem, 5vw, 4rem); margin: 2rem 0 0.6rem; }
     .formula-pair .math { flex: 0 1 auto; }
@@ -69,6 +70,22 @@
     ol.worked > li > .math + .math { margin-top: 0.7rem; }
     figure.journey + p.journey-note { margin-top: -0.6rem; }
     .mjx-target { color: #e8706a; }
+    /* a linear and a logarithmic number line, one above the other */
+    figure.scales { margin: 2.4rem 0 2rem; }
+    figure.scales svg { max-width: 560px; display: block; margin: 0 auto; }
+    .scales .axis { stroke: var(--faint); stroke-width: 1.2; }
+    .scales .tick { stroke: var(--faint); stroke-width: 1.1; }
+    .scales .hop { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.3; }
+    .scales .half { stroke: var(--exp); stroke-opacity: 0.55; stroke-dasharray: 3 4; }
+    .scales text { font-family: "IBM Plex Mono", monospace; font-size: 13px; text-anchor: middle; }
+    .scales text.halflab { font-size: 11px; fill: var(--exp); }
+    .scales text.op { fill: var(--base); }
+    .scales text.num { fill: var(--ink); }
+    .scales text.midnum { fill: var(--value); }
+    .scales text.cap { font-size: 12px; fill: var(--dim); text-anchor: end; }
+    .scales circle.start { fill: var(--value); }
+    .scales circle.mid { fill: var(--value); }
+    .scales circle.end { fill: #e8706a; }
     .growth-graphs .guide { fill: none; stroke: var(--ink); stroke-opacity: 0.35; stroke-width: 1; stroke-dasharray: 3 4; }
     .growth-graphs circle.start { fill: var(--value); }
     .growth-graphs circle.end { fill: #e8706a; }
@@ -165,22 +182,30 @@
       </section>
 
       <section aria-labelledby="steps-and-output">
-        <h2 id="steps-and-output">The Relationship Between Steps and Output</h2>
-        <p>For additive growth, the ratio between the input and the output is always equal.</p>
-        <p>Halfway in terms of input is halfway in terms of output.</p>
-        <p>For multiplicative growth, the ratio between the input and the output changes. In this example, we see that the output changes slowly as steps along the \(x\)-axis increase in the beginning. However, the change gets greater and greater as we progress along the <span class="nw">\(x\)-axis.</span></p>
-        <figure class="growth-graphs">
-          <div class="growth-graph">
-            <svg viewBox="0 0 260 226" role="img" aria-label="Additive growth: output against steps, from 0 to 256 in 8 steps of plus 32. The points lie on a straight line. Halfway through the steps, at step 4, the output is 128: halfway to 256."><line class="axis" x1="40" y1="170" x2="250" y2="170"/><line class="axis" x1="40" y1="170" x2="40" y2="10"/><path class="guide" d="M140.0 170 V96.0 H40"/><polyline class="path" points="40.0,170.0 65.0,151.5 90.0,133.0 115.0,114.5 140.0,96.0 165.0,77.5 190.0,59.0 215.0,40.5 240.0,22.0"/><circle class="start" cx="40.0" cy="170.0" r="3.4"/><circle cx="65.0" cy="151.5" r="3.4"/><circle cx="90.0" cy="133.0" r="3.4"/><circle cx="115.0" cy="114.5" r="3.4"/><circle cx="140.0" cy="96.0" r="3.4"/><circle cx="165.0" cy="77.5" r="3.4"/><circle cx="190.0" cy="59.0" r="3.4"/><circle cx="215.0" cy="40.5" r="3.4"/><circle class="end" cx="240.0" cy="22.0" r="3.4"/><text x="40.0" y="187" class="t">0</text><text x="65.0" y="187" class="t">1</text><text x="90.0" y="187" class="t">2</text><text x="115.0" y="187" class="t">3</text><text x="140.0" y="187" class="t steps">4</text><text x="165.0" y="187" class="t">5</text><text x="190.0" y="187" class="t">6</text><text x="215.0" y="187" class="t">7</text><text x="240.0" y="187" class="t">8</text><text x="33" y="26.0" class="t out-end">256</text><text x="33" y="100.0" class="t out">128</text><text x="140" y="206" class="t lab-steps">steps</text><text x="140" y="224" class="t cap">additive</text></svg>
-          </div>
-          <div class="growth-graph">
-            <svg viewBox="0 0 260 226" role="img" aria-label="Multiplicative growth: output against steps, from 1 to 256 in 8 steps of times 2. The points stay low and then curve sharply upward. Halfway through the steps, at step 4, the output is only 16."><line class="axis" x1="40" y1="170" x2="250" y2="170"/><line class="axis" x1="40" y1="170" x2="40" y2="10"/><path class="guide" d="M140.0 170 V160.8 H40"/><polyline class="path" points="40.0,169.4 65.0,168.8 90.0,167.7 115.0,165.4 140.0,160.8 165.0,151.5 190.0,133.0 215.0,96.0 240.0,22.0"/><circle class="start" cx="40.0" cy="169.4" r="3.4"/><circle cx="65.0" cy="168.8" r="3.4"/><circle cx="90.0" cy="167.7" r="3.4"/><circle cx="115.0" cy="165.4" r="3.4"/><circle cx="140.0" cy="160.8" r="3.4"/><circle cx="165.0" cy="151.5" r="3.4"/><circle cx="190.0" cy="133.0" r="3.4"/><circle cx="215.0" cy="96.0" r="3.4"/><circle class="end" cx="240.0" cy="22.0" r="3.4"/><text x="40.0" y="187" class="t">0</text><text x="65.0" y="187" class="t">1</text><text x="90.0" y="187" class="t">2</text><text x="115.0" y="187" class="t">3</text><text x="140.0" y="187" class="t steps">4</text><text x="165.0" y="187" class="t">5</text><text x="190.0" y="187" class="t">6</text><text x="215.0" y="187" class="t">7</text><text x="240.0" y="187" class="t">8</text><text x="33" y="26.0" class="t out-end">256</text><text x="33" y="164.8" class="t out">16</text><text x="140" y="206" class="t lab-steps">steps</text><text x="140" y="224" class="t cap">multiplicative</text></svg>
-          </div>
+        <h2 id="steps-and-output">Steps and Output</h2>
+        <p>Having divided our journey into discrete steps, there are two quantities we can track as we progress:</p>
+        <ol>
+          <li>Portion of <span class="c-steps">steps taken</span></li>
+          <li>Portion of <span class="c-output">target output reached</span></li>
+        </ol>
+        <p>For additive growth, the relationship between the two is directly proportional.</p>
+        <p>If we have taken \(x\%\) of our total steps, then we have reached \(x\%\) of our target output.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/steps-output-portion-widget.html" title="Interactive: an additive journey from 0 to 100 in 10 steps of plus 10. Use the arrows to take steps; two lines show the percentage of steps taken and the percentage of the target output reached, which always match." style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p>For multiplicative growth, however, the relationship between the two quantities is not immediately obvious.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/steps-output-portion-widget.html?journey=mul" title="Interactive: a multiplicative journey from 1 to 100 in 10 equal multiplicative steps. Use the arrows to take steps; two lines show the percentage of steps taken and the percentage of the target output reached. Halfway through the steps, the output has reached only 10 percent." style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p>The following shows the steps taken on the \(x\)-axis and the corresponding output on the <span class="nw">\(y\)-axis.</span></p>
+        <p>Notice that when we are halfway through our steps on the multiplicative journey, we are only at \(10\%\) of our target output reached.</p>
+        <p>While the additive growth journey increases at a constant rate, the rate at which the multiplicative journey increases the output increases the more we progress in our steps.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/steps-output-graph-widget.html" title="Interactive: two graphs side by side, additive and multiplicative, each showing the percentage of the target output reached against the percentage of steps taken. Slide, or pick 25, 50, 75 or 100 percent; at 50 percent of the steps, the additive journey has reached 50 percent of its target output and the multiplicative journey 10 percent." style="height: 420px" scrolling="no" loading="lazy"></iframe>
+        <p>On an ordinary number line, equal distances represent equal differences between values.</p>
+        <p>But we can construct a different type of number line, where equal distances represent equal ratios between values.</p>
+        <p>This is called a <strong>logarithmic scale</strong>.</p>
+        <figure class="scales">
+          <svg viewBox="0 0 560 262" role="img" aria-label="Two number lines. Above, a linear scale from 0 to 100: 0 to 50 and 50 to 100 are equal distances, each plus 50, and the halfway point is 50. Below, a logarithmic scale from 1 to 100: 1 to 10 and 10 to 100 are equal distances, each times 10, and the halfway point is 10."><path class="half" d="M280 22 V94 M280 114 V216"/><text class="halflab" x="280.0" y="14">halfway</text><line class="axis" x1="44" x2="516" y1="84" y2="84"/><line class="tick" x1="44.0" x2="44.0" y1="79" y2="89"/><line class="tick" x1="91.2" x2="91.2" y1="81" y2="87"/><line class="tick" x1="138.4" x2="138.4" y1="81" y2="87"/><line class="tick" x1="185.6" x2="185.6" y1="81" y2="87"/><line class="tick" x1="232.8" x2="232.8" y1="81" y2="87"/><line class="tick" x1="280.0" x2="280.0" y1="79" y2="89"/><line class="tick" x1="327.2" x2="327.2" y1="81" y2="87"/><line class="tick" x1="374.4" x2="374.4" y1="81" y2="87"/><line class="tick" x1="421.6" x2="421.6" y1="81" y2="87"/><line class="tick" x1="468.8" x2="468.8" y1="81" y2="87"/><line class="tick" x1="516.0" x2="516.0" y1="79" y2="89"/><path class="hop" d="M44.0 78 Q162.0 22 280.0 78"/><text class="op" x="162.0" y="46">+50</text><path class="hop" d="M280.0 78 Q398.0 22 516.0 78"/><text class="op" x="398.0" y="46">+50</text><circle class="start" cx="44.0" cy="84" r="4"/><circle class="mid" cx="280.0" cy="84" r="4.5"/><circle class="end" cx="516.0" cy="84" r="4"/><text class="num" x="44.0" y="108">0</text><text class="num midnum" x="280.0" y="108">50</text><text class="num" x="516.0" y="108">100</text><text class="cap" x="516" y="128" text-anchor="end">linear scale</text><line class="axis" x1="44" x2="516" y1="206" y2="206"/><line class="tick" x1="44.0" x2="44.0" y1="201" y2="211"/><line class="tick" x1="115.0" x2="115.0" y1="203" y2="209"/><line class="tick" x1="156.6" x2="156.6" y1="203" y2="209"/><line class="tick" x1="186.1" x2="186.1" y1="203" y2="209"/><line class="tick" x1="209.0" x2="209.0" y1="203" y2="209"/><line class="tick" x1="227.6" x2="227.6" y1="203" y2="209"/><line class="tick" x1="243.4" x2="243.4" y1="203" y2="209"/><line class="tick" x1="257.1" x2="257.1" y1="203" y2="209"/><line class="tick" x1="269.2" x2="269.2" y1="203" y2="209"/><line class="tick" x1="280.0" x2="280.0" y1="201" y2="211"/><line class="tick" x1="351.0" x2="351.0" y1="203" y2="209"/><line class="tick" x1="392.6" x2="392.6" y1="203" y2="209"/><line class="tick" x1="422.1" x2="422.1" y1="203" y2="209"/><line class="tick" x1="445.0" x2="445.0" y1="203" y2="209"/><line class="tick" x1="463.6" x2="463.6" y1="203" y2="209"/><line class="tick" x1="479.4" x2="479.4" y1="203" y2="209"/><line class="tick" x1="493.1" x2="493.1" y1="203" y2="209"/><line class="tick" x1="505.2" x2="505.2" y1="203" y2="209"/><line class="tick" x1="516.0" x2="516.0" y1="201" y2="211"/><path class="hop" d="M44.0 200 Q162.0 144 280.0 200"/><text class="op" x="162.0" y="168">×10</text><path class="hop" d="M280.0 200 Q398.0 144 516.0 200"/><text class="op" x="398.0" y="168">×10</text><circle class="start" cx="44.0" cy="206" r="4"/><circle class="mid" cx="280.0" cy="206" r="4.5"/><circle class="end" cx="516.0" cy="206" r="4"/><text class="num" x="44.0" y="230">1</text><text class="num midnum" x="280.0" y="230">10</text><text class="num" x="516.0" y="230">100</text><text class="cap" x="516" y="250" text-anchor="end">logarithmic scale</text></svg>
         </figure>
-        <p>Let's imagine we are moving from \(0\) to \(100\) in our outputs. We can track the percentage of our output reached compared with the percentage of our input complete as we progress.</p>
-        <p>Notice that for additive growth the percentages are equivalent.</p>
-        <p>For multiplicative growth, the percentage of target output reached remains much smaller in the beginning, and then increases rapidly towards the end.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/steps-output-compare-widget.html" title="Interactive: two journeys to 256 in 8 steps, one additive (from 0, plus 32 each step) and one multiplicative (from 1, times 2 each step). Use the arrows to take steps; for each journey, two lines show the percentage of steps taken and the percentage of the target output reached. The additive percentages always match; the multiplicative output stays far behind until the last few steps." style="height: 340px" scrolling="no" loading="lazy"></iframe>
+        <p>On a logarithmic number line, the distance between \(1\) and \(10\) is the same as the distance between \(10\) and <span class="nw">\(100\),</span> because the ratio between both is the same: <span class="nw">\(\class{mjx-base}{\times 10}\).</span></p>
+        <p>Looking at the below we can see that if our \(y\)-axis is set to a logarithmic scaling, the multiplicative relationship between steps and output becomes clearer.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/steps-output-log-widget.html" title="Interactive: two graphs side by side, additive and multiplicative, each showing output against the percentage of steps taken, with a choice of a linear or a logarithmic output scale. Slide, or pick 25, 50, 75 or 100 percent. On the logarithmic scale the multiplicative journey becomes a straight line, while the additive one bends over; zero cannot be shown, so the additive line starts at an output of 1." style="height: 470px" scrolling="no" loading="lazy"></iframe>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Output against steps: additive and multiplicative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  :root { --value: #7fcf9a; --target: #e8706a; }
+  .graphs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.6rem, 4vw, 2.2rem); }
+  .panel { min-width: 0; text-align: center; }
+  .panel h3 { font-weight: 400; font-size: clamp(1.05rem, 3.4vw, 1.25rem); color: var(--ink); margin-bottom: 0.2rem; }
+  .control { margin-top: 1.4rem; text-align: center; }
+  .metric-lab { margin-top: 1rem; text-align: center; font-size: 1.05rem; color: var(--dim); }
+  .metric-v { margin-top: 0.3rem; text-align: center; font-size: clamp(1.5rem, 5vw, 1.9rem); line-height: 1.25; color: var(--base); font-variant-numeric: tabular-nums; }
+  .metric-v.steps { color: var(--exp); }
+  .control input[type="range"] { margin-top: 0.4rem; }
+  .choices { margin-top: 0.4rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="graphs">
+    <div class="panel">
+      <h3>Additive</h3>
+      <svg id="g-add" role="img"></svg>
+    </div>
+    <div class="panel">
+      <h3>Multiplicative</h3>
+      <svg id="g-mul" role="img"></svg>
+    </div>
+  </div>
+  <div class="metric-lab">Steps taken</div>
+  <div class="metric-v steps" id="p">50%</div>
+  <div class="metric-lab">Output</div>
+  <div class="graphs readouts">
+    <div class="panel"><div class="metric-v" id="v-add">50</div></div>
+    <div class="panel"><div class="metric-v" id="v-mul">10</div></div>
+  </div>
+  <div class="control">
+    <input id="s" type="range" min="0" max="100" step="1" value="50" aria-label="Percentage of steps taken, from 0 to 100" autocomplete="off" />
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Percentage of the target output reached against percentage of steps taken, for two journeys to 100:
+  // additive (from 0, a straight line: output % = steps %) and multiplicative (from 1, a curve that
+  // steepens: output % = 100^(steps % / 100)). Halfway through the steps: 50% and 10%.
+  const NS = "http://www.w3.org/2000/svg";
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#e8a33d";
+  const slider = document.getElementById("s");
+  const add = p => p, mul = p => Math.pow(100, p / 100);
+  const fmt = v => Number(v.toFixed(1)).toString();
+
+  // plot area inside a 300 × 230 view box
+  const L = 34, R = 288, T = 14, B = 196;
+  const sx = p => L + (p / 100) * (R - L), sy = v => B - (v / 100) * (B - T);
+
+  function el(svg, name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) e.setAttribute(a, attrs[a]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+  const label = (svg, x, y, t, col, anchor, op) => {
+    const e = el(svg, "text", { x, y, "text-anchor": anchor || "middle" }, t);
+    e.style.fill = col; e.style.fillOpacity = op === undefined ? 1 : op; e.style.fontSize = "12px"; return e;
+  };
+
+  const graphs = [["g-add", add], ["g-mul", mul]].map(([id, f]) => {
+    const svg = document.getElementById(id);
+    svg.setAttribute("viewBox", "0 0 300 230");
+    el(svg, "path", { d: `M${L} ${T - 6} V${B} H${R + 6}`, fill: "none", stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    label(svg, L - 7, sy(f(0)) + 4, String(f(0)), VAL, "end");   // the start: 0 for additive, 1 for multiplicative
+    label(svg, L - 7, sy(100) + 4, "100", RED, "end");
+    label(svg, L, B + 18, "0", INK, "middle", 0.6);
+    label(svg, R + 6, B + 18, "100%", INK, "end", 0.6);
+    label(svg, (L + R) / 2, B + 32, "steps", INK);
+    const yl = label(svg, 10, (T + B) / 2, "output", INK); yl.setAttribute("transform", `rotate(-90 10 ${(T + B) / 2})`);
+    let d = ""; for (let p = 0; p <= 100; p++) d += `${p ? "L" : "M"}${sx(p).toFixed(1)} ${sy(f(p)).toFixed(1)} `;
+    el(svg, "path", { d, fill: "none", stroke: INK, "stroke-opacity": 0.55, "stroke-width": 1.6, "stroke-linecap": "round" });
+    const s0 = el(svg, "circle", { cx: sx(0), cy: sy(f(0)), r: 3.2 }); s0.style.fill = VAL;
+    const s1 = el(svg, "circle", { cx: sx(100), cy: sy(100), r: 3.2 }); s1.style.fill = RED;
+    const up = el(svg, "line", { stroke: EXP, "stroke-opacity": 0.6, "stroke-dasharray": "3 4" });
+    const across = el(svg, "line", { stroke: BASE, "stroke-opacity": 0.7, "stroke-dasharray": "3 4" });
+    const dot = el(svg, "circle", { r: 5 }); dot.style.fill = VAL;
+    return { svg, f, up, across, dot };
+  });
+
+  function update(p) {
+    graphs.forEach(g => {
+      const x = sx(p), y = sy(g.f(p));
+      Object.entries({ x1: x, x2: x, y1: B, y2: y }).forEach(([k, v]) => g.up.setAttribute(k, v));
+      Object.entries({ x1: L, x2: x, y1: y, y2: y }).forEach(([k, v]) => g.across.setAttribute(k, v));
+      g.dot.setAttribute("cx", x); g.dot.setAttribute("cy", y);
+    });
+    document.getElementById("v-add").textContent = fmt(add(p));
+    document.getElementById("v-mul").textContent = fmt(mul(p));
+    document.getElementById("p").textContent = p + "%";
+    graphs[0].svg.setAttribute("aria-label", `Additive: ${p}% of steps taken, ${fmt(add(p))}% of the target output reached.`);
+    graphs[1].svg.setAttribute("aria-label", `Multiplicative: ${p}% of steps taken, ${fmt(mul(p))}% of the target output reached.`);
+  }
+
+  slider.addEventListener("input", () => update(+slider.value));
+  // start at 50% even if the browser restores the slider from an earlier visit
+  slider.value = 50;
+  update(50);
+</script>
+</body>
+</html>
