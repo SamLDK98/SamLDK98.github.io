@@ -38,7 +38,7 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const prev = document.getElementById("prev"), next = document.getElementById("next");
-  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#e8a33d";
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#e8a33d", CORAL = "#f4879c";
   const STEPS = 10, TARGET = 100;
   const addOut = k => 10 * k;                              // 0 → 100, +10 each step
   const mulOut = k => Math.pow(TARGET, k / STEPS);         // 1 → 100, ×100^(1/10) ≈ ×1.585 each step
@@ -69,7 +69,7 @@
     svg.textContent = "";
     const px = f => L + f * (R - L);
 
-    [[Y1, ps, EXP, "Steps taken", fmt(100 * ps) + "%"], [Y2, po, BASE, "Output reached", fmt(100 * po) + "%"]].forEach(([y, f, col, lab, val]) => {
+    [[Y1, ps, EXP, "Steps taken", fmt(100 * ps) + "%"], [Y2, po, CORAL, "Output reached", fmt(100 * po) + "%"]].forEach(([y, f, col, lab, val]) => {
       const l = serif(el("text", { x: L, y: y - 13, "font-size": big }, lab)); l.style.fill = col;
       const r = serif(el("text", { x: R, y: y - 13, "text-anchor": "end", "font-size": big }, val)); r.style.fill = col; r.style.fontWeight = 500;
       el("line", { x1: L, x2: R, y1: y, y2: y, stroke: INK, "stroke-opacity": 0.14, "stroke-width": 2, "stroke-linecap": "round" });

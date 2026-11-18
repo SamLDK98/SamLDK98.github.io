@@ -3,35 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Output against steps, on a linear or logarithmic scale</title>
+<title>Output against steps, on a logarithmic scale</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../widget-base.css" />
 <style>
   :root { --value: #7fcf9a; }
-  .scale { display: flex; justify-content: center; align-items: baseline; gap: 0.4rem 1.1rem; flex-wrap: wrap; margin-bottom: 1rem; }
-  .scale .lab { font-size: 1.02rem; color: var(--dim); }
-  .scale .choices { margin-top: 0; }
   .graphs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.6rem, 4vw, 2.2rem); }
   .panel { min-width: 0; text-align: center; }
   .panel h3 { font-weight: 400; font-size: clamp(1.05rem, 3.4vw, 1.25rem); color: var(--ink); margin-bottom: 0.2rem; }
   .control { margin-top: 1.4rem; text-align: center; }
   .metric-lab { margin-top: 1rem; text-align: center; font-size: 1.05rem; color: var(--dim); }
-  .metric-v { margin-top: 0.3rem; text-align: center; font-size: clamp(1.5rem, 5vw, 1.9rem); line-height: 1.25; color: var(--base); font-variant-numeric: tabular-nums; }
+  .metric-v { margin-top: 0.3rem; text-align: center; font-size: clamp(1.5rem, 5vw, 1.9rem); line-height: 1.25; color: #f4879c; font-variant-numeric: tabular-nums; }
   .metric-v.steps { color: var(--exp); }
   .control input[type="range"] { margin-top: 0.4rem; }
 </style>
 </head>
 <body>
 <div class="widget">
-  <div class="scale">
-    <span class="lab">Output scale:</span>
-    <div class="choices" id="scales">
-      <button type="button" data-scale="linear" aria-pressed="true">Linear</button>
-      <button type="button" data-scale="log" aria-pressed="false">Logarithmic</button>
-    </div>
-  </div>
   <div class="graphs">
     <div class="panel">
       <h3>Additive</h3>
@@ -61,12 +51,12 @@
   // logarithmic. On the logarithmic axis the multiplicative journey becomes a straight line, and the
   // additive one bends over; zero cannot be shown, so the additive line starts at 1.
   const NS = "http://www.w3.org/2000/svg";
-  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#e8a33d";
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#e8a33d", CORAL = "#f4879c";
   const slider = document.getElementById("s");
-  const scales = document.querySelectorAll("#scales button");
   const add = p => p, mul = p => Math.pow(100, p / 100);
   const fmt = v => Number(v.toFixed(1)).toString();
-  let p = 50, scale = "linear";
+  let p = 50;
+  const scale = "log";   // this widget always shows the logarithmic output scale
 
   // plot area inside a 300 × 230 view box
   const L = 34, R = 288, T = 14, B = 196;
@@ -126,7 +116,7 @@
     if (!(scale === "log" && v < 1)) {
       const x = sx(p), y = sy(v);
       el(svg, "line", { x1: x, x2: x, y1: B, y2: y, stroke: EXP, "stroke-opacity": 0.6, "stroke-dasharray": "3 4" });
-      el(svg, "line", { x1: L, x2: x, y1: y, y2: y, stroke: BASE, "stroke-opacity": 0.7, "stroke-dasharray": "3 4" });
+      el(svg, "line", { x1: L, x2: x, y1: y, y2: y, stroke: CORAL, "stroke-opacity": 0.75, "stroke-dasharray": "3 4" });
       const dot = el(svg, "circle", { cx: x, cy: y, r: 5 }); dot.style.fill = VAL;
     }
     svg.setAttribute("aria-label", `${g.name}, ${scale === "log" ? "logarithmic" : "linear"} output scale: ${p}% of steps taken, output ${fmt(v)}.`);
@@ -137,12 +127,10 @@
     document.getElementById("v-add").textContent = fmt(add(p));
     document.getElementById("v-mul").textContent = fmt(mul(p));
     document.getElementById("p").textContent = p + "%";
-    scales.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.scale === scale)));
     if (window.postWidgetHeight) window.postWidgetHeight();
   }
 
   slider.addEventListener("input", () => { p = +slider.value; update(); });
-  scales.forEach(b => b.addEventListener("click", () => { scale = b.dataset.scale; update(); }));
   // start at 50% even if the browser restores the slider from an earlier visit
   slider.value = 50;
   update();

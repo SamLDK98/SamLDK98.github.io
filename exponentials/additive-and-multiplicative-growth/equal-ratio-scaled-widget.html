@@ -11,6 +11,7 @@
 <style>
   .widget { max-width: none; }
   #fig { -webkit-user-select: none; user-select: none; }
+  .nav[hidden] { display: none; }
   .nav { display: flex; justify-content: center; gap: 2.4rem; margin-top: 0.4rem; }
   .nav button {
     font: inherit; font-size: 1.3rem; line-height: 1; width: 2.4rem; height: 2.4rem; border-radius: 50%;
@@ -25,6 +26,7 @@
 <body>
 <div class="widget">
   <svg id="fig" role="img"></svg>
+  <input id="pos" type="range" min="0" step="1" value="0" autocomplete="off" aria-label="Where the selected steps start" hidden />
   <div class="nav">
     <button id="prev" type="button" aria-label="Slide the selection back one step">←</button>
     <button id="next" type="button" aria-label="Slide the selection forward one step">→</button>
@@ -90,10 +92,16 @@
   const Q = new URLSearchParams(location.search);
   const RUN0 = Math.max(1, Math.min(STEPS, +Q.get("run") || 1)), DRAG = Q.get("drag") !== "0";
   let s = 0, e = RUN0, drag = null, geo = null;
+  // ?nav=slider: a slider moves the selection instead of the arrows
+  const SLIDER = Q.get("nav") === "slider", pos = document.getElementById("pos");
+  if (SLIDER) { pos.hidden = false; document.querySelector(".nav").hidden = true; }
+  function syncPos() { pos.max = STEPS - (e - s); pos.value = s; }
+  pos.addEventListener("input", () => { const n = e - s; s = +pos.value; e = s + n; render(); });
 
   function render() {
     const a = out(s), b = out(e), n = e - s, ratio = out(n);
     prev.disabled = s === 0; next.disabled = e === STEPS;
+    if (SLIDER) syncPos();
     const W = svg.clientWidth || 560, L = 18, R = W - 18, AX = 74;
     const H = AX + 84;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
