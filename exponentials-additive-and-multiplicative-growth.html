@@ -336,63 +336,62 @@
 
       <section aria-labelledby="fractional-positions">
         <h2 id="fractional-positions">Calculating Outputs at Fractional Positions</h2>
-        <p>We should now have a rough intuition of the difference between additive and multiplicative growth:</p>
-        <ul>
-          <li>As we take additive steps, our output grows steadily.</li>
-          <li>As we take multiplicative steps, our output grows increasingly faster.</li>
-        </ul>
-        <p>Let's now think about the mapping between progress in our steps journey and our output journey.</p>
-
-        <h3 id="quantifying-progress">Quantifying Progress</h3>
         <p>We can describe how far we have progressed through a journey in several ways.</p>
-        <p>For example, we might say that we are <em>a quarter of the way through</em>, that we have completed \(\frac{1}{4}\) of the journey, or that we have completed <span class="nw">\(25\%\).</span></p>
-        <p>These are simply different ways of expressing the same <strong>proportion of the whole</strong>.</p>
         <div class="math">\[\text{a quarter} = \frac{1}{4} = 0.25 = 25\%\]</div>
+        <p>These are simply different ways of expressing the same <strong>proportion of the whole</strong>.</p>
         <p>We will primarily express progress as a percentage or as a fraction.</p>
 
-        <h3 id="additive-progress-mapped">Progress in Additive Steps Mapped to Output</h3>
+        <h3 id="additive-progress-mapped">Calculating Outputs in Additive Journeys</h3>
         <p>Because every step adds the same amount, the percentage of steps taken always equals the percentage of the target output reached, however we divide the journey.</p>
         <div class="math">\[\text{total steps }\% = \text{target output }\%\]</div>
         <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/split-progress-widget.html" title="Interactive: the journey from 0 to 256 divided three ways, into 4 steps of plus 64, 16 steps of plus 16 and 64 steps of plus 4. Use the arrows to take 0, 25, 50, 75 or 100 percent of the steps; every row reaches the same output, the same percentage of 256." style="height: 300px" scrolling="no" loading="lazy"></iframe>
 
-        <h3 id="multiplicative-progress-mapped">Progress in Multiplicative Steps Mapped to Output</h3>
+        <h3 id="multiplicative-progress-mapped">Calculating Outputs in Multiplicative Journeys</h3>
         <p>For multiplicative growth, the percentage of steps taken and the percentage of the target output reached is not equivalent.</p>
         <p>Suppose our journey starts at \(1\) and ends at <span class="nw">\(x\).</span></p>
-        <p>If we have taken \(50\%\), \(25\%\), \(3\%\) or \(97\%\) of the steps in a multiplicative journey, what percentage of the target output have we reached?</p>
+        <p>If we have taken \(50\%\), \(25\%\), \(3\%\) or \(97\%\) of our steps, what output have we reached?</p>
         <ul class="q-list">
           <li><button type="button" class="popup-link popup-q" data-dialog="pct50-popup" aria-haspopup="dialog">After \(50\%\) or \(\frac{1}{2}\) of our multiplicative steps, what is the corresponding output?</button>
           <dialog id="pct50-popup" class="popup" aria-labelledby="pct50-popup-title">
             <button type="button" class="popup-close" aria-label="Close">×</button>
             <h3 id="pct50-popup-title">After \(50\%\) or \(\frac{1}{2}\) of our multiplicative steps, what is the corresponding output?</h3>
             <p>We partition the journey into two equal portions, each multiplying the output by the same factor, <span class="nw">\(r\).</span></p>
-            <div class="math">\[r \cdot r = x\]</div>
+            <div class="math">\[1 \cdot r \cdot r = x\]</div>
+            <div class="math">\[r^2 = x\]</div>
             <p>Therefore:</p>
             <div class="math">\[r = \sqrt{x}\]</div>
-            <p>Example:</p>
-            <p>If we start at \(1\) and our target is <span class=\"nw\">\(25\):</span></p>
+            <p class="popup-note">For a journey starting at \(1\) and ending at <span class="nw">\(x\),</span> the output at \(50\%\) of our total steps taken is <span class="nw">\(\sqrt{x}\).</span></p>
+            <p>For example, if we start at \(1\) and our target is <span class="nw">\(25\):</span></p>
             <div class="math">\[1 \cdot r \cdot r = 25\]</div>
             <div class="math">\[r^2 = 25\]</div>
             <div class="math">\[r = \sqrt{25}\]</div>
             <div class="math">\[r = 5\]</div>
-            <p>After \(50\%\) of our multiplicative steps, the corresponding output will be <span class=\"nw\">\(5\).</span></p>
+            <p class="popup-note">After \(50\%\) of our multiplicative steps, the corresponding output will be <span class="nw">\(5\).</span></p>
           </dialog>
           </li>
           <li><button type="button" class="popup-link popup-q" data-dialog="pct25-popup" aria-haspopup="dialog">After \(25\%\) or \(\frac{1}{4}\) of our multiplicative steps, what is the corresponding output?</button>
           <dialog id="pct25-popup" class="popup" aria-labelledby="pct25-popup-title">
             <button type="button" class="popup-close" aria-label="Close">×</button>
             <h3 id="pct25-popup-title">After \(25\%\) or \(\frac{1}{4}\) of our multiplicative steps, what is the corresponding output?</h3>
-            <p>We can divide the journey into four equal portions, each multiplying the output by the same factor, <span class="nw">\(r\).</span></p>
-            <div class="math">\[r \cdot r \cdot r \cdot r = x\]</div>
+            <p>We can partition the journey into four equal portions, each multiplying the output by the same factor, <span class="nw">\(r\).</span></p>
+            <div class="math">\[1 \cdot r \cdot r \cdot r \cdot r = x\]</div>
             <div class="math">\[r^4 = x\]</div>
             <div class="math">\[r = \sqrt[4]{x}\]</div>
-            <p>Example:</p>
-            <p>If we start at \(2\) and our target is <span class=\"nw\">\(512\):</span></p>
+            <p class="popup-note">For a journey starting at \(1\) and ending at <span class="nw">\(x\),</span> the output at \(25\%\) of our total steps taken is <span class="nw">\(\sqrt[4]{x}\).</span></p>
+            <p>If we start at \(1\) and end at <span class="nw">\(512\),</span> the output after \(25\%\) would be:</p>
+            <div class="math">\[\sqrt[4]{512} \approx 4.75682846\]</div>
+            <p class="popup-ask">But what about if we start somewhere other than <span class="nw">\(1\)?</span></p>
+            <p>Say we start at \(2\) and our final output is <span class="nw">\(512\):</span></p>
             <div class="math">\[2 \cdot r \cdot r \cdot r \cdot r = 512\]</div>
             <div class="math">\[2r^4 = 512\]</div>
+            <div class="math">\[r^4 = \frac{512}{2}\]</div>
             <div class="math">\[r^4 = 256\]</div>
             <div class="math">\[r = \sqrt[4]{256}\]</div>
             <div class="math">\[r = 4\]</div>
-            <p>After \(25\%\) of our multiplicative steps, the corresponding output is:</p>
+            <p>Notice that we divided the final output by the starting output to find the total multiplicative factor, <span class="nw">\(R\).</span> This parallels additive growth, where we subtract the starting output from the final output to find the total additive change, <span class="nw">\(T\).</span></p>
+            <p>Here, \(r\) denotes the multiplicative factor that will take us to the final output if we start at \(2\) and include \(4\) factors of <span class="nw">\(r\).</span></p>
+            <p>Since \(25\%\) of four steps is one step, to find the output we multiply our starting output of \(2\) by \(r\) once.</p>
+            <p>The corresponding output is therefore:</p>
             <div class="math">\[2 \cdot 4 = \boxed{8}\]</div>
           </dialog>
           </li>
@@ -400,60 +399,62 @@
           <dialog id="pct3-popup" class="popup" aria-labelledby="pct3-popup-title">
             <button type="button" class="popup-close" aria-label="Close">×</button>
             <h3 id="pct3-popup-title">After \(3\%\) or \(\frac{3}{100}\) of our multiplicative steps, what is the corresponding output?</h3>
-            <p>We can divide the journey into \(100\) equal portions, each multiplying the output by the same factor, <span class="nw">\(r\).</span></p>
+            <p>We can partition the journey into \(100\) equal portions, each multiplying the output by the same factor, <span class="nw">\(r\).</span></p>
             <div class="math">\[r^{100} = x\]</div>
             <div class="math">\[r = \sqrt[100]{x}\]</div>
-            <p>This gives us the output at <span class=\"nw\">\(1\%\).</span></p>
+            <p>This gives us the output at \(1\%\) (assuming we start at <span class="nw">\(1\)).</span></p>
             <p>We need to apply the factor \(r\) three times:</p>
             <div class="math">\[r^3 = \bigl(\,\sqrt[100]{x}\,\bigr)^3\]</div>
-            <p>Example:</p>
-            <p>If we start at \(3\) and our target is <span class=\"nw\">\(3 \times 2^{100}\):</span></p>
+            <p>For example, if we start at \(3\) and our target is <span class="nw">\(3 \times 2^{100}\):</span></p>
             <div class="math">\[3r^{100} = 3 \times 2^{100}\]</div>
             <div class="math">\[r^{100} = 2^{100}\]</div>
             <div class="math">\[r = 2\]</div>
-            <p>After \(3\%\) of our steps, we have applied the factor three times:</p>
+            <p>Here, \(r\) is the factor that, raised to the \(100\)th power, gives us the total multiplicative factor that, if applied to the starting output, <span class="nw">\(3\),</span> gives us the final output.</p>
+            <p>After \(3\%\) of our steps, we have applied this factor three times:</p>
             <div class="math">\[3 \times r^3 = 3 \times 2^3\]</div>
-            <div class="math">\[= 3 \times 8 = \boxed{24}\]</div>
-            <p>So we reach an output of <span class=\"nw\">\(24\).</span></p>
+            <div class="math">\[3 \times 8 = \boxed{24}\]</div>
+            <p class="popup-note">So we reach an output of <span class="nw">\(24\).</span></p>
           </dialog>
           </li>
           <li><button type="button" class="popup-link popup-q" data-dialog="pct97-popup" aria-haspopup="dialog">After \(97\%\) or \(\frac{97}{100}\) of our multiplicative steps, what is the corresponding output?</button>
           <dialog id="pct97-popup" class="popup" aria-labelledby="pct97-popup-title">
             <button type="button" class="popup-close" aria-label="Close">×</button>
             <h3 id="pct97-popup-title">After \(97\%\) or \(\frac{97}{100}\) of our multiplicative steps, what is the corresponding output?</h3>
-            <p>We can divide the journey into \(100\) equal portions, each multiplying the output by the same factor, <span class="nw">\(r\).</span></p>
+            <p>We can partition the journey into \(100\) equal portions, each multiplying the output by the same factor, <span class="nw">\(r\).</span></p>
             <div class="math">\[r^{100} = x\]</div>
             <div class="math">\[r = \sqrt[100]{x}\]</div>
-            <p>This gives us the output at <span class=\"nw\">\(1\%\).</span></p>
+            <p>This gives us the output at \(1\%\) (assuming our starting output is <span class="nw">\(1\)).</span></p>
             <p>We need to apply the factor \(r\) \(97\) times:</p>
             <div class="math">\[r^{97} = \bigl(\,\sqrt[100]{x}\,\bigr)^{97}\]</div>
-            <p>Example:</p>
-            <p>If we start at \(2\) and our target is <span class=\"nw\">\(2 \times 2^{100}\):</span></p>
+            <p>For example, if we start at \(2\) and our target is <span class="nw">\(2 \times 2^{100}\):</span></p>
             <div class="math">\[2r^{100} = 2 \times 2^{100}\]</div>
             <div class="math">\[r^{100} = 2^{100}\]</div>
             <div class="math">\[r = 2\]</div>
-            <p>After \(97\%\) of our steps, we have applied the factor \(97\) times:</p>
+            <p>After \(97\%\) of our steps, we have applied the factor \(r\) \(97\) times to our starting output <span class="nw">\(2\):</span></p>
             <div class="math">\[2 \times r^{97} = 2 \times 2^{97}\]</div>
-            <div class="math">\[= \boxed{2^{98}}\]</div>
-            <p>So we reach an output of \(2^{98}\), approximately <span class=\"nw\">\(3.17 \times 10^{29}\).</span></p>
+            <div class="math">\[\boxed{2^{98}}\]</div>
+            <p class="popup-note">So we reach an output of <span class="nw">\(2^{98}\),</span> approximately <span class="nw">\(3.17 \times 10^{29}\).</span></p>
           </dialog>
           </li>
         </ul>
 
-        <p>For additive growth, we can map progress in steps to progress in output through division and multiplication.</p>
-        <p>Suppose we want to find the output after completing \(61\%\) of an additive journey from \(0\) to <span class="nw">\(x\).</span></p>
-        <p>First, we divide the total change into \(100\) equal portions:</p>
-        <div class="math">\[\frac{x}{100} = \text{Output at } 1\%\]</div>
-        <p>Then, we combine \(61\) of these portions:</p>
-        <div class="math">\[61 \cdot \frac{x}{100} = \text{Output at } 61\%\]</div>
-        <div class="math">\[\boxed{\frac{61x}{100}}\]</div>
-        <p>For multiplicative growth, we instead use roots and multiplication.</p>
-        <p>Suppose we want to find the output after completing \(61\%\) of a multiplicative journey from \(1\) to <span class="nw">\(x\).</span></p>
-        <p>First, we find the factor associated with each of \(100\) equal portions:</p>
-        <div class="math">\[\sqrt[100]{x} = \text{Output at } 1\%\]</div>
-        <p>Then, we apply this factor \(61\) times:</p>
-        <div class="math">\[\underbrace{\sqrt[100]{x} \cdot \sqrt[100]{x} \cdots \sqrt[100]{x}}_{61 \text{ factors}} = \text{Output at } 61\%\]</div>
-        <div class="math">\[\boxed{\bigl(\,\sqrt[100]{x}\,\bigr)^{61}}\]</div>
+        <p>Calculating outputs at fractional positions involves different operations depending on the type of growth.</p>
+        <p>Halfway, a quarter, or a sixteenth of the way through an additive journey just corresponds to dividing the whole by the relevant factor.</p>
+        <p>A sixteenth of \(144\) is just:</p>
+        <div class="math">\[\frac{144}{16} = 9\]</div>
+        <p>The same fractions through a multiplicative journey correspond with taking the relevant root of the final output.</p>
+        <p>A sixteenth of \(144\) is just:</p>
+        <div class="math">\[\sqrt[16]{144} \approx 1.36\]</div>
+        <p><strong>Division is to additive journeys what taking roots is to multiplicative journeys.</strong></p>
+        <p>For non-unit fractions, we also use multiplication with additive journeys and exponentiation with multiplicative journeys to scale the result for one portion up to the number of portions we need.</p>
+        <p>To identify the output after \(\frac{3}{4}\) of an additive journey starting at \(0\) and ending at <span class="nw">\(100\).</span></p>
+        <p>We would find \(\frac{1}{4}\) using division and then multiply that by <span class="nw">\(3\):</span></p>
+        <div class="math">\[3 \cdot \frac{100}{4}\]</div>
+        <div class="math">\[3 \cdot 25 = 75\]</div>
+        <p>To identify the output after \(\frac{3}{4}\) of a multiplicative journey starting at \(1\) and ending at <span class="nw">\(100\).</span></p>
+        <p>We would find \(\frac{1}{4}\) using radication and then raise that to the \(3\)rd power.</p>
+        <div class="math">\[\bigl(\,\sqrt[4]{100}\,\bigr)^3\]</div>
+        <div class="math">\[(3.16227766)^3 \approx 31.62\]</div>
       </section>
 
       <hr class="archive-rule" />
@@ -468,25 +469,6 @@
           <div class="math">\[\frac{\text{target output}}{\text{step size}} = \text{total steps}\]</div>
           <div class="math">\[\frac{\text{target output}}{\text{total steps}} = \text{step size}\]</div>
         </div>
-
-        <h3 id="additive-accumulation">How Additive Changes Combine over Multiple Steps</h3>
-        <p>The change in output that occurs per step is the same regardless of where this step occurs.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-run-widget.html?run=1" title="Interactive: a journey from 0 to 48 in 8 steps of plus 6. Slide to highlight any one step; the difference between its outputs is always 6." style="height: 140px" scrolling="no" loading="lazy"></iframe>
-        <p>The change that occurs after \(n\) number of steps is the sum of the change that occurs at each step.</p>
-        <p>Again, this is the same regardless of where the \(n\) successive steps occur along the number line.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-run-widget.html?run=3" title="Interactive: a journey from 0 to 48 in 8 steps of plus 6. Slide a run of 3 steps along the journey; wherever it sits, it adds 6 + 6 + 6 = 18." style="height: 140px" scrolling="no" loading="lazy"></iframe>
-
-
-        <h3 id="additive-relationship">The Relationship Between Additive Steps and Output</h3>
-        <p>We can track two quantities as we progress in our growth journey:</p>
-        <ul>
-          <li>Steps taken</li>
-          <li>Output</li>
-        </ul>
-        <p>Because every step adds the same amount, the percentage of steps taken always equals the percentage of the target output reached, however we divide the journey.</p>
-        <div class="math">\[\text{total steps }\% = \text{target output }\%\]</div>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/split-progress-widget.html" title="Interactive: the journey from 0 to 256 divided three ways, into 4 steps of plus 64, 16 steps of plus 16 and 64 steps of plus 4. Use the arrows to take 0, 25, 50, 75 or 100 percent of the steps; every row reaches the same output, the same percentage of 256." style="height: 300px" scrolling="no" loading="lazy"></iframe>
-
 
         <h3 id="reconstructing-total">Reconstructing the Total from Partial Progress</h3>
         <p>Because:</p>
@@ -510,59 +492,7 @@
         </ol>
       </section>
 
-      <section aria-labelledby="multiplicative-progress">
-        <h2 id="multiplicative-progress">Progress in Multiplicative Journeys</h2>
-        <figure class="journey">
-          <svg viewBox="0 0 300 60" role="img" aria-label="A journey from 1 to 256."><text x="40" y="40" class="from">1</text><line x1="72" y1="31" x2="214" y2="31" class="arrow"/><path d="M206 25 L216 31 L206 37" class="arrow"/><text x="252" y="40" class="to">256</text></svg>
-        </figure>
-        <p class="centred journey-note"><em>Multiplicative journeys start at \(1\) instead of <span class="nw">\(0\).</span></em></p>
-        <p>This time we progress by multiplying the current output by a constant factor.</p>
-        <div class="math">\[1 \xrightarrow{\times 2} 2 \xrightarrow{\times 2} 4 \xrightarrow{\times 2} 8 \xrightarrow{\times 2} 16 \xrightarrow{\times 2} 32 \xrightarrow{\times 2} 64 \xrightarrow{\times 2} 128 \xrightarrow{\times 2} 256\]</div>
-
-        <h3 id="multiplicative-accumulation">How Multiplicative Changes Accumulate</h3>
-        <p>The change in output covered by each step is no longer equal. Consequently, neither are the differences between successive outputs.</p>
-        <figure class="journey">
-          <svg viewBox="0 0 520 106" style="max-width: 520px" role="img" aria-label="The journey from 1 to 256 as six hops that grow by the same ratio, each marked underneath with a bracket; the brackets are all different lengths: the change covered by each step is not equal."><text x="40" y="87" class="from">1</text><line x1="72" y1="78" x2="448" y2="78" class="arrow"/><path d="M441 72.5 L448 78 L441 83.5" class="arrow"/><path d="M72.0 78 A8.8 7.9 0 0 1 89.5 78" class="hop"/><path d="M89.5 78 A13.1 11.8 0 0 1 115.8 78" class="hop"/><path d="M115.8 78 A19.7 17.7 0 0 1 155.2 78" class="hop"/><path d="M155.2 78 A29.6 26.6 0 0 1 214.3 78" class="hop"/><path d="M214.3 78 A44.3 39.9 0 0 1 303.0 78" class="hop"/><path d="M303.0 78 A66.5 59.9 0 0 1 436.0 78" class="hop"/><path d="M74.0 88 V96 H87.5 V88" class="unequal"/><path d="M91.5 88 V96 H113.8 V88" class="unequal"/><path d="M117.8 88 V96 H153.2 V88" class="unequal"/><path d="M157.2 88 V96 H212.3 V88" class="unequal"/><path d="M216.3 88 V96 H301.0 V88" class="unequal"/><path d="M305.0 88 V96 H434.0 V88" class="unequal"/><text x="484" y="87" class="to">256</text></svg>
-        </figure>
-        <p>However, the ratios between successive outputs are equal.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=1&amp;drag=0" title="Interactive: a journey from 1 to 256 in 8 steps of times 2, spaced so that later steps cover more distance. Use the arrows to move along the steps; below the line, each step's two outputs as a ratio, which is always 2." style="height: 200px" scrolling="no" loading="lazy"></iframe>
-        <p>Recall that in additive growth, the changes produced by successive steps accumulate through addition. For example, three steps of \(+6\) produce a total increase of:</p>
-        <div class="math">\[6 + 6 + 6 = 18\]</div>
-        <p>In multiplicative growth, the factors combine through multiplication.</p>
-        <p>Three steps of \(\times 2\) produce a total factor of:</p>
-        <div class="math">\[2 \times 2 \times 2 = 8\]</div>
-        <p>Drag the white dots to select more steps, then use the arrows to slide them along the line. Each extra step multiplies the ratio by <span class="nw">\(2\),</span> but for a given number of steps, the ratio is the same wherever they sit.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=3" title="Interactive: a journey from 1 to 256 in 8 steps of times 2, spaced so that later steps cover more distance. Three steps are selected to begin with. Drag the dots at either end to select more or fewer steps, and use the arrows to slide the selection along. Below the line, the ratio of its end outputs: 2 for one step, 4 for two, 8 for three, wherever they sit." style="height: 200px" scrolling="no" loading="lazy"></iframe>
-        <p>Equal numbers of multiplicative steps produce equal ratios between outputs, regardless of where they occur along the journey.</p>
-
-        <h3 id="multiplicative-relationship-draft">The Relationship Between Multiplicative Steps and Output</h3>
-        <p>Let's consider growth by a factor of <span class="nw">\(2\).</span></p>
-        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32 \to 64 \to 128 \to 256\]</div>
-        <p>It's clear that, unlike additive steps:</p>
-        <div class="math">\[\text{total steps }\% \ne \text{target output }\%\]</div>
-        <p>There are \(8\) steps, and the halfway point of the target output occurs at the <span class="nw">\(7\)th!</span></p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/steps-output-widget.html" title="Interactive: a journey from 1 to 256 in 8 steps of times 2. Use the arrows to take steps; two lines show the percentage of steps taken and the percentage of the target output reached. Half the steps reaches only 16, 6.25 percent of the target; half the target, 128, is reached at step 7." style="height: 200px" scrolling="no" loading="lazy"></iframe>
-        <p>The key insight here relates to the idea of equal additive steps increasing the output by the same addition, i.e.</p>
-        <p>If:</p>
-        <div class="math">\[\text{1 step} = +6\]</div>
-        <p>Then:</p>
-        <div class="math">\[\text{3 steps} = 6 + 6 + 6\]</div>
-        <div class="math">\[\text{3 steps} = +18\]</div>
-        <p>So if three steps were \(50\%\) of the total steps required to reach the target output, another three steps would add the same amount:</p>
-        <div class="math">\[\text{6 steps} = \text{3 steps} + \text{3 steps} = 18 + 18 = 36\]</div>
-        <p>And for multiplicative growth, equal multiplicative steps increase the output by the same multiplicative factor, i.e.</p>
-        <p>If:</p>
-        <div class="math">\[\text{1 step} = \times 2\]</div>
-        <p>Then:</p>
-        <div class="math">\[\text{4 steps} = 2 \times 2 \times 2 \times 2\]</div>
-        <div class="math">\[\text{4 steps} = \times 16\]</div>
-        <p>It might feel different because the additive steps, abstracted from their position on the number line, gave us a value, whereas this gives us an operation. But remember that the additive steps can be thought of as being added to \(0\), while the multiplicative steps are being multiplied by <span class="nw">\(1\):</span></p>
-        <div class="math">\[0 + 18 = 18\]</div>
-        <div class="math">\[1 \times 16 = 16\]</div>
-        <p>So if four steps were \(50\%\) of the total steps required to reach the target output, another four steps would multiply by the same factor:</p>
-        <div class="math">\[\text{8 steps} = \text{4 steps} \times \text{4 steps}\]</div>
-        <div class="math">\[\text{8 steps} = \times 16 \times 16 = \times 256\]</div>
-
+      <section aria-label="Earlier multiplicative material, kept for reference">
         <h3 id="multiplicative-relationship">The Relationship Between Multiplicative Steps and Output</h3>
         <p>When each step changes the output by a constant factor:</p>
         <div class="math">\[\text{steps taken }\% \ne \text{target output }\%\]</div>
@@ -628,8 +558,8 @@
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
-        <a href="exponentials-the-many-rules-of-exponentiation.html">← Laws of Exponents</a>
-        <a href="exponentials-moving-between-exponents.html">Next: Moving Between Exponents →</a>
+        <a href="exponentials.html">← All Exponentials pages</a>
+        <a href="exponentials-exponentiation-notation.html">Next: Exponentiation Notation →</a>
       </nav>
     </main>
   </div>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A multiplicative journey in exponent notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .choices { margin: 0 0 0.6rem; }
+  .nav { display: flex; justify-content: center; gap: 2.4rem; margin-top: 0.4rem; }
+  .nav button {
+    font: inherit; font-size: 1.3rem; line-height: 1; width: 2.4rem; height: 2.4rem; border-radius: 50%;
+    background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .nav button:hover:not(:disabled) { border-color: var(--dim); }
+  .nav button:disabled { opacity: 0.25; cursor: default; }
+  .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="choices" id="mode" role="group" aria-label="Label the steps with">
+    <button type="button" data-mode="steps" aria-pressed="true">Step numbers</button>
+    <button type="button" data-mode="exp" aria-pressed="false">Exponents</button>
+  </div>
+  <svg id="fig" role="img"></svg>
+  <div class="nav">
+    <button id="prev" type="button" aria-label="One step back">←</button>
+    <button id="next" type="button" aria-label="One step forward">→</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The journey from 1 to 1024 in 5 steps of ×4, drawn as equal hops. Under each point, its step
+  // label (0 to 5, or 4^0 to 4^5) and its output. The arrows move one step at a time.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  const modes = document.querySelectorAll("#mode button");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff", VAL = "#7fcf9a";
+  const B = 4, N = 5;
+  const out = k => Math.pow(B, k), fmt = v => v.toLocaleString("en-GB");
+  let k = 0, mode = "steps";
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const serif = e => { e.style.fontFamily = "Spectral, Georgia, serif"; return e; };
+  // 4 with a raised exponent, as tspans inside a text element
+  function power(t, e, size, op) {
+    const b = el("tspan", {}, String(B), t); b.style.fill = BASE; b.style.fillOpacity = op;
+    const x = el("tspan", { dy: -size * 0.45, "font-size": size * 0.62 }, String(e), t); x.style.fill = EXP; x.style.fillOpacity = op;
+    return size * 0.45;   // the drop back to the baseline, for whatever follows
+  }
+
+  function render() {
+    prev.disabled = k === 0; next.disabled = k === N;
+    const W = svg.clientWidth || 560, L = 30, R = W - 30, AX = 70, H = 184;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const x = i => L + i * (R - L) / N, hw = (R - L) / N;
+    const small = W < 420 ? 13 : 15;
+
+    // the line and its hops: those taken lit, the latest labelled ×4
+    el("line", { x1: x(0), x2: x(N), y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    for (let i = 0; i < N; i++) {
+      const lit = i < k, rise = Math.min(34, hw * 0.45);
+      el("path", { d: `M${x(i)} ${AX} Q${x(i) + hw / 2} ${AX - rise} ${x(i + 1)} ${AX}`, fill: "none", stroke: EXP, "stroke-opacity": lit ? 0.95 : 0.22, "stroke-width": 1.4 });
+      if (lit && i === k - 1) { const t = el("text", { x: x(i) + hw / 2, y: AX - rise / 2 - 8, "text-anchor": "middle", "font-size": 12 }, "×4"); t.style.fill = BASE; }
+    }
+
+    // each point: its step label, then its output
+    for (let i = 0; i <= N; i++) {
+      const on = i === k, op = on ? 1 : 0.45;
+      const c = el("circle", { cx: x(i), cy: AX, r: on ? 4.5 : 2.6 }); c.style.fill = on ? VAL : INK; c.style.fillOpacity = on ? 1 : 0.45;
+      const s = serif(el("text", { x: x(i), y: AX + 30, "text-anchor": "middle", "font-size": small }));
+      if (mode === "steps") { s.textContent = String(i); s.style.fill = EXP; s.style.fillOpacity = op; }
+      else power(s, i, small, op);
+      const o = el("text", { x: x(i), y: AX + 54, "text-anchor": "middle", "font-size": 12 }, fmt(out(i)));
+      o.style.fill = on ? VAL : INK; o.style.fillOpacity = op;
+    }
+    // the reading underneath
+    const big = W < 420 ? 19 : 22;
+    const r = serif(el("text", { x: W / 2, y: H - 12, "text-anchor": "middle", "font-size": big }));
+    if (mode === "steps") {
+      const a = el("tspan", {}, `After ${k} ${k === 1 ? "step" : "steps"}: `, r); a.style.fill = INK; a.style.fillOpacity = 0.75;
+      const b = el("tspan", {}, fmt(out(k)), r); b.style.fill = VAL;
+    } else {
+      const back = power(r, k, big, 1);
+      const eq = el("tspan", { dy: back }, " = ", r); eq.style.fill = INK;
+      const b = el("tspan", {}, fmt(out(k)), r); b.style.fill = VAL;
+    }
+
+    svg.setAttribute("aria-label", `Step ${k} of ${N}: 4 to the ${k}, an output of ${out(k)}.`);
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  modes.forEach(b => b.addEventListener("click", () => {
+    mode = b.dataset.mode; modes.forEach(m => m.setAttribute("aria-pressed", String(m === b))); render();
+  }));
+  prev.addEventListener("click", () => { if (k > 0) { k--; render(); } });
+  next.addEventListener("click", () => { if (k < N) { k++; render(); } });
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

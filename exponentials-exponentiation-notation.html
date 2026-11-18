@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exponentiation Notation | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Exponentiation as a multiplicative journey: start at 1 and take a number of steps at a fixed step ratio. The base is the step ratio, the exponent is the number of steps, and the power is the output." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    p.centred { text-align: center; }
+    main > section > h2 { text-align: center; }
+    .formula-pair { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.6rem clamp(1.2rem, 5vw, 4rem); margin: 1.6rem 0 0.6rem; }
+    /* the anatomy of a power, read as a journey */
+    figure.anatomy svg { max-width: 470px; }
+    figure.anatomy text.note { font-size: 11px; letter-spacing: 0.04em; fill: var(--dim); }
+    figure.anatomy text.value { fill: var(--value); }
+    /* hop diagrams */
+    figure.hops { margin: 2rem 0 1.8rem; }
+    figure.hops svg { max-width: 560px; display: block; margin: 0 auto; }
+    .hops .axis { stroke: var(--faint); stroke-width: 1.2; }
+    .hops .hop { fill: none; stroke: var(--ink); stroke-opacity: 0.55; stroke-width: 1.3; }
+    .hops circle { fill: var(--ink); fill-opacity: 0.7; }
+    .hops circle.start { fill: var(--value); fill-opacity: 1; }
+    .hops circle.end { fill: #e8706a; fill-opacity: 1; }
+    .hops text { font-family: "IBM Plex Mono", monospace; font-size: 13px; text-anchor: middle; fill: var(--dim); }
+    .hops text.op { fill: var(--base); }
+    .hops text.start { fill: var(--value); }
+    .hops text.end { fill: #e8706a; }
+    .hops text.pow { font-family: "Spectral", Georgia, serif; font-size: 22px; text-anchor: end; fill: var(--ink); }
+    .hops tspan.b { fill: var(--base); }
+    .hops tspan.e { fill: var(--exp); font-size: 14px; }
+  </style>
+  <style>
+    .c-base { color: var(--base); }
+    .c-exp { color: var(--exp); }
+    p.widget-note { color: var(--dim); }
+  </style>
+  <style>
+    .centred-block p, .centred-block .math mjx-container[display="true"] { text-align: center !important; }
+    .centred-block .math { display: flex; justify-content: center; }
+    figure.anatomy text.value { fill: var(--value); }
+    .hops text.big { font-family: "Spectral", Georgia, serif; font-size: 28px; }
+    .hops text.v { fill: var(--value); }
+    ul.facts { list-style: none; padding: 0; margin: 1rem 0; }
+    ul.facts li + li { margin-top: 0.2rem; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>Exponentiation Notation</h1>
+    </header>
+    <main>
+      <section aria-label="What an exponent is">
+        <figure class="anatomy">
+          <svg viewBox="0 0 490 220" role="img" aria-label="3 to the fourth power. Base: 3. Exponent: 4. Power: 3 to the fourth. Value: 81.">
+            <text x="190" y="120" class="glyph big base">3</text>
+            <text x="242" y="72" class="glyph sup exp">4</text>
+            <line x1="148" y1="88" x2="185" y2="88" class="lead base"/>
+            <text x="142" y="92.5" text-anchor="end" class="base">base: 3</text>
+            <line x1="273" y1="55.5" x2="302" y2="55.5" class="lead exp"/>
+            <text x="308" y="60" class="exp">exponent: 4</text>
+            <path d="M189.5 134 V141 H269.5 V134" class="lead power"/>
+            <text x="229.5" y="167" text-anchor="middle" class="power">power: 3<tspan dy="-6" font-size="9">4</tspan></text>
+            <text x="229.5" y="192" text-anchor="middle" class="value">value: 81</text>
+          </svg>
+        </figure>
+        <div class="centred-block">
+          <p>Defining exponentiation succinctly in plain language is surprisingly tricky.</p>
+          <p>It is often introduced as repeated multiplication where the exponent denotes a number of copies of the base to include in a product.</p>
+          <div class="math">\[x^2 \rightarrow x^3\]</div>
+          <div class="math">\[8 \cdot 8 \rightarrow 8 \cdot 8 \cdot 8\]</div>
+          <p>This works for positive integer exponents, but becomes confusing when we try to apply it to fractional exponents.</p>
+          <p>A cleaner way to conceptualise exponentiation is to think in terms of multiplicative growth journeys.</p>
+        </div>
+        <figure class="anatomy">
+          <svg viewBox="0 0 490 220" role="img" aria-label="3 to the fourth power, read as a journey. Step ratio: 3. Number of steps: 4. Power: 3 to the fourth. Output: 81.">
+            <text x="190" y="120" class="glyph big base">3</text>
+            <text x="242" y="72" class="glyph sup exp">4</text>
+            <line x1="148" y1="88" x2="185" y2="88" class="lead base"/>
+            <text x="142" y="92.5" text-anchor="end" class="base">step ratio: 3</text>
+            <line x1="273" y1="55.5" x2="302" y2="55.5" class="lead exp"/>
+            <text x="308" y="60" class="exp">number of steps: 4</text>
+            <path d="M189.5 134 V141 H269.5 V134" class="lead power"/>
+            <text x="229.5" y="167" text-anchor="middle" class="power">power: 3<tspan dy="-6" font-size="9">4</tspan></text>
+            <text x="229.5" y="192" text-anchor="middle" class="value">output: 81</text>
+          </svg>
+        </figure>
+        <p>We can think of powers as starting at \(1\) on our number line. The above would read, &ldquo;start at \(1\) and take \(4\) steps at a step ratio of <span class="nw">\(3\)&rdquo;.</span></p>
+        <figure class="hops">
+          <svg viewBox="0 0 560 140" role="img" aria-label="A journey from 1 to 81 in 4 steps of times 3, drawn to scale: 1, 3, 9, 27, 81. Each hop is three times as long as the last."><text x="50" y="106" class="big v" text-anchor="end" style="text-anchor:end">1</text><line class="axis" x1="74" x2="470" y1="96" y2="96"/><path class="hop" d="M74.0 92 Q79.0 87.5 83.9 92"/><path class="hop" d="M83.9 92 Q98.8 78.6 113.6 92"/><path class="hop" d="M113.6 92 Q158.2 51.9 202.7 92"/><text x="158.2" y="66.0" class="op">×3</text><path class="hop" d="M202.7 92 Q336.4 20.0 470.0 92"/><text x="336.4" y="50.0" class="op">×3</text><circle class="start" cx="74.0" cy="96" r="3.5"/><circle cx="83.9" cy="96" r="2.6"/><text x="83.9" y="120">3</text><circle cx="113.6" cy="96" r="2.6"/><text x="113.6" y="120">9</text><circle cx="202.7" cy="96" r="2.6"/><text x="202.7" y="120">27</text><circle class="start" cx="470.0" cy="96" r="3.5"/><text x="490" y="106" class="big v" style="text-anchor:start">81</text></svg>
+        </figure>
+      </section>
+
+      <section aria-labelledby="notation">
+        <h2 id="notation">Introducing Exponent Notation to a Multiplicative Journey</h2>
+        <ul class="facts">
+          <li>Start: <span class="nw">\(1\).</span></li>
+          <li>Step ratio: <span class="nw">\(\times 4\).</span></li>
+          <li>Number of steps: <span class="nw">\(5\).</span></li>
+        </ul>
+        <p>Outputs:</p>
+        <div class="math">\[1 \rightarrow 4 \rightarrow 16 \rightarrow 64 \rightarrow 256 \rightarrow 1{,}024\]</div>
+        <p>Steps:</p>
+        <div class="math">\[0 \rightarrow 1 \rightarrow 2 \rightarrow 3 \rightarrow 4 \rightarrow 5\]</div>
+        <p>We can replace our step labels with exponents, using \(4\) as the base. These powers correspond to the above outputs.</p>
+        <div class="math">\[4^0 \rightarrow 4^1 \rightarrow 4^2 \rightarrow 4^3 \rightarrow 4^4 \rightarrow 4^5\]</div>
+        <iframe class="expo-widget" src="exponentials/exponents/journey-notation-widget.html" title="Interactive: the journey from 1 to 1,024 in 5 steps of times 4. Switch the step labels between step numbers (0 to 5) and exponent notation (4 to the 0 up to 4 to the 5), and use the arrows to move through the journey one step at a time." style="height: 280px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-additive-and-multiplicative-growth.html">← Additive and Multiplicative Growth</a>
+        <a href="exponentials-positive-and-negative-integer-exponents.html">Next: Integer Exponents →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
