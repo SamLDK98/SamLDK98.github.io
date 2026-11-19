@@ -129,8 +129,6 @@
     .popup-close:hover, .popup-close:focus-visible { border-color: var(--dim); outline: none; }
     /* the earlier version, kept below a rule for reference */
     hr.archive-rule { margin: 5rem 0 2rem; border-top-color: var(--faint); }
-    /* section headings centred above the text */
-    main > section > h2 { text-align: center; }
   </style>
 </head>
 <body>
@@ -460,16 +458,6 @@
       <hr class="archive-rule" />
 
       <section class="archive" aria-label="Earlier version of this page, kept for reference">
-        <p>Notice that the steps always add up to 256. If we take \(n\) steps of size \(x\), then \(n \times x = 256\), so \(x = 256 \div n\).</p>
-        <p>Division can find the <span class="c-steps">number of steps</span> needed to reach a <span class="c-target">target output</span> for a given <span class="c-size">step size</span>.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/divide-steps-widget.html" title="Interactive: 256 divided by a step size gives the number of equally spaced steps. Use the arrows to step through step sizes of 4, 16, 32 and 64, giving 64, 16, 8 and 4 steps." style="height: 150px" scrolling="no" loading="lazy"></iframe>
-        <p>Division can find the <span class="c-size">step size</span> needed to reach a <span class="c-target">target output</span> for a given <span class="c-steps">number of steps</span>.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/divide-steps-widget.html?solve=size" title="Interactive: 256 divided by a number of steps gives the step size. Use the arrows to step through 4, 16, 32 and 64 steps, giving step sizes of 64, 16, 8 and 4." style="height: 150px" scrolling="no" loading="lazy"></iframe>
-        <div class="formula-pair">
-          <div class="math">\[\frac{\text{target output}}{\text{step size}} = \text{total steps}\]</div>
-          <div class="math">\[\frac{\text{target output}}{\text{total steps}} = \text{step size}\]</div>
-        </div>
-
         <h3 id="reconstructing-total">Reconstructing the Total from Partial Progress</h3>
         <p>Because:</p>
         <div class="math">\[\text{steps complete }\% = \text{target output }\%\]</div>
@@ -559,7 +547,7 @@
 
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="exponentials.html">← All Exponentials pages</a>
-        <a href="exponentials-exponentiation-notation.html">Next: Exponentiation Notation →</a>
+        <a href="exponentials-inverse-operations-radication-and-logarithms.html">Next: Inverse Operations: Radication and Logarithms →</a>
       </nav>
     </main>
   </div>

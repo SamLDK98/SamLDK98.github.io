@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inverse Operations: Radication and Logarithms | Exponentials | Sam Kirwan</title>
-  <meta name="description" content="Division undoes multiplication whichever factor is unknown, because multiplication is commutative. Exponentiation is not, so it has two inverses: radication recovers the base, logarithms recover the exponent." />
+  <meta name="description" content="Journeys to 256 in equal additive and multiplicative steps, then working backwards: division recovers either the step size or the number of steps; logarithms recover the number of steps and roots recover the step ratio." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -21,6 +21,18 @@
     };
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    /* words coloured to match the parts of a calculation beside them */
+    .c-steps { color: var(--exp); }
+    .c-target { color: #e8706a; }
+    .c-size { color: var(--base); }
+    .math.rule-box { margin-top: 2rem; font-size: 1.2em; }
+    main > section + section > h3:first-child { margin-top: 2.6rem; }
+    .mjx-steps { color: var(--exp); }
+    .mjx-size { color: var(--base); }
+    .mjx-target { color: #e8706a; }
+    .formula-pair { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.6rem clamp(1.2rem, 5vw, 4rem); margin: 1.6rem 0 0.6rem; }
+  </style>
 </head>
 <body>
   <div class="sheet">
@@ -29,28 +41,23 @@
       <h1>Inverse Operations: Radication and Logarithms</h1>
     </header>
     <main>
-      <section aria-labelledby="reversing-multiplication">
-        <h2 id="reversing-multiplication">Reversing Multiplication</h2>
-        <p>An inverse operation reverses the effect of another operation.</p>
-        <p>We start with:</p>
-        <div class="math">\[4\]</div>
-        <p>We multiply it by <span class="nw">\(3\):</span></p>
-        <div class="math">\[4 \times 3 = \boxed{12}\]</div>
-        <p>But we can undo this by dividing by <span class="nw">\(3\):</span></p>
-        <div class="math">\[\frac{12}{3} = \boxed{4}\]</div>
-        <p>We could just as easily have started with:</p>
-        <div class="math">\[3\]</div>
-        <p>And multiplied by <span class="nw">\(4\):</span></p>
-        <div class="math">\[3 \times 4 = \boxed{12}\]</div>
-        <p>And divided by <span class="nw">\(4\):</span></p>
-        <div class="math">\[\frac{12}{4} = \boxed{3}\]</div>
-      </section>
-
-      <section aria-labelledby="commutativity">
-        <h2 id="commutativity">Why Commutativity Matters</h2>
-        <p>A number can be made by multiplying two factors.</p>
-        <p>One factor will denote the number of copies of the other factor we have.</p>
-        <p>The second factor will denote the value of each copy.</p>
+      <section aria-labelledby="division">
+        <h2 id="division">Division and Additive Journeys</h2>
+        <p>An additive journey involves adding values to reach a target output.</p>
+        <div class="math">\[x + x + x + x + x + x + x + x = 64\]</div>
+        <p>We could add any number of \(x\) to reach \(64\) as long as we can adjust the value of \(x\) accordingly.</p>
+        <p>Likewise, we could have any value for <span class="nw">\(x\),</span> as long as we can adjust the number of steps accordingly.</p>
+        <p>Division can tell us either the size each step must be for a given number of steps, or vice versa.</p>
+        <p>The reason division can tell us either is because the additive journey involves multiplying two variables.</p>
+        <div class="math">\[\class{mjx-steps}{\text{number of steps}} \times \class{mjx-size}{\text{step size}} = \class{mjx-target}{\text{target output}}\]</div>
+        <p>Say:</p>
+        <div class="math">\[\class{mjx-size}{x} = \class{mjx-size}{\text{step size}}, \qquad \class{mjx-steps}{y} = \class{mjx-steps}{\text{number of steps}}\]</div>
+        <p>Multiplication is commutative.</p>
+        <p>If we multiply two factors \(xy\) to give an output:</p>
+        <ul>
+          <li>One factor will denote the number of copies of the other factor we have.</li>
+          <li>The second factor will denote the value of each copy.</li>
+        </ul>
         <p>We could have \(a\) groups of \(b\) or \(b\) groups of <span class="nw">\(a\).</span></p>
         <figure class="groups">
           <svg viewBox="0 0 520 168" role="img" aria-label="The same twelve dots, arranged in four rows of three, grouped two ways. On the left each row is a group: 4 groups of 3. On the right each column is a group: 3 groups of 4. Both make 12.">
@@ -71,79 +78,70 @@
             <text x="398" y="156">3 groups of 4</text>
           </svg>
         </figure>
-        <p>Multiplication is <strong>commutative</strong>, meaning that changing the order of the factors does not change their product.</p>
-        <div class="math">\[\boxed{a \times b = b \times a}\]</div>
-        <p>So…</p>
-        <p>Suppose we know:</p>
-        <ul>
-          <li>Two factors multiply to produce <span class="nw">\(12\).</span></li>
-          <li>One factor is <span class="nw">\(3\).</span></li>
-        </ul>
-        <p>There are two possible situations.</p>
-        <p>The first factor is unknown:</p>
-        <div class="math">\[x \times 3 = 12\]</div>
-        <p>The second factor is unknown:</p>
-        <div class="math">\[3 \times x = 12\]</div>
-        <p>But because multiplication is commutative:</p>
-        <div class="math">\[3 \times x = x \times 3\]</div>
-        <p>Division gives us the answer to both situations:</p>
-        <div class="math">\[x = \frac{12}{3} = \boxed{4}\]</div>
+        <p>Changing the role of the factors does not change the value of the output.</p>
+        <p>Just as taking \(16\) steps that add \(+4\) gives the same output as taking \(4\) that add <span class="nw">\(+16\).</span></p>
+        <p>So:</p>
+        <p>Division can tell us the size each step must be for a given number of steps.</p>
+        <p>Division can also tell us how many steps we must take if our steps must be a certain size.</p>
+        <div class="formula-pair">
+          <div class="math">\[\frac{\class{mjx-target}{\text{target output}}}{\class{mjx-size}{\text{step size}}} = \class{mjx-steps}{\text{number of steps}}\]</div>
+          <div class="math">\[\frac{\class{mjx-target}{\text{target output}}}{\class{mjx-steps}{\text{number of steps}}} = \class{mjx-size}{\text{step size}}\]</div>
+        </div>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/divide-steps-widget.html?target=64&amp;toggle=1" title="Interactive: 64 divided by a step size gives the number of steps, or 64 divided by a number of steps gives the step size. Switch between solving for the number of steps and for the step size, and use the arrows to step through 2, 4, 8 and 16." style="height: 200px" scrolling="no" loading="lazy"></iframe>
+
       </section>
 
-      <section aria-labelledby="reversing-exponentiation">
-        <h2 id="reversing-exponentiation">Reversing Exponentiation</h2>
-        <p>For multiplication:</p>
-        <div class="math">\[a \times b = b \times a\]</div>
-        <p>The two inputs are interchangeable.</p>
-        <p>Therefore, whether the unknown is the first or second factor, we can recover it by dividing the product by the known factor (provided it is nonzero).</p>
-        <p>For exponentiation:</p>
+      <section aria-labelledby="multiplicative-journeys">
+        <h2 id="multiplicative-journeys">Radication and Logarithms for Multiplicative Journeys</h2>
+        <p>A multiplicative journey involves multiplying factors to reach a target output.</p>
+        <div class="math">\[x \cdot x \cdot x \cdot x = 64\]</div>
+        <p>Again, we have two quantities that may vary: step ratio and number of steps.</p>
+        <p>However, the relationship between these two is exponential, and exponentiation is not commutative.</p>
+        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{3}} = 8 \qquad \text{but} \qquad \class{mjx-base}{3}^{\class{mjx-exp}{2}} = 9\]</div>
         <div class="math">\[\class{mjx-base}{a}^{\class{mjx-exp}{b}} \neq \class{mjx-base}{b}^{\class{mjx-exp}{a}} \quad \text{in general}\]</div>
-        <p>The inputs are not interchangeable. Moreover, the <span class="base">base</span> and <span class="exp">exponent</span> participate in fundamentally different ways, and recovering each requires a different mathematical procedure.</p>
-        <p>Consider:</p>
-        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{3}} = 8\]</div>
-        <p>Working backwards from the result of exponentiation has two different inverse operations, depending on whether we know the base or the exponent.</p>
-        <p>Knowing the exponent requires <strong>radication</strong>.</p>
-        <div class="math">\[\class{mjx-base}{x}^{\class{mjx-exp}{3}} = 8 \qquad \sqrt[\class{mjx-exp}{3}]{8}=\class{mjx-base}{2}\]</div>
-        <p>Knowing the base requires <strong>logarithms</strong>.</p>
-        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{x}} = 8 \qquad \log_{\class{mjx-base}{2}}(8) =\class{mjx-exp}{3}\]</div>
+        <p>To recover our quantities requires two different operations, depending on which one we know.</p>
       </section>
 
       <section aria-labelledby="radication">
-        <h2 id="radication">Radication: Recovering the Base</h2>
-        <div class="math">\[\class{mjx-base}{x}^{\class{mjx-exp}{3}} = 8\]</div>
-        <p>We know that we are taking three multiplicative steps to reach <span class="nw">\(8\).</span></p>
+        <h3 id="radication">Radication: Recovering the Step Ratio</h3>
+        <p>Radication identifies the necessary step ratio if we are taking a given number of multiplicative steps to reach a target output.</p>
+        <p>For example, here we know that we are taking three steps to reach <span class="nw">\(8\),</span> but we don't know the value the identical factors in this product must be:</p>
         <div class="math">\[\class{mjx-base}{x} \cdot \class{mjx-base}{x} \cdot \class{mjx-base}{x} = 8\]</div>
-        <p>We do not know what the factors are in this product.</p>
-        <p>We can recover the factor by taking the cube root of <span class="nw">\(8\):</span></p>
-        <div class="math">\[\class{mjx-base}{x} = \sqrt[\class{mjx-exp}{3}]{8} = \boxed{\class{mjx-base}{2}}\]</div>
-        <p>More generally, for a positive base:</p>
-        <div class="math">\[\boxed{\class{mjx-base}{a}^{\class{mjx-exp}{n}} = b \iff \class{mjx-base}{a} = \sqrt[\class{mjx-exp}{n}]{b}}\]</div>
+        <div class="math">\[\class{mjx-base}{x}^{\class{mjx-exp}{3}} = 8\]</div>
+        <p>We can identify the value of these factors by taking the root with the number of steps as the index and the target output as the radicand:</p>
+        <div class="math">\[\class{mjx-base}{x} = \sqrt[\class{mjx-exp}{3}]{8}\]</div>
+        <div class="math">\[\class{mjx-base}{x} = \class{mjx-base}{2}\]</div>
+        <p>In general, for a positive target output <span class="nw">\(b\):</span></p>
+        <div class="math rule-box">\[\class{mjx-base}{r}^{\class{mjx-exp}{n}} = b \iff \class{mjx-base}{r} = \sqrt[\class{mjx-exp}{n}]{b}\]</div>
       </section>
 
       <section aria-labelledby="logarithms">
-        <h2 id="logarithms">Logarithms: Recovering the Exponent</h2>
+        <h3 id="logarithms">Logarithms: Recovering the Number of Steps</h3>
+        <p>Logarithms identify the necessary number of steps to reach a target output given a step ratio.</p>
+        <p>Say:</p>
         <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{x}} = 8\]</div>
-        <p>We know:</p>
-        <ul>
-          <li>Our common ratio is multiplication by <span class="nw">\(\class{mjx-base}{2}\).</span></li>
-          <li>We must reach <span class="nw">\(8\).</span></li>
-        </ul>
-        <p>We don't know:</p>
-        <ul>
-          <li>How many multiplicative steps will this take?</li>
-        </ul>
-        <p>We can recover it by “taking the logarithm of \(8\) to base <span class="nw">\(\class{mjx-base}{2}\)”:</span></p>
-        <div class="math">\[\class{mjx-exp}{x} = \log_{\class{mjx-base}{2}}(8) = \boxed{\class{mjx-exp}{3}}\]</div>
+        <p>How many multiplicative steps of \(\class{mjx-base}{\times 2}\) does it take to reach <span class="nw">\(8\)?</span></p>
+        <p>We find the answer by &ldquo;taking the logarithm of \(8\) to base <span class="nw">\(\class{mjx-base}{2}\)&rdquo;:</span></p>
+        <div class="math">\[\class{mjx-exp}{x} = \log_{\class{mjx-base}{2}}(8) = \class{mjx-exp}{3}\]</div>
         <p>More generally:</p>
         <div class="math">\[\boxed{\class{mjx-base}{a}^{\class{mjx-exp}{x}} = b \iff \class{mjx-exp}{x} = \log_{\class{mjx-base}{a}}(b)}\]</div>
         <p>For real logarithms, <span class="nw">\(a &gt; 0\),</span> <span class="nw">\(a \neq 1\),</span> and <span class="nw">\(b &gt; 0\).</span></p>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
-        <a href="exponentials-fractional-exponents.html">← Fractional Exponents</a>
-        <a href="exponentials-understanding-logarithms.html">Next: Understanding Logarithms →</a>
+        <a href="exponentials-additive-and-multiplicative-growth.html">← Additive and Multiplicative Growth</a>
+        <a href="exponentials-exponentiation-notation.html">Next: Exponentiation Notation →</a>
       </nav>
     </main>
   </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
 </body>
 </html>

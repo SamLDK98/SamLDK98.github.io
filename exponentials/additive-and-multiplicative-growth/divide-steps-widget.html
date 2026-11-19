@@ -29,10 +29,16 @@
   .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
   .num, .den span, .res .n { display: inline-block; transition: opacity 0.18s ease; }
   .fade { opacity: 0; }
+  .choices[hidden] { display: none; }
+  #mode { margin: 0 0 1rem; }
 </style>
 </head>
 <body>
 <div class="widget">
+  <div class="choices" id="mode" role="group" aria-label="Solve for" hidden>
+    <button type="button" data-solve="steps" aria-pressed="true">Number of steps</button>
+    <button type="button" data-solve="size" aria-pressed="false">Step size</button>
+  </div>
   <div class="eq" aria-live="polite">
     <span class="frac">
       <span class="num">256</span>
@@ -51,8 +57,22 @@
   // 256 divided by a step size gives the number of equally spaced steps from 0 to 256.
   // With ?solve=size it runs the other way: 256 divided by a number of steps gives the step size.
   // Either way the denominators are 4, 16, 32, 64 and the results 64, 16, 8, 4.
-  const TARGET = 256, SIZES = [4, 16, 32, 64];
-  if (new URLSearchParams(location.search).get("solve") === "size") document.body.classList.add("solve-size");
+  // ?target=64 runs the same division for a journey to 64
+  const TARGET = +new URLSearchParams(location.search).get("target") || 256;
+  const SIZES = TARGET === 256 ? [4, 16, 32, 64] : [2, 4, 8, 16];
+  document.querySelector(".num").textContent = TARGET;
+  const QS = new URLSearchParams(location.search);
+  if (QS.get("solve") === "size") document.body.classList.add("solve-size");
+  // ?toggle=1: buttons above switch between solving for the number of steps and for the step size
+  if (QS.get("toggle") === "1") {
+    const mode = document.getElementById("mode"); mode.hidden = false;
+    mode.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      const size = b.dataset.solve === "size";
+      document.body.classList.toggle("solve-size", size);
+      mode.querySelectorAll("button").forEach(m => m.setAttribute("aria-pressed", String(m === b)));
+      if (window.postWidgetHeight) window.postWidgetHeight();
+    }));
+  }
   let i = 0;
   const sizeEl = document.getElementById("size"), stepsEl = document.getElementById("steps");
   const prev = document.getElementById("prev"), next = document.getElementById("next");
