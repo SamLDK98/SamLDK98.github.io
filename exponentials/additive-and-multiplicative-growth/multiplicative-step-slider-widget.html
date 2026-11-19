@@ -23,7 +23,10 @@
   const svg = document.getElementById("fig");
   const slider = document.getElementById("n");
   const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a";
-  const START = 1, TARGET = 256;
+  // ?start=, ?target= and ?max= set the journey and the most steps; by default 1 to 256 in up to 64
+  const QS = new URLSearchParams(location.search);
+  const START = +QS.get("start") || 1, TARGET = +QS.get("target") || 256;
+  if (QS.get("max")) { slider.max = +QS.get("max"); slider.setAttribute("aria-label", `Number of steps, from 1 to ${QS.get("max")}`); }
 
   function el(name, attrs, text, parent) {
     const e = document.createElementNS(NS, name);
@@ -43,7 +46,7 @@
   }
 
   function render() {
-    const n = +slider.value, r = Math.pow(TARGET, 1 / n);
+    const n = +slider.value, r = Math.pow(TARGET / START, 1 / n);
     const W = svg.clientWidth || 560, L = 34, R = W - 46, AX = 66, H = 116;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
     svg.textContent = "";
@@ -51,16 +54,16 @@
 
     // the hops: each one r times the last, so each covers more distance than the one before
     for (let i = 0; i < n; i++) {
-      const a = px(Math.pow(r, i)), b = i === n - 1 ? px(TARGET) : px(Math.pow(r, i + 1));
+      const a = px(START * Math.pow(r, i)), b = i === n - 1 ? px(TARGET) : px(START * Math.pow(r, i + 1));
       const rise = Math.min(46, (b - a) * 0.55);
       el("path", { d: `M${a} ${AX} Q${(a + b) / 2} ${AX - rise} ${b} ${AX}`, fill: "none", stroke: EXP, "stroke-opacity": 0.9, "stroke-width": n > 40 ? 1.1 : 1.4 });
     }
 
     // the line, with the start in green and the target in red at either end
     el("line", { x1: px(START), x2: px(TARGET), y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
-    const a = el("text", { x: px(START) - 12, y: AX + 6, "text-anchor": "end", "font-size": 18 }, "1");
+    const a = el("text", { x: px(START) - 12, y: AX + 6, "text-anchor": "end", "font-size": 18 }, String(START));
     a.style.fill = VAL; a.style.fontFamily = "Spectral, Georgia, serif";
-    const z = el("text", { x: px(TARGET) + 10, y: AX + 6, "text-anchor": "start", "font-size": 18 }, "256");
+    const z = el("text", { x: px(TARGET) + 10, y: AX + 6, "text-anchor": "start", "font-size": 18 }, String(TARGET));
     z.style.fill = RED; z.style.fontFamily = "Spectral, Georgia, serif";
 
     // the two readings, side by side
@@ -70,7 +73,7 @@
       const v = el("tspan", {}, val, t); v.style.fill = col;
     });
 
-    svg.setAttribute("aria-label", `The journey from 1 to 256 in ${n} equal multiplicative ${n === 1 ? "step" : "steps"}. Step ratio: ${fmtRatio(r).replace("×≈ ", "times about ").replace("×", "times ")}.`);
+    svg.setAttribute("aria-label", `The journey from ${START} to ${TARGET} in ${n} equal multiplicative ${n === 1 ? "step" : "steps"}. Step ratio: ${fmtRatio(r).replace("×≈ ", "times about ").replace("×", "times ")}.`);
     if (window.postWidgetHeight) window.postWidgetHeight();
   }
 

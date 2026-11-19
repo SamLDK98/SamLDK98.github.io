@@ -46,6 +46,50 @@
     .hops text.pow { font-family: "Spectral", Georgia, serif; font-size: 22px; text-anchor: end; fill: var(--ink); }
     .hops tspan.b { fill: var(--base); }
     .hops tspan.e { fill: var(--exp); font-size: 14px; }
+    p.widget-note { color: var(--dim); }
+    .aside-italic { font-style: italic; }
+    .c-exp { color: var(--exp); }
+    .c-value { color: var(--value); }
+    /* two runs of steps lined up end to end */
+    figure.runs { margin: 2rem 0 1.4rem; }
+    figure.runs svg { max-width: 660px; display: block; margin: 0 auto; }
+    .runs text { font-family: "Spectral", Georgia, serif; text-anchor: middle; }
+    .runs text.n { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--dim); }
+    .runs text.f { font-size: 17px; }
+    .runs text.st { font-size: 15px; }
+    .runs text.s8 { font-size: 17px; fill: var(--ink); }
+    .runs .b { fill: var(--exp); stroke: var(--exp); }
+    .runs .p { fill: var(--power); stroke: var(--power); }
+    .runs text.b, .runs text.p { stroke: none; }
+    .runs .br { fill: none; stroke-width: 1.8; }
+    .runs .b8 { fill: none; stroke: var(--ink); stroke-opacity: 0.6; stroke-width: 1.4; }
+    .runs .guide { stroke: var(--ink); stroke-opacity: 0.18; stroke-dasharray: 3 4; }
+    .runs .axis { stroke: var(--faint); stroke-width: 1.2; }
+    .runs .hop { fill: none; stroke: var(--ink); stroke-opacity: 0.3; stroke-width: 1.2; }
+    .runs circle { fill: var(--ink); fill-opacity: 0.5; }
+    .runs circle.start { fill: var(--value); fill-opacity: 1; }
+    .runs circle.end { fill: #e8706a; fill-opacity: 1; }
+    /* a heading with its rule beside it */
+    h2.rule-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1.6rem; margin-bottom: 2.2rem; }
+    h2.rule-head .rule-formula { font-size: 0.9em; }
+    /* a rule set apart at the end of its section */
+    .math.rule-box { margin-top: 2.6rem; font-size: 1.3em; }
+    .mjx-pow { color: var(--power); }
+    figure.anatomy text.power { fill: var(--value); }
+    figure.anatomy .lead.power { stroke: var(--value); }
+    figure.anatomy.power-only svg { max-width: 300px; }
+    /* a table of powers, with one lookup picked out */
+    figure.ptable { margin: 2rem 0 1.6rem; }
+    figure.ptable svg { max-width: 560px; display: block; margin: 0 auto; }
+    .ptable text { font-family: "IBM Plex Mono", monospace; font-size: 15px; text-anchor: middle; }
+    .ptable text.e { fill: var(--exp); fill-opacity: 0.55; }
+    .ptable text.v { fill: var(--value); fill-opacity: 0.55; }
+    .ptable text.on { fill-opacity: 1; }
+    .ptable text.lab { font-size: 12px; text-anchor: start; fill-opacity: 1; letter-spacing: 0.04em; }
+    .ptable text.sum { font-family: "Spectral", Georgia, serif; font-size: 20px; fill-opacity: 1; }
+    .ptable .rule { stroke: var(--faint); stroke-width: 1; }
+    .ptable rect.pick { fill: rgba(244, 246, 255, 0.04); stroke: var(--ink); stroke-opacity: 0.3; stroke-dasharray: 3 4; }
+    .ptable rect.result { fill: rgba(127, 207, 154, 0.08); stroke: var(--value); stroke-opacity: 0.6; }
   </style>
 </head>
 <body>
@@ -70,42 +114,63 @@
         </figure>
         <p>As the exponent increases additively, the corresponding value of the power increases multiplicatively.</p>
         <p>The step size for the exponent's journey is just <span class="nw">\(1\).</span></p>
-        <p>The step ratio depends on the base.</p>
-        <div class="math">\[2^0 = 1, \quad 2^1 = 2, \quad 2^2 = 4, \quad 2^3 = 8\]</div>
-        <figure class="hops">
-          <svg viewBox="0 0 560 222" role="img" aria-label="Two rows of steps, lined up column by column. Above, the exponent: 0, 1, 2, 3, each step adding 1. Below, the value of 2 to that exponent: 1, 2, 4, 8, each step multiplying by 2."><text x="20" y="67" class="rowlab e">exponent</text><text x="20" y="173" class="rowlab v">value</text><line class="link" x1="150" x2="150" y1="92" y2="156"/><line class="link" x1="270" x2="270" y1="92" y2="156"/><line class="link" x1="390" x2="390" y1="92" y2="156"/><line class="link" x1="510" x2="510" y1="92" y2="156"/><line class="axis" x1="150" x2="510" y1="62" y2="62"/><line class="axis" x1="150" x2="510" y1="168" y2="168"/><path class="hop e" d="M150 62 Q210.0 22 270 62"/><text x="210.0" y="35" class="e">+1</text><path class="hop" d="M150 168 Q210.0 128 270 168"/><text x="210.0" y="141" class="op">×2</text><path class="hop e" d="M270 62 Q330.0 22 390 62"/><text x="330.0" y="35" class="e">+1</text><path class="hop" d="M270 168 Q330.0 128 390 168"/><text x="330.0" y="141" class="op">×2</text><path class="hop e" d="M390 62 Q450.0 22 510 62"/><text x="450.0" y="35" class="e">+1</text><path class="hop" d="M390 168 Q450.0 128 510 168"/><text x="450.0" y="141" class="op">×2</text><circle class="pe" cx="150" cy="62" r="3.5"/><text x="150" y="86" class="e">0</text><circle class="pv" cx="150" cy="168" r="3.5"/><text x="150" y="192" class="v">1</text><circle class="pe" cx="270" cy="62" r="3.5"/><text x="270" y="86" class="e">1</text><circle class="pv" cx="270" cy="168" r="3.5"/><text x="270" y="192" class="v">2</text><circle class="pe" cx="390" cy="62" r="3.5"/><text x="390" y="86" class="e">2</text><circle class="pv" cx="390" cy="168" r="3.5"/><text x="390" y="192" class="v">4</text><circle class="pe" cx="510" cy="62" r="3.5"/><text x="510" y="86" class="e">3</text><circle class="pv" cx="510" cy="168" r="3.5"/><text x="510" y="192" class="v">8</text></svg>
+        <p>The step ratio for the power's journey depends on the base.</p>
+        <p>Imagine a step ratio of <span class="nw">\(\times 2\):</span></p>
+        <figure class="anatomy power-only">
+          <svg viewBox="0 0 400 150" role="img" aria-label="2 to the n: a base of 2, raised to the exponent n.">
+            <text x="166" y="118" class="glyph big base">2</text>
+            <text x="222" y="70" class="glyph sup exp" font-style="italic">n</text>
+          </svg>
         </figure>
+        <figure class="ptable">
+          <svg viewBox="0 0 560 140" role="img" aria-label="A table of powers of 2. Exponents 0 to 8 along the top row; their values 1, 2, 4, 8, 16, 32, 64, 128, 256 along the bottom row. The columns for exponents 3 and 5 are picked out, holding 8 and 32, and so is the column for exponent 8, holding 256."><rect class="pick" x="255.5" y="26" width="40" height="92" rx="7"/><rect class="pick" x="360.5" y="26" width="40" height="92" rx="7"/><rect class="result" x="518.0" y="26" width="40" height="92" rx="7"/><line class="rule" x1="98.0" x2="558.0" y1="72.0" y2="72.0"/><text x="20" y="57" class="lab e">exponent</text><text x="20" y="109" class="lab v">value</text><text x="118.0" y="57" class="e">0</text><text x="118.0" y="109" class="v">1</text><text x="170.5" y="57" class="e">1</text><text x="170.5" y="109" class="v">2</text><text x="223.0" y="57" class="e">2</text><text x="223.0" y="109" class="v">4</text><text x="275.5" y="57" class="e on">3</text><text x="275.5" y="109" class="v on">8</text><text x="328.0" y="57" class="e">4</text><text x="328.0" y="109" class="v">16</text><text x="380.5" y="57" class="e on">5</text><text x="380.5" y="109" class="v on">32</text><text x="433.0" y="57" class="e">6</text><text x="433.0" y="109" class="v">64</text><text x="485.5" y="57" class="e">7</text><text x="485.5" y="109" class="v">128</text><text x="538.0" y="57" class="e on">8</text><text x="538.0" y="109" class="v on">256</text></svg>
+        </figure>
+        <p>Adding exponents in the top row corresponds to multiplying values in the bottom row.</p>
       </section>
 
       <section aria-labelledby="product">
-        <h2 id="product">Product of Powers Rule</h2>
-        <p>Recall that steps combine through multiplication and apply the same factor to the output regardless of position on the number line.</p>
-        <div class="math">\[5^2 = 25, \quad 5^3 = 125\]</div>
-        <p>These powers represent combined factors:</p>
-        <div class="math">\[\underbrace{1 \cdot 5 \cdot 5}_{2\text{ steps}} \qquad \underbrace{1 \cdot 5 \cdot 5 \cdot 5}_{3\text{ steps}}\]</div>
-        <p>Multiplying them together is equivalent to combining the two journeys:</p>
-        <div class="math">\[5^2 \cdot 5^3 = 5^{2+3} = 5^5\]</div>
-        <p>The exponents add because we're combining the number of steps, while the outputs multiply because we're combining the multiplicative factors.</p>
-        <div class="math">\[\boxed{a^m \times a^n = a^{m+n}}\]</div>
-        <p>When multiplying powers with identical bases, we combine their factors into a single product.</p>
-        <figure class="factor-combination">
-          <svg viewBox="0 0 640 235" role="img" aria-labelledby="product-factors-title product-factors-desc">
-            <title id="product-factors-title">Combining two factors and three factors makes five factors</title>
-            <desc id="product-factors-desc">5 squared times 5 cubed expands to (5 times 5) times (5 times 5 times 5). Each factor connects to one of the five factors below, giving 5 to the power of 2 plus 3, equal to 5 to the fifth power.</desc>
-            <g class="connections"><path d="M326.0 90 L348.0 166 M372.0 90 L394.0 166 M462.0 90 L440.0 166 M508.0 90 L486.0 166 M554.0 90 L532.0 166"/></g><text x="20" y="76">5<tspan class="exponent" dy="-17" font-size="21">2</tspan></text><text x="67" y="76" class="operator">×</text><text x="98" y="76">5<tspan class="exponent" dy="-17" font-size="21">3</tspan></text><g class="factors"><text x="305.0" y="76" text-anchor="middle" class="operator">(</text><text x="326.0" y="76" text-anchor="middle" class="fac">5</text><text x="349.0" y="76" text-anchor="middle" class="operator">·</text><text x="372.0" y="76" text-anchor="middle" class="fac">5</text><text x="393.0" y="76" text-anchor="middle" class="operator">)</text><text x="417.0" y="76" text-anchor="middle" class="operator">×</text><text x="441.0" y="76" text-anchor="middle" class="operator">(</text><text x="462.0" y="76" text-anchor="middle" class="fac">5</text><text x="485.0" y="76" text-anchor="middle" class="operator">·</text><text x="508.0" y="76" text-anchor="middle" class="fac">5</text><text x="531.0" y="76" text-anchor="middle" class="operator">·</text><text x="554.0" y="76" text-anchor="middle" class="fac">5</text><text x="575.0" y="76" text-anchor="middle" class="operator">)</text></g><g class="factors"><text x="348.0" y="205" text-anchor="middle" class="fac">5</text><text x="371.0" y="205" text-anchor="middle" class="operator">·</text><text x="394.0" y="205" text-anchor="middle" class="fac">5</text><text x="417.0" y="205" text-anchor="middle" class="operator">·</text><text x="440.0" y="205" text-anchor="middle" class="fac">5</text><text x="463.0" y="205" text-anchor="middle" class="operator">·</text><text x="486.0" y="205" text-anchor="middle" class="fac">5</text><text x="509.0" y="205" text-anchor="middle" class="operator">·</text><text x="532.0" y="205" text-anchor="middle" class="fac">5</text></g><text x="20" y="205">5<tspan class="exponent" dy="-17" font-size="21">2+3</tspan></text><text x="99" y="205" class="operator">=</text><text x="137" y="205">5<tspan class="exponent" dy="-17" font-size="21">5</tspan></text>
-          </svg>
+        <h2 id="product" class="rule-head"><span>Product of Powers Rule</span><span class="rule-formula">\(a^m \times a^n = a^{m+n}\)</span></h2>
+        <p>A power is just notation for an idea we previously saw: multiplicative steps combine their factors through multiplication.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=4&amp;nav=slider&amp;show=factors" title="Interactive: a journey from 1 to 256 in 8 steps of times 2, with four steps selected. Drag the dots at either end to select more or fewer steps, and use the slider to move them along. Above the line, one times 2 for each step selected, and an arrow to their combined factor, such as times 16 for four steps." style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p>\(2^3\) is just \(3\) steps of \(\times 2\) \(\rightarrow\) a combined factor of <span class="nw">\(2 \cdot 2 \cdot 2 = \times 8\).</span></p>
+        <p>\(2^5\) is just \(5\) steps of \(\times 2\) \(\rightarrow\) a combined factor of <span class="nw">\(2 \cdot 2 \cdot 2 \cdot 2 \cdot 2 = \times 32\).</span></p>
+        <p>When we see a power written as <span class="nw">\(b^n\),</span> we can assume the journey begins at \(1\) and the multiplicative factor is being applied to <span class="nw">\(1\).</span></p>
+        <div class="math">\[1 \cdot b^n\]</div>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=3&amp;nav=slider&amp;show=grow" title="Interactive: a journey from 1 in steps of times 2. Move the slider to take more or fewer steps, always starting from 1. Above the line, the power those steps make and its value, such as 2 cubed equals 8." style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p class="aside-italic">Notice that as we increase the number of multiplicative steps by <span class="nw">\(1\):</span></p>
+        <ul class="aside-italic">
+          <li>We add \(1\) to the <span class="c-exp">exponent</span>.</li>
+          <li>We multiply our <span class="c-value">output</span> by another copy of the base.</li>
+        </ul>
+        <p>The power does not have to be applied to <span class="nw">\(1\).</span> We could move it up and down the number line and include a coefficient to represent the initial value that the power applies to.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=2&amp;from=3&amp;drag=0&amp;nav=slider&amp;show=coef" title="Interactive: a run of 2 steps of times 2, starting at 8. Move the slider to slide the run along the journey. Above the line, the starting value as a coefficient: 8 times 2 squared equals 32." style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p>Multiplying two powers can be thought of like this. One power applies to \(1\) to give us the output that the other power applies to.</p>
+        <p>For example:</p>
+        <div class="math">\[2^3 \cdot 2^5\]</div>
+        <div class="math">\[2^3 \rightarrow 1 \cdot 2 \cdot 2 \cdot 2 = 8\]</div>
+        <p>The first power is applied to \(1\) and takes us to <span class="nw">\(8\).</span></p>
+        <p>The second power, which represents a combined factor of <span class="nw">\(\times 32\),</span> is then applied to <span class="nw">\(8\).</span></p>
+        <div class="math">\[8 \cdot 2^5\]</div>
+        <div class="math">\[8 \cdot 32 = 256\]</div>
+        <p>It's not necessary to think like this when performing the calculations. It's as simple as:</p>
+        <div class="math">\[2^3 \cdot 2^5 = 8 \cdot 32 = 256\]</div>
+        <p>Notice that if we rewrite the product as a power of base <span class="nw">\(2\):</span></p>
+        <div class="math">\[256 = 2^8\]</div>
+        <p>We see that multiplying powers together gives the same value as adding their exponents:</p>
+        <div class="math">\[2^3 \cdot 2^5 = 2^{3+5} = 2^8\]</div>
+        <figure class="runs">
+          <svg viewBox="0 0 660 300" role="img" aria-label="The journey from 1 to 256 in 8 steps of times 2. A blue bracket over the first 3 steps, from 1 to 8, labelled 3 steps, times 2 times 2 times 2. A purple bracket over the next 5 steps, from 8 to 256, labelled 5 steps, times 2 five times. A larger bracket over both, labelled 8 steps."><path class="b8" d="M40.0 58 V48 H620.0 V58"/><text x="330.0" y="36" class="s8">8 steps</text><line class="guide" x1="40.0" x2="40.0" y1="140" y2="244"/><line class="guide" x1="157.4" x2="157.4" y1="140" y2="244"/><path class="br b" d="M42.0 140 V132 H155.4 V140"/><text x="98.7" y="120" class="f b">×2 ×2 ×2</text><text x="98.7" y="96" class="st b">3 steps</text><line class="guide" x1="157.4" x2="157.4" y1="140" y2="244"/><line class="guide" x1="620.0" x2="620.0" y1="140" y2="244"/><path class="br p" d="M159.4 140 V132 H618.0 V140"/><text x="388.7" y="120" class="f p">×2 ×2 ×2 ×2 ×2</text><text x="388.7" y="96" class="st p">5 steps</text><line class="axis" x1="40" x2="620" y1="250" y2="250"/><path class="hop" d="M40.0 250 Q55.7 236.8 71.3 250"/><path class="hop" d="M71.3 250 Q90.6 233.8 109.9 250"/><path class="hop" d="M109.9 250 Q133.7 230.1 157.4 250"/><path class="hop" d="M157.4 250 Q186.7 225.4 215.9 250"/><path class="hop" d="M215.9 250 Q251.9 219.8 287.9 250"/><path class="hop" d="M287.9 250 Q332.2 212.8 376.5 250"/><path class="hop" d="M376.5 250 Q431.1 204.2 485.7 250"/><path class="hop" d="M485.7 250 Q552.8 198.0 620.0 250"/><circle class="start" cx="40.0" cy="250" r="3.5"/><text x="40.0" y="274" class="n">1</text><circle cx="71.3" cy="250" r="2.4"/><text x="71.3" y="274" class="n">2</text><circle cx="109.9" cy="250" r="2.4"/><text x="109.9" y="274" class="n">4</text><circle cx="157.4" cy="250" r="2.4"/><text x="157.4" y="274" class="n">8</text><circle cx="215.9" cy="250" r="2.4"/><text x="215.9" y="274" class="n">16</text><circle cx="287.9" cy="250" r="2.4"/><text x="287.9" y="274" class="n">32</text><circle cx="376.5" cy="250" r="2.4"/><text x="376.5" y="274" class="n">64</text><circle cx="485.7" cy="250" r="2.4"/><text x="485.7" y="274" class="n">128</text><circle class="end" cx="620.0" cy="250" r="3.5"/><text x="620.0" y="274" class="n">256</text></svg>
         </figure>
       </section>
 
       <section aria-labelledby="quotient">
-        <h2 id="quotient">Quotient of Powers Rule</h2>
-        <p>Recall that the ratio between two outputs depends only on the number of steps between them, regardless of where they sit on the number line.</p>
-        <div class="math">\[7^4 = 2401, \quad 7^2 = 49\]</div>
-        <p>Dividing one power by the other compares the output after \(4\) steps with the output after \(2\) steps. Two steps lie between them:</p>
-        <div class="math">\[\frac{7^4}{7^2} = 7^{4-2} = 7^2\]</div>
-        <div class="math">\[\boxed{\frac{a^m}{a^n}=a^{m-n}\qquad(a\ne0)}\]</div>
-        <p>When dividing powers with <strong>identical bases</strong>, matching factors in the numerator and denominator cancel.</p>
-        <p>This corresponds with subtracting the bottom exponent from the top.</p>
+        <h2 id="quotient" class="rule-head"><span>Quotient of Powers Rule</span><span class="rule-formula">\(\dfrac{a^m}{a^n} = a^{m-n} \quad (a \ne 0)\)</span></h2>
+        <p>Previously we saw that taking a multiplicative step added \(1\) to the exponent and multiplied the output by the base.</p>
+        <p>Taking a step backwards therefore subtracts \(1\) from the exponent and divides the output by the base.</p>
+        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/equal-ratio-scaled-widget.html?run=8&amp;nav=slider&amp;show=back" title="Interactive: a journey from 1 in steps of times 2, starting with all 8 steps, 2 to the 8 equals 256. Move the slider back to take steps backwards: each step back is marked divide by 2, and the reading drops to 2 to the 7 equals 128, and so on." style="height: 190px" scrolling="no" loading="lazy"></iframe>
+        <p>Dividing a power by a power is therefore the same as subtracting the exponent in the denominator from the exponent in the numerator.</p>
+        <p>We are just taking that number of steps backwards.</p>
+        <p>The matching factors in the numerator and denominator cancel.</p>
         <figure class="factor-combination">
           <svg viewBox="0 0 640 250" role="img" aria-labelledby="cancel-title cancel-desc">
             <title id="cancel-title">Cancelling matching factors</title>
@@ -116,12 +181,14 @@
       </section>
 
       <section aria-labelledby="power-power">
-        <h2 id="power-power">Power of a Power Rule</h2>
-        <p>Recall that a single multiplicative step can be made up of several smaller ones.</p>
-        <p>Each step of \(\times 2^3\) is itself \(3\) steps of <span class="nw">\(\times 2\).</span> Taking \(2\) of these larger steps takes \(3 \times 2\) steps of <span class="nw">\(\times 2\):</span></p>
-        <div class="math">\[\bigl(2^3\bigr)^2 = 2^{3 \times 2} = 2^6\]</div>
-        <div class="math">\[\boxed{(a^m)^n=a^{mn}}\]</div>
-        <p>Raising a power to another power means repeating the entire original product. The total number of factors is therefore the product of the two exponents.</p>
+        <h2 id="power-power" class="rule-head"><span>Power of a Power Rule</span><span class="rule-formula">\((a^m)^n = a^{mn}\)</span></h2>
+        <p>We've seen that a power just represents the combined factors of successive steps.</p>
+        <p>We could think of \(2^3\) as either:</p>
+        <ul>
+          <li>Three steps of <span class="nw">\(\times 2\).</span></li>
+          <li>One step of <span class="nw">\(\times 8\).</span></li>
+        </ul>
+        <p>Raising the power to a power just repeats the entire original product. The total number of factors is therefore the product of the two exponents.</p>
         <figure class="factor-combination">
           <svg viewBox="0 0 640 235" role="img" aria-labelledby="repeat-title repeat-desc">
             <title id="repeat-title">Repeating a whole product</title>
@@ -129,16 +196,10 @@
             <g class="connections"><path d="M303.0 90 L325.0 166 M349.0 90 L371.0 166 M395.0 90 L417.0 166 M485.0 90 L463.0 166 M531.0 90 L509.0 166 M577.0 90 L555.0 166"/></g><text x="20" y="76">(</text><text x="34" y="76">2<tspan class="exponent" dy="-17" font-size="21">3</tspan></text><text x="64" y="76">)<tspan class="exponent" dy="-17" font-size="21">2</tspan></text><g class="factors"><text x="282.0" y="76" text-anchor="middle" class="operator">(</text><text x="303.0" y="76" text-anchor="middle" class="fac">2</text><text x="326.0" y="76" text-anchor="middle" class="operator">·</text><text x="349.0" y="76" text-anchor="middle" class="fac">2</text><text x="372.0" y="76" text-anchor="middle" class="operator">·</text><text x="395.0" y="76" text-anchor="middle" class="fac">2</text><text x="416.0" y="76" text-anchor="middle" class="operator">)</text><text x="440.0" y="76" text-anchor="middle" class="operator">×</text><text x="464.0" y="76" text-anchor="middle" class="operator">(</text><text x="485.0" y="76" text-anchor="middle" class="fac">2</text><text x="508.0" y="76" text-anchor="middle" class="operator">·</text><text x="531.0" y="76" text-anchor="middle" class="fac">2</text><text x="554.0" y="76" text-anchor="middle" class="operator">·</text><text x="577.0" y="76" text-anchor="middle" class="fac">2</text><text x="598.0" y="76" text-anchor="middle" class="operator">)</text></g><g class="factors"><text x="325.0" y="205" text-anchor="middle" class="fac">2</text><text x="348.0" y="205" text-anchor="middle" class="operator">·</text><text x="371.0" y="205" text-anchor="middle" class="fac">2</text><text x="394.0" y="205" text-anchor="middle" class="operator">·</text><text x="417.0" y="205" text-anchor="middle" class="fac">2</text><text x="440.0" y="205" text-anchor="middle" class="operator">·</text><text x="463.0" y="205" text-anchor="middle" class="fac">2</text><text x="486.0" y="205" text-anchor="middle" class="operator">·</text><text x="509.0" y="205" text-anchor="middle" class="fac">2</text><text x="532.0" y="205" text-anchor="middle" class="operator">·</text><text x="555.0" y="205" text-anchor="middle" class="fac">2</text></g><text x="20" y="205">2<tspan class="exponent" dy="-17" font-size="21">3×2</tspan></text><text x="108" y="205" class="operator">=</text><text x="148" y="205">2<tspan class="exponent" dy="-17" font-size="21">6</tspan></text>
           </svg>
         </figure>
-        <p>The same grouping lets one output be reached by many journeys. One step of \(\times 16\) is two steps of <span class="nw">\(\times 4\),</span> or four steps of <span class="nw">\(\times 2\):</span></p>
-        <div class="math">\[256 = 256^1 = 16^2 = 4^4 = 2^8\]</div>
-        <figure class="hops">
-          <svg viewBox="0 0 560 262" role="img" aria-label="Four journeys from 1 to 256, each drawn the same length: one step of times 256, two steps of times 16, four steps of times 4 and eight steps of times 2."><text x="118" y="20" class="start">1</text><text x="524" y="20" class="end">256</text><text x="92" y="69" class="pow"><tspan class="b">256</tspan><tspan class="e" dy="-10">1</tspan></text><line class="axis" x1="118" x2="524" y1="62" y2="62"/><path class="hop" d="M118.0 62 Q321.0 28.0 524.0 62"/><text x="321.0" y="41.0" class="op">×256</text><circle class="start" cx="118" cy="62" r="3.5"/><circle class="end" cx="524" cy="62" r="3.5"/><text x="92" y="127" class="pow"><tspan class="b">16</tspan><tspan class="e" dy="-10">2</tspan></text><line class="axis" x1="118" x2="524" y1="120" y2="120"/><path class="hop" d="M118.0 120 Q219.5 86.0 321.0 120"/><path class="hop" d="M321.0 120 Q422.5 86.0 524.0 120"/><text x="219.5" y="99.0" class="op">×16</text><circle cx="321.0" cy="120" r="2.4"/><circle class="start" cx="118" cy="120" r="3.5"/><circle class="end" cx="524" cy="120" r="3.5"/><text x="92" y="185" class="pow"><tspan class="b">4</tspan><tspan class="e" dy="-10">4</tspan></text><line class="axis" x1="118" x2="524" y1="178" y2="178"/><path class="hop" d="M118.0 178 Q168.8 144.0 219.5 178"/><path class="hop" d="M219.5 178 Q270.2 144.0 321.0 178"/><path class="hop" d="M321.0 178 Q371.8 144.0 422.5 178"/><path class="hop" d="M422.5 178 Q473.2 144.0 524.0 178"/><text x="168.8" y="157.0" class="op">×4</text><circle cx="219.5" cy="178" r="2.4"/><circle cx="321.0" cy="178" r="2.4"/><circle cx="422.5" cy="178" r="2.4"/><circle class="start" cx="118" cy="178" r="3.5"/><circle class="end" cx="524" cy="178" r="3.5"/><text x="92" y="243" class="pow"><tspan class="b">2</tspan><tspan class="e" dy="-10">8</tspan></text><line class="axis" x1="118" x2="524" y1="236" y2="236"/><path class="hop" d="M118.0 236 Q143.4 214.7 168.8 236"/><path class="hop" d="M168.8 236 Q194.1 214.7 219.5 236"/><path class="hop" d="M219.5 236 Q244.9 214.7 270.2 236"/><path class="hop" d="M270.2 236 Q295.6 214.7 321.0 236"/><path class="hop" d="M321.0 236 Q346.4 214.7 371.8 236"/><path class="hop" d="M371.8 236 Q397.1 214.7 422.5 236"/><path class="hop" d="M422.5 236 Q447.9 214.7 473.2 236"/><path class="hop" d="M473.2 236 Q498.6 214.7 524.0 236"/><text x="143.4" y="221.3" class="op">×2</text><circle cx="168.8" cy="236" r="2.4"/><circle cx="219.5" cy="236" r="2.4"/><circle cx="270.2" cy="236" r="2.4"/><circle cx="321.0" cy="236" r="2.4"/><circle cx="371.8" cy="236" r="2.4"/><circle cx="422.5" cy="236" r="2.4"/><circle cx="473.2" cy="236" r="2.4"/><circle class="start" cx="118" cy="236" r="3.5"/><circle class="end" cx="524" cy="236" r="3.5"/></svg>
-        </figure>
       </section>
 
       <section aria-labelledby="power-product">
-        <h2 id="power-product">Power of a Product Rule</h2>
-        <div class="math">\[\boxed{(ab)^n=a^nb^n}\]</div>
+        <h2 id="power-product" class="rule-head"><span>Power of a Product Rule</span><span class="rule-formula">\((ab)^n = a^n b^n\)</span></h2>
         <p>Raising a product to a power is equivalent to raising each factor to that power and then multiplying the results together.</p>
         <figure class="factor-combination">
           <svg viewBox="0 0 640 235" role="img" aria-labelledby="regroup-title regroup-desc">
@@ -150,8 +211,7 @@
       </section>
 
       <section aria-labelledby="power-quotient">
-        <h2 id="power-quotient">Power of a Quotient Rule</h2>
-        <div class="math">\[\boxed{\left(\frac{a}{b}\right)^n=\frac{a^n}{b^n}\qquad(b\ne0)}\]</div>
+        <h2 id="power-quotient" class="rule-head"><span>Power of a Quotient Rule</span><span class="rule-formula">\(\left(\dfrac{a}{b}\right)^n = \dfrac{a^n}{b^n} \quad (b \ne 0)\)</span></h2>
         <p>Raising a quotient to a power is equivalent to raising the numerator and denominator separately to that power.</p>
         <p>For example:</p>
         <div class="math">\[\left(\frac{2}{3}\right)^3\]</div>
@@ -178,10 +238,19 @@
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
-        <a href="exponentials-positive-and-negative-integer-exponents.html">← Integer Exponents</a>
-        <a href="exponentials-additive-and-multiplicative-growth.html">Next: Additive and Multiplicative Growth →</a>
+        <a href="exponentials-exponentiation-notation.html">← Exponentiation Notation</a>
+        <a href="exponentials-zero-and-negative-exponents.html">Next: Zero and Negative Exponents →</a>
       </nav>
     </main>
   </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
 </body>
 </html>

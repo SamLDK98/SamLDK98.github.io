@@ -35,10 +35,10 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* cell division in the corner: one cell doubles to 2, 4, 8, 16, 32, then fades and begins again */
+    /* cell division behind the page: one cell keeps doubling until the cells fill the screen, then fades and begins again */
     .cells {
-      position: fixed; right: 0; bottom: 0; z-index: 0;
-      width: min(46vw, 560px); height: min(46vw, 560px);
+      position: fixed; inset: 0; z-index: 0;
+      width: 100vw; height: 100svh;
       pointer-events: none;
     }
 
@@ -107,7 +107,6 @@
       h1 { font-size: clamp(2.6rem, 12vw, 3.8rem); }
       nav { margin-top: 2.4rem; }
       li + li { margin-top: 0.8rem; }
-      .cells { width: 70vw; height: 70vw; opacity: 0.6; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -124,8 +123,8 @@
         <ul>
           <li><a href="exponentials-additive-and-multiplicative-growth.html">Additive and Multiplicative Growth</a></li>
           <li><a href="exponentials-exponentiation-notation.html">Exponentiation Notation</a></li>
-          <li><a href="exponentials-positive-and-negative-integer-exponents.html">Integer Exponents</a></li>
           <li><a href="exponentials-the-many-rules-of-exponentiation.html">Laws of Exponents</a></li>
+          <li><a href="exponentials-zero-and-negative-exponents.html">Zero and Negative Exponents</a></li>
           <li><a href="exponentials-visualising-different-types-of-growth.html">Visualising Different Types of Growth</a></li>
           <li><a href="exponentials-moving-between-exponents.html">Moving Between Exponents</a></li>
           <li><a href="exponentials-working-backwards-through-our-journeys.html">Working Backwards Through Our Journeys</a></li>
@@ -140,75 +139,101 @@
     </nav>
   </main>
   <script>
-    // Cell division: one cell divides into 2, then 4, 8, 16 and 32, each generation pushing gently
-    // apart into a cluster; then the cluster fades and a single cell begins again. A faint label counts
-    // the generations as powers of 2. Still (at 16 cells) for anyone who prefers reduced motion.
+    // Cell division: one cell divides into 2, 4, 8, … up to 2^11 = 2,048, each generation pushing
+    // apart into a growing cluster that spreads across the page. Each generation stays on screen a
+    // little longer than the last. The cells never overlap: each is drawn no wider than the space to
+    // its nearest neighbour allows, so a new pair starts small and swells as they part. They drift
+    // very gently the whole time. After the last generation they hold, fade, and one cell begins again.
+    // A still cluster for anyone who prefers reduced motion.
     (function () {
       var canvas = document.querySelector(".cells");
       if (!canvas || !canvas.getContext) return;
       var ctx = canvas.getContext("2d");
       var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      var GENS = 5, SPLIT = 2600, HOLD = 4200, FADE = 1600;
-      var W, H, D, R, cells, gen, t0, phase, alpha;
+      var LAST = 11, HOLD = 7000, FADE = 2500;
+      var split = function (g) { return 1800 + g * 550; };   // each generation lingers longer
+      var W, H, D, R, CX, CY, cells, gen, t0, phase, alpha;
 
       function size() {
-        var r = canvas.getBoundingClientRect(), k = window.devicePixelRatio || 1;
-        W = r.width; H = r.height;
+        var k = window.devicePixelRatio || 1;
+        W = window.innerWidth; H = window.innerHeight;
         canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
         ctx.setTransform(k, 0, 0, k, 0, 0);
-        D = Math.max(14, W / 24); R = D * 0.26;   // spacing between cells, and each cell's radius
+        // spacing chosen so that 2,048 closely packed cells cover about the area of the screen
+        D = Math.max(14, Math.min(34, Math.sqrt(W * H * 1.15 / (Math.pow(2, LAST) * 0.866))));
+        R = D * 0.32;
+        CX = W * (W < 600 ? 0.55 : 0.6); CY = H * 0.55;
       }
-      function reset() { cells = [{ x: 0, y: 0 }]; gen = 0; t0 = performance.now(); phase = "grow"; alpha = 0; }
+      function cell(x, y) { return { x: x, y: y, nd: 0, p: Math.random() * 6.283, q: Math.random() * 6.283 }; }
+      function reset() { cells = [cell(0, 0)]; cells[0].nd = D; gen = 0; t0 = performance.now(); phase = "grow"; alpha = 0; }
       function divide() {
         var next = [];
         cells.forEach(function (c) {
-          var a = Math.random() * Math.PI * 2, dx = Math.cos(a) * 0.6, dy = Math.sin(a) * 0.6;
-          next.push({ x: c.x + dx, y: c.y + dy }, { x: c.x - dx, y: c.y - dy });
+          var a = Math.random() * 6.283, dx = Math.cos(a) * D * 0.08, dy = Math.sin(a) * D * 0.08;
+          next.push(cell(c.x + dx, c.y + dy), cell(c.x - dx, c.y - dy));
         });
         cells = next; gen++;
       }
-      // cells push apart until they no longer overlap, and drift gently towards the middle
-      function relax() {
-        for (var it = 0; it < 3; it++) {
-          for (var i = 0; i < cells.length; i++) {
-            var a = cells[i];
-            a.x *= 0.995; a.y *= 0.995;
-            for (var j = i + 1; j < cells.length; j++) {
-              var b = cells[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-              if (d < D) { var m = (D - d) / d * 0.06; a.x -= dx * m; a.y -= dy * m; b.x += dx * m; b.y += dy * m; }
+      // cells push apart until they sit a spacing D from their neighbours; a grid keeps this quick.
+      // Each pass also records every cell's distance to its nearest neighbour.
+      function relax(iters) {
+        for (var it = 0; it < iters; it++) {
+          var grid = {}, i, c;
+          for (i = 0; i < cells.length; i++) {
+            c = cells[i]; c.nd = D * 2;
+            var key = Math.floor(c.x / D) + "," + Math.floor(c.y / D);
+            (grid[key] || (grid[key] = [])).push(i);
+          }
+          for (i = 0; i < cells.length; i++) {
+            var a = cells[i], gx = Math.floor(a.x / D), gy = Math.floor(a.y / D);
+            if (cells.length < 64) { a.x *= 0.997; a.y *= 0.997; }   // a small cluster draws together
+            for (var ox = -1; ox <= 1; ox++) for (var oy = -1; oy <= 1; oy++) {
+              var list = grid[(gx + ox) + "," + (gy + oy)]; if (!list) continue;
+              for (var n = 0; n < list.length; n++) {
+                var j = list[n]; if (j <= i) continue;
+                var b = cells[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 0.01;
+                if (d < a.nd) a.nd = d; if (d < b.nd) b.nd = d;
+                if (d < D) { var m = (D - d) / d * 0.22; a.x -= dx * m; a.y -= dy * m; b.x += dx * m; b.y += dy * m; }
+              }
             }
           }
         }
       }
-      function draw() {
+      function draw(now) {
         ctx.clearRect(0, 0, W, H);
-        var cx = W * 0.62, cy = H * 0.6;
         ctx.globalAlpha = alpha;
-        cells.forEach(function (c) {
-          ctx.beginPath(); ctx.arc(cx + c.x, cy + c.y, R, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(203, 163, 255, 0.42)"; ctx.fill();
-          ctx.lineWidth = 1; ctx.strokeStyle = "rgba(203, 163, 255, 0.6)"; ctx.stroke();
-        });
-        // the count, as a power of 2
-        var fs = Math.max(12, W / 34);
-        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.textAlign = "center";
-        ctx.fillStyle = "rgba(255, 255, 255, 0.32)";
-        var base = "2", exp = String(gen), rest = " = " + Math.pow(2, gen);
-        var wb = ctx.measureText(base).width, we, wr = ctx.measureText(rest).width;
-        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; we = ctx.measureText(exp).width;
-        var x0 = cx - (wb + we + wr) / 2, y = cy + D * 4.6;
-        ctx.textAlign = "left";
-        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText(base, x0, y);
-        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; ctx.fillText(exp, x0 + wb + 1, y - fs * 0.42);
-        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText(rest, x0 + wb + we + 2, y);
+        var fade = Math.max(0.4, 1 - gen * 0.05);
+        ctx.fillStyle = "rgba(203, 163, 255, " + (0.3 * fade) + ")";
+        ctx.strokeStyle = "rgba(203, 163, 255, " + (0.48 * fade) + ")"; ctx.lineWidth = 1;
+        var t = now * 0.00045, wob = D * 0.06;
+        ctx.beginPath();
+        for (var i = 0; i < cells.length; i++) {
+          var c = cells[i];
+          // never wider than half the gap to the nearest neighbour, less a hair for the drift and outline
+          var r = Math.min(R, c.nd / 2 - wob - 1.2); if (r < 0.8) continue;
+          var x = CX + c.x + Math.sin(t + c.p) * wob, y = CY + c.y + Math.cos(t * 0.9 + c.q) * wob;
+          if (x < -R || y < -R || x > W + R || y > H + R) continue;
+          ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.283);
+        }
+        ctx.fill(); ctx.stroke();
+        // the count, as a power of 2, in the lower right corner
+        var fs = Math.max(13, Math.min(18, W / 70)), count = Math.pow(2, gen).toLocaleString("en-GB");
+        ctx.globalAlpha = Math.min(1, alpha * 1.2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)"; ctx.textAlign = "left";
+        ctx.font = "400 " + fs + "px Jost, sans-serif"; var wb = ctx.measureText("2").width, wr = ctx.measureText(" = " + count).width;
+        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; var we = ctx.measureText(String(gen)).width;
+        var x0 = W - 28 - (wb + we + wr), y0 = H - 24;
+        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText("2", x0, y0);
+        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; ctx.fillText(String(gen), x0 + wb + 1, y0 - fs * 0.42);
+        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText(" = " + count, x0 + wb + we + 2, y0);
         ctx.globalAlpha = 1;
       }
       function frame(now) {
         var t = now - t0;
         if (phase === "grow") {
           alpha = Math.min(1, alpha + 0.02);
-          if (t > SPLIT) {
-            if (gen < GENS) { divide(); t0 = now; } else { phase = "hold"; t0 = now; }
+          if (t > split(gen)) {
+            if (gen < LAST) { divide(); t0 = now; } else { phase = "hold"; t0 = now; }
           }
         } else if (phase === "hold") {
           if (t > HOLD) { phase = "fade"; t0 = now; }
@@ -216,17 +241,15 @@
           alpha = Math.max(0, 1 - t / FADE);
           if (t > FADE) reset();
         }
-        relax(); draw();
+        relax(cells.length > 1000 ? 2 : 3); draw(now);
         requestAnimationFrame(frame);
       }
 
       size();
-      window.addEventListener("resize", size);
+      window.addEventListener("resize", function () { size(); if (still) draw(0); });
       if (still) {
-        reset(); for (var g = 0; g < 4; g++) { divide(); for (var k = 0; k < 120; k++) relax(); }
-        alpha = 1; draw();
-        window.addEventListener("resize", draw);
-        return;
+        reset(); for (var g = 0; g < 7; g++) { divide(); relax(80); }
+        alpha = 1; draw(0); return;
       }
       reset();
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(frame); });

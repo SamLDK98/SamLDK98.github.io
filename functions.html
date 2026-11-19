@@ -7,13 +7,15 @@
   <title>Functions | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
   <style>
+    /* Same look as the Exponentials landing page: flat charcoal, Poppins title, Jost text, lavender accent. */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #08090b;
-      --text: #f4f5f8;
+      --bg: #1f1f22;
+      --text: rgba(255, 255, 255, 0.87);
+      --lavender: #cba3ff;
     }
 
     html, body { min-height: 100%; }
@@ -24,16 +26,22 @@
       align-items: center;
       justify-content: flex-start;
       overflow-x: hidden;
-      background:
-        radial-gradient(circle at 15% 38%, rgba(226, 232, 255, 0.05), transparent 25rem),
-        radial-gradient(circle at 24% 70%, rgba(96, 116, 190, 0.07), transparent 28rem),
-        var(--bg);
+      background: var(--bg);
       color: var(--text);
-      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-family: "Jost", system-ui, sans-serif;
+      letter-spacing: 0.04em;
       -webkit-font-smoothing: antialiased;
     }
 
+    /* a function at work in the corner: each input travels to its one output */
+    .mapping {
+      position: fixed; right: 0; bottom: 0; z-index: 0;
+      width: min(46vw, 560px); height: min(46vw, 560px);
+      pointer-events: none;
+    }
+
     main {
+      position: relative; z-index: 1;
       width: min(46rem, calc(100% - 2rem));
       margin-left: clamp(2rem, 11vw, 10rem);
       padding: clamp(3rem, 9vh, 5.5rem) 0;
@@ -41,56 +49,58 @@
     }
 
     h1 {
-      font-size: clamp(3rem, 7vw, 5.4rem);
-      font-weight: 300;
-      line-height: 0.96;
-      letter-spacing: -0.045em;
+      font-family: "Poppins", system-ui, sans-serif;
+      font-size: clamp(3rem, 7vw, 5.2rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      color: #fff;
     }
 
-    .back { margin-top: 2.6rem; font-size: 0.85rem; color: #a5adc1; }
-
-    nav { margin-top: clamp(2.4rem, 6vh, 4rem); }
+    nav { margin-top: clamp(2.4rem, 6vh, 3.6rem); }
 
     ul { list-style: none; }
 
-    li + li { margin-top: 0.7rem; }
+    li + li { margin-top: 0.75rem; }
 
     section + section { margin-top: 2.4rem; }
 
     h2 {
       margin-bottom: 0.95rem;
-      color: #a5adc1;
+      color: var(--lavender);
+      opacity: 0.8;
       font-size: 0.78rem;
       font-weight: 500;
       letter-spacing: 0.16em;
       text-transform: uppercase;
     }
 
-    .unavailable {
-      display: inline-block;
-      color: rgba(235, 238, 246, 0.42);
-      font-size: clamp(1rem, 1.65vw, 1.25rem);
-      font-weight: 300;
-      line-height: 1.35;
-      cursor: default;
-    }
-
-    a {
+    nav a {
       display: inline-block;
       color: var(--text);
-      font-size: clamp(1rem, 1.65vw, 1.25rem);
-      font-weight: 300;
-      line-height: 1.35;
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      font-weight: 400;
+      line-height: 1.4;
       text-decoration: none;
       transition: color 180ms ease, transform 180ms ease;
     }
 
-    a:hover,
-    a:focus-visible {
-      color: #cfd8ff;
+    nav a:hover,
+    nav a:focus-visible {
+      color: var(--lavender);
       outline: none;
       transform: translateX(3px);
     }
+
+    .back {
+      display: inline-block;
+      margin-top: 2.6rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.5);
+      text-decoration: none;
+      transition: color 180ms ease;
+    }
+    .back:hover, .back:focus-visible { color: var(--lavender); outline: none; }
 
     @media (max-height: 720px) and (min-width: 600px) {
       main { padding-block: 2rem; }
@@ -104,17 +114,19 @@
         margin-left: 2rem;
       }
 
-      h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
-      nav { margin-top: 2.6rem; }
+      h1 { font-size: clamp(2.6rem, 12vw, 3.8rem); }
+      nav { margin-top: 2.4rem; }
       li + li { margin-top: 0.8rem; }
+      .mapping { width: 70vw; height: 70vw; opacity: 0.6; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      a { transition: none; }
+      nav a, .back { transition: none; }
     }
   </style>
 </head>
 <body>
+  <canvas class="mapping" aria-hidden="true"></canvas>
   <main>
     <h1>Functions</h1>
     <nav aria-label="Functions pages">
@@ -134,5 +146,99 @@
     </nav>
     <a class="back" href="index.html#math">← Math</a>
   </main>
+  <script>
+    // A function at work: inputs -2 to 2 on the left, outputs 0 to 4 on the right, f(x) = x².
+    // One input at a time sends a dot along its arrow to its one output; -2 and 2 share an output,
+    // as a function allows. Still, with all five arrows drawn, for anyone who prefers reduced motion.
+    (function () {
+      var canvas = document.querySelector(".mapping");
+      if (!canvas || !canvas.getContext) return;
+      var ctx = canvas.getContext("2d");
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var INS = [-2, -1, 0, 1, 2], f = function (x) { return x * x; };
+      var TRAVEL = 1700, PAUSE = 900;
+      var W, H, order = [0, 3, 1, 4, 2], step = 0, t0 = performance.now(), done = [];
+
+      function size() {
+        var r = canvas.getBoundingClientRect(), k = window.devicePixelRatio || 1;
+        W = r.width; H = r.height;
+        canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
+        ctx.setTransform(k, 0, 0, k, 0, 0);
+      }
+      // where things sit: two upright number lines, inputs left and outputs right
+      function geo() {
+        var top = H * 0.3, bot = H * 0.82, xl = W * 0.38, xr = W * 0.78;
+        return {
+          xl: xl, xr: xr, top: top, bot: bot,
+          yin: function (x) { return bot - (x + 2) / 4 * (bot - top); },
+          yout: function (y) { return bot - y / 4 * (bot - top); }
+        };
+      }
+      function arrow(g, x) {   // a gentle curve from an input to its output
+        var y1 = g.yin(x), y2 = g.yout(f(x)), mx = (g.xl + g.xr) / 2;
+        return { x1: g.xl, y1: y1, cx: mx, cy: (y1 + y2) / 2 - (g.xr - g.xl) * 0.18, x2: g.xr, y2: y2 };
+      }
+      function at(a, t) {   // a point along the curve
+        var u = 1 - t;
+        return { x: u * u * a.x1 + 2 * u * t * a.cx + t * t * a.x2, y: u * u * a.y1 + 2 * u * t * a.cy + t * t * a.y2 };
+      }
+      function label(text, x, y, align, op) {
+        ctx.font = "400 " + Math.max(11, W / 40) + "px Jost, sans-serif"; ctx.textAlign = align;
+        ctx.fillStyle = "rgba(255, 255, 255, " + op + ")"; ctx.fillText(text, x, y);
+      }
+      function draw(current, t) {
+        ctx.clearRect(0, 0, W, H);
+        var g = geo();
+        // the two lines and their marks
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.14)"; ctx.lineWidth = 1.2;
+        [g.xl, g.xr].forEach(function (x) { ctx.beginPath(); ctx.moveTo(x, g.top - 10); ctx.lineTo(x, g.bot + 10); ctx.stroke(); });
+        label("x", g.xl, g.top - 22, "center", 0.35);
+        label("f(x)", g.xr, g.top - 22, "center", 0.35);
+        INS.forEach(function (x) { label(String(x), g.xl - 12, g.yin(x) + 4, "right", 0.3); });
+        [0, 1, 4].forEach(function (y) { label(String(y), g.xr + 12, g.yout(y) + 4, "left", 0.3); });
+        // arrows already travelled stay faintly drawn
+        done.forEach(function (x) {
+          var a = arrow(g, x);
+          ctx.beginPath(); ctx.moveTo(a.x1, a.y1); ctx.quadraticCurveTo(a.cx, a.cy, a.x2, a.y2);
+          ctx.strokeStyle = "rgba(203, 163, 255, 0.22)"; ctx.lineWidth = 1; ctx.stroke();
+        });
+        // the arrow being travelled now, drawn up to the moving dot
+        if (current !== null) {
+          var a = arrow(g, current), n = 30;
+          ctx.beginPath(); ctx.moveTo(a.x1, a.y1);
+          for (var i = 1; i <= n * t; i++) { var p = at(a, i / n); ctx.lineTo(p.x, p.y); }
+          var q = at(a, t); ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = "rgba(203, 163, 255, 0.5)"; ctx.lineWidth = 1.2; ctx.stroke();
+          ctx.beginPath(); ctx.arc(q.x, q.y, 3.4, 0, Math.PI * 2); ctx.fillStyle = "rgba(203, 163, 255, 0.85)"; ctx.fill();
+        }
+        // the points on both lines
+        INS.forEach(function (x) { dot(g.xl, g.yin(x), x === current || done.indexOf(x) >= 0); });
+        [0, 1, 4].forEach(function (y) { dot(g.xr, g.yout(y), done.some(function (x) { return f(x) === y; })); });
+      }
+      function dot(x, y, lit) {
+        ctx.beginPath(); ctx.arc(x, y, lit ? 3.2 : 2.4, 0, Math.PI * 2);
+        ctx.fillStyle = lit ? "rgba(203, 163, 255, 0.75)" : "rgba(255, 255, 255, 0.3)"; ctx.fill();
+      }
+      function frame(now) {
+        var t = now - t0, x = INS[order[step]];
+        if (t < TRAVEL) draw(x, t / TRAVEL);
+        else {
+          if (done.indexOf(x) < 0) done.push(x);
+          draw(null, 0);
+          if (t > TRAVEL + PAUSE) {
+            step++; t0 = now;
+            if (step === order.length) { step = 0; done = []; }
+          }
+        }
+        requestAnimationFrame(frame);
+      }
+
+      size();
+      window.addEventListener("resize", function () { size(); if (still) draw(null, 0); });
+      if (still) { done = INS.slice(); draw(null, 0); return; }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(frame); });
+      else requestAnimationFrame(frame);
+    })();
+  </script>
 </body>
 </html>

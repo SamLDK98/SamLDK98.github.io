@@ -31,7 +31,8 @@
   const btns = [...document.querySelectorAll("button[data-a]")];
   const INK = "#f4f6ff", BASE = "#e8a33d", VAL = "#7fcf9a", RED = "#e8706a";
   const X = 10;
-  let n = 2;
+  const n = Math.max(2, +new URLSearchParams(location.search).get("n") || 2);   // ?n=4 for quarter steps
+  const NAIVE = X / n;   // "that much of x": 10 ÷ n
 
   function el(name, attrs, text, parent) {
     const e = document.createElementNS(NS, name);
@@ -90,17 +91,23 @@
   }
 
   btns.forEach(b => b.addEventListener("click", () => {
-    slider.value = b.dataset.a === "root" ? Math.sqrt(X) : 5;
+    slider.value = b.dataset.a === "root" ? Math.pow(X, 1 / n) : NAIVE;
     render();
   }));
   // the buttons light up when the slider sits on their value
   function mark(a) {
-    btns.forEach(b => b.setAttribute("aria-pressed", (b.dataset.a === "root" ? Math.abs(a - Math.sqrt(X)) < 0.012 : Math.abs(a - 5) < 0.005) ? "true" : "false"));
+    btns.forEach(b => b.setAttribute("aria-pressed", (b.dataset.a === "root" ? Math.abs(a - Math.pow(X, 1 / n)) < 0.012 : Math.abs(a - NAIVE) < 0.005) ? "true" : "false"));
   }
   let rt;
   window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
   slider.addEventListener("input", render);
-  slider.min = 1.5;
+  slider.min = n === 2 ? 1.5 : 1.2; slider.max = n === 2 ? 6 : 3;
+  if (n !== 2) {
+    btns[0].textContent = "×" + NAIVE; btns[0].dataset.a = String(NAIVE);
+    btns[1].textContent = "×∜10";
+    document.querySelector(".choices").setAttribute("aria-label", "Factor for each quarter step");
+  }
+  slider.value = NAIVE;
   render();
 </script>
 </body>
