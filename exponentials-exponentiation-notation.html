@@ -51,8 +51,6 @@
     p.widget-note { color: var(--dim); }
   </style>
   <style>
-    .centred-block p, .centred-block .math mjx-container[display="true"] { text-align: center !important; }
-    .centred-block .math { display: flex; justify-content: center; }
     figure.anatomy text.value { fill: var(--value); }
     .hops text.big { font-family: "Spectral", Georgia, serif; font-size: 28px; }
     .hops text.v { fill: var(--value); }
@@ -73,11 +71,11 @@
             <text x="190" y="120" class="glyph big base">3</text>
             <text x="242" y="72" class="glyph sup exp">4</text>
             <line x1="148" y1="88" x2="185" y2="88" class="lead base"/>
-            <text x="142" y="92.5" text-anchor="end" class="base">base: 3</text>
+            <text x="142" y="92.5" text-anchor="end" class="base">base</text>
             <line x1="273" y1="55.5" x2="302" y2="55.5" class="lead exp"/>
-            <text x="308" y="60" class="exp">exponent: 4</text>
+            <text x="308" y="60" class="exp">exponent</text>
             <path d="M189.5 134 V141 H269.5 V134" class="lead power"/>
-            <text x="229.5" y="167" text-anchor="middle" class="power">power: 3<tspan dy="-6" font-size="9">4</tspan></text>
+            <text x="229.5" y="167" text-anchor="middle" class="power">power</text>
             <text x="229.5" y="192" text-anchor="middle" class="value">value: 81</text>
           </svg>
         </figure>
@@ -90,21 +88,18 @@
           <p>A cleaner way to conceptualise exponentiation is to think in terms of multiplicative growth journeys.</p>
         </div>
         <figure class="anatomy">
-          <svg viewBox="0 0 490 220" role="img" aria-label="3 to the fourth power, read as a journey. Step ratio: 3. Number of steps: 4. Power: 3 to the fourth. Output: 81.">
+          <svg viewBox="0 0 490 140" role="img" aria-label="3 to the fourth power, read as a journey. Step ratio: 3. Number of steps: 4.">
             <text x="190" y="120" class="glyph big base">3</text>
             <text x="242" y="72" class="glyph sup exp">4</text>
             <line x1="148" y1="88" x2="185" y2="88" class="lead base"/>
-            <text x="142" y="92.5" text-anchor="end" class="base">step ratio: 3</text>
+            <text x="142" y="92.5" text-anchor="end" class="base">step ratio</text>
             <line x1="273" y1="55.5" x2="302" y2="55.5" class="lead exp"/>
-            <text x="308" y="60" class="exp">number of steps: 4</text>
-            <path d="M189.5 134 V141 H269.5 V134" class="lead power"/>
-            <text x="229.5" y="167" text-anchor="middle" class="power">power: 3<tspan dy="-6" font-size="9">4</tspan></text>
-            <text x="229.5" y="192" text-anchor="middle" class="value">output: 81</text>
+            <text x="308" y="60" class="exp">number of steps</text>
           </svg>
         </figure>
         <p>We can think of powers as starting at \(1\) on our number line. The above would read, &ldquo;start at \(1\) and take \(4\) steps at a step ratio of <span class="nw">\(3\)&rdquo;.</span></p>
         <figure class="hops">
-          <svg viewBox="0 0 560 140" role="img" aria-label="A journey from 1 to 81 in 4 steps of times 3, drawn to scale: 1, 3, 9, 27, 81. Each hop is three times as long as the last."><text x="50" y="106" class="big v" text-anchor="end" style="text-anchor:end">1</text><line class="axis" x1="74" x2="470" y1="96" y2="96"/><path class="hop" d="M74.0 92 Q79.0 87.5 83.9 92"/><path class="hop" d="M83.9 92 Q98.8 78.6 113.6 92"/><path class="hop" d="M113.6 92 Q158.2 51.9 202.7 92"/><text x="158.2" y="66.0" class="op">×3</text><path class="hop" d="M202.7 92 Q336.4 20.0 470.0 92"/><text x="336.4" y="50.0" class="op">×3</text><circle class="start" cx="74.0" cy="96" r="3.5"/><circle cx="83.9" cy="96" r="2.6"/><text x="83.9" y="120">3</text><circle cx="113.6" cy="96" r="2.6"/><text x="113.6" y="120">9</text><circle cx="202.7" cy="96" r="2.6"/><text x="202.7" y="120">27</text><circle class="start" cx="470.0" cy="96" r="3.5"/><text x="490" y="106" class="big v" style="text-anchor:start">81</text></svg>
+          <svg viewBox="0 0 560 140" role="img" aria-label="A journey from 1 to 81 in 4 steps of times 3, drawn to scale: 1, 3, 9, 27, 81. Each hop is three times as long as the last."><text x="50" y="106" class="big v" text-anchor="end" style="text-anchor:end">1</text><line class="axis" x1="74" x2="470" y1="96" y2="96"/><path class="hop" d="M74.0 92 Q79.0 87.5 83.9 92"/><path class="hop" d="M83.9 92 Q98.8 78.6 113.6 92"/><path class="hop" d="M113.6 92 Q158.2 51.9 202.7 92"/><text x="158.2" y="66.0" class="op">×3</text><path class="hop" d="M202.7 92 Q336.4 20.0 470.0 92"/><text x="336.4" y="50.0" class="op">×3</text><circle class="start" cx="74.0" cy="96" r="3.5"/><circle cx="83.9" cy="96" r="2.6"/><text x="83.9" y="120">3</text><circle cx="113.6" cy="96" r="2.6"/><text x="113.6" y="120">9</text><circle cx="202.7" cy="96" r="2.6"/><text x="202.7" y="120">27</text><circle class="end" cx="470.0" cy="96" r="3.5"/><text x="490" y="106" class="big end" style="text-anchor:start">81</text></svg>
         </figure>
       </section>
 
