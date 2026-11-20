@@ -187,7 +187,7 @@
       var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       var LAST = 11, HOLD = 7000, FADE = 2500;
       var split = function (g) { return 1800 + g * 550; };   // each generation lingers longer
-      var W, H, D, R, CX, CY, cells, gen, t0, phase, alpha;
+      var W, H, D, R, CX, CY, SX, SY, ax, ay, cells, gen, t0, phase, alpha;
 
       function size() {
         var k = window.devicePixelRatio || 1;
@@ -198,9 +198,11 @@
         D = Math.max(14, Math.min(34, Math.sqrt(W * H * 1.15 / (Math.pow(2, LAST) * 0.866))));
         R = D * 0.32;
         CX = W * (W < 600 ? 0.55 : 0.6); CY = H * 0.55;
+        // the first cell appears near the top right corner; the cluster drifts towards CX, CY as it grows
+        SX = W - Math.min(110, W * 0.12); SY = Math.min(110, H * 0.14);
       }
       function cell(x, y) { return { x: x, y: y, nd: 0, p: Math.random() * 6.283, q: Math.random() * 6.283 }; }
-      function reset() { cells = [cell(0, 0)]; cells[0].nd = D; gen = 0; t0 = performance.now(); phase = "grow"; alpha = 0; }
+      function reset() { cells = [cell(0, 0)]; cells[0].nd = D; gen = 0; t0 = performance.now(); phase = "grow"; alpha = 0; ax = SX; ay = SY; }
       function divide() {
         var next = [];
         cells.forEach(function (c) {
@@ -246,7 +248,7 @@
           var c = cells[i];
           // never wider than half the gap to the nearest neighbour, less a hair for the drift and outline
           var r = Math.min(R, c.nd / 2 - wob - 1.2); if (r < 0.8) continue;
-          var x = CX + c.x + Math.sin(t + c.p) * wob, y = CY + c.y + Math.cos(t * 0.9 + c.q) * wob;
+          var x = ax + c.x + Math.sin(t + c.p) * wob, y = ay + c.y + Math.cos(t * 0.9 + c.q) * wob;
           if (x < -R || y < -R || x > W + R || y > H + R) continue;
           ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.283);
         }
@@ -276,14 +278,17 @@
           alpha = Math.max(0, 1 - t / FADE);
           if (t > FADE) reset();
         }
+        // ease the cluster's centre from the corner towards the middle over the generations
+        var k = Math.pow(gen / LAST, 1.6), tx = SX + (CX - SX) * k, ty = SY + (CY - SY) * k;
+        ax += (tx - ax) * 0.004; ay += (ty - ay) * 0.004;
         relax(cells.length > 1000 ? 2 : 3); draw(now);
         requestAnimationFrame(frame);
       }
 
       size();
-      window.addEventListener("resize", function () { size(); if (still) draw(0); });
+      window.addEventListener("resize", function () { size(); if (still) { ax = CX; ay = CY; draw(0); } });
       if (still) {
-        reset(); for (var g = 0; g < 7; g++) { divide(); relax(80); }
+        reset(); for (var g = 0; g < 7; g++) { divide(); relax(80); } ax = CX; ay = CY;
         alpha = 1; draw(0); return;
       }
       reset();
