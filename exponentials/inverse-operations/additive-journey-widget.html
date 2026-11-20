@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Many additive journeys to 64</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .eq { text-align: center; font-family: "Spectral", Georgia, serif; font-size: clamp(1.15rem, 3.8vw, 1.5rem); color: var(--dim); min-height: 2.2rem; }
+  .eq .s { color: var(--base); }
+  .eq .t { color: #e8706a; }
+  #line { margin-top: 0.4rem; }
+  #line .axis { stroke: var(--faint); stroke-width: 1.5; }
+  #line .hop { fill: none; stroke: var(--dim); stroke-width: 1.3; }
+  #line circle { fill: var(--dim); }
+  #line circle.start { fill: #7fcf9a; }
+  #line circle.end { fill: #e8706a; }
+  #line text.op { fill: var(--base); text-anchor: middle; }
+  #line text.big { font-family: "Spectral", Georgia, serif; font-size: 22px; }
+  #line text.start { fill: #7fcf9a; text-anchor: end; }
+  #line text.end { fill: #e8706a; text-anchor: start; }
+  .ctrls { display: flex; justify-content: center; gap: 3.2rem; margin-top: 0.8rem; }
+  .ctrl { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+  .ctrl .row { display: flex; align-items: center; gap: 0.9rem; }
+  .ctrl .val { font-family: "Spectral", Georgia, serif; font-size: 1.6rem; min-width: 2.2rem; text-align: center; }
+  .ctrl .lab { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; }
+  .steps .val, .steps .lab { color: var(--exp); }
+  .size .val, .size .lab { color: var(--base); }
+  .ctrl button {
+    font: inherit; font-size: 1.1rem; line-height: 1; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+    background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .ctrl button:hover:not(:disabled) { border-color: var(--dim); }
+  .ctrl button:disabled { opacity: 0.25; cursor: default; }
+  .ctrl button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+  @media (max-width: 420px) { .ctrls { gap: 1.6rem; } }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="eq" id="eq" aria-live="polite"></div>
+  <svg id="line" viewBox="0 18 600 92" role="img" aria-label="Number line from 0 to 64 split into equal additive steps"></svg>
+  <div class="ctrls">
+    <div class="ctrl steps">
+      <div class="row">
+        <button type="button" data-k="steps" data-d="-1" aria-label="Fewer steps">←</button>
+        <span class="val" id="nSteps"></span>
+        <button type="button" data-k="steps" data-d="1" aria-label="More steps">→</button>
+      </div>
+      <span class="lab">number of steps</span>
+    </div>
+    <div class="ctrl size">
+      <div class="row">
+        <button type="button" data-k="size" data-d="-1" aria-label="Smaller step size">←</button>
+        <span class="val" id="nSize"></span>
+        <button type="button" data-k="size" data-d="1" aria-label="Larger step size">→</button>
+      </div>
+      <span class="lab">step size</span>
+    </div>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Equal additive steps from 0 to a fixed target (?target=, default 64).
+  // Changing either control changes the other: more steps means a smaller step size, and vice versa.
+  const TARGET = +new URLSearchParams(location.search).get("target") || 64;
+  const STEPS = [];
+  for (let n = 1; n <= TARGET; n++) if (TARGET % n === 0 && n <= 64) STEPS.push(n);
+  let i = STEPS.indexOf(4); if (i < 0) i = 1;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("line");
+  const X0 = 70, X1 = 530, Y = 88;
+
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    svg.appendChild(e); return e;
+  }
+
+  function draw() {
+    const n = STEPS[i], s = TARGET / n, w = (X1 - X0) / n;
+    svg.innerHTML = "";
+    el("line", { class: "axis", x1: X0, x2: X1, y1: Y, y2: Y });
+    for (let k = 0; k < n; k++) {
+      const a = X0 + k * w, b = a + w, h = Math.min(w * 0.45, 46);
+      el("path", { class: "hop", d: `M${a} ${Y - 3} Q${(a + b) / 2} ${Y - 3 - 2 * h} ${b} ${Y - 3}` });
+      if (n <= 8 || k === 0) el("text", { class: "op", x: (a + b) / 2, y: Y - 9 - h }, "+" + s);
+    }
+    const r = n <= 16 ? 2.6 : n <= 32 ? 1.8 : 1.2;
+    for (let k = 1; k < n; k++) el("circle", { cx: X0 + k * w, cy: Y, r });
+    el("circle", { class: "start", cx: X0, cy: Y, r: 3.5 });
+    el("circle", { class: "end", cx: X1, cy: Y, r: 3.5 });
+    el("text", { class: "big start", x: X0 - 14, y: Y + 7 }, "0");
+    el("text", { class: "big end", x: X1 + 14, y: Y + 7 }, TARGET);
+
+    const term = `<span class="s">${s}</span>`;
+    document.getElementById("eq").innerHTML = (n <= 8
+      ? Array(n).fill(term).join(" + ")
+      : `${term} + ${term} + ⋯ + ${term}`) + ` = <span class="t">${TARGET}</span>`;
+    document.getElementById("nSteps").textContent = n;
+    document.getElementById("nSize").textContent = s;
+    svg.setAttribute("aria-label", `${n} steps of ${s} from 0 to ${TARGET}`);
+
+    document.querySelectorAll(".ctrl button").forEach(b => {
+      const d = +b.dataset.d * (b.dataset.k === "steps" ? 1 : -1), j = i + d;
+      b.disabled = j < 0 || j >= STEPS.length;
+    });
+  }
+
+  document.querySelectorAll(".ctrl button").forEach(b => b.addEventListener("click", () => {
+    const j = i + +b.dataset.d * (b.dataset.k === "steps" ? 1 : -1);
+    if (j < 0 || j >= STEPS.length) return;
+    i = j; draw();
+  }));
+  draw();
+</script>
+</body>
+</html>
