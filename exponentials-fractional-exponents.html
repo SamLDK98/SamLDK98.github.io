@@ -33,6 +33,36 @@
       background: linear-gradient(100deg, #eef1f6 0%, #b9c0cc 45%, #e3e7ee 70%, #a9b1be 100%);
       -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     }
+    /* incorrect examples */
+    .mjx-wrong { color: #e8706a; }
+    section[aria-label="The exponent question"] { margin-top: 4.5rem; }
+    /* the opening questions, set larger */
+    section[aria-label="The question"] .power-intro-copy p, section[aria-label="The exponent question"] .power-intro-copy p { font-size: clamp(1.4rem, 3.6vw, 1.75rem); line-height: 1.45; }
+    /* a phrase in the prose that opens its explanation in a pop-up window */
+    button.popup-link {
+      font: inherit; color: #b9a8d4; background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+      border-bottom: 1px dashed rgba(185, 168, 212, 0.4);
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    button.popup-link:hover, button.popup-link:focus-visible { color: #d6cde3; border-bottom-color: rgba(214, 205, 227, 0.8); outline: none; }
+    dialog.popup {
+      margin: auto; width: min(640px, 92vw); max-height: 86vh; overflow-y: auto;
+      background: var(--bg); color: var(--body); border: 1px solid var(--faint); border-radius: 10px;
+      padding: 2.6rem clamp(1.2rem, 4vw, 2.4rem) 2.4rem;
+    }
+    dialog.popup::backdrop { background: rgba(4, 4, 6, 0.72); }
+    dialog.popup p.popup-note {
+      margin: 1.4rem 0 0.4rem; padding: 0.6rem 0.9rem; color: var(--ink);
+      border-left: 2px solid #cfc2e4; background: rgba(207, 194, 228, 0.06); border-radius: 0 6px 6px 0;
+    }
+    dialog.popup .math { margin: 1rem 0; }
+    dialog.popup + p { margin-top: 0.9rem; }
+    p.ask { margin-top: 2.2rem; font-size: clamp(1.2rem, 2.8vw, 1.34rem); color: var(--ink); }
+    .popup-close {
+      position: absolute; top: 0.7rem; right: 0.8rem; width: 2rem; height: 2rem; border-radius: 50%;
+      font: inherit; font-size: 1.3rem; line-height: 1; background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    }
+    .popup-close:hover, .popup-close:focus-visible { border-color: var(--dim); outline: none; }
   </style>
 </head>
 <body>
@@ -44,134 +74,96 @@
     <main>
       <section aria-label="The question">
         <div class="power-intro-copy">
-          <p><em>What happens to the value of a power as we move continuously between two exponents?</em></p>
+          <p><em>What happens to the value of a term as we move continuously between two coefficients?</em></p>
         </div>
-        <div class="power-intro">
-          <figure class="anatomy journey">
-            <svg viewBox="0 0 400 170" role="img" aria-label="8 raised to an exponent moving from 1 to 2: what value does it take along the way?">
-              <style>
-                .journey .q { fill: var(--value); }
-                .journey .arrow { stroke: var(--exp); stroke-width: 2; fill: none; }
-                .journey text.eq { fill: var(--dim); }
-              </style>
-              <text x="92" y="130" class="glyph big base">8</text>
-              <text x="146" y="78" class="glyph sup exp">1</text>
-              <path class="arrow" d="M176 64 H222 M214 57 L222 64 L214 71"/>
-              <text x="230" y="78" class="glyph sup exp">2</text>
-              <text x="278" y="130" class="glyph big q" style="font-size:129px">?</text>
-            </svg>
-          </figure>
-        </div>
-      </section>
-
-      <section aria-labelledby="coef-fraction">
-        <h2 id="coef-fraction">Increasing a Coefficient by a Fraction</h2>
-        <p>Increasing a coefficient by a whole number <strong>adds that many copies</strong> of <span class="nw">\(x\).</span></p>
+        <iframe class="expo-widget" src="exponentials/fractional-exponents/coefficient-slide-widget.html" title="Interactive: slide the coefficient from 3 to 4 with x equal to 8 and watch the value of the term move steadily from 24 to 32." style="height: 230px" scrolling="no" loading="lazy"></iframe>
+        <p>Increasing a coefficient by a whole number <strong>adds that many copies of \(x\)</strong> to the sum.</p>
         <div class="math">\[3x = x + x + x\]</div>
         <div class="math">\[(\class{mjx-value}{1}+3)x = x + x + x + \class{mjx-value}{x}\]</div>
-        <p>Increasing a coefficient by a fraction <strong>adds that much of</strong> <span class="nw">\(x\).</span></p>
-        <div class="math">\[(\class{mjx-value}{0.25}+3)x = x + x + x +\ \class{mjx-value}{?}\]</div>
-        <p>\(\frac{1}{4}\) of an addition is the value that when added four times gives <span class="nw">\(x\):</span></p>
-        <div class="math">\[q + q + q + q = x\]</div>
-        <div class="math">\[4q = x\]</div>
-        <p>Division by four is the operation that finds the value of one part if <strong>four equal additive parts</strong> must reach some value.</p>
-        <div class="math">\[\frac{x}{4} = q\]</div>
-        <p>So increasing the coefficient by a quarter looks like:</p>
-        <div class="math">\[(0.25+3)x = x + x + x + \frac{x}{4}\]</div>
+        <p>Increasing a coefficient by a fraction <strong>adds that fraction of \(x\)</strong> to the sum.</p>
+        <div class="math">\[(\class{mjx-value}{0.25}+3)x = x + x + x + \class{mjx-value}{\frac{x}{4}}\]</div>
+        <p>Notice that <strong>multiplication by a fraction corresponds to division.</strong></p>
+        <div class="math">\[\begin{aligned} 0.10 \times 50 &= 5 & \qquad \qquad \frac{50}{10} &= 5 \\[0.6em] 0.5 \times 14 &= 7 & \qquad \qquad \frac{14}{2} &= 7 \\[0.6em] 0.125 \times 24 &= 3 & \qquad \qquad \frac{24}{8} &= 3 \end{aligned}\]</div>
+        <p>So a fractional coefficient essentially performs division on the variable and then adds the quotient to the sum.</p>
+        <p>To find the value of \(6.43x\) when <span class="nw">\(x=2\):</span></p>
+        <div class="math">\[6 \cdot 2 = 12\]</div>
+        <div class="math">\[\frac{2}{100} \cdot 43 = 0.86\]</div>
+        <div class="math">\[12 + 0.86 = 12.86\]</div>
       </section>
 
-      <section aria-labelledby="exp-fraction">
-        <h2 id="exp-fraction">Increasing an Exponent by a Fraction</h2>
-        <p>Increasing an exponent by a whole number <strong>adds another factor of \(x\) to the product</strong>.</p>
-        <div class="math">\[x^{3} = x \cdot x \cdot x\]</div>
-        <div class="math">\[x^{3+\class{mjx-value}{1}} = x \cdot x \cdot x \cdot \class{mjx-value}{x}\]</div>
-        <p><strong>If</strong> increasing by a fraction added <em>that much of</em> \(x\) as a factor to the product, we might get something like:</p>
-        <div class="math">\[x^{3+0.5} = x \cdot x \cdot x \cdot \frac{x}{2}\]</div>
-        <p>Imagine <span class="nw">\(x=10\):</span></p>
-        <div class="math">\[10^{3+0.5} = 10 \cdot 10 \cdot 10 \cdot 5\]</div>
-        <p>Now imagine we added another \(\frac{1}{2}\) to the exponent.</p>
-        <div class="math">\[10^{3+0.5+0.5} = 10 \cdot 10 \cdot 10 \cdot 5 \cdot 5\]</div>
-        <p>Yikes! Now we have ended up multiplying by \(25\) while only increasing the exponent by <span class="nw">\(1\):</span></p>
-        <div class="math">\[10^{3+1} = 10 \cdot 10 \cdot 10 \cdot 25\]</div>
-        <p>We forgot to appreciate that our exponents correspond to multiplicative growth.</p>
-        <p><strong>Increasing an exponent by a half does not take us halfway to the value of <span class="nw">\(x\);</span> it takes us halfway along the multiplicative journey to <span class="nw">\(x\).</span></strong></p>
-        <p>We therefore want to multiply by the factor that takes us halfway along this multiplicative journey.</p>
-        <div class="math">\[a \cdot a = 10\]</div>
-        <div class="math">\[a^2 = 10\]</div>
-        <div class="math">\[a = \sqrt{10}\]</div>
-        <p>Therefore:</p>
-        <div class="math">\[10^{3+0.5} = 10 \cdot 10 \cdot 10 \cdot \sqrt{10}\]</div>
-        <iframe class="expo-widget" src="exponentials/moving-between-exponents/equal-parts-widget.html" title="Interactive: split one step of times 10 into two equal half steps and choose the factor for each. Times 5, half of 10, twice lands on 25, past 10; times root 10 twice lands exactly on 10." style="height: 240px" scrolling="no" loading="lazy"></iframe>
-        <p>Or let's say we are adding \(\frac{1}{4}\) to an exponent.</p>
-        <p>One quarter of a multiplication of \(x\) is the value that, when multiplied by itself four times, gives <span class="nw">\(x\).</span></p>
-        <div class="math">\[a \cdot a \cdot a \cdot a = x\]</div>
-        <div class="math">\[a^4 = x\]</div>
-        <iframe class="expo-widget" src="exponentials/moving-between-exponents/equal-parts-widget.html?n=4" title="Interactive: split one step of times 10 into four equal quarter steps and choose the factor for each. Times 2.5, a quarter of 10, four times lands far past 10; times the fourth root of 10 four times lands exactly on 10." style="height: 240px" scrolling="no" loading="lazy"></iframe>
-        <p><strong>Radication</strong> (or taking roots) is the operation that finds the value of the multiplicative factor for a given output and number of equal multiplicative parts.</p>
-        <p>The number of multiplicative parts (or steps) is denoted by the index above the radical:</p>
-        <div class="math">\[a = \sqrt[4]{x}\]</div>
-        <p>So increasing the exponent by a quarter looks like:</p>
-        <div class="math">\[x^{3+0.25} = x \cdot x \cdot x \cdot \sqrt[4]{x}\]</div>
-      </section>
-
-      <section aria-labelledby="moving">
-        <h2 id="moving">Moving Between Exponents</h2>
-        <p>Let's return to the overarching question.</p>
+      <section aria-label="The exponent question">
         <div class="power-intro-copy">
           <p><em>What happens to the value of a power as we move continuously between two exponents?</em></p>
         </div>
-        <div class="power-intro">
-          <figure class="anatomy journey">
-            <svg viewBox="0 0 400 170" role="img" aria-label="8 raised to an exponent moving from 1 to 2: what value does it take along the way?">
-              <style>
-                .journey .q { fill: var(--value); }
-                .journey .arrow { stroke: var(--exp); stroke-width: 2; fill: none; }
-                .journey text.eq { fill: var(--dim); }
-              </style>
-              <text x="92" y="130" class="glyph big base">8</text>
-              <text x="146" y="78" class="glyph sup exp">1</text>
-              <path class="arrow" d="M176 64 H222 M214 57 L222 64 L214 71"/>
-              <text x="230" y="78" class="glyph sup exp">2</text>
-              <text x="278" y="130" class="glyph big q" style="font-size:129px">?</text>
-            </svg>
-          </figure>
-        </div>
-        <div class="math">\[8^1 = 8 \qquad 8^2 = 64\]</div>
-        <p>We could break the multiplicative journey from \(8\) to \(64\) down into any number of steps.</p>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/multiplicative-step-slider-widget.html?start=8&amp;target=64&amp;max=20" title="Interactive: slide to divide the journey from 8 to 64 into 1 to 20 equal multiplicative steps. The hops redraw, each longer than the last, and the step ratio needed, the nth root of 8, is shown alongside the number of steps." style="height: 170px" scrolling="no" loading="lazy"></iframe>
-        <p>Let's choose \(10\) steps.</p>
-        <p>Our exponent increases by \(+1\) in additive steps, so say \(x\) is one step:</p>
-        <div class="math">\[10x = 1\]</div>
-        <div class="math">\[x = 0.1\]</div>
-        <p>Our value must increase by \(\frac{64}{8} = 8\) in multiplicative steps, so say \(r\) is one step:</p>
-        <div class="math">\[r^{10} = 8\]</div>
-        <div class="math">\[r = \sqrt[10]{8}\]</div>
-        <div class="math">\[r \approx 1.23114\]</div>
-        <table>
-          <thead>
-            <tr><th scope="col">Power</th><th scope="col">Value</th><th scope="col">Additive Change</th><th scope="col">Multiplicative Change</th></tr>
-          </thead>
-          <tbody>
-              <tr><td>\(8^{1}\)</td><td>\(8\)</td><td>–</td><td>–</td></tr>
-              <tr><td>\(8^{1.1}\)</td><td>\(9.849\)</td><td>\(+1.849\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.2}\)</td><td>\(12.126\)</td><td>\(+2.277\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.3}\)</td><td>\(14.929\)</td><td>\(+2.803\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.4}\)</td><td>\(18.379\)</td><td>\(+3.450\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.5}\)</td><td>\(22.627\)</td><td>\(+4.248\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.6}\)</td><td>\(27.858\)</td><td>\(+5.231\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.7}\)</td><td>\(34.297\)</td><td>\(+6.439\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.8}\)</td><td>\(42.224\)</td><td>\(+7.927\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{1.9}\)</td><td>\(51.984\)</td><td>\(+9.760\)</td><td>\(\times 1.23114\)</td></tr>
-              <tr><td>\(8^{2}\)</td><td>\(64\)</td><td>\(+12.016\)</td><td>\(\times 1.23114\)</td></tr>
-          </tbody>
-        </table>
-        <p>The amount that one step changes the value becomes increasingly greater.</p>
-        <p>Increasing the exponent by \(+0.1\) increases the power's value by <span class="nw">\(\times 1.23114\).</span></p>
+        <iframe class="expo-widget" src="exponentials/fractional-exponents/exponent-slide-widget.html" title="Interactive: slide the exponent of 8 from 1 to 2 and watch the value move from 8 to 64, slowly at first and then faster." style="height: 210px" scrolling="no" loading="lazy"></iframe>
+        <p>Increasing an exponent by a whole number <strong>adds another factor of \(x\) to the product</strong>.</p>
+        <div class="math">\[x^3 = x \cdot x \cdot x\]</div>
+        <div class="math">\[x^{3+\class{mjx-value}{1}} = x \cdot x \cdot x \cdot \class{mjx-value}{x}\]</div>
+        <p>We might then think that adding a fraction to the exponent would result in including that fraction of \(x\) into the product.</p>
+        <p>But that would be treating our powers like additive growth. <button type="button" class="popup-link" data-dialog="wrong-popup" aria-haspopup="dialog">See here for why that&rsquo;s wrong.</button></p>
+
+        <dialog id="wrong-popup" class="popup" aria-label="Why a fraction of x is the wrong factor">
+          <button type="button" class="popup-close" aria-label="Close">×</button>
+          <p>Imagine if increasing an exponent by a fraction meant we included that fraction of <span class="nw">\(x\).</span></p>
+          <div class="math">\[x^{(3\,+\,0.5)} = x \cdot x \cdot x \cdot \class{mjx-wrong}{\frac{x}{2}}\]</div>
+          <p>Say <span class="nw">\(x=10\):</span></p>
+          <div class="math">\[10^{(3\,+\,0.5)} = 10 \cdot 10 \cdot 10 \cdot \class{mjx-wrong}{5}\]</div>
+          <p>Now imagine we added another \(\frac{1}{2}\) to the exponent.</p>
+          <div class="math">\[10^{(3\,+\,0.5\,+\,0.5)} = 10 \cdot 10 \cdot 10 \cdot \class{mjx-wrong}{5} \cdot \class{mjx-wrong}{5}\]</div>
+          <p>Yikes! Now we have ended up multiplying by \(25\) while only increasing the exponent by <span class="nw">\(1\):</span></p>
+          <div class="math">\[10^{(3\,+\,1)} = 10 \cdot 10 \cdot 10 \cdot \class{mjx-wrong}{25}\]</div>
+          <p class="popup-note">We forgot to appreciate that our exponents correspond to multiplicative growth.</p>
+        </dialog>
+
+        <p>But one exponent contributes \(\times 8\) not \(+8\) to the output.</p>
+        <p>A fractional increase refers then to multiplicative growth.</p>
+        <p>For example, \(x^{\frac{1}{2}}\) asks for the factor that when multiplied by itself twice gives <span class="nw">\(x\).</span></p>
+        <div class="math">\[a \cdot a = x\]</div>
+        <div class="math">\[a = \sqrt{x}\]</div>
+        <p>That factor is then included in the product.</p>
+        <div class="math">\[5^{4.5}\]</div>
+        <div class="math">\[5 \cdot 5 \cdot 5 \cdot 5 \cdot \sqrt{5}\]</div>
+        <p>In general, raising a base to \(\frac{1}{n}\) gives the factor that when multiplied by itself \(n\) times gives the base.</p>
+        <div class="math">\[a^{\frac{1}{n}} = \sqrt[n]{a}\]</div>
+        <p>Notice that <strong>exponentiation by a fraction corresponds to radication</strong> (taking roots).</p>
+        <p>Both seek the factor when we must reach a target by multiplication of an identical factor given a specific number of steps.</p>
+        <p>\(x^{\frac{1}{2}} \rightarrow\) finds the square root \(\rightarrow \sqrt[2]{x}\).</p>
+        <p>\(x^{\frac{1}{3}} \rightarrow\) finds the cube root \(\rightarrow \sqrt[3]{x}\).</p>
+        <p>\(x^{\frac{1}{8}} \rightarrow\) finds the value that when multiplied by itself \(8\) times gives \(x \rightarrow \sqrt[8]{x}\).</p>
+        <p class="ask"><em>But what about when we have a numerator that is not <span class="nw">\(1\)?</span></em></p>
+        <p><button type="button" class="popup-link" data-dialog="numerator-popup" aria-haspopup="dialog">Firstly read how to find the fraction in an exponent.</button></p>
+
+        <dialog id="numerator-popup" class="popup" aria-label="Reading a fraction in an exponent">
+          <button type="button" class="popup-close" aria-label="Close">×</button>
+          <p>With \(1\) in the numerator:</p>
+          <div class="math">\[8^{\frac{1}{10}}\]</div>
+          <p>This is the value that, when multiplied by itself \(10\) times, gives <span class="nw">\(8\).</span></p>
+          <p>With a number greater than \(1\) in the numerator:</p>
+          <div class="math">\[8^{\frac{3}{10}}\]</div>
+          <p>This is the value that, when multiplied by itself \(10\) times, gives \(8\), then multiplied by itself \(3\) times.</p>
+          <p>The value that, when multiplied by itself \(10\) times, gives <span class="nw">\(8\):</span></p>
+          <div class="math">\[8^{\frac{1}{10}}\]</div>
+          <p>Then multiplied by itself \(3\) times:</p>
+          <div class="math">\[8^{\frac{1}{10}} \times 8^{\frac{1}{10}} \times 8^{\frac{1}{10}}\]</div>
+        </dialog>
+
+        <p>Just as in division we first find the value of one step and then scale it by multiplication, here we find the value of one step by radication and then scale it via exponentiation.</p>
+        <p>To find the value of <span class="nw">\(2^{6.43}\):</span></p>
+        <div class="math">\[2^6 = 64\]</div>
+        <div class="math">\[2^{0.43}\]</div>
+        <p>We want to break the journey up into \(100\) steps of equal ratios:</p>
+        <div class="math">\[\sqrt[100]{2}\]</div>
+        <p>And then take \(43\) steps to find our combined factor. This is done by multiplying this factor by itself \(43\) times.</p>
+        <div class="math">\[\left(\sqrt[100]{2}\right)^{43} \approx 1.347\]</div>
+        <p>So we have a product that looks like:</p>
+        <div class="math">\[2^{6.43} = 2 \cdot 2 \cdot 2 \cdot 2 \cdot 2 \cdot 2 \cdot 1.347\]</div>
+        <p>Or in other words:</p>
+        <div class="math">\[64 \cdot 1.347 \approx 86.22\]</div>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="exponentials-zero-and-negative-exponents.html">← Zero and Negative Exponents</a>
-        <a href="exponentials-old-fractional-exponents.html">Next: Old Fractional Exponents →</a>
+        <a href="exponentials-fractions-as-division-and-radication.html">Next: Fractions as Division and Radication →</a>
       </nav>
     </main>
   </div>
@@ -181,6 +173,21 @@
       if (!e.data || e.data.type !== "expo-widget-height") return;
       document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
         if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+  <script>
+    // Phrases that open their explanation in a pop-up window.
+    document.querySelectorAll("[data-dialog]").forEach(function (b) {
+      var d = document.getElementById(b.dataset.dialog);
+      b.addEventListener("click", function () { d.showModal(); });
+    });
+    document.querySelectorAll("dialog.popup").forEach(function (d) {
+      d.querySelector(".popup-close").addEventListener("click", function () { d.close(); });
+      // a click outside the window closes it
+      d.addEventListener("click", function (e) {
+        var r = d.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
       });
     });
   </script>

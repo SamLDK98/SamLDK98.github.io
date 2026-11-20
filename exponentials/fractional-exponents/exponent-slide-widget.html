@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sliding an exponent from 1 to 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .eq { text-align: center; font-family: "Spectral", Georgia, serif; font-weight: 300; font-size: clamp(2.6rem, 11vw, 4.4rem); line-height: 1.15; color: var(--dim); white-space: nowrap; }
+  .eq { display: grid; grid-template-columns: 1fr auto 1fr; column-gap: 0.25em; align-items: baseline; }
+  .eq .l { justify-self: end; }
+  .eq .r { justify-self: start; }
+  .eq .b { color: var(--base); }
+  .eq sup { color: var(--exp); font-size: 0.5em; vertical-align: 0.85em; margin-left: 0.04em; }
+  .eq .v { color: #7fcf9a; }
+  #line { margin-top: 0.6rem; height: 74px; }
+  input[type="range"] { margin-top: 0.1rem; }
+  #line .axis { stroke: var(--faint); stroke-width: 1.5; }
+  #line .tick { stroke: var(--faint); stroke-width: 1; }
+  #line .done { stroke: #7fcf9a; stroke-width: 2.2; stroke-opacity: 0.7; }
+  #line circle.start { fill: #7fcf9a; }
+  #line circle.end { fill: #e8706a; }
+  #line circle.now { fill: #7fcf9a; stroke: #121215; stroke-width: 1.5; }
+  #line text { font-size: 12px; text-anchor: middle; }
+  #line text.start { fill: #7fcf9a; }
+  #line text.end { fill: #e8706a; }
+  #line text.cx { fill: var(--dim); font-size: 11px; }
+  input[type="range"] { margin-top: 0.4rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="eq" aria-live="polite"><span class="l"><span class="b">8</span><sup id="c"></sup></span><span>=</span><span class="r"><span class="v" id="v"></span></span></div>
+  <svg id="line" viewBox="0 0 560 74" role="img"></svg>
+  <input id="s" type="range" min="100" max="200" step="1" value="100" aria-label="The exponent, from 1 to 2" />
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The exponent slides from 1 to 2, so the value of 8 to that power slides from 8 to 64.
+  // Equal changes in the exponent give ever larger changes in the value: the ticks, one per 0.1, spread out.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("line"), s = document.getElementById("s");
+  const Y = 30;
+  let L = 40, R = 520;
+  const px = v => L + (v - 8) / 56 * (R - L);
+  function fit() {
+    const sr = svg.getBoundingClientRect(), ir = s.getBoundingClientRect();
+    const W = sr.width || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} 74`);
+    L = ir.left - sr.left + 7; R = ir.right - sr.left - 7;
+  }
+  const fmt = (x, d) => (+x.toFixed(d)).toString();
+
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    svg.appendChild(e); return e;
+  }
+
+  function draw() {
+    const c = +s.value / 100, v = Math.pow(8, c);
+    document.getElementById("c").textContent = fmt(c, 2);
+    document.getElementById("v").textContent = fmt(v, 2);
+    svg.innerHTML = "";
+    el("line", { class: "axis", x1: L, x2: R, y1: Y, y2: Y });
+    for (let k = 1; k < 10; k++) { const t = px(Math.pow(8, 1 + k / 10)); el("line", { class: "tick", x1: t, x2: t, y1: Y - 4, y2: Y + 4 }); }
+    if (c > 1) el("line", { class: "done", x1: L, x2: px(v), y1: Y, y2: Y });
+    el("circle", { class: "start", cx: L, cy: Y, r: 3.5 });
+    el("circle", { class: "end", cx: R, cy: Y, r: 3.5 });
+    el("text", { class: "start", x: L, y: Y + 22 }, "8");
+    el("text", { class: "end", x: R, y: Y + 22 }, "64");
+    el("text", { class: "cx", x: L, y: Y + 38 }, "8\u00b9");
+    el("text", { class: "cx", x: R, y: Y + 38 }, "8\u00b2");
+    el("circle", { class: "now", cx: px(v), cy: Y, r: 5.5 });
+    svg.setAttribute("aria-label", `8 to the power ${fmt(c, 2)} = ${fmt(v, 2)}, between 8 and 64`);
+  }
+  s.addEventListener("input", draw);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { fit(); draw(); }, 60); });
+  fit(); draw();
+</script>
+</body>
+</html>
