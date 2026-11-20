@@ -84,11 +84,26 @@
         <div class="math">\[(\class{mjx-value}{0.25}+3)x = x + x + x + \class{mjx-value}{\frac{x}{4}}\]</div>
         <p>Notice that <strong>multiplication by a fraction corresponds to division.</strong></p>
         <div class="math">\[\begin{aligned} 0.10 \times 50 &= 5 & \qquad \qquad \frac{50}{10} &= 5 \\[0.6em] 0.5 \times 14 &= 7 & \qquad \qquad \frac{14}{2} &= 7 \\[0.6em] 0.125 \times 24 &= 3 & \qquad \qquad \frac{24}{8} &= 3 \end{aligned}\]</div>
+        <p><button type="button" class="popup-link" data-dialog="decimal-popup" aria-haspopup="dialog">How to convert a decimal to a fraction.</button></p>
+
+        <dialog id="decimal-popup" class="popup" aria-label="Converting a decimal to a fraction">
+          <button type="button" class="popup-close" aria-label="Close">×</button>
+          <p>Each place after the decimal point is worth a tenth of the place before it: tenths, hundredths, thousandths, and so on.</p>
+          <p>So a decimal is a fraction whose denominator is a power of ten. Count the digits after the point to find which power:</p>
+          <div class="math">\[0.5 = \frac{5}{10} \qquad 0.10 = \frac{10}{100} \qquad 0.125 = \frac{125}{1000}\]</div>
+          <p>Then simplify by dividing the top and bottom by the same number:</p>
+          <div class="math">\[\frac{5}{10} = \frac{1}{2} \qquad \frac{10}{100} = \frac{1}{10} \qquad \frac{125}{1000} = \frac{1}{8}\]</div>
+        </dialog>
+
         <p>So a fractional coefficient essentially performs division on the variable and then adds the quotient to the sum.</p>
-        <p>To find the value of \(6.43x\) when <span class="nw">\(x=2\):</span></p>
-        <div class="math">\[6 \cdot 2 = 12\]</div>
-        <div class="math">\[\frac{2}{100} \cdot 43 = 0.86\]</div>
-        <div class="math">\[12 + 0.86 = 12.86\]</div>
+        <p><button type="button" class="popup-link" data-dialog="coef-example-popup" aria-haspopup="dialog">If \(x=2\), how would we find the value of <span class="nw">\(6.43x\)?</span></button></p>
+
+        <dialog id="coef-example-popup" class="popup" aria-label="Finding the value of 6.43x when x is 2">
+          <button type="button" class="popup-close" aria-label="Close">×</button>
+          <div class="math">\[6 \cdot 2 = 12\]</div>
+          <div class="math">\[\frac{2}{100} \cdot 43 = 0.86\]</div>
+          <div class="math">\[12 + 0.86 = 12.86\]</div>
+        </dialog>
       </section>
 
       <section aria-label="The exponent question">
@@ -131,23 +146,11 @@
         <p>\(x^{\frac{1}{3}} \rightarrow\) finds the cube root \(\rightarrow \sqrt[3]{x}\).</p>
         <p>\(x^{\frac{1}{8}} \rightarrow\) finds the value that when multiplied by itself \(8\) times gives \(x \rightarrow \sqrt[8]{x}\).</p>
         <p class="ask"><em>But what about when we have a numerator that is not <span class="nw">\(1\)?</span></em></p>
-        <p><button type="button" class="popup-link" data-dialog="numerator-popup" aria-haspopup="dialog">Firstly read how to find the fraction in an exponent.</button></p>
-
-        <dialog id="numerator-popup" class="popup" aria-label="Reading a fraction in an exponent">
-          <button type="button" class="popup-close" aria-label="Close">×</button>
-          <p>With \(1\) in the numerator:</p>
-          <div class="math">\[8^{\frac{1}{10}}\]</div>
-          <p>This is the value that, when multiplied by itself \(10\) times, gives <span class="nw">\(8\).</span></p>
-          <p>With a number greater than \(1\) in the numerator:</p>
-          <div class="math">\[8^{\frac{3}{10}}\]</div>
-          <p>This is the value that, when multiplied by itself \(10\) times, gives \(8\), then multiplied by itself \(3\) times.</p>
-          <p>The value that, when multiplied by itself \(10\) times, gives <span class="nw">\(8\):</span></p>
-          <div class="math">\[8^{\frac{1}{10}}\]</div>
-          <p>Then multiplied by itself \(3\) times:</p>
-          <div class="math">\[8^{\frac{1}{10}} \times 8^{\frac{1}{10}} \times 8^{\frac{1}{10}}\]</div>
-        </dialog>
-
-        <p>Just as in division we first find the value of one step and then scale it by multiplication, here we find the value of one step by radication and then scale it via exponentiation.</p>
+        <p>\(8^{\frac{1}{10}}\) is the value that when multiplied by itself \(10\) times is <span class="nw">\(8\).</span></p>
+        <p>\(8^{\frac{3}{10}}\) is the value that, when multiplied by itself \(10\) times is \(8\), multiplied by itself \(3\) times.</p>
+        <div class="math">\[8^{\frac{1}{10}} \times 8^{\frac{1}{10}} \times 8^{\frac{1}{10}} = 8^{\frac{3}{10}}\]</div>
+        <p>Just as how in division, we first found the value of one step and then scaled it by multiplication, here we find the value of one step by radication and then scale it via exponentiation.</p>
+        <p>For example:</p>
         <p>To find the value of <span class="nw">\(2^{6.43}\):</span></p>
         <div class="math">\[2^6 = 64\]</div>
         <div class="math">\[2^{0.43}\]</div>
@@ -163,7 +166,7 @@
 
       <nav class="foot-nav" aria-label="Page navigation">
         <a href="exponentials-zero-and-negative-exponents.html">← Zero and Negative Exponents</a>
-        <a href="exponentials-fractions-as-division-and-radication.html">Next: Fractions as Division and Radication →</a>
+        <a href="exponentials-irrational-exponents.html">Next: Irrational Exponents →</a>
       </nav>
     </main>
   </div>

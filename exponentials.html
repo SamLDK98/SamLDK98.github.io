@@ -44,7 +44,7 @@
 
     main {
       position: relative; z-index: 1;
-      width: min(46rem, calc(100% - 2rem));
+      width: min(76rem, calc(100% - clamp(4rem, 15vw, 14rem)));
       margin-left: clamp(2rem, 11vw, 10rem);
       padding: clamp(3rem, 9vh, 5.5rem) 0;
       text-align: left;
@@ -57,9 +57,25 @@
       line-height: 1;
       letter-spacing: 0.01em;
       color: #fff;
+      position: relative; top: -2.6rem; /* the title sits a little higher than the lists */
     }
 
     nav { margin-top: clamp(2.4rem, 6vh, 3.6rem); }
+
+    /* three columns: the basics, exponential functions, and everything else */
+    .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.4rem clamp(2rem, 4vw, 3.6rem); align-items: start; }
+    h2 {
+      margin-bottom: 1.1rem;
+      color: var(--lavender);
+      opacity: 0.8;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    /* working titles for pages not yet written */
+    li.planned span { color: var(--soft); opacity: 0.6; font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.4; }
+    li.planned::before { opacity: 0.4; }
 
     /* the pages, numbered in lavender */
     ul { list-style: none; counter-reset: page; }
@@ -98,6 +114,10 @@
       li + li { margin-top: 0.45rem; }
     }
 
+    @media (max-width: 900px) {
+      .cols { grid-template-columns: 1fr; }
+    }
+
     @media (max-width: 560px) {
       main {
         width: min(27rem, calc(100% - 4rem));
@@ -118,8 +138,9 @@
   <canvas class="cells" aria-hidden="true"></canvas>
   <main>
     <h1>Exponentials</h1>
-    <nav aria-label="Exponentials pages">
-      <section aria-label="Exponentials pages">
+    <nav aria-label="Exponentials pages" class="cols">
+      <section aria-labelledby="col-basics">
+        <h2 id="col-basics">Foundations</h2>
         <ul>
           <li><a href="exponentials-additive-and-multiplicative-growth.html">Additive and Multiplicative Growth</a></li>
           <li><a href="exponentials-inverse-operations-radication-and-logarithms.html">Inverse Operations: Radication and Logarithms</a></li>
@@ -127,9 +148,26 @@
           <li><a href="exponentials-the-many-rules-of-exponentiation.html">Laws of Exponents</a></li>
           <li><a href="exponentials-zero-and-negative-exponents.html">Zero and Negative Exponents</a></li>
           <li><a href="exponentials-fractional-exponents.html">Fractional Exponents</a></li>
-          <li><a href="exponentials-fractions-as-division-and-radication.html">Fractions as Division and Radication</a></li>
-          <li><a href="exponentials-understanding-logarithms.html">Understanding Logarithms</a></li>
           <li><a href="exponentials-irrational-exponents.html">Irrational Exponents</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-functions">
+        <h2 id="col-functions">Exponential Functions</h2>
+        <ul>
+          <li class="planned"><span>From Powers to Functions</span></li>
+          <li class="planned"><span>Starting Value and Step Ratio</span></li>
+          <li class="planned"><span>Equal Steps, Equal Ratios</span></li>
+          <li class="planned"><span>Growth and Decay</span></li>
+          <li class="planned"><span>Changing the Step Size</span></li>
+          <li class="planned"><span>Compounding and <em>e</em></span></li>
+          <li class="planned"><span>Growth Proportional to Size</span></li>
+          <li class="planned"><span>Log Scales and Straight Lines</span></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-misc">
+        <h2 id="col-misc">Misc</h2>
+        <ul>
+          <li><a href="exponentials-understanding-logarithms.html">Understanding Logarithms</a></li>
           <li><a href="exponentials-visualising-different-types-of-growth.html">Visualising Different Types of Growth</a></li>
         </ul>
       </section>
