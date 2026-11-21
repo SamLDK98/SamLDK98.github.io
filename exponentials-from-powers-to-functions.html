@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Powers to Functions | Exponentials | Sam Kirwan</title>
+  <meta name="description" content="Once the number of steps can be any real number, a power becomes a rule: the number of steps goes in and the output comes out. This is the exponential function, f(x) = b^x." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="exponentials.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    /* the opening question, set larger */
+    section[aria-label="The question"] .power-intro-copy p { font-size: clamp(1.4rem, 3.6vw, 1.75rem); line-height: 1.45; }
+    /* a phrase in the prose that opens its explanation in a pop-up window */
+    button.popup-link {
+      font: inherit; color: #b9a8d4; background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+      border-bottom: 1px dashed rgba(185, 168, 212, 0.4);
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    button.popup-link:hover, button.popup-link:focus-visible { color: #d6cde3; border-bottom-color: rgba(214, 205, 227, 0.8); outline: none; }
+    dialog.popup {
+      margin: auto; width: min(640px, 92vw); max-height: 86vh; overflow-y: auto;
+      background: var(--bg); color: var(--body); border: 1px solid var(--faint); border-radius: 10px;
+      padding: 2.6rem clamp(1.2rem, 4vw, 2.4rem) 2.4rem;
+    }
+    dialog.popup::backdrop { background: rgba(4, 4, 6, 0.72); }
+    dialog.popup p.popup-note {
+      margin: 1.4rem 0 0.4rem; padding: 0.6rem 0.9rem; color: var(--ink);
+      border-left: 2px solid #cfc2e4; background: rgba(207, 194, 228, 0.06); border-radius: 0 6px 6px 0;
+    }
+    dialog.popup .math { margin: 1rem 0; }
+    dialog.popup + p { margin-top: 0.9rem; }
+    .popup-close {
+      position: absolute; top: 0.7rem; right: 0.8rem; width: 2rem; height: 2rem; border-radius: 50%;
+      font: inherit; font-size: 1.3rem; line-height: 1; background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    }
+    .popup-close:hover, .popup-close:focus-visible { border-color: var(--dim); outline: none; }
+    /* inputs in blue, outputs in green */
+    td.in { color: var(--exp); }
+    td.out { color: var(--value); }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="exponentials.html">Exponentials</a>
+      <h1>From Powers to Functions</h1>
+    </header>
+    <main>
+      <section aria-label="The question">
+        <div class="power-intro-copy">
+          <p><em>What happens to the output if we let the number of steps vary freely?</em></p>
+        </div>
+        <iframe class="expo-widget" src="exponentials/exponential-functions/curve-widget.html" title="Interactive: slide the number of steps x from minus 3 to 4 and watch 2 to the power x trace out a curve, with the current input and output marked" style="height: 380px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section aria-labelledby="input">
+        <h2 id="input">The Number of Steps as an Input</h2>
+        <p>Until now, each power has had a fixed number of steps.</p>
+        <div class="math">\[\class{mjx-base}{2}^{\class{mjx-exp}{3}} = \class{mjx-value}{8}\]</div>
+        <p>&ldquo;Start at \(1\) and take \(3\) steps at a step ratio of <span class="nw">\(2\).&rdquo;</span></p>
+        <p>Over the first column we extended the number of steps to zero, negative numbers, fractions and finally irrational numbers.</p>
+        <p>So the number of steps can now be <strong>any real number</strong>.</p>
+        <p>This lets us treat the number of steps as an <strong>input</strong> and the value of the power as an <strong>output</strong>.</p>
+        <div class="math">\[f(\class{mjx-exp}{x}) = \class{mjx-base}{2}^{\class{mjx-exp}{x}}\]</div>
+        <p>A function is a rule that gives exactly one output for each input.</p>
+        <p>Here the rule is: start at \(1\) and take \(x\) steps at a step ratio of <span class="nw">\(2\).</span></p>
+        <table>
+          <thead>
+            <tr><th scope="col">Input \(x\)</th><th scope="col">Journey</th><th scope="col">Output \(2^x\)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="in">\(-2\)</td><td>\(1 \div 2 \div 2\)</td><td class="out">\(\frac{1}{4}\)</td></tr>
+            <tr><td class="in">\(-1\)</td><td>\(1 \div 2\)</td><td class="out">\(\frac{1}{2}\)</td></tr>
+            <tr><td class="in">\(0\)</td><td>\(1\)</td><td class="out">\(1\)</td></tr>
+            <tr><td class="in">\(0.5\)</td><td>\(1 \times \sqrt{2}\)</td><td class="out">\(\approx 1.414\)</td></tr>
+            <tr><td class="in">\(1\)</td><td>\(1 \times 2\)</td><td class="out">\(2\)</td></tr>
+            <tr><td class="in">\(2\)</td><td>\(1 \times 2 \times 2\)</td><td class="out">\(4\)</td></tr>
+            <tr><td class="in">\(3\)</td><td>\(1 \times 2 \times 2 \times 2\)</td><td class="out">\(8\)</td></tr>
+          </tbody>
+        </table>
+        <p>Because the input sits in the exponent, we call this an <strong>exponential function</strong>.</p>
+      </section>
+
+      <section aria-labelledby="graph">
+        <h2 id="graph">Reading the Graph</h2>
+        <p>Each input and its output make a point <span class="nw">\((x, 2^x)\).</span></p>
+        <p>Plotting every point gives the curve in the widget above.</p>
+        <p>Notice that:</p>
+        <ul>
+          <li><em>The curve passes through <span class="nw">\((0, 1)\).</span> Taking zero steps leaves us where we started.</em></li>
+          <li><em>Each step of \(1\) to the right doubles the height.</em></li>
+          <li><em>Each step of \(1\) to the left halves the height, so the curve creeps towards \(0\) but never reaches it.</em></li>
+          <li><em>The curve never drops below <span class="nw">\(0\).</span> Multiplying a positive number by a positive step ratio always gives a positive number.</em></li>
+        </ul>
+        <p>The dots in the widget mark the whole-number inputs. Between them, the fractional and irrational inputs fill in the curve.</p>
+      </section>
+
+      <section aria-labelledby="ratio">
+        <h2 id="ratio">Changing the Step Ratio</h2>
+        <p>The base is the step ratio, so changing it changes how much each step multiplies by.</p>
+        <iframe class="expo-widget" src="exponentials/exponential-functions/curve-widget.html?bases=1" title="Interactive: change the step ratio between 0.5, 1, 1.5, 2 and 3 and slide the number of steps to see how the curve of the step ratio to the power x changes" style="height: 430px" scrolling="no" loading="lazy"></iframe>
+        <ul>
+          <li>A step ratio greater than \(1\) makes the output <strong>grow</strong> as we step right.</li>
+          <li>A step ratio of \(1\) leaves the output at \(1\) forever: every step multiplies by <span class="nw">\(1\).</span></li>
+          <li>A step ratio between \(0\) and \(1\) makes the output <strong>shrink</strong> as we step right.</li>
+        </ul>
+        <p>Notice that the curve for \(0.5\) is the curve for \(2\) reflected in the vertical axis.</p>
+        <div class="math">\[\left(\frac{1}{2}\right)^{x} = \frac{1}{2^x} = 2^{-x}\]</div>
+        <p>Taking \(x\) steps at a ratio of \(\frac{1}{2}\) is the same as taking \(x\) steps backwards at a ratio of <span class="nw">\(2\).</span></p>
+        <p>We only use positive step ratios. <button type="button" class="popup-link" data-dialog="negative-popup" aria-haspopup="dialog">Why not negative ones?</button></p>
+
+        <dialog id="negative-popup" class="popup" aria-label="Why the step ratio must be positive">
+          <button type="button" class="popup-close" aria-label="Close">×</button>
+          <p>Imagine a step ratio of <span class="nw">\(-4\).</span></p>
+          <p>Whole-number steps are fine. The sign flips with each step:</p>
+          <div class="math">\[(-4)^1 = -4 \qquad (-4)^2 = 16 \qquad (-4)^3 = -64\]</div>
+          <p>But half a step asks for the factor that, when multiplied by itself twice, gives <span class="nw">\(-4\):</span></p>
+          <div class="math">\[a \cdot a = -4\]</div>
+          <p>Any number multiplied by itself is positive (or zero), so no such factor exists among the real numbers.</p>
+          <p>The output exists at some inputs and not at the ones between them, so there is no curve to draw.</p>
+          <p class="popup-note">With a positive step ratio, every fraction of a step has a positive factor, so the output exists for every input.</p>
+        </dialog>
+
+        <div class="math">\[\boxed{f(x) = b^{x} \qquad (b &gt; 0)}\]</div>
+      </section>
+
+      <section aria-labelledby="versus">
+        <h2 id="versus">Exponential Versus Power Functions</h2>
+        <p>\(2^x\) and \(x^2\) look alike, but they swap the roles of the input.</p>
+        <ul>
+          <li>In \(x^2\) the input is the <strong>step ratio</strong>; the number of steps is fixed at <span class="nw">\(2\).</span></li>
+          <li>In \(2^x\) the input is the <strong>number of steps</strong>; the step ratio is fixed at <span class="nw">\(2\).</span></li>
+        </ul>
+        <table>
+          <thead>
+            <tr><th scope="col">\(x\)</th><th scope="col">\(x^2\)</th><th scope="col">\(2^x\)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="in">\(1\)</td><td>\(1\)</td><td class="out">\(2\)</td></tr>
+            <tr><td class="in">\(2\)</td><td>\(4\)</td><td class="out">\(4\)</td></tr>
+            <tr><td class="in">\(3\)</td><td>\(9\)</td><td class="out">\(8\)</td></tr>
+            <tr><td class="in">\(4\)</td><td>\(16\)</td><td class="out">\(16\)</td></tr>
+            <tr><td class="in">\(5\)</td><td>\(25\)</td><td class="out">\(32\)</td></tr>
+            <tr><td class="in">\(6\)</td><td>\(36\)</td><td class="out">\(64\)</td></tr>
+            <tr><td class="in">\(10\)</td><td>\(100\)</td><td class="out">\(1{,}024\)</td></tr>
+          </tbody>
+        </table>
+        <p>Increasing the input by \(1\) adds a little more to \(x^2\) each time, but it always <strong>doubles</strong> <span class="nw">\(2^x\).</span></p>
+        <p>So the exponential function eventually leaves the power function far behind.</p>
+        <p><strong>An exponential function is one whose input is the number of steps: the variable sits in the exponent.</strong></p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="exponentials-irrational-exponents.html">← Irrational Exponents</a>
+        <a href="exponentials-understanding-logarithms.html">Next: Understanding Logarithms →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its height so its frame fits it exactly.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+  <script>
+    // Phrases that open their explanation in a pop-up window.
+    document.querySelectorAll("[data-dialog]").forEach(function (b) {
+      var d = document.getElementById(b.dataset.dialog);
+      b.addEventListener("click", function () { d.showModal(); });
+    });
+    document.querySelectorAll("dialog.popup").forEach(function (d) {
+      d.querySelector(".popup-close").addEventListener("click", function () { d.close(); });
+      // a click outside the window closes it
+      d.addEventListener("click", function (e) {
+        var r = d.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+      });
+    });
+  </script>
+</body>
+</html>

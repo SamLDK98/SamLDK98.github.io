@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>An exponential function, one input at a time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .eq { font-family: "Spectral", Georgia, serif; font-weight: 300; font-size: clamp(2.2rem, 9vw, 3.6rem); line-height: 1.15; color: var(--dim); white-space: nowrap;
+        display: grid; grid-template-columns: 1fr auto 1fr; column-gap: 0.25em; align-items: baseline; }
+  .eq .l { justify-self: end; }
+  .eq .r { justify-self: start; }
+  .eq .b { color: var(--base); }
+  .eq sup { color: var(--exp); font-size: 0.5em; vertical-align: 0.85em; margin-left: 0.04em; }
+  .eq .v { color: #7fcf9a; }
+  #plot { margin-top: 0.4rem; }
+  #plot .axis { stroke: var(--faint); stroke-width: 1.4; }
+  #plot .grid { stroke: var(--hair); stroke-width: 1; }
+  #plot .curve { fill: none; stroke: var(--dim); stroke-width: 1.8; }
+  #plot .whole { fill: var(--dim); }
+  #plot .drop-x { stroke: var(--exp); stroke-width: 1.2; stroke-dasharray: 3 4; stroke-opacity: 0.8; }
+  #plot .drop-y { stroke: #7fcf9a; stroke-width: 1.2; stroke-dasharray: 3 4; stroke-opacity: 0.8; }
+  #plot circle.now { fill: #7fcf9a; stroke: #121215; stroke-width: 1.5; }
+  #plot text { font-size: 11px; }
+  #plot text.xl { fill: var(--exp); fill-opacity: 0.75; text-anchor: middle; }
+  #plot text.yl { fill: #7fcf9a; fill-opacity: 0.75; text-anchor: end; }
+  #plot text.cap-x { fill: var(--exp); text-anchor: end; }
+  #plot text.cap-y { fill: #7fcf9a; text-anchor: start; }
+  .bases { display: flex; justify-content: center; align-items: center; gap: 0.9rem; margin-top: 0.9rem; }
+  .bases[hidden] { display: none; }
+  .bases .val { font-family: "Spectral", Georgia, serif; font-size: 1.45rem; min-width: 2.4rem; text-align: center; color: var(--base); }
+  .bases .lab { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--base); margin-left: 0.4rem; }
+  .bases button {
+    font: inherit; font-size: 1.05rem; line-height: 1; width: 2rem; height: 2rem; border-radius: 50%;
+    background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .bases button:hover:not(:disabled) { border-color: var(--dim); }
+  .bases button:disabled { opacity: 0.25; cursor: default; }
+  .bases button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="eq" aria-live="polite"><span class="l"><span class="b" id="b"></span><sup id="c"></sup></span><span>=</span><span class="r"><span class="v" id="v"></span></span></div>
+  <svg id="plot" role="img"></svg>
+  <input id="s" type="range" min="-300" max="400" step="1" value="0" aria-label="The number of steps, x, from -3 to 4" />
+  <div class="bases" id="bases" hidden>
+    <button type="button" data-d="-1" aria-label="Smaller step ratio">←</button>
+    <span class="val" id="bv"></span>
+    <button type="button" data-d="1" aria-label="Larger step ratio">→</button>
+    <span class="lab">step ratio</span>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // f(x) = b^x for x from -3 to 4. Slide x along the bottom; the point rides the curve.
+  // The dots mark whole-number inputs, where each step of 1 multiplies the height by b.
+  // ?bases=1 adds arrows that change the step ratio b; ?b= sets the starting base.
+  const QS = new URLSearchParams(location.search);
+  const BASES = [0.5, 1, 1.5, 2, 3];
+  let bi = Math.max(0, BASES.indexOf(+QS.get("b") || 2));
+  if (QS.get("bases") === "1") document.getElementById("bases").hidden = false;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("plot"), s = document.getElementById("s");
+  const XMIN = -3, XMAX = 4, YMAX = 16, H = 260, TOP = 14, BOT = 226;
+  let L = 40, R = 520, W = 560;
+  const px = x => L + (x - XMIN) / (XMAX - XMIN) * (R - L);
+  const py = y => BOT - y / YMAX * (BOT - TOP);
+  const fmt = (x, d) => (+x.toFixed(d)).toString().replace("-", "−");
+
+  function fit() {
+    const sr = svg.getBoundingClientRect(), ir = s.getBoundingClientRect();
+    W = sr.width || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.style.height = H + "px";
+    L = ir.left - sr.left + 7; R = ir.right - sr.left - 7;
+  }
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    svg.appendChild(e); return e;
+  }
+
+  function draw() {
+    const b = BASES[bi], x = +s.value / 100, y = Math.pow(b, x);
+    document.getElementById("b").textContent = fmt(b, 2);
+    document.getElementById("bv").textContent = fmt(b, 2);
+    document.getElementById("c").textContent = fmt(x, 2);
+    document.getElementById("v").textContent = y >= 100 ? fmt(y, 1) : fmt(y, 2);
+    svg.innerHTML = "";
+    // grid and axes
+    for (let g = 4; g <= YMAX; g += 4) {
+      el("line", { class: "grid", x1: L, x2: R, y1: py(g), y2: py(g) });
+      el("text", { class: "yl", x: px(0) - 7, y: py(g) + 4 }, g);
+    }
+    el("line", { class: "axis", x1: L, x2: R, y1: BOT, y2: BOT });
+    el("line", { class: "axis", x1: px(0), x2: px(0), y1: TOP - 4, y2: BOT });
+    for (let k = XMIN; k <= XMAX; k++) el("text", { class: "xl", x: px(k), y: BOT + 17 }, fmt(k, 0));
+    el("text", { class: "cap-x", x: R, y: BOT - 7 }, "x");
+    el("text", { class: "cap-y", x: px(0) + 8, y: TOP + 2 }, "f(x)");
+    // the curve, clipped to the plot
+    let d = "", on = false;
+    for (let i = 0; i <= 400; i++) {
+      const xx = XMIN + (XMAX - XMIN) * i / 400, yy = Math.pow(b, xx);
+      if (yy > YMAX * 1.05) { on = false; continue; }
+      d += (on ? "L" : "M") + px(xx).toFixed(1) + " " + py(yy).toFixed(1) + " "; on = true;
+    }
+    el("path", { class: "curve", d });
+    for (let k = XMIN; k <= XMAX; k++) { const yy = Math.pow(b, k); if (yy <= YMAX) el("circle", { class: "whole", cx: px(k), cy: py(yy), r: 2.6 }); }
+    // the current input and output
+    if (y <= YMAX) {
+      el("line", { class: "drop-x", x1: px(x), x2: px(x), y1: py(y), y2: BOT });
+      el("line", { class: "drop-y", x1: px(x), x2: px(0), y1: py(y), y2: py(y) });
+      el("circle", { class: "now", cx: px(x), cy: py(y), r: 5.5 });
+    }
+    svg.setAttribute("aria-label", `${fmt(b, 2)} to the power ${fmt(x, 2)} = ${fmt(y, 3)}`);
+    document.querySelectorAll(".bases button").forEach(btn => {
+      const j = bi + +btn.dataset.d; btn.disabled = j < 0 || j >= BASES.length;
+    });
+  }
+  document.querySelectorAll(".bases button").forEach(btn => btn.addEventListener("click", () => {
+    const j = bi + +btn.dataset.d; if (j < 0 || j >= BASES.length) return; bi = j; draw();
+  }));
+  s.addEventListener("input", draw);
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { fit(); draw(); }, 60); });
+  s.value = 0; fit(); draw();
+</script>
+</body>
+</html>

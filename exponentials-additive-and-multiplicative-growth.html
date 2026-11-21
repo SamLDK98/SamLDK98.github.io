@@ -94,11 +94,11 @@
     .c-output { color: #f4879c; }   /* coral pink: target output reached */
     /* a word in the prose that opens its explanation in a pop-up window */
     button.popup-link {
-      font: inherit; color: #c77dff; background: none; border: 0; padding: 0; cursor: pointer;
-      border-bottom: 1px dashed rgba(199, 125, 255, 0.6); text-shadow: 0 0 8px rgba(199, 125, 255, 0.45);
-      transition: border-color 0.2s ease, text-shadow 0.2s ease;
+      font: inherit; color: #b9a8d4; background: none; border: 0; padding: 0; cursor: pointer;
+      border-bottom: 1px dashed rgba(185, 168, 212, 0.4);
+      transition: color 0.2s ease, border-color 0.2s ease;
     }
-    button.popup-link:hover, button.popup-link:focus-visible { border-bottom-color: #c77dff; text-shadow: 0 0 12px rgba(199, 125, 255, 0.75); outline: none; }
+    button.popup-link:hover, button.popup-link:focus-visible { color: #d6cde3; border-bottom-color: rgba(214, 205, 227, 0.8); outline: none; }
     /* questions that open their worked answers in pop-up windows */
     ul.q-list { list-style: none; margin: 1.8rem 0 2.6rem; padding: 0; }
     ul.q-list > li { position: relative; padding-left: 1.6rem; }
@@ -128,7 +128,6 @@
     }
     .popup-close:hover, .popup-close:focus-visible { border-color: var(--dim); outline: none; }
     /* the earlier version, kept below a rule for reference */
-    hr.archive-rule { margin: 5rem 0 2rem; border-top-color: var(--faint); }
   </style>
 </head>
 <body>
@@ -453,96 +452,6 @@
         <p>We would find \(\frac{1}{4}\) using radication and then raise that to the \(3\)rd power.</p>
         <div class="math">\[\bigl(\,\sqrt[4]{100}\,\bigr)^3\]</div>
         <div class="math">\[(3.16227766)^3 \approx 31.62\]</div>
-      </section>
-
-      <hr class="archive-rule" />
-
-      <section class="archive" aria-label="Earlier version of this page, kept for reference">
-        <h3 id="reconstructing-total">Reconstructing the Total from Partial Progress</h3>
-        <p>Because:</p>
-        <div class="math">\[\text{steps complete }\% = \text{target output }\%\]</div>
-        <p>Calculating the target output when we know the output reached after a given percentage of steps is straightforward.</p>
-        <ol class="worked">
-          <li>
-            <p>Work out how many times that percentage needs to be added to itself to reach <span class="nw">\(100\%\).</span></p>
-            <p>For <span class="nw">\(25\%\),</span> <span class="nw">\(40\%\),</span> and <span class="nw">\(85\%\):</span></p>
-            <div class="math">\[\frac{100}{25} = 4, \qquad \frac{100}{40} = 2.5, \qquad \frac{100}{85} \approx 1.17\]</div>
-          </li>
-          <li>
-            <p>This will correspond to the number of times we need to add the current output (<span class="nw">\(x\))</span> to itself to reach the target output.</p>
-            <p>For <span class="nw">\(25\%\):</span></p>
-            <div class="math">\[x + x + x + x = 4x\]</div>
-            <p>For <span class="nw">\(40\%\):</span></p>
-            <div class="math">\[x + x + 0.5x = 2.5x\]</div>
-            <p>For <span class="nw">\(85\%\):</span></p>
-            <div class="math">\[x + 0.17647x \approx 1.17647x\]</div>
-          </li>
-        </ol>
-      </section>
-
-      <section aria-label="Earlier multiplicative material, kept for reference">
-        <h3 id="multiplicative-relationship">The Relationship Between Multiplicative Steps and Output</h3>
-        <p>When each step changes the output by a constant factor:</p>
-        <div class="math">\[\text{steps taken }\% \ne \text{target output }\%\]</div>
-        <iframe class="expo-widget" src="exponentials/additive-and-multiplicative-growth/multiplicative-progress-widget.html" title="Interactive: walk from 1 to 256 in 8 steps of times 2. One bar shows the share of steps taken, another the share of the output reached; they do not match. Halfway through the steps the output is only 16, 6.25% of the target, but 16 times 16 is 256" style="height: 200px" scrolling="no" loading="lazy"></iframe>
-        <p>Previously, we used division to identify the number of steps needed to reach our target output given a constant step size.</p>
-        <p>Now, we will use logarithms to identify the number of steps needed to reach our target output given a constant step ratio (we will discuss this operation in more detail later).</p>
-        <p>Target: \(256\)<br>Step size ratio: <span class="nw">\(\times\class{mjx-base}{2}\)</span></p>
-        <div class="math">\[\log_{2}(256) = 8\]</div>
-        <p>Number of steps in the journey from \(1 \to 256\): <span class="nw">\(8\).</span></p>
-        <div class="math">\[1 \to 2 \to 4 \to 8 \to 16 \to 32 \to 64 \to 128 \to 256\]</div>
-        <p>Let's examine the relationship between the percentage of steps completed and the percentage of the target output reached.</p>
-        <table>
-          <thead>
-            <tr><th scope="col">% of Steps Taken</th><th scope="col">% of Output Reached</th><th scope="col">Output</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>\(25\%\)</td><td>\(\approx 1.56\%\)</td><td>\(4\)</td></tr>
-            <tr><td>\(40\%\)</td><td>\(\approx 3.59\%\)</td><td>\(\approx 9.19\)</td></tr>
-            <tr><td>\(50\%\)</td><td>\(6.25\%\)</td><td>\(16\)</td></tr>
-            <tr><td>\(85\%\)</td><td>\(\approx 43.53\%\)</td><td>\(\approx 111.43\)</td></tr>
-            <tr><td>\(100\%\)</td><td>\(100\%\)</td><td>\(256\)</td></tr>
-          </tbody>
-        </table>
-        <p>Recall that, in additive growth, equal portions of a journey contribute equal increases in output. For example, completing \(25\%\) of the steps in a journey from \(0\) to \(200\) produces an output of <span class="nw">\(50\).</span></p>
-        <p>Because four groups of \(25\%\) make up the complete journey, we can add the accumulated increase four times:</p>
-        <div class="math">\[50 + 50 + 50 + 50 = 200\]</div>
-        <p>In multiplicative growth, equal portions of a journey contribute equal multiplicative factors instead.</p>
-        <p>After completing \(25\%\) of our steps, we have reached <span class="nw">\(4\).</span></p>
-        <p>That is an increase of \(\times 4\) from our starting output <span class="nw">\(1\).</span></p>
-        <p>Each subsequent \(25\%\) of the journey must then multiply the current output by that same factor of <span class="nw">\(4\):</span></p>
-        <div class="math">\[1 \xrightarrow{\times 4} 4 \xrightarrow{\times 4} 16 \xrightarrow{\times 4} 64 \xrightarrow{\times 4} 256\]</div>
-        <p>Therefore:</p>
-        <div class="math">\[4 \times 4 \times 4 \times 4 = 256\]</div>
-        <p>Because four groups of \(25\%\) make up the complete journey:</p>
-        <div class="math">\[\frac{100}{25} = 4\]</div>
-        <p>We can express the repeated multiplication using an exponent:</p>
-        <div class="math">\[4^4 = \boxed{256}\]</div>
-        <p>If we took \(50\%\) of our steps, we calculate how many groups of \(50\%\) make up the journey:</p>
-        <div class="math">\[\frac{100}{50} = 2\]</div>
-        <p>The output after \(50\%\) is <span class="nw">\(16\).</span></p>
-        <p>So to reach \(100\%\) we must multiply this value by itself \(2\) times:</p>
-        <div class="math">\[16 \times 16\]</div>
-        <div class="math">\[16^2\]</div>
-        <div class="math">\[16 \times 16 = 256\]</div>
-        <blockquote class="aside-quote"><p>Taking \(\frac{1}{2}\) our steps means we can multiply the value there by itself to reach the output because the ratio between the start and the halfway point must be the same as the ratio between the halfway point and the final target output.</p></blockquote>
-        <p>What about <span class="nw">\(40\%\)?</span></p>
-        <div class="math">\[\frac{100}{40} = 2.5\]</div>
-        <p>Our multiplicative factor has accumulated \(2.5\) times.</p>
-        <div class="math">\[\approx 9.19^{2.5}\]</div>
-        <p>Finally, consider \(85\%\) (<span class="nw">\(\frac{17}{20}\))</span> of steps complete.</p>
-        <div class="math">\[\frac{100}{85} = 1.17647059\]</div>
-        <div class="math">\[111.43^{1.17647059}\]</div>
-        <p>The difference is that <strong>with additive growth, we multiply; with multiplicative growth, we exponentiate.</strong></p>
-        <p>Suppose we have completed \(25\%\) of our steps and reached an output of <span class="nw">\(x\).</span></p>
-        <p>In an additive journey starting at <span class="nw">\(0\),</span> the increases accumulate through addition:</p>
-        <div class="math">\[x + x + x + x = \text{Target output}\]</div>
-        <p>Which we can express as multiplication:</p>
-        <div class="math">\[\boxed{4x = \text{Target output}}\]</div>
-        <p>In a multiplicative journey starting at <span class="nw">\(1\),</span> the factors accumulate through multiplication:</p>
-        <div class="math">\[x \cdot x \cdot x \cdot x = \text{Target output}\]</div>
-        <p>Which we can express as exponentiation:</p>
-        <div class="math">\[\boxed{x^4 = \text{Target output}}\]</div>
       </section>
 
       <nav class="foot-nav" aria-label="Page navigation">
