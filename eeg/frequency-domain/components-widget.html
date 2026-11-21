@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>One signal, two descriptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  svg text { font-size: 11px; }
+  .cap { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin: 0.2rem 0 0.2rem; }
+  .cap + svg { margin-bottom: 0.6rem; }
+  .axis { stroke: var(--faint); stroke-width: 1.3; }
+  .sum { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+  .comp { fill: none; stroke-width: 1.1; stroke-opacity: 0.45; }
+  text.tl { fill: var(--dim); text-anchor: middle; }
+  text.fl { fill: var(--freq); fill-opacity: 0.8; text-anchor: middle; }
+  .stem { stroke-width: 2.4; stroke-linecap: round; }
+  text.sl { text-anchor: middle; font-size: 12px; }
+  .choices button[data-k="theta"][aria-pressed="true"] { border-bottom-color: var(--theta); }
+  .choices button[data-k="alpha"][aria-pressed="true"] { border-bottom-color: var(--alpha); }
+  .choices button[data-k="beta"][aria-pressed="true"] { border-bottom-color: var(--beta); }
+  .choices .hz { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; margin-left: 0.3rem; color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="cap">Time domain: voltage over one second</div>
+  <svg id="time" viewBox="0 0 560 150" role="img" aria-label="The signal over one second"></svg>
+  <div class="cap">Frequency domain: amplitude of each frequency</div>
+  <svg id="freq" viewBox="0 0 560 140" role="img" aria-label="The amplitude at each frequency"></svg>
+  <div class="choices" role="group" aria-label="Oscillations in the signal">
+    <button type="button" data-k="theta" aria-pressed="true">theta<span class="hz">6 Hz</span></button>
+    <button type="button" data-k="alpha" aria-pressed="true">alpha<span class="hz">10 Hz</span></button>
+    <button type="button" data-k="beta" aria-pressed="true">beta<span class="hz">20 Hz</span></button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Three oscillations add up to one signal. The top plot shows their sum over one second;
+  // the bottom plot shows the same signal described by frequency: one stem per oscillation,
+  // as tall as its amplitude. Switching an oscillation off removes its wiggle above and its stem below.
+  const NS = "http://www.w3.org/2000/svg";
+  const C = { theta: ["#7aa7ff", 6, 6, 0.6], alpha: ["#e8a33d", 10, 10, 1.9], beta: ["#7fcf9a", 20, 4, 0.3] };  // colour, Hz, µV, phase
+  const on = { theta: true, alpha: true, beta: true };
+  const L = 34, R = 540;
+
+  function el(svg, tag, attrs, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    svg.appendChild(e); return e;
+  }
+
+  function draw() {
+    const T = document.getElementById("time"), F = document.getElementById("freq");
+    T.innerHTML = ""; F.innerHTML = "";
+    // time domain, centred on 75, ±20 µV over ±62 px
+    const Y0 = 70, sc = 62 / 20, tx = t => L + t * (R - L);
+    el(T, "line", { class: "axis", x1: L, x2: R, y1: Y0, y2: Y0 });
+    for (let k = 0; k <= 4; k++) el(T, "text", { class: "tl", x: tx(k / 4), y: 146 }, (k / 4) + " s");
+    let sum = "";
+    const paths = {};
+    for (let i = 0; i <= 600; i++) {
+      const t = i / 600; let v = 0;
+      for (const k in C) {
+        const [, f, a, ph] = C[k], c = a * Math.sin(2 * Math.PI * f * t + ph);
+        if (on[k]) { v += c; paths[k] = (paths[k] || "") + (i ? "L" : "M") + tx(t).toFixed(1) + " " + (Y0 - c * sc).toFixed(1) + " "; }
+      }
+      sum += (i ? "L" : "M") + tx(t).toFixed(1) + " " + (Y0 - v * sc).toFixed(1) + " ";
+    }
+    for (const k in paths) el(T, "path", { class: "comp", d: paths[k], stroke: C[k][0] });
+    el(T, "path", { class: "sum", d: sum });
+    // frequency domain, 0 to 30 Hz, 0 to 12 µV
+    const B = 112, fx = f => L + f / 30 * (R - L), ay = a => B - a / 12 * 92;
+    el(F, "line", { class: "axis", x1: L, x2: R, y1: B, y2: B });
+    for (let f = 0; f <= 30; f += 5) el(F, "text", { class: "fl", x: fx(f), y: B + 17 }, f + (f === 30 ? " Hz" : ""));
+    for (const k in C) {
+      const [col, f, a] = C[k], h = on[k] ? a : 0;
+      el(F, "line", { class: "stem", x1: fx(f), x2: fx(f), y1: B, y2: ay(h), stroke: col, "stroke-opacity": on[k] ? 1 : 0.2 });
+      if (on[k]) el(F, "text", { class: "sl", x: fx(f), y: ay(h) - 7, fill: col }, a + " µV");
+    }
+    const list = Object.keys(C).filter(k => on[k]).map(k => `${k} at ${C[k][1]} hertz`);
+    T.setAttribute("aria-label", "A signal made of " + (list.join(", ") || "nothing"));
+  }
+  document.querySelectorAll(".choices button").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.k; on[k] = !on[k]; b.setAttribute("aria-pressed", String(on[k])); draw();
+  }));
+  draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Power Spectral Density | EEG | Sam Kirwan</title>
+  <meta name="description" content="The power spectral density shows how an EEG signal's power is spread across frequencies. From squaring amplitudes, through the periodogram and frequency resolution, to Welch's method and band power." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="eeg.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="eeg.html">EEG</a>
+      <h1>Power Spectral Density</h1>
+    </header>
+    <main>
+      <section class="question" aria-label="The question">
+        <div class="power-intro-copy">
+          <p><em>How is a signal&rsquo;s power spread across frequencies?</em></p>
+        </div>
+      </section>
+
+      <section aria-labelledby="power">
+        <h2 id="power">From Amplitude to Power</h2>
+        <p>An oscillation&rsquo;s amplitude tells us how far it swings.</p>
+        <p>Its <strong>power</strong> is proportional to the amplitude squared.</p>
+        <div class="math">\[\class{mjx-pow}{\text{power}} \propto \class{mjx-amp}{A}^2\]</div>
+        <p>Squaring does two things for us:</p>
+        <ul>
+          <li>It removes the sign, so swings above and below zero count the same.</li>
+          <li>It makes power add up. Once the average voltage is removed, the power of all the frequencies together equals the variance of the signal.</li>
+        </ul>
+        <div class="math">\[\sum_{\text{all frequencies}} \class{mjx-pow}{\text{power}} = \text{variance of } x(t)\]</div>
+        <p>So a power spectrum is a breakdown of the signal&rsquo;s variance by frequency.</p>
+        <p>For a sine wave of amplitude <span class="nw">\(\class{mjx-amp}{A}\),</span> the variance is exactly <span class="nw">\(\frac{\class{mjx-amp}{A}^2}{2}\).</span></p>
+      </section>
+
+      <section aria-labelledby="dft">
+        <h2 id="dft">The Discrete Fourier Transform</h2>
+        <p>An EEG recording is not a continuous curve. It is a list of \(N\) voltages sampled at a rate \(f_s\) (often \(250\) to \(1{,}000\) samples per second).</p>
+        <p>The discrete Fourier transform compares the recording with a set of oscillations, one at each frequency:</p>
+        <div class="math">\[X_k = \sum_{n=0}^{N-1} x_n \, e^{-i 2\pi k n / N}\]</div>
+        <p>Each \(X_k\) is a complex number. Its size tells us how strongly the recording matches the oscillation at frequency <span class="nw">\(\class{mjx-freq}{f_k}\),</span> and its angle tells us the phase.</p>
+        <div class="math">\[\class{mjx-freq}{f_k} = \frac{k \, f_s}{N} \qquad k = 0, 1, 2, \ldots, \frac{N}{2}\]</div>
+        <p>The frequencies stop at <span class="nw">\(\frac{f_s}{2}\),</span> the <strong>Nyquist frequency</strong>. Faster oscillations cannot be told apart from slower ones with fewer than two samples per cycle.</p>
+        <p>A power spectrum keeps the size of each \(X_k\) and throws away the angle.</p>
+      </section>
+
+      <section aria-labelledby="periodogram">
+        <h2 id="periodogram">The Periodogram</h2>
+        <p>Squaring the size of each \(X_k\) and scaling it gives the <strong>periodogram</strong>:</p>
+        <div class="math">\[\class{mjx-pow}{P(f_k)} = \frac{2}{f_s N} \, \lvert X_k \rvert^2\]</div>
+        <p>The \(2\) folds the negative frequencies, which mirror the positive ones for a real signal, onto the positive ones.</p>
+        <p>The units are <strong>µV²/Hz</strong>: power per hertz of frequency. This is why it is called a <strong>density</strong>.</p>
+        <p>Dividing by the width of each frequency bin means the values do not depend on how finely we chose to slice the frequencies. Summing the density over a range, times the bin width, gives the power in that range.</p>
+      </section>
+
+      <section aria-labelledby="resolution">
+        <h2 id="resolution">Frequency Resolution</h2>
+        <p>The frequencies in the spectrum are spaced <span class="nw">\(\frac{f_s}{N}\)</span> apart. Since a recording of \(N\) samples lasts \(T = \frac{N}{f_s}\) seconds:</p>
+        <div class="math">\[\boxed{\Delta \class{mjx-freq}{f} = \frac{1}{T}}\]</div>
+        <p><strong>Only the length of the recording sets the frequency resolution.</strong> Sampling faster adds higher frequencies, but does not space the bins more finely.</p>
+        <p>The widget below shows two equal oscillations at \(10\) Hz and <span class="nw">\(11\) Hz.</span></p>
+        <iframe class="expo-widget" src="eeg/frequency-domain/resolution-widget.html" title="Interactive: choose 0.5, 1, 2 or 4 seconds of a signal with oscillations at 10 and 11 hertz and see the spectrum; short windows merge the two peaks, long windows separate them" style="height: 310px" scrolling="no" loading="lazy"></iframe>
+        <p>With half a second, the bins are \(2\) Hz apart, and the two oscillations blur into one peak.</p>
+        <p>With four seconds, the bins are \(0.25\) Hz apart, and the peaks separate cleanly.</p>
+        <p>Before transforming, each stretch of signal is usually tapered at its ends by a <button type="button" class="popup-link" data-dialog="window-popup" aria-haspopup="dialog">window</button>, which widens each peak a little.</p>
+
+        <dialog id="window-popup" class="popup" aria-label="Windows and spectral leakage">
+          <button type="button" class="popup-close" aria-label="Close">×</button>
+          <p>The Fourier transform treats a stretch of recording as if it repeated forever.</p>
+          <p>If the signal&rsquo;s value at the end does not match its value at the start, the repeat has a jump in it.</p>
+          <p>A jump needs many frequencies to describe it, so some power from each true peak spreads into its neighbours. This is <strong>spectral leakage</strong>.</p>
+          <p>A window fades the stretch in and out, so its ends meet at zero. The <strong>Hann window</strong> is the usual choice:</p>
+          <div class="math">\[w_n = \frac{1}{2}\left(1 - \cos\frac{2\pi n}{N}\right)\]</div>
+          <p class="popup-note">Windowing trades a slightly wider peak for much less leakage far from the peak.</p>
+        </dialog>
+      </section>
+
+      <section aria-labelledby="welch">
+        <h2 id="welch">A Noisy Estimate</h2>
+        <p>EEG is not a few clean oscillations. Much of it is irregular, and the periodogram of irregular activity is jagged.</p>
+        <p>Recording for longer does not smooth it. A longer recording gives finer frequency bins, but each bin is just as uncertain as before.</p>
+        <p><strong>Welch&rsquo;s method</strong> trades some resolution for a steadier estimate:</p>
+        <ol>
+          <li>Cut the recording into shorter segments, usually overlapping by half.</li>
+          <li>Window each segment and compute its periodogram.</li>
+          <li>Average the periodograms.</li>
+        </ol>
+        <iframe class="expo-widget" src="eeg/frequency-domain/welch-widget.html" title="Interactive: average the periodograms of 1, 4, 16 or all 63 two-second segments of 64 seconds of simulated EEG; the spectrum goes from jagged to smooth, revealing a falling background and an alpha peak" style="height: 325px" scrolling="no" loading="lazy"></iframe>
+        <p>Here, \(64\) seconds of simulated EEG are cut into \(2\)-second segments, so each periodogram has <span class="nw">\(0.5\) Hz</span> bins.</p>
+        <p>One segment hides the structure. Averaging all \(63\) reveals it.</p>
+        <p>The segment length sets the trade-off. Longer segments give finer resolution but fewer segments to average.</p>
+      </section>
+
+      <section aria-labelledby="shape">
+        <h2 id="shape">Reading an EEG Spectrum</h2>
+        <p>The averaged spectrum above is plotted on a <strong>logarithmic</strong> power axis, as EEG spectra usually are.</p>
+        <p>Notice that:</p>
+        <ul>
+          <li><em>Power falls steadily as frequency rises, roughly in proportion to <span class="nw">\(\frac{1}{f^{\chi}}\).</span> This is the aperiodic background.</em></li>
+          <li><em>The alpha peak sits above that background rather than standing alone.</em></li>
+        </ul>
+        <p>Without the log scale, the low frequencies would tower over everything and the alpha peak would be hard to see.</p>
+      </section>
+
+      <section aria-labelledby="band-power">
+        <h2 id="band-power">Band Power</h2>
+        <p>To summarise a band, we add up the density across it:</p>
+        <div class="math">\[\class{mjx-pow}{P_{\text{alpha}}} = \int_{8}^{13} \class{mjx-pow}{\text{PSD}}(\class{mjx-freq}{f}) \, d\class{mjx-freq}{f} \approx \sum_{8 \le f_k \le 13} \class{mjx-pow}{P(f_k)} \, \Delta \class{mjx-freq}{f}\]</div>
+        <p>This is the <strong>absolute</strong> band power, in µV².</p>
+        <p>Dividing by the power over a broad range (for example \(1\) to \(40\) Hz) gives the <strong>relative</strong> band power: the fraction of the signal&rsquo;s variance in that band.</p>
+        <div class="math">\[\text{relative alpha} = \frac{\class{mjx-pow}{P_{\text{alpha}}}}{\class{mjx-pow}{P_{1\text{–}40}}}\]</div>
+        <p>Relative power is less affected by things that scale the whole signal, such as skull thickness or electrode contact, but a change in one band also changes the relative power of all the others.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="eeg-frequency-domain-overview.html">← An Overview of Frequency Domain Analyses</a>
+        <a href="eeg.html">All EEG pages →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+  <script>
+    // Phrases that open their explanation in a pop-up window.
+    document.querySelectorAll("[data-dialog]").forEach(function (b) {
+      var d = document.getElementById(b.dataset.dialog);
+      b.addEventListener("click", function () { d.showModal(); });
+    });
+    document.querySelectorAll("dialog.popup").forEach(function (d) {
+      d.querySelector(".popup-close").addEventListener("click", function () { d.close(); });
+      // a click outside the window closes it
+      d.addEventListener("click", function (e) {
+        var r = d.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+      });
+    });
+  </script>
+</body>
+</html>

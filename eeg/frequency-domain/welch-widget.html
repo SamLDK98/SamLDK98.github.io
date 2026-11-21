@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Averaging segments: Welch's method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  svg text { font-size: 11px; }
+  .axis { stroke: var(--faint); stroke-width: 1.3; }
+  .grid { stroke: var(--hair); stroke-width: 1; }
+  .psd { fill: none; stroke: var(--pow); stroke-width: 1.6; }
+  .band { fill: var(--alpha); fill-opacity: 0.07; }
+  text.fl { fill: var(--freq); fill-opacity: 0.8; text-anchor: middle; }
+  text.yl { fill: var(--pow); fill-opacity: 0.75; text-anchor: end; }
+  text.cap { fill: var(--dim); }
+  text.al { fill: var(--alpha); fill-opacity: 0.8; text-anchor: middle; }
+  .lab { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--dim); margin-top: 0.6rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="plot" viewBox="0 0 560 230" role="img"></svg>
+  <div class="lab">segments averaged</div>
+  <div class="choices" role="group" aria-label="Number of segments averaged">
+    <button type="button" data-n="1" aria-pressed="true">1</button>
+    <button type="button" data-n="4" aria-pressed="false">4</button>
+    <button type="button" data-n="16" aria-pressed="false">16</button>
+    <button type="button" data-n="63" aria-pressed="false">all 63</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // 64 s of simulated EEG at 128 Hz: 1/f-like background activity plus waxing and waning 10 Hz alpha.
+  // It is cut into 2 s segments overlapping by half (63 of them). Each segment gets a Hann window and
+  // a periodogram; the plot shows the average of the first n. One segment is jagged; averaging many
+  // keeps the shape and removes the jitter.
+  const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("plot");
+  const FS = 128, DUR = 64, SEG = 256, HOP = 128, LO = 1, HI = 40;
+  const L = 52, R = 540, TOP = 14, B = 196;
+
+  // a seeded random source, so the page always shows the same recording
+  let seed = 7;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const gauss = () => Math.sqrt(-2 * Math.log(rnd() + 1e-12)) * Math.cos(2 * Math.PI * rnd());
+
+  // the background: a 1/f-like spectrum (power falling as f^-1.3) with random amplitudes and phases,
+  // turned into a signal by an inverse Fourier transform; then alpha bursts on top
+  const N = FS * DUR, re = new Float64Array(N), im = new Float64Array(N), df = FS / N;
+  for (let k = 1; k < N / 2; k++) {
+    const f = k * df, S = 20 * Math.pow(Math.max(f, 0.5), -1.3), c = Math.sqrt(S * df);
+    re[k] = c * gauss(); im[k] = c * gauss();
+  }
+  (function fft(re, im) {   // in-place radix-2, with a + sign: an inverse transform without the 1/N
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit;
+      if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = 2 * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let cr = 1, ci = 0;
+        for (let j = 0; j < len / 2; j++) {
+          const ar = re[i + j + len / 2] * cr - im[i + j + len / 2] * ci, ai = re[i + j + len / 2] * ci + im[i + j + len / 2] * cr;
+          re[i + j + len / 2] = re[i + j] - ar; im[i + j + len / 2] = im[i + j] - ai;
+          re[i + j] += ar; im[i + j] += ai;
+          const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t;
+        }
+      }
+    }
+  })(re, im);
+  const x = new Float64Array(N);
+  for (let n = 0; n < N; n++) {
+    const t = n / FS, env = 0.6 + 0.4 * Math.sin(2 * Math.PI * 0.11 * t) * Math.sin(2 * Math.PI * 0.037 * t + 1);
+    x[n] = re[n] + 5 * env * Math.sin(2 * Math.PI * 10 * t);
+  }
+
+  // one Hann-windowed periodogram per segment, at 0.5 Hz bins, as a density in µV²/Hz
+  const win = [], K = SEG / 2;
+  let U = 0;
+  for (let n = 0; n < SEG; n++) { win.push(0.5 - 0.5 * Math.cos(2 * Math.PI * n / SEG)); U += win[n] * win[n]; }
+  const cosT = [], sinT = [];
+  for (let m = 0; m < SEG; m++) { cosT.push(Math.cos(2 * Math.PI * m / SEG)); sinT.push(Math.sin(2 * Math.PI * m / SEG)); }
+  const segs = [];
+  for (let s = 0; s + SEG <= N; s += HOP) {
+    let mean = 0; for (let n = 0; n < SEG; n++) mean += x[s + n]; mean /= SEG;
+    const p = new Float64Array(K + 1);
+    for (let k = 0; k <= K; k++) {
+      let re = 0, im = 0;
+      for (let n = 0; n < SEG; n++) { const v = (x[s + n] - mean) * win[n], m = (k * n) % SEG; re += v * cosT[m]; im -= v * sinT[m]; }
+      p[k] = (k === 0 || k === K ? 1 : 2) * (re * re + im * im) / (FS * U);
+    }
+    segs.push(p);
+  }
+
+  const fx = f => L + (f - LO) / (HI - LO) * (R - L);
+  const Y0 = -2, Y1 = 2, py = v => B - (Math.log10(v) - Y0) / (Y1 - Y0) * (B - TOP);
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    svg.appendChild(e); return e;
+  }
+  function draw(n) {
+    const avg = new Float64Array(K + 1);
+    for (let i = 0; i < n; i++) for (let k = 0; k <= K; k++) avg[k] += segs[i][k] / n;
+    svg.innerHTML = "";
+    el("rect", { class: "band", x: fx(8), y: TOP, width: fx(13) - fx(8), height: B - TOP });
+    el("text", { class: "al", x: (fx(8) + fx(13)) / 2, y: TOP + 12 }, "alpha");
+    for (let e = Y0; e <= Y1; e++) {
+      el("line", { class: "grid", x1: L, x2: R, y1: py(Math.pow(10, e)), y2: py(Math.pow(10, e)) });
+      el("text", { class: "yl", x: L - 6, y: py(Math.pow(10, e)) + 4 }, e === 0 ? "1" : e === 1 ? "10" : e === 2 ? "100" : "10" + (e < 0 ? "⁻" : "") + "¹²"[Math.abs(e) - 1]);
+    }
+    el("line", { class: "axis", x1: L, x2: R, y1: B, y2: B });
+    for (let f = 5; f <= HI; f += 5) el("text", { class: "fl", x: fx(f), y: B + 17 }, f + (f === HI ? " Hz" : ""));
+    el("text", { class: "cap", x: R, y: TOP + 2, "text-anchor": "end" }, "µV²/Hz (log scale)");
+    let d = "";
+    for (let k = LO * 2; k <= HI * 2; k++) { const v = Math.max(avg[k], 1e-6); d += (d ? "L" : "M") + fx(k / 2).toFixed(1) + " " + Math.min(B, Math.max(TOP, py(v))).toFixed(1) + " "; }
+    el("path", { class: "psd", d });
+    svg.setAttribute("aria-label", `Power spectral density averaged over ${n} two-second segment${n > 1 ? "s" : ""}, from 1 to 40 hertz on a log scale, with a peak in the alpha band`);
+  }
+  document.querySelectorAll(".choices button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".choices button").forEach(c => c.setAttribute("aria-pressed", String(c === b)));
+    draw(+b.dataset.n);
+  }));
+  draw(1);
+</script>
+</body>
+</html>

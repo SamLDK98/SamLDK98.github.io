@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cancel Two Waves | Sinusoidal Tetris | Sam Kirwan</title>
+  <meta name="description" content="Sinusoidal Tetris with a signal made of two sine waves. Drop one wave at a time; whatever is left becomes the signal for the next drop, until the signal is flat." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #0e0e11;
+      --ink:   #f4f6ff;
+      --body:  rgba(243, 246, 255, 0.88);
+      --dim:   rgba(238, 242, 252, 0.5);
+      --faint: rgba(238, 242, 252, 0.15);
+      --hair:  rgba(238, 242, 252, 0.08);
+      --drop:  #e8a33d;   /* the falling wave */
+      --flat:  #7fcf9a;   /* flat: a win */
+      --up:    #f4879c;   /* the merge pushing up */
+      --down:  #7aa7ff;   /* the merge pushing down */
+      --measure: 44rem;
+    }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body { background: var(--bg); color: var(--body); font-family: "Spectral", Georgia, serif; -webkit-font-smoothing: antialiased; }
+    .sheet { width: min(var(--measure), calc(100% - 2.4rem)); margin: 0 auto; padding: clamp(2.4rem, 7vh, 4.5rem) 0 4rem; }
+    .crumb { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
+    .crumb::before { content: "← "; }
+    .crumb:hover { color: var(--ink); }
+    h1 { margin: 1.2rem 0 1.8rem; font-weight: 400; font-size: clamp(2.3rem, 7.4vw, 3.9rem); line-height: 1.05; color: var(--ink); }
+    h1::after { content: ""; display: block; width: 2rem; height: 1px; background: var(--drop); margin-top: 1.4rem; }
+    p { font-size: clamp(1.1rem, 2.4vw, 1.22rem); line-height: 1.7; }
+    p + p { margin-top: 0.9rem; }
+    strong { color: var(--ink); font-weight: 500; }
+    .c-drop { color: var(--drop); }
+    a { color: #b9a8d4; }
+
+    /* the board */
+    .game { margin: 2.2rem 0 1rem; }
+    .game svg { display: block; width: 100%; overflow: visible; touch-action: manipulation; }
+    .game text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
+    .game .frame { fill: none; stroke: var(--faint); stroke-width: 1.2; }
+    .game .grid { stroke: var(--hair); stroke-width: 1; }
+    .game .base { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 2 5; }
+    .game .sig { fill: none; stroke: var(--ink); stroke-width: 2.2; }
+    .game .sig.flat { stroke: var(--flat); }
+    .game .fall { fill: none; stroke: var(--drop); stroke-width: 2.2; }
+    .game .hint { fill: none; stroke: var(--dim); stroke-width: 1.4; stroke-dasharray: 5 5; }
+    .game .ring { fill: none; stroke: var(--drop); stroke-opacity: 0.55; stroke-width: 1.3; }
+    .game .arm { stroke: var(--drop); stroke-width: 1.6; }
+    .game .bar { stroke-width: 1.4; }
+    .game text.dial { fill: var(--drop); font-size: 12px; }
+
+    .controls { display: grid; grid-template-columns: repeat(3, auto) 1fr; gap: 0.7rem 1.6rem; align-items: center; justify-content: center; margin-top: 1.2rem; }
+    .dial-ctl { display: flex; align-items: center; gap: 0.55rem; }
+    .dial-ctl .name { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--drop); min-width: 1.1rem; text-align: center; }
+    .dial-ctl .val { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; color: var(--ink); min-width: 3.6rem; text-align: center; }
+    .round {
+      font: inherit; font-size: 1rem; line-height: 1; width: 2rem; height: 2rem; border-radius: 50%;
+      background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .round:hover:not(:disabled), .pill:hover:not(:disabled) { border-color: var(--dim); }
+    .round:disabled, .pill:disabled { opacity: 0.25; cursor: default; }
+    .round:focus-visible, .pill:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+    .pill {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.55rem 1.1rem; border-radius: 999px; background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .pill.go { border-color: var(--drop); color: var(--drop); justify-self: end; }
+    .row2 { display: flex; justify-content: center; align-items: center; gap: 1.4rem; flex-wrap: wrap; margin-top: 1.1rem; font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--dim); }
+    .row2 label { display: flex; align-items: center; gap: 0.45rem; cursor: pointer; }
+    .row2 input { accent-color: #b9a8d4; }
+    .result { min-height: 3.6rem; margin-top: 1.2rem; text-align: center; font-size: clamp(1.05rem, 2.3vw, 1.2rem); line-height: 1.6; }
+    .result strong.win { color: var(--flat); }
+    .keys { margin-top: 0.6rem; text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--dim); }
+    @media (max-width: 620px) {
+      .controls { grid-template-columns: 1fr; justify-items: center; }
+      .pill.go { justify-self: center; }
+    }
+    /* the guide below the game */
+    .math-line { margin: 0.9rem 0; text-align: center; font-size: 1.2rem; color: var(--ink); }
+    h2 { margin: 3rem 0 1rem; font-weight: 400; font-size: clamp(1.45rem, 3.6vw, 1.9rem); color: var(--ink); }
+    h3 { margin: 1.8rem 0 0.6rem; font-weight: 400; font-size: clamp(1.2rem, 2.8vw, 1.4rem); color: var(--ink); }
+    ol, ul.plain { margin: 0.9rem 0 0 1.4rem; }
+    ol li, ul.plain li { font-size: clamp(1.1rem, 2.4vw, 1.22rem); line-height: 1.7; }
+    ol li + li, ul.plain li + li { margin-top: 0.45rem; }
+    ul.plain + p, table.phase + p { margin-top: 0.9rem; }
+    table.phase { margin: 1rem 0; border-collapse: collapse; font-size: 1.05rem; }
+    table.phase th { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); font-weight: 400; text-align: left; padding: 0 1.4rem 0.5rem 0; }
+    table.phase td { padding: 0.35rem 1.4rem 0.35rem 0; border-top: 1px solid var(--hair); }
+    table.phase td:first-child { color: var(--drop); font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; }
+    .foot { margin-top: 3.4rem; padding-top: 1.2rem; border-top: 1px solid var(--hair); display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    .foot a { color: var(--dim); text-decoration: none; }
+    .foot a:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <a class="crumb" href="sinusoidal-tetris.html">Sinusoidal Tetris</a>
+    <h1>Cancel Two Waves</h1>
+
+    <p>The signal at the bottom is now <strong>two sine waves</strong> added together, at different frequencies.</p>
+    <p>One drop cannot cancel both. Cancel them <strong>one at a time</strong>: whatever is left after a drop becomes the signal for the next.</p>
+    <p>This is still practice: the <span class="c-drop">wave at the top</span> waits for you. Turn its dials, then press <strong>Drop</strong>. Take back a drop at any time.</p>
+
+    <div class="game">
+      <svg id="board" viewBox="0 0 640 394" role="img" aria-label="The game board"></svg>
+
+      <div class="controls">
+        <div class="dial-ctl"><span class="name">A</span><button class="round" data-dial="A" data-d="-1" aria-label="Decrease amplitude">−</button><span class="val" id="vA"></span><button class="round" data-dial="A" data-d="1" aria-label="Increase amplitude">+</button></div>
+        <div class="dial-ctl"><span class="name">ω</span><button class="round" data-dial="w" data-d="-1" aria-label="Decrease frequency">−</button><span class="val" id="vw"></span><button class="round" data-dial="w" data-d="1" aria-label="Increase frequency">+</button></div>
+        <div class="dial-ctl"><span class="name">φ</span><button class="round" data-dial="p" data-d="-1" aria-label="Turn phase back">−</button><span class="val" id="vp"></span><button class="round" data-dial="p" data-d="1" aria-label="Turn phase on">+</button></div>
+        <button class="pill go" id="drop" type="button">Drop</button>
+      </div>
+      <div class="row2">
+        <label><input type="checkbox" id="hint" /> show hint</label>
+        <span>drops: <span id="count">0</span></span>
+        <button class="pill" id="undo" type="button">Undo drop</button>
+        <button class="pill" id="restart" type="button">Start over</button>
+        <button class="pill" id="new" type="button">New signal</button>
+      </div>
+      <div class="result" id="result" aria-live="polite"></div>
+      <div class="keys"><a href="#guide" style="color:#b9a8d4">How do I solve this?</a> · keys (first increases, second decreases): U / J frequency · I / K amplitude · O / L phase · P drop</div>
+    </div>
+
+    <h2 id="guide">How to Solve It</h2>
+    <p>The trick is to treat the signal as two separate waves and deal with the <strong>bigger, slower one first</strong>. The faster one is the small ripple riding on top of it.</p>
+
+    <h3>1. Find the slow wave&rsquo;s frequency</h3>
+    <p>Ignore the ripple and follow the big swell. Count how many <strong>grid squares</strong> one full cycle of it takes, from one crest to the next.</p>
+    <div class="math-line"><em>ω</em> = 4 ÷ (grid squares per cycle)</div>
+    <ul class="plain">
+      <li>8 squares (one cycle across the whole board): <em>ω</em> = 0.5</li>
+      <li>4 squares: <em>ω</em> = 1</li>
+      <li>2 squares: <em>ω</em> = 2</li>
+    </ul>
+
+    <h3>2. Estimate its amplitude</h3>
+    <p>Imagine a line running through the middle of the ripple. The amplitude is how far that line rises above the dotted centre line at its highest. The faint horizontal lines mark heights of <strong>0.5</strong> and <strong>1</strong>, so you can read it off the board.</p>
+
+    <h3>3. Read its phase from the left edge</h3>
+    <p>Look at where the slow swell starts on the left edge of the board, and which way it is heading:</p>
+    <table class="phase">
+      <thead><tr><th>Phase</th><th>The wave starts&hellip;</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>on the centre line, heading up</td></tr>
+        <tr><td>0.5π</td><td>at its highest point</td></tr>
+        <tr><td>π</td><td>on the centre line, heading down</td></tr>
+        <tr><td>1.5π</td><td>at its lowest point</td></tr>
+      </tbody>
+    </table>
+    <p>Positions in between have phases in between.</p>
+
+    <h3>4. Set the drop to its mirror image</h3>
+    <p>Use the same frequency and amplitude, and add <strong>1π</strong> (half a turn) to the phase. On the board, your wave should start at the <strong>opposite</strong> height to the swell and head the <strong>opposite</strong> way: wherever the swell is up, your wave is down.</p>
+
+    <h3>5. Drop, then repeat with the ripple</h3>
+    <p>If the first drop was right, the slow swell vanishes and the leftover is a clean, even ripple: a single wave. Read its frequency, amplitude and phase in the same way, and drop its mirror image.</p>
+
+    <h3>If the leftover still swells</h3>
+    <ul class="plain">
+      <li>A swell <strong>in step</strong> with the original means your amplitude was too small; one <strong>upside down</strong> means it was too big.</li>
+      <li>A swell <strong>shifted sideways</strong> means the phase was off.</li>
+      <li>A new wiggle at a <strong>different speed</strong> means the frequency was wrong: undo and recount the grid squares.</li>
+    </ul>
+    <p>&ldquo;Undo drop&rdquo; takes back a drop, and &ldquo;show hint&rdquo; draws the mirror image of the biggest wave left, so you can check your settings against it.</p>
+
+    <nav class="foot" aria-label="Page navigation">
+      <a href="sinusoidal-tetris-one-wave.html">← Cancel One Wave</a>
+      <a href="sinusoidal-tetris.html">All Sinusoidal Tetris pages →</a>
+    </nav>
+  </div>
+
+  <script>
+    // Cancel Two Waves. The signal is the sum of two sine waves with different frequencies, each chosen
+    // from the steps the dials move in. Every drop is added to the signal, and whatever is left becomes
+    // the signal for the next drop. A win is a leftover whose peak is under a third of a unit, as in the
+    // original game. This is practice: the wave at the top waits until DROP is pressed.
+    // The signal is kept as a list of waves, one per frequency, each stored as a phasor (A cos φ, A sin φ),
+    // so that a drop at a frequency already present simply adds to that wave.
+    (function () {
+      const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("board");
+      const STEP = { A: 0.1, w: 0.5, p: Math.PI / 12 };
+      const MIN = { A: 0.3, w: 0.5 }, MAX = { A: 1.5, w: 4 };
+      const TMAX = 4 * Math.PI, L = 120, R = 628, TOP = 14, BOT = 380, SC = 40, BASEY = 276, STARTY = 76;
+      const WIN = 1 / 3;
+      let start, comps, before, history, drop, state, anim, last, raf, drops, peakNow;
+
+      const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+      const round = (v, s) => Math.round(v / s) * s;
+      const wave = (c, t) => c.A * Math.sin(c.w * t + c.p);
+      const tx = t => L + t / TMAX * (R - L);
+      const norm = a => ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const toPh = c => ({ w: c.w, re: c.A * Math.cos(c.p), im: c.A * Math.sin(c.p) });
+      const amp = c => Math.hypot(c.re, c.im);
+      const sig = list => t => list.reduce((s, c) => s + c.re * Math.sin(c.w * t) + c.im * Math.cos(c.w * t), 0);
+      const peak = list => { let m = 0; const f = sig(list); for (let k = 0; k <= 600; k++) m = Math.max(m, Math.abs(f(k / 600 * TMAX))); return m; };
+      function add(list, c) {
+        const out = list.map(x => ({ ...x })), p = toPh(c), hit = out.find(x => Math.abs(x.w - p.w) < 1e-9);
+        if (hit) { hit.re += p.re; hit.im += p.im; } else out.push(p);
+        return out.filter(x => amp(x) > 1e-9);
+      }
+
+      function newSignal() {
+        const w1 = rint(1, 3) * 0.5;
+        let w2 = rint(1, 8) * 0.5; while (Math.abs(w2 - w1) < 1) w2 = rint(1, 8) * 0.5;
+        start = [toPh({ A: rint(6, 13) / 10, w: w1, p: rint(0, 23) * STEP.p }), toPh({ A: rint(4, 9) / 10, w: w2, p: rint(0, 23) * STEP.p })];
+        restart();
+      }
+      function restart() {
+        comps = start.map(x => ({ ...x })); before = comps; history = []; drops = 0;
+        drop = { A: 1, w: 1, p: 0 }; state = "wait"; anim = 1; peakNow = peak(comps);
+        say("");
+        loop();
+      }
+      function undo() {
+        if (!history.length || state === "merge") return;
+        comps = history.pop(); before = comps; drops--; state = "wait"; anim = 1; peakNow = peak(comps);
+        say(drops ? "Took back the last drop." : "");
+        loop();
+      }
+      function turn(dial, d) {
+        if (state !== "wait") return;
+        if (dial === "p") drop.p = norm(drop.p + d * STEP.p);
+        else drop[dial] = Math.min(MAX[dial], Math.max(MIN[dial], round(drop[dial] + d * STEP[dial], STEP[dial])));
+        draw();
+      }
+      function land() {
+        if (state !== "wait") return;
+        history.push(comps); before = comps; comps = add(comps, drop); drops++;
+        peakNow = peak(comps); state = "merge"; anim = 0; loop();
+      }
+      function settle() {
+        const p = peakNow.toFixed(2), n = drops + " drop" + (drops === 1 ? "" : "s");
+        if (peakNow < 1e-6) { state = "done"; say("<strong class='win'>Perfectly flat</strong> in " + n + "."); }
+        else if (peakNow < WIN) { state = "done"; say("<strong class='win'>Flat enough</strong> in " + n + ". The leftover reaches " + p + ", under the threshold of 0.33."); }
+        else {
+          state = "wait";
+          const left = comps.length;
+          say("The leftover reaches " + p + " after " + n + ". " +
+              (left === 1 ? "It is now a single wave." : "It is still made of " + left + " waves.") + " Drop again.");
+        }
+        controls();
+      }
+      const say = h => { document.getElementById("result").innerHTML = h; };
+      function controls() {
+        document.querySelectorAll(".round").forEach(b => b.disabled = state !== "wait");
+        document.getElementById("drop").disabled = state !== "wait";
+        document.getElementById("undo").disabled = !history.length || state === "merge";
+        document.getElementById("count").textContent = drops;
+      }
+
+      function el(tag, attrs, text) {
+        const e = document.createElementNS(NS, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        if (text != null) e.textContent = text;
+        svg.appendChild(e); return e;
+      }
+      function path(f, y0) { let d = ""; for (let k = 0; k <= 400; k++) { const t = k / 400 * TMAX; d += (k ? "L" : "M") + tx(t).toFixed(1) + " " + (y0 - f(t) * SC).toFixed(1) + " "; } return d; }
+
+      function draw() {
+        svg.innerHTML = "";
+        const defs = el("defs", {}), cp = document.createElementNS(NS, "clipPath"), cr = document.createElementNS(NS, "rect");
+        cp.setAttribute("id", "board-clip"); [["x", L], ["y", TOP], ["width", R - L], ["height", BOT - TOP]].forEach(([k, v]) => cr.setAttribute(k, v));
+        cp.appendChild(cr); defs.appendChild(cp);
+        el("rect", { class: "frame", x: L, y: TOP, width: R - L, height: BOT - TOP, rx: 8 });
+        for (let g = 1; g < 8; g++) el("line", { class: "grid", x1: L + g * (R - L) / 8, x2: L + g * (R - L) / 8, y1: TOP, y2: BOT });
+        el("line", { class: "base", x1: L, x2: R, y1: BASEY, y2: BASEY });
+        // faint height marks at ±0.5 and ±1 around the centre line, for reading amplitudes
+        [-1, -0.5, 0.5, 1].forEach(v => el("line", { class: "grid", x1: L, x2: R, y1: BASEY - v * SC, y2: BASEY - v * SC }));
+        el("text", { x: L + 6, y: BASEY - SC - 4 }, "1"); el("text", { x: L + 6, y: BASEY - SC / 2 - 4 }, "0.5");
+        // the signal; during a merge the new signal sweeps in from the left
+        const now = sig(comps), old = sig(before), edge = anim * TMAX;
+        const flat = state === "done";
+        el("path", { class: "sig" + (flat ? " flat" : ""), "clip-path": "url(#board-clip)", d: path(t => (t <= edge ? now(t) : old(t)), BASEY) });
+        if (state === "merge" && anim < 1) {
+          const a = old(edge), b = now(edge);
+          el("line", { class: "bar", x1: tx(edge), x2: tx(edge), y1: BASEY - a * SC, y2: BASEY - b * SC, stroke: b > a ? "var(--up)" : "var(--down)" });
+        }
+        if (state === "wait") {
+          // the hint: the mirror image of the biggest wave left in the signal
+          if (document.getElementById("hint").checked && comps.length) {
+            const big = comps.reduce((m, c) => amp(c) > amp(m) ? c : m);
+            el("path", { class: "hint", d: path(t => -(big.re * Math.sin(big.w * t) + big.im * Math.cos(big.w * t)), STARTY) });
+          }
+          el("path", { class: "fall", d: path(t => wave(drop, t), STARTY) });
+        }
+        // the drop's dials, drawn as a circle: radius A, arm at angle φ
+        const cx = 58, cy = state === "wait" ? STARTY : BASEY, r = drop.A * 30;
+        el("circle", { class: "ring", cx, cy, r });
+        el("line", { class: "arm", x1: cx, y1: cy, x2: cx + r * Math.cos(drop.p), y2: cy - r * Math.sin(drop.p) });
+        el("circle", { cx: cx + r * Math.cos(drop.p), cy: cy - r * Math.sin(drop.p), r: 3, fill: "var(--drop)" });
+        el("text", { x: R - 8, y: BOT - 8, "text-anchor": "end" }, "signal");
+        document.getElementById("vA").textContent = drop.A.toFixed(1);
+        document.getElementById("vw").textContent = drop.w.toFixed(1);
+        document.getElementById("vp").textContent = (drop.p / Math.PI).toFixed(2).replace(/\.?0+$/, "") + "π";
+      }
+
+      function loop() {
+        cancelAnimationFrame(raf); last = performance.now(); controls();
+        const tick = t => {
+          const dt = Math.min(0.1, (t - last) / 1000); last = t;
+          if (state === "merge") { anim = Math.min(1, anim + dt / 1.6); if (anim >= 1) settle(); }
+          draw();
+          if (state === "merge") raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      }
+
+      document.querySelectorAll(".round").forEach(b => b.addEventListener("click", () => turn(b.dataset.dial, +b.dataset.d)));
+      document.getElementById("drop").addEventListener("click", land);
+      document.getElementById("undo").addEventListener("click", undo);
+      document.getElementById("restart").addEventListener("click", restart);
+      document.getElementById("new").addEventListener("click", newSignal);
+      document.getElementById("hint").addEventListener("change", draw);
+      document.addEventListener("keydown", e => {
+        if (e.target.tagName === "INPUT" && e.target.type !== "checkbox") return;
+        const k = e.key.toLowerCase(), map = { u: ["w", 1], j: ["w", -1], i: ["A", 1], k: ["A", -1], o: ["p", 1], l: ["p", -1] };
+        if (map[k]) { turn(...map[k]); e.preventDefault(); }
+        else if (k === "p") land();
+      });
+      newSignal();
+    })();
+  </script>
+</body>
+</html>

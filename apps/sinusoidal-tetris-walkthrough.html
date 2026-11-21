@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flattening a Signal | Sinusoidal Tetris | Sam Kirwan</title>
+  <meta name="description" content="A walkthrough of flattening a signal: a wiggly signal made of two sine waves is cancelled, one wave at a time, by dropping each wave's mirror image on top of it." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #0e0e11;
+      --ink:   #f4f6ff;
+      --body:  rgba(243, 246, 255, 0.88);
+      --dim:   rgba(238, 242, 252, 0.5);
+      --faint: rgba(238, 242, 252, 0.15);
+      --hair:  rgba(238, 242, 252, 0.08);
+      --slow:  #e8a33d;   /* the slow wave */
+      --fast:  #7aa7ff;   /* the fast wave */
+      --flat:  #7fcf9a;   /* what is left */
+      --plus:  #f4879c;   /* the merge pushing up */
+      --measure: 40rem;
+    }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body { background: var(--bg); color: var(--body); font-family: "Spectral", Georgia, serif; -webkit-font-smoothing: antialiased; }
+    .sheet { width: min(var(--measure), calc(100% - 2.4rem)); margin: 0 auto; padding: clamp(2.4rem, 7vh, 4.5rem) 0 4rem; }
+    .crumb { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
+    .crumb::before { content: "← "; }
+    .crumb:hover { color: var(--ink); }
+    h1 { margin-top: 1.2rem; font-weight: 400; font-size: clamp(2.3rem, 7.4vw, 3.9rem); line-height: 1.05; color: var(--ink); }
+    h1 { margin-bottom: 1.8rem; }
+    h1::after { content: ""; display: block; width: 2rem; height: 1px; background: var(--slow); margin-top: 1.4rem; }
+    h2 { margin: 3rem 0 1rem; font-weight: 400; font-size: clamp(1.45rem, 3.6vw, 1.9rem); color: var(--ink); }
+    p, li { font-size: clamp(1.1rem, 2.4vw, 1.22rem); line-height: 1.7; }
+    p + p, .math + p, p + .math { margin-top: 0.9rem; }
+    ul { margin: 0.9rem 0 0 1.3rem; }
+    li + li { margin-top: 0.3rem; }
+    strong { color: var(--ink); font-weight: 500; }
+    .math { margin: 1.1rem 0; color: var(--ink); }
+    .c-slow { color: var(--slow); } .c-fast { color: var(--fast); } .c-flat { color: var(--flat); }
+    a { color: #b9a8d4; }
+    .next { margin-top: 2.6rem; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .next a { color: var(--slow); text-decoration: none; border-bottom: 1px solid rgba(232, 163, 61, 0.4); }
+    .next a:hover { border-bottom-color: var(--slow); }
+    .credit { margin-top: 3.4rem; padding-top: 1.2rem; border-top: 1px solid var(--hair); font-size: 0.95rem; color: var(--dim); }
+
+    /* the walkthrough */
+    .walk { margin: 2rem 0 1rem; }
+    .walk svg { display: block; width: 100%; overflow: visible; }
+    .walk text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
+    .walk .axis { stroke: var(--faint); stroke-width: 1.2; }
+    .walk .grid { stroke: var(--hair); stroke-width: 1; }
+    .walk .res { fill: none; stroke: var(--ink); stroke-width: 2.2; }
+    .walk .comp { fill: none; stroke-width: 1.4; stroke-opacity: 0.75; }
+    .walk .drop { fill: none; stroke-width: 2; stroke-dasharray: 6 5; }
+    .walk .bar { stroke-width: 1.4; }
+    .walk .ring { fill: none; stroke-width: 1.4; }
+    .walk .arm { stroke-width: 1.6; }
+    .walk text.lab { font-size: 12px; }
+    .cap { min-height: 6.2rem; margin-top: 1rem; text-align: center; font-size: clamp(1.05rem, 2.3vw, 1.18rem); line-height: 1.6; color: var(--body); }
+    .cap strong { color: var(--ink); }
+    .nav { display: flex; justify-content: center; align-items: center; gap: 1.4rem; margin-top: 0.8rem; }
+    .nav button {
+      font: inherit; font-size: 1.2rem; line-height: 1; width: 2.3rem; height: 2.3rem; border-radius: 50%;
+      background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .nav button:hover:not(:disabled) { border-color: var(--dim); }
+    .nav button:disabled { opacity: 0.25; cursor: default; }
+    .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+    .nav .count { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--dim); min-width: 3.4rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <a class="crumb" href="sinusoidal-tetris.html">Sinusoidal Tetris</a>
+    <h1>Flattening a Signal</h1>
+
+    <p>In Sinusoidal Tetris, a wiggly signal sits at the bottom of the board.</p>
+    <p>Sine waves fall from the top, one at a time. Each one lands on the signal and is <strong>added</strong> to it.</p>
+    <p>The aim is to choose each falling wave so that the signal ends up <strong>flat</strong>.</p>
+
+    <h2>Three Dials</h2>
+    <p>Every falling wave is a sine wave with three dials you can turn:</p>
+    <div class="math">\[y(t) = A \sin(\omega t + \varphi)\]</div>
+    <ul>
+      <li>\(A\), the <strong>amplitude</strong>: how tall the wave is.</li>
+      <li>\(\omega\), the <strong>frequency</strong>: how quickly it wiggles.</li>
+      <li>\(\varphi\), the <strong>phase</strong>: how far along its cycle it starts.</li>
+    </ul>
+
+    <h2>Flattening a Signal, Step by Step</h2>
+    <p>Here is the easiest possible game: a signal made of just two sine waves.</p>
+
+    <div class="walk" id="walk">
+      <svg id="plot" viewBox="0 0 600 295" role="img"></svg>
+      <div class="cap" id="cap" aria-live="polite"></div>
+      <div class="nav">
+        <button type="button" id="prev" aria-label="Previous step">←</button>
+        <span class="count" id="count"></span>
+        <button type="button" id="next" aria-label="Next step">→</button>
+      </div>
+    </div>
+
+    <h2>The Idea</h2>
+    <p>Each wave is cancelled by its <strong>mirror image</strong>: the same amplitude and the same frequency, with the phase moved half a turn.</p>
+    <div class="math">\[A \sin(\omega t + \varphi) + A \sin(\omega t + \varphi + \pi) = 0\]</div>
+    <p>Half a turn flips the wave upside down, so wherever one is up, the other is down by the same amount.</p>
+    <p>A complicated signal is just several waves added together, so it can be flattened <strong>one wave at a time</strong>.</p>
+    <p>Get any dial slightly wrong and a small wave is left behind. In the game, that leftover becomes part of the signal you have to deal with next.</p>
+
+    <p class="next"><a href="sinusoidal-tetris-one-wave.html">Play: Cancel One Wave →</a></p>
+
+    <p class="credit">Based on <a href="https://www.andreinc.net" rel="noopener">Sinusoidal Tetris</a> by Andrei N. Ciobanu.</p>
+  </div>
+
+  <script>
+    // The walkthrough: a signal made of a slow wave and a fast wave is flattened by dropping
+    // each wave's mirror image onto it. Each step has a caption; stepping into a "land" step
+    // animates the merge sweeping left to right, as in the game.
+    (function () {
+      const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("plot");
+      const SLOW = { A: 1.0, w: 1, p: 0.4, col: "#e8a33d" }, FAST = { A: 0.55, w: 3, p: 1.3, col: "#7aa7ff" };
+      const TMAX = 4 * Math.PI, L = 92, R = 590, MID = 172, SC = 55;
+      const wave = (c, t, flip) => c.A * Math.sin(c.w * t + c.p + (flip ? Math.PI : 0));
+      const off = { A: 1.0, w: 1, p: 0.4 + Math.PI + 0.5, col: "#e8a33d" };   // a slightly wrong drop
+
+      // residual: which waves are still in the signal; drop: the falling wave; land: animate the merge
+      const STEPS = [
+        { res: [SLOW, FAST], cap: "This signal looks complicated, but it is only <strong>two sine waves</strong> added together." },
+        { res: [SLOW, FAST], show: true, cap: "Pulled apart, it is a <strong class='c-slow'>slow wave</strong> and a <strong class='c-fast'>fast wave</strong>." },
+        { res: [SLOW, FAST], drop: SLOW, cap: "To cancel the slow wave, drop its <strong>mirror image</strong>: the same <em>A</em> and <em>ω</em>, with <em>φ</em> moved half a turn." },
+        { res: [FAST], drop: SLOW, land: [SLOW, FAST], cap: "The drop is added to the signal. Where the signal was up, the drop was down. <strong class='c-slow'>The slow wave is gone.</strong>" },
+        { res: [FAST], show: true, drop: FAST, cap: "Only the <strong class='c-fast'>fast wave</strong> is left. Drop its mirror image in the same way." },
+        { res: [], drop: FAST, land: [FAST], cap: "<strong class='c-flat'>Flat.</strong> Both waves have been cancelled, one at a time." },
+        { res: [SLOW, FAST], drop: off, wrong: true, cap: "What if a dial is slightly off? Here the phase is wrong by about a twelfth of a turn&hellip;" },
+        { res: [FAST], wrongRes: true, drop: off, land: [SLOW, FAST], wrong: true, cap: "&hellip;so the slow wave is not fully cancelled. A smaller slow wave is left behind for the next drop." }
+      ];
+      let i = 0, anim = 1, raf = null;
+
+      function el(tag, attrs, text) {
+        const e = document.createElementNS(NS, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        if (text != null) e.textContent = text;
+        svg.appendChild(e); return e;
+      }
+      const tx = t => L + t / TMAX * (R - L), ty = v => MID - v * SC;
+      function path(f) { let d = ""; for (let k = 0; k <= 300; k++) { const t = k / 300 * TMAX; d += (k ? "L" : "M") + tx(t).toFixed(1) + " " + ty(f(t)).toFixed(1) + " "; } return d; }
+      const sum = list => t => list.reduce((s, c) => s + wave(c, t), 0);
+
+      function residual(st) {
+        if (st.wrongRes) return t => wave(SLOW, t) + wave(FAST, t) + wave(off, t);
+        return sum(st.res);
+      }
+
+      function phasor(c, flip) {
+        // the drop's dials, drawn as in the game: a circle of radius A, an arm at angle φ
+        const cx = 40, cy = MID, r = c.A * 30, a = c.p + (flip ? Math.PI : 0);
+        el("circle", { class: "ring", cx, cy, r, stroke: c.col, "stroke-opacity": 0.6 });
+        el("line", { class: "arm", x1: cx, y1: cy, x2: cx + r * Math.cos(a), y2: cy - r * Math.sin(a), stroke: c.col });
+        el("circle", { cx: cx + r * Math.cos(a), cy: cy - r * Math.sin(a), r: 3, fill: c.col });
+        el("text", { class: "lab", x: cx, y: cy + r + 18, "text-anchor": "middle", fill: c.col }, "φ = " + ((a % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI)).toFixed(2));
+      }
+
+      function draw() {
+        const st = STEPS[i];
+        svg.innerHTML = "";
+        for (let g = -2; g <= 2; g++) el("line", { class: g ? "grid" : "axis", x1: L, x2: R, y1: ty(g), y2: ty(g) });
+        const flip = !st.wrong;
+        // the falling wave and its dials
+        if (st.drop) {
+          const dropF = t => wave(st.drop, t, flip);
+          const lift = st.land ? 0 : -1.6;
+          el("path", { class: "drop", d: path(t => dropF(t) - lift), stroke: st.drop.col, "stroke-opacity": st.land ? 0.35 * (1 - anim) + 0.15 : 0.9 });
+          phasor(st.drop, flip);
+        }
+        // the signal's components, faint
+        if (st.show) st.res.forEach(c => el("path", { class: "comp", d: path(t => wave(c, t)), stroke: c.col }));
+        // the signal itself: during a landing, the new signal sweeps in from the left
+        const now = residual(st), before = st.land ? sum(st.land) : now, edge = anim * TMAX;
+        el("path", { class: "res", d: path(t => (t <= edge ? now(t) : before(t))), stroke: st.res.length || st.wrongRes ? "#f4f6ff" : "#7fcf9a" });
+        if (st.land && anim < 1) {
+          const t = edge, a = before(t), b = now(t);
+          el("line", { class: "bar", x1: tx(t), x2: tx(t), y1: ty(a), y2: ty(b), stroke: b > a ? "#f4879c" : "#7aa7ff" });
+        }
+        el("text", { x: R, y: ty(-2) + 16, "text-anchor": "end" }, "signal");
+        svg.setAttribute("aria-label", document.getElementById("cap").textContent);
+      }
+
+      function go(j) {
+        if (j < 0 || j >= STEPS.length) return;
+        i = j;
+        document.getElementById("cap").innerHTML = STEPS[i].cap;
+        document.getElementById("count").textContent = (i + 1) + " / " + STEPS.length;
+        document.getElementById("prev").disabled = i === 0;
+        document.getElementById("next").disabled = i === STEPS.length - 1;
+        cancelAnimationFrame(raf);
+        const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (STEPS[i].land && !reduce) {
+          const t0 = performance.now();
+          const tick = now => { anim = Math.min(1, (now - t0) / 1400); draw(); if (anim < 1) raf = requestAnimationFrame(tick); };
+          anim = 0; raf = requestAnimationFrame(tick);
+        } else { anim = 1; draw(); }
+      }
+      document.getElementById("prev").addEventListener("click", () => go(i - 1));
+      document.getElementById("next").addEventListener("click", () => go(i + 1));
+      go(0);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive explanations of EEG analysis by Sam Kirwan." />
+  <title>EEG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #08090b;
+      --text: #f4f5f8;
+      --soft: rgba(244, 245, 248, 0.6);
+      --accent: #7aa7ff;
+    }
+    html, body { min-height: 100%; }
+    body {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* a faint EEG trace running behind the page */
+    .trace { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100svh; pointer-events: none; }
+    main {
+      position: relative; z-index: 1;
+      width: min(46rem, calc(100% - 2rem));
+      margin-left: clamp(2rem, 11vw, 10rem);
+      padding: clamp(3rem, 9vh, 5.5rem) 0;
+      text-align: left;
+    }
+    h1 {
+      font-size: clamp(3rem, 7vw, 5.4rem);
+      font-weight: 300;
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+    }
+    nav { margin-top: clamp(2.4rem, 6vh, 4rem); }
+    h2 {
+      margin-bottom: 1.1rem;
+      color: var(--accent);
+      opacity: 0.85;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    ul { list-style: none; counter-reset: page; }
+    li { counter-increment: page; display: flex; align-items: baseline; gap: 1.1rem; }
+    li::before {
+      content: counter(page, decimal-leading-zero);
+      min-width: 1.6rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--accent);
+      opacity: 0.75;
+    }
+    li + li { margin-top: 0.7rem; }
+    a, li.planned span {
+      display: inline-block;
+      color: var(--text);
+      font-size: clamp(1rem, 1.65vw, 1.25rem);
+      font-weight: 300;
+      line-height: 1.35;
+      text-decoration: none;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+    a:hover,
+    a:focus-visible {
+      color: var(--accent);
+      outline: none;
+      transform: translateX(3px);
+    }
+    /* working titles for pages not yet written */
+    li.planned span { color: var(--soft); opacity: 0.6; }
+    li.planned::before { opacity: 0.4; }
+    @media (max-height: 720px) and (min-width: 600px) {
+      main { padding-block: 2rem; }
+      nav { margin-top: 2rem; }
+      li + li { margin-top: 0.45rem; }
+    }
+    @media (max-width: 560px) {
+      main {
+        width: min(27rem, calc(100% - 4rem));
+        margin-left: 2rem;
+      }
+      h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
+      nav { margin-top: 2.6rem; }
+      li + li { margin-top: 0.8rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="trace" aria-hidden="true"></canvas>
+  <main>
+    <h1>EEG</h1>
+    <nav aria-label="EEG pages">
+      <section aria-labelledby="ch-frequency">
+        <h2 id="ch-frequency">Frequency Domain Analyses</h2>
+        <ul>
+          <li><a href="eeg-frequency-domain-overview.html">An Overview of Frequency Domain Analyses</a></li>
+          <li><a href="eeg-power-spectral-density.html">Power Spectral Density</a></li>
+          <li class="planned"><span>Time&ndash;Frequency Analysis</span></li>
+          <li class="planned"><span>Coherence and Connectivity</span></li>
+          <li class="planned"><span>Cross-Frequency Coupling</span></li>
+          <li class="planned"><span>The Aperiodic Component</span></li>
+        </ul>
+      </section>
+    </nav>
+  </main>
+  <script>
+    // A faint EEG-like trace drifting across the lower part of the page: a few rhythms and some
+    // irregular background, scrolling slowly from right to left. Still for reduced motion.
+    (function () {
+      var c = document.querySelector(".trace"); if (!c || !c.getContext) return;
+      var ctx = c.getContext("2d"), W, H;
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var parts = [];
+      for (var i = 0; i < 24; i++) { var f = 0.4 + Math.random() * 14; parts.push([f, (1 / Math.sqrt(f)) * (0.6 + Math.random()), Math.random() * 6.283]); }
+      parts.push([10, 1.1, 0]);   // alpha
+      var peak = 0; for (var j = 0; j < 4000; j++) { var t = j / 100; var s0 = 0; for (var i2 = 0; i2 < parts.length; i2++) s0 += parts[i2][1] * Math.sin(2 * Math.PI * parts[i2][0] * t + parts[i2][2]); peak = Math.max(peak, Math.abs(s0)); }
+      function size() {
+        var k = window.devicePixelRatio || 1; W = window.innerWidth; H = window.innerHeight;
+        c.width = W * k; c.height = H * k; ctx.setTransform(k, 0, 0, k, 0, 0);
+      }
+      function v(t) { var s = 0; for (var i = 0; i < parts.length; i++) s += parts[i][1] * Math.sin(2 * Math.PI * parts[i][0] * t + parts[i][2]); return s; }
+      function draw(now) {
+        ctx.clearRect(0, 0, W, H);
+        var y0 = H * 0.88, amp = Math.min(40, H * 0.06) / peak, t0 = now / 1000 * 0.35, span = 4;
+        ctx.strokeStyle = "rgba(122, 167, 255, 0.22)"; ctx.lineWidth = 1.2; ctx.beginPath();
+        for (var x = 0; x <= W; x += 2) { var y = y0 - amp * v(t0 + x / W * span); x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke();
+        if (!still) requestAnimationFrame(draw);
+      }
+      size(); window.addEventListener("resize", function () { size(); if (still) draw(0); });
+      still ? draw(0) : requestAnimationFrame(draw);
+    })();
+  </script>
+</body>
+</html>

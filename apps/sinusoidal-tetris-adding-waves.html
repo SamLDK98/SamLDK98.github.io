@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding Waves | Sinusoidal Tetris | Sam Kirwan</title>
+  <meta name="description" content="Waves add point by point. Two waves at the same frequency always make one wave, larger or smaller depending on their phases; waves at different frequencies make a more complicated shape." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #0e0e11;
+      --ink:   #f4f6ff;
+      --body:  rgba(243, 246, 255, 0.88);
+      --dim:   rgba(238, 242, 252, 0.5);
+      --faint: rgba(238, 242, 252, 0.15);
+      --hair:  rgba(238, 242, 252, 0.08);
+      --one:   #e8a33d;   /* the first wave */
+      --two:   #7aa7ff;   /* the second wave */
+      --sum:   #f4f6ff;   /* their sum */
+      --measure: 40rem;
+    }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body { background: var(--bg); color: var(--body); font-family: "Spectral", Georgia, serif; -webkit-font-smoothing: antialiased; }
+    .sheet { width: min(var(--measure), calc(100% - 2.4rem)); margin: 0 auto; padding: clamp(2.4rem, 7vh, 4.5rem) 0 4rem; }
+    .crumb { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
+    .crumb::before { content: "← "; }
+    .crumb:hover { color: var(--ink); }
+    h1 { margin: 1.2rem 0 1.8rem; font-weight: 400; font-size: clamp(2.3rem, 7.4vw, 3.9rem); line-height: 1.05; color: var(--ink); }
+    h1::after { content: ""; display: block; width: 2rem; height: 1px; background: var(--one); margin-top: 1.4rem; }
+    h2 { margin: 3rem 0 1rem; font-weight: 400; font-size: clamp(1.45rem, 3.6vw, 1.9rem); color: var(--ink); }
+    p, li { font-size: clamp(1.1rem, 2.4vw, 1.22rem); line-height: 1.7; }
+    p + p, .math + p, p + .math, .aw + p, ul + p { margin-top: 0.9rem; }
+    ul { margin: 0.9rem 0 0 1.3rem; }
+    li + li { margin-top: 0.3rem; }
+    strong { color: var(--ink); font-weight: 500; }
+    .math { margin: 1.1rem 0; color: var(--ink); }
+    .c-one { color: var(--one); } .c-two { color: var(--two); }
+    a { color: #b9a8d4; }
+    .next { margin-top: 2.6rem; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .next a { color: var(--one); text-decoration: none; border-bottom: 1px solid rgba(232, 163, 61, 0.4); }
+    .next a:hover { border-bottom-color: var(--one); }
+
+    /* the adding widgets */
+    .aw { margin: 1.8rem 0 1.4rem; }
+    .aw svg { display: block; width: 100%; overflow: visible; }
+    .aw text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
+    .aw .axis { stroke: var(--faint); stroke-width: 1.2; }
+    .aw .grid { stroke: var(--hair); stroke-width: 1; }
+    .aw .w1 { fill: none; stroke: var(--one); stroke-width: 1.5; stroke-opacity: 0.8; }
+    .aw .w2 { fill: none; stroke: var(--two); stroke-width: 1.5; stroke-opacity: 0.8; }
+    .aw .ws { fill: none; stroke: var(--sum); stroke-width: 2.4; }
+    .aw .b1 { stroke: var(--one); stroke-width: 3; stroke-linecap: round; }
+    .aw .b2 { stroke: var(--two); stroke-width: 3; stroke-linecap: round; }
+    .aw .cursor { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 2 4; }
+    .aw .ring { fill: none; stroke: var(--faint); stroke-width: 1; }
+    .aw .a1 { stroke: var(--one); stroke-width: 2; }
+    .aw .a2 { stroke: var(--two); stroke-width: 2; }
+    .aw .as { stroke: var(--sum); stroke-width: 2.2; }
+    .aw .read { text-align: center; font-size: clamp(1.02rem, 2.2vw, 1.12rem); line-height: 1.6; color: var(--body); margin-top: 0.7rem; min-height: 1.8rem; }
+    .aw .read .n { font-family: "IBM Plex Mono", monospace; font-size: 0.92em; }
+    .aw .read .n1 { color: var(--one); } .aw .read .n2 { color: var(--two); } .aw .read .ns { color: var(--sum); }
+    .aw input[type="range"] { display: block; width: calc(465 / 640 * 100%); margin: 0.4rem 0 0 calc(165 / 640 * 100%); accent-color: #b9a8d4; }
+    .ctl { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.7rem 1.8rem; margin-top: 0.9rem; }
+    .dial-ctl { display: flex; align-items: center; gap: 0.55rem; }
+    .dial-ctl .name { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--two); }
+    .dial-ctl .val { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; color: var(--ink); min-width: 3.4rem; text-align: center; }
+    .round {
+      font: inherit; font-size: 1rem; line-height: 1; width: 2rem; height: 2rem; border-radius: 50%;
+      background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .round:hover:not(:disabled) { border-color: var(--dim); }
+    .round:disabled { opacity: 0.25; cursor: default; }
+    .round:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <a class="crumb" href="sinusoidal-tetris.html">Sinusoidal Tetris</a>
+    <h1>Adding Waves</h1>
+
+    <p>In the game, every wave that lands is <strong>added</strong> to the signal. So before flattening anything, we need to know what adding two waves actually does.</p>
+
+    <h2>Adding Point by Point</h2>
+    <p>Adding two waves means adding their <strong>heights</strong> at every moment.</p>
+    <p>Slide along the board. At each point, the <span class="c-one">amber</span> height and the <span class="c-two">blue</span> height are stacked, and the white curve is where the stack ends.</p>
+    <div class="aw" data-mode="slide"></div>
+    <p>Where both waves are up, the sum is higher than either. Where one is up and the other is down, they partly cancel. A height below the centre line counts as negative, so it pulls the sum down.</p>
+
+    <h2>Same Frequency: Still One Wave</h2>
+    <p>When the two waves have the <strong>same frequency</strong>, something tidy happens: their sum is always a single wave, at that same frequency.</p>
+    <p>Only its size changes, and that depends on how far apart the two phases are. Turn the <span class="c-two">blue</span> wave&rsquo;s phase:</p>
+    <div class="aw" data-mode="phase"></div>
+    <ul>
+      <li><strong>In step</strong> (phases equal): the crests line up and the sizes add. \(1 + 1 = 2\).</li>
+      <li><strong>A quarter turn apart</strong>: the sum is in between, about \(1.41\).</li>
+      <li><strong>Half a turn apart</strong>: every crest meets a trough, and the sum is <strong>flat</strong>. \(1 - 1 = 0\).</li>
+    </ul>
+    <p>The circles on the left show why. Each wave is an arm going round a circle, and adding the waves adds the arms tip to tail. The <strong>white arm</strong> is the sum: it is just another arm going round at the same speed, so the sum is another wave. When the two arms point in opposite directions, the white arm shrinks to nothing.</p>
+    <p>This is why a drop that is <strong>nearly</strong> right leaves a small wave behind, rather than a mess: the leftover is still one wave at the same frequency, only smaller.</p>
+
+    <h2>Different Frequencies: a New Shape</h2>
+    <p>Waves at <strong>different frequencies</strong> do not merge into one wave. One arm goes round faster than the other, so they drift in and out of step, and the sum takes on a more complicated shape.</p>
+    <div class="aw" data-mode="freq"></div>
+    <p>Change the <span class="c-two">blue</span> wave&rsquo;s frequency. Only when it matches the <span class="c-one">amber</span> wave does the sum become a single wave again.</p>
+    <p>This is the signal in <a href="sinusoidal-tetris-two-waves.html">Cancel Two Waves</a>: two waves at different frequencies, added together.</p>
+
+    <h2>Taking a Shape Apart</h2>
+    <p>The game runs this in reverse. It hands you a complicated shape and asks you to find the simple waves inside it, then cancel them <strong>one at a time</strong>.</p>
+    <p>A wave at one frequency can only be cancelled by a wave at the <strong>same</strong> frequency. A drop at any other frequency just adds a new wave to the pile.</p>
+    <p>Splitting a complicated signal into simple waves is the idea behind the <strong>Fourier transform</strong>, which is how scientists find the rhythms inside signals such as <a href="../eeg-frequency-domain-overview.html">brain recordings</a>.</p>
+
+    <p class="next"><a href="sinusoidal-tetris-walkthrough.html">Next: Flattening a Signal →</a></p>
+  </div>
+
+  <script>
+    // Three widgets, chosen by data-mode:
+    //   slide: two fixed waves at different frequencies, a slider that stacks their heights at one point;
+    //   phase: two waves of the same frequency, a phase dial for the blue one, with the arms added tip to tail;
+    //   freq:  a frequency dial and a phase dial for the blue one.
+    (function () {
+      const NS = "http://www.w3.org/2000/svg";
+      const TMAX = 4 * Math.PI, CX = 70, L = 165, R = 630, MID = 104, SC = 42, H = 212;
+      const wave = (c, t) => c.A * Math.sin(c.w * t + c.p * Math.PI);
+      const fmtP = v => ((((v % 2) + 2) % 2).toFixed(2).replace(/\.?0+$/, "") || "0") + "π";
+      const n = (v, cls) => `<span class="n ${cls}">${(Math.abs(v) < 0.005 ? 0 : v).toFixed(2)}</span>`;
+
+      document.querySelectorAll(".aw").forEach(box => {
+        const mode = box.dataset.mode;
+        const one = { A: 1, w: 1, p: 0 };
+        const two = mode === "slide" ? { A: 0.6, w: 2.5, p: 0.5 } : mode === "phase" ? { A: 1, w: 1, p: 0 } : { A: 0.6, w: 2, p: 0 };
+        let at = 0.3;   // the slider's position, as a fraction of the board
+        const svg = document.createElementNS(NS, "svg");
+        svg.setAttribute("viewBox", `0 0 640 ${H}`); svg.setAttribute("role", "img");
+        box.appendChild(svg);
+        if (mode === "slide") {
+          const r = document.createElement("input"); r.type = "range"; r.min = 0; r.max = 1000; r.value = at * 1000;
+          r.setAttribute("aria-label", "Position along the board");
+          r.addEventListener("input", () => { at = r.value / 1000; draw(); });
+          box.appendChild(r);
+        }
+        const read = document.createElement("div"); read.className = "read"; read.setAttribute("aria-live", "polite"); box.appendChild(read);
+        const dials = mode === "phase" ? ["p"] : mode === "freq" ? ["w", "p"] : [];
+        const STEP = { w: 0.5, p: 1 / 12 }, MIN = { w: 0.5, p: -Infinity }, MAX = { w: 4, p: Infinity }, NAME = { w: "ω", p: "φ" };
+        if (dials.length) {
+          const ctl = document.createElement("div"); ctl.className = "ctl"; box.appendChild(ctl);
+          dials.forEach(k => {
+            const d = document.createElement("div"); d.className = "dial-ctl"; d.dataset.k = k;
+            d.innerHTML = `<span class="name">${NAME[k]}</span><button class="round" data-d="-1" aria-label="Decrease the blue wave's ${k === "w" ? "frequency" : "phase"}">−</button><span class="val"></span><button class="round" data-d="1" aria-label="Increase the blue wave's ${k === "w" ? "frequency" : "phase"}">+</button>`;
+            d.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+              const v = Math.round((two[k] + +b.dataset.d * STEP[k]) / STEP[k]) * STEP[k];
+              two[k] = Math.min(MAX[k], Math.max(MIN[k], +v.toFixed(4))); draw();
+            }));
+            ctl.appendChild(d);
+          });
+        }
+        const tx = t => L + t / TMAX * (R - L);
+        function el(tag, attrs) { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); svg.appendChild(e); return e; }
+        function path(f) { let d = ""; for (let i = 0; i <= 420; i++) { const t = i / 420 * TMAX; d += (i ? "L" : "M") + tx(t).toFixed(1) + " " + (MID - f(t) * SC).toFixed(1) + " "; } return d; }
+
+        function draw() {
+          svg.innerHTML = "";
+          [-2, -1, 1, 2].forEach(g => el("line", { class: "grid", x1: L, x2: R, y1: MID - g * SC, y2: MID - g * SC }));
+          el("line", { class: "axis", x1: L, x2: R, y1: MID, y2: MID });
+          [1, 2].forEach(g => { const t = el("text", { x: L - 6, y: MID - g * SC + 4, "text-anchor": "end" }); t.textContent = g; });
+          el("path", { class: "w1", d: path(t => wave(one, t)) });
+          el("path", { class: "w2", d: path(t => wave(two, t)) });
+          el("path", { class: "ws", d: path(t => wave(one, t) + wave(two, t)) });
+
+          if (mode === "slide") {
+            const t = at * TMAX, h1 = wave(one, t), h2 = wave(two, t), x = tx(t);
+            el("line", { class: "cursor", x1: x, x2: x, y1: MID - 2.4 * SC, y2: MID + 2.4 * SC });
+            el("line", { class: "b1", x1: x - 5, x2: x - 5, y1: MID, y2: MID - h1 * SC });
+            el("line", { class: "b2", x1: x + 5, x2: x + 5, y1: MID - h1 * SC, y2: MID - (h1 + h2) * SC });
+            el("circle", { cx: x, cy: MID - (h1 + h2) * SC, r: 4.5, fill: "var(--sum)" });
+            read.innerHTML = `${n(h1, "n1")} + ${n(h2, "n2")} = ${n(h1 + h2, "ns")}`;
+          } else {
+            // the arms at the start of the board: each wave's arm at its phase, added tip to tail
+            const a1 = one.p * Math.PI, a2 = two.p * Math.PI, r = 0.7 * SC / 1.2;
+            const x1 = CX + one.A * r * Math.cos(a1), y1 = MID - one.A * r * Math.sin(a1);
+            const x2 = x1 + two.A * r * Math.cos(a2), y2 = y1 - two.A * r * Math.sin(a2);
+            el("circle", { class: "ring", cx: CX, cy: MID, r: 2 * r });
+            el("line", { class: "a1", x1: CX, y1: MID, x2: x1, y2: y1 });
+            el("line", { class: "a2", x1: x1, y1: y1, x2: x2, y2: y2 });
+            el("line", { class: "as", x1: CX, y1: MID, x2: x2, y2: y2 });
+            el("circle", { cx: x2, cy: y2, r: 3.5, fill: "var(--sum)" });
+            if (Math.abs(two.w - one.w) < 1e-9) {
+              const re = one.A * Math.cos(a1) + two.A * Math.cos(a2), im = one.A * Math.sin(a1) + two.A * Math.sin(a2), s = Math.hypot(re, im);
+              read.innerHTML = s < 0.005 ? "Half a turn apart: the sum is <strong>flat</strong>."
+                : `Same frequency: the sum is one wave of amplitude ${n(s, "ns")}.`;
+            } else {
+              read.innerHTML = "Different frequencies: the sum is <strong>not</strong> a single wave.";
+            }
+            box.querySelectorAll(".dial-ctl").forEach(d => {
+              const k = d.dataset.k; d.querySelector(".val").textContent = k === "p" ? fmtP(two.p) : two.w.toFixed(1);
+              const [dn, up] = d.querySelectorAll("button");
+              dn.disabled = two[k] - STEP[k] < MIN[k] - 1e-9; up.disabled = two[k] + STEP[k] > MAX[k] + 1e-9;
+            });
+          }
+          svg.setAttribute("aria-label", "An amber wave, a blue wave and their sum in white");
+        }
+        draw();
+      });
+    })();
+  </script>
+</body>
+</html>

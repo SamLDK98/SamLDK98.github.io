@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Window length and frequency resolution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  svg text { font-size: 11px; }
+  .axis { stroke: var(--faint); stroke-width: 1.3; }
+  .curve { fill: none; stroke: var(--pow); stroke-width: 1.8; }
+  .bin { fill: var(--pow); }
+  .true { stroke: var(--amp); stroke-width: 1.2; stroke-dasharray: 3 4; stroke-opacity: 0.8; }
+  text.fl { fill: var(--freq); fill-opacity: 0.8; text-anchor: middle; }
+  text.tl { fill: var(--amp); text-anchor: middle; font-size: 10px; }
+  .read { text-align: center; font-family: "Spectral", Georgia, serif; font-size: 1.25rem; color: var(--dim); margin-top: 0.2rem; }
+  .read .f { color: var(--freq); }
+  .lab { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--dim); margin-top: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="plot" viewBox="0 0 560 190" role="img"></svg>
+  <div class="read" aria-live="polite">bins every <span class="f" id="df"></span></div>
+  <div class="lab">length of recording analysed</div>
+  <div class="choices" role="group" aria-label="Length of recording analysed">
+    <button type="button" data-t="0.5" aria-pressed="false">0.5 s</button>
+    <button type="button" data-t="1" aria-pressed="true">1 s</button>
+    <button type="button" data-t="2" aria-pressed="false">2 s</button>
+    <button type="button" data-t="4" aria-pressed="false">4 s</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // Two equal oscillations, at 10 Hz and 11 Hz, sampled at 256 Hz. A Hann-windowed periodogram of
+  // T seconds can only report frequencies every 1/T Hz (the dots). The line shows the shape of the
+  // spectrum between those bins. Short windows blur the two peaks into one; long ones pull them apart.
+  const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("plot");
+  const FS = 256, F1 = 10, F2 = 11, LO = 5, HI = 16, L = 34, R = 540, B = 160, TOP = 22;
+  const fx = f => L + (f - LO) / (HI - LO) * (R - L);
+  let T = 1;
+
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    svg.appendChild(e); return e;
+  }
+  function power(x, w, f) {
+    let re = 0, im = 0;
+    for (let n = 0; n < x.length; n++) { const a = 2 * Math.PI * f * n / FS; re += x[n] * w[n] * Math.cos(a); im -= x[n] * w[n] * Math.sin(a); }
+    return re * re + im * im;
+  }
+
+  function draw() {
+    const N = Math.round(T * FS), x = [], w = [];
+    for (let n = 0; n < N; n++) {
+      x.push(Math.sin(2 * Math.PI * F1 * n / FS) + Math.sin(2 * Math.PI * F2 * n / FS + 1.1));
+      w.push(0.5 - 0.5 * Math.cos(2 * Math.PI * n / (N - 1)));
+    }
+    const pts = [];
+    for (let i = 0; i <= 330; i++) { const f = LO + (HI - LO) * i / 330; pts.push([f, power(x, w, f)]); }
+    const bins = [];
+    for (let k = Math.ceil(LO * T); k / T <= HI; k++) bins.push([k / T, power(x, w, k / T)]);
+    const mx = Math.max(...pts.map(p => p[1])), py = p => B - p / mx * (B - TOP);
+    svg.innerHTML = "";
+    el("line", { class: "axis", x1: L, x2: R, y1: B, y2: B });
+    for (let f = LO; f <= HI; f++) el("text", { class: "fl", x: fx(f), y: B + 17 }, f + (f === HI ? " Hz" : ""));
+    [F1, F2].forEach(f => el("line", { class: "true", x1: fx(f), x2: fx(f), y1: B, y2: TOP - 6 }));
+    el("text", { class: "tl", x: (fx(F1) + fx(F2)) / 2, y: TOP - 10 }, "true frequencies");
+    el("path", { class: "curve", d: pts.map((p, i) => (i ? "L" : "M") + fx(p[0]).toFixed(1) + " " + py(p[1]).toFixed(1)).join(" ") });
+    bins.forEach(b => el("circle", { class: "bin", cx: fx(b[0]), cy: py(b[1]), r: 3.2 }));
+    document.getElementById("df").textContent = (1 / T) + " Hz";
+    svg.setAttribute("aria-label", `Spectrum of ${T} seconds of a signal with oscillations at 10 and 11 hertz; frequency bins every ${1 / T} hertz`);
+  }
+  document.querySelectorAll(".choices button").forEach(b => b.addEventListener("click", () => {
+    T = +b.dataset.t;
+    document.querySelectorAll(".choices button").forEach(c => c.setAttribute("aria-pressed", String(c === b)));
+    draw();
+  }));
+  draw();
+</script>
+</body>
+</html>

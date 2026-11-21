@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>An Overview of Frequency Domain Analyses | EEG | Sam Kirwan</title>
+  <meta name="description" content="An EEG recording is a voltage changing over time, but it can also be described as a sum of oscillations. Frequency domain analyses ask how much of each frequency a signal contains, and how those oscillations behave." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="eeg.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="eeg.html">EEG</a>
+      <h1>An Overview of Frequency Domain Analyses</h1>
+    </header>
+    <main>
+      <section class="question" aria-label="The question">
+        <div class="power-intro-copy">
+          <p><em>What oscillations is this signal made of?</em></p>
+        </div>
+        <iframe class="expo-widget" src="eeg/frequency-domain/components-widget.html" title="Interactive: a signal built from oscillations at 6, 10 and 20 hertz, shown over time and as one amplitude per frequency; switch each oscillation on or off" style="height: 410px" scrolling="no" loading="lazy"></iframe>
+      </section>
+
+      <section aria-labelledby="two-views">
+        <h2 id="two-views">Two Descriptions of One Signal</h2>
+        <p>An EEG electrode records a voltage that changes over time.</p>
+        <p>Plotted against time, this is the <strong>time domain</strong>: the voltage at each moment.</p>
+        <p>The same signal can also be written as a sum of oscillations, each with its own frequency.</p>
+        <div class="math">\[x(t) = \class{mjx-amp}{A_1}\sin(2\pi \class{mjx-freq}{f_1} t + \phi_1) + \class{mjx-amp}{A_2}\sin(2\pi \class{mjx-freq}{f_2} t + \phi_2) + \cdots\]</div>
+        <p>Listing how much of each frequency the signal contains gives the <strong>frequency domain</strong>.</p>
+        <p>Neither description holds more information than the other. They are two ways of writing the same signal.</p>
+        <p>In the widget above, the wiggles in the top plot and the stems in the bottom plot are the same three oscillations.</p>
+        <p>The step from one description to the other is the <strong>Fourier transform</strong>.</p>
+        <p>Any recording of finite length, however irregular, can be written as a sum of oscillations in this way.</p>
+      </section>
+
+      <section aria-labelledby="describe">
+        <h2 id="describe">Describing an Oscillation</h2>
+        <p>Each oscillation in the sum is described by three numbers:</p>
+        <ul>
+          <li><span class="c-freq">Frequency</span>: how many cycles it completes per second, in hertz <span class="nw">(Hz).</span></li>
+          <li><span class="c-amp">Amplitude</span>: how far it swings from zero, in microvolts <span class="nw">(µV).</span></li>
+          <li>Phase: where in its cycle it is at a given moment.</li>
+        </ul>
+        <p>Frequency domain analyses ask questions about one or more of these.</p>
+      </section>
+
+      <section aria-labelledby="bands">
+        <h2 id="bands">Frequency Bands</h2>
+        <p>EEG researchers group frequencies into named bands.</p>
+        <table>
+          <thead>
+            <tr><th scope="col">Band</th><th scope="col">Range</th><th scope="col">Often associated with</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="c-delta">Delta</td><td>\(1\)&ndash;\(4\) Hz</td><td>Deep sleep</td></tr>
+            <tr><td class="c-theta">Theta</td><td>\(4\)&ndash;\(8\) Hz</td><td>Drowsiness, memory tasks</td></tr>
+            <tr><td class="c-alpha">Alpha</td><td>\(8\)&ndash;\(13\) Hz</td><td>Relaxed wakefulness, eyes closed</td></tr>
+            <tr><td class="c-beta">Beta</td><td>\(13\)&ndash;\(30\) Hz</td><td>Active thinking, movement</td></tr>
+            <tr><td class="c-gamma">Gamma</td><td>above \(30\) Hz</td><td>Sensory processing</td></tr>
+          </tbody>
+        </table>
+        <p>The boundaries are conventions, and they vary a little between studies.</p>
+        <p>Many effects are easier to see as a change in one band than as a change in the raw trace.</p>
+        <ul>
+          <li><em>Closing the eyes increases alpha over the back of the head.</em></li>
+          <li><em>Benzodiazepines, which enhance GABA<sub>A</sub> receptor activity, reliably increase beta.</em></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="family">
+        <h2 id="family">The Family of Analyses</h2>
+        <p>Each analysis in this chapter asks a different question of the same oscillations.</p>
+        <table>
+          <thead>
+            <tr><th scope="col">Analysis</th><th scope="col">The question it asks</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><a href="eeg-power-spectral-density.html">Power spectral density</a></td><td>How is the signal&rsquo;s power spread across frequencies?</td></tr>
+            <tr><td>Time&ndash;frequency analysis</td><td>How does that spread change from moment to moment?</td></tr>
+            <tr><td>Coherence and connectivity</td><td>Do two channels oscillate together at a given frequency?</td></tr>
+            <tr><td>Cross-frequency coupling</td><td>Does the phase of a slow rhythm shape the amplitude of a fast one?</td></tr>
+            <tr><td>The aperiodic component</td><td>What does the background look like once the peaks are set aside?</td></tr>
+          </tbody>
+        </table>
+        <p>The first, and the most widely used, is the power spectral density.</p>
+        <p><strong>It sets aside phase entirely and asks only how much of each frequency the signal contains.</strong></p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="eeg.html">← All EEG pages</a>
+        <a href="eeg-power-spectral-density.html">Next: Power Spectral Density →</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    // Each widget reports its own height, so no frame ever scrolls.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "expo-widget-height") return;
+      document.querySelectorAll("iframe.expo-widget").forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.height + "px";
+      });
+    });
+  </script>
+</body>
+</html>
