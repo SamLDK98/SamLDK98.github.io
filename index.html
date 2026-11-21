@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Interactive explanations by Sam Kirwan." />
-  <title>Interactive Explanations</title>
+  <meta name="description" content="Explore apps, mathematics, neurophysiology, physics, and more by Sam Kirwan." />
+  <title>Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -12,16 +12,20 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #08090b;
-      --text: #f4f5f8;
-      --muted: rgba(235, 238, 246, 0.5);
+      color-scheme: dark;
+      --bg: #120e0b;
+      --panel: #793a24;
+      --text: #ffd0a0;
+      --accent: #ffd0a0;
+      --muted: #fff1df;
+      --border: #ad6440;
     }
 
     html, body { min-height: 100%; }
 
     body {
       min-height: 100svh;
-      overflow-x: hidden;
+      padding: clamp(1rem, 4vh, 3rem) 1rem;
       display: grid;
       place-items: center;
       background: var(--bg);
@@ -31,72 +35,66 @@
     }
 
     main {
-      position: relative;
-      z-index: 1;
-      width: min(32rem, calc(100% - 2rem));
-      padding: clamp(3rem, 10vh, 6rem) 0;
+      width: min(36rem, 100%);
+      min-height: 38rem;
+      padding: 3rem clamp(1.5rem, 5vw, 4rem);
+      display: grid;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: linear-gradient(145deg, #944c2e 0%, var(--panel) 55%, #62301f 100%);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 222, 180, 0.09);
       text-align: center;
     }
 
-    h1 {
-      font-family: "Space Grotesk", system-ui, sans-serif;
-      font-size: clamp(3rem, 7vw, 5.4rem);
-      font-weight: 300;
-      line-height: 0.96;
-      letter-spacing: -0.045em;
-      text-wrap: balance;
-    }
-
-    nav { margin-top: clamp(2.4rem, 7vh, 4.5rem); }
-
+    nav { min-width: 0; }
     ul { list-style: none; }
-
-    .nav-level > li + li { margin-top: 0.65rem; }
+    .nav-level { display: grid; gap: 0.35rem; }
+    .nav-level[hidden] { display: none; }
 
     .nav-item {
-      display: inline-block;
-      color: var(--muted);
-      background: none;
+      display: inline-flex;
+      min-height: 3.25rem;
+      max-width: 100%;
+      align-items: center;
+      justify-content: center;
+      padding: 0.35rem 0.5rem;
       border: 0;
-      font-size: clamp(1rem, 1.65vw, 1.25rem);
+      border-radius: 2px;
+      background: none;
+      color: var(--muted);
       font-family: inherit;
-      font-weight: 300;
-      line-height: 1.35;
+      font-size: clamp(1.65rem, 3.2vw, 2.15rem);
+      font-weight: 400;
+      line-height: 1.3;
+      letter-spacing: -0.035em;
       text-decoration: none;
-      transition: color 180ms ease, transform 180ms ease;
+      transition: color 180ms ease;
     }
 
     a.nav-item:hover,
+    button.nav-item:hover { color: var(--text); }
+
     a.nav-item:focus-visible,
-    button.nav-item:hover,
     button.nav-item:focus-visible {
       color: var(--text);
-      outline: none;
-      transform: translateY(-1px);
+      outline: 1px solid var(--accent);
+      outline-offset: 4px;
     }
 
     button.nav-item { cursor: pointer; }
 
-    .nav-level[hidden] { display: none; }
-
     .back-button {
-      margin-bottom: 0.35rem;
-      font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+      margin-bottom: 0.65rem;
+      font-size: 1rem;
+      letter-spacing: 0;
     }
 
-    .unavailable { cursor: default; }
-
-    @media (max-height: 720px) and (min-width: 600px) {
-      main { padding-block: 2rem 8rem; }
-      nav { margin-top: 2rem; }
-      .nav-level > li + li { margin-top: 0.4rem; }
-    }
+    .unavailable { color: #d3ac93; cursor: default; }
 
     @media (max-width: 560px) {
-      main { width: min(25rem, calc(100% - 2rem)); }
-      h1 { font-size: clamp(3.1rem, 15vw, 4.2rem); }
-      nav { margin-top: 2.6rem; }
-      .nav-level > li + li { margin-top: 0.75rem; }
+      main { min-height: 34rem; padding-block: 2rem; }
+      .nav-level { gap: 0.25rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -105,8 +103,7 @@
   </style>
 </head>
 <body>
-  <main>
-    <h1>Interactive Explanations</h1>
+  <main aria-label="Sam Kirwan homepage">
     <nav aria-label="Sections">
       <ul class="nav-level" data-level="home">
         <li><a class="nav-item" href="apps.html">Apps</a></li>
@@ -118,7 +115,7 @@
       </ul>
 
       <ul class="nav-level" data-level="math" hidden>
-        <li><a class="nav-item back-button" href="index.html" aria-label="Back to homepage">←</a></li>
+        <li><a class="nav-item back-button" href="index.html" aria-label="Back to homepage">Back</a></li>
         <li><a class="nav-item" href="numbers.html">Numbers</a></li>
         <li><a class="nav-item" href="trigonometry.html">Trigonometry</a></li>
         <li><a class="nav-item" href="complex-numbers.html">Complex Numbers</a></li>
@@ -129,12 +126,12 @@
       </ul>
 
       <ul class="nav-level" data-level="physics" hidden>
-        <li><button class="nav-item back-button" type="button" data-back aria-label="Back to sections">←</button></li>
+        <li><button class="nav-item back-button" type="button" data-back aria-label="Back to sections">Back</button></li>
         <li><a class="nav-item" href="field-theories.html">Field Theories</a></li>
       </ul>
 
       <ul class="nav-level" data-level="random" hidden>
-        <li><button class="nav-item back-button" type="button" data-back aria-label="Back to sections">←</button></li>
+        <li><button class="nav-item back-button" type="button" data-back aria-label="Back to sections">Back</button></li>
         <li><a class="nav-item" href="active-inference.html">Active Inference</a></li>
         <li><a class="nav-item" href="calendars.html">Calendars</a></li>
       </ul>
