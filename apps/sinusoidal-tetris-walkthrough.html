@@ -91,11 +91,11 @@
 
     <h2>Three Dials</h2>
     <p>Every falling wave is a sine wave with three dials you can turn:</p>
-    <div class="math">\[y(t) = A \sin(\omega t + \varphi)\]</div>
+    <div class="math">\[y(t) = A \sin(\omega t + \phi)\]</div>
     <ul>
       <li>\(A\), the <strong>amplitude</strong>: how tall the wave is.</li>
       <li>\(\omega\), the <strong>frequency</strong>: how quickly it wiggles.</li>
-      <li>\(\varphi\), the <strong>phase</strong>: how far along its cycle it starts.</li>
+      <li>\(\phi\), the <strong>phase</strong>: how far along its cycle it starts.</li>
     </ul>
 
     <h2>Flattening a Signal, Step by Step</h2>
@@ -113,7 +113,7 @@
 
     <h2>The Idea</h2>
     <p>Each wave is cancelled by its <strong>mirror image</strong>: the same amplitude and the same frequency, with the phase moved half a turn.</p>
-    <div class="math">\[A \sin(\omega t + \varphi) + A \sin(\omega t + \varphi + \pi) = 0\]</div>
+    <div class="math">\[A \sin(\omega t + \phi) + A \sin(\omega t + \phi + \pi) = 0\]</div>
     <p>Half a turn flips the wave upside down, so wherever one is up, the other is down by the same amount.</p>
     <p>A complicated signal is just several waves added together, so it can be flattened <strong>one wave at a time</strong>.</p>
     <p>Get any dial slightly wrong and a small wave is left behind. In the game, that leftover becomes part of the signal you have to deal with next.</p>
@@ -138,7 +138,7 @@
       const STEPS = [
         { res: [SLOW, FAST], cap: "This signal looks complicated, but it is only <strong>two sine waves</strong> added together." },
         { res: [SLOW, FAST], show: true, cap: "Pulled apart, it is a <strong class='c-slow'>slow wave</strong> and a <strong class='c-fast'>fast wave</strong>." },
-        { res: [SLOW, FAST], drop: SLOW, cap: "To cancel the slow wave, drop its <strong>mirror image</strong>: the same <em>A</em> and <em>ω</em>, with <em>φ</em> moved half a turn." },
+        { res: [SLOW, FAST], drop: SLOW, cap: "To cancel the slow wave, drop its <strong>mirror image</strong>: the same <em>A</em> and <em>ω</em>, with <em>ϕ</em> moved half a turn." },
         { res: [FAST], drop: SLOW, land: [SLOW, FAST], cap: "The drop is added to the signal. Where the signal was up, the drop was down. <strong class='c-slow'>The slow wave is gone.</strong>" },
         { res: [FAST], show: true, drop: FAST, cap: "Only the <strong class='c-fast'>fast wave</strong> is left. Drop its mirror image in the same way." },
         { res: [], drop: FAST, land: [FAST], cap: "<strong class='c-flat'>Flat.</strong> Both waves have been cancelled, one at a time." },
@@ -163,12 +163,12 @@
       }
 
       function phasor(c, flip) {
-        // the drop's dials, drawn as in the game: a circle of radius A, an arm at angle φ
+        // the drop's dials, drawn as in the game: a circle of radius A, an arm at angle ϕ
         const cx = 40, cy = MID, r = c.A * 30, a = c.p + (flip ? Math.PI : 0);
         el("circle", { class: "ring", cx, cy, r, stroke: c.col, "stroke-opacity": 0.6 });
         el("line", { class: "arm", x1: cx, y1: cy, x2: cx + r * Math.cos(a), y2: cy - r * Math.sin(a), stroke: c.col });
         el("circle", { cx: cx + r * Math.cos(a), cy: cy - r * Math.sin(a), r: 3, fill: c.col });
-        el("text", { class: "lab", x: cx, y: cy + r + 18, "text-anchor": "middle", fill: c.col }, "φ = " + ((a % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI)).toFixed(2));
+        el("text", { class: "lab", x: cx, y: cy + r + 18, "text-anchor": "middle", fill: c.col }, "ϕ = " + ((a % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI)).toFixed(2));
       }
 
       function draw() {

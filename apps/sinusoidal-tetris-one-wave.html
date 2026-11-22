@@ -100,7 +100,7 @@
       <div class="controls">
         <div class="dial-ctl"><span class="name">A</span><button class="round" data-dial="A" data-d="-1" aria-label="Decrease amplitude">−</button><span class="val" id="vA"></span><button class="round" data-dial="A" data-d="1" aria-label="Increase amplitude">+</button></div>
         <div class="dial-ctl"><span class="name">ω</span><button class="round" data-dial="w" data-d="-1" aria-label="Decrease frequency">−</button><span class="val" id="vw"></span><button class="round" data-dial="w" data-d="1" aria-label="Increase frequency">+</button></div>
-        <div class="dial-ctl"><span class="name">φ</span><button class="round" data-dial="p" data-d="-1" aria-label="Turn phase back">−</button><span class="val" id="vp"></span><button class="round" data-dial="p" data-d="1" aria-label="Turn phase on">+</button></div>
+        <div class="dial-ctl"><span class="name">ϕ</span><button class="round" data-dial="p" data-d="-1" aria-label="Turn phase back">−</button><span class="val" id="vp"></span><button class="round" data-dial="p" data-d="1" aria-label="Turn phase on">+</button></div>
         <button class="pill go" id="drop" type="button">Drop</button>
       </div>
       <div class="row2">
@@ -118,7 +118,7 @@
   </div>
 
   <script>
-    // Cancel One Wave. The signal is one sine wave, A sin(ωt + φ), with A, ω and φ chosen at random
+    // Cancel One Wave. The signal is one sine wave, A sin(ωt + ϕ), with A, ω and ϕ chosen at random
     // from the same steps the dials move in, so an exact cancellation is always possible.
     // This is practice, so the wave at the top does not fall: it waits until DROP is pressed, then
     // it is added to the signal, sweeping left to right. Flat means a win.
@@ -213,7 +213,7 @@
         if (document.getElementById("hint").checked && state === "fall") el("path", { class: "hint", d: path(t => -wave(target, t), y) });
         // the falling wave
         if (state === "fall") el("path", { class: "fall", d: path(t => wave(drop, t), y) });
-        // its dials, drawn as a circle: radius A, arm at angle φ
+        // its dials, drawn as a circle: radius A, arm at angle ϕ
         const cx = 58, cy = state === "fall" ? y : BASEY, r = drop.A * 30;
         el("circle", { class: "ring", cx, cy, r });
         el("line", { class: "arm", x1: cx, y1: cy, x2: cx + r * Math.cos(drop.p), y2: cy - r * Math.sin(drop.p) });

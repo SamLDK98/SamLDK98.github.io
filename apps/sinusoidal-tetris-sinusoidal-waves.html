@@ -62,12 +62,11 @@
     .wv .link { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 2 4; }
     .wv .dot { fill: var(--wave); }
     .wv .start { fill: none; stroke: var(--ink); stroke-width: 1.3; }
-    .wv .eq { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; color: var(--ink); margin-top: 0.6rem; }
-    .wv .eq b { color: var(--wave); font-weight: 500; }
-    .ctl { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.7rem 1.8rem; margin-top: 0.9rem; }
-    .dial-ctl { display: flex; align-items: center; gap: 0.55rem; }
-    .dial-ctl .name { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--wave); }
-    .dial-ctl .val { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; color: var(--ink); min-width: 3.4rem; text-align: center; }
+    .ctl { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.2rem 3rem; margin-top: 1.4rem; }
+    .dial-ctl { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .dial-ctl .name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 2.4rem; line-height: 1; color: var(--wave); }
+    .dial-ctl .row { display: flex; align-items: center; gap: 0.7rem; }
+    .dial-ctl .val { font-family: "IBM Plex Mono", monospace; font-size: 1.05rem; color: var(--ink); min-width: 3.6rem; text-align: center; }
     .round {
       font: inherit; font-size: 1rem; line-height: 1; width: 2rem; height: 2rem; border-radius: 50%;
       background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
@@ -92,9 +91,9 @@
       <li>The size of the circle.</li>
       <li>The position from which the point begins travelling.</li>
     </ul>
-    <p>The angular speed corresponds to the <strong>frequency</strong> of the wave: how many oscillations (or cycles) it completes per second. We write the angular speed as <span style="white-space:nowrap">\(\omega\);</span> it is \(2\pi\) times the number of cycles per second, since one cycle is one full turn of <span style="white-space:nowrap">\(2\pi\) radians.</span></p>
-    <p>The size of the circle&rsquo;s radius scales the height of the peaks and troughs of the wave. The height of a peak above the centre line is called the <strong>amplitude</strong> <span style="white-space:nowrap">\((A)\).</span></p>
-    <p>The position from which the point begins travelling is called the <strong>phase</strong> \((\varphi)\) of the wave. It changes where the wave begins on the y-axis.</p>
+    <p>The speed at which the point travels around the circle is described by its <strong>angular frequency</strong> <span style="white-space:nowrap">\((\omega)\).</span> Increasing this speed increases the <strong>frequency</strong> \((f)\) of the wave: the number of complete oscillations (or cycles) that occur per second.</p>
+    <p>The radius of the circle determines the <strong>amplitude</strong> \((A)\) of the wave: the maximum height of its peaks above the centre line (or the maximum depth of its troughs below it).</p>
+    <p>The position from which the point begins travelling determines the <strong>initial phase</strong> \((\phi)\) of the wave. Changing it shifts the wave horizontally, altering where in its cycle the wave begins.</p>
     <div class="wv" data-dials="A w p" data-start="1,1,0"></div>
 
     <p class="next"><a href="sinusoidal-tetris-adding-waves.html">Next: Adding Waves →</a></p>
@@ -102,12 +101,12 @@
 
   <script>
     // Each .wv is a circle with a point going round it and the wave its height draws.
-    // data-dials lists the dials shown (A, w, p); data-start gives A, ω, φ/π at the start;
+    // data-dials lists the dials shown (A, w, p); data-start gives A, ω, ϕ/π at the start;
     // data-ghost draws the starting wave dashed, so a change can be compared with it.
     (function () {
       const NS = "http://www.w3.org/2000/svg";
       const STEP = { A: 0.1, w: 0.5, p: 1 / 12 }, MIN = { A: 0.3, w: 0.5, p: -Infinity }, MAX = { A: 1.5, w: 4, p: Infinity };
-      const NAME = { A: "A", w: "ω", p: "φ" }, LABEL = { A: "amplitude", w: "frequency", p: "phase" };
+      const NAME = { A: "A", w: "ω", p: "ϕ" }, LABEL = { A: "amplitude", w: "frequency", p: "phase" };
       const TMAX = 4 * Math.PI, CX = 72, L = 170, R = 630, MID = 96, SC = 52, H = 200;
       const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const fmt = (k, v) => k === "p" ? ((((v % 2) + 2) % 2).toFixed(2).replace(/\.?0+$/, "") || "0") + "π" : v.toFixed(1);
@@ -119,11 +118,11 @@
         const svg = document.createElementNS(NS, "svg");
         svg.setAttribute("viewBox", `0 0 640 ${H}`); svg.setAttribute("role", "img");
         box.appendChild(svg);
-        const eq = document.createElement("div"); eq.className = "eq"; if (dials.length) box.appendChild(eq);
+        
         const ctl = document.createElement("div"); ctl.className = "ctl"; if (dials.length) box.appendChild(ctl);
         dials.forEach(k => {
           const d = document.createElement("div"); d.className = "dial-ctl";
-          d.innerHTML = `<span class="name">${NAME[k]}</span><button class="round" data-d="-1" aria-label="Decrease ${LABEL[k]}">−</button><span class="val"></span><button class="round" data-d="1" aria-label="Increase ${LABEL[k]}">+</button>`;
+          d.innerHTML = `<span class="name">${NAME[k]}</span><div class="row"><button class="round" data-d="-1" aria-label="Decrease ${LABEL[k]}">−</button><span class="val"></span><button class="round" data-d="1" aria-label="Increase ${LABEL[k]}">+</button></div>`;
           d.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
             const n = Math.round((v[k] + +b.dataset.d * STEP[k]) / STEP[k]) * STEP[k];
             v[k] = Math.min(MAX[k], Math.max(MIN[k], +n.toFixed(4))); draw();
@@ -158,7 +157,6 @@
           el("line", { class: "link", x1: px, y1: py, x2: tx(tau), y2: py });
           el("circle", { class: "dot", cx: px, cy: py, r: 3.5 });
           el("circle", { class: "dot", cx: tx(tau), cy: py, r: 3.5 });
-          eq.innerHTML = `y = <b>${v.A.toFixed(1)}</b> sin(<b>${v.w.toFixed(1)}</b>t + <b>${fmt("p", v.p)}</b>)`;
           ctl.querySelectorAll(".dial-ctl").forEach(d => {
             const k = d.dataset.k; d.querySelector(".val").textContent = fmt(k, v[k]);
             const [dn, up] = d.querySelectorAll("button");

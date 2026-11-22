@@ -113,7 +113,7 @@
       <div class="controls">
         <div class="dial-ctl"><span class="name">A</span><button class="round" data-dial="A" data-d="-1" aria-label="Decrease amplitude">−</button><span class="val" id="vA"></span><button class="round" data-dial="A" data-d="1" aria-label="Increase amplitude">+</button></div>
         <div class="dial-ctl"><span class="name">ω</span><button class="round" data-dial="w" data-d="-1" aria-label="Decrease frequency">−</button><span class="val" id="vw"></span><button class="round" data-dial="w" data-d="1" aria-label="Increase frequency">+</button></div>
-        <div class="dial-ctl"><span class="name">φ</span><button class="round" data-dial="p" data-d="-1" aria-label="Turn phase back">−</button><span class="val" id="vp"></span><button class="round" data-dial="p" data-d="1" aria-label="Turn phase on">+</button></div>
+        <div class="dial-ctl"><span class="name">ϕ</span><button class="round" data-dial="p" data-d="-1" aria-label="Turn phase back">−</button><span class="val" id="vp"></span><button class="round" data-dial="p" data-d="1" aria-label="Turn phase on">+</button></div>
         <button class="pill go" id="drop" type="button">Drop</button>
       </div>
       <div class="row2">
@@ -180,7 +180,7 @@
     // from the steps the dials move in. Every drop is added to the signal, and whatever is left becomes
     // the signal for the next drop. A win is a leftover whose peak is under a third of a unit, as in the
     // original game. This is practice: the wave at the top waits until DROP is pressed.
-    // The signal is kept as a list of waves, one per frequency, each stored as a phasor (A cos φ, A sin φ),
+    // The signal is kept as a list of waves, one per frequency, each stored as a phasor (A cos ϕ, A sin ϕ),
     // so that a drop at a frequency already present simply adds to that wave.
     (function () {
       const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("board");
@@ -289,7 +289,7 @@
           }
           el("path", { class: "fall", d: path(t => wave(drop, t), STARTY) });
         }
-        // the drop's dials, drawn as a circle: radius A, arm at angle φ
+        // the drop's dials, drawn as a circle: radius A, arm at angle ϕ
         const cx = 58, cy = state === "wait" ? STARTY : BASEY, r = drop.A * 30;
         el("circle", { class: "ring", cx, cy, r });
         el("line", { class: "arm", x1: cx, y1: cy, x2: cx + r * Math.cos(drop.p), y2: cy - r * Math.sin(drop.p) });
