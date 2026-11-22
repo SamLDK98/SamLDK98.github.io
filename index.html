@@ -3,129 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Explore apps, mathematics, neurophysiology, physics, and more by Sam Kirwan." />
+  <meta name="description" content="Interactive essays on mathematics, neuroscience and physics by Sam Kirwan, each built up from first principles with widgets to explore along the way." />
   <title>Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      color-scheme: dark;
-      --bg: #120e0b;
-      --ember: #b8592f;          /* burnt orange */
-      --ember-deep: #6e2f19;
-      --ember-dark: #3a1a0f;
-      --cream: #f6e3cf;
-      --cream-soft: rgba(246, 227, 207, 0.62);
-      --cream-faint: rgba(246, 227, 207, 0.16);
+      --beige: #e8dcc6;
+      --beige-deep: #ddcfb5;
+      --ink: #1d1a16;
+      --ink-soft: rgba(29, 26, 22, 0.55);
+      --black: #121110;
+      --cream: #efe6d6;
+      --cream-soft: rgba(239, 230, 214, 0.62);
+      --gold: #d9a441;
     }
 
-    html, body { min-height: 100%; }
-
+    html, body { height: 100%; }
     body {
       min-height: 100svh;
-      padding: clamp(1.5rem, 6vh, 4rem) 1.2rem;
       display: grid;
-      place-items: center;
-      background:
-        radial-gradient(ellipse 42rem 34rem at 50% 48%, rgba(184, 89, 47, 0.10), transparent 70%),
-        var(--bg);
-      color: var(--cream);
-      font-family: "Space Grotesk", system-ui, sans-serif;
+      grid-template-columns: 1fr 1.15fr;
+      font-family: "Alegreya", Georgia, serif;
       -webkit-font-smoothing: antialiased;
     }
-    /* the whole page shares the card's grain, and darkens towards its edges */
-    body::before, body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-    body::before {
-      opacity: 0.07; mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-    body::after { background: radial-gradient(ellipse 75% 70% at 50% 48%, transparent 45%, rgba(0, 0, 0, 0.55) 100%); }
 
-    /* the card: a burnt-orange panel with a fine inner frame */
-    main {
-      position: relative;
-      width: min(25rem, 100%);
-      min-height: min(37rem, calc(100svh - 3rem));   /* tall enough for the longest list, so the card does not jump */
-      padding: clamp(2.4rem, 6vh, 3.2rem) clamp(1.8rem, 6vw, 2.8rem) clamp(2rem, 5vh, 2.6rem);
-      display: flex;
-      flex-direction: column;
-      border-radius: 6px;
-      background: linear-gradient(165deg, #9a4a29 0%, var(--ember-deep) 48%, var(--ember-dark) 100%);
-      z-index: 1;
-      box-shadow:
-        0 0 0 1px rgba(255, 200, 160, 0.14),
-        inset 0 1px 0 rgba(255, 220, 190, 0.18),
-        9px 11px 0 -1px #4a2314,                    /* the sheet behind */
-        9px 11px 0 0 rgba(255, 190, 150, 0.2),      /* its edge */
-        14px 44px 90px -24px rgba(0, 0, 0, 0.8);
-      overflow: hidden;
-    }
-    main::before {   /* the inner frame */
-      content: "";
-      position: absolute; inset: 10px;
-      border: 1px solid rgba(255, 214, 180, 0.16);
-      border-radius: 3px;
-      pointer-events: none;
-    }
-    main::after {    /* a faint grain, so the colour reads as paper rather than plastic */
-      content: "";
-      position: absolute; inset: 0; pointer-events: none;
-      opacity: 0.09; mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    /* a fine grain over both halves, so the colours read as paper and matte card rather than flat screen */
+    .half { position: relative; overflow: hidden; }
+    .half::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    nav { position: relative; z-index: 1; margin: auto 0; }
+    /* right: the sections, on beige */
+    .sections {
+      background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 8vw, 7rem);
+    }
+    .sections::after { opacity: 0.16; mix-blend-mode: multiply; }
+
+    nav { position: relative; z-index: 1; width: 100%; max-width: 26rem; }
     ul { list-style: none; }
-    .nav-level { display: grid; }
     .nav-level[hidden] { display: none; }
     .nav-level:not([hidden]) { animation: rise 320ms ease both; }
     @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
+    .nav-level li + li { margin-top: 0.15rem; }
 
     .nav-item {
-      position: relative;
-      display: flex;
-      width: 100%;
-      align-items: baseline;
-      justify-content: space-between;
-      padding: 0.78rem 0.1rem;
-      border: 0;
-      background: none;
-      color: var(--cream);
-      font-family: inherit;
-      font-size: clamp(1.25rem, 2.6vw, 1.45rem);
-      font-weight: 300;
-      line-height: 1.25;
-      letter-spacing: -0.01em;
-      text-align: left;
-      /* letterpress: a highlight below and a shadow above, so the words sit in the card */
-      text-shadow: 0 1px 0 rgba(255, 214, 182, 0.22), 0 -1px 0 rgba(30, 10, 4, 0.45);
-      text-decoration: none;
-      cursor: pointer;
-      transition: color 200ms ease, padding-left 220ms ease;
-    }
-    .nav-item:hover, .nav-item:focus-visible { padding-left: 0.45rem; outline: none; }
-    .nav-item:focus-visible { box-shadow: inset 2px 0 0 var(--cream); }
-
-    /* the heading of a sub-list, with its way back */
-    .label { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 0.9rem; }
-    .label span, .back { text-shadow: 0 1px 0 rgba(255, 214, 182, 0.18), 0 -1px 0 rgba(30, 10, 4, 0.4); }
-    .label span { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.32em; text-transform: uppercase; color: var(--cream); }
-    .back {
+      display: inline-block;
+      padding: 0.2rem 0;
       border: 0; background: none; cursor: pointer;
-      font-family: inherit; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--cream-soft);
-      transition: color 200ms ease;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.2;
+      text-align: left;
+      text-decoration: none;
+      background-image: linear-gradient(var(--ink), var(--ink));
+      background-size: 0 1px; background-repeat: no-repeat; background-position: 0 92%;
+      transition: background-size 260ms ease, color 200ms ease;
     }
-    .back:hover, .back:focus-visible { color: var(--cream); outline: none; }
+    .nav-item:hover, .nav-item:focus-visible { background-size: 100% 1px; outline: none; }
 
-    @media (max-width: 480px) {
-      main { min-height: auto; }
+    .label { display: flex; align-items: baseline; gap: 1.2rem; margin-bottom: 1rem; }
+    .label span, .back {
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.08em;
     }
+    .label span { color: #9c6a1e; }
+    .back { border: 0; background: none; cursor: pointer; color: var(--ink-soft); transition: color 200ms ease; }
+    .back:hover, .back:focus-visible { color: var(--ink); outline: none; }
 
+    /* left: the overview, on matte black */
+    .about {
+      background: var(--black);
+      color: var(--cream);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 6vw, 5.5rem);
+      box-shadow: inset -18px 0 40px -28px rgba(0, 0, 0, 0.9);
+    }
+    .about::after { opacity: 0.05; mix-blend-mode: screen; }
+    .about > div { position: relative; z-index: 1; max-width: 25rem; }
+    .about .kicker {
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; line-height: 1.4; letter-spacing: 0.06em; color: var(--gold);
+      margin-bottom: 0.7rem;
+    }
+    .about .kicker .dot { margin: 0 0.45rem; }
+    .about h1 {
+      font-weight: 500; font-size: clamp(1.6rem, 2.6vw, 2.15rem); line-height: 1.22;
+      color: var(--cream); margin-bottom: 1.4rem;
+    }
+    .about p { font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.6; color: var(--cream-soft); }
+    .about p + p { margin-top: 0.9rem; }
+    .about .intro { font-weight: 500; font-size: clamp(1.4rem, 2.2vw, 1.85rem); line-height: 1.3; color: var(--cream); }
+
+    @media (max-width: 760px) {
+      body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+      .about { order: -1; padding-block: 3rem 2.6rem; }
+      .sections { padding-block: 2.8rem 3.4rem; align-items: flex-start; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .nav-level:not([hidden]) { animation: none; }
       .nav-item, .back { transition: none; }
@@ -133,7 +116,14 @@
   </style>
 </head>
 <body>
-  <main aria-label="Sam Kirwan homepage">
+  <aside class="half about" aria-label="About this site">
+    <div>
+      <p class="kicker">Sam Kirwan</p>
+      <p class="intro">Essay-style maths explanations, with images and interactive widgets, built up from first principles. Mostly high-school topics, plus some from my research in EEG analysis.</p>
+    </div>
+  </aside>
+
+  <main class="half sections" aria-label="Sections">
     <nav aria-label="Sections">
       <ul class="nav-level" data-level="home">
         <li><a class="nav-item" href="apps.html">Apps</a></li>
@@ -145,7 +135,7 @@
       </ul>
 
       <ul class="nav-level" data-level="math" hidden>
-        <li class="label"><span>Math</span><button class="back" type="button" data-back aria-label="Back to sections">← Back</button></li>
+        <li class="label"><span>Math</span><button class="back" type="button" data-back aria-label="Back to sections">← back</button></li>
         <li><a class="nav-item" href="numbers.html">Numbers</a></li>
         <li><a class="nav-item" href="trigonometry.html">Trigonometry</a></li>
         <li><a class="nav-item" href="complex-numbers.html">Complex Numbers</a></li>
@@ -156,17 +146,19 @@
       </ul>
 
       <ul class="nav-level" data-level="physics" hidden>
-        <li class="label"><span>Physics</span><button class="back" type="button" data-back aria-label="Back to sections">← Back</button></li>
+        <li class="label"><span>Physics</span><button class="back" type="button" data-back aria-label="Back to sections">← back</button></li>
         <li><a class="nav-item" href="field-theories.html">Field Theories</a></li>
       </ul>
 
       <ul class="nav-level" data-level="random" hidden>
-        <li class="label"><span>Random</span><button class="back" type="button" data-back aria-label="Back to sections">← Back</button></li>
+        <li class="label"><span>Random</span><button class="back" type="button" data-back aria-label="Back to sections">← back</button></li>
         <li><a class="nav-item" href="active-inference.html">Active Inference</a></li>
         <li><a class="nav-item" href="calendars.html">Calendars</a></li>
       </ul>
     </nav>
   </main>
+
+
   <script>
     const nav = document.querySelector("nav");
     const levels = [...document.querySelectorAll("[data-level]")];
