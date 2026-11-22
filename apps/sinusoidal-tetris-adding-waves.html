@@ -62,7 +62,9 @@
     .aw .b1 { stroke: var(--one); stroke-width: 3; stroke-linecap: round; }
     .aw .b2 { stroke: var(--two); stroke-width: 3; stroke-linecap: round; }
     .aw .faded { stroke-opacity: 0.18; }
-    .pc { margin: 1.6rem 0 1.4rem; }
+    .aw[data-slider] { margin-bottom: 2.8rem; }
+    .aw .axis.mid { stroke: rgba(238, 242, 252, 0.42); stroke-width: 1.3; }
+    .pc { margin: 1.6rem 0 4rem; }
     .pc svg { display: block; width: 100%; max-width: 420px; margin: 0 auto; overflow: visible; }
     .pc .axis { stroke: var(--faint); stroke-width: 1.2; }
     .pc .ring.strong { fill: none; stroke: var(--dim); stroke-width: 1.4; }
@@ -78,7 +80,7 @@
     .aw .link { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 2 4; }
     .nw { white-space: nowrap; }
     .aw .cursor { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 2 4; }
-    .aw .ring { fill: none; stroke: var(--faint); stroke-width: 1; }
+    .aw .ring { fill: none; stroke: rgba(238, 242, 252, 0.34); stroke-width: 1.2; }
     .aw .a1 { stroke: var(--one); stroke-width: 2; }
     .aw .a2 { stroke: var(--two); stroke-width: 2; }
     .aw .as { stroke: var(--sum); stroke-width: 2.2; }
@@ -119,16 +121,16 @@
     <p>Phase may increase from \(0\) to \(2\pi\) radians.</p>
     <div class="pc"></div>
     <p>Watch what happens to the summed wave as the phase of one wave changes.</p>
-    <div class="aw" data-w1="1,2,0" data-w2="1,2,0" data-max="2" data-slider="p2" data-read="amp"></div>
+    <div class="aw" data-w1="1,2,0" data-w2="1,2,0" data-max="2" data-slider="p2" data-bare="1"></div>
     <p>As the phase approaches a half turn, the amplitude of the summed wave decreases.</p>
     <p>When it reaches the half turn, they cancel completely.</p>
     <p>As the phase begins moving from the half turn back towards <span class="nw">\(0\),</span> the amplitude of the summed wave begins increasing again.</p>
 
     <h2>In Terms of Rotating Radii</h2>
     <p>Each wave is produced by a point going around a circle.</p>
-    <div class="aw" data-w1="1,1,0" data-max="1.5" data-radii="1" data-single="1" data-ring="1"></div>
+    <div class="aw" data-w1="1,1,0" data-max="1.5" data-radii="1" data-single="1" data-ring="1" data-nonum="1"></div>
     <p>We can forget the circumference of the circle and think just about rotating radii.</p>
-    <div class="aw" data-w1="1,1,0" data-max="1.5" data-radii="1" data-single="1"></div>
+    <div class="aw" data-w1="1,1,0" data-max="1.5" data-radii="1" data-single="1" data-nonum="1"></div>
     <p>Adding two waves corresponds to adding these rotating radii as <strong>vectors</strong>, placing the beginning of one at the end of the other.</p>
     <p>The vertical position of the resulting vector gives the sum of the two waves.</p>
     <div class="aw" data-w1="1,1,0" data-w2="0.7,1,0.35" data-max="2" data-radii="1"></div>
@@ -140,10 +142,24 @@
     </ul>
     <div class="aw" data-w1="1,1,0" data-w2="1,1,0.25" data-max="2" data-radii="1" data-dials="A2 p2" data-read="len"></div>
 
-    <h2>Different Frequencies: a New Shape</h2>
-    <p>Waves at <strong>different frequencies</strong> do not merge into one wave. One arm goes round faster than the other, so they drift in and out of step, and the sum takes on a more complicated shape.</p>
-    <div class="aw" data-w1="1,1,0" data-w2="0.6,2,0" data-max="2" data-dials="w2 p2" data-read="amp"></div>
-    <p>Change the <span class="c-two">blue</span> wave&rsquo;s frequency. Only when it matches the <span class="c-one">amber</span> wave does the sum become a single wave again.</p>
+    <h2>How Frequency Affects the Sum</h2>
+    <p>When two waves have different frequencies, their heights no longer line up in the same way at every point in time.</p>
+    <p>Where a crest of one meets a crest of the other, their heights add. Where a crest meets a trough, they cancel.</p>
+    <p>Because one wave cycles faster than the other, where these meetings happen keeps changing.</p>
+    <div class="aw" data-w1="1,2,0" data-w2="1,3,0" data-max="2" data-bare="1"></div>
+    <p>The summed wave is no longer a simple sinusoidal wave: it has no single amplitude, frequency or phase.</p>
+    <p>Watch what happens to the summed wave as the frequency of one wave changes.</p>
+    <div class="aw" data-w1="1,2,0" data-w2="1,2,0" data-max="2" data-slider="w2" data-bare="1"></div>
+    <p>Only when the frequencies match does the summed wave become a simple sinusoidal wave again.</p>
+    <p>When the frequencies are close but not equal, the waves drift slowly in and out of step. The summed wave swells and fades. These slow swells are called <strong>beats</strong>.</p>
+    <div class="aw" data-w1="1,4,0" data-w2="1,4.5,0" data-max="2" data-bare="1"></div>
+
+    <h2>Rotating Radii at Different Speeds</h2>
+    <p>A higher frequency means the radius turns faster.</p>
+    <p>When two radii turn at different speeds, the angle between them keeps changing.</p>
+    <p>So the length of the resulting vector keeps changing too. It is longest when the radii point the same way, and shortest when they point in opposite directions.</p>
+    <div class="aw" data-w1="1,1,0" data-w2="1,1.5,0" data-max="2" data-radii="1" data-nonum="1"></div>
+    <p>This is why a wave can only be cancelled by a wave of the <strong>same frequency</strong>. Two radii can only stay pointing in opposite directions if they turn at the same speed.</p>
     <p>This is the signal in <a href="sinusoidal-tetris-two-waves.html">Cancel Two Waves</a>: two waves at different frequencies, added together.</p>
 
     <h2>Taking a Shape Apart</h2>
@@ -151,7 +167,7 @@
     <p>A wave at one frequency can only be cancelled by a wave at the <strong>same</strong> frequency. A drop at any other frequency just adds a new wave to the pile.</p>
     <p>Splitting a complicated signal into simple waves is the idea behind the <strong>Fourier transform</strong>, which is how scientists find the rhythms inside signals such as <a href="../eeg-frequency-domain-overview.html">brain recordings</a>.</p>
 
-    <p class="next"><a href="sinusoidal-tetris-walkthrough.html">Next: Flattening a Signal →</a></p>
+    <p class="next"><a href="sinusoidal-tetris-decomposing.html">Next: Decomposing a Composite Signal →</a></p>
   </div>
 
   <script>
@@ -186,6 +202,13 @@
         const svg = document.createElementNS(NS, "svg");
         svg.setAttribute("viewBox", `0 0 640 ${H}`); svg.setAttribute("role", "img");
         box.appendChild(svg);
+        if (box.dataset.slider === "w2") {
+          const w0 = two.w, r = document.createElement("input"); r.type = "range"; r.min = 50; r.max = 400; r.step = 5; r.value = w0 * 100; r.autocomplete = "off";
+          r.setAttribute("aria-label", "Frequency of the blue wave, from 0.5 to 4");
+          r.addEventListener("input", () => { two.w = r.value / 100; draw(); });
+          window.addEventListener("pageshow", () => { r.value = w0 * 100; two.w = w0; draw(); });
+          box.appendChild(r);
+        }
         if (box.dataset.slider === "p2") {
           const r = document.createElement("input"); r.type = "range"; r.min = 0; r.max = 2000; r.value = two.p * 1000; r.autocomplete = "off";
           const p0 = two.p; window.addEventListener("pageshow", () => { r.value = p0 * 1000; two.p = p0; draw(); });
@@ -223,9 +246,9 @@
           svg.innerHTML = "";
           if (!bare) {
             for (let g = 1; g <= Math.floor(MAX); g++) [g, -g].forEach(v => el("line", { class: "grid", x1: L, x2: R, y1: MID - v * SC, y2: MID - v * SC }));
-            for (let g = 1; g <= Math.floor(MAX); g++) { const t = el("text", { x: L - 6, y: MID - g * SC + 4, "text-anchor": "end" }); t.textContent = g; }
+            if (!box.dataset.nonum) for (let g = 1; g <= Math.floor(MAX); g++) { const t = el("text", { x: L - 6, y: MID - g * SC + 4, "text-anchor": "end" }); t.textContent = g; }
           }
-          el("line", { class: "axis", x1: L, x2: R, y1: MID, y2: MID });
+          el("line", { class: bare ? "axis mid" : "axis", x1: L, x2: R, y1: MID, y2: MID });
           const f1 = t => wave(one, t), f2 = t => wave(two, t), fs = t => f1(t) + f2(t);
           const upto = radii ? tau : TMAX;
           if (radii) {   // faint full curves behind the traces
@@ -279,10 +302,9 @@
       // The phase circle: a point on a circle, its angle from the start shaded, with the angle read in radians.
       document.querySelectorAll(".pc").forEach(box => {
         const svg = document.createElementNS(NS, "svg");
-        svg.setAttribute("viewBox", "0 0 360 270"); svg.setAttribute("role", "img"); box.appendChild(svg);
+        svg.setAttribute("viewBox", "-20 0 400 270"); svg.setAttribute("role", "img"); box.appendChild(svg);
         const r = document.createElement("input"); r.type = "range"; r.min = 0; r.max = 2000; r.value = 0; r.autocomplete = "off";
         r.setAttribute("aria-label", "Phase, from 0 to 2π radians"); box.appendChild(r);
-        const read = document.createElement("div"); read.className = "read"; read.setAttribute("aria-live", "polite"); box.appendChild(read);
         const CX = 180, CY = 135, RR = 92;
         function el(tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
         function draw() {
@@ -298,17 +320,14 @@
               : `M${CX} ${CY} L${CX + ra} ${CY} A${ra} ${ra} 0 ${big} 0 ${end[0].toFixed(1)} ${end[1].toFixed(1)} Z`;
             el("path", { class: "sweep", d });
           }
-          [["0", 0], ["π/2", 0.5], ["π", 1], ["3π/2", 1.5]].forEach(([t, q]) => {
+          [["0 / 2π", 0], ["π/2", 0.5], ["π", 1], ["3π/2", 1.5]].forEach(([t, q]) => {
             const qa = q * Math.PI, lx = CX + (RR + 20) * Math.cos(qa), ly = CY - (RR + 20) * Math.sin(qa);
             el("circle", { class: "tick", cx: CX + RR * Math.cos(qa), cy: CY - RR * Math.sin(qa), r: 2.5 });
             el("text", { class: "rad", x: lx + (q === 0 ? 8 : q === 1 ? -8 : 0), y: ly + 5, "text-anchor": q === 0 ? "start" : q === 1 ? "end" : "middle" }, t);
           });
-          el("text", { class: "rad dim", x: CX + RR + 28, y: CY + 22, "text-anchor": "start" }, "(2π)");
           const px = CX + RR * Math.cos(a), py = CY - RR * Math.sin(a);
           el("line", { class: "a1", x1: CX, y1: CY, x2: px, y2: py });
           el("circle", { cx: px, cy: py, r: 6, fill: "var(--one)" });
-          const pTxt = p < 0.005 ? "0" : (+p.toFixed(2)) + "π";
-          read.innerHTML = `ϕ = <span class="n n1">${pTxt}</span> radians <span class="n">(≈ ${a.toFixed(2)})</span> &nbsp;·&nbsp; ${(p / 2 * 100).toFixed(0)}% of a full turn`;
           svg.setAttribute("aria-label", `A point on a circle at an angle of ${(a).toFixed(2)} radians`);
         }
         r.addEventListener("input", draw); draw();

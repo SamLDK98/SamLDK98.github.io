@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decomposing a Composite Signal | Sinusoidal Tetris | Sam Kirwan</title>
+  <meta name="description" content="How to take apart a wave made of a slow sinusoidal wave and a fast one: find the slow wave running through the middle of the ripple, then read the ripple itself." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #0e0e11;
+      --ink:   #f4f6ff;
+      --body:  rgba(243, 246, 255, 0.88);
+      --dim:   rgba(238, 242, 252, 0.5);
+      --faint: rgba(238, 242, 252, 0.15);
+      --hair:  rgba(238, 242, 252, 0.08);
+      --one:   #e8a33d;   /* the slow wave */
+      --two:   #7aa7ff;   /* the fast wave */
+      --sum:   #f4f6ff;   /* the combined wave */
+      --try:   #c9a8ff;   /* your attempt */
+      --measure: 40rem;
+    }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body { background: var(--bg); color: var(--body); font-family: "Spectral", Georgia, serif; -webkit-font-smoothing: antialiased; }
+    .sheet { width: min(var(--measure), calc(100% - 2.4rem)); margin: 0 auto; padding: clamp(2.4rem, 7vh, 4.5rem) 0 4rem; }
+    .crumb { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
+    .crumb::before { content: "← "; }
+    .crumb:hover { color: var(--ink); }
+    h1 { margin: 1.2rem 0 1.8rem; font-weight: 400; font-size: clamp(2.1rem, 6.4vw, 3.4rem); line-height: 1.08; color: var(--ink); }
+    h1::after { content: ""; display: block; width: 2rem; height: 1px; background: var(--one); margin-top: 1.4rem; }
+    h2 { margin: 3rem 0 1rem; font-weight: 400; font-size: clamp(1.45rem, 3.6vw, 1.9rem); color: var(--ink); }
+    p, li { font-size: clamp(1.1rem, 2.4vw, 1.22rem); line-height: 1.7; }
+    p + p, ul + p, .w + p, table + p { margin-top: 0.9rem; }
+    ul { margin: 0.9rem 0 0 1.3rem; }
+    li + li { margin-top: 0.3rem; }
+    strong { color: var(--ink); font-weight: 500; }
+    .c-one { color: var(--one); } .c-two { color: var(--two); } .c-try { color: var(--try); }
+    a { color: #b9a8d4; }
+    .nw { white-space: nowrap; }
+    .next { margin-top: 2.6rem; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .next a { color: var(--one); text-decoration: none; border-bottom: 1px solid rgba(232, 163, 61, 0.4); }
+    .next a:hover { border-bottom-color: var(--one); }
+    table.phase { margin: 1rem 0; border-collapse: collapse; font-size: 1.05rem; }
+    table.phase th { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); font-weight: 400; text-align: left; padding: 0 1.4rem 0.5rem 0; }
+    table.phase td { padding: 0.35rem 1.4rem 0.35rem 0; border-top: 1px solid var(--hair); }
+    table.phase td:first-child { font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; color: var(--ink); }
+
+    /* the widgets */
+    .w { margin: 1.8rem 0 1.6rem; }
+    .w svg { display: block; width: 100%; overflow: visible; }
+    .w text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
+    .w .mid { stroke: rgba(238, 242, 252, 0.42); stroke-width: 1.3; }
+    .w .grid { stroke: var(--hair); stroke-width: 1; }
+    .w .w1 { fill: none; stroke: var(--one); stroke-width: 1.8; }
+    .w .w2 { fill: none; stroke: var(--two); stroke-width: 1.8; }
+    .w .ws { fill: none; stroke: var(--sum); stroke-width: 2.2; }
+    .w .ws.faded { stroke-opacity: 0.22; }
+    .w .found { fill: none; stroke: #7fcf9a; stroke-width: 2.4; }
+    .w .guide { fill: none; stroke: var(--one); stroke-width: 2; stroke-dasharray: 7 5; }
+    .w .band { fill: var(--two); fill-opacity: 0.1; stroke: var(--two); stroke-opacity: 0.45; stroke-width: 1; stroke-dasharray: 3 4; }
+    .w .try { fill: none; stroke: var(--try); stroke-width: 1.8; stroke-dasharray: 6 5; }
+    .w .gap { fill: var(--try); fill-opacity: 0.12; }
+    .cap { min-height: 5.6rem; margin-top: 1rem; text-align: center; font-size: clamp(1.05rem, 2.3vw, 1.16rem); line-height: 1.6; }
+    .nav { display: flex; justify-content: center; align-items: center; gap: 1.4rem; margin-top: 0.6rem; }
+    .nav .count { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--dim); min-width: 3.4rem; text-align: center; }
+    .round {
+      font: inherit; font-size: 1rem; line-height: 1; width: 2rem; height: 2rem; border-radius: 50%;
+      background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .nav .round { font-size: 1.2rem; width: 2.3rem; height: 2.3rem; }
+    .round:hover:not(:disabled), .pill:hover:not(:disabled) { border-color: var(--dim); }
+    .round:disabled, .pill:disabled { opacity: 0.25; cursor: default; }
+    .round:focus-visible, .pill:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+    .pill {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.5rem 1rem; border-radius: 999px; background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+    .pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.7rem; margin-top: 1rem; }
+    .groups { display: grid; grid-template-columns: 1fr; gap: 0.9rem; max-width: 24rem; margin: 1.2rem auto 0; }
+    .group { border: 1px solid var(--hair); border-radius: 8px; padding: 0.9rem 0.6rem 1rem; }
+    .group h3 { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 400; margin-bottom: 0.6rem; }
+    .group.one h3 { color: var(--one); } .group.two h3 { color: var(--two); }
+    .dials { display: flex; justify-content: center; gap: 1.4rem; }
+    .dial-ctl { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+    .dial-ctl .name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 1.6rem; line-height: 1; }
+    .group.one .name { color: var(--one); } .group.two .name { color: var(--two); }
+    .dial-ctl .row { display: flex; align-items: center; gap: 0.3rem; }
+    .dial-ctl .val { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; color: var(--ink); min-width: 2.9rem; text-align: center; }
+    .dial-ctl .round { width: 1.7rem; height: 1.7rem; font-size: 0.9rem; }
+    .result { min-height: 2rem; margin-top: 1rem; text-align: center; font-size: clamp(1.05rem, 2.3vw, 1.16rem); line-height: 1.6; }
+    .result .win { color: #7fcf9a; }
+    .sliders { max-width: 30rem; margin: 1.1rem auto 0; display: grid; gap: 1rem; }
+    .shead { font-size: clamp(1.02rem, 2.2vw, 1.1rem); margin-bottom: 0.35rem; }
+    .srow.one .shead { color: var(--one); } .srow.two .shead { color: var(--two); }
+    .srow input { display: block; width: 100%; }
+    .srow.one input { accent-color: var(--one); } .srow.two input { accent-color: var(--two); }
+    .w .zone { fill-opacity: 0.26; stroke: var(--one); stroke-opacity: 0.55; stroke-width: 1; }
+    .w .zone.up, .w .zone.down { fill: var(--one); }
+    .w .mark { fill: var(--one); stroke: #0e0e11; stroke-width: 1.5; }
+    .w .mark.start { fill: none; stroke: var(--one); stroke-width: 1.8; }
+    .w .measure { fill: none; stroke: var(--one); stroke-width: 1.3; }
+    .w text.mtext { fill: var(--one); font-size: 12px; }
+    .dials.big { margin-top: 1.2rem; gap: 2.6rem; }
+    .dials.big .name { font-size: 2.1rem; color: var(--one); }
+    .dials.big .val { font-size: 1.05rem; min-width: 3.4rem; }
+    .dials.big .round { width: 2rem; height: 2rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <a class="crumb" href="sinusoidal-tetris.html">Sinusoidal Tetris</a>
+    <h1>Decomposing a Composite Signal</h1>
+
+    <p>Here is a wave made by adding two sinusoidal waves with different frequencies: a <span class="c-one">slow</span> one and a <span class="c-two">fast</span> one.</p>
+    <div class="w" id="reveal"></div>
+    <p>When we add a faster wave to a slower wave, we can think of the slower wave as becoming the centre line of the faster wave.</p>
+    <p>Because the faster wave oscillates equally above and below this line, the combined wave appears to <strong>ripple</strong> around the slower wave.</p>
+    <p>If we imagine tracing a line through the middle of these ripples, we can visualise the underlying slow wave.</p>
+    <div class="w" id="steps"></div>
+
+    <p>When the slow wave&rsquo;s amplitude is much greater than the fast wave&rsquo;s, its contribution to the height of the composite wave is large enough to make it visually clear.</p>
+    <p>However, as the fast wave&rsquo;s amplitude increases, the ripples get bigger.</p>
+    <p>If the slow wave has only a small amplitude, the centre line of the composite wave may only sway up and down ever so slightly, as the slow wave is not contributing much to the height at each point.</p>
+    <div class="w" id="amps"></div>
+
+    <h2>Spotting the Slow Wave</h2>
+    <p>The ripples ride highest where the slow wave has a crest, and sink lowest where it has a trough.</p>
+    <p>So the quickest way to find the slow wave is to look for those places first, then read its frequency and phase from them.</p>
+    <div class="w" id="spot"></div>
+
+    <p>Try to create the slow wave that features in the following composite waves by adjusting the frequency and phase. In these first examples, the slow wave&rsquo;s amplitude is much greater than the fast wave&rsquo;s, so it is visually clear.</p>
+    <div class="w" id="slowgame-easy"></div>
+    <p>Now try some where the ripples are bigger.</p>
+    <div class="w" id="slowgame"></div>
+
+    <h2>Reading Each Wave</h2>
+    <p>Once a wave has been separated out, read its three properties off the board.</p>
+    <p><strong>Frequency.</strong> The board is split into 8 columns. Count how many columns one full cycle takes, from one crest to the next:</p>
+    <ul>
+      <li>8 columns (one cycle across the whole board): <span class="nw">\(\omega = 0.5\)</span></li>
+      <li>4 columns: <span class="nw">\(\omega = 1\)</span></li>
+      <li>2 columns: <span class="nw">\(\omega = 2\)</span></li>
+      <li>1 column: <span class="nw">\(\omega = 4\)</span></li>
+    </ul>
+    <p>In general, <span class="nw">\(\omega = 4 \div\)</span> (columns per cycle). For the fast wave it is often easier to count its crests across the whole board and halve the count.</p>
+    <p><strong>Amplitude.</strong> For the slow wave, it is the height of the middle line&rsquo;s crests above the centre line. For the fast wave, it is <strong>half the thickness</strong> of the ripple.</p>
+    <p><strong>Phase.</strong> Look at where each wave starts at the left edge, and which way it is heading:</p>
+    <table class="phase">
+      <thead><tr><th>Phase</th><th>The wave starts&hellip;</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>on its centre line, heading up</td></tr>
+        <tr><td>0.5π</td><td>at a crest</td></tr>
+        <tr><td>π</td><td>on its centre line, heading down</td></tr>
+        <tr><td>1.5π</td><td>at a trough</td></tr>
+      </tbody>
+    </table>
+    <p>For the fast wave, &ldquo;its centre line&rdquo; is the slow wave: look at where the ripple starts relative to it.</p>
+
+    <h2>Try It</h2>
+    <p>Set the dials for the <span class="c-one">slow</span> and <span class="c-two">fast</span> waves. Your two waves added together are drawn as a <span class="c-try">dashed line</span>. When it lies on top of the white wave, you have decomposed it.</p>
+    <div class="w" id="practice"></div>
+
+    <h2>When It Gets Harder</h2>
+    <ul>
+      <li><strong>Similar amplitudes.</strong> If the fast wave is as big as the slow one, there is no clear &ldquo;ripple&rdquo;. The middle-line trick still works, but the middle is harder to see.</li>
+      <li><strong>Similar frequencies.</strong> If the two frequencies are close, the waves drift slowly in and out of step and the sum swells and fades in beats. The slow wave is no longer obvious at all.</li>
+    </ul>
+    <p>In the game, you do not need to find both waves at once. Cancel the one you are surest of; whatever is left becomes easier to read.</p>
+
+    <p class="next"><a href="sinusoidal-tetris-walkthrough.html">Next: Flattening a Signal →</a></p>
+  </div>
+
+  <script>
+    (function () {
+      const NS = "http://www.w3.org/2000/svg";
+      const TMAX = 4 * Math.PI, L = 40, R = 630, MID = 112, H = 226, SC = 60;
+      const wave = (c, t) => c.A * Math.sin(c.w * t + c.p * Math.PI);
+      const tx = t => L + t / TMAX * (R - L);
+      const fmtP = v => { const x = ((v % 2) + 2) % 2; return x < 0.005 ? "0" : (+x.toFixed(2)) + "π"; };
+
+      function board(box, grid) {
+        const svg = document.createElementNS(NS, "svg");
+        svg.setAttribute("viewBox", `0 0 640 ${H}`); svg.setAttribute("role", "img");
+        box.appendChild(svg);
+        const api = {
+          svg,
+          el(tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; },
+          path(f, cls) { let d = ""; for (let i = 0; i <= 600; i++) { const t = i / 600 * TMAX; d += (i ? "L" : "M") + tx(t).toFixed(1) + " " + (MID - f(t) * SC).toFixed(1) + " "; } return api.el("path", { class: cls, d }); },
+          clear() {
+            svg.innerHTML = "";
+            if (grid) {
+              for (let g = 1; g < 8; g++) api.el("line", { class: "grid", x1: L + g * (R - L) / 8, x2: L + g * (R - L) / 8, y1: MID - 1.75 * SC, y2: MID + 1.75 * SC });
+              if (grid !== "cols") {
+                [-1, -0.5, 0.5, 1].forEach(v => api.el("line", { class: "grid", x1: L, x2: R, y1: MID - v * SC, y2: MID - v * SC }));
+                api.el("text", { x: L - 6, y: MID - SC + 4, "text-anchor": "end" }, "1");
+                api.el("text", { x: L - 6, y: MID - SC / 2 + 4, "text-anchor": "end" }, "0.5");
+              }
+            }
+            api.el("line", { class: "mid", x1: L, x2: R, y1: MID, y2: MID });
+          }
+        };
+        return api;
+      }
+
+      // 1. The combined wave, with a button that reveals the two waves inside it
+      (function () {
+        const box = document.getElementById("reveal"), b = board(box, false);
+        const S = { A: 1, w: 0.5, p: 0 }, F = { A: 0.35, w: 4, p: 0 };
+        let show = false;
+        const pills = document.createElement("div"); pills.className = "pills";
+        const btn = document.createElement("button"); btn.className = "pill"; btn.type = "button";
+        pills.appendChild(btn); box.appendChild(pills);
+        function draw() {
+          b.clear();
+          if (show) { b.path(t => wave(S, t), "w1"); b.path(t => wave(F, t), "w2"); }
+          b.path(t => wave(S, t) + wave(F, t), "ws" + (show ? " faded" : ""));
+          btn.textContent = show ? "Hide" : "Show";
+          b.svg.setAttribute("aria-label", show ? "The combined wave, with its slow and fast waves shown" : "A wave made of two sinusoidal waves");
+        }
+        btn.addEventListener("click", () => { show = !show; draw(); });
+        draw();
+      })();
+
+      // 1b. The two amplitudes: how big the ripples are compared with the slow swell.
+      (function () {
+        const box = document.getElementById("amps");
+        const svg = document.createElementNS(NS, "svg");
+        const AH = 220, AM = 110, ASC = 34;   // room for a composite up to 3 high
+        svg.setAttribute("viewBox", `0 0 640 ${AH}`); svg.setAttribute("role", "img"); box.appendChild(svg);
+        const S = { A: 1, w: 0.5, p: 0 }, F = { A: 0.3, w: 4, p: 0 };
+        const sliders = document.createElement("div"); sliders.className = "sliders";
+        const rows = [["one", "Slow wave", S], ["two", "Fast wave", F]].map(([cls, label, obj]) => {
+          const row = document.createElement("div"); row.className = "srow " + cls;
+          row.innerHTML = `<div class="shead">${label} amplitude</div><input type="range" min="0" max="15" step="1" autocomplete="off" aria-label="${label} amplitude">`;
+          const r = row.querySelector("input");
+          r.addEventListener("input", () => { obj.A = r.value / 10; draw(); });
+          sliders.appendChild(row);
+          return { row, r, obj };
+        });
+box.appendChild(sliders);
+        function draw() {
+          svg.innerHTML = "";
+          const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); svg.appendChild(e); return e; };
+          const path = f => { let d = ""; for (let i = 0; i <= 700; i++) { const t = i / 700 * TMAX; d += (i ? "L" : "M") + tx(t).toFixed(1) + " " + (AM - f(t) * ASC).toFixed(1) + " "; } return d; };
+          el("line", { class: "mid", x1: L, x2: R, y1: AM, y2: AM });
+          el("path", { class: "guide", d: path(t => wave(S, t)) });
+          el("path", { class: "ws", d: path(t => wave(S, t) + wave(F, t)) });
+          rows.forEach(({ r, obj }) => { r.value = Math.round(obj.A * 10); });
+          svg.setAttribute("aria-label", `A composite wave: a slow wave of amplitude ${S.A.toFixed(1)} with a fast wave of amplitude ${F.A.toFixed(1)} riding on it`);
+        }
+        window.addEventListener("pageshow", () => { S.A = 1; F.A = 0.3; draw(); });
+        draw();
+      })();
+
+      // 2. Step by step: find the slow wave through the middle, then the fast wave that is left
+      (function () {
+        const box = document.getElementById("steps"), b = board(box, false);
+        const S = { A: 1, w: 0.5, p: 0.25 }, F = { A: 0.3, w: 3.5, p: 0 };
+        const STEPS = [
+          { cap: "Imagine a line running through the middle of these oscillations." },
+          { cap: "If we calculated this line we would identify the <span class='c-one'>slow wave</span>." },
+          { cap: "The ripple stays within a <span class='c-two'>band</span> around the slow wave. Half the band&rsquo;s thickness is the <span class='c-two'>fast wave&rsquo;s</span> amplitude." }
+        ];
+        let i = 0;
+        const cap = document.createElement("div"); cap.className = "cap"; cap.setAttribute("aria-live", "polite");
+        const nav = document.createElement("div"); nav.className = "nav";
+        nav.innerHTML = `<button class="round" type="button" aria-label="Previous step">←</button><span class="count"></span><button class="round" type="button" aria-label="Next step">→</button>`;
+        box.appendChild(cap); box.appendChild(nav);
+        const [prev, next] = nav.querySelectorAll("button");
+        function draw() {
+          b.clear();
+          const sum = t => wave(S, t) + wave(F, t);
+          if (i === 2) {
+            let d = "";
+            for (let k = 0; k <= 300; k++) { const t = k / 300 * TMAX; d += (k ? "L" : "M") + tx(t).toFixed(1) + " " + (MID - (wave(S, t) + F.A) * SC).toFixed(1) + " "; }
+            for (let k = 300; k >= 0; k--) { const t = k / 300 * TMAX; d += "L" + tx(t).toFixed(1) + " " + (MID - (wave(S, t) - F.A) * SC).toFixed(1) + " "; }
+            b.el("path", { class: "band", d: d + "Z" });
+          }
+          if (i <= 2) b.path(sum, "ws");
+          if (i === 3 || i === 4) { b.path(sum, "ws faded"); b.path(t => wave(F, t), "w2"); }
+          if (i === 5) { b.path(t => wave(S, t), "w1"); b.path(t => wave(F, t), "w2"); b.path(sum, "ws faded"); }
+          if (i === 1 || i === 2) b.path(t => wave(S, t), "guide");
+          cap.innerHTML = STEPS[i].cap;
+          nav.querySelector(".count").textContent = (i + 1) + " / " + STEPS.length;
+          prev.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+          b.svg.setAttribute("aria-label", cap.textContent);
+        }
+        prev.addEventListener("click", () => { if (i > 0) { i--; draw(); } });
+        next.addEventListener("click", () => { if (i < STEPS.length - 1) { i++; draw(); } });
+        draw();
+      })();
+
+      // 2a. How to spot the slow wave: highest and lowest ripples, then the crests and troughs,
+      //     then half a cycle from crest to trough, then the phase at the left edge.
+      (function () {
+        const box = document.getElementById("spot"), b = board(box, "cols");
+        const S = { A: 1, w: 1, p: 0 }, F = { A: 0.28, w: 5, p: 0 };
+        const COL = (R - L) / 8;   // one column is a quarter of a cycle at ω = 1
+        const crests = [0.5 * Math.PI, 2.5 * Math.PI], troughs = [1.5 * Math.PI, 3.5 * Math.PI];
+        const STEPS = [
+          "Look for where the ripples sit <strong>highest</strong> and where they sink <strong>lowest</strong>.",
+          "The slow wave&rsquo;s <span class='c-one'>crests and troughs</span> sit in the middle of the ripples in those places. Their height above the centre line is its amplitude.",
+          "From a crest to the next trough is <strong>half a cycle</strong>. Here that is 2 columns, so a full cycle is 4 columns, and <em>ω</em> = 4 ÷ 4 = 1.",
+          "Now the phase. At the left edge, the middle of the ripples is on the centre line, heading up towards the first crest, so <em>ϕ</em> = 0."
+        ];
+        let i = 0;
+        const cap = document.createElement("div"); cap.className = "cap"; cap.setAttribute("aria-live", "polite");
+        const nav = document.createElement("div"); nav.className = "nav";
+        nav.innerHTML = `<button class="round" type="button" aria-label="Previous step">←</button><span class="count"></span><button class="round" type="button" aria-label="Next step">→</button>`;
+        box.appendChild(cap); box.appendChild(nav);
+        const [prev, next] = nav.querySelectorAll("button");
+        const Y = v => MID - v * SC;
+        function draw() {
+          b.clear();
+          // step 1: soft bands where the ripples ride highest and lowest
+          if (i === 0) {
+            crests.forEach(t => b.el("rect", { class: "zone up", x: tx(t) - COL * 0.6, y: Y(1.5), width: COL * 1.2, height: (Y(0.5) - Y(1.5)) }));
+            troughs.forEach(t => b.el("rect", { class: "zone down", x: tx(t) - COL * 0.6, y: Y(-0.5), width: COL * 1.2, height: (Y(-1.5) - Y(-0.5)) }));
+          }
+          b.path(t => wave(S, t) + wave(F, t), i >= 3 ? "ws faded" : "ws");
+          if (i >= 3) b.path(t => wave(S, t), "guide");
+          if (i >= 1) {
+            crests.concat(troughs).forEach(t => b.el("circle", { class: "mark", cx: tx(t), cy: Y(wave(S, t)), r: 5 }));
+          }
+          if (i === 1) {
+            const t = crests[0];
+            b.el("line", { class: "measure", x1: tx(t), x2: tx(t), y1: Y(0), y2: Y(1) });
+            b.el("text", { class: "mtext", x: tx(t) + 8, y: Y(0.5) + 4 }, "A = 1");
+          }
+          if (i === 2) {
+            const a = tx(crests[0]), c = tx(troughs[0]), y = Y(1.55);
+            b.el("path", { class: "measure", d: `M${a} ${y + 6} V${y} H${c} V${y + 6}` });
+            b.el("text", { class: "mtext", x: (a + c) / 2, y: y - 7, "text-anchor": "middle" }, "half a cycle: 2 columns");
+          }
+          if (i === 3) {
+            b.el("circle", { class: "mark start", cx: tx(0), cy: Y(0), r: 5 });
+          }
+          cap.innerHTML = STEPS[i];
+          nav.querySelector(".count").textContent = (i + 1) + " / " + STEPS.length;
+          prev.disabled = i === 0; next.disabled = i === STEPS.length - 1;
+          b.svg.setAttribute("aria-label", cap.textContent);
+        }
+        prev.addEventListener("click", () => { if (i > 0) { i--; draw(); } });
+        next.addEventListener("click", () => { if (i < STEPS.length - 1) { i++; draw(); } });
+        draw();
+      })();
+
+      // 2b. Mini-games: find the slow wave inside a composite by setting its frequency and phase.
+      //     The easy one has a big slow wave, a faint ripple and phases in quarter turns.
+      //     Its amplitude is set for you; the columns help with counting cycles.
+      function slowGame(id, level) {
+        const box = document.getElementById(id), b = board(box, "cols");
+        const rint = (a, c) => a + Math.floor(Math.random() * (c - a + 1));
+        let S, F, round = 0;
+        const U = { A: 1, w: 1, p: 0 };
+        const easy = level === "easy";
+        const STEP = { w: 0.5, p: easy ? 0.25 : 1 / 12 }, LO = { w: 0.5 }, HI = { w: 2 };
+        const dials = document.createElement("div"); dials.className = "dials big";
+        [["w", "ω"], ["p", "ϕ"]].forEach(([k, sym]) => {
+          const d = document.createElement("div"); d.className = "dial-ctl one";
+          d.innerHTML = `<span class="name">${sym}</span><div class="row"><button class="round" type="button" data-d="-1" aria-label="Decrease ${sym}">−</button><span class="val"></span><button class="round" type="button" data-d="1" aria-label="Increase ${sym}">+</button></div>`;
+          d.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+            let v = U[k] + +btn.dataset.d * STEP[k];
+            if (k === "w") v = Math.min(HI.w, Math.max(LO.w, v));
+            U[k] = +(Math.round(v / STEP[k]) * STEP[k]).toFixed(4); draw();
+          }));
+          d.update = () => {
+            d.querySelector(".val").textContent = k === "p" ? fmtP(U.p) : U.w.toFixed(1);
+            if (k === "w") { const [dn, up] = d.querySelectorAll("button"); dn.disabled = U.w - STEP.w < LO.w - 1e-9; up.disabled = U.w + STEP.w > HI.w + 1e-9; }
+          };
+          dials.appendChild(d);
+        });
+        const pills = document.createElement("div"); pills.className = "pills";
+        pills.innerHTML = `<button class="pill" type="button" data-a="new">Next wave</button>`;
+        box.appendChild(dials); box.appendChild(pills);
+        function fresh() {
+          if (easy) {   // a big, clear slow wave with a faint ripple; phases in quarter turns
+            // the ripple must be steep enough (fast A × ω at least slow A × ω) to show as wiggles everywhere,
+            // not just as flattened crests and troughs
+            S = { A: rint(10, 12) / 10, w: rint(1, 2) * 0.5, p: rint(0, 3) / 2 };
+            F = { A: 0.3, w: 4, p: rint(0, 7) / 4 };
+          } else {
+            S = { A: rint(8, 12) / 10, w: rint(1, 3) * 0.5, p: rint(0, 23) / 12 };
+            F = { A: rint(2, 3) / 10, w: rint(6, 8) * 0.5, p: rint(0, 23) / 12 };
+          }
+          U.A = S.A; U.w = 1; U.p = 0; round++;
+          draw();
+        }
+        function draw() {
+          b.clear();
+          b.path(t => wave(S, t) + wave(F, t), "ws");
+          let gap = 0;
+          for (let k = 0; k <= 600; k++) { const t = k / 600 * TMAX; gap = Math.max(gap, Math.abs(wave(S, t) - wave(U, t))); }
+          const found = gap < 0.02;
+          b.path(t => wave(U, t), found ? "found" : "guide");
+          dials.querySelectorAll(".dial-ctl").forEach(d => d.update());
+          b.svg.setAttribute("aria-label", found ? "Your line matches the slow wave" : "A composite wave, with your guess at its slow wave as a dashed line");
+        }
+        pills.addEventListener("click", e => {
+          const a = e.target.dataset && e.target.dataset.a;
+          if (a === "new") fresh();
+        });
+        fresh();
+      }
+      slowGame("slowgame-easy", "easy");
+      slowGame("slowgame", "hard");
+
+      // 3. Practice: set both waves' dials until their sum lies on the white wave
+      (function () {
+        const box = document.getElementById("practice"), b = board(box, true);
+        const STEP = { A: 0.1, w: 0.5, p: 1 / 12 }, LO = { A: 0.1, w: 0.5 }, HI = { A: 1.5, w: 4 };
+        const rint = (a, c) => a + Math.floor(Math.random() * (c - a + 1));
+        let T1, T2;
+        const U1 = { A: 1, w: 0.5, p: 0 }, U2 = { A: 0.3, w: 3, p: 0 };
+        const groups = document.createElement("div"); groups.className = "groups";
+        [["one", "Slow wave", U1], ["two", "Fast wave", U2]].forEach(([cls, title, obj]) => {
+          const g = document.createElement("div"); g.className = "group " + cls;
+          g.innerHTML = `<h3>${title}</h3><div class="dials"></div>`;
+          [["A", "A"], ["w", "ω"], ["p", "ϕ"]].forEach(([k, sym]) => {
+            const d = document.createElement("div"); d.className = "dial-ctl";
+            d.innerHTML = `<span class="name">${sym}</span><div class="row"><button class="round" type="button" data-d="-1" aria-label="Decrease ${title} ${sym}">−</button><span class="val"></span><button class="round" type="button" data-d="1" aria-label="Increase ${title} ${sym}">+</button></div>`;
+            d.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+              let v = obj[k] + +btn.dataset.d * STEP[k];
+              if (k !== "p") v = Math.min(HI[k], Math.max(LO[k], v));
+              obj[k] = +(Math.round(v / STEP[k]) * STEP[k]).toFixed(4); draw();
+            }));
+            d.update = () => {
+              d.querySelector(".val").textContent = k === "p" ? fmtP(obj.p) : obj[k].toFixed(1);
+              const [dn, up] = d.querySelectorAll("button");
+              if (k !== "p") { dn.disabled = obj[k] - STEP[k] < LO[k] - 1e-9; up.disabled = obj[k] + STEP[k] > HI[k] + 1e-9; }
+            };
+            g.querySelector(".dials").appendChild(d);
+          });
+          groups.appendChild(g);
+        });
+        const result = document.createElement("div"); result.className = "result"; result.setAttribute("aria-live", "polite");
+        const pills = document.createElement("div"); pills.className = "pills";
+        pills.innerHTML = `<button class="pill" type="button" data-a="reveal">Show the answer</button><button class="pill" type="button" data-a="new">New wave</button>`;
+        box.appendChild(groups); box.appendChild(result); box.appendChild(pills);
+        let revealed = false;
+        function fresh() {
+          T1 = { A: rint(6, 13) / 10, w: rint(1, 2) * 0.5, p: rint(0, 23) / 12 };
+          T2 = { A: rint(2, 5) / 10, w: rint(5, 8) * 0.5, p: rint(0, 23) / 12 };
+          revealed = false; draw();
+        }
+        function draw() {
+          b.clear();
+          const target = t => wave(T1, t) + wave(T2, t), mine = t => wave(U1, t) + wave(U2, t);
+          if (revealed) { b.path(t => wave(T1, t), "w1"); b.path(t => wave(T2, t), "w2"); }
+          b.path(target, "ws");
+          b.path(mine, "try");
+          let gap = 0;
+          for (let k = 0; k <= 600; k++) { const t = k / 600 * TMAX; gap = Math.max(gap, Math.abs(target(t) - mine(t))); }
+          result.innerHTML = gap < 0.02 ? "<strong class='win'>Decomposed!</strong> Your two waves add up to the white wave exactly."
+            : gap < 0.15 ? "Very close. The biggest gap between the lines is " + gap.toFixed(2) + "."
+            : "The biggest gap between the dashed line and the white wave is " + gap.toFixed(2) + ".";
+          groups.querySelectorAll(".dial-ctl").forEach(d => d.update());
+          b.svg.setAttribute("aria-label", "A wave made of two sinusoidal waves, and your attempt at it as a dashed line");
+        }
+        pills.addEventListener("click", e => {
+          const a = e.target.dataset && e.target.dataset.a;
+          if (a === "reveal") { revealed = !revealed; e.target.textContent = revealed ? "Hide the answer" : "Show the answer"; draw(); }
+          if (a === "new") { pills.querySelector("[data-a=reveal]").textContent = "Show the answer"; fresh(); }
+        });
+        fresh();
+      })();
+    })();
+  </script>
+</body>
+</html>
