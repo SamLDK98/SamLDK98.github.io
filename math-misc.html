@@ -112,11 +112,17 @@
     .about a.kicker:hover, .about a.kicker:focus-visible { color: var(--cream); outline: none; }
     .about .intro { font-weight: 500; font-size: clamp(1.4rem, 2.2vw, 1.85rem); line-height: 1.3; color: var(--cream); }
 
+    /* phones: keep the split, with smaller type and no drawings */
     @media (max-width: 760px) {
-      body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-      .about { order: -1; padding-block: 3rem 2.6rem; }
-      .sections { padding-block: 2.8rem 3.4rem; align-items: flex-start; }
-      .emblem { top: auto; bottom: 1.5rem; transform: none; width: 46%; opacity: 0.55; }
+      body { grid-template-columns: 1fr 1.1fr; }
+      .about { padding: 2rem 1.1rem 2rem 1.2rem; }
+      .sections { padding: 2rem 1rem 2rem 1.3rem; }
+      .about .intro { font-size: 1rem; line-height: 1.38; }
+      .about .intro.title { font-size: 1.75rem; }
+      .about .kicker { font-size: 0.72rem; margin-top: 1.4rem; }
+      .nav-item { font-size: 1.15rem; }
+      .nav-level li + li { margin-top: 0.3rem; }
+      .emblem { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
       .nav-level:not([hidden]) { animation: none; }
