@@ -7,238 +7,365 @@
   <title>Functions | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    /* Same look as the Exponentials landing page: flat charcoal, Poppins title, Jost text, lavender accent. */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #1f1f22;
-      --text: rgba(255, 255, 255, 0.87);
-      --lavender: #cba3ff;
+      --beige: #e8dcc6;
+      --beige-deep: #ddcfb5;
+      --ink: #1d1a16;
+      --ink-deep: #0b0907;
+      --ink-soft: rgba(29, 26, 22, 0.55);
+      --black: #121110;
+      --cream: #efe6d6;
+      --cream-soft: rgba(239, 230, 214, 0.62);
+      --gold: #d9a441;
+      --gold-deep: #b5852b;
     }
 
-    html, body { min-height: 100%; }
-
+    html, body { height: 100%; }
     body {
       min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-x: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Jost", system-ui, sans-serif;
-      letter-spacing: 0.04em;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      font-family: "Alegreya", Georgia, serif;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* a function at work in the corner: each input travels to its one output */
-    .mapping {
-      position: fixed; right: 0; bottom: 0; z-index: 0;
-      width: min(46vw, 560px); height: min(46vw, 560px);
-      pointer-events: none;
+    /* a fine grain over both halves, so the colours read as paper and matte card rather than flat screen */
+    .half { position: relative; overflow: hidden; }
+    .half::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    main {
-      position: relative; z-index: 1;
-      width: min(46rem, calc(100% - 2rem));
-      margin-left: clamp(2rem, 11vw, 10rem);
-      padding: clamp(3rem, 9vh, 5.5rem) 0;
-      text-align: left;
+    /* right: the sections, on beige */
+    .sections {
+      background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 8vw, 7rem);
     }
+    .sections::after { opacity: 0.16; mix-blend-mode: multiply; }
 
-    h1 {
-      font-family: "Poppins", system-ui, sans-serif;
-      font-size: clamp(3rem, 7vw, 5.2rem);
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: 0.01em;
-      color: #fff;
-    }
-
-    nav { margin-top: clamp(2.4rem, 6vh, 3.6rem); }
-
+    nav { position: relative; z-index: 1; width: 100%; max-width: 26rem; }
     ul { list-style: none; }
+    .nav-level[hidden] { display: none; }
+    .nav-level:not([hidden]) { animation: rise 320ms ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .nav-level li + li { margin-top: 0.15rem; }
 
-    li + li { margin-top: 0.75rem; }
-
-    section + section { margin-top: 2.4rem; }
-
-    h2 {
-      margin-bottom: 0.95rem;
-      color: var(--lavender);
-      opacity: 0.8;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    nav a {
+    .nav-item {
       display: inline-block;
-      color: var(--text);
-      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      padding: 0.2rem 0;
+      border: 0; background: none; cursor: pointer;
+      color: rgba(29, 26, 22, 0.82);
+      font-family: inherit;
+      font-size: clamp(1.7rem, 3.4vw, 2.6rem);
       font-weight: 400;
-      line-height: 1.4;
+      line-height: 1.2;
+      text-align: left;
       text-decoration: none;
-      transition: color 180ms ease, transform 180ms ease;
     }
 
-    nav a:hover,
-    nav a:focus-visible {
-      color: var(--lavender);
-      outline: none;
-      transform: translateX(3px);
-    }
+    /* on hover a name darkens and thickens, easing through the font's weights */
+    .nav-item { transition: color 350ms ease, font-weight 350ms ease; }
+    .nav-item:hover, .nav-item:focus-visible { color: var(--ink-deep); font-weight: 700; outline: none; }
 
-    .back {
-      display: inline-block;
+    /* a line drawing for each section, drawn in on hover */
+    .emblem {
+      position: absolute; z-index: 0; pointer-events: none;
+      right: clamp(1rem, 4vw, 4rem); top: 50%; transform: translateY(-50%);
+      width: min(34%, 330px); aspect-ratio: 1; overflow: visible;
+    }
+    .emblem path { fill: none; stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .emblem .faint { opacity: 0.3; }
+    .emblem .accent { fill: var(--gold-deep); stroke: none; }
+    .emblem g { transition: opacity 380ms ease; }
+
+
+    /* left: the overview, on matte black */
+    .about {
+      background: var(--black);
+      color: var(--cream);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 6vw, 5.5rem);
+      box-shadow: inset -18px 0 40px -28px rgba(0, 0, 0, 0.9);
+    }
+    .about::after { opacity: 0.05; mix-blend-mode: screen; }
+    .about > div { position: relative; z-index: 1; max-width: 25rem; }
+    .about .kicker {
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; line-height: 1.4; letter-spacing: 0.06em; color: var(--gold);
       margin-top: 2.6rem;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.5);
-      text-decoration: none;
-      transition: color 180ms ease;
     }
-    .back:hover, .back:focus-visible { color: var(--lavender); outline: none; }
-
-    @media (max-height: 720px) and (min-width: 600px) {
-      main { padding-block: 2rem; }
-      nav { margin-top: 2rem; }
-      li + li { margin-top: 0.45rem; }
+    .about .kicker .dot { margin: 0 0.45rem; }
+    .about h1 {
+      font-weight: 500; font-size: clamp(1.6rem, 2.6vw, 2.15rem); line-height: 1.22;
+      color: var(--cream); margin-bottom: 1.4rem;
     }
+    .about p { font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.6; color: var(--cream-soft); }
+    .about p + p { margin-top: 0.9rem; }
+    .about .intro.title { font-size: clamp(2.6rem, 4.6vw, 3.8rem); line-height: 1.1; }
+    .about a.kicker { display: inline-block; text-decoration: none; transition: color 200ms ease; }
+    .about a.kicker:hover, .about a.kicker:focus-visible { color: var(--cream); outline: none; }
+    .about .intro { font-weight: 500; font-size: clamp(1.4rem, 2.2vw, 1.85rem); line-height: 1.3; color: var(--cream); }
 
-    @media (max-width: 560px) {
-      main {
-        width: min(27rem, calc(100% - 4rem));
-        margin-left: 2rem;
-      }
-
-      h1 { font-size: clamp(2.6rem, 12vw, 3.8rem); }
-      nav { margin-top: 2.4rem; }
-      li + li { margin-top: 0.8rem; }
-      .mapping { width: 70vw; height: 70vw; opacity: 0.6; }
+    /* phones: keep the split, with smaller type and no drawings */
+    @media (max-width: 760px) {
+      body { grid-template-columns: 1fr 1.1fr; }
+      .about { padding: 2rem 1.1rem 2rem 1.2rem; }
+      .sections { padding: 2rem 1rem 2rem 1.3rem; }
+      .about .intro { font-size: 1rem; line-height: 1.38; }
+      .about .intro.title { font-size: 1.75rem; }
+      .about .kicker { font-size: 0.72rem; margin-top: 1.4rem; }
+      .nav-item { font-size: 1.15rem; }
+      .nav-level li + li { margin-top: 0.3rem; }
+      .emblem { display: none; }
     }
-
     @media (prefers-reduced-motion: reduce) {
-      nav a, .back { transition: none; }
+      .nav-level:not([hidden]) { animation: none; }
+      .nav-item { transition: none; }
+      .emblem g { transition: none; }
     }
   </style>
 </head>
 <body>
-  <canvas class="mapping" aria-hidden="true"></canvas>
-  <main>
-    <h1>Functions</h1>
+  <aside class="half about" aria-label="About this site">
+    <div>
+      <h1 class="intro title">Functions</h1>
+      <a class="kicker" href="index.html#math">← Math</a>
+    </div>
+  </aside>
+
+  <main class="half sections" aria-label="Sections">
+    <svg class="emblem" viewBox="0 0 300 300" aria-hidden="true"></svg>
     <nav aria-label="Functions pages">
-      <section aria-labelledby="functions-pages">
-        <h2 id="functions-pages">Pages</h2>
-        <ul>
-          <li><a href="functions-what-is-a-function.html">What is a function?</a></li>
-        </ul>
-      </section>
-      <section aria-labelledby="functions-types">
-        <h2 id="functions-types">Types of Function</h2>
-        <ul>
-          <li><a href="polynomials.html">Polynomials</a></li>
-          <li><a href="exponentials.html">Exponentials</a></li>
-        </ul>
-      </section>
+      <ul class="nav-level" data-level="home">
+        <li><a class="nav-item" href="functions-what-is-a-function.html">What is a function?</a></li>
+        <li><a class="nav-item" href="polynomials.html">Polynomials</a></li>
+        <li><a class="nav-item" href="exponentials.html">Exponentials</a></li>
+      </ul>
     </nav>
-    <a class="back" href="index.html#math">← Math</a>
   </main>
+
+
   <script>
-    // A function at work: inputs -2 to 2 on the left, outputs 0 to 4 on the right, f(x) = x².
-    // One input at a time sends a dot along its arrow to its one output; -2 and 2 share an output,
-    // as a function allows. Still, with all five arrows drawn, for anyone who prefers reduced motion.
-    (function () {
-      var canvas = document.querySelector(".mapping");
-      if (!canvas || !canvas.getContext) return;
-      var ctx = canvas.getContext("2d");
-      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      var INS = [-2, -1, 0, 1, 2], f = function (x) { return x * x; };
-      var TRAVEL = 1700, PAUSE = 900;
-      var W, H, order = [0, 3, 1, 4, 2], step = 0, t0 = performance.now(), done = [];
+    const nav = document.querySelector("nav");
+    const levels = [...document.querySelectorAll("[data-level]")];
+    const levelNames = { home: "Functions pages", math: "Math chapters", physics: "Physics chapters", random: "Random chapters" };
 
-      function size() {
-        var r = canvas.getBoundingClientRect(), k = window.devicePixelRatio || 1;
-        W = r.width; H = r.height;
-        canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
-        ctx.setTransform(k, 0, 0, k, 0, 0);
-      }
-      // where things sit: two upright number lines, inputs left and outputs right
-      function geo() {
-        var top = H * 0.3, bot = H * 0.82, xl = W * 0.38, xr = W * 0.78;
-        return {
-          xl: xl, xr: xr, top: top, bot: bot,
-          yin: function (x) { return bot - (x + 2) / 4 * (bot - top); },
-          yout: function (y) { return bot - y / 4 * (bot - top); }
-        };
-      }
-      function arrow(g, x) {   // a gentle curve from an input to its output
-        var y1 = g.yin(x), y2 = g.yout(f(x)), mx = (g.xl + g.xr) / 2;
-        return { x1: g.xl, y1: y1, cx: mx, cy: (y1 + y2) / 2 - (g.xr - g.xl) * 0.18, x2: g.xr, y2: y2 };
-      }
-      function at(a, t) {   // a point along the curve
-        var u = 1 - t;
-        return { x: u * u * a.x1 + 2 * u * t * a.cx + t * t * a.x2, y: u * u * a.y1 + 2 * u * t * a.cy + t * t * a.y2 };
-      }
-      function label(text, x, y, align, op) {
-        ctx.font = "400 " + Math.max(11, W / 40) + "px Jost, sans-serif"; ctx.textAlign = align;
-        ctx.fillStyle = "rgba(255, 255, 255, " + op + ")"; ctx.fillText(text, x, y);
-      }
-      function draw(current, t) {
-        ctx.clearRect(0, 0, W, H);
-        var g = geo();
-        // the two lines and their marks
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.14)"; ctx.lineWidth = 1.2;
-        [g.xl, g.xr].forEach(function (x) { ctx.beginPath(); ctx.moveTo(x, g.top - 10); ctx.lineTo(x, g.bot + 10); ctx.stroke(); });
-        label("x", g.xl, g.top - 22, "center", 0.35);
-        label("f(x)", g.xr, g.top - 22, "center", 0.35);
-        INS.forEach(function (x) { label(String(x), g.xl - 12, g.yin(x) + 4, "right", 0.3); });
-        [0, 1, 4].forEach(function (y) { label(String(y), g.xr + 12, g.yout(y) + 4, "left", 0.3); });
-        // arrows already travelled stay faintly drawn
-        done.forEach(function (x) {
-          var a = arrow(g, x);
-          ctx.beginPath(); ctx.moveTo(a.x1, a.y1); ctx.quadraticCurveTo(a.cx, a.cy, a.x2, a.y2);
-          ctx.strokeStyle = "rgba(203, 163, 255, 0.22)"; ctx.lineWidth = 1; ctx.stroke();
-        });
-        // the arrow being travelled now, drawn up to the moving dot
-        if (current !== null) {
-          var a = arrow(g, current), n = 30;
-          ctx.beginPath(); ctx.moveTo(a.x1, a.y1);
-          for (var i = 1; i <= n * t; i++) { var p = at(a, i / n); ctx.lineTo(p.x, p.y); }
-          var q = at(a, t); ctx.lineTo(q.x, q.y);
-          ctx.strokeStyle = "rgba(203, 163, 255, 0.5)"; ctx.lineWidth = 1.2; ctx.stroke();
-          ctx.beginPath(); ctx.arc(q.x, q.y, 3.4, 0, Math.PI * 2); ctx.fillStyle = "rgba(203, 163, 255, 0.85)"; ctx.fill();
-        }
-        // the points on both lines
-        INS.forEach(function (x) { dot(g.xl, g.yin(x), x === current || done.indexOf(x) >= 0); });
-        [0, 1, 4].forEach(function (y) { dot(g.xr, g.yout(y), done.some(function (x) { return f(x) === y; })); });
-      }
-      function dot(x, y, lit) {
-        ctx.beginPath(); ctx.arc(x, y, lit ? 3.2 : 2.4, 0, Math.PI * 2);
-        ctx.fillStyle = lit ? "rgba(203, 163, 255, 0.75)" : "rgba(255, 255, 255, 0.3)"; ctx.fill();
-      }
-      function frame(now) {
-        var t = now - t0, x = INS[order[step]];
-        if (t < TRAVEL) draw(x, t / TRAVEL);
-        else {
-          if (done.indexOf(x) < 0) done.push(x);
-          draw(null, 0);
-          if (t > TRAVEL + PAUSE) {
-            step++; t0 = now;
-            if (step === order.length) { step = 0; done = []; }
+    function showLevel(level) {
+      const nextLevel = levelNames[level] ? level : "home";
+      levels.forEach((list) => { list.hidden = list.dataset.level !== nextLevel; });
+      nav.setAttribute("aria-label", levelNames[nextLevel]);
+    }
+
+    document.querySelectorAll("[data-open-level]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const level = button.dataset.openLevel;
+        showLevel(level);
+        history.pushState({ level }, "", `#${level}`);
+      });
+    });
+
+    addEventListener("popstate", () => showLevel(location.hash.slice(1)));
+    showLevel(location.hash.slice(1));
+
+    /* emblems: a small line drawing for each section */
+    (() => {
+      const svg = document.querySelector(".emblem");
+      const NS = "http://www.w3.org/2000/svg";
+      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const TAU = Math.PI * 2;
+      const f = (n) => n.toFixed(1);
+      const line = (pts) => "M" + pts.map(([x, y]) => `${f(x)} ${f(y)}`).join(" L");
+      const curve = (g, x0, x1, n = 120) => line(Array.from({ length: n + 1 }, (_, i) => { const x = x0 + (x1 - x0) * i / n; return [x, g(x)]; }));
+      const circle = (cx, cy, r) => `M${f(cx + r)} ${f(cy)} A${r} ${r} 0 1 0 ${f(cx - r)} ${f(cy)} A${r} ${r} 0 1 0 ${f(cx + r)} ${f(cy)}`;
+      const rect = (x, y, w, h) => `M${x} ${y} h${w} v${h} h${-w} Z`;
+      const rand = (seed) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      const dot = (x, y, r = 3.4) => ({ dot: [x, y, r] });
+      const faint = (d) => ({ d, faint: true });
+
+      const draw = {
+        math() {
+          const a = 0.85, cx = 80, cy = 150, r = 55;
+          const px = cx + r * Math.cos(a), py = cy - r * Math.sin(a);
+          return [faint(line([[15, cy], [290, cy]])), circle(cx, cy, r), line([[cx, cy], [px, py]]),
+            faint(line([[px, py], [160, py]])), curve((x) => cy - r * Math.sin(a - (x - 160) / 130 * TAU), 160, 290), dot(px, py)];
+        },
+        apps() {
+          const c = 32, x0 = 70, y0 = 70, out = [line([[x0, y0], [x0, y0 + 5 * c], [x0 + 5 * c, y0 + 5 * c], [x0 + 5 * c, y0]])];
+          [[0, 4], [1, 4], [2, 4], [2, 3], [3, 4], [4, 4], [4, 3], [3, 3], [0, 3], [0, 2], [1, 3], [4, 2], [2, 0], [2, 1], [3, 1], [1, 1]]
+            .forEach(([i, j], k) => out.push(k >= 12 ? faint(rect(x0 + i * c, y0 + j * c, c, c)) : rect(x0 + i * c, y0 + j * c, c, c)));
+          out.push(dot(x0 + 2.5 * c, y0 + 0.5 * c));
+          return out;
+        },
+        eeg() {
+          const out = [], r = rand(7);
+          for (let k = 0; k < 5; k++) {
+            const base = 70 + k * 40, ph = r() * TAU, fr = 0.05 + r() * 0.08, nz = Array.from({ length: 141 }, () => r() - 0.5);
+            out.push(line(nz.map((n, i) => { const x = 20 + i * 1.85; return [x, base + 10 * Math.sin(fr * x + ph) + 5 * Math.sin(fr * 3.1 * x) + 7 * n]; })));
           }
-        }
-        requestAnimationFrame(frame);
-      }
+          out.push(faint(line([[20, 250], [280, 250]])), dot(20, 70));
+          return out;
+        },
+        neurophysiology() {
+          const v = (x) => x < 110 ? 200 - 22 * Math.exp((x - 110) / 18)
+            : x < 130 ? 178 - 128 * Math.sin((x - 110) / 20 * Math.PI / 2)
+            : x < 160 ? 50 + 170 * (1 - Math.cos((x - 130) / 30 * Math.PI)) / 2
+            : 220 - 20 * (1 - Math.exp(-(x - 160) / 30));
+          return [faint(line([[20, 200], [280, 200]])), faint(line([[20, 50], [280, 50]])), curve(v, 20, 280, 260), dot(130, 50)];
+        },
+        physics() {
+          const a = [95, 150], b = [205, 150], out = [circle(...a, 7), circle(...b, 7)];
+          [-150, -95, -50, 50, 95, 150].forEach((h) => out.push(`M${a[0] + 7} ${a[1]} C${a[0] + 30} ${a[1] + h} ${b[0] - 30} ${b[1] + h} ${b[0] - 7} ${b[1]}`));
+          out.push(line([[a[0] + 7, a[1]], [b[0] - 7, b[1]]]));
+          [[-1, 0], [-0.7, 0.7], [-0.7, -0.7]].forEach(([dx, dy]) => out.push(faint(line([[a[0] + 10 * dx, a[1] + 10 * dy], [a[0] + 60 * dx, a[1] + 60 * dy]]))));
+          [[1, 0], [0.7, 0.7], [0.7, -0.7]].forEach(([dx, dy]) => out.push(faint(line([[b[0] + 10 * dx, b[1] + 10 * dy], [b[0] + 60 * dx, b[1] + 60 * dy]]))));
+          out.push(dot(...a, 3));
+          return out;
+        },
+        random() {
+          const r = rand(11); let x = 150, y = 150; const pts = [[x, y]];
+          for (let i = 0; i < 160; i++) { const t = r() * TAU; x = Math.min(275, Math.max(25, x + 19 * Math.cos(t))); y = Math.min(275, Math.max(25, y + 19 * Math.sin(t))); pts.push([x, y]); }
+          return [line(pts), dot(150, 150), dot(x, y, 2.6)];
+        },
+        numbers() {
+          const out = [line([[20, 180], [280, 180]])];
+          for (let i = 0; i <= 10; i++) out.push(line([[30 + i * 24, 174], [30 + i * 24, 186]]));
+          [[1, 4], [4, 7], [7, 10]].forEach(([p, q]) => out.push(`M${30 + p * 24} 170 Q${30 + (p + q) * 12} 110 ${30 + q * 24} 170`));
+          out.push(faint(`M${30 + 24} 196 Q${30 + 5.5 * 24} 250 ${30 + 10 * 24} 196`), dot(30 + 24, 180), dot(30 + 240, 180));
+          return out;
+        },
+        trigonometry() {
+          const cx = 120, cy = 180, r = 110, a = 0.65, px = cx + r * Math.cos(a), py = cy - r * Math.sin(a);
+          return [faint(line([[cx - 10, cy], [cx + r + 30, cy]])), faint(line([[cx, cy + 10], [cx, cy - r - 30]])),
+            `M${cx + r} ${cy} A${r} ${r} 0 0 0 ${cx} ${cy - r}`, line([[cx, cy], [px, py], [px, cy], [cx, cy]]),
+            `M${cx + 28} ${cy} A28 28 0 0 0 ${f(cx + 28 * Math.cos(a))} ${f(cy - 28 * Math.sin(a))}`, line([[px - 10, cy], [px - 10, cy - 10], [px, cy - 10]]), dot(px, py)];
+        },
+        "complex-numbers"() {
+          const cx = 120, cy = 180, a = 0.9, r = 120, px = cx + r * Math.cos(a), py = cy - r * Math.sin(a);
+          return [line([[20, cy], [285, cy]]), line([[cx, 285], [cx, 20]]), faint(circle(cx, cy, r)), line([[cx, cy], [px, py]]),
+            faint(line([[px, py], [px, cy]])), faint(line([[px, py], [cx, py]])), `M${cx + 34} ${cy} A34 34 0 0 0 ${f(cx + 34 * Math.cos(a))} ${f(cy - 34 * Math.sin(a))}`, dot(px, py)];
+        },
+        algebra() {
+          return [faint(line([[20, 200], [280, 200]])), faint(line([[150, 280], [150, 20]])),
+            curve((x) => 200 + 0.016 * (x - 100) * (x - 200), 62, 238), dot(100, 200), dot(200, 200), dot(150, 160, 2.6)];
+        },
+        functions() {
+          const out = ["M95 60 C40 60 40 240 95 240 C150 240 150 60 95 60", "M215 60 C160 60 160 240 215 240 C270 240 270 60 215 60"];
+          [[95, 100, 215, 120], [95, 150, 215, 120], [95, 200, 215, 190]].forEach(([a, b, c, d]) => out.push(`M${a + 6} ${b} Q155 ${(b + d) / 2 - 22} ${c - 6} ${d}`), );
+          [[95, 100], [95, 150], [95, 200], [215, 120], [215, 190]].forEach(([x, y]) => out.push(dot(x, y, 2.8)));
+          out.push(faint(line([[215, 160], [215, 160.1]])));
+          return out;
+        },
+        calculus() {
+          const g = (x) => 220 - 130 * Math.sin((x - 30) / 260 * Math.PI) - 20 * Math.sin((x - 30) / 50);
+          const out = [faint(line([[20, 240], [285, 240]])), curve(g, 30, 280)];
+          for (let x = 110; x <= 200; x += 9) out.push(faint(line([[x, 240], [x, g(x)]])));
+          const x0 = 230, h = 0.5, m = (g(x0 + h) - g(x0 - h)) / (2 * h);
+          out.push(line([[x0 - 55, g(x0) - 55 * m], [x0 + 45, g(x0) + 45 * m]]), dot(x0, g(x0)));
+          return out;
+        },
+        "linear-algebra"() {
+          const M = ([x, y]) => [150 + (x - 150) + 0.45 * (y - 150), 150 + 0.25 * (x - 150) + 0.85 * (y - 150)];
+          const out = [];
+          for (let i = 0; i <= 6; i++) { const t = 60 + i * 30;
+            out.push(faint(line([[t, 60], [t, 240]])), faint(line([[60, t], [240, t]])));
+            out.push(line([M([t, 60]), M([t, 240])]), line([M([60, t]), M([240, t])])); }
+          out.push(dot(...M([180, 150])), dot(...M([150, 120])), dot(150, 150, 2.6));
+          return out;
+        },
+        "field-theories"() {
+          const out = [], r = rand(3);
+          for (let i = 0; i < 9; i++) for (let j = 0; j < 9; j++) {
+            const x = 40 + i * 27.5, y = 40 + j * 27.5, t = Math.atan2(y - 150, x - 150) + Math.PI / 2 + 0.6 * Math.sin(x / 40);
+            const l = 6 + 5 * Math.exp(-((x - 150) ** 2 + (y - 150) ** 2) / 8000);
+            out.push(line([[x - l * Math.cos(t), y - l * Math.sin(t)], [x + l * Math.cos(t), y + l * Math.sin(t)]]));
+          }
+          out.push(dot(150, 150));
+          return out;
+        },
+        "active-inference"() {
+          const cx = 150, cy = 150;
+          return [faint(circle(cx, cy, 118)), circle(cx, cy, 62),
+            `M${cx - 95} ${cy - 20} A100 100 0 0 1 ${cx + 95} ${cy - 20}`, line([[cx + 95, cy - 20], [cx + 84, cy - 30]]), line([[cx + 95, cy - 20], [cx + 99, cy - 34]]),
+            `M${cx + 95} ${cy + 20} A100 100 0 0 1 ${cx - 95} ${cy + 20}`, line([[cx - 95, cy + 20], [cx - 84, cy + 30]]), line([[cx - 95, cy + 20], [cx - 99, cy + 34]]),
+            dot(cx, cy)];
+        },
+        "math-misc"() {
+          const s1 = (x) => 30 * Math.sin((x - 30) / 260 * 2 * Math.PI * 1.5), s2 = (x) => 12 * Math.sin((x - 30) / 260 * 2 * Math.PI * 7 + 1);
+          return [faint(curve((x) => 85 + s1(x), 30, 270, 200)), faint(curve((x) => 150 + s2(x), 30, 270, 240)), curve((x) => 225 + s1(x) + s2(x), 30, 270, 300)];
+        },
+        exponentials() {
+          return [faint(line([[30, 250], [280, 250]])), faint(line([[60, 270], [60, 30]])),
+            curve((x) => 250 - 8 * Math.exp((x - 60) / 62), 30, 262, 200)];
+        },
+        calendars() {
+          const out = [], s = 30, x0 = 45, y0 = 75;
+          out.push(line([[x0, y0 - 12], [x0 + 7 * s, y0 - 12]]));
+          for (let j = 0; j < 5; j++) for (let i = 0; i < 7; i++) { const k = j * 7 + i; if (k < 2 || k > 32) continue;
+            out.push((k % 7 === 6 || k % 7 === 0) ? faint(rect(x0 + i * s + 3, y0 + j * s + 3, s - 6, s - 6)) : rect(x0 + i * s + 3, y0 + j * s + 3, s - 6, s - 6)); }
+          out.push(dot(x0 + 4.5 * s, y0 + 2.5 * s));
+          return out;
+        },
+      };
 
-      size();
-      window.addEventListener("resize", function () { size(); if (still) draw(null, 0); });
-      if (still) { done = INS.slice(); draw(null, 0); return; }
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(frame); });
-      else requestAnimationFrame(frame);
+      const cache = {};
+      let current = null, timer = null;
+      function build(key) {
+        const g = document.createElementNS(NS, "g");
+        draw[key]().forEach((it, i, all) => {
+          if (it.dot && key !== "math") return;
+          if (it.dot) {
+            const c = document.createElementNS(NS, "circle");
+            c.setAttribute("cx", f(it.dot[0])); c.setAttribute("cy", f(it.dot[1])); c.setAttribute("r", it.dot[2]);
+            c.setAttribute("class", "accent"); g.appendChild(c); return;
+          }
+          const p = document.createElementNS(NS, "path");
+          p.setAttribute("d", it.d || it);
+          if (it.faint) p.setAttribute("class", "faint");
+          g.appendChild(p);
+        });
+        return g;
+      }
+      function show(key) {
+        if (!draw[key] || key === current) return;
+        current = key;
+        svg.querySelectorAll("g").forEach((old) => { old.style.opacity = 0; setTimeout(() => old.remove(), 400); });
+        const g = build(key);
+        svg.appendChild(g);
+        if (still) return;
+        const parts = [...g.children];
+        parts.forEach((el, i) => {
+          const delay = i / parts.length * 450;
+          if (el.tagName === "circle") {
+            el.animate([{ opacity: 0, transform: "scale(0)" }, { opacity: 1, transform: "scale(1)" }],
+              { duration: 300, delay: 650 + delay * 0.3, easing: "cubic-bezier(.3,1.6,.5,1)", fill: "backwards" });
+            el.style.transformBox = "fill-box"; el.style.transformOrigin = "center";
+            return;
+          }
+          const L = el.getTotalLength();
+          el.style.strokeDasharray = L;
+          el.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 900, delay, easing: "cubic-bezier(.45,.05,.25,1)", fill: "backwards" });
+        });
+      }
+      const keyOf = (item) => ({ "polynomials.html": "algebra", "exponentials.html": "exponentials" })[item.getAttribute("href")] || "functions";
+      const levelKey = () => "functions";
+
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        const go = () => { clearTimeout(timer); document.querySelectorAll(".nav-item.on").forEach((o) => o.classList.remove("on")); item.classList.add("on"); show(keyOf(item)); };
+        item.addEventListener("pointerenter", go);
+        item.addEventListener("focus", go);
+      });
+      nav.addEventListener("pointerleave", () => { timer = setTimeout(() => { document.querySelectorAll(".nav-item.on").forEach((o) => o.classList.remove("on")); show(levelKey()); }, 900); });
+      addEventListener("popstate", () => show(levelKey()));
+      show(levelKey());
     })();
+
+
   </script>
 </body>
 </html>

@@ -46,12 +46,6 @@ body::before {
 /* ---------- masthead ---------- */
 header { padding: clamp(2rem, 7vh, 3.6rem) 0 clamp(1.6rem, 4vh, 2.4rem); }
 
-/* a short amber rule under the title: the one flourish */
-header::after {
-  content: ""; display: block;
-  width: 2.4rem; height: 1px; margin-top: clamp(1.2rem, 3vh, 1.6rem);
-  background: var(--base); opacity: 0.85;
-}
 
 .crumb {
   font-family: "IBM Plex Mono", monospace;
@@ -68,7 +62,7 @@ h1 {
   font-size: clamp(2.3rem, 7.4vw, 3.9rem);
   line-height: 1.06; letter-spacing: -0.02em;
   color: var(--ink);
-  margin-top: clamp(1.4rem, 4.5vh, 2.4rem);
+  margin-top: clamp(0.6rem, 2vh, 1.2rem);
   overflow-wrap: break-word;
 }
 

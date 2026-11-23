@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Exponents and exponential functions: what an exponent means, from whole numbers to fractions and irrationals, and the rules they follow — explanations by Sam Kirwan." />
+  <title>Exponentials | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
+  <!-- the previous version of this page is kept as exponentials-original.html -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --beige: #e8dcc6;
+      --beige-deep: #ddcfb5;
+      --ink: #1d1a16;
+      --ink-deep: #0b0907;
+      --ink-soft: rgba(29, 26, 22, 0.55);
+      --black: #121110;
+      --cream: #efe6d6;
+      --cream-soft: rgba(239, 230, 214, 0.62);
+      --gold: #d9a441;
+      --gold-deep: #9c6a1e;
+    }
+
+    html, body { height: 100%; }
+    body {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(20rem, 0.9fr) 2fr;
+      font-family: "Alegreya", Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* a fine grain over both halves, so the colours read as paper and matte card rather than flat screen */
+    .half { position: relative; overflow: hidden; }
+    .half::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* left: the title on matte black, with cells dividing behind it */
+    .about {
+      background: var(--black);
+      color: var(--cream);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 4.5vw, 4.5rem);
+      box-shadow: inset -18px 0 40px -28px rgba(0, 0, 0, 0.9);
+    }
+    .about::after { opacity: 0.05; mix-blend-mode: screen; }
+    .cells { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .about > div { position: relative; z-index: 1; }
+    .about h1 { font-weight: 500; font-size: clamp(2.2rem, 3.4vw, 3.2rem); line-height: 1.1; color: var(--cream); text-shadow: 0 0 14px var(--black), 0 0 28px var(--black); }
+    .about .kicker {
+      display: inline-block; margin-top: 2.2rem;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold);
+      text-decoration: none; transition: color 200ms ease;
+    }
+    .about .kicker:hover, .about .kicker:focus-visible { color: var(--cream); outline: none; }
+
+    /* right: three columns of pages, on beige */
+    .sections {
+      background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 5vw, 5rem);
+    }
+    .sections::after { opacity: 0.16; mix-blend-mode: multiply; }
+
+    .cols {
+      position: relative; z-index: 1; width: 100%;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2.4rem clamp(1.6rem, 3vw, 3rem); align-items: start;
+      animation: rise 320ms ease both;
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    h2 {
+      margin-bottom: 1.1rem;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold-deep);
+    }
+
+    /* the pages, numbered quietly */
+    ul { list-style: none; counter-reset: page; }
+    li { counter-increment: page; display: flex; align-items: baseline; gap: 0.8rem; }
+    li::before {
+      content: counter(page, decimal-leading-zero); min-width: 1.4rem;
+      font-family: "Alegreya SC", Georgia, serif; font-size: 0.85rem; color: var(--ink-soft);
+    }
+    li + li { margin-top: 0.55rem; }
+
+    .cols a, li.planned span { font-size: clamp(1.05rem, 1.35vw, 1.25rem); line-height: 1.3; }
+    .cols a {
+      color: rgba(29, 26, 22, 0.82); text-decoration: none;
+      transition: color 350ms ease, font-weight 350ms ease;
+    }
+    /* on hover a title darkens and thickens, easing through the font's weights */
+    .cols a:hover, .cols a:focus-visible { color: var(--ink-deep); font-weight: 700; outline: none; }
+    /* working titles for pages not yet written */
+    li.planned span { color: var(--ink-soft); opacity: 0.75; }
+    li.planned::before { opacity: 0.6; }
+
+    @media (max-width: 1100px) and (min-width: 761px) {
+      .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* phones: keep the split, with smaller type, one column and no cells */
+    @media (max-width: 760px) {
+      body { grid-template-columns: 0.62fr 1fr; }
+      .about { padding: 2rem 0.9rem 2rem 1.1rem; }
+      .sections { padding: 2rem 1rem 2rem 1.1rem; align-items: flex-start; }
+      .about h1 { font-size: 1.45rem; }
+      .about .kicker { font-size: 0.72rem; margin-top: 1.4rem; }
+      .cells { display: none; }
+      .cols { grid-template-columns: 1fr; gap: 1.8rem; }
+      h2 { font-size: 0.75rem; margin-bottom: 0.7rem; }
+      li { gap: 0.55rem; }
+      li::before { font-size: 0.68rem; min-width: 1rem; }
+      li + li { margin-top: 0.4rem; }
+      .cols a, li.planned span { font-size: 0.95rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cols { animation: none; }
+      .cols a, .about .kicker { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="half about" aria-label="Exponentials">
+    <canvas class="cells" aria-hidden="true"></canvas>
+    <div>
+      <h1>Exponentials</h1>
+    </div>
+  </aside>
+
+  <main class="half sections" aria-label="Exponentials pages">
+    <nav aria-label="Exponentials pages" class="cols">
+      <section aria-labelledby="col-basics">
+        <h2 id="col-basics">Foundations</h2>
+        <ul>
+          <li><a href="exponentials-additive-and-multiplicative-growth.html">Additive and Multiplicative Growth</a></li>
+          <li><a href="exponentials-inverse-operations-radication-and-logarithms.html">Inverse Operations: Radication and Logarithms</a></li>
+          <li><a href="exponentials-exponentiation-notation.html">Exponentiation Notation</a></li>
+          <li><a href="exponentials-the-many-rules-of-exponentiation.html">Laws of Exponents</a></li>
+          <li><a href="exponentials-zero-and-negative-exponents.html">Zero and Negative Exponents</a></li>
+          <li><a href="exponentials-fractional-exponents.html">Fractional Exponents</a></li>
+          <li><a href="exponentials-irrational-exponents.html">Irrational Exponents</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-functions">
+        <h2 id="col-functions">Exponential Functions</h2>
+        <ul>
+          <li><a href="exponentials-from-powers-to-functions.html">From Powers to Functions</a></li>
+          <li class="planned"><span>Starting Value and Step Ratio</span></li>
+          <li class="planned"><span>Equal Steps, Equal Ratios</span></li>
+          <li class="planned"><span>Growth and Decay</span></li>
+          <li class="planned"><span>Changing the Step Size</span></li>
+          <li class="planned"><span>Compounding and <em>e</em></span></li>
+          <li class="planned"><span>Growth Proportional to Size</span></li>
+          <li class="planned"><span>Log Scales and Straight Lines</span></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-misc">
+        <h2 id="col-misc">Misc</h2>
+        <ul>
+          <li><a href="exponentials-understanding-logarithms.html">Understanding Logarithms</a></li>
+          <li><a href="exponentials-visualising-different-types-of-growth.html">Visualising Different Types of Growth</a></li>
+        </ul>
+      </section>
+    </nav>
+  </main>
+
+  <script>
+    // Folding paper to the Moon, in soft pixel splats. A sheet 0.1 mm thick doubles in thickness with each
+    // fold; after 42 folds the stack is about 440,000 km tall, past the Moon (about 384,400 km away).
+    // The view keeps the top of the stack in frame, so the world falls away beneath it: a person, a house,
+    // Big Ben, the Burj Khalifa, Everest, the edge of space, the Space Station, the curve of the Earth,
+    // and finally the Moon. Everything is drawn as soft blobs on a coarse grid, then enlarged with hard
+    // pixel edges. (Earlier versions of this panel: exponentials-rabbits.html, exponentials-cells.html.)
+    (function () {
+      var canvas = document.querySelector(".cells");
+      if (!canvas || !canvas.getContext) return;
+      var ctx = canvas.getContext("2d");
+      var lo = document.createElement("canvas"), lx = lo.getContext("2d");
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var PX = 3, SHEET = 0.0001, FOLDS = 42, STEP = 1250, HOLD = 7000, FADE = 1600;
+      var EARTH = 6.371e6, MOON_D = 3.844e8, MOON_R = 1.737e6;
+      var MARKS = [
+        { name: "a person", h: 1.7, kind: "spire", dx: -7 },
+        { name: "a house", h: 9, kind: "house", dx: -13 },
+        { name: "Big Ben", h: 96, kind: "spire", dx: -9 },
+        { name: "the Burj Khalifa", h: 828, kind: "spire", dx: -11 },
+        { name: "Mount Everest", h: 8849, kind: "mountain", dx: -6 },
+        { name: "the edge of space", h: 1e5, kind: "line" },
+        { name: "the Space Station", h: 4.08e5, kind: "dot", dx: -14 },
+        { name: "the Moon", h: MOON_D, kind: "moon" }
+      ];
+      var W, H, lw, lh, stars, t0, phase, logView, alpha = 1;
+
+      function size() {
+        var k = window.devicePixelRatio || 1, r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
+        ctx.setTransform(k, 0, 0, k, 0, 0);
+        lw = Math.ceil(W / PX); lh = Math.ceil(H / PX);
+        lo.width = lw; lo.height = lh;
+        stars = [];
+        for (var i = 0; i < lw * lh / 70; i++) stars.push({ x: Math.random() * lw, y: Math.random() * lh, r: 0.7 + Math.random(), p: Math.random() * 6.283, a: 0.15 + Math.random() * 0.45 });
+      }
+      // one soft blob per colour, drawn once and then stamped at any size
+      var sprites = {};
+      function sprite(rgb) {
+        if (sprites[rgb]) return sprites[rgb];
+        var c = document.createElement("canvas"); c.width = c.height = 32;
+        var g = c.getContext("2d"), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gr.addColorStop(0, "rgba(" + rgb + ",1)"); gr.addColorStop(0.45, "rgba(" + rgb + ",0.55)"); gr.addColorStop(1, "rgba(" + rgb + ",0)");
+        g.fillStyle = gr; g.fillRect(0, 0, 32, 32);
+        return (sprites[rgb] = c);
+      }
+      function splat(x, y, r, rgb, a) {
+        if (a <= 0.003 || r <= 0 || x < -r || y < -r || x > lw + r || y > lh + r) return;
+        lx.globalAlpha = Math.min(1, a); lx.drawImage(sprite(rgb), x - r, y - r, 2 * r, 2 * r); lx.globalAlpha = 1;
+      }
+      function fmt(m) {
+        if (m < 0.01) return (m * 1000).toFixed(m < 0.001 ? 2 : 1) + " mm";
+        if (m < 1) return (m * 100).toFixed(1) + " cm";
+        if (m < 1000) return (m < 10 ? m.toFixed(1) : Math.round(m)) + " m";
+        return Math.round(m / 1000).toLocaleString("en-GB") + " km";
+      }
+      function reset() { t0 = performance.now(); phase = "fold"; logView = Math.log(0.004); alpha = 1; }
+
+      function render(now, folds) {
+        var thick = SHEET * Math.pow(2, folds);
+        var ground = lh * 0.86, usable = ground * 0.82, cx = lw * 0.84;
+        var view = Math.exp(logView);
+        var Y = function (h) { return ground - h / view * usable; };
+        lx.clearRect(0, 0, lw, lh);
+
+        // stars, twinkling
+        var tw = now * 0.0012;
+        stars.forEach(function (s) { splat(s.x, s.y, s.r, "239,230,214", s.a * (0.6 + 0.4 * Math.sin(tw + s.p))); });
+
+        // the Moon
+        // drawn larger than true scale (it would be under a pixel), so that it can be seen
+        var mR = Math.max(5, MOON_R / view * usable), my = Y(MOON_D), mx = cx - mR * 0.6;
+        if (my + mR > 0 && my - mR < lh) {
+          splat(mx, my, mR * 2.2, "220,214,204", 0.16);
+          lx.fillStyle = "rgb(200,194,184)"; lx.beginPath(); lx.arc(mx, my, mR, 0, 6.283); lx.fill();
+          [[-0.3, -0.25, 0.22], [0.25, 0.1, 0.16], [-0.1, 0.35, 0.12], [0.35, -0.35, 0.1]].forEach(function (c) {
+            splat(mx + c[0] * mR, my + c[1] * mR, c[2] * mR * 1.6, "140,134,126", 0.55);
+          });
+        }
+
+        // the Earth: flat ground up close, a globe from far away, with a thin glow of atmosphere
+        var R = EARTH / view * usable, atm = Math.min(lh * 0.3, Math.max(1.5, 1e5 / view * usable));
+        if (R > 3000) {
+          var gg = lx.createLinearGradient(0, ground - atm, 0, ground);
+          gg.addColorStop(0, "rgba(120,170,230,0)"); gg.addColorStop(1, "rgba(120,170,230,0.22)");
+          lx.fillStyle = gg; lx.fillRect(0, ground - atm, lw, atm);
+          lx.fillStyle = "rgb(58,96,70)"; lx.fillRect(0, ground, lw, lh - ground);
+          for (var i = 0; i < lw; i += 5) splat(i + 2, ground + 2 + (i * 7 % 5), 3.5, "88,130,84", 0.5);
+        } else {
+          var ey = ground + R;
+          var ag = lx.createRadialGradient(cx, ey, R, cx, ey, R + atm);
+          ag.addColorStop(0, "rgba(120,170,230,0.45)"); ag.addColorStop(1, "rgba(120,170,230,0)");
+          lx.fillStyle = ag; lx.beginPath(); lx.arc(cx, ey, R + atm, 0, 6.283); lx.fill();
+          R = Math.max(R, 4);
+          lx.save(); lx.beginPath(); lx.arc(cx, ey, R, 0, 6.283);
+          lx.fillStyle = "rgb(47,88,150)"; lx.fill(); lx.clip();
+          [[-1.57, 0.32], [-1.2, 0.22], [-1.95, 0.26], [-0.9, 0.16], [-2.3, 0.18]].forEach(function (c) {
+            splat(cx + Math.cos(c[0]) * R * 0.8, ey + Math.sin(c[0]) * R * 0.8, c[1] * R * 1.4, "86,132,82", 0.75);
+          });
+          splat(cx - R * 0.3, ey - R * 0.5, R * 0.6, "255,255,255", 0.08);
+          lx.restore();
+        }
+
+        // landmarks, beside the stack
+        MARKS.forEach(function (m) {
+          var top = Y(m.h), hpx = ground - top;
+          if (m.kind === "moon" || hpx < 0.4 || top < 0) return;
+          if (m.kind === "line") {
+            if (top < 2) return;
+            for (var x = 0; x < lw; x += 3) splat(x, top, 0.9, "160,190,230", 0.35);
+          } else if (m.kind === "dot") {
+            splat(cx + m.dx, top, 2.2, "230,230,240", 0.9);
+          } else if (m.kind === "mountain") {
+            var w = Math.max(3, hpx * 1.1), mx = cx + m.dx - w * 0.25;
+            lx.fillStyle = "rgb(112,104,96)"; lx.beginPath(); lx.moveTo(mx - w / 2, ground); lx.lineTo(mx, top); lx.lineTo(mx + w / 2, ground); lx.fill();
+            lx.fillStyle = "rgb(232,232,238)"; lx.beginPath(); lx.moveTo(mx - w * 0.12, top + hpx * 0.24); lx.lineTo(mx, top); lx.lineTo(mx + w * 0.12, top + hpx * 0.24); lx.fill();
+            for (var yy = 0; yy < hpx; yy += Math.max(1.5, hpx / 40)) { var hf = w / 2 * (1 - yy / hpx); splat(mx - hf, ground - yy, 1.6, "150,142,132", 0.5); splat(mx + hf, ground - yy, 1.6, "90,84,78", 0.5); }
+          } else if (m.kind === "house") {
+            var hw = Math.max(2, hpx * 0.9), hx = cx + m.dx - hw / 2;
+            lx.fillStyle = "rgb(150,144,136)"; lx.fillRect(hx, ground - hpx * 0.6, hw, hpx * 0.6);
+            lx.fillStyle = "rgb(120,80,70)"; lx.beginPath(); lx.moveTo(hx - hw * 0.08, ground - hpx * 0.6); lx.lineTo(hx + hw / 2, top); lx.lineTo(hx + hw * 1.08, ground - hpx * 0.6); lx.fill();
+            lx.fillStyle = "rgba(240,200,120,0.8)"; lx.fillRect(hx + hw * 0.2, ground - hpx * 0.45, hw * 0.2, hpx * 0.15); lx.fillRect(hx + hw * 0.6, ground - hpx * 0.45, hw * 0.2, hpx * 0.15);
+          } else {
+            var wd = Math.max(0.8, Math.min(2.5, hpx * 0.08));
+            lx.fillStyle = "rgba(150,144,136,0.6)"; lx.fillRect(cx + m.dx - wd / 2, top, wd, hpx);
+            for (var y2 = 0; y2 < hpx; y2 += Math.max(1, hpx / 60)) splat(cx + m.dx, ground - y2, Math.min(1.6, Math.max(1.1, wd * 0.7)), "170,164,156", 0.35);
+          }
+        });
+
+        // the folded stack of paper
+        var sp = thick / view * usable, top = ground - sp;
+        for (var s = 0; s <= Math.min(sp, lh); s += 0.8) splat(cx + Math.sin(s * 1.7) * 0.25, ground - s, 1.5, "243,236,223", 0.55);
+        splat(cx, top, 2.6, "255,248,235", 0.9);
+
+        // enlarge with hard pixel edges
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalAlpha = alpha;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(lo, 0, 0, lw * PX, lh * PX);
+
+        // labels: the landmarks in view, and the fold count
+        ctx.textAlign = "left";
+        var passed = null;
+        MARKS.forEach(function (m) { if (thick >= m.h) passed = m; });
+        MARKS.forEach(function (m) {
+          var ly = Y(m.h) * PX, hpx = (ground - Y(m.h)) * PX;
+          if (hpx < 26 || ly < 18) return;
+          ctx.font = "400 12px 'Alegreya', Georgia, serif";
+          ctx.fillStyle = "rgba(239,230,214," + (m === passed ? 0.85 : 0.45) + ")";
+          ctx.textAlign = "right"; ctx.fillText(m.name, (cx - 5) * PX, ly + 4); ctx.textAlign = "left";
+        });
+        var fs = Math.max(13, Math.min(17, W / 26)), x0 = parseFloat(getComputedStyle(canvas.parentElement).paddingLeft) || 32;
+        ctx.fillStyle = "rgba(217, 164, 65, 0.85)";
+        ctx.font = "500 " + fs + "px 'Alegreya', Georgia, serif";
+        ctx.fillText((Math.floor(folds) === 1 ? "1 fold" : Math.floor(folds) + " folds") + " · " + fmt(SHEET * Math.pow(2, Math.floor(folds))), x0, H - 28);
+        if (passed) {
+          ctx.font = "400 " + (fs - 2) + "px 'Alegreya', Georgia, serif";
+          ctx.fillStyle = "rgba(239,230,214,0.55)";
+          ctx.fillText(passed.kind === "moon" ? "past the Moon" : "taller than " + passed.name, x0, H - 28 - fs * 1.4);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function frame(now) {
+        var t = now - t0, folds;
+        if (phase === "fold") {
+          var n = Math.floor(t / STEP), e = Math.min(1, (t - n * STEP) / (STEP * 0.5));
+          folds = Math.min(FOLDS, n + (1 - Math.pow(1 - e, 3)));
+          if (n >= FOLDS) { phase = "hold"; t0 = now; folds = FOLDS; }
+        } else {
+          folds = FOLDS;
+          if (phase === "hold" && t > HOLD) { phase = "fade"; t0 = now; }
+          if (phase === "fade") { alpha = Math.max(0, 1 - t / FADE); if (t > FADE) reset(); }
+        }
+        var target = Math.log(Math.max(0.004, SHEET * Math.pow(2, folds) * 1.45));
+        logView += (target - logView) * 0.06;
+        render(now, folds);
+        requestAnimationFrame(frame);
+      }
+
+      size(); reset();
+      window.addEventListener("resize", function () { size(); if (still) render(0, FOLDS); });
+      if (still) { logView = Math.log(SHEET * Math.pow(2, FOLDS) * 1.45); render(0, FOLDS); return; }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(frame); });
+      else requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

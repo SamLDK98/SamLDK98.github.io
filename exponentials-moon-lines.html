@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Exponents and exponential functions: what an exponent means, from whole numbers to fractions and irrationals, and the rules they follow — explanations by Sam Kirwan." />
+  <title>Exponentials | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
+  <!-- the previous version of this page is kept as exponentials-original.html -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --beige: #e8dcc6;
+      --beige-deep: #ddcfb5;
+      --ink: #1d1a16;
+      --ink-deep: #0b0907;
+      --ink-soft: rgba(29, 26, 22, 0.55);
+      --black: #121110;
+      --cream: #efe6d6;
+      --cream-soft: rgba(239, 230, 214, 0.62);
+      --gold: #d9a441;
+      --gold-deep: #9c6a1e;
+    }
+
+    html, body { height: 100%; }
+    body {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(20rem, 0.9fr) 2fr;
+      font-family: "Alegreya", Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* a fine grain over both halves, so the colours read as paper and matte card rather than flat screen */
+    .half { position: relative; overflow: hidden; }
+    .half::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* left: the title on matte black, with cells dividing behind it */
+    .about {
+      background: var(--black);
+      color: var(--cream);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 4.5vw, 4.5rem);
+      box-shadow: inset -18px 0 40px -28px rgba(0, 0, 0, 0.9);
+    }
+    .about::after { opacity: 0.05; mix-blend-mode: screen; }
+    .cells { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .about > div { position: relative; z-index: 1; }
+    .about h1 { font-weight: 500; font-size: clamp(2.2rem, 3.4vw, 3.2rem); line-height: 1.1; color: var(--cream); text-shadow: 0 0 14px var(--black), 0 0 28px var(--black); }
+    .about .kicker {
+      display: inline-block; margin-top: 2.2rem;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold);
+      text-decoration: none; transition: color 200ms ease;
+    }
+    .about .kicker:hover, .about .kicker:focus-visible { color: var(--cream); outline: none; }
+
+    /* right: three columns of pages, on beige */
+    .sections {
+      background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 5vw, 5rem);
+    }
+    .sections::after { opacity: 0.16; mix-blend-mode: multiply; }
+
+    .cols {
+      position: relative; z-index: 1; width: 100%;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2.4rem clamp(1.6rem, 3vw, 3rem); align-items: start;
+      animation: rise 320ms ease both;
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    h2 {
+      margin-bottom: 1.1rem;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold-deep);
+    }
+
+    /* the pages, numbered quietly */
+    ul { list-style: none; counter-reset: page; }
+    li { counter-increment: page; display: flex; align-items: baseline; gap: 0.8rem; }
+    li::before {
+      content: counter(page, decimal-leading-zero); min-width: 1.4rem;
+      font-family: "Alegreya SC", Georgia, serif; font-size: 0.85rem; color: var(--ink-soft);
+    }
+    li + li { margin-top: 0.55rem; }
+
+    .cols a, li.planned span { font-size: clamp(1.05rem, 1.35vw, 1.25rem); line-height: 1.3; }
+    .cols a {
+      color: rgba(29, 26, 22, 0.82); text-decoration: none;
+      transition: color 350ms ease, font-weight 350ms ease;
+    }
+    /* on hover a title darkens and thickens, easing through the font's weights */
+    .cols a:hover, .cols a:focus-visible { color: var(--ink-deep); font-weight: 700; outline: none; }
+    /* working titles for pages not yet written */
+    li.planned span { color: var(--ink-soft); opacity: 0.75; }
+    li.planned::before { opacity: 0.6; }
+
+    @media (max-width: 1100px) and (min-width: 761px) {
+      .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* phones: keep the split, with smaller type, one column and no cells */
+    @media (max-width: 760px) {
+      body { grid-template-columns: 0.62fr 1fr; }
+      .about { padding: 2rem 0.9rem 2rem 1.1rem; }
+      .sections { padding: 2rem 1rem 2rem 1.1rem; align-items: flex-start; }
+      .about h1 { font-size: 1.45rem; }
+      .about .kicker { font-size: 0.72rem; margin-top: 1.4rem; }
+      .cells { display: none; }
+      .cols { grid-template-columns: 1fr; gap: 1.8rem; }
+      h2 { font-size: 0.75rem; margin-bottom: 0.7rem; }
+      li { gap: 0.55rem; }
+      li::before { font-size: 0.68rem; min-width: 1rem; }
+      li + li { margin-top: 0.4rem; }
+      .cols a, li.planned span { font-size: 0.95rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cols { animation: none; }
+      .cols a, .about .kicker { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="half about" aria-label="Exponentials">
+    <canvas class="cells" aria-hidden="true"></canvas>
+    <div>
+      <h1>Exponentials</h1>
+    </div>
+  </aside>
+
+  <main class="half sections" aria-label="Exponentials pages">
+    <nav aria-label="Exponentials pages" class="cols">
+      <section aria-labelledby="col-basics">
+        <h2 id="col-basics">Foundations</h2>
+        <ul>
+          <li><a href="exponentials-additive-and-multiplicative-growth.html">Additive and Multiplicative Growth</a></li>
+          <li><a href="exponentials-inverse-operations-radication-and-logarithms.html">Inverse Operations: Radication and Logarithms</a></li>
+          <li><a href="exponentials-exponentiation-notation.html">Exponentiation Notation</a></li>
+          <li><a href="exponentials-the-many-rules-of-exponentiation.html">Laws of Exponents</a></li>
+          <li><a href="exponentials-zero-and-negative-exponents.html">Zero and Negative Exponents</a></li>
+          <li><a href="exponentials-fractional-exponents.html">Fractional Exponents</a></li>
+          <li><a href="exponentials-irrational-exponents.html">Irrational Exponents</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-functions">
+        <h2 id="col-functions">Exponential Functions</h2>
+        <ul>
+          <li><a href="exponentials-from-powers-to-functions.html">From Powers to Functions</a></li>
+          <li class="planned"><span>Starting Value and Step Ratio</span></li>
+          <li class="planned"><span>Equal Steps, Equal Ratios</span></li>
+          <li class="planned"><span>Growth and Decay</span></li>
+          <li class="planned"><span>Changing the Step Size</span></li>
+          <li class="planned"><span>Compounding and <em>e</em></span></li>
+          <li class="planned"><span>Growth Proportional to Size</span></li>
+          <li class="planned"><span>Log Scales and Straight Lines</span></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-misc">
+        <h2 id="col-misc">Misc</h2>
+        <ul>
+          <li><a href="exponentials-understanding-logarithms.html">Understanding Logarithms</a></li>
+          <li><a href="exponentials-visualising-different-types-of-growth.html">Visualising Different Types of Growth</a></li>
+        </ul>
+      </section>
+    </nav>
+  </main>
+
+  <script>
+    // Folding paper to the Moon. A sheet 0.1 mm thick doubles in thickness with each fold; after 42 folds
+    // the stack is about 440,000 km tall, past the Moon (about 384,400 km away). The view keeps the top of
+    // the stack in frame, so the world shrinks away beneath it, drawn in fine lines: a person, a house,
+    // Big Ben, the Burj Khalifa, Everest, the edge of space, the Space Station's orbit, the Earth, the Moon.
+    // (Earlier versions of this panel: exponentials-rabbits.html, exponentials-cells.html.)
+    (function () {
+      var canvas = document.querySelector(".cells");
+      if (!canvas || !canvas.getContext) return;
+      var ctx = canvas.getContext("2d");
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var SHEET = 1e-4, FOLDS = 42, STEP = 1300, HOLD = 7000, FADE = 1800;
+      var EARTH = 6.371e6, MOON_D = 3.844e8, MOON_R = 1.737e6, ISS = 4.08e5, KARMAN = 1e5;
+      var W, H, stars, t0, phase, logView, alpha, lastFold, pops;
+
+      // landmarks standing on the ground, smallest first; w is width as a fraction of height
+      var GROUND = [
+        { name: "a person", h: 1.7, w: 0.4, draw: person },
+        { name: "a house", h: 9, w: 1.1, draw: house },
+        { name: "Big Ben", h: 96, w: 0.16, draw: bigBen },
+        { name: "the Burj Khalifa", h: 828, w: 0.14, draw: burj },
+        { name: "Mount Everest", h: 8849, w: 1.9, draw: everest }
+      ];
+      var PASS = GROUND.concat([{ name: "the edge of space", h: KARMAN }, { name: "the Space Station", h: ISS }, { name: "the Moon", h: MOON_D }]);
+
+      function size() {
+        var k = window.devicePixelRatio || 1, r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
+        ctx.setTransform(k, 0, 0, k, 0, 0);
+        stars = [];
+        for (var i = 0; i < W * H / 2600; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, r: 0.35 + Math.random() * 0.7, a: 0.08 + Math.random() * 0.3, p: Math.random() * 6.283 });
+      }
+      function reset() { t0 = performance.now(); phase = "fold"; logView = Math.log(0.004); alpha = 1; lastFold = 0; pops = []; }
+      function fmt(m) {
+        if (m < 0.01) return (m * 1000).toFixed(m < 0.001 ? 2 : 1) + " mm";
+        if (m < 1) return (m * 100).toFixed(1) + " cm";
+        if (m < 1000) return (m < 10 ? m.toFixed(1) : Math.round(m)) + " m";
+        return Math.round(m / 1000).toLocaleString("en-GB") + " km";
+      }
+      function ink(a) { return "rgba(239,230,214," + a + ")"; }
+      function gold(a) { return "rgba(217,164,65," + a + ")"; }
+
+      // line drawings: (right edge x, ground y, height in px)
+      function person(xr, gy, h) {
+        var xc = xr - h * 0.2, hr = h * 0.09;
+        ctx.moveTo(xc + hr, gy - h + hr); ctx.arc(xc, gy - h + hr, hr, 0, 6.283);
+        ctx.moveTo(xc, gy - h + 2 * hr); ctx.lineTo(xc, gy - h * 0.45);
+        ctx.lineTo(xc - h * 0.13, gy); ctx.moveTo(xc, gy - h * 0.45); ctx.lineTo(xc + h * 0.13, gy);
+        ctx.moveTo(xc - h * 0.18, gy - h * 0.48); ctx.lineTo(xc, gy - h * 0.72); ctx.lineTo(xc + h * 0.18, gy - h * 0.48);
+      }
+      function house(xr, gy, h) {
+        var w = h * 1.1, xl = xr - w;
+        ctx.rect(xl, gy - h * 0.6, w, h * 0.6);
+        ctx.moveTo(xl - w * 0.06, gy - h * 0.6); ctx.lineTo(xl + w / 2, gy - h); ctx.lineTo(xr + w * 0.06, gy - h * 0.6);
+        ctx.rect(xl + w * 0.42, gy - h * 0.3, w * 0.16, h * 0.3);
+        ctx.rect(xl + w * 0.12, gy - h * 0.45, w * 0.16, h * 0.13); ctx.rect(xr - w * 0.28, gy - h * 0.45, w * 0.16, h * 0.13);
+      }
+      function bigBen(xr, gy, h) {
+        var w = h * 0.16, xl = xr - w, xc = xr - w / 2;
+        ctx.rect(xl, gy - h * 0.7, w, h * 0.7);
+        ctx.moveTo(xc + w * 0.32, gy - h * 0.6); ctx.arc(xc, gy - h * 0.6, w * 0.32, 0, 6.283);
+        ctx.moveTo(xl - w * 0.08, gy - h * 0.7); ctx.lineTo(xr + w * 0.08, gy - h * 0.7);
+        ctx.moveTo(xl + w * 0.1, gy - h * 0.7); ctx.lineTo(xl + w * 0.1, gy - h * 0.8); ctx.lineTo(xr - w * 0.1, gy - h * 0.8); ctx.lineTo(xr - w * 0.1, gy - h * 0.7);
+        ctx.moveTo(xl + w * 0.1, gy - h * 0.8); ctx.lineTo(xc, gy - h); ctx.lineTo(xr - w * 0.1, gy - h * 0.8);
+      }
+      function burj(xr, gy, h) {
+        var w = h * 0.14, xc = xr - w / 2, steps = [[0, 1], [0.28, 0.78], [0.5, 0.56], [0.68, 0.38], [0.82, 0.2], [0.9, 0.08], [1, 0]];
+        ctx.moveTo(xc - w / 2, gy);
+        steps.forEach(function (s) { ctx.lineTo(xc - s[1] * w / 2, gy - s[0] * h); });
+        steps.slice().reverse().forEach(function (s) { ctx.lineTo(xc + s[1] * w / 2, gy - s[0] * h); });
+        steps.slice(1, 5).forEach(function (s) { ctx.moveTo(xc - s[1] * w / 2, gy - s[0] * h); ctx.lineTo(xc + s[1] * w / 2, gy - s[0] * h); });
+      }
+      function everest(xr, gy, h) {
+        var w = h * 1.9, xl = xr - w, pts = [[0, 0], [0.16, 0.34], [0.24, 0.3], [0.38, 0.72], [0.46, 0.66], [0.55, 1], [0.62, 0.86], [0.7, 0.9], [0.84, 0.42], [0.9, 0.46], [1, 0]];
+        ctx.moveTo(xl, gy);
+        pts.forEach(function (p) { ctx.lineTo(xl + p[0] * w, gy - p[1] * h); });
+        ctx.moveTo(xl + 0.47 * w, gy - 0.78 * h); ctx.lineTo(xl + 0.52 * w, gy - 0.84 * h); ctx.lineTo(xl + 0.57 * w, gy - 0.8 * h); ctx.lineTo(xl + 0.64 * w, gy - 0.84 * h);
+      }
+
+      function render(now, folds) {
+        var thick = SHEET * Math.pow(2, folds);
+        var ground = H * 0.86, usable = ground - H * 0.07, cx = W * 0.8;
+        var s = usable / Math.exp(logView), Y = function (h) { return ground - h * s; };
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = 1; ctx.lineCap = "round"; ctx.lineJoin = "round";
+
+        // stars
+        var tw = now * 0.0009;
+        stars.forEach(function (st) { ctx.fillStyle = ink(st.a * (0.75 + 0.25 * Math.sin(tw + st.p))); ctx.fillRect(st.x, st.y, st.r * 2, st.r * 2); });
+
+        // the Earth: a straight horizon up close, then a curve, then a globe; with the edge of space and the Space Station's orbit
+        var R = EARTH * s, ey = ground + R, flat = R > 2e5;
+        function ring(h, dash, a) {
+          ctx.beginPath(); ctx.setLineDash(dash); ctx.strokeStyle = ink(a);
+          if (flat) { ctx.moveTo(0, Y(h)); ctx.lineTo(W, Y(h)); } else ctx.arc(cx, ey, R + h * s, 0, 6.283);
+          ctx.stroke(); ctx.setLineDash([]);
+        }
+        ctx.beginPath();
+        if (flat) ctx.rect(0, ground, W, H - ground); else ctx.arc(cx, ey, R, 0, 6.283);
+        ctx.fillStyle = "#121110"; ctx.fill(); ctx.fillStyle = ink(0.035); ctx.fill();
+        ring(0, [], 0.6);
+        var kpx = KARMAN * s;
+        if (kpx > 3 && Y(KARMAN) > -10) ring(KARMAN, [2, 5], Math.min(0.35, kpx / 40));
+        var ipx = ISS * s;
+        if (ipx > 3) ring(ISS, [1, 6], Math.min(0.3, ipx / 40));
+
+        // landmarks on the ground, side by side to the left of the stack
+        var xr = cx - 12;
+        GROUND.forEach(function (m) {
+          var h = m.h * s;
+          // fade out before reaching the title
+          var a = Math.min(1, (h - 3) / 10) * Math.max(0, Math.min(1, (H * 0.42 - h) / (H * 0.14)));
+          if (a <= 0) return;
+          ctx.beginPath(); m.draw(xr, ground, h);
+          ctx.strokeStyle = ink(0.75 * a); ctx.stroke();
+          if (h > 22) {
+            ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "center";
+            ctx.fillStyle = ink(0.55 * a); ctx.fillText(m.name, xr - m.w * h / 2, ground - h - 7);
+          }
+          xr -= m.w * h + 10;
+        });
+
+        // the Space Station, on its orbit
+        if (ipx > 3 && ipx < H * 1.4) {
+          var ang = -Math.PI / 2 - 0.35, ix = cx + (R + ipx) * Math.cos(ang), iy = ey + (R + ipx) * Math.sin(ang);
+          if (flat) { ix = cx - 60; iy = Y(ISS); }
+          var ia = Math.min(1, (ipx - 3) / 12);
+          ctx.beginPath(); ctx.strokeStyle = ink(0.8 * ia);
+          ctx.moveTo(ix - 6, iy); ctx.lineTo(ix + 6, iy); ctx.rect(ix - 6, iy - 4, 3, 8); ctx.rect(ix + 3, iy - 4, 3, 8); ctx.stroke();
+          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.fillStyle = ink(0.5 * ia); ctx.fillText("the Space Station", ix - 10, iy + 4);
+        }
+        if (kpx > 14 && Y(KARMAN) > 20) {
+          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.fillStyle = ink(Math.min(0.5, (kpx - 14) / 30)); ctx.fillText("the edge of space", cx - 12, (flat ? Y(KARMAN) : ey - R - kpx) - 6);
+        }
+
+        // the Moon, drawn larger than true scale once it would be smaller than a few pixels
+        var mr = Math.max(7, MOON_R * s), my = Y(MOON_D), mx = cx - mr - 10;
+        if (my + mr > 0 && my - mr < H) {
+          ctx.beginPath(); ctx.arc(mx, my, mr, 0, 6.283); ctx.fillStyle = "#121110"; ctx.fill();
+          ctx.strokeStyle = ink(0.85); ctx.stroke();
+          ctx.beginPath();
+          [[-0.35, -0.2, 0.2], [0.25, 0.25, 0.16], [0.1, -0.45, 0.1]].forEach(function (c) { ctx.moveTo(mx + c[0] * mr + c[2] * mr, my + c[1] * mr); ctx.arc(mx + c[0] * mr, my + c[1] * mr, c[2] * mr, 0, 6.283); });
+          ctx.strokeStyle = ink(0.35); ctx.stroke();
+          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.fillStyle = ink(0.6); ctx.fillText("the Moon", mx - mr - 8, my + 4);
+        }
+
+        // the stack of paper, in gold
+        var top = Math.max(-10, Y(thick));
+        ctx.save();
+        ctx.shadowColor = gold(0.8); ctx.shadowBlur = 10;
+        ctx.strokeStyle = gold(0.95); ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(cx, ground); ctx.lineTo(cx, top); ctx.stroke();
+        ctx.fillStyle = "rgba(255,240,210,1)"; ctx.beginPath(); ctx.arc(cx, top, 2.6, 0, 6.283); ctx.fill();
+        ctx.restore();
+
+        // ×2 at each fold, rising from the top of the stack
+        ctx.font = "500 14px 'Alegreya', Georgia, serif"; ctx.textAlign = "left";
+        pops = pops.filter(function (p) { return now - p < 1100; });
+        pops.forEach(function (p) { var u = (now - p) / 1100; ctx.fillStyle = gold(0.9 * (1 - u)); ctx.fillText("×2", cx + 9, top + 5 - u * 18); });
+
+        // the count, and the last landmark passed
+        var n = Math.floor(folds), passed = null;
+        PASS.forEach(function (m) { if (SHEET * Math.pow(2, n) >= m.h) passed = m; });
+        var fs = Math.max(13, Math.min(17, W / 26)), x0 = parseFloat(getComputedStyle(canvas.parentElement).paddingLeft) || 32;
+        ctx.textAlign = "left";
+        ctx.fillStyle = gold(0.9); ctx.font = "500 " + fs + "px 'Alegreya', Georgia, serif";
+        ctx.fillText((n === 1 ? "1 fold" : n + " folds") + " · " + fmt(SHEET * Math.pow(2, n)), x0, H - 28);
+        if (passed) {
+          ctx.fillStyle = ink(0.55); ctx.font = "italic 400 " + (fs - 1) + "px 'Alegreya', Georgia, serif";
+          ctx.fillText(passed.name === "the Moon" ? "past the Moon" : "taller than " + passed.name, x0, H - 28 - fs * 1.45);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function frame(now) {
+        var t = now - t0, folds;
+        if (phase === "fold") {
+          var n = Math.floor(t / STEP), e = Math.min(1, (t - n * STEP) / (STEP * 0.45));
+          folds = Math.min(FOLDS, n + (1 - Math.pow(1 - e, 3)));
+          if (n > lastFold && n <= FOLDS) { pops.push(now); lastFold = n; }
+          if (n >= FOLDS) { phase = "hold"; t0 = now; folds = FOLDS; }
+        } else {
+          folds = FOLDS;
+          if (phase === "hold" && t > HOLD) { phase = "fade"; t0 = now; }
+          if (phase === "fade") { alpha = Math.max(0, 1 - t / FADE); if (t > FADE) reset(); }
+        }
+        var target = Math.log(Math.max(0.004, SHEET * Math.pow(2, folds) * 1.4));
+        logView += (target - logView) * 0.05;
+        render(now, folds);
+        requestAnimationFrame(frame);
+      }
+
+      size(); reset();
+      window.addEventListener("resize", function () { size(); if (still) render(0, FOLDS); });
+      if (still) { logView = Math.log(SHEET * Math.pow(2, FOLDS) * 1.4); render(0, FOLDS); return; }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(frame); });
+      else requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

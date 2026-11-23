@@ -381,9 +381,10 @@
         return g;
       }
       function show(key) {
-        if (!draw[key] || key === current) return;
+        if (key === current || (key && !draw[key])) return;
         current = key;
         svg.querySelectorAll("g").forEach((old) => { old.style.opacity = 0; setTimeout(() => old.remove(), 400); });
+        if (!key) return;
         const g = build(key);
         svg.appendChild(g);
         if (still) return;
@@ -402,16 +403,16 @@
         });
       }
       const keyOf = (item) => item.dataset.openLevel || (item.getAttribute("href") || "").replace(/\.html$/, "");
-      const levelKey = () => ({ math: "math", physics: "physics", random: "random" })[location.hash.slice(1)] || "math";
 
       document.querySelectorAll(".nav-item").forEach((item) => {
         const go = () => { clearTimeout(timer); document.querySelectorAll(".nav-item.on").forEach((o) => o.classList.remove("on")); item.classList.add("on"); show(keyOf(item)); };
         item.addEventListener("pointerenter", go);
         item.addEventListener("focus", go);
       });
-      nav.addEventListener("pointerleave", () => { timer = setTimeout(() => { document.querySelectorAll(".nav-item.on").forEach((o) => o.classList.remove("on")); show(levelKey()); }, 900); });
-      addEventListener("popstate", () => show(levelKey()));
-      show(levelKey());
+      const clear = () => { document.querySelectorAll(".nav-item.on").forEach((o) => o.classList.remove("on")); show(null); };
+      nav.addEventListener("pointerleave", () => { timer = setTimeout(clear, 200); });
+      nav.addEventListener("focusout", (e) => { if (!nav.contains(e.relatedTarget)) clear(); });
+      addEventListener("popstate", clear);
     })();
 
 

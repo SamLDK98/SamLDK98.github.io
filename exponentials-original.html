@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Exponents and exponential functions: what an exponent means, from whole numbers to fractions and irrationals, and the rules they follow — explanations by Sam Kirwan." />
+  <title>Exponentials | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* Experimental look: flat charcoal ground, Poppins headings, Jost text, a violet and lavender accent. */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1f1f22;
+      --text: rgba(255, 255, 255, 0.87);
+      --soft: rgba(255, 255, 255, 0.6);
+      --violet: #561ba4;
+      --lavender: #cba3ff;
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Jost", system-ui, sans-serif;
+      letter-spacing: 0.04em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* cell division behind the page: one cell keeps doubling until the cells fill the screen, then fades and begins again */
+    .cells {
+      position: fixed; inset: 0; z-index: 0;
+      width: 100vw; height: 100svh;
+      pointer-events: none;
+    }
+
+    main {
+      position: relative; z-index: 1;
+      width: min(76rem, calc(100% - clamp(4rem, 15vw, 14rem)));
+      margin-left: clamp(2rem, 11vw, 10rem);
+      padding: clamp(3rem, 9vh, 5.5rem) 0;
+      text-align: left;
+    }
+
+    h1 {
+      font-family: "Poppins", system-ui, sans-serif;
+      font-size: clamp(3rem, 7vw, 5.2rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      color: #fff;
+      position: relative; top: -2.6rem; /* the title sits a little higher than the lists */
+    }
+
+    nav { margin-top: clamp(2.4rem, 6vh, 3.6rem); }
+
+    /* three columns: the basics, exponential functions, and everything else */
+    .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.4rem clamp(2rem, 4vw, 3.6rem); align-items: start; }
+    h2 {
+      margin-bottom: 1.1rem;
+      color: var(--lavender);
+      opacity: 0.8;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    /* working titles for pages not yet written */
+    li.planned span { color: var(--soft); opacity: 0.6; font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.4; }
+    li.planned::before { opacity: 0.4; }
+
+    /* the pages, numbered in lavender */
+    ul { list-style: none; counter-reset: page; }
+    li { counter-increment: page; display: flex; align-items: baseline; gap: 1.1rem; }
+    li::before {
+      content: counter(page, decimal-leading-zero);
+      min-width: 1.6rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--lavender);
+      opacity: 0.75;
+    }
+    li + li { margin-top: 0.75rem; }
+
+    nav a {
+      display: inline-block;
+      color: var(--text);
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      font-weight: 400;
+      line-height: 1.4;
+      text-decoration: none;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+
+    nav a:hover,
+    nav a:focus-visible {
+      color: var(--lavender);
+      outline: none;
+      transform: translateX(3px);
+    }
+
+
+    @media (max-height: 720px) and (min-width: 600px) {
+      main { padding-block: 2rem; }
+      nav { margin-top: 2rem; }
+      li + li { margin-top: 0.45rem; }
+    }
+
+    @media (max-width: 900px) {
+      .cols { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(27rem, calc(100% - 4rem));
+        margin-left: 2rem;
+      }
+
+      h1 { font-size: clamp(2.6rem, 12vw, 3.8rem); }
+      nav { margin-top: 2.4rem; }
+      li + li { margin-top: 0.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      nav a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="cells" aria-hidden="true"></canvas>
+  <main>
+    <h1>Exponentials</h1>
+    <nav aria-label="Exponentials pages" class="cols">
+      <section aria-labelledby="col-basics">
+        <h2 id="col-basics">Foundations</h2>
+        <ul>
+          <li><a href="exponentials-additive-and-multiplicative-growth.html">Additive and Multiplicative Growth</a></li>
+          <li><a href="exponentials-inverse-operations-radication-and-logarithms.html">Inverse Operations: Radication and Logarithms</a></li>
+          <li><a href="exponentials-exponentiation-notation.html">Exponentiation Notation</a></li>
+          <li><a href="exponentials-the-many-rules-of-exponentiation.html">Laws of Exponents</a></li>
+          <li><a href="exponentials-zero-and-negative-exponents.html">Zero and Negative Exponents</a></li>
+          <li><a href="exponentials-fractional-exponents.html">Fractional Exponents</a></li>
+          <li><a href="exponentials-irrational-exponents.html">Irrational Exponents</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-functions">
+        <h2 id="col-functions">Exponential Functions</h2>
+        <ul>
+          <li><a href="exponentials-from-powers-to-functions.html">From Powers to Functions</a></li>
+          <li class="planned"><span>Starting Value and Step Ratio</span></li>
+          <li class="planned"><span>Equal Steps, Equal Ratios</span></li>
+          <li class="planned"><span>Growth and Decay</span></li>
+          <li class="planned"><span>Changing the Step Size</span></li>
+          <li class="planned"><span>Compounding and <em>e</em></span></li>
+          <li class="planned"><span>Growth Proportional to Size</span></li>
+          <li class="planned"><span>Log Scales and Straight Lines</span></li>
+        </ul>
+      </section>
+      <section aria-labelledby="col-misc">
+        <h2 id="col-misc">Misc</h2>
+        <ul>
+          <li><a href="exponentials-understanding-logarithms.html">Understanding Logarithms</a></li>
+          <li><a href="exponentials-visualising-different-types-of-growth.html">Visualising Different Types of Growth</a></li>
+        </ul>
+      </section>
+    </nav>
+  </main>
+  <script>
+    // Cell division: one cell divides into 2, 4, 8, … up to 2^11 = 2,048, each generation pushing
+    // apart into a growing cluster that spreads across the page. Each generation stays on screen a
+    // little longer than the last. The cells never overlap: each is drawn no wider than the space to
+    // its nearest neighbour allows, so a new pair starts small and swells as they part. They drift
+    // very gently the whole time. After the last generation they hold, fade, and one cell begins again.
+    // A still cluster for anyone who prefers reduced motion.
+    (function () {
+      var canvas = document.querySelector(".cells");
+      if (!canvas || !canvas.getContext) return;
+      var ctx = canvas.getContext("2d");
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var LAST = 11, HOLD = 7000, FADE = 2500;
+      var split = function (g) { return 1800 + g * 550; };   // each generation lingers longer
+      var W, H, D, R, CX, CY, SX, SY, ax, ay, cells, gen, t0, phase, alpha;
+
+      function size() {
+        var k = window.devicePixelRatio || 1;
+        W = window.innerWidth; H = window.innerHeight;
+        canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
+        ctx.setTransform(k, 0, 0, k, 0, 0);
+        // spacing chosen so that 2,048 closely packed cells cover about the area of the screen
+        D = Math.max(14, Math.min(34, Math.sqrt(W * H * 1.15 / (Math.pow(2, LAST) * 0.866))));
+        R = D * 0.32;
+        CX = W * (W < 600 ? 0.55 : 0.6); CY = H * 0.55;
+        // the first cell appears near the top right corner; the cluster drifts towards CX, CY as it grows
+        SX = W - Math.min(110, W * 0.12); SY = Math.min(110, H * 0.14);
+      }
+      function cell(x, y) { return { x: x, y: y, nd: 0, p: Math.random() * 6.283, q: Math.random() * 6.283 }; }
+      function reset() { cells = [cell(0, 0)]; cells[0].nd = D; gen = 0; t0 = performance.now(); phase = "grow"; alpha = 0; ax = SX; ay = SY; }
+      function divide() {
+        var next = [];
+        cells.forEach(function (c) {
+          var a = Math.random() * 6.283, dx = Math.cos(a) * D * 0.08, dy = Math.sin(a) * D * 0.08;
+          next.push(cell(c.x + dx, c.y + dy), cell(c.x - dx, c.y - dy));
+        });
+        cells = next; gen++;
+      }
+      // cells push apart until they sit a spacing D from their neighbours; a grid keeps this quick.
+      // Each pass also records every cell's distance to its nearest neighbour.
+      function relax(iters) {
+        for (var it = 0; it < iters; it++) {
+          var grid = {}, i, c;
+          for (i = 0; i < cells.length; i++) {
+            c = cells[i]; c.nd = D * 2;
+            var key = Math.floor(c.x / D) + "," + Math.floor(c.y / D);
+            (grid[key] || (grid[key] = [])).push(i);
+          }
+          for (i = 0; i < cells.length; i++) {
+            var a = cells[i], gx = Math.floor(a.x / D), gy = Math.floor(a.y / D);
+            if (cells.length < 64) { a.x *= 0.997; a.y *= 0.997; }   // a small cluster draws together
+            for (var ox = -1; ox <= 1; ox++) for (var oy = -1; oy <= 1; oy++) {
+              var list = grid[(gx + ox) + "," + (gy + oy)]; if (!list) continue;
+              for (var n = 0; n < list.length; n++) {
+                var j = list[n]; if (j <= i) continue;
+                var b = cells[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 0.01;
+                if (d < a.nd) a.nd = d; if (d < b.nd) b.nd = d;
+                if (d < D) { var m = (D - d) / d * 0.22; a.x -= dx * m; a.y -= dy * m; b.x += dx * m; b.y += dy * m; }
+              }
+            }
+          }
+        }
+      }
+      function draw(now) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalAlpha = alpha;
+        var fade = Math.max(0.4, 1 - gen * 0.05);
+        ctx.fillStyle = "rgba(203, 163, 255, " + (0.3 * fade) + ")";
+        ctx.strokeStyle = "rgba(203, 163, 255, " + (0.48 * fade) + ")"; ctx.lineWidth = 1;
+        var t = now * 0.00045, wob = D * 0.06;
+        ctx.beginPath();
+        for (var i = 0; i < cells.length; i++) {
+          var c = cells[i];
+          // never wider than half the gap to the nearest neighbour, less a hair for the drift and outline
+          var r = Math.min(R, c.nd / 2 - wob - 1.2); if (r < 0.8) continue;
+          var x = ax + c.x + Math.sin(t + c.p) * wob, y = ay + c.y + Math.cos(t * 0.9 + c.q) * wob;
+          if (x < -R || y < -R || x > W + R || y > H + R) continue;
+          ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.283);
+        }
+        ctx.fill(); ctx.stroke();
+        // the count, as a power of 2, in the lower right corner
+        var fs = Math.max(13, Math.min(18, W / 70)), count = Math.pow(2, gen).toLocaleString("en-GB");
+        ctx.globalAlpha = Math.min(1, alpha * 1.2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)"; ctx.textAlign = "left";
+        ctx.font = "400 " + fs + "px Jost, sans-serif"; var wb = ctx.measureText("2").width, wr = ctx.measureText(" = " + count).width;
+        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; var we = ctx.measureText(String(gen)).width;
+        var x0 = W - 28 - (wb + we + wr), y0 = H - 24;
+        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText("2", x0, y0);
+        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; ctx.fillText(String(gen), x0 + wb + 1, y0 - fs * 0.42);
+        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText(" = " + count, x0 + wb + we + 2, y0);
+        ctx.globalAlpha = 1;
+      }
+      function frame(now) {
+        var t = now - t0;
+        if (phase === "grow") {
+          alpha = Math.min(1, alpha + 0.02);
+          if (t > split(gen)) {
+            if (gen < LAST) { divide(); t0 = now; } else { phase = "hold"; t0 = now; }
+          }
+        } else if (phase === "hold") {
+          if (t > HOLD) { phase = "fade"; t0 = now; }
+        } else if (phase === "fade") {
+          alpha = Math.max(0, 1 - t / FADE);
+          if (t > FADE) reset();
+        }
+        // ease the cluster's centre from the corner towards the middle over the generations
+        var k = Math.pow(gen / LAST, 1.6), tx = SX + (CX - SX) * k, ty = SY + (CY - SY) * k;
+        ax += (tx - ax) * 0.004; ay += (ty - ay) * 0.004;
+        relax(cells.length > 1000 ? 2 : 3); draw(now);
+        requestAnimationFrame(frame);
+      }
+
+      size();
+      window.addEventListener("resize", function () { size(); if (still) { ax = CX; ay = CY; draw(0); } });
+      if (still) {
+        reset(); for (var g = 0; g < 7; g++) { divide(); relax(80); } ax = CX; ay = CY;
+        alpha = 1; draw(0); return;
+      }
+      reset();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(frame); });
+      else requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

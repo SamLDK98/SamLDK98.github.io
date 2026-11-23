@@ -7,137 +7,215 @@
   <title>Exponentials | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
+  <!-- the previous version of this page is kept as exponentials-original.html -->
   <style>
-    /* Experimental look: flat charcoal ground, Poppins headings, Jost text, a violet and lavender accent. */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #1f1f22;
-      --text: rgba(255, 255, 255, 0.87);
-      --soft: rgba(255, 255, 255, 0.6);
-      --violet: #561ba4;
-      --lavender: #cba3ff;
+      --beige: #e8dcc6;
+      --beige-deep: #ddcfb5;
+      --ink: #1d1a16;
+      --ink-deep: #0b0907;
+      --ink-soft: rgba(29, 26, 22, 0.55);
+      --black: #121110;
+      --cream: #efe6d6;
+      --cream-soft: rgba(239, 230, 214, 0.62);
+      --gold: #d9a441;
+      --gold-deep: #9c6a1e;
     }
 
-    html, body { min-height: 100%; }
-
+    html, body { height: 100%; }
     body {
       min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-x: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Jost", system-ui, sans-serif;
-      letter-spacing: 0.04em;
+      display: grid;
+      grid-template-columns: minmax(22rem, 1.25fr) 2fr;
+      font-family: "Alegreya", Georgia, serif;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* cell division behind the page: one cell keeps doubling until the cells fill the screen, then fades and begins again */
-    .cells {
-      position: fixed; inset: 0; z-index: 0;
-      width: 100vw; height: 100svh;
-      pointer-events: none;
+    /* a fine grain over both halves, so the colours read as paper and matte card rather than flat screen */
+    .half { position: relative; overflow: hidden; }
+    .half::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    main {
-      position: relative; z-index: 1;
-      width: min(76rem, calc(100% - clamp(4rem, 15vw, 14rem)));
-      margin-left: clamp(2rem, 11vw, 10rem);
-      padding: clamp(3rem, 9vh, 5.5rem) 0;
-      text-align: left;
+    /* left: the title on matte black, with cells dividing behind it */
+    .about {
+      background: var(--black);
+      color: var(--cream);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 4.5vw, 4.5rem);
+      box-shadow: inset -18px 0 40px -28px rgba(0, 0, 0, 0.9);
     }
-
-    h1 {
-      font-family: "Poppins", system-ui, sans-serif;
-      font-size: clamp(3rem, 7vw, 5.2rem);
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: 0.01em;
-      color: #fff;
-      position: relative; top: -2.6rem; /* the title sits a little higher than the lists */
+    .about::after { opacity: 0.05; mix-blend-mode: screen; }
+    .cells { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .about > div { position: relative; z-index: 1; }
+    /* the section overview, shown in the black panel until an animation is chosen */
+    .overview-text { margin-top: 1.6rem; max-width: 30rem; animation: rise 420ms ease both; color: var(--cream-soft); transition: opacity 400ms ease, visibility 400ms; }
+    .overview-text p, .overview-text li { font-size: clamp(0.92rem, 1.05vw, 1.04rem); line-height: 1.5; }
+    .overview-text p + p, .overview-text ul + p { margin-top: 0.6rem; }
+    .overview-text ul { list-style: disc; margin: 0.4rem 0 0 1.2rem; }
+    .overview-text li { display: list-item; }
+    .overview-text li::before { content: none; }
+    .overview-text li::marker { color: var(--gold); }
+    .overview-text .identity { margin: 0.6rem 0 0.8rem; font-size: 1.45rem; color: var(--cream); }
+    .overview-text .identity sup { font-size: 0.6em; }
+    .about.playing .overview-text { display: none; }
+    /* switch between the animations, bottom right */
+    .about .anim-switch { position: absolute; z-index: 2; right: clamp(1.2rem, 3vw, 2.4rem); bottom: 22px; display: flex; gap: 0.9rem; }
+    .anim-switch button {
+      border: 0; background: none; cursor: pointer; padding: 0.2rem 0;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.06em;
+      color: var(--cream-soft); transition: color 200ms ease;
     }
+    .anim-switch button:hover, .anim-switch button:focus-visible { color: var(--cream); outline: none; }
+    .anim-switch button[aria-pressed="true"] { color: var(--gold); }
+    .about h1 { font-weight: 500; font-size: clamp(2.2rem, 3.4vw, 3.2rem); line-height: 1.1; color: var(--cream); text-shadow: 0 0 14px var(--black), 0 0 28px var(--black); }
+    .about .kicker {
+      display: inline-block; margin-top: 2.2rem;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold);
+      text-decoration: none; transition: color 200ms ease;
+    }
+    .about .kicker:hover, .about .kicker:focus-visible { color: var(--cream); outline: none; }
 
-    nav { margin-top: clamp(2.4rem, 6vh, 3.6rem); }
+    /* right: three columns of pages, on beige */
+    .sections {
+      background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 5vw, 5rem);
+    }
+    .sections::after { opacity: 0.16; mix-blend-mode: multiply; }
 
-    /* three columns: the basics, exponential functions, and everything else */
-    .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.4rem clamp(2rem, 4vw, 3.6rem); align-items: start; }
+    .inner { position: relative; z-index: 1; width: 100%; }
+    /* the overview: a link above the columns that opens a card */
+    .overview-link {
+      display: none; margin-bottom: clamp(1.8rem, 5vh, 2.8rem);
+      border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
+      font-family: "Alegreya", Georgia, serif; font-style: italic; font-size: clamp(1.15rem, 1.5vw, 1.35rem);
+      color: var(--gold-deep); transition: color 350ms ease, font-weight 350ms ease;
+    }
+    .overview-link:hover, .overview-link:focus-visible { color: #6e4a12; font-weight: 700; outline: none; }
+    dialog.overview {
+      margin: auto; width: min(36rem, calc(100% - 2.4rem)); max-height: calc(100svh - 3rem);
+      padding: clamp(1.8rem, 4vw, 2.6rem); border: 0; border-radius: 4px;
+      background: radial-gradient(ellipse 90% 80% at 40% 40%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink); font-family: "Alegreya", Georgia, serif;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+    dialog.overview::backdrop { background: rgba(18, 17, 16, 0.72); }
+    dialog.overview h2 { margin: 0 2rem 1.2rem 0; font-family: "Alegreya SC", Georgia, serif; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.06em; color: var(--gold-deep); }
+    dialog.overview p, dialog.overview li { font-size: clamp(1.05rem, 1.4vw, 1.18rem); line-height: 1.55; }
+    dialog.overview p + p, dialog.overview ul + p { margin-top: 0.8rem; }
+    dialog.overview ul { margin: 0.6rem 0 0 1.3rem; list-style: disc; }
+    dialog.overview li { display: list-item; }
+    dialog.overview li::before { content: none; }
+    dialog.overview li::marker { color: var(--gold-deep); }
+    dialog.overview li + li { margin-top: 0.15rem; }
+    dialog.overview .identity { margin: 0.9rem 0 1rem; text-align: center; font-size: 1.7rem; }
+    dialog.overview .identity sup { font-size: 0.6em; }
+    dialog.overview .close {
+      position: absolute; top: 0.9rem; right: 1rem; border: 0; background: none; cursor: pointer;
+      font-size: 1.6rem; line-height: 1; color: var(--ink-soft); transition: color 200ms ease;
+    }
+    dialog.overview .close:hover, dialog.overview .close:focus-visible { color: var(--ink); outline: none; }
+    .cols {
+      position: relative; z-index: 1; width: 100%;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2.4rem clamp(1.6rem, 3vw, 3rem); align-items: start;
+      animation: rise 320ms ease both;
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     h2 {
       margin-bottom: 1.1rem;
-      color: var(--lavender);
-      opacity: 0.8;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold-deep);
     }
-    /* working titles for pages not yet written */
-    li.planned span { color: var(--soft); opacity: 0.6; font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.4; }
-    li.planned::before { opacity: 0.4; }
 
-    /* the pages, numbered in lavender */
+    /* the pages, numbered quietly */
     ul { list-style: none; counter-reset: page; }
-    li { counter-increment: page; display: flex; align-items: baseline; gap: 1.1rem; }
+    li { counter-increment: page; display: flex; align-items: baseline; gap: 0.8rem; }
     li::before {
-      content: counter(page, decimal-leading-zero);
-      min-width: 1.6rem;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--lavender);
-      opacity: 0.75;
+      content: counter(page, decimal-leading-zero); min-width: 1.4rem;
+      font-family: "Alegreya SC", Georgia, serif; font-size: 0.85rem; color: var(--ink-soft);
     }
-    li + li { margin-top: 0.75rem; }
+    li + li { margin-top: 0.55rem; }
 
-    nav a {
-      display: inline-block;
-      color: var(--text);
-      font-size: clamp(1rem, 1.6vw, 1.2rem);
-      font-weight: 400;
-      line-height: 1.4;
-      text-decoration: none;
-      transition: color 180ms ease, transform 180ms ease;
+    .cols a, li.planned span { font-size: clamp(1.05rem, 1.35vw, 1.25rem); line-height: 1.3; }
+    .cols a {
+      color: rgba(29, 26, 22, 0.82); text-decoration: none;
+      transition: color 350ms ease, font-weight 350ms ease;
     }
+    /* on hover a title darkens and thickens, easing through the font's weights */
+    .cols a:hover, .cols a:focus-visible { color: var(--ink-deep); font-weight: 700; outline: none; }
+    /* working titles for pages not yet written */
+    li.planned span { color: var(--ink-soft); opacity: 0.75; }
+    li.planned::before { opacity: 0.6; }
 
-    nav a:hover,
-    nav a:focus-visible {
-      color: var(--lavender);
-      outline: none;
-      transform: translateX(3px);
+    @media (max-width: 1100px) and (min-width: 761px) {
+      .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
-
-    @media (max-height: 720px) and (min-width: 600px) {
-      main { padding-block: 2rem; }
-      nav { margin-top: 2rem; }
-      li + li { margin-top: 0.45rem; }
+    /* phones: keep the split, with smaller type, one column and no cells */
+    @media (max-width: 760px) {
+      body { grid-template-columns: 0.62fr 1fr; }
+      .about { padding: 2rem 0.9rem 2rem 1.1rem; }
+      .sections { padding: 2rem 1rem 2rem 1.1rem; align-items: flex-start; }
+      .about h1 { font-size: 1.45rem; }
+      .about .kicker { font-size: 0.72rem; margin-top: 1.4rem; }
+      .cells, .about .anim-switch { display: none; }
+      .cols { grid-template-columns: 1fr; gap: 1.8rem; }
+      .overview-link { display: inline-block; font-size: 1rem; margin-bottom: 1.4rem; }
+      .overview-text { display: none; }
+      h2 { font-size: 0.75rem; margin-bottom: 0.7rem; }
+      li { gap: 0.55rem; }
+      li::before { font-size: 0.68rem; min-width: 1rem; }
+      li + li { margin-top: 0.4rem; }
+      .cols a, li.planned span { font-size: 0.95rem; }
     }
-
-    @media (max-width: 900px) {
-      .cols { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 560px) {
-      main {
-        width: min(27rem, calc(100% - 4rem));
-        margin-left: 2rem;
-      }
-
-      h1 { font-size: clamp(2.6rem, 12vw, 3.8rem); }
-      nav { margin-top: 2.4rem; }
-      li + li { margin-top: 0.8rem; }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      nav a { transition: none; }
+      .cols { animation: none; }
+      .cols a, .about .kicker { transition: none; }
     }
   </style>
 </head>
 <body>
-  <canvas class="cells" aria-hidden="true"></canvas>
-  <main>
-    <h1>Exponentials</h1>
+  <aside class="half about" aria-label="Exponentials">
+    <canvas class="cells" aria-hidden="true"></canvas>
+    <div class="anim-switch" role="group" aria-label="Animation">
+      <button type="button" data-anim="overview">Overview</button>
+      <button type="button" data-anim="paper">Paper</button>
+      <button type="button" data-anim="rabbits">Rabbits</button>
+      <button type="button" data-anim="cells">Cells</button>
+    </div>
+    <div>
+      <h1>Exponentials</h1>
+      <div class="overview-text">
+        <p>Our overarching goal is to understand Euler's identity:</p>
+        <p class="identity"><em>e</em><sup><em>iπ</em></sup> + 1 = 0</p>
+        <p>To get there, we first need to develop an understanding of what it means to raise a number to different types of exponents:</p>
+        <ul>
+          <li>A positive integer.</li>
+          <li>Zero.</li>
+          <li>A negative integer.</li>
+          <li>A fraction.</li>
+          <li>An irrational number.</li>
+          <li>An imaginary number.</li>
+        </ul>
+        <p>We will also explore what makes the mathematical constant <em>e</em> so significant.</p>
+        <p>Ultimately, we want to understand how these ideas come together in Euler's identity, and why this result reveals a remarkable connection between exponentiation and circular motion.</p>
+        <p>Two concepts are particularly important to understand along the way: multiplicative growth and fractional exponents.</p>
+        <p>Developing a strong intuition for these will provide a foundation for understanding much of what follows.</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="half sections" aria-label="Exponentials pages">
+    <div class="inner">
+    <button class="overview-link" type="button" aria-haspopup="dialog">Exponentials Section Overview</button>
     <nav aria-label="Exponentials pages" class="cols">
       <section aria-labelledby="col-basics">
         <h2 id="col-basics">Foundations</h2>
@@ -172,47 +250,291 @@
         </ul>
       </section>
     </nav>
+    </div>
   </main>
+
+  <dialog class="overview" aria-labelledby="overview-title">
+    <button class="close" type="button" aria-label="Close">×</button>
+    <h2 id="overview-title">Exponentials Section Overview</h2>
+    <p>Our overarching goal is to understand Euler's identity:</p>
+    <p class="identity"><em>e</em><sup><em>iπ</em></sup> + 1 = 0</p>
+    <p>To get there, we first need to develop an understanding of what it means to raise a number to different types of exponents:</p>
+    <ul>
+      <li>A positive integer.</li>
+      <li>Zero.</li>
+      <li>A negative integer.</li>
+      <li>A fraction.</li>
+      <li>An irrational number.</li>
+      <li>An imaginary number.</li>
+    </ul>
+    <p>We will also explore what makes the mathematical constant <em>e</em> so significant.</p>
+    <p>Ultimately, we want to understand how these ideas come together in Euler's identity, and why this result reveals a remarkable connection between exponentiation and circular motion.</p>
+    <p>Two concepts are particularly important to understand along the way: multiplicative growth and fractional exponents.</p>
+    <p>Developing a strong intuition for these will provide a foundation for understanding much of what follows.</p>
+  </dialog>
+
   <script>
-    // Cell division: one cell divides into 2, 4, 8, … up to 2^11 = 2,048, each generation pushing
-    // apart into a growing cluster that spreads across the page. Each generation stays on screen a
-    // little longer than the last. The cells never overlap: each is drawn no wider than the space to
-    // its nearest neighbour allows, so a new pair starts small and swells as they part. They drift
-    // very gently the whole time. After the last generation they hold, fade, and one cell begins again.
-    // A still cluster for anyone who prefers reduced motion.
+    // the overview card: open from the link, close with ×, Escape, or a click outside the card
     (function () {
+      var d = document.querySelector("dialog.overview");
+      document.querySelector(".overview-link").addEventListener("click", function () { d.showModal(); });
+      d.querySelector(".close").addEventListener("click", function () { d.close(); });
+      d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
+    })();
+
+    var ANIMS = {};
+
+    // Folding paper to the Moon. A sheet 0.1 mm thick doubles in thickness with each fold; after 42 folds
+    // the stack is about 440,000 km tall, past the Moon (about 384,400 km away). The view keeps the top of
+    // the stack in frame, so the world shrinks away beneath it, drawn in fine lines: a person, a house,
+    // Big Ben, the Burj Khalifa, Everest, the edge of space, the Space Station's orbit, the Earth, the Moon.
+    // (Earlier versions of this panel: exponentials-rabbits.html, exponentials-cells.html.)
+    ANIMS.paper = function () {
+      var alive = true, onResize = null;
+      var stop = function () { alive = false; if (onResize) window.removeEventListener("resize", onResize); };
       var canvas = document.querySelector(".cells");
-      if (!canvas || !canvas.getContext) return;
+      if (!canvas || !canvas.getContext) return stop;
       var ctx = canvas.getContext("2d");
       var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      var LAST = 11, HOLD = 7000, FADE = 2500;
-      var split = function (g) { return 1800 + g * 550; };   // each generation lingers longer
+      var SHEET = 1e-4, FOLDS = 42, STEP = 1300, HOLD = 7000, FADE = 1800;
+      var EARTH = 6.371e6, MOON_D = 3.844e8, MOON_R = 1.737e6, ISS = 4.08e5, KARMAN = 1e5;
+      var W, H, stars, t0, phase, logView, alpha, lastFold, pops;
+
+      // landmarks standing on the ground, smallest first; w is width as a fraction of height
+      var GROUND = [
+        { name: "a person", h: 1.7, w: 0.4, draw: person },
+        { name: "a house", h: 9, w: 1.1, draw: house },
+        { name: "Big Ben", h: 96, w: 0.16, draw: bigBen },
+        { name: "the Burj Khalifa", h: 828, w: 0.14, draw: burj },
+        { name: "Mount Everest", h: 8849, w: 1.9, draw: everest }
+      ];
+      var PASS = GROUND.concat([{ name: "the edge of space", h: KARMAN }, { name: "the Space Station", h: ISS }, { name: "the Moon", h: MOON_D }]);
+
+      function size() {
+        var k = window.devicePixelRatio || 1, r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
+        ctx.setTransform(k, 0, 0, k, 0, 0);
+        stars = [];
+        for (var i = 0; i < W * H / 2600; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, r: 0.35 + Math.random() * 0.7, a: 0.08 + Math.random() * 0.3, p: Math.random() * 6.283 });
+      }
+      function reset() { t0 = performance.now(); phase = "fold"; logView = Math.log(0.004); alpha = 1; lastFold = 0; pops = []; }
+      function fmt(m) {
+        if (m < 0.01) return (m * 1000).toFixed(m < 0.001 ? 2 : 1) + " mm";
+        if (m < 1) return (m * 100).toFixed(1) + " cm";
+        if (m < 1000) return (m < 10 ? m.toFixed(1) : Math.round(m)) + " m";
+        return Math.round(m / 1000).toLocaleString("en-GB") + " km";
+      }
+      function ink(a) { return "rgba(239,230,214," + a + ")"; }
+      function gold(a) { return "rgba(217,164,65," + a + ")"; }
+
+      // line drawings: (right edge x, ground y, height in px)
+      function person(xr, gy, h) {
+        var xc = xr - h * 0.2, hr = h * 0.09;
+        ctx.moveTo(xc + hr, gy - h + hr); ctx.arc(xc, gy - h + hr, hr, 0, 6.283);
+        ctx.moveTo(xc, gy - h + 2 * hr); ctx.lineTo(xc, gy - h * 0.45);
+        ctx.lineTo(xc - h * 0.13, gy); ctx.moveTo(xc, gy - h * 0.45); ctx.lineTo(xc + h * 0.13, gy);
+        ctx.moveTo(xc - h * 0.18, gy - h * 0.48); ctx.lineTo(xc, gy - h * 0.72); ctx.lineTo(xc + h * 0.18, gy - h * 0.48);
+      }
+      function house(xr, gy, h) {
+        var w = h * 1.1, xl = xr - w;
+        ctx.rect(xl, gy - h * 0.6, w, h * 0.6);
+        ctx.moveTo(xl - w * 0.06, gy - h * 0.6); ctx.lineTo(xl + w / 2, gy - h); ctx.lineTo(xr + w * 0.06, gy - h * 0.6);
+        ctx.rect(xl + w * 0.42, gy - h * 0.3, w * 0.16, h * 0.3);
+        ctx.rect(xl + w * 0.12, gy - h * 0.45, w * 0.16, h * 0.13); ctx.rect(xr - w * 0.28, gy - h * 0.45, w * 0.16, h * 0.13);
+      }
+      function bigBen(xr, gy, h) {
+        var w = h * 0.16, xl = xr - w, xc = xr - w / 2;
+        ctx.rect(xl, gy - h * 0.7, w, h * 0.7);
+        ctx.moveTo(xc + w * 0.32, gy - h * 0.6); ctx.arc(xc, gy - h * 0.6, w * 0.32, 0, 6.283);
+        ctx.moveTo(xl - w * 0.08, gy - h * 0.7); ctx.lineTo(xr + w * 0.08, gy - h * 0.7);
+        ctx.moveTo(xl + w * 0.1, gy - h * 0.7); ctx.lineTo(xl + w * 0.1, gy - h * 0.8); ctx.lineTo(xr - w * 0.1, gy - h * 0.8); ctx.lineTo(xr - w * 0.1, gy - h * 0.7);
+        ctx.moveTo(xl + w * 0.1, gy - h * 0.8); ctx.lineTo(xc, gy - h); ctx.lineTo(xr - w * 0.1, gy - h * 0.8);
+      }
+      function burj(xr, gy, h) {
+        var w = h * 0.14, xc = xr - w / 2, steps = [[0, 1], [0.28, 0.78], [0.5, 0.56], [0.68, 0.38], [0.82, 0.2], [0.9, 0.08], [1, 0]];
+        ctx.moveTo(xc - w / 2, gy);
+        steps.forEach(function (s) { ctx.lineTo(xc - s[1] * w / 2, gy - s[0] * h); });
+        steps.slice().reverse().forEach(function (s) { ctx.lineTo(xc + s[1] * w / 2, gy - s[0] * h); });
+        steps.slice(1, 5).forEach(function (s) { ctx.moveTo(xc - s[1] * w / 2, gy - s[0] * h); ctx.lineTo(xc + s[1] * w / 2, gy - s[0] * h); });
+      }
+      function everest(xr, gy, h) {
+        var w = h * 1.9, xl = xr - w, pts = [[0, 0], [0.16, 0.34], [0.24, 0.3], [0.38, 0.72], [0.46, 0.66], [0.55, 1], [0.62, 0.86], [0.7, 0.9], [0.84, 0.42], [0.9, 0.46], [1, 0]];
+        ctx.moveTo(xl, gy);
+        pts.forEach(function (p) { ctx.lineTo(xl + p[0] * w, gy - p[1] * h); });
+        ctx.moveTo(xl + 0.47 * w, gy - 0.78 * h); ctx.lineTo(xl + 0.52 * w, gy - 0.84 * h); ctx.lineTo(xl + 0.57 * w, gy - 0.8 * h); ctx.lineTo(xl + 0.64 * w, gy - 0.84 * h);
+      }
+
+      function render(now, folds) {
+        var thick = SHEET * Math.pow(2, folds);
+        var ground = H * 0.86, usable = ground - H * 0.07, cx = W * 0.8;
+        var s = usable / Math.exp(logView), Y = function (h) { return ground - h * s; };
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = 1; ctx.lineCap = "round"; ctx.lineJoin = "round";
+
+        // stars
+        var tw = now * 0.0009;
+        stars.forEach(function (st) { ctx.fillStyle = ink(st.a * (0.75 + 0.25 * Math.sin(tw + st.p))); ctx.fillRect(st.x, st.y, st.r * 2, st.r * 2); });
+
+        // the Earth: a straight horizon up close, then a curve, then a globe; with the edge of space and the Space Station's orbit
+        var R = EARTH * s, ey = ground + R, flat = R > 2e5;
+        function ring(h, dash, a) {
+          ctx.beginPath(); ctx.setLineDash(dash); ctx.strokeStyle = ink(a);
+          if (flat) { ctx.moveTo(0, Y(h)); ctx.lineTo(W, Y(h)); } else ctx.arc(cx, ey, R + h * s, 0, 6.283);
+          ctx.stroke(); ctx.setLineDash([]);
+        }
+        ctx.beginPath();
+        if (flat) ctx.rect(0, ground, W, H - ground); else ctx.arc(cx, ey, R, 0, 6.283);
+        ctx.fillStyle = "#121110"; ctx.fill(); ctx.fillStyle = ink(0.035); ctx.fill();
+        ring(0, [], 0.6);
+        var kpx = KARMAN * s;
+        if (kpx > 3 && Y(KARMAN) > -10) ring(KARMAN, [2, 5], Math.min(0.35, kpx / 40));
+        var ipx = ISS * s;
+        if (ipx > 3) ring(ISS, [1, 6], Math.min(0.3, ipx / 40));
+
+        // landmarks on the ground, side by side to the left of the stack
+        var xr = cx - 12;
+        GROUND.forEach(function (m) {
+          var h = m.h * s;
+          // fade out before reaching the title
+          var a = Math.min(1, (h - 3) / 10) * Math.max(0, Math.min(1, (H * 0.42 - h) / (H * 0.14)));
+          if (a <= 0) return;
+          ctx.beginPath(); m.draw(xr, ground, h);
+          ctx.strokeStyle = ink(0.75 * a); ctx.stroke();
+          if (h > 22) {
+            ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "center";
+            ctx.fillStyle = ink(0.55 * a); ctx.fillText(m.name, xr - m.w * h / 2, ground - h - 7);
+          }
+          xr -= m.w * h + 10;
+        });
+
+        // the Space Station, on its orbit
+        if (ipx > 3 && ipx < H * 1.4) {
+          var ang = -Math.PI / 2 - 0.35, ix = cx + (R + ipx) * Math.cos(ang), iy = ey + (R + ipx) * Math.sin(ang);
+          if (flat) { ix = cx - 60; iy = Y(ISS); }
+          var ia = Math.min(1, (ipx - 3) / 12);
+          ctx.beginPath(); ctx.strokeStyle = ink(0.8 * ia);
+          ctx.moveTo(ix - 6, iy); ctx.lineTo(ix + 6, iy); ctx.rect(ix - 6, iy - 4, 3, 8); ctx.rect(ix + 3, iy - 4, 3, 8); ctx.stroke();
+          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.fillStyle = ink(0.5 * ia); ctx.fillText("the Space Station", ix - 10, iy + 4);
+        }
+        if (kpx > 14 && Y(KARMAN) > 20) {
+          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.fillStyle = ink(Math.min(0.5, (kpx - 14) / 30)); ctx.fillText("the edge of space", cx - 12, (flat ? Y(KARMAN) : ey - R - kpx) - 6);
+        }
+
+        // the Moon, drawn larger than true scale once it would be smaller than a few pixels
+        var mr = Math.max(7, MOON_R * s), my = Y(MOON_D), mx = cx - mr - 10;
+        if (my + mr > 0 && my - mr < H) {
+          ctx.beginPath(); ctx.arc(mx, my, mr, 0, 6.283); ctx.fillStyle = "#121110"; ctx.fill();
+          ctx.strokeStyle = ink(0.85); ctx.stroke();
+          ctx.beginPath();
+          [[-0.35, -0.2, 0.2], [0.25, 0.25, 0.16], [0.1, -0.45, 0.1]].forEach(function (c) { ctx.moveTo(mx + c[0] * mr + c[2] * mr, my + c[1] * mr); ctx.arc(mx + c[0] * mr, my + c[1] * mr, c[2] * mr, 0, 6.283); });
+          ctx.strokeStyle = ink(0.35); ctx.stroke();
+          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.fillStyle = ink(0.6); ctx.fillText("the Moon", mx - mr - 8, my + 4);
+        }
+
+        // the stack of paper, in gold
+        var top = Math.max(-10, Y(thick));
+        ctx.save();
+        ctx.shadowColor = gold(0.8); ctx.shadowBlur = 10;
+        ctx.strokeStyle = gold(0.95); ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(cx, ground); ctx.lineTo(cx, top); ctx.stroke();
+        ctx.fillStyle = "rgba(255,240,210,1)"; ctx.beginPath(); ctx.arc(cx, top, 2.6, 0, 6.283); ctx.fill();
+        ctx.restore();
+
+        // ×2 at each fold, rising from the top of the stack
+        ctx.font = "500 14px 'Alegreya', Georgia, serif"; ctx.textAlign = "left";
+        pops = pops.filter(function (p) { return now - p < 1100; });
+        pops.forEach(function (p) { var u = (now - p) / 1100; ctx.fillStyle = gold(0.9 * (1 - u)); ctx.fillText("×2", cx + 9, top + 5 - u * 18); });
+
+        // the count, and the last landmark passed
+        var n = Math.floor(folds), passed = null;
+        PASS.forEach(function (m) { if (SHEET * Math.pow(2, n) >= m.h) passed = m; });
+        var fs = Math.max(13, Math.min(17, W / 26)), x0 = parseFloat(getComputedStyle(canvas.parentElement).paddingLeft) || 32;
+        ctx.textAlign = "left";
+        ctx.fillStyle = gold(0.9); ctx.font = "500 " + fs + "px 'Alegreya', Georgia, serif";
+        ctx.fillText((n === 1 ? "1 fold" : n + " folds") + " · " + fmt(SHEET * Math.pow(2, n)), x0, H - 28);
+        if (passed) {
+          ctx.fillStyle = ink(0.55); ctx.font = "italic 400 " + (fs - 1) + "px 'Alegreya', Georgia, serif";
+          ctx.fillText(passed.name === "the Moon" ? "past the Moon" : "taller than " + passed.name, x0, H - 28 - fs * 1.45);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function frame(now) {
+        var t = now - t0, folds;
+        if (phase === "fold") {
+          var n = Math.floor(t / STEP), e = Math.min(1, (t - n * STEP) / (STEP * 0.45));
+          folds = Math.min(FOLDS, n + (1 - Math.pow(1 - e, 3)));
+          if (n > lastFold && n <= FOLDS) { pops.push(now); lastFold = n; }
+          if (n >= FOLDS) { phase = "hold"; t0 = now; folds = FOLDS; }
+        } else {
+          folds = FOLDS;
+          if (phase === "hold" && t > HOLD) { phase = "fade"; t0 = now; }
+          if (phase === "fade") { alpha = Math.max(0, 1 - t / FADE); if (t > FADE) reset(); }
+        }
+        var target = Math.log(Math.max(0.004, SHEET * Math.pow(2, folds) * 1.4));
+        logView += (target - logView) * 0.05;
+        render(now, folds);
+        if (alive) requestAnimationFrame(frame);
+      }
+
+      size(); reset();
+      onResize = function () { if (alive) { size(); if (still) render(0, FOLDS); } };
+      window.addEventListener("resize", onResize);
+      if (still) { logView = Math.log(SHEET * Math.pow(2, FOLDS) * 1.4); render(0, FOLDS); return stop; }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (alive) requestAnimationFrame(frame); });
+      else requestAnimationFrame(frame);
+      return stop;
+    };
+
+    // Population growth in the black panel: one rabbit becomes 2, 4, 8, … up to 2^9 = 512, each
+    // (adapted from the cell-division version, kept as exponentials-cells.html)
+    // generation pushing apart into a growing cluster that fills the panel. Each generation stays a
+    // little longer than the last. Cells never overlap: each is drawn no wider than the space to its
+    // nearest neighbour allows. After the last generation they hold, fade, and one cell begins again.
+    // A still cluster for anyone who prefers reduced motion.
+    ANIMS.rabbits = function () {
+      var alive = true, onResize = null;
+      var stop = function () { alive = false; if (onResize) window.removeEventListener("resize", onResize); };
+      var canvas = document.querySelector(".cells");
+      if (!canvas || !canvas.getContext) return stop;
+      var ctx = canvas.getContext("2d");
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var LAST = 9, HOLD = 7000, FADE = 2500;
+      var split = function (g) { return 1800 + g * 550; };
       var W, H, D, R, CX, CY, SX, SY, ax, ay, cells, gen, t0, phase, alpha;
 
       function size() {
-        var k = window.devicePixelRatio || 1;
-        W = window.innerWidth; H = window.innerHeight;
+        var k = window.devicePixelRatio || 1, r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
         canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
         ctx.setTransform(k, 0, 0, k, 0, 0);
-        // spacing chosen so that 2,048 closely packed cells cover about the area of the screen
-        D = Math.max(14, Math.min(34, Math.sqrt(W * H * 1.15 / (Math.pow(2, LAST) * 0.866))));
-        R = D * 0.32;
-        CX = W * (W < 600 ? 0.55 : 0.6); CY = H * 0.55;
-        // the first cell appears near the top right corner; the cluster drifts towards CX, CY as it grows
-        SX = W - Math.min(110, W * 0.12); SY = Math.min(110, H * 0.14);
+        // spacing chosen so that 2,048 closely packed cells cover about the area of the panel
+        D = Math.max(12, Math.min(44, Math.sqrt(W * H * 1.15 / (Math.pow(2, LAST) * 0.866))));
+        R = D * 0.4;
+        CX = W * 0.5; CY = H * 0.5;
+        SX = W - Math.min(70, W * 0.18); SY = Math.min(90, H * 0.12);
       }
-      function cell(x, y) { return { x: x, y: y, nd: 0, p: Math.random() * 6.283, q: Math.random() * 6.283 }; }
+      function cell(x, y) { return { x: x, y: y, nd: 0, p: Math.random() * 6.283, q: Math.random() * 6.283, f: Math.random() < 0.5 ? -1 : 1 }; }
+      // a rabbit in profile, cream with a pink nose, drawn in its own units (about 610 wide, centred on 760, 560):
+      // ears and tail behind, then the body, then the eye and nose
+      var BACK = new Path2D("M790 470 C730 410 688 340 688 260 C688 215 725 205 752 228 C795 265 822 340 842 450 Z M880 445 C900 340 912 255 870 205 C845 180 805 185 798 240 C795 300 815 350 830 448 Z M545 655 A45 45 0 1 0 455 655 A45 45 0 1 0 545 655 Z");
+      var BODY = new Path2D("M535 628 C570 560 660 520 778 545 C800 470 860 432 905 440 C975 448 1020 490 1035 530 C1045 560 1035 595 1010 615 C985 635 955 645 922 648 C915 690 900 715 885 735 C915 742 945 755 948 775 C950 795 920 800 880 800 C760 802 620 812 560 785 C525 768 515 730 520 690 C515 670 520 645 535 628 Z");
+      var EYE = new Path2D("M956 530 A16 16 0 1 0 924 530 A16 16 0 1 0 956 530 Z");
+      var NOSE = new Path2D("M1064 548 A24 24 0 1 0 1016 548 A24 24 0 1 0 1064 548 Z");
       function reset() { cells = [cell(0, 0)]; cells[0].nd = D; gen = 0; t0 = performance.now(); phase = "grow"; alpha = 0; ax = SX; ay = SY; }
       function divide() {
         var next = [];
         cells.forEach(function (c) {
           var a = Math.random() * 6.283, dx = Math.cos(a) * D * 0.08, dy = Math.sin(a) * D * 0.08;
-          next.push(cell(c.x + dx, c.y + dy), cell(c.x - dx, c.y - dy));
+          var k1 = cell(c.x + dx, c.y + dy); k1.f = c.f; next.push(k1, cell(c.x - dx, c.y - dy));
         });
         cells = next; gen++;
       }
-      // cells push apart until they sit a spacing D from their neighbours; a grid keeps this quick.
-      // Each pass also records every cell's distance to its nearest neighbour.
       function relax(iters) {
         for (var it = 0; it < iters; it++) {
           var grid = {}, i, c;
@@ -223,7 +545,7 @@
           }
           for (i = 0; i < cells.length; i++) {
             var a = cells[i], gx = Math.floor(a.x / D), gy = Math.floor(a.y / D);
-            if (cells.length < 64) { a.x *= 0.997; a.y *= 0.997; }   // a small cluster draws together
+            if (cells.length < 64) { a.x *= 0.997; a.y *= 0.997; }
             for (var ox = -1; ox <= 1; ox++) for (var oy = -1; oy <= 1; oy++) {
               var list = grid[(gx + ox) + "," + (gy + oy)]; if (!list) continue;
               for (var n = 0; n < list.length; n++) {
@@ -239,30 +561,35 @@
       function draw(now) {
         ctx.clearRect(0, 0, W, H);
         ctx.globalAlpha = alpha;
-        var fade = Math.max(0.4, 1 - gen * 0.05);
-        ctx.fillStyle = "rgba(203, 163, 255, " + (0.3 * fade) + ")";
-        ctx.strokeStyle = "rgba(203, 163, 255, " + (0.48 * fade) + ")"; ctx.lineWidth = 1;
+        var fade = Math.max(0.6, 1 - gen * 0.04);
         var t = now * 0.00045, wob = D * 0.06;
-        ctx.beginPath();
+        var back = new Path2D(), body = new Path2D(), eyes = new Path2D(), noses = new Path2D();
         for (var i = 0; i < cells.length; i++) {
           var c = cells[i];
-          // never wider than half the gap to the nearest neighbour, less a hair for the drift and outline
-          var r = Math.min(R, c.nd / 2 - wob - 1.2); if (r < 0.8) continue;
-          var x = ax + c.x + Math.sin(t + c.p) * wob, y = ay + c.y + Math.cos(t * 0.9 + c.q) * wob;
-          if (x < -R || y < -R || x > W + R || y > H + R) continue;
-          ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.283);
+          // never wider than the gap to the nearest neighbour allows, so a new rabbit starts small and grows
+          var r = Math.min(R, c.nd / 2 - wob - 1.2); if (r < 1.2) continue;
+          var hop = Math.pow(Math.max(0, Math.sin(now * 0.004 + c.p * 3)), 6) * r * 0.5;
+          var x = ax + c.x + Math.sin(t + c.p) * wob, y = ay + c.y + Math.cos(t * 0.9 + c.q) * wob - hop;
+          if (x < -2 * R || y < -2 * R || x > W + 2 * R || y > H + 2 * R) continue;
+          var k = r / 300, mx = new DOMMatrix([k * c.f, 0, 0, k, x - k * c.f * 760, y - k * 560]);
+          back.addPath(BACK, mx); body.addPath(BODY, mx); eyes.addPath(EYE, mx); noses.addPath(NOSE, mx);
         }
-        ctx.fill(); ctx.stroke();
-        // the count, as a power of 2, in the lower right corner
-        var fs = Math.max(13, Math.min(18, W / 70)), count = Math.pow(2, gen).toLocaleString("en-GB");
+        ctx.globalAlpha = alpha * (0.55 + 0.4 * fade);
+        ctx.lineWidth = 1; ctx.strokeStyle = "#121110"; ctx.fillStyle = "#f3ecdf";
+        ctx.fill(back); ctx.stroke(back); ctx.fill(body); ctx.stroke(body);
+        ctx.fillStyle = "#1d1a16"; ctx.fill(eyes);
+        ctx.fillStyle = "#ef8d82"; ctx.fill(noses);
+        // the count, as a power of 2, in the lower left corner, in gold
+        var fs = Math.max(13, Math.min(17, W / 26)), count = Math.pow(2, gen).toLocaleString("en-GB");
+        var big = "500 " + fs + "px 'Alegreya', Georgia, serif", small = "500 " + fs * 0.65 + "px 'Alegreya', Georgia, serif";
         ctx.globalAlpha = Math.min(1, alpha * 1.2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)"; ctx.textAlign = "left";
-        ctx.font = "400 " + fs + "px Jost, sans-serif"; var wb = ctx.measureText("2").width, wr = ctx.measureText(" = " + count).width;
-        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; var we = ctx.measureText(String(gen)).width;
-        var x0 = W - 28 - (wb + we + wr), y0 = H - 24;
-        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText("2", x0, y0);
-        ctx.font = "400 " + fs * 0.65 + "px Jost, sans-serif"; ctx.fillText(String(gen), x0 + wb + 1, y0 - fs * 0.42);
-        ctx.font = "400 " + fs + "px Jost, sans-serif"; ctx.fillText(" = " + count, x0 + wb + we + 2, y0);
+        ctx.fillStyle = "rgba(217, 164, 65, 0.8)"; ctx.textAlign = "left";
+        ctx.font = big; var wb = ctx.measureText("2").width;
+        ctx.font = small; var we = ctx.measureText(String(gen)).width;
+        var x0 = parseFloat(getComputedStyle(canvas.parentElement).paddingLeft) || 32, y0 = H - 28;
+        ctx.font = big; ctx.fillText("2", x0, y0);
+        ctx.font = small; ctx.fillText(String(gen), x0 + wb + 1, y0 - fs * 0.42);
+        ctx.font = big; ctx.fillText(" = " + count + (gen ? " rabbits" : " rabbit"), x0 + wb + we + 2, y0);
         ctx.globalAlpha = 1;
       }
       function frame(now) {
@@ -278,22 +605,161 @@
           alpha = Math.max(0, 1 - t / FADE);
           if (t > FADE) reset();
         }
-        // ease the cluster's centre from the corner towards the middle over the generations
         var k = Math.pow(gen / LAST, 1.6), tx = SX + (CX - SX) * k, ty = SY + (CY - SY) * k;
         ax += (tx - ax) * 0.004; ay += (ty - ay) * 0.004;
         relax(cells.length > 1000 ? 2 : 3); draw(now);
-        requestAnimationFrame(frame);
+        if (alive) requestAnimationFrame(frame);
       }
 
       size();
-      window.addEventListener("resize", function () { size(); if (still) { ax = CX; ay = CY; draw(0); } });
+      onResize = function () { if (alive) { size(); if (still) { ax = CX; ay = CY; draw(0); } } };
+      window.addEventListener("resize", onResize);
       if (still) {
         reset(); for (var g = 0; g < 7; g++) { divide(); relax(80); } ax = CX; ay = CY;
-        alpha = 1; draw(0); return;
+        alpha = 1; draw(0); return stop;
       }
       reset();
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(frame); });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (alive) requestAnimationFrame(frame); });
       else requestAnimationFrame(frame);
+      return stop;
+    };
+
+    // Cell division in the black panel: one cell divides into 2, 4, 8, … up to 2^11 = 2,048, each
+    // generation pushing apart into a growing cluster that fills the panel. Each generation stays a
+    // little longer than the last. Cells never overlap: each is drawn no wider than the space to its
+    // nearest neighbour allows. After the last generation they hold, fade, and one cell begins again.
+    // A still cluster for anyone who prefers reduced motion.
+    ANIMS.cells = function () {
+      var alive = true, onResize = null;
+      var stop = function () { alive = false; if (onResize) window.removeEventListener("resize", onResize); };
+      var canvas = document.querySelector(".cells");
+      if (!canvas || !canvas.getContext) return stop;
+      var ctx = canvas.getContext("2d");
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var LAST = 11, HOLD = 7000, FADE = 2500;
+      var split = function (g) { return 1800 + g * 550; };
+      var W, H, D, R, CX, CY, SX, SY, ax, ay, cells, gen, t0, phase, alpha;
+
+      function size() {
+        var k = window.devicePixelRatio || 1, r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        canvas.width = Math.round(W * k); canvas.height = Math.round(H * k);
+        ctx.setTransform(k, 0, 0, k, 0, 0);
+        // spacing chosen so that 2,048 closely packed cells cover about the area of the panel
+        D = Math.max(9, Math.min(30, Math.sqrt(W * H * 1.15 / (Math.pow(2, LAST) * 0.866))));
+        R = D * 0.32;
+        CX = W * 0.5; CY = H * 0.5;
+        SX = W - Math.min(70, W * 0.18); SY = Math.min(90, H * 0.12);
+      }
+      function cell(x, y) { return { x: x, y: y, nd: 0, p: Math.random() * 6.283, q: Math.random() * 6.283 }; }
+      function reset() { cells = [cell(0, 0)]; cells[0].nd = D; gen = 0; t0 = performance.now(); phase = "grow"; alpha = 0; ax = SX; ay = SY; }
+      function divide() {
+        var next = [];
+        cells.forEach(function (c) {
+          var a = Math.random() * 6.283, dx = Math.cos(a) * D * 0.08, dy = Math.sin(a) * D * 0.08;
+          next.push(cell(c.x + dx, c.y + dy), cell(c.x - dx, c.y - dy));
+        });
+        cells = next; gen++;
+      }
+      function relax(iters) {
+        for (var it = 0; it < iters; it++) {
+          var grid = {}, i, c;
+          for (i = 0; i < cells.length; i++) {
+            c = cells[i]; c.nd = D * 2;
+            var key = Math.floor(c.x / D) + "," + Math.floor(c.y / D);
+            (grid[key] || (grid[key] = [])).push(i);
+          }
+          for (i = 0; i < cells.length; i++) {
+            var a = cells[i], gx = Math.floor(a.x / D), gy = Math.floor(a.y / D);
+            if (cells.length < 64) { a.x *= 0.997; a.y *= 0.997; }
+            for (var ox = -1; ox <= 1; ox++) for (var oy = -1; oy <= 1; oy++) {
+              var list = grid[(gx + ox) + "," + (gy + oy)]; if (!list) continue;
+              for (var n = 0; n < list.length; n++) {
+                var j = list[n]; if (j <= i) continue;
+                var b = cells[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 0.01;
+                if (d < a.nd) a.nd = d; if (d < b.nd) b.nd = d;
+                if (d < D) { var m = (D - d) / d * 0.22; a.x -= dx * m; a.y -= dy * m; b.x += dx * m; b.y += dy * m; }
+              }
+            }
+          }
+        }
+      }
+      function draw(now) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalAlpha = alpha;
+        var fade = Math.max(0.6, 1 - gen * 0.04);
+        ctx.fillStyle = "rgba(217, 164, 65, " + (0.16 * fade) + ")";
+        ctx.strokeStyle = "rgba(217, 164, 65, " + (0.7 * fade) + ")"; ctx.lineWidth = 1;
+        var t = now * 0.00045, wob = D * 0.06;
+        ctx.beginPath();
+        for (var i = 0; i < cells.length; i++) {
+          var c = cells[i];
+          var r = Math.min(R, c.nd / 2 - wob - 1.2); if (r < 0.8) continue;
+          var x = ax + c.x + Math.sin(t + c.p) * wob, y = ay + c.y + Math.cos(t * 0.9 + c.q) * wob;
+          if (x < -R || y < -R || x > W + R || y > H + R) continue;
+          ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.283);
+        }
+        ctx.fill(); ctx.stroke();
+        // the count, as a power of 2, in the lower left corner, in gold
+        var fs = Math.max(13, Math.min(17, W / 26)), count = Math.pow(2, gen).toLocaleString("en-GB");
+        var big = "500 " + fs + "px 'Alegreya', Georgia, serif", small = "500 " + fs * 0.65 + "px 'Alegreya', Georgia, serif";
+        ctx.globalAlpha = Math.min(1, alpha * 1.2);
+        ctx.fillStyle = "rgba(217, 164, 65, 0.8)"; ctx.textAlign = "left";
+        ctx.font = big; var wb = ctx.measureText("2").width;
+        ctx.font = small; var we = ctx.measureText(String(gen)).width;
+        var x0 = parseFloat(getComputedStyle(canvas.parentElement).paddingLeft) || 32, y0 = H - 28;
+        ctx.font = big; ctx.fillText("2", x0, y0);
+        ctx.font = small; ctx.fillText(String(gen), x0 + wb + 1, y0 - fs * 0.42);
+        ctx.font = big; ctx.fillText(" = " + count, x0 + wb + we + 2, y0);
+        ctx.globalAlpha = 1;
+      }
+      function frame(now) {
+        var t = now - t0;
+        if (phase === "grow") {
+          alpha = Math.min(1, alpha + 0.02);
+          if (t > split(gen)) {
+            if (gen < LAST) { divide(); t0 = now; } else { phase = "hold"; t0 = now; }
+          }
+        } else if (phase === "hold") {
+          if (t > HOLD) { phase = "fade"; t0 = now; }
+        } else if (phase === "fade") {
+          alpha = Math.max(0, 1 - t / FADE);
+          if (t > FADE) reset();
+        }
+        var k = Math.pow(gen / LAST, 1.6), tx = SX + (CX - SX) * k, ty = SY + (CY - SY) * k;
+        ax += (tx - ax) * 0.004; ay += (ty - ay) * 0.004;
+        relax(cells.length > 1000 ? 2 : 3); draw(now);
+        if (alive) requestAnimationFrame(frame);
+      }
+
+      size();
+      onResize = function () { if (alive) { size(); if (still) { ax = CX; ay = CY; draw(0); } } };
+      window.addEventListener("resize", onResize);
+      if (still) {
+        reset(); for (var g = 0; g < 7; g++) { divide(); relax(80); } ax = CX; ay = CY;
+        alpha = 1; draw(0); return stop;
+      }
+      reset();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (alive) requestAnimationFrame(frame); });
+      else requestAnimationFrame(frame);
+      return stop;
+    };
+
+    // the switch in the bottom right corner: one animation runs at a time
+    (function () {
+      var buttons = [].slice.call(document.querySelectorAll(".anim-switch button")), stopCurrent = null;
+      var about = document.querySelector(".about"), canvas = document.querySelector(".cells");
+      function play(name) {
+        if (name !== "overview" && !ANIMS[name]) name = "overview";
+        if (stopCurrent) { stopCurrent(); stopCurrent = null; }
+        if (name === "overview") {
+          var c = canvas.getContext("2d"); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, canvas.width, canvas.height);
+        } else stopCurrent = ANIMS[name]();
+        about.classList.toggle("playing", name !== "overview");
+        buttons.forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.anim === name ? "true" : "false"); });
+      }
+      buttons.forEach(function (b) { b.addEventListener("click", function () { play(b.dataset.anim); }); });
+      play("overview");
     })();
   </script>
 </body>
