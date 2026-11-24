@@ -22,7 +22,7 @@
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const slider = document.getElementById("n");
-  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a";
+  const INK = "#f4f6ff", BASE = "#f5d547", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a";
   // ?start=, ?target= and ?max= set the journey and the most steps; by default 1 to 256 in up to 64
   const QS = new URLSearchParams(location.search);
   const START = +QS.get("start") || 1, TARGET = +QS.get("target") || 256;
@@ -65,6 +65,8 @@
     a.style.fill = VAL; a.style.fontFamily = "Spectral, Georgia, serif";
     const z = el("text", { x: px(TARGET) + 10, y: AX + 6, "text-anchor": "start", "font-size": 18 }, String(TARGET));
     z.style.fill = RED; z.style.fontFamily = "Spectral, Georgia, serif";
+    el("circle", { cx: px(START), cy: AX, r: 4, fill: VAL });
+    el("circle", { cx: px(TARGET), cy: AX, r: 4, fill: RED });
 
     // the two readings, side by side
     [[W * 0.3, "Step ratio: ", fmtRatio(r), BASE], [W * 0.7, "Number of steps: ", String(n), EXP]].forEach(([x, lab, val, col]) => {

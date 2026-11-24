@@ -3,44 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#121110" />
   <title>The Hindu-Arabic Number System | Numbers | Sam Kirwan</title>
   <meta name="description" content="How counting became writing, how grouping became place value, and why ten digits and a zero turn arithmetic into a procedure." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,200;0,300;0,400;0,500;1,400&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,200;0,300;0,400;0,500;1,400&family=Geist+Mono:wght@400&family=Alegreya:ital,wght@0,400;0,500;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="numbers.css" />
+  <!-- An experiment in the homepage's black and beige. The page opens on a full-width black band with the
+       numeral and the introduction; beneath it the page splits, the essay on beige to the left and black to
+       the right, and the divide drifts as you read. Earlier versions: numbers-hindu-arabic-number-system-
+       original.html, -sweep.html, -split.html, -slide.html. -->
+  <style>
+    :root {
+      --black: #121110; --beige: #e8dcc6; --beige-deep: #ddcfb5; --cream: #efe6d6; --gold: #d9a441;
+      --ink: #1d1a16; --body: rgba(29, 26, 22, 0.84); --dim: rgba(29, 26, 22, 0.52);
+      --faint: rgba(29, 26, 22, 0.18); --hair: rgba(29, 26, 22, 0.1); --hi: #a8741a;
+      --bw: 46vw;                        /* the width of the black panel, from the right; drifts as you scroll */
+      --col: min(38rem, 100vw - 2.4rem);
+    }
+    /* black beyond the page's edges, so pulling past the top shows the opening's black, not beige */
+    html { background: #121110; }
+    body { background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige), var(--beige-deep)) fixed; }
+    body { font-family: "Alegreya", Georgia, serif; color: var(--body); }
+    h1, h2 { font-family: "Alegreya", Georgia, serif; letter-spacing: 0; font-weight: 500; }
+    p, li { font-size: clamp(1.1rem, 2.4vw, 1.22rem); }
+    body::after {
+      content: ""; position: fixed; inset: 0; z-index: 3; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* the black panel, anchored on the right; it names the section you are in once the essay begins */
+    .panel {
+      position: fixed; top: 0; bottom: 0; right: 0; width: var(--bw); z-index: 0;
+      background: var(--black); box-shadow: inset 18px 0 40px -28px rgba(0, 0, 0, 0.9);
+      display: flex; align-items: center; padding: 0 clamp(1.6rem, 4vw, 4rem); overflow: hidden;
+    }
+    .panel .art {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      height: min(78vh, 640px); width: auto; max-width: 80%; overflow: visible;
+      opacity: 0; transition: opacity 600ms ease;
+    }
+    .panel .art path { fill: none; stroke: var(--cream); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .panel .art.on { opacity: 1; }
+    .panel.art-on .now { opacity: 0; }
+    .panel .art circle.dot { fill: var(--gold); stroke: none; }
+    /* the invented system gets a stretch of the page to itself before the history begins */
+    main > section[data-art="symbols"] { padding-bottom: clamp(8rem, 30vh, 16rem); }
+    .panel .now {
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.06em;
+      color: var(--gold); white-space: nowrap; transition: opacity 400ms ease;
+    }
+
+    /* the opening, on black: centred in the black panel, so it travels with it as it slides */
+    .opening {
+      position: relative; z-index: 1; background: var(--black);
+      padding: clamp(3rem, 12vh, 7rem) max(1.2rem, (100vw - var(--col)) / 2) clamp(4rem, 14vh, 8rem); min-height: 100vh;
+      --ink: var(--cream); --body: rgba(239, 230, 214, 0.84); --dim: rgba(239, 230, 214, 0.5);
+      --faint: rgba(239, 230, 214, 0.16); --hair: rgba(239, 230, 214, 0.08);
+      color: var(--body);
+    }
+    .opening header h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .opening .hero { margin-top: 0; }
+    .opening .hero .d::before, .opening .hero .d::after { display: none; }
+    .opening p:not(.hero) { font-size: clamp(1.45rem, 2.5vw, 1.85rem); line-height: 1.45; }
+    .opening p:not(.hero) + p { margin-top: 1.1rem; }
+    @media (max-width: 760px) { .opening p:not(.hero) { font-size: 1.3rem; } }
+
+    /* the essay, centred in the beige on the left */
+    .sheet { position: relative; z-index: 1; width: var(--col); margin-left: max(1.2rem, (100vw - var(--bw) - var(--col)) / 2); }
+    .sheet main > section:first-child { margin-top: clamp(3rem, 10vh, 6rem); }
+
+    /* the widgets are drawn for a dark ground, so each sits on a small black card */
+    iframe.num-widget { box-sizing: content-box; background: var(--black); border-radius: 6px; padding: 1rem 1.2rem; width: calc(100% - 2.4rem); }
+
+    @media (max-width: 760px) {
+      .panel { display: none; }
+      .opening { padding: 3rem 1.2rem 3rem; min-height: 0; }
+      .sheet { margin: 0 auto; }
+      .sheet main > section:first-child { margin-top: 2.4rem; }
+    }
+  </style>
 </head>
 <body>
-  <div class="sheet">
+  <aside class="panel" aria-hidden="true">
+    <div class="now"></div>
+    <!-- counting without numbers: a notched bone, a knotted cord, a bag of pebbles -->
+    <svg class="art" data-art="counting" viewBox="0 0 300 640"></svg>
+    <!-- an invented number system: a symbol for each quantity from one to ten -->
+    <svg class="art" data-art="symbols" viewBox="0 0 300 640"></svg>
+  </aside>
+  <div class="opening">
     <header>
       <h1>The Hindu-Arabic Number System</h1>
       <p class="hero" aria-label="36,952"><span class="d">3</span><span class="d">6</span><span class="sep" aria-hidden="true">,</span><span class="d">9</span><span class="d">5</span><span class="d">2</span></p>
     </header>
-
-    <main>
-      <section aria-label="Introduction">
+    <section aria-label="Introduction">
         <p>Thirty-six thousand, nine hundred and fifty-two.</p>
-
-        <p>This is a single quantity.</p>
-
-        <p>It is represented here by five digits, in a particular order.</p>
-
+        <p>This quantity is represented here by five digits and the order they are positioned in.</p>
         <p>This representation is a numeral of the <strong>Hindu-Arabic number system</strong>.</p>
-
-        <ul>
-          <li><strong>Digits</strong> are the elementary symbols.</li>
-          <li><strong>Numerals</strong> are written representations of numbers.</li>
-          <li><strong>Numbers</strong> are the concept of the quantity itself.</li>
-        </ul>
-
-        <p>
-          Our familiarity with this system hides how impressive a technology it is.
-          To understand how clever it is, let's consider how numbers came to be.
-        </p>
+        <p>We are so familiar with this number system that we can easily miss how impressive a technology it is.</p>
+    </section>
+  </div>
+  <div class="sheet">
+    <main>
+      <section aria-label="Inventing a number system" data-art="symbols">
+        <p>Imagine early humans trying to come up with a way of recording quantities.</p>
+        <p>One natural first idea is to give every quantity a symbol of its own.</p>
+        <p>Memorising thirty or so symbols is not unreasonable. The trouble is that the list never ends: every new number needs a new symbol, which someone has to invent and everyone else has to learn.</p>
+        <p>For a small community this might be enough. Few people need to tell 53 of something from 57. But as societies grew, traded and kept records, larger numbers became harder to avoid.</p>
+        <p>Arithmetic is the other problem. If every number has its own symbol, nothing in the symbols tells you how they combine. That one symbol and another make a third is a fact to be memorised, and there is a separate fact for every pair of numbers.</p>
+        <p>A better idea is to <strong>group</strong>. Suppose we keep separate symbols for one to nineteen, and add one more for twenty. Twenty-three is then a twenty and a three; forty is two twenties.</p>
+        <p>This works for a while, but large numbers still pile up: a thousand would take fifty twenties.</p>
+        <p>So we can group the groups. With a symbol for a hundred, a thousand becomes ten hundreds; with a symbol for a thousand, it becomes a single mark. Each symbol for a larger group keeps the number of marks small.</p>
       </section>
 
-      <section aria-labelledby="one-to-one">
-        <h2 id="one-to-one">Counting by One-to-One Correspondence</h2>
+      <section aria-label="Counting by one-to-one correspondence" data-art="counting">
 
         <p>
           While we lack a detailed account of how the ability to count developed,
@@ -394,6 +472,102 @@
   </div>
 
   <script>
+    // The divide. The opening is a full-width black band; beneath it the page splits, beige on the left for
+    // the essay and black on the right, the black continuing straight down from the band above. Through the
+    // rest of the page the beige widens for a while, then the black, and the two settle back.
+    (function () {
+      var root = document.documentElement, now = document.querySelector(".panel .now"), panel = document.querySelector(".panel");
+      var opening = document.querySelector(".opening"), heads = [].slice.call(document.querySelectorAll("main h2"));
+      // the black panel's share of the width, through the essay (0 = just opened, 1 = the end)
+      var KEYS = [[0, 0.46], [0.12, 0.46], [0.36, 0.3], [0.5, 0.34], [0.72, 0.62], [0.9, 0.46], [1, 0.46]];
+      function smooth(u) { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); }
+      function frac(p) {
+        for (var i = 0; i < KEYS.length - 1; i++) { var a = KEYS[i], b = KEYS[i + 1]; if (p <= b[0]) return a[1] + (b[1] - a[1]) * smooth((p - a[0]) / (b[0] - a[0])); }
+        return KEYS[KEYS.length - 1][1];
+      }
+      var shown = null;
+      function update() {
+        if (window.innerWidth <= 760) return;
+        var W = window.innerWidth, vh = window.innerHeight, y = window.scrollY;
+        var max = Math.max(1, root.scrollHeight - vh), start = opening.offsetTop + opening.offsetHeight - vh;
+        var col = Math.min(608, W - 38);
+        var bw = frac(Math.min(1, Math.max(0, (y - start) / Math.max(1, max - start)))) * W;
+        bw = Math.min(bw, W - (col + 64));                                      // the essay always has room in the beige
+        root.style.setProperty("--bw", bw.toFixed(1) + "px");
+        var cur = null;
+        heads.forEach(function (h) { if (h.getBoundingClientRect().top < vh * 0.4) cur = h; });
+        var name = cur ? cur.textContent : "";
+        // the drawings that go with the section on screen
+        var want = null;
+        document.querySelectorAll("main section[data-art]").forEach(function (sec) { var q = sec.getBoundingClientRect(); if (q.top < vh * 0.5 && q.bottom > vh * 0.5) want = sec.dataset.art; });
+        document.querySelectorAll(".panel .art").forEach(function (a) { a.classList.toggle("on", a.dataset.art === want); });
+        panel.classList.toggle("art-on", !!want);
+        if (name !== shown) { shown = name; now.textContent = name; }
+      }
+      var q = false;
+      function later() { if (!q) { q = true; requestAnimationFrame(function () { q = false; update(); }); } }
+      window.addEventListener("scroll", later, { passive: true });
+      window.addEventListener("resize", later);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
+      update();
+    })();
+
+    // The drawings in the black panel beside the first section: a notched bone, a knotted cord, a bag of pebbles.
+    (function () {
+      var svg = document.querySelector('.panel .art[data-art="counting"]'), NS = "http://www.w3.org/2000/svg";
+      function P(d, o) { var p = document.createElementNS(NS, "path"); p.setAttribute("d", d); if (o) p.setAttribute("stroke-opacity", o); else p.setAttribute("stroke-opacity", 0.85); svg.appendChild(p); }
+      function e(cx, cy, rx, ry, rot) {
+        var a = (rot || 0) * Math.PI / 180, pts = [];
+        for (var i = 0; i <= 40; i++) { var t = i / 40 * 2 * Math.PI, x = rx * Math.cos(t), y = ry * Math.sin(t); pts.push((cx + x * Math.cos(a) - y * Math.sin(a)).toFixed(1) + " " + (cy + x * Math.sin(a) + y * Math.cos(a)).toFixed(1)); }
+        return "M" + pts.join(" L");
+      }
+      // a notched bone: two groups of five and three more
+      P("M30 92 C28 76 46 70 58 77 C100 71 200 73 242 79 C254 70 274 77 271 93 C273 109 255 115 242 107 C200 113 100 115 58 108 C46 115 28 108 30 92 Z");
+      var x = 78;
+      [5, 5, 3].forEach(function (n) { for (var i = 0; i < n; i++) { P("M" + x + " 80 L" + (x + 1.5) + " 104"); x += 9; } x += 14; });
+      // a knotted cord: strings hanging from a top cord, with knots tied along them
+      P("M40 232 C100 226 200 226 260 232");
+      [[70, [262, 300]], [110, [258, 276, 330]], [150, [290]], [190, [256, 272, 288, 318]], [230, [300, 322]]].forEach(function (c) {
+        var cx = c[0];
+        P("M" + cx + " 229 C" + (cx - 3) + " 280 " + (cx + 3) + " 320 " + cx + " 352", 0.75);
+        c[1].forEach(function (k) { P(e(cx, k, 4.2, 3.4)); P("M" + (cx - 4) + " " + (k + 1) + " L" + (cx + 4) + " " + (k - 1), 0.6); });
+      });
+      // a bag of pebbles, tied at the neck, with a few pebbles beside it
+      P("M122 452 C98 472 84 522 96 562 C108 596 192 596 204 562 C216 522 202 472 178 452");
+      P("M122 452 C132 446 168 446 178 452");
+      P("M122 452 C114 434 128 424 138 434 C142 420 158 420 162 434 C172 424 186 434 178 452", 0.75);
+      P("M140 448 C130 460 128 472 136 482 M160 448 C170 462 172 472 164 484", 0.75);
+      [[236, 574, 9, 6, 10], [256, 580, 7, 5, -20], [248, 563, 6, 4.5, 30], [66, 578, 8, 5.5, -5], [84, 584, 6, 4.5, 20]].forEach(function (a) { P(e.apply(null, a)); });
+    })();
+
+    // An invented number system for the panel: ten made-up symbols, each with its quantity in gold dots beneath.
+    (function () {
+      var svg = document.querySelector('.panel .art[data-art="symbols"]'), NS = "http://www.w3.org/2000/svg";
+      var GLYPHS = [
+        "M20 4 L20 36 L26 30",
+        "M8 20 A12 12 0 1 0 32 20 A12 12 0 1 0 8 20 M20 20 L20 20.5",
+        "M6 34 L20 6 L34 34 M14 26 L26 26",
+        "M6 8 L34 32 M34 8 L6 32 M20 4 L20 10",
+        "M4 22 Q12 6 20 22 T36 22 M20 30 L20 36",
+        "M8 6 L8 34 L32 34 L32 22",
+        "M20 4 L20 36 M8 14 L32 14 M8 26 L14 26",
+        "M8 32 A12 12 0 0 1 32 32 M20 6 L20 18 M14 6 L26 6",
+        "M6 6 L34 6 L6 34 L34 34 M14 20 L26 20",
+        "M20 4 L34 20 L20 36 L6 20 Z M20 14 L20 26"
+      ];
+      GLYPHS.forEach(function (d, i) {
+        var col = i % 2, row = Math.floor(i / 2), cx = 85 + col * 130, top = 24 + row * 122;
+        var g = document.createElementNS(NS, "g"); g.setAttribute("transform", "translate(" + (cx - 30) + " " + (top - 14) + ") scale(1.5)");
+        var p = document.createElementNS(NS, "path"); p.setAttribute("d", d); g.appendChild(p); svg.appendChild(g);
+        var n = i + 1, per = 5, r = 3, gap = 10;
+        for (var k = 0; k < n; k++) {
+          var c = document.createElementNS(NS, "circle"), rr = Math.floor(k / per), cc = k % per, inRow = Math.min(per, n - rr * per);
+          c.setAttribute("cx", cx + (cc - (inRow - 1) / 2) * gap); c.setAttribute("cy", top + 62 + rr * gap); c.setAttribute("r", r); c.setAttribute("class", "dot");
+          svg.appendChild(c);
+        }
+      });
+    })();
+
     // Each widget reports its own height, so no frame ever scrolls.
     window.addEventListener("message", function (e) {
       if (!e.data || e.data.type !== "numbers-widget-height") return;

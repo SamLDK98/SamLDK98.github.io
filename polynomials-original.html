@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Polynomial equations, their general forms, and the formulas that solve them — explanations by Sam Kirwan." />
+  <title>Polynomials | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #08090b;
+      --text: #f4f5f8;
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 15% 38%, rgba(226, 232, 255, 0.05), transparent 25rem),
+        radial-gradient(circle at 24% 70%, rgba(96, 116, 190, 0.07), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      width: min(46rem, calc(100% - 2rem));
+      margin-left: clamp(2rem, 11vw, 10rem);
+      padding: clamp(3rem, 9vh, 5.5rem) 0;
+      text-align: left;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 7vw, 5.4rem);
+      font-weight: 300;
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+    }
+
+    .back { margin-top: 2.6rem; font-size: 0.85rem; color: #a5adc1; }
+
+    nav { margin-top: clamp(2.4rem, 6vh, 4rem); }
+
+    ul { list-style: none; }
+
+    section + section { margin-top: 2.4rem; }
+
+    h2 {
+      margin-bottom: 0.95rem;
+      color: #e8a33d;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    li + li { margin-top: 0.7rem; }
+
+    a {
+      display: inline-block;
+      color: var(--text);
+      font-size: clamp(1rem, 1.65vw, 1.25rem);
+      font-weight: 300;
+      line-height: 1.35;
+      text-decoration: none;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #cfd8ff;
+      outline: none;
+      transform: translateX(3px);
+    }
+
+    @media (max-height: 720px) and (min-width: 600px) {
+      main { padding-block: 2rem; }
+      nav { margin-top: 2rem; }
+      li + li { margin-top: 0.45rem; }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(27rem, calc(100% - 4rem));
+        margin-left: 2rem;
+      }
+
+      h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
+      nav { margin-top: 2.6rem; }
+      li + li { margin-top: 0.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Polynomials</h1>
+    <nav aria-label="Polynomials pages">
+      <section aria-labelledby="g1">
+        <h2 id="g1">Algebraic Principles</h2>
+        <ul>
+          <li><a href="polynomials-addition-multiplication-squaring.html">Addition, Multiplication, Squaring</a></li>
+          <li><a href="polynomials-why-only-like-terms-can-be-combined.html">Why Only Like Terms Can Be Combined</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="g2">
+        <h2 id="g2">Conceptual Understanding</h2>
+        <ul>
+          <li><a href="polynomials-equations-and-general-solution-formulas.html">Equations and General Solution Formulas</a></li>
+          <li><a href="polynomials-constructing-classes-of-equations.html">Polynomials</a></li>
+          <li><a href="polynomials-where-do-multiple-different-solutions-come-from.html">Quadratics: Where Do Multiple Solutions Come From?</a></li>
+          <li><a href="polynomials-effects-of-changing-parameters-on-quadratic-graphs.html">The Effects of Changing Parameters on Quadratic Graphs</a></li>
+          <li><a href="polynomials-axis-of-symmetry.html">Axis of Symmetry</a></li>
+          <li><a href="polynomials-multiple-solutions-2.html">Multiple Solutions (2)</a></li>
+        </ul>
+      </section>
+      <section aria-labelledby="g3">
+        <h2 id="g3">Methods and Techniques</h2>
+        <ul>
+          <li><a href="polynomials-roots.html">Roots</a></li>
+          <li><a href="polynomials-expansion.html">Expansion</a></li>
+          <li><a href="polynomials-factorisation.html">Factorisation</a></li>
+          <li><a href="polynomials-the-quadratic-formula.html">The Quadratic Formula</a></li>
+        </ul>
+      </section>
+    </nav>
+    <a class="back" href="functions.html">← Functions</a>
+  </main>
+</body>
+</html>

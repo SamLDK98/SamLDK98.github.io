@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
   <!-- the previous version of this page is kept as exponentials-original.html -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -52,15 +56,25 @@
     .about::after { opacity: 0.05; mix-blend-mode: screen; }
     .cells { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
     .about > div { position: relative; z-index: 1; }
+    .about.playing { align-items: flex-start; }
     /* the section overview, shown in the black panel until an animation is chosen */
-    .overview-text { margin-top: 1.6rem; max-width: 30rem; animation: rise 420ms ease both; color: var(--cream-soft); transition: opacity 400ms ease, visibility 400ms; }
-    .overview-text p, .overview-text li { font-size: clamp(0.92rem, 1.05vw, 1.04rem); line-height: 1.5; }
+    .overview-text { margin-top: 2.6rem; max-width: 30rem; animation: rise 420ms ease both; color: var(--cream-soft); transition: opacity 400ms ease, visibility 400ms; }
+    .overview-text p, .overview-text li { font-size: clamp(1.06rem, 1.35vw, 1.26rem); line-height: 1.5; }
+    /* one example of each kind of exponent, in a row */
+    p.exps { display: flex; flex-wrap: wrap; gap: 0.4rem clamp(1rem, 1.8vw, 1.6rem); align-items: baseline; margin: 0.8rem 0 1rem; color: var(--cream); font-size: clamp(1.15rem, 1.5vw, 1.4rem) !important; }
+    dialog.overview p.exps { color: var(--ink); }
+    .overview-text p.exps { margin: 1.2rem 0 1.4rem; }
+    /* maths within the prose is set in the brighter cream, like the formulas */
+    .overview-text mjx-container { color: var(--cream); }
+    dialog.overview mjx-container { color: var(--ink); }
+    /* a little more room before the closing paragraph */
+    .overview-text p:nth-last-child(2) { margin-bottom: 1.3rem; }
     .overview-text p + p, .overview-text ul + p { margin-top: 0.6rem; }
     .overview-text ul { list-style: disc; margin: 0.4rem 0 0 1.2rem; }
     .overview-text li { display: list-item; }
     .overview-text li::before { content: none; }
     .overview-text li::marker { color: var(--gold); }
-    .overview-text .identity { margin: 0.6rem 0 0.8rem; font-size: 1.45rem; color: var(--cream); }
+    .overview-text p.identity { margin: 1.2rem 0 1.4rem; font-size: 1.6rem !important; color: var(--cream); }
     .overview-text .identity sup { font-size: 0.6em; }
     .about.playing .overview-text { display: none; }
     /* switch between the animations, bottom right */
@@ -195,20 +209,11 @@
       <h1>Exponentials</h1>
       <div class="overview-text">
         <p>Our overarching goal is to understand Euler's identity:</p>
-        <p class="identity"><em>e</em><sup><em>iπ</em></sup> + 1 = 0</p>
-        <p>To get there, we first need to develop an understanding of what it means to raise a number to different types of exponents:</p>
-        <ul>
-          <li>A positive integer.</li>
-          <li>Zero.</li>
-          <li>A negative integer.</li>
-          <li>A fraction.</li>
-          <li>An irrational number.</li>
-          <li>An imaginary number.</li>
-        </ul>
-        <p>We will also explore what makes the mathematical constant <em>e</em> so significant.</p>
-        <p>Ultimately, we want to understand how these ideas come together in Euler's identity, and why this result reveals a remarkable connection between exponentiation and circular motion.</p>
-        <p>Two concepts are particularly important to understand along the way: multiplicative growth and fractional exponents.</p>
-        <p>Developing a strong intuition for these will provide a foundation for understanding much of what follows.</p>
+        <p class="identity">\(e^{i\pi} + 1 = 0\)</p>
+        <p>First, we need to understand what it means to raise a number to different types of exponents:</p>
+        <p class="exps">\(2^{3}\) \(2^{0}\) \(2^{-3}\) \(2^{\frac{1}{2}}\) \(2^{\sqrt{2}}\) \(2^{i}\)</p>
+        <p>We'll also explore what makes the constant \(e\) significant, and how exponentiation connects to circular motion.</p>
+        <p>Two concepts will be particularly important throughout: multiplicative growth and fractional exponents. Developing a clear understanding of each will be key to understanding this section.</p>
       </div>
     </div>
   </aside>
@@ -257,20 +262,11 @@
     <button class="close" type="button" aria-label="Close">×</button>
     <h2 id="overview-title">Exponentials Section Overview</h2>
     <p>Our overarching goal is to understand Euler's identity:</p>
-    <p class="identity"><em>e</em><sup><em>iπ</em></sup> + 1 = 0</p>
-    <p>To get there, we first need to develop an understanding of what it means to raise a number to different types of exponents:</p>
-    <ul>
-      <li>A positive integer.</li>
-      <li>Zero.</li>
-      <li>A negative integer.</li>
-      <li>A fraction.</li>
-      <li>An irrational number.</li>
-      <li>An imaginary number.</li>
-    </ul>
-    <p>We will also explore what makes the mathematical constant <em>e</em> so significant.</p>
-    <p>Ultimately, we want to understand how these ideas come together in Euler's identity, and why this result reveals a remarkable connection between exponentiation and circular motion.</p>
-    <p>Two concepts are particularly important to understand along the way: multiplicative growth and fractional exponents.</p>
-    <p>Developing a strong intuition for these will provide a foundation for understanding much of what follows.</p>
+    <p class="identity">\(e^{i\pi} + 1 = 0\)</p>
+    <p>First, we need to understand what it means to raise a number to different types of exponents:</p>
+    <p class="exps">\(2^{3}\) \(2^{0}\) \(2^{-3}\) \(2^{\frac{1}{2}}\) \(2^{\sqrt{2}}\) \(2^{i}\)</p>
+    <p>We'll also explore what makes the constant \(e\) significant, and how exponentiation connects to circular motion.</p>
+    <p>Two concepts will be particularly important throughout: multiplicative growth and fractional exponents. Developing a clear understanding of each will be key to understanding this section.</p>
   </dialog>
 
   <script>
@@ -296,14 +292,20 @@
       if (!canvas || !canvas.getContext) return stop;
       var ctx = canvas.getContext("2d");
       var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      var SHEET = 1e-4, FOLDS = 42, STEP = 1300, HOLD = 7000, FADE = 1800;
+      var SHEET = 1e-4, FOLDS = 42, STEP = 1300, HOLD = 7000, FADE = 1800, START = 2600;
+      var mark = { h: SHEET, a: 0 };   // the line on the white bar: its height in metres, and how visible it is
       var EARTH = 6.371e6, MOON_D = 3.844e8, MOON_R = 1.737e6, ISS = 4.08e5, KARMAN = 1e5;
       var W, H, stars, t0, phase, logView, alpha, lastFold, pops;
 
       // landmarks standing on the ground, smallest first; w is width as a fraction of height
       var GROUND = [
-        { name: "a person", h: 1.7, w: 0.4, draw: person },
-        { name: "a house", h: 9, w: 1.1, draw: house },
+        { name: "an ant", plain: true, h: 0.002, w: 2.6, draw: ant },
+        { name: "a coin", plain: true, h: 0.023, w: 1, draw: coin },
+        { name: "a mug", plain: true, h: 0.1, w: 1.05, draw: mug },
+        { name: "a cat", h: 0.3, w: 0.9, draw: cat },
+        { name: "a chair", plain: true, h: 0.9, w: 0.5, draw: chair },
+        { name: "a person", plain: true, h: 1.7, w: 0.4, draw: person },
+        { name: "a house", plain: true, h: 9, w: 1.1, draw: house },
         { name: "Big Ben", h: 96, w: 0.16, draw: bigBen },
         { name: "the Burj Khalifa", h: 828, w: 0.14, draw: burj },
         { name: "Mount Everest", h: 8849, w: 1.9, draw: everest }
@@ -318,7 +320,7 @@
         stars = [];
         for (var i = 0; i < W * H / 2600; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, r: 0.35 + Math.random() * 0.7, a: 0.08 + Math.random() * 0.3, p: Math.random() * 6.283 });
       }
-      function reset() { t0 = performance.now(); phase = "fold"; logView = Math.log(0.004); alpha = 1; lastFold = 0; pops = []; }
+      function reset() { t0 = performance.now(); phase = "fold"; logView = Math.log(SHEET * 8 * 1.5); alpha = 1; mark.h = SHEET; mark.a = 0; lastFold = 0; pops = []; }
       function fmt(m) {
         if (m < 0.01) return (m * 1000).toFixed(m < 0.001 ? 2 : 1) + " mm";
         if (m < 1) return (m * 100).toFixed(1) + " cm";
@@ -329,6 +331,58 @@
       function gold(a) { return "rgba(217,164,65," + a + ")"; }
 
       // line drawings: (right edge x, ground y, height in px)
+      function ant(xr, gy, h) {
+        // abdomen, thorax, head from left to right; three legs with a bend at the knee; one antenna
+        var w = h * 2.6, xl = xr - w * 1.18, cy = gy - h * 0.55;   // set back from its right edge, so the antennae stay clear of the stack
+        ctx.moveTo(xl + 0.52 * w, cy); ctx.ellipse(xl + 0.3 * w, cy - h * 0.02, 0.22 * w, 0.3 * h, -0.12, 0, 6.283);
+        ctx.moveTo(xl + 0.72 * w, cy); ctx.ellipse(xl + 0.62 * w, cy, 0.1 * w, 0.16 * h, 0, 0, 6.283);
+        ctx.moveTo(xl + 0.94 * w, cy - h * 0.08); ctx.ellipse(xl + 0.86 * w, cy - h * 0.08, 0.08 * w, 0.19 * h, 0, 0, 6.283);
+        [-0.26, 0, 0.26].forEach(function (k) {
+          var x0 = xl + (0.62 + k * 0.25) * w;
+          ctx.moveTo(x0, cy + h * 0.1); ctx.lineTo(x0 + k * w * 0.35, cy - h * 0.18); ctx.lineTo(x0 + k * w * 0.6, gy);
+        });
+        // two antennae
+        ctx.moveTo(xl + 0.9 * w, cy - h * 0.26); ctx.quadraticCurveTo(xl + 0.98 * w, gy - h * 1.05, xl + 1.06 * w, gy - h * 0.9);
+        ctx.moveTo(xl + 0.86 * w, cy - h * 0.27); ctx.quadraticCurveTo(xl + 0.88 * w, gy - h * 1.15, xl + 0.98 * w, gy - h * 1.12);
+      }
+      function coin(xr, gy, h) {
+        var r = h / 2, cx = xr - r, cy = gy - r;
+        ctx.moveTo(cx + r, cy); ctx.arc(cx, cy, r, 0, 6.283);
+        ctx.moveTo(cx + r * 0.78, cy); ctx.arc(cx, cy, r * 0.78, 0, 6.283);
+        // a euro sign: a C open to the right, crossed by two bars
+        var R = r * 0.4, ex = cx + R * 0.15;
+        ctx.moveTo(ex + R * Math.cos(-0.85), cy + R * Math.sin(-0.85)); ctx.arc(ex, cy, R, -0.85, 0.85, true);
+        ctx.moveTo(ex - R * 1.3, cy - R * 0.22); ctx.lineTo(ex + R * 0.35, cy - R * 0.22);
+        ctx.moveTo(ex - R * 1.3, cy + R * 0.22); ctx.lineTo(ex + R * 0.35, cy + R * 0.22);
+      }
+      function mug(xr, gy, h) {
+        var w = h * 0.8, xl = xr - h * 1.05;
+        ctx.moveTo(xl, gy - h); ctx.lineTo(xl + w * 0.04, gy); ctx.lineTo(xl + w * 0.96, gy); ctx.lineTo(xl + w, gy - h); ctx.closePath();   // closed across the rim
+        ctx.moveTo(xl + w * 0.98, gy - h * 0.78);
+        ctx.bezierCurveTo(xl + w + h * 0.34, gy - h * 0.8, xl + w + h * 0.34, gy - h * 0.28, xl + w * 0.97, gy - h * 0.3);
+        // two wisps of steam
+        [0.33, 0.63].forEach(function (u, i) {
+          var sx = xl + w * u, b = gy - h * (1.15 + i * 0.05);
+          ctx.moveTo(sx, b); ctx.bezierCurveTo(sx - w * 0.1, b - h * 0.15, sx + w * 0.1, b - h * 0.25, sx, b - h * 0.4);
+        });
+      }
+      function cat(xr, gy, h) {
+        var w = h * 0.9, xl = xr - w, hx = xl + w * 0.62, hy = gy - h * 0.72, hr = h * 0.17;
+        ctx.moveTo(xl + w * 0.2, gy);
+        ctx.bezierCurveTo(xl + w * 0.12, gy - h * 0.45, xl + w * 0.4, gy - h * 0.62, hx - hr * 0.6, hy + hr * 0.8);
+        ctx.moveTo(hx + hr * 0.6, hy + hr * 0.8);
+        ctx.bezierCurveTo(xl + w * 0.86, gy - h * 0.4, xl + w * 0.84, gy - h * 0.15, xl + w * 0.8, gy);
+        ctx.lineTo(xl + w * 0.2, gy);
+        ctx.moveTo(hx + hr, hy); ctx.arc(hx, hy, hr, 0, 6.283);
+        ctx.moveTo(hx - hr * 0.85, hy - hr * 0.5); ctx.lineTo(hx - hr * 0.6, hy - hr * 1.6); ctx.lineTo(hx - hr * 0.1, hy - hr * 0.95);
+        ctx.moveTo(hx + hr * 0.1, hy - hr * 0.95); ctx.lineTo(hx + hr * 0.6, hy - hr * 1.6); ctx.lineTo(hx + hr * 0.85, hy - hr * 0.5);
+        ctx.moveTo(xl + w * 0.22, gy - h * 0.04); ctx.bezierCurveTo(xl - w * 0.1, gy - h * 0.06, xl - w * 0.1, gy - h * 0.4, xl + w * 0.04, gy - h * 0.46);
+      }
+      function chair(xr, gy, h) {
+        var w = h * 0.5, xl = xr - w, seat = gy - h * 0.5;
+        ctx.moveTo(xl, gy); ctx.lineTo(xl, gy - h);
+        ctx.moveTo(xl, seat); ctx.lineTo(xr, seat); ctx.lineTo(xr, gy);
+      }
       function person(xr, gy, h) {
         var xc = xr - h * 0.2, hr = h * 0.09;
         ctx.moveTo(xc + hr, gy - h + hr); ctx.arc(xc, gy - h + hr, hr, 0, 6.283);
@@ -362,7 +416,10 @@
         var w = h * 1.9, xl = xr - w, pts = [[0, 0], [0.16, 0.34], [0.24, 0.3], [0.38, 0.72], [0.46, 0.66], [0.55, 1], [0.62, 0.86], [0.7, 0.9], [0.84, 0.42], [0.9, 0.46], [1, 0]];
         ctx.moveTo(xl, gy);
         pts.forEach(function (p) { ctx.lineTo(xl + p[0] * w, gy - p[1] * h); });
-        ctx.moveTo(xl + 0.47 * w, gy - 0.78 * h); ctx.lineTo(xl + 0.52 * w, gy - 0.84 * h); ctx.lineTo(xl + 0.57 * w, gy - 0.8 * h); ctx.lineTo(xl + 0.64 * w, gy - 0.84 * h);
+        // the snow line: a zigzag from one slope to the other, below the summit
+        [[0.497, 0.8], [0.54, 0.74], [0.58, 0.79], [0.62, 0.73], [0.66, 0.79], [0.729, 0.8]].forEach(function (p, i) {
+          ctx[i ? "lineTo" : "moveTo"](xl + p[0] * w, gy - p[1] * h);
+        });
       }
 
       function render(now, folds) {
@@ -394,16 +451,16 @@
         if (ipx > 3) ring(ISS, [1, 6], Math.min(0.3, ipx / 40));
 
         // landmarks on the ground, side by side to the left of the stack
-        var xr = cx - 12;
+        var xr = cx - 12 - 75 * Math.max(0, Math.min(1, (6.5 - folds) / 2));   // clear of the white bar while it is wide
         GROUND.forEach(function (m) {
           var h = m.h * s;
           // fade out before reaching the title
-          var a = Math.min(1, (h - 3) / 10) * Math.max(0, Math.min(1, (H * 0.42 - h) / (H * 0.14)));
+          var a = Math.min(1, (h - 3) / 10) * Math.max(0, Math.min(1, (H * 0.7 - h) / (H * 0.12)));
           if (a <= 0) return;
           ctx.beginPath(); m.draw(xr, ground, h);
           ctx.strokeStyle = ink(0.75 * a); ctx.stroke();
-          if (h > 22) {
-            ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "center";
+          if (h > 22 && !m.plain) {   // the obvious ones go unlabelled
+            ctx.font = "400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "center";
             ctx.fillStyle = ink(0.55 * a); ctx.fillText(m.name, xr - m.w * h / 2, ground - h - 7);
           }
           xr -= m.w * h + 10;
@@ -416,11 +473,11 @@
           var ia = Math.min(1, (ipx - 3) / 12);
           ctx.beginPath(); ctx.strokeStyle = ink(0.8 * ia);
           ctx.moveTo(ix - 6, iy); ctx.lineTo(ix + 6, iy); ctx.rect(ix - 6, iy - 4, 3, 8); ctx.rect(ix + 3, iy - 4, 3, 8); ctx.stroke();
-          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.font = "400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
           ctx.fillStyle = ink(0.5 * ia); ctx.fillText("the Space Station", ix - 10, iy + 4);
         }
         if (kpx > 14 && Y(KARMAN) > 20) {
-          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.font = "400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
           ctx.fillStyle = ink(Math.min(0.5, (kpx - 14) / 30)); ctx.fillText("the edge of space", cx - 12, (flat ? Y(KARMAN) : ey - R - kpx) - 6);
         }
 
@@ -432,18 +489,56 @@
           ctx.beginPath();
           [[-0.35, -0.2, 0.2], [0.25, 0.25, 0.16], [0.1, -0.45, 0.1]].forEach(function (c) { ctx.moveTo(mx + c[0] * mr + c[2] * mr, my + c[1] * mr); ctx.arc(mx + c[0] * mr, my + c[1] * mr, c[2] * mr, 0, 6.283); });
           ctx.strokeStyle = ink(0.35); ctx.stroke();
-          ctx.font = "italic 400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
+          ctx.font = "400 12px 'Alegreya', Georgia, serif"; ctx.textAlign = "right";
           ctx.fillStyle = ink(0.6); ctx.fillText("the Moon", mx - mr - 8, my + 4);
         }
 
-        // the stack of paper, in gold
-        var top = Math.max(-10, Y(thick));
-        ctx.save();
-        ctx.shadowColor = gold(0.8); ctx.shadowBlur = 10;
-        ctx.strokeStyle = gold(0.95); ctx.lineWidth = 2.5;
-        ctx.beginPath(); ctx.moveTo(cx, ground); ctx.lineTo(cx, top); ctx.stroke();
-        ctx.fillStyle = "rgba(255,240,210,1)"; ctx.beginPath(); ctx.arc(cx, top, 2.6, 0, 6.283); ctx.fill();
-        ctx.restore();
+        // the stack of paper. Up close it is drawn edge-on, as a white bar with a line between each sheet; as the
+        // view pulls back it narrows into a glowing gold line.
+        var top = Math.max(-10, Y(thick)), n = Math.pow(2, Math.floor(folds));
+        var bar = Math.max(0, Math.min(1, (6.5 - folds) / 2));            // 1 = a white bar, 0 = the gold line
+        var bw = 150 * bar;
+        if (bar > 0) {
+          ctx.save(); ctx.globalAlpha = alpha * Math.min(1, bar * 1.6);
+          ctx.fillStyle = "rgba(243,236,223,0.92)"; ctx.fillRect(cx - bw / 2, top, bw, ground - top);
+          // a dark line marking the height before each fold: it sits on the top edge, stays put while the
+          // stack doubles (so it ends at the halfway point), then glides up to the new top, ready for the next
+          if (mark.a > 0) {
+            var yy = Math.max(top + 1.5, Y(mark.h));   // at the top, it covers the edge exactly, with no white above it
+            ctx.beginPath(); ctx.moveTo(cx - bw / 2, yy); ctx.lineTo(cx + bw / 2, yy);
+            ctx.strokeStyle = "rgba(18,17,16," + (0.8 * mark.a) + ")"; ctx.lineWidth = 3; ctx.stroke();
+          }
+          ctx.restore();
+        }
+        if (bar < 1) {
+          ctx.save(); ctx.globalAlpha = alpha * (1 - bar);
+          ctx.shadowColor = gold(0.8); ctx.shadowBlur = 10;
+          ctx.strokeStyle = gold(0.95); ctx.lineWidth = 2.5;
+          ctx.beginPath(); ctx.moveTo(cx, ground); ctx.lineTo(cx, top); ctx.stroke();
+          ctx.fillStyle = "rgba(255,240,210,1)"; ctx.beginPath(); ctx.arc(cx, top, 2.6, 0, 6.283); ctx.fill();
+          ctx.restore();
+        }
+
+        // to begin with: what the bar is, labelled on its left with an arrow pointing to it
+        var pa = 1 - Math.max(0, Math.min(1, (folds - 0.5) / 1.2));
+        if (pa > 0) {
+          var my = (ground + Y(SHEET)) / 2, ax = cx - bw / 2 - 6, tx = ax - 46;
+          ctx.save(); ctx.globalAlpha = alpha * pa;
+          ctx.beginPath(); ctx.moveTo(tx + 6, my - 20); ctx.quadraticCurveTo(ax - 20, my - 20, ax, my);
+          ctx.moveTo(ax - 8, my - 3); ctx.lineTo(ax, my); ctx.lineTo(ax - 3, my - 8);
+          ctx.strokeStyle = ink(0.75); ctx.lineWidth = 1.2; ctx.stroke();
+          ctx.font = "500 22px 'Alegreya', Georgia, serif"; ctx.textAlign = "right"; ctx.fillStyle = ink(1);
+          ctx.fillText("The thickness of a sheet", tx, my - 38);
+          ctx.fillText("of paper (0.1 mm)", tx, my - 12);
+          ctx.restore();
+        }
+        // for the first few folds, the number of folds so far
+        if (folds >= 0.9 && folds < 5.5 && bar > 0) {
+          ctx.save(); ctx.globalAlpha = alpha * Math.min(1, (5.5 - folds)) * Math.min(1, (folds - 0.9) * 3);
+          ctx.font = "400 13px 'Alegreya', Georgia, serif"; ctx.textAlign = "right"; ctx.fillStyle = ink(0.65);
+          var k = Math.floor(folds); ctx.fillText(k + (k === 1 ? " fold" : " folds"), cx - bw / 2 - 12, (ground + top) / 2 + 4);
+          ctx.restore();
+        }
 
         // ×2 at each fold, rising from the top of the stack
         ctx.font = "500 14px 'Alegreya', Georgia, serif"; ctx.textAlign = "left";
@@ -453,30 +548,35 @@
         // the count, and the last landmark passed
         var n = Math.floor(folds), passed = null;
         PASS.forEach(function (m) { if (SHEET * Math.pow(2, n) >= m.h) passed = m; });
-        var fs = Math.max(13, Math.min(17, W / 26)), x0 = parseFloat(getComputedStyle(canvas.parentElement).paddingLeft) || 32;
+        var fs = Math.max(16, Math.min(22, W / 22)), x0 = parseFloat(getComputedStyle(canvas.parentElement).paddingLeft) || 32;
         ctx.textAlign = "left";
         ctx.fillStyle = gold(0.9); ctx.font = "500 " + fs + "px 'Alegreya', Georgia, serif";
         ctx.fillText((n === 1 ? "1 fold" : n + " folds") + " · " + fmt(SHEET * Math.pow(2, n)), x0, H - 28);
-        if (passed) {
-          ctx.fillStyle = ink(0.55); ctx.font = "italic 400 " + (fs - 1) + "px 'Alegreya', Georgia, serif";
-          ctx.fillText(passed.name === "the Moon" ? "past the Moon" : "taller than " + passed.name, x0, H - 28 - fs * 1.45);
-        }
         ctx.globalAlpha = 1;
       }
 
       function frame(now) {
+        if (!alive) return;   // stopped: a frame already queued must not draw
         var t = now - t0, folds;
         if (phase === "fold") {
-          var n = Math.floor(t / STEP), e = Math.min(1, (t - n * STEP) / (STEP * 0.45));
-          folds = Math.min(FOLDS, n + (1 - Math.pow(1 - e, 3)));
-          if (n > lastFold && n <= FOLDS) { pops.push(now); lastFold = n; }
+          t -= START;                                             // a pause on the single sheet before the first fold
+          if (t < 0) t = -1;
+          var n = Math.floor(Math.max(0, t) / STEP), e = Math.min(1, (t - n * STEP) / (STEP * 0.45));
+          folds = t < 0 ? 0 : Math.min(FOLDS, n + (1 - Math.pow(1 - e, 3)));
+          if (t < 0) { mark.h = SHEET; mark.a = Math.max(0, Math.min(1, (t + 1100) / 500)); }
+          else {
+            var u = (t - n * STEP) / STEP, k = Math.max(0, Math.min(1, (u - 0.5) / 0.35)); k = k * k * (3 - 2 * k);
+            mark.h = SHEET * Math.pow(2, n) * (u < 0.45 ? 1 : 1 + k); mark.a = 1;
+          }
+          if (t >= 0 && n + 1 > lastFold && n < FOLDS) { pops.push(now); lastFold = n + 1; }
           if (n >= FOLDS) { phase = "hold"; t0 = now; folds = FOLDS; }
         } else {
           folds = FOLDS;
           if (phase === "hold" && t > HOLD) { phase = "fade"; t0 = now; }
           if (phase === "fade") { alpha = Math.max(0, 1 - t / FADE); if (t > FADE) reset(); }
         }
-        var target = Math.log(Math.max(0.004, SHEET * Math.pow(2, folds) * 1.4));
+        // the view looks ahead: the stack fills about 40% of the height, so what it is about to pass is already in view
+        var target = Math.log(Math.max(SHEET * 8 * 1.5, SHEET * Math.pow(2, folds) * 2.5));   // still for the first few folds
         logView += (target - logView) * 0.05;
         render(now, folds);
         if (alive) requestAnimationFrame(frame);
@@ -593,6 +693,7 @@
         ctx.globalAlpha = 1;
       }
       function frame(now) {
+        if (!alive) return;   // stopped: a frame already queued must not draw
         var t = now - t0;
         if (phase === "grow") {
           alpha = Math.min(1, alpha + 0.02);
@@ -714,6 +815,7 @@
         ctx.globalAlpha = 1;
       }
       function frame(now) {
+        if (!alive) return;   // stopped: a frame already queued must not draw
         var t = now - t0;
         if (phase === "grow") {
           alpha = Math.min(1, alpha + 0.02);

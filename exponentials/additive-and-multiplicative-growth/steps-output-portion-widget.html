@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Portion of steps taken and portion of target output reached</title>
+<title>Portion of steps taken and portion of the total change completed</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
@@ -18,10 +18,24 @@
   .nav button:hover:not(:disabled) { border-color: var(--dim); }
   .nav button:disabled { opacity: 0.25; cursor: default; }
   .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+  /* percentages, or the worked example of a journey from 25 to 75 */
+  .mode { display: none; justify-content: center; gap: 0.3rem; margin-bottom: 0.9rem; }
+  .mode.on { display: flex; }
+  .mode button {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.35rem 0.8rem; border-radius: 999px; border: 1px solid var(--faint); background: none; color: var(--dim); cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .mode button:hover { color: var(--ink); }
+  .mode button[aria-pressed="true"] { color: var(--ink); border-color: var(--dim); }
 </style>
 </head>
 <body>
 <div class="widget">
+  <div class="mode" role="group" aria-label="Show">
+    <button type="button" data-mode="pct" aria-pressed="true">Percentages</button>
+    <button type="button" data-mode="eg" aria-pressed="false">Example</button>
+  </div>
   <svg id="fig" role="img"></svg>
   <div class="nav">
     <button id="prev" type="button" aria-label="One step back">←</button>
@@ -33,12 +47,12 @@
 <script>
   // One journey to 100 in 10 steps: additive (0, +10 each step) or, with ?journey=mul, multiplicative
   // (1, ×1.585 each step). Two thin lines: the portion of steps taken (blue) and the portion of the
-  // target output reached (green). Additive: the two always match. Multiplicative: halfway through the
-  // steps, the output has reached only 10%.
+  // total change completed (orange). Additive: the two always match. Multiplicative: halfway through the
+  // steps, the output is 10, only 9 of the total change of 99 (about 9%).
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("fig");
   const prev = document.getElementById("prev"), next = document.getElementById("next");
-  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#e8a33d", CORAL = "#f4879c";
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#f5d547", CORAL = "#e8a33d";
   const STEPS = 10, TARGET = 100;
   const addOut = k => 10 * k;                              // 0 → 100, +10 each step
   const mulOut = k => Math.pow(TARGET, k / STEPS);         // 1 → 100, ×100^(1/10) ≈ ×1.585 each step
@@ -58,18 +72,37 @@
   const fmt = v => Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : "≈ " + v.toFixed(1);
   const MUL = new URLSearchParams(location.search).get("journey") === "mul";
   const out = MUL ? mulOut : addOut;
-  let n = 0;
+  // ?toggle=1: switch between percentages and a worked example in 10 steps:
+  // additive, 0 to 100 in steps of +10; multiplicative, 1 to 100 in steps of ×100^(1/10) ≈ ×1.585
+  const TOGGLE = new URLSearchParams(location.search).get("toggle") === "1";
+  const EG = MUL ? { from: 1, to: 100, at: mulOut } : { from: 0, to: 100, at: k => 10 * k };
+  let n = 0, mode = "pct";
+  if (TOGGLE) {
+    document.querySelector(".mode").classList.add("on");
+    document.querySelectorAll(".mode button").forEach(b => b.addEventListener("click", () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll(".mode button").forEach(o => o.setAttribute("aria-pressed", o === b ? "true" : "false"));
+      render();
+    }));
+  }
 
   function render() {
     prev.disabled = n === 0; next.disabled = n === STEPS;
-    const ps = n / STEPS, po = out(n) / TARGET;
+    // the portion of the total change completed: (current output − start) ÷ (final output − start)
+    const START = MUL ? 1 : 0, ps = n / STEPS, po = (out(n) - START) / (TARGET - START);
     const W = svg.clientWidth || 560, L = 18, R = W - 18, Y1 = 34, Y2 = 100, H = 116;
     const big = W < 420 ? 15 : 17;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
     svg.textContent = "";
     const px = f => L + f * (R - L);
 
-    [[Y1, ps, EXP, "Steps taken", fmt(100 * ps) + "%"], [Y2, po, CORAL, "Output reached", fmt(100 * po) + "%"]].forEach(([y, f, col, lab, val]) => {
+    const eg = TOGGLE && mode === "eg";
+    const outLab = "Change completed";
+    const rows = eg
+      ? [[Y1, ps, EXP, "Steps taken", `${n} of ${STEPS}`],
+         [Y2, (EG.at(n) - EG.from) / (EG.to - EG.from), CORAL, "Change completed", `${fmt(EG.at(n) - EG.from)} of ${EG.to - EG.from}`]]
+      : [[Y1, ps, EXP, "Steps taken", fmt(100 * ps) + "%"], [Y2, po, CORAL, outLab, fmt(100 * po) + "%"]];
+    rows.forEach(([y, f, col, lab, val]) => {
       const l = serif(el("text", { x: L, y: y - 13, "font-size": big }, lab)); l.style.fill = col;
       const r = serif(el("text", { x: R, y: y - 13, "text-anchor": "end", "font-size": big }, val)); r.style.fill = col; r.style.fontWeight = 500;
       el("line", { x1: L, x2: R, y1: y, y2: y, stroke: INK, "stroke-opacity": 0.14, "stroke-width": 2, "stroke-linecap": "round" });
@@ -77,7 +110,9 @@
       const d = el("circle", { cx: px(f), cy: y, r: 4.5 }); d.style.fill = col;
     });
 
-    svg.setAttribute("aria-label", `${MUL ? "Multiplicative" : "Additive"} journey: ${fmt(100 * ps)}% of steps taken, ${fmt(100 * po).replace("≈ ", "about ")}% of the target output reached.`);
+    svg.setAttribute("aria-label", eg
+      ? `Journey from ${EG.from} to ${EG.to} in ${STEPS} steps: ${n} taken, output ${fmt(EG.at(n)).replace("≈ ", "about ")}, ${fmt(EG.at(n) - EG.from).replace("≈ ", "about ")} of the total change of ${EG.to - EG.from} completed.`
+      : `${MUL ? "Multiplicative" : "Additive"} journey: ${fmt(100 * ps)}% of steps taken, ${fmt(100 * po).replace("≈ ", "about ")}% of the total change completed.`);
     if (window.postWidgetHeight) window.postWidgetHeight();
   }
 
