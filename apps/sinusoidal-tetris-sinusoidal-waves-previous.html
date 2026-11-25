@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sinusoidal Waves | Sinusoidal Tetris | Sam Kirwan</title>
+  <meta name="description" content="The basics behind Sinusoidal Tetris: a sine wave is the height of a point going round a circle. Its amplitude, frequency and phase are the circle's size, speed and starting angle." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #0e0e11;
+      --ink:   #f4f6ff;
+      --body:  rgba(243, 246, 255, 0.88);
+      --dim:   rgba(238, 242, 252, 0.5);
+      --faint: rgba(238, 242, 252, 0.15);
+      --hair:  rgba(238, 242, 252, 0.08);
+      --wave:  #e8a33d;
+      --measure: 40rem;
+    }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body { background: var(--bg); color: var(--body); font-family: "Spectral", Georgia, serif; -webkit-font-smoothing: antialiased; }
+    .sheet { width: min(var(--measure), calc(100% - 2.4rem)); margin: 0 auto; padding: clamp(2.4rem, 7vh, 4.5rem) 0 4rem; }
+    .crumb { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
+    .crumb::before { content: "← "; }
+    .crumb:hover { color: var(--ink); }
+    h1 { margin: 1.2rem 0 1.8rem; font-weight: 400; font-size: clamp(2.3rem, 7.4vw, 3.9rem); line-height: 1.05; color: var(--ink); }
+    h2 { margin: 3rem 0 1rem; font-weight: 400; font-size: clamp(1.45rem, 3.6vw, 1.9rem); color: var(--ink); }
+    p, li { font-size: clamp(1.1rem, 2.4vw, 1.22rem); line-height: 1.7; }
+    p + p, .math + p, p + .math, .wv + p, ul + p { margin-top: 0.9rem; }
+    ul { margin: 0.9rem 0 0 1.3rem; }
+    li + li { margin-top: 0.3rem; }
+    strong { color: var(--ink); font-weight: 500; }
+    .math { margin: 1.1rem 0; color: var(--ink); }
+    .c-wave { color: var(--wave); }
+    a { color: #b9a8d4; }
+    .next { margin-top: 2.6rem; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .next a { color: var(--wave); text-decoration: none; border-bottom: 1px solid rgba(232, 163, 61, 0.4); }
+    .next a:hover { border-bottom-color: var(--wave); }
+
+    /* the circle-and-wave widgets */
+    .wv { margin: 1.8rem 0 1.4rem; }
+    .wv svg { display: block; width: 100%; overflow: visible; }
+    .wv text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--dim); }
+    .wv .axis { stroke: var(--faint); stroke-width: 1.2; }
+    .wv .grid { stroke: var(--hair); stroke-width: 1; }
+    .wv .ring { fill: none; stroke: var(--wave); stroke-opacity: 0.5; stroke-width: 1.3; }
+    .wv .arm { stroke: var(--wave); stroke-width: 1.8; }
+    .wv .wave { fill: none; stroke: var(--wave); stroke-width: 1.4; stroke-opacity: 0.3; }
+    .wv .trace { fill: none; stroke: var(--wave); stroke-width: 2.2; }
+    .wv .ghost { fill: none; stroke: var(--dim); stroke-width: 1.3; stroke-dasharray: 5 5; }
+    .wv .link { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 2 4; }
+    .wv .dot { fill: var(--wave); }
+    .wv .start { fill: none; stroke: var(--ink); stroke-width: 1.3; }
+    .ctl { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.2rem 3rem; margin-top: 1.4rem; }
+    .dial-ctl { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .dial-ctl .name { font-family: "Spectral", Georgia, serif; font-style: italic; font-size: 2.4rem; line-height: 1; color: var(--wave); }
+    .dial-ctl .row { display: flex; align-items: center; gap: 0.7rem; }
+    .dial-ctl .val { font-family: "IBM Plex Mono", monospace; font-size: 1.05rem; color: var(--ink); min-width: 3.6rem; text-align: center; }
+    .round {
+      font: inherit; font-size: 1rem; line-height: 1; width: 2rem; height: 2rem; border-radius: 50%;
+      background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .round:hover:not(:disabled) { border-color: var(--dim); }
+    .round:disabled { opacity: 0.25; cursor: default; }
+    .round:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <h1>Sinusoidal Waves</h1>
+
+    <p>Imagine a point travelling around a circle at a constant speed.</p>
+    <p>If we plot its height on the y-axis and time on the x-axis, we will graph a sinusoidal wave.</p>
+    <div class="wv" data-dials="" data-start="1,1,0"></div>
+    <p>Three parameters may vary:</p>
+    <ul>
+      <li>The speed the point travels around the circle.</li>
+      <li>The size of the circle.</li>
+      <li>The place the point begins travelling from.</li>
+    </ul>
+    <p>The speed at which the point travels around the circle is described by its <strong>angular frequency</strong> <span style="white-space:nowrap">\((\omega)\).</span> Increasing this speed increases the <strong>frequency</strong> \((f)\) of the wave: the number of complete oscillations (or cycles) that occur per second.</p>
+    <p>The radius of the circle determines the <strong>amplitude</strong> \((A)\) of the wave: the maximum height of its peaks above the centre line (or the maximum depth of its troughs below it).</p>
+    <p>The position from which the point begins travelling determines the <strong>initial phase</strong> \((\phi)\) of the wave. Changing it shifts the wave horizontally, altering where in its cycle the wave begins.</p>
+    <div class="wv" data-dials="A w p" data-start="1,1,0"></div>
+
+    <p class="next"><a href="sinusoidal-tetris-adding-waves.html">Next: Adding Waves →</a></p>
+  </div>
+
+  <script>
+    // Each .wv is a circle with a point going round it and the wave its height draws.
+    // data-dials lists the dials shown (A, w, p); data-start gives A, ω, ϕ/π at the start;
+    // data-ghost draws the starting wave dashed, so a change can be compared with it.
+    (function () {
+      const NS = "http://www.w3.org/2000/svg";
+      const STEP = { A: 0.1, w: 0.5, p: 1 / 12 }, MIN = { A: 0.3, w: 0.5, p: -Infinity }, MAX = { A: 1.5, w: 4, p: Infinity };
+      const NAME = { A: "A", w: "ω", p: "ϕ" }, LABEL = { A: "amplitude", w: "frequency", p: "phase" };
+      const TMAX = 4 * Math.PI, CX = 72, L = 170, R = 630, MID = 96, SC = 52, H = 200;
+      const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const fmt = (k, v) => k === "p" ? ((((v % 2) + 2) % 2).toFixed(2).replace(/\.?0+$/, "") || "0") + "π" : v.toFixed(1);
+
+      document.querySelectorAll(".wv").forEach(box => {
+        const dials = box.dataset.dials.split(" ").filter(Boolean);
+        const [A0, w0, p0] = box.dataset.start.split(",").map(Number);
+        const v = { A: A0, w: w0, p: p0 }, ghost = !!box.dataset.ghost;
+        const svg = document.createElementNS(NS, "svg");
+        svg.setAttribute("viewBox", `0 0 640 ${H}`); svg.setAttribute("role", "img");
+        box.appendChild(svg);
+        
+        const ctl = document.createElement("div"); ctl.className = "ctl"; if (dials.length) box.appendChild(ctl);
+        dials.forEach(k => {
+          const d = document.createElement("div"); d.className = "dial-ctl";
+          d.innerHTML = `<span class="name">${NAME[k]}</span><div class="row"><button class="round" data-d="-1" aria-label="Decrease ${LABEL[k]}">−</button><span class="val"></span><button class="round" data-d="1" aria-label="Increase ${LABEL[k]}">+</button></div>`;
+          d.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+            const n = Math.round((v[k] + +b.dataset.d * STEP[k]) / STEP[k]) * STEP[k];
+            v[k] = Math.min(MAX[k], Math.max(MIN[k], +n.toFixed(4))); draw();
+          }));
+          d.dataset.k = k; ctl.appendChild(d);
+        });
+        const tx = t => L + t / TMAX * (R - L);
+        function el(tag, attrs) { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); svg.appendChild(e); return e; }
+        function wpath(A, w, p, upto) {
+          let d = ""; const n = 360;
+          for (let i = 0; i <= n; i++) { const t = i / n * TMAX; if (t > upto) break; d += (i ? "L" : "M") + tx(t).toFixed(1) + " " + (MID - A * SC * Math.sin(w * t + p * Math.PI)).toFixed(1) + " "; }
+          return d;
+        }
+        let tau = 0, last = 0;
+        function draw() {
+          svg.innerHTML = "";
+          [-1, 1].forEach(g => el("line", { class: "grid", x1: L, x2: R, y1: MID - g * SC, y2: MID - g * SC }));
+          el("line", { class: "axis", x1: L, x2: R, y1: MID, y2: MID });
+          el("line", { class: "axis", x1: L, x2: L, y1: MID - 1.6 * SC, y2: MID + 1.6 * SC });
+          const t1 = el("text", { x: L - 6, y: MID - SC + 4, "text-anchor": "end" }); t1.textContent = "1";
+          const t2 = el("text", { x: L - 6, y: MID + SC + 4, "text-anchor": "end" }); t2.textContent = "−1";
+          if (ghost) el("path", { class: "ghost", d: wpath(A0, w0, p0, TMAX) });
+          el("path", { class: "wave", d: wpath(v.A, v.w, v.p, TMAX) });
+          el("path", { class: "trace", d: wpath(v.A, v.w, v.p, tau) });
+          // the circle, its starting point, and the point now
+          const r = v.A * SC, a = v.w * tau + v.p * Math.PI, a0 = v.p * Math.PI;
+          el("line", { class: "axis", x1: CX - 1.6 * SC, x2: CX + 1.6 * SC, y1: MID, y2: MID });
+          el("circle", { class: "ring", cx: CX, cy: MID, r });
+          el("circle", { class: "start", cx: CX + r * Math.cos(a0), cy: MID - r * Math.sin(a0), r: 4 });
+          const px = CX + r * Math.cos(a), py = MID - r * Math.sin(a);
+          el("line", { class: "arm", x1: CX, y1: MID, x2: px, y2: py });
+          el("line", { class: "link", x1: px, y1: py, x2: tx(tau), y2: py });
+          el("circle", { class: "dot", cx: px, cy: py, r: 3.5 });
+          el("circle", { class: "dot", cx: tx(tau), cy: py, r: 3.5 });
+          ctl.querySelectorAll(".dial-ctl").forEach(d => {
+            const k = d.dataset.k; d.querySelector(".val").textContent = fmt(k, v[k]);
+            const [dn, up] = d.querySelectorAll("button");
+            dn.disabled = v[k] - STEP[k] < MIN[k] - 1e-9; up.disabled = v[k] + STEP[k] > MAX[k] + 1e-9;
+          });
+          svg.setAttribute("aria-label", `A point going round a circle of radius ${v.A.toFixed(1)}, drawing the wave y = ${v.A.toFixed(1)} sin(${v.w.toFixed(1)} t + ${fmt("p", v.p)})`);
+        }
+        // the point goes round continuously; the trace restarts at the left edge every pass
+        if (reduce) { tau = TMAX; draw(); }
+        else {
+          // only animate while the widget is on screen
+          let running = false;
+          new IntersectionObserver(es => es.forEach(e => {
+            if (e.isIntersecting && !running) { running = true; last = 0; requestAnimationFrame(function loop(n) { if (!running) return; tick0(n); requestAnimationFrame(loop); }); }
+            else if (!e.isIntersecting) running = false;
+          })).observe(box);
+          const tick0 = now => { const dt = last ? Math.min(0.1, (now - last) / 1000) : 0; last = now; tau += dt * 1.6; if (tau > TMAX) tau = 0; draw(); };
+          draw();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

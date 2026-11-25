@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sinusoidal Waves | Sinusoidal Tetris | Sam Kirwan</title>
-  <meta name="description" content="The basics behind Sinusoidal Tetris: a sine wave is the height of a point going round a circle. Its amplitude, frequency and phase are the circle's size, speed and starting angle." />
+  <meta name="description" content="The basics behind Sinusoidal Tetris: a sine wave is the height of a point going round a circle. Its frequency, amplitude and initial phase are set by the circle's rate of rotation, radius and starting position." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -46,6 +46,43 @@
     .next { margin-top: 2.6rem; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
     .next a { color: var(--wave); text-decoration: none; border-bottom: 1px solid rgba(232, 163, 61, 0.4); }
     .next a:hover { border-bottom-color: var(--wave); }
+    /* the way on to the next page: a single arrow, bottom right */
+    /* out in the right-hand margin, partway in from the edge, glowing softly */
+    .sheet p.next-down { display: flex; justify-content: flex-end; margin-top: 6rem; margin-right: calc((100% - 100vw) / 4); }
+    .next-down a {
+      display: inline-block; color: var(--wave); text-decoration: none; font-size: 2.6rem; line-height: 1;
+      text-shadow: 0 0 10px rgba(232, 163, 61, 0.55), 0 0 26px rgba(232, 163, 61, 0.3);
+      transition: transform 0.25s ease, text-shadow 0.25s ease;
+    }
+    .next-down a:hover, .next-down a:focus-visible {
+      transform: translateX(4px); outline: none;
+      text-shadow: 0 0 12px rgba(232, 163, 61, 0.8), 0 0 34px rgba(232, 163, 61, 0.45);
+    }
+
+    /* the parameters of the circle, each linked to the property of the wave it sets */
+    figure.map { margin: 1.6rem 0 1.2rem; }
+    figure.map svg { display: block; width: 100%; overflow: visible; }
+    figure.map .ring { fill: none; stroke: var(--wave); stroke-opacity: 0.55; stroke-width: 1.3; }
+    figure.map .arc, figure.map .arm { fill: none; stroke: var(--wave); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+    figure.map .axis { stroke: var(--faint); stroke-width: 1; }
+    figure.map .pt { fill: var(--wave); }
+    figure.map .lab { font-family: "Spectral", Georgia, serif; font-size: 17px; fill: var(--ink); }
+    figure.map .lab .sym { font-style: italic; fill: var(--wave); }
+    figure.map .link { fill: none; stroke: var(--dim); stroke-width: 1.2; }
+    figure.map .wave1 { fill: none; stroke: var(--wave); stroke-width: 1.6; }
+    figure.map .wave2 { fill: none; stroke: var(--dim); stroke-width: 1.2; stroke-dasharray: 4 4; }
+    ul.props { margin-top: 0.4rem; }
+    .nw { white-space: nowrap; }
+    .pair-ctl { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2.4rem; flex-wrap: wrap; }
+    .pair-ctl button { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.06em; padding: 0.45rem 0.9rem; border-radius: 999px; border: 1px solid var(--faint); background: none; color: var(--dim); cursor: pointer; }
+    .pair-ctl button[aria-pressed="true"] { color: var(--ink); border-color: var(--dim); }
+    .pair-key { display: flex; justify-content: center; gap: 1.6rem; margin-top: 0.6rem; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--dim); }
+    .pair-key .b { color: var(--wave); } .pair-key .s { color: #7aa7ff; }
+    .wv .ring2 { fill: none; stroke: #7aa7ff; stroke-opacity: 0.55; stroke-width: 1.3; }
+    .wv .arm2 { stroke: #7aa7ff; stroke-width: 1.8; }
+    .wv .trace2 { fill: none; stroke: #7aa7ff; stroke-width: 2.2; }
+    .wv .wave2 { fill: none; stroke: #7aa7ff; stroke-width: 1.4; stroke-opacity: 0.3; }
+    .wv .dot2 { fill: #7aa7ff; }
 
     /* the circle-and-wave widgets */
     .wv { margin: 1.8rem 0 1.4rem; }
@@ -81,20 +118,39 @@
     <h1>Sinusoidal Waves</h1>
 
     <p>Imagine a point travelling around a circle at a constant speed.</p>
-    <p>If we plot its height on the y-axis and time on the x-axis, we will graph a sinusoidal wave.</p>
+    <p>If we plot its height on the \(y\)-axis and time on the \(x\)-axis, we graph a sinusoidal wave.</p>
     <div class="wv" data-dials="" data-start="1,1,0"></div>
-    <p>Three parameters may vary:</p>
+    <p>Three parameters of this circular motion can vary:</p>
     <ul>
-      <li>The speed the point travels around the circle.</li>
-      <li>The size of the circle.</li>
-      <li>The place the point begins travelling from.</li>
+      <li>The speed at which the point travels around the circle.</li>
+      <li>The size of the circle (its radius).</li>
+      <li>The position the point starts from.</li>
     </ul>
-    <p>The speed at which the point travels around the circle is described by its <strong>angular frequency</strong> <span style="white-space:nowrap">\((\omega)\).</span> Increasing this speed increases the <strong>frequency</strong> \((f)\) of the wave: the number of complete oscillations (or cycles) that occur per second.</p>
-    <p>The radius of the circle determines the <strong>amplitude</strong> \((A)\) of the wave: the maximum height of its peaks above the centre line (or the maximum depth of its troughs below it).</p>
-    <p>The position from which the point begins travelling determines the <strong>initial phase</strong> \((\phi)\) of the wave. Changing it shifts the wave horizontally, altering where in its cycle the wave begins.</p>
+    <p style="margin-top: 2.2rem">Each one sets a property of the resulting wave:</p>
+    <ul class="props">
+      <li><strong>Frequency</strong> <span class="c-wave">\((f)\)</span>: the number of complete oscillations (cycles) per second.</li>
+      <li><strong>Amplitude</strong> <span class="c-wave">\((A)\)</span>: the greatest height of the peaks, and depth of the troughs, measured from the centre line.</li>
+      <li><strong>Initial phase</strong> <span class="c-wave">\((\phi)\)</span>: where the wave starts, both its height on the \(y\)-axis and the direction it is moving in. Two waves can start at the same height, one rising and the other falling.</li>
+    </ul>
     <div class="wv" data-dials="A w p" data-start="1,1,0"></div>
 
-    <p class="next"><a href="sinusoidal-tetris-adding-waves.html">Next: Adding Waves →</a></p>
+    <h2>Measuring the Speed of Rotation</h2>
+    <p>We usually measure speed as distance travelled per unit of time, <span class="nw">\(\frac{\text{distance}}{\text{time}}\).</span></p>
+    <p>Here, though, we measure the number of complete rotations the point makes per second, not the distance it covers along the circumference.</p>
+    <p>This keeps the parameter that sets the frequency independent of the radius.</p>
+    <p>Suppose circle A has twice the radius of circle B. If a point travels around each at the same speed in distance per second, it takes twice as long to complete a rotation of the larger circle, so the larger circle produces a wave of half the frequency.</p>
+    <p>Measuring speed as the rate of rotation avoids this. If we fix the rate of rotation and change only the size of the circle, the frequency stays the same; only the amplitude changes.</p>
+    <div class="wv" data-pair="1.3,0.65" data-dials="" data-start="1,1,0"></div>
+
+    <p style="margin-top: 3rem">The rate of rotation can be given in two ways.</p>
+    <p>The <strong>frequency</strong> <span class="c-wave">\(f\)</span> counts complete rotations per second. The <strong>angular frequency</strong> <span class="c-wave">\(\omega\)</span> instead measures the angle the point sweeps through per second, in radians.</p>
+    <p>One complete rotation is an angle of \(2\pi\) radians, so the two differ only by that factor:</p>
+    <div class="math">\[\omega = 2\pi f\]</div>
+    <p>A point making one rotation per second has \(f = 1\) and <span class="nw">\(\omega = 2\pi \approx 6.28\)</span> radians per second. At two rotations per second, \(f = 2\) and <span class="nw">\(\omega = 4\pi\).</span></p>
+    <p>Both describe the same motion. Frequency is easier to picture; angular frequency is more convenient in formulas, because the angle the point has turned through after \(t\) seconds is simply <span class="nw">\(\omega t\).</span> That is why a sinusoidal wave is usually written as</p>
+    <div class="math">\[y = A \sin(\omega t + \phi) = A \sin(2\pi f t + \phi)\]</div>
+
+    <p class="next-down"><a href="sinusoidal-tetris-adding-waves.html" aria-label="Next: Adding Waves" title="Next: Adding Waves">→</a></p>
   </div>
 
   <script>
@@ -104,7 +160,7 @@
     (function () {
       const NS = "http://www.w3.org/2000/svg";
       const STEP = { A: 0.1, w: 0.5, p: 1 / 12 }, MIN = { A: 0.3, w: 0.5, p: -Infinity }, MAX = { A: 1.5, w: 4, p: Infinity };
-      const NAME = { A: "A", w: "ω", p: "ϕ" }, LABEL = { A: "amplitude", w: "frequency", p: "phase" };
+      const NAME = { A: "A", w: "f", p: "ϕ" }, LABEL = { A: "amplitude", w: "frequency", p: "phase" };
       const TMAX = 4 * Math.PI, CX = 72, L = 170, R = 630, MID = 96, SC = 52, H = 200;
       const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const fmt = (k, v) => k === "p" ? ((((v % 2) + 2) % 2).toFixed(2).replace(/\.?0+$/, "") || "0") + "π" : v.toFixed(1);
@@ -113,11 +169,24 @@
         const dials = box.dataset.dials.split(" ").filter(Boolean);
         const [A0, w0, p0] = box.dataset.start.split(",").map(Number);
         const v = { A: A0, w: w0, p: p0 }, ghost = !!box.dataset.ghost;
+        // data-pair: two circles of different radius, turning either at the same rate of rotation or at the same
+        // speed along the circle; a switch chooses which
+        const pair = box.dataset.pair ? box.dataset.pair.split(",").map(Number) : null;
+        let same = "rate";
         const svg = document.createElementNS(NS, "svg");
         svg.setAttribute("viewBox", `0 0 640 ${H}`); svg.setAttribute("role", "img");
         box.appendChild(svg);
         
         const ctl = document.createElement("div"); ctl.className = "ctl"; if (dials.length) box.appendChild(ctl);
+        if (pair) {
+          const sw = document.createElement("div"); sw.className = "pair-ctl"; sw.setAttribute("role", "group");
+          sw.innerHTML = '<button type="button" data-s="rate" aria-pressed="true">Same rate of rotation</button><button type="button" data-s="speed" aria-pressed="false">Same speed along the circle</button>';
+          sw.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+            same = b.dataset.s; tau = 0;
+            sw.querySelectorAll("button").forEach(o => o.setAttribute("aria-pressed", o === b ? "true" : "false")); draw();
+          }));
+          box.appendChild(sw);
+        }
         dials.forEach(k => {
           const d = document.createElement("div"); d.className = "dial-ctl";
           d.innerHTML = `<span class="name">${NAME[k]}</span><div class="row"><button class="round" data-d="-1" aria-label="Decrease ${LABEL[k]}">−</button><span class="val"></span><button class="round" data-d="1" aria-label="Increase ${LABEL[k]}">+</button></div>`;
@@ -142,6 +211,25 @@
           el("line", { class: "axis", x1: L, x2: L, y1: MID - 1.6 * SC, y2: MID + 1.6 * SC });
           const t1 = el("text", { x: L - 6, y: MID - SC + 4, "text-anchor": "end" }); t1.textContent = "1";
           const t2 = el("text", { x: L - 6, y: MID + SC + 4, "text-anchor": "end" }); t2.textContent = "−1";
+          if (pair) {
+            // circle A, the larger, and circle B; at the same speed along the circle, A turns more slowly
+            const [ra, rb] = pair, wb = v.w, wa = same === "rate" ? v.w : v.w * rb / ra;
+            [[ra, wa, ""], [rb, wb, "2"]].forEach(([rr, ww, k]) => {
+              el("path", { class: "wave" + k, d: wpath(rr, ww, 0, TMAX) });
+              el("path", { class: (k ? "trace2" : "trace"), d: wpath(rr, ww, 0, tau) });
+            });
+            el("line", { class: "axis", x1: CX - 1.6 * SC, x2: CX + 1.6 * SC, y1: MID, y2: MID });
+            [[ra, wa, ""], [rb, wb, "2"]].forEach(([rr, ww, k]) => {
+              const R0 = rr * SC, an = ww * tau, px = CX + R0 * Math.cos(an), py = MID - R0 * Math.sin(an);
+              el("circle", { class: k ? "ring2" : "ring", cx: CX, cy: MID, r: R0 });
+              el("line", { class: k ? "arm2" : "arm", x1: CX, y1: MID, x2: px, y2: py });
+              el("line", { class: "link", x1: px, y1: py, x2: tx(tau), y2: py });
+              el("circle", { class: k ? "dot2" : "dot", cx: px, cy: py, r: 3.5 });
+              el("circle", { class: k ? "dot2" : "dot", cx: tx(tau), cy: py, r: 3.5 });
+            });
+            svg.setAttribute("aria-label", same === "rate" ? "Two circles turning at the same rate of rotation: their waves have the same frequency and different amplitudes." : "Two circles whose points travel at the same speed along the circle: the larger circle's wave has half the frequency.");
+            return;
+          }
           if (ghost) el("path", { class: "ghost", d: wpath(A0, w0, p0, TMAX) });
           el("path", { class: "wave", d: wpath(v.A, v.w, v.p, TMAX) });
           el("path", { class: "trace", d: wpath(v.A, v.w, v.p, tau) });
