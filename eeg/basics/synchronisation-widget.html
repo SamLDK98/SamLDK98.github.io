@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neural Synchronisation</title>
+  <link rel="stylesheet" href="../widget-base.css" />
+  <style>
+    .widget { --label: #bfc2cc; }
+    .caption, .controls { font-family: system-ui, sans-serif; font-size: 0.875rem; }
+    .caption { color: var(--label); margin: 0.6rem 0 0.25rem; }
+    .baseline { stroke: var(--faint); }
+    path { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+    .source { stroke: var(--freq); }
+    .sum { stroke: var(--amp); stroke-width: 2; }
+    .controls { width: min(100%, 420px); margin: 1rem auto 0; }
+    .controls input { margin: 0.35rem 0 0; width: 100%; }
+    .control-label { display: flex; justify-content: space-between; gap: 0.5rem; }
+    .readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem; }
+    dt { color: var(--label); }
+    dd { margin-top: 0.2rem; font-variant-numeric: tabular-nums; }
+    #combined-amplitude { color: var(--amp); }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <p class="caption">Individual sources · 1 µV each</p>
+    <svg id="sources" viewBox="0 0 440 208" role="img" aria-label="Eight waves with equal amplitudes and frequencies"></svg>
+
+    <p class="caption">Combined electrical signal · ±8 µV scale</p>
+    <svg viewBox="0 0 440 92" role="img" aria-label="The sum of the eight waves on a fixed voltage scale">
+      <line class="baseline" x1="1" x2="439" y1="46" y2="46" />
+      <path class="sum" id="combined-wave" />
+    </svg>
+
+    <div class="controls">
+      <div class="control-label">
+        <label for="synchronisation">Synchronisation</label>
+        <span id="synchronisation-value" aria-hidden="true"></span>
+      </div>
+      <input type="range" id="synchronisation" min="0" max="1" step="0.01" value="0.25" />
+      <dl class="readouts">
+        <div><dt>Number of sources</dt><dd>8</dd></div>
+        <div><dt>Combined amplitude</dt><dd><output id="combined-amplitude" for="synchronisation"></output></dd></div>
+      </dl>
+    </div>
+  </div>
+  <script src="../widget-base.js"></script>
+  <script>
+    const sourceCount = 8;
+    const sources = document.querySelector("#sources");
+    const combinedWave = document.querySelector("#combined-wave");
+    const slider = document.querySelector("#synchronisation");
+    const setting = document.querySelector("#synchronisation-value");
+    const amplitude = document.querySelector("#combined-amplitude");
+    const sourcePaths = Array.from({ length: sourceCount }, (_, index) => {
+      const midline = 13 + index * 26;
+      const baseline = document.createElementNS(sources.namespaceURI, "line");
+      baseline.setAttribute("class", "baseline");
+      baseline.setAttribute("x1", "1");
+      baseline.setAttribute("x2", "439");
+      baseline.setAttribute("y1", midline);
+      baseline.setAttribute("y2", midline);
+      const path = document.createElementNS(sources.namespaceURI, "path");
+      path.setAttribute("class", "source");
+      sources.append(baseline, path);
+      return path;
+    });
+
+    function trace(midline, scale, sineWeight, cosineWeight) {
+      const points = [];
+      for (let sample = 0; sample <= 240; sample++) {
+        const fraction = sample / 240;
+        const angle = 6 * Math.PI * fraction;
+        const voltage = sineWeight * Math.sin(angle) + cosineWeight * Math.cos(angle);
+        points.push((1 + 438 * fraction).toFixed(2) + "," + (midline - scale * voltage).toFixed(2));
+      }
+      return "M" + points.join(" L");
+    }
+
+    function draw() {
+      const synchronisation = slider.valueAsNumber;
+      let summedSine = 0;
+      let summedCosine = 0;
+
+      // Start with evenly spaced phases and move them towards a common phase.
+      sourcePaths.forEach((path, index) => {
+        const phase = (1 - synchronisation) * 2 * Math.PI * (index - (sourceCount - 1) / 2) / sourceCount;
+        const sineWeight = Math.cos(phase);
+        const cosineWeight = Math.sin(phase);
+        summedSine += sineWeight;
+        summedCosine += cosineWeight;
+        path.setAttribute("d", trace(13 + index * 26, 9, sineWeight, cosineWeight));
+      });
+
+      combinedWave.setAttribute("d", trace(46, 5, summedSine, summedCosine));
+      setting.textContent = synchronisation.toFixed(2);
+      amplitude.value = Math.hypot(summedSine, summedCosine).toFixed(2) + " µV";
+    }
+
+    slider.addEventListener("input", draw);
+    draw();
+  </script>
+</body>
+</html>

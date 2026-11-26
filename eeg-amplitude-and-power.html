@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amplitude and Power | EEG | Sam Kirwan</title>
+  <meta name="description" content="What amplitude, frequency and phase describe in EEG, how synchronisation changes the recorded voltage, and how amplitude relates to power." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Spectral:ital,wght@0,300;0,400;0,500;1,400&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="eeg.css" />
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <a class="crumb" href="eeg.html#basics">EEG / Basics</a>
+      <h1>Amplitude and Power</h1>
+    </header>
+    <main>
+      <section aria-labelledby="amplitude">
+        <h2 id="amplitude">What Is Amplitude?</h2>
+        <p>The <strong>amplitude</strong> of a sinusoidal wave is the distance from its centre line to a peak or trough. If the centre line is at 0 µV and the amplitude is 5 µV, the wave reaches +5 µV at every peak and −5 µV at every trough. The full distance from peak to trough is 10 µV.</p>
+        <p>Every cycle of a pure sinusoid has the same amplitude. A raw EEG trace can contain several rhythms, and its peaks and troughs can vary from cycle to cycle. When we talk about the amplitude of a rhythm in that trace, we can estimate it for a particular stretch of the recording and see how it changes over time.</p>
+      </section>
+
+      <section aria-labelledby="properties">
+        <h2 id="properties">What Does the Wave Describe in EEG?</h2>
+        <p>Scalp EEG measures the voltage difference between an electrode and a reference. Much of the signal comes from the combined electrical effects of postsynaptic currents, which flow when neurons receive input.</p>
+        <ul>
+          <li><strong class="c-freq">Frequency</strong> counts how often the voltage pattern repeats. A 10 Hz rhythm completes ten cycles per second. Individual neurons can fire at different rates and may fire during only some cycles of that rhythm.</li>
+          <li><strong>Phase</strong> gives the position within a cycle. Two 10 Hz rhythms can have the same frequency and reach their peaks at different times. If the peak of one lines up with the trough of the other, they are half a cycle apart.</li>
+          <li><strong class="c-amp">Amplitude</strong> gives the size of the recorded voltage swings. It depends on the strength of the contributing sources, their distance and orientation relative to the electrodes, and how closely their cycles line up.</li>
+        </ul>
+        <p><a class="inline" href="https://doi.org/10.1038/nrn3241">Buzsáki, Anastassiou and Koch on the origins of EEG signals</a></p>
+      </section>
+
+      <section aria-labelledby="synchronisation">
+        <h2 id="synchronisation">How Synchronisation Changes Amplitude</h2>
+        <p>Move the slider to change how closely the eight source waves line up. Each source represents the voltage that a similarly oriented group of neurons would contribute. They all have the same frequency and amplitude throughout.</p>
+        <iframe class="expo-widget" src="eeg/basics/synchronisation-widget.html" title="Neural synchronisation and combined amplitude" style="height: 430px" loading="lazy"></iframe>
+        <p>At one end, peaks and troughs from different sources overlap and cancel. At the other, the peaks arrive together and so do the troughs. The combined amplitude grows even though the number and strength of the sources stay the same.</p>
+      </section>
+
+      <section aria-labelledby="power">
+        <h2 id="power">From Amplitude to Power</h2>
+        <p>Over a full cycle, a sine wave centred on zero has an average voltage of zero. Its positive and negative voltages cancel in the average, however large the swings are.</p>
+        <p>To calculate the signal’s <strong>power</strong> over a stretch of EEG, square each voltage sample and then average those squares. Squaring makes a sample of −5 µV contribute the same amount as a sample of +5 µV. If the voltages are measured in microvolts, power is measured in square microvolts (µV²).</p>
+        <p>For a pure sinusoid centred on zero, the power over a whole number of cycles is half the squared amplitude, <strong class="c-pow"><var>A</var>² / 2</strong>. So a 5 µV sinusoid has a power of 12.5 µV², and a 10 µV sinusoid has a power of 50 µV². Doubling the amplitude quadruples the power.</p>
+      </section>
+
+      <section aria-labelledby="psd">
+        <h2 id="psd">Power Across Frequencies</h2>
+        <p>Power gives us one number for a stretch of EEG. What if we want to know how much of that power comes from activity around 10 Hz? The <a class="inline" href="eeg-power-spectral-density.html">power spectral density</a> shows how power is distributed across frequencies, in µV² per Hz. The area under that curve across a range of frequencies gives the power in that band.</p>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="eeg.html#basics">All EEG pages</a>
+        <a href="eeg-frequency-domain-overview.html">An Overview of Frequency Domain Analyses</a>
+      </nav>
+    </main>
+  </div>
+  <script>
+    const widget = document.querySelector("iframe.expo-widget");
+    window.addEventListener("message", event => {
+      if (event.origin !== window.location.origin || event.source !== widget.contentWindow) return;
+      if (event.data?.type === "expo-widget-height" && Number.isFinite(event.data.height)) {
+        widget.style.height = event.data.height + "px";
+      }
+    });
+  </script>
+</body>
+</html>
