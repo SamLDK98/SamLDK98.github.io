@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Squaring in two steps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .centre { stroke: var(--dim); stroke-width: 1; }
+  path { fill: none; stroke-width: 2; }
+  svg text.v { font-size: 12px; }
+  .ends { display: flex; justify-content: space-between; width: min(100%, 420px); margin: 0.2rem auto 0;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="svg" viewBox="0 0 440 276" role="img" aria-label="A sinusoidal wave with an amplitude of 4 microvolts. Partway along the slider, the signs are removed by taking the absolute value: the troughs flip up, meeting zero in sharp V shapes. The rest of the slider squares those sizes: the V shapes round off and the peaks grow from 4 to 16.">
+    <line class="centre" x1="40" x2="430" y1="205" y2="205" />
+    <text id="zero" x="32" y="209" text-anchor="end">0</text>
+    <path id="wave" />
+    <g id="pts"></g>
+  </svg>
+  <input type="range" id="t" min="0" max="1" step="0.005" value="0" aria-label="Remove the signs, then square the sizes" />
+  <div class="ends"><span>wave</span><span>squared</span></div>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg", A = 4, X0 = 50, X1 = 430;
+  // one fixed scale throughout: the centre line never moves, so every change on screen is a change in the values
+  const BASE = 205, S = 10.5;
+  const ORANGE = [232, 163, 61], PINK = [255, 92, 184], INK = [244, 246, 255];
+  const mix = (a, b, t) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(",")})`;
+  const ease = k => k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+  const x = u => A * Math.sin(2 * Math.PI * 2 * u);
+  const X = u => X0 + (X1 - X0) * u;
+  // about an eighth of the way along, the signs are removed in one jump (the absolute value);
+  // from 0.22 the sizes are squared, so the wave visibly grows from 4 to 16
+  const k1 = t => (t >= 0.12 ? 1 : 0), k2 = t => ease(Math.max(0, (t - 0.22) / 0.78));
+  const value = (v, a, b) => b > 0 ? (1 - b) * Math.abs(v) + b * v * v : (1 - a) * v + a * Math.abs(v);
+  // marked points where the wave is at +1, −4, +4 and −2 µV
+  const marks = [Math.asin(0.25) / (4 * Math.PI), 0.375, 0.625, (3 * Math.PI + Math.asin(0.5)) / (4 * Math.PI)].map(u => {
+    const g = document.getElementById("pts");
+    const c = document.createElementNS(NS, "circle"); c.setAttribute("r", 4.5); g.appendChild(c);
+    const lab = document.createElementNS(NS, "text"); lab.setAttribute("class", "v"); g.appendChild(lab);
+    return { u, c, lab };
+  });
+  const fmt = v => (Math.abs(v - Math.round(v)) > 0.05 ? Math.abs(v).toFixed(1) : String(Math.round(Math.abs(v))));
+  function draw() {
+    const t = document.getElementById("t").valueAsNumber, a = k1(t), b = k2(t);
+    const base = BASE, s = S;
+    let d = "";
+    for (let i = 0; i <= 400; i++) d += (i ? " L" : "M") + X(i / 400).toFixed(1) + "," + (base - s * value(x(i / 400), a, b)).toFixed(1);
+    const w = document.getElementById("wave"); w.setAttribute("d", d); w.setAttribute("stroke", mix(INK, PINK, b));
+    marks.forEach(({ u, c, lab }) => {
+      const v = value(x(u), a, b), cx = X(u), cy = base - s * v, col = mix(ORANGE, PINK, b);
+      c.setAttribute("cx", cx); c.setAttribute("cy", cy); c.setAttribute("fill", col);
+      // each step's labels: its starting value, fading across to its end value
+      const raw = x(u), step2 = b > 0, kk = step2 ? b : a;
+      const start = step2 ? Math.abs(raw) : raw, end = step2 ? raw * raw : Math.abs(raw);
+      const shown = kk < 0.5 ? start : end;
+      lab.textContent = (shown < 0 ? "−" : "") + fmt(shown);
+      lab.setAttribute("opacity", (step2 ? Math.abs(2 * kk - 1) : 1).toFixed(2));
+      // keep each label on the side of its point that the curve leaves free
+      const slope = value(x(u + 0.002), a, b) - value(x(u - 0.002), a, b), sg = Math.abs(slope) < 0.02 ? 0 : Math.sign(slope);
+      const above = v >= 0, dx = (above ? -sg : sg) * 10;
+      lab.setAttribute("x", cx + dx); lab.setAttribute("y", above ? cy - 12 : cy + 24);
+      lab.setAttribute("text-anchor", dx < 0 ? "end" : dx > 0 ? "start" : "middle");
+      lab.style.fill = col;
+    });
+  }
+  document.getElementById("t").addEventListener("input", draw);
+  draw();
+</script>
+</body>
+</html>

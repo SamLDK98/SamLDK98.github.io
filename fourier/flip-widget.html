@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flipping where the test wave is negative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .widget { --wave: #7aa7ff; --test: #7fcf9a; --prod: #f2d45c; --neg: #ff5a5f; }
+  .baseline { stroke: var(--dim); stroke-width: 1; }
+  path.line { fill: none; }
+  .wave { stroke: var(--wave); stroke-width: 1.6; } .test { stroke: var(--test); stroke-width: 1.6; }
+  .ghost { stroke: var(--wave); stroke-width: 1.2; stroke-opacity: 0.25; }
+  .res { stroke: var(--prod); stroke-width: 1.6; }
+  .testneg { stroke: var(--neg); stroke-width: 1.6; fill: none; }
+  .edge { stroke: var(--neg); stroke-width: 1; stroke-opacity: 0.45; stroke-dasharray: 2 3; }
+  .fup { fill: var(--test); fill-opacity: 0.35; } .fdown { fill: var(--neg); fill-opacity: 0.35; }
+  .avg { stroke: var(--prod); stroke-width: 1.3; stroke-dasharray: 4 4; transition: opacity 0.2s; }
+  svg text { font-size: 12px; font-family: "IBM Plex Mono", monospace; }
+  text.w { fill: var(--wave); } text.t { fill: var(--test); } text.p { fill: var(--prod); } text.num { text-anchor: end; fill: var(--prod); }
+  .ends { display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 140" role="img" aria-label="A 2 hertz wave above a test wave whose negative stretches are drawn in red. The slider first flips the 2 hertz wave wherever the test wave is negative, shading tops flipped down in red and bottoms flipped up in green, then scales it by the test wave's size, turning it from blue to yellow: the product, with its average. With a 3 hertz test wave, as much flips down as up and the average is 0; with a 2 hertz test wave, only bottoms flip, everything ends up above the line and the average is 1.5.">
+    <g id="edges"></g>
+    <text x="0" y="12" id="rlab"></text><text class="num" x="440" y="12" id="rnum"></text>
+    <line class="baseline" x1="0" x2="440" y1="49" y2="49" />
+    <path class="line ghost" id="ghost" /><path class="fup" id="fup" /><path class="fdown" id="fdown" />
+    <path class="line res" id="res" /><line class="avg" id="avg" x1="0" x2="440" />
+    <text class="t" x="0" y="98" id="tlab"></text>
+    <line class="baseline" x1="0" x2="440" y1="117" y2="117" /><path class="line test" id="test" /><g id="negs"></g>
+  </svg>
+  <input type="range" id="u" min="0" max="1" step="0.005" value="0" aria-label="Flip, then scale" />
+  <div class="choices" role="group" aria-label="Test wave frequency">
+    <button type="button" data-f="3" aria-pressed="true">Test wave at 3 Hz</button>
+    <button type="button" data-f="2" aria-pressed="false">Test wave at 2 Hz</button>
+  </div>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  const $ = id => document.getElementById(id), W = 440, S = 9, N = 1200, NS = "http://www.w3.org/2000/svg";
+  const wave = t => 3 * Math.sin(2 * Math.PI * 2 * t);
+  let F = 3;
+  const test = t => Math.sin(2 * Math.PI * F * t);
+  const line = (fn, mid) => { let d = ""; for (let i = 0; i <= W; i++) d += (i ? " L" : "M") + i + "," + (mid - S * fn(i / W)).toFixed(1); return d; };
+  $("ghost").setAttribute("d", line(wave, 49));
+  // Result at slider u: first half swings the flipped parts over the line; second half scales by the test wave's size.
+  function result(t, u) {
+    const v = wave(t), tv = test(t), neg = tv < 0;
+    if (u <= 0.5) { const k = u / 0.5; return neg ? v * (1 - 2 * k) : v; }
+    const k = (u - 0.5) / 0.5, sv = neg ? -v : v;
+    return sv * ((1 - k) + k * Math.abs(tv));
+  }
+  function fills(u) {
+    let up = "", down = "", cur = null, seg = [];
+    const flush = () => { if (seg.length > 1) { const d = `M${seg[0][0]},49 ` + seg.map(p => `L${p[0]},${p[1].toFixed(1)}`).join(" ") + ` L${seg[seg.length - 1][0]},49 Z`; if (cur === "up") up += d; else down += d; } seg = []; };
+    for (let i = 0; i <= W; i++) {
+      const t = i / W, neg = test(t) < 0, v = wave(t);
+      const kind = neg ? (v < 0 ? "up" : "down") : null;
+      if (kind !== cur) { flush(); cur = kind; }
+      if (kind) seg.push([i, 49 - S * result(t, u)]);
+    }
+    flush();
+    $("fup").setAttribute("d", up); $("fdown").setAttribute("d", down);
+  }
+  function drawTest() {
+    $("tlab").textContent = `test wave · ${F} Hz`;
+    $("test").setAttribute("d", line(test, 117));
+    const g = $("negs"), ed = $("edges"); g.innerHTML = ""; ed.innerHTML = "";
+    const mk = (p, tag, a) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); };
+    const edge = x => mk(ed, "line", { class: "edge", x1: x, x2: x, y1: 18, y2: 132 });
+    let start = null;
+    for (let i = 0; i <= W; i++) {
+      const neg = test(i / W) < -1e-9;
+      if (neg && start === null) start = i - 1;
+      if ((!neg || i === W) && start !== null) {
+        const end = neg ? i : i; let d = "";
+        for (let x = start; x <= end; x++) d += (x === start ? "M" : " L") + x + "," + (117 - S * test(x / W)).toFixed(1);
+        mk(g, "path", { class: "testneg", d });
+        
+        start = null;
+      }
+    }
+  }
+  const mix = (a, b, k) => "#" + [0, 2, 4].map(o => Math.round(parseInt(a.substr(o + 1, 2), 16) * (1 - k) + parseInt(b.substr(o + 1, 2), 16) * k).toString(16).padStart(2, "0")).join("");
+  function draw() {
+    const u = $("u").valueAsNumber, k = u <= 0.5 ? 0 : (u - 0.5) / 0.5, col = mix("#7aa7ff", "#f2d45c", k);
+    $("res").setAttribute("d", line(t => result(t, u), 49)); $("res").style.stroke = col;
+    fills(u);
+    const lab = $("rlab"); lab.style.fill = col;
+    lab.textContent = u < 0.02 ? "2 Hz" : u <= 0.5 ? "2 Hz · flipped where the test wave is negative" : u < 0.99 ? "scaled by the test wave's size" : "product";
+    let m = 0; for (let n = 0; n < N; n++) m += wave(n / N) * test(n / N); m /= N; if (Math.abs(m) < 0.005) m = 0;
+    const done = u >= 0.99;
+    $("avg").setAttribute("y1", 49 - S * m); $("avg").setAttribute("y2", 49 - S * m); $("avg").style.opacity = done ? 1 : 0;
+    $("rnum").textContent = done ? "average " + m.toFixed(2) : "";
+  }
+  $("u").addEventListener("input", draw);
+  document.querySelectorAll("[data-f]").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-f]").forEach(o => o.setAttribute("aria-pressed", o === b));
+    F = +b.dataset.f; drawTest(); draw();
+  }));
+  drawTest(); draw();
+</script>
+</body>
+</html>

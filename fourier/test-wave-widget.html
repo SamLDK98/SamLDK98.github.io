@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The test wave</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .widget { --test: #7aa7ff; --pos: #6fe0e0; --neg: #9d8cff; --avg: #e8a33d; }
+  .baseline { stroke: var(--dim); stroke-width: 1; }
+  path.line { fill: none; vector-effect: non-scaling-stroke; }
+  .sig { stroke: var(--ink); stroke-width: 1.8; } .tst { stroke: var(--test); stroke-width: 1.6; }
+  .prod { stroke: var(--ink); stroke-opacity: 0.6; stroke-width: 1.1; }
+  .fpos { fill: var(--pos); fill-opacity: 0.35; } .fneg { fill: var(--neg); fill-opacity: 0.35; }
+  .avg { stroke: var(--avg); stroke-width: 2; }
+  svg text { font-size: 12px; } svg text.t { fill: var(--test); } svg text.s { fill: var(--ink); } svg text.a { fill: var(--avg); }
+  .bar { fill: var(--avg); } .bar.off { fill: var(--faint); } .bar.now { fill: var(--avg); }
+  .readout { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--ink); margin-top: 0.4rem; }
+  .readout b { font-weight: 400; color: var(--avg); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 270" role="img" aria-label="The signal, a test wave at the chosen frequency, and their product, shaded where it is positive and where it is negative, with a line at its average. The average is zero unless the test frequency matches one of the waves in the signal.">
+    <text class="s" x="0" y="12">signal = 3 µV at 2 Hz + 2 µV at 5 Hz</text>
+    <line class="baseline" x1="0" x2="440" y1="48" y2="48" /><path class="line sig" id="sig" />
+    <text class="t" x="0" y="96" id="tlab"></text>
+    <line class="baseline" x1="0" x2="440" y1="122" y2="122" /><path class="line tst" id="tst" />
+    <text class="s" x="0" y="170">signal × test wave</text>
+    <path class="fpos" id="pos" /><path class="fneg" id="neg" />
+    <line class="baseline" x1="0" x2="440" y1="222" y2="222" /><path class="line prod" id="prod" />
+    <line class="avg" id="avg" x1="0" x2="440" />
+  </svg>
+  <input type="range" id="f" min="1" max="8" step="1" value="1" aria-label="Test frequency" />
+  <p class="readout">average of the product <b id="ra"></b></p>
+  <svg viewBox="0 0 440 120" role="img" aria-label="A bar chart of the average of the product at each test frequency from 1 to 8 hertz. Bars appear as each frequency is tried; only 2 and 5 hertz are not zero." id="spec">
+    <line class="baseline" x1="40" x2="430" y1="92" y2="92" />
+    <g id="bars"></g>
+    <text x="235" y="116" text-anchor="middle">test frequency (Hz)</text>
+  </svg>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  // The signal: 3 µV at 2 Hz plus 2 µV at 5 Hz, over exactly one second.
+  // The test wave has a height of 1 and the chosen frequency. Their product is averaged over the second:
+  // waves at other frequencies average to zero; a matching wave leaves half its amplitude.
+  const $ = id => document.getElementById(id), NS = "http://www.w3.org/2000/svg", N = 1200, W = 440;
+  const sig = t => 3 * Math.sin(2 * Math.PI * 2 * t) + 2 * Math.sin(2 * Math.PI * 5 * t);
+  const average = f => { let m = 0; for (let n = 0; n < N; n++) { const t = n / N; m += sig(t) * Math.sin(2 * Math.PI * f * t); } return m / N; };
+  const AVG = {}; for (let f = 1; f <= 8; f++) AVG[f] = average(f);
+  const seen = new Set();
+  const path = (fn, mid, s) => { let d = ""; for (let i = 0; i <= W; i += 1) { const t = i / W; d += (i ? " L" : "M") + i + "," + (mid - s * fn(t)).toFixed(1); } return d; };
+  $("sig").setAttribute("d", path(sig, 48, 6));
+  // bars
+  const bx = f => 40 + (f - 0.5) * (390 / 8), bars = {};
+  for (let f = 1; f <= 8; f++) {
+    const r = document.createElementNS(NS, "rect"); r.setAttribute("x", bx(f) - 14); r.setAttribute("width", 28); $("bars").appendChild(r); bars[f] = r;
+    const l = document.createElementNS(NS, "text"); l.setAttribute("x", bx(f)); l.setAttribute("y", 106); l.setAttribute("text-anchor", "middle"); l.textContent = f; $("bars").appendChild(l);
+  }
+  function draw() {
+    const f = $("f").valueAsNumber; seen.add(f);
+    const tst = t => Math.sin(2 * Math.PI * f * t), prod = t => sig(t) * tst(t);
+    $("tst").setAttribute("d", path(tst, 122, 20));
+    $("tlab").textContent = `test wave · ${f} Hz`;
+    const PS = 7, MID = 222;
+    $("prod").setAttribute("d", path(prod, MID, PS));
+    let dp = `M0,${MID}`, dn = `M0,${MID}`;
+    for (let i = 0; i <= W; i++) { const v = prod(i / W); dp += ` L${i},${(MID - PS * Math.max(0, v)).toFixed(1)}`; dn += ` L${i},${(MID - PS * Math.min(0, v)).toFixed(1)}`; }
+    $("pos").setAttribute("d", dp + ` L${W},${MID} Z`); $("neg").setAttribute("d", dn + ` L${W},${MID} Z`);
+    const a = AVG[f], ya = MID - PS * a;
+    $("avg").setAttribute("y1", ya); $("avg").setAttribute("y2", ya);
+    $("ra").textContent = (Math.abs(a) < 0.005 ? 0 : a).toFixed(2) + " µV";
+    for (let g = 1; g <= 8; g++) {
+      const h = seen.has(g) ? Math.abs(AVG[g]) * 40 : 0;
+      bars[g].setAttribute("y", 92 - Math.max(h, seen.has(g) ? 1.5 : 0)); bars[g].setAttribute("height", Math.max(h, seen.has(g) ? 1.5 : 0));
+      bars[g].setAttribute("class", "bar" + (g === f ? " now" : "")); bars[g].style.opacity = g === f ? 1 : 0.55;
+    }
+  }
+  $("f").addEventListener("input", draw);
+  draw();
+</script>
+</body>
+</html>

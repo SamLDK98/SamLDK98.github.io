@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Testing every frequency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .widget { --wave: #7aa7ff; --test: #7fcf9a; --prod: #f2d45c; --neg: #ff5a5f; --pow: #ff5cb8; }
+  .baseline { stroke: var(--dim); stroke-width: 1; }
+  path.line { fill: none; }
+  .wave { stroke: var(--wave); stroke-width: 1.4; }
+  .prod { stroke: var(--prod); stroke-width: 1.2; }
+  .fpos { fill: var(--test); fill-opacity: 0.18; } .fneg { fill: var(--neg); fill-opacity: 0.18; }
+  .avg { stroke: var(--prod); stroke-width: 1.3; stroke-dasharray: 4 4; }
+  svg text { font-size: 12px; font-family: "IBM Plex Mono", monospace; }
+  text.w { fill: var(--wave); } text.t { fill: var(--test); } text.num { text-anchor: end; fill: var(--prod); }
+  text.ax { fill: var(--dim); text-anchor: middle; } text.cap { fill: var(--ink); }
+  .bar { fill: var(--prod); fill-opacity: 0.75; } .bar.pow { fill: var(--pow); }
+  .bar.cur { fill-opacity: 1; }
+  .cursor { fill: none; stroke: var(--ink); stroke-opacity: 0.5; stroke-width: 1; }
+  .tick { stroke: var(--ink); stroke-width: 2; }
+  #cosrow { transition: opacity 0.25s; }
+  .readout { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--ink); margin-top: 0.5rem; line-height: 1.7; min-height: 3.4em; }
+  .readout b { font-weight: 400; color: var(--prod); } .readout b.p { color: var(--pow); }
+  .ends { display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--dim); }
+  .choices { margin-top: 0.4rem; } .choices button { font-size: 0.95rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 528" id="svg" role="img" aria-label="A complex wave made of waves at every frequency from 1 to 15 hertz. A slider picks a test frequency; the complex wave is multiplied by sine and cosine test waves at that frequency, and the amplitude recovered from their averages appears as a bar. Once every frequency is tested, the hidden amplitudes are shown as white marks, and the bars match them. The bars can be switched to power, whose total equals the complex wave's average power, and the cosine test can be switched off to show how the bars go wrong.">
+    <text class="w" x="0" y="12">complex wave</text>
+    <line class="baseline" x1="0" x2="440" y1="66" y2="66" /><path class="line wave" id="wave" />
+    <text class="t" x="0" y="134" id="slab"></text><text class="num" id="as" x="440" y="134"></text>
+    <path class="fpos" id="p1" /><path class="fneg" id="n1" />
+    <line class="baseline" x1="0" x2="440" y1="182" y2="182" /><path class="line prod" id="q1" /><line class="avg" id="v1" x1="0" x2="440" />
+    <g id="cosrow">
+      <text class="t" x="0" y="244" id="clab"></text><text class="num" id="ac" x="440" y="244"></text>
+      <path class="fpos" id="p2" /><path class="fneg" id="n2" />
+      <line class="baseline" x1="0" x2="440" y1="292" y2="292" /><path class="line prod" id="q2" /><line class="avg" id="v2" x1="0" x2="440" />
+    </g>
+    <text class="cap" x="0" y="358" id="chartlab"></text>
+    <text class="cap" x="440" y="358" text-anchor="end" id="recipelab" style="opacity:0">▬ hidden recipe</text>
+    <line class="baseline" x1="20" x2="436" y1="444" y2="444" />
+    <g id="bars"></g><g id="ticks"></g><rect class="cursor" id="cur" />
+    <g id="axis"></g>
+  </svg>
+  <input type="range" id="f" min="1" max="15" step="1" value="1" aria-label="Test frequency" />
+  <div class="ends"><span>1 Hz</span><span>test frequency</span><span>15 Hz</span></div>
+  <p class="readout" id="read"></p>
+  <div class="choices" role="group" aria-label="Sweep"><button type="button" id="all">Test all</button><button type="button" id="reset">Reset</button></div>
+  <div class="choices" role="group" aria-label="Bars show">
+    <button type="button" data-m="amp" aria-pressed="true">Amplitude</button><button type="button" data-m="pow" aria-pressed="false">Power</button>
+  </div>
+  <div class="choices" role="group" aria-label="Test waves">
+    <button type="button" data-t="both" aria-pressed="true">Sine + cosine</button><button type="button" data-t="sine" aria-pressed="false">Sine only</button>
+  </div>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  // Hidden recipe: a wave at each whole frequency from 1 to 15 Hz, with its own amplitude (µV) and phase.
+  const AMP = [2.0, 1.7, 1.5, 1.3, 1.1, 0.95, 0.9, 1.2, 2.0, 2.6, 1.8, 0.9, 0.6, 0.5, 0.4];
+  const PH = [40, 200, 110, 300, 15, 250, 170, 80, 320, 130, 230, 60, 190, 280, 100].map(d => d * Math.PI / 180);
+  const $ = id => document.getElementById(id), NS = "http://www.w3.org/2000/svg", W = 440, N = 1500, S = 4;
+  const sig = t => { let v = 0; for (let k = 0; k < 15; k++) v += AMP[k] * Math.sin(2 * Math.PI * (k + 1) * t + PH[k]); return v; };
+  const SIG = new Float64Array(N + 1); for (let n = 0; n <= N; n++) SIG[n] = sig(n / N);
+  const line = (fn, mid) => { let d = ""; for (let i = 0; i <= W; i++) d += (i ? " L" : "M") + i + "," + (mid - S * fn(i / W)).toFixed(1); return d; };
+  function shade(fn, mid, pid, nid) {
+    let dp = `M0,${mid}`, dn = `M0,${mid}`;
+    for (let i = 0; i <= W; i++) { const v = fn(i / W); dp += ` L${i},${(mid - S * Math.max(0, v)).toFixed(1)}`; dn += ` L${i},${(mid - S * Math.min(0, v)).toFixed(1)}`; }
+    $(pid).setAttribute("d", dp + ` L${W},${mid} Z`); $(nid).setAttribute("d", dn + ` L${W},${mid} Z`);
+  }
+  $("wave").setAttribute("d", line(sig, 66));
+  // Averages of the product with sine and cosine test waves, for every frequency (whole cycles in one second).
+  const SA = [], CA = [];
+  for (let f = 1; f <= 15; f++) { let s = 0, c = 0; for (let n = 0; n < N; n++) { const t = n / N; s += SIG[n] * Math.sin(2 * Math.PI * f * t); c += SIG[n] * Math.cos(2 * Math.PI * f * t); } SA.push(s / N); CA.push(c / N); }
+  let ms = 0; for (let n = 0; n < N; n++) ms += SIG[n] * SIG[n]; const TOTAL = ms / N;
+  // Chart geometry
+  const BASE = 444, X0 = 24, STEP = 27.4, BW = 17, KA = 28, KP = 22;
+  const bx = f => X0 + (f - 1) * STEP + (STEP - BW) / 2;
+  const el = (p, tag, a, txt) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; p.appendChild(e); return e; };
+  const bars = [], ticks = [];
+  for (let f = 1; f <= 15; f++) {
+    bars.push(el($("bars"), "rect", { class: "bar", x: bx(f), width: BW, y: BASE, height: 0, style: "opacity:0" }));
+    ticks.push(el($("ticks"), "line", { class: "tick", x1: bx(f) - 2, x2: bx(f) + BW + 2, style: "opacity:0" }));
+    el($("axis"), "text", { class: "ax", x: bx(f) + BW / 2, y: 518 }, f);
+  }
+  let mode = "amp", tests = "both", tested = new Set(), timer = null;
+  const est = f => { const s = SA[f - 1], c = CA[f - 1]; return tests === "both" ? 2 * Math.hypot(s, c) : 2 * s; };
+  const val = f => mode === "amp" ? est(f) : est(f) ** 2 / 2;
+  const truth = f => mode === "amp" ? AMP[f - 1] : AMP[f - 1] ** 2 / 2;
+  const K = () => mode === "amp" ? KA : KP;
+  const fm = v => (Math.abs(v) < 0.005 ? 0 : v).toFixed(2);
+  function drawBars() {
+    const f0 = $("f").valueAsNumber, k = K();
+    let sum = 0;
+    for (let f = 1; f <= 15; f++) {
+      const b = bars[f - 1], v = val(f), on = tested.has(f);
+      if (on) sum += v;
+      b.setAttribute("class", "bar" + (mode === "pow" ? " pow" : "") + (f === f0 ? " cur" : ""));
+      b.style.opacity = on ? 1 : 0;
+      b.setAttribute("y", v >= 0 ? BASE - k * v : BASE); b.setAttribute("height", Math.abs(k * v));
+      const tk = ticks[f - 1], ty = BASE - k * truth(f);
+      tk.setAttribute("y1", ty); tk.setAttribute("y2", ty); tk.style.opacity = tested.size === 15 ? 1 : 0;
+    }
+    $("recipelab").style.opacity = tested.size === 15 ? 1 : 0;
+    const v0 = val(f0), top = Math.min(BASE - k * Math.max(v0, 0), BASE) - 4, bot = Math.max(BASE, BASE - k * v0) + 4;
+    const cur = $("cur"); cur.setAttribute("x", bx(f0) - 3); cur.setAttribute("width", BW + 6); cur.setAttribute("y", top); cur.setAttribute("height", bot - top);
+    $("chartlab").textContent = mode === "amp" ? "amplitude (µV)" : "power (µV²)";
+    let r = `${f0} Hz · sine average <b>${fm(SA[f0 - 1])}</b>`;
+    if (tests === "both") r += ` · cosine average <b>${fm(CA[f0 - 1])}</b>`;
+    r += mode === "amp" ? `<br>amplitude <b>${fm(est(f0))} µV</b>` : `<br>power <b class="p">${fm(val(f0))} µV²</b>`;
+    if (mode === "pow" && tested.size === 15) r += ` · bars total <b class="p">${sum.toFixed(2)}</b> · complex wave's average power <b class="p">${TOTAL.toFixed(2)}</b> µV²`;
+    $("read").innerHTML = r;
+    if (window.postWidgetHeight) postWidgetHeight();
+  }
+  function drawTest() {
+    const f = $("f").valueAsNumber;
+    const sn = t => Math.sin(2 * Math.PI * f * t), cs = t => Math.cos(2 * Math.PI * f * t);
+    const ps = t => sig(t) * sn(t), pc = t => sig(t) * cs(t);
+    $("slab").textContent = `× sine test wave · ${f} Hz`; $("clab").textContent = `× cosine test wave · ${f} Hz`;
+    $("q1").setAttribute("d", line(ps, 182)); shade(ps, 182, "p1", "n1");
+    $("q2").setAttribute("d", line(pc, 292)); shade(pc, 292, "p2", "n2");
+    const s = SA[f - 1], c = CA[f - 1];
+    $("v1").setAttribute("y1", 182 - S * s); $("v1").setAttribute("y2", 182 - S * s);
+    $("v2").setAttribute("y1", 292 - S * c); $("v2").setAttribute("y2", 292 - S * c);
+    $("as").textContent = "average " + fm(s); $("ac").textContent = "average " + fm(c);
+    $("cosrow").style.opacity = tests === "both" ? 1 : 0.15;
+    tested.add(f); drawBars();
+  }
+  $("f").addEventListener("input", () => { stop(); drawTest(); });
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  $("all").addEventListener("click", () => {
+    stop(); let f = 1; const r = $("f");
+    const step = () => { r.value = f; r.style.setProperty("--pct", ((f - 1) / 14 * 100) + "%"); r.classList.remove("fresh"); drawTest(); if (++f > 15) stop(); };
+    step(); timer = setInterval(step, 320);
+  });
+  $("reset").addEventListener("click", () => { stop(); tested.clear(); $("f").value = 1; $("f").dispatchEvent(new Event("input")); });
+  document.querySelectorAll("[data-m]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-m]").forEach(o => o.setAttribute("aria-pressed", o === b)); mode = b.dataset.m; drawBars(); }));
+  document.querySelectorAll("[data-t]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-t]").forEach(o => o.setAttribute("aria-pressed", o === b)); tests = b.dataset.t; drawTest(); }));
+  drawTest();
+</script>
+</body>
+</html>

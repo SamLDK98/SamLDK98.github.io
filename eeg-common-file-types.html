@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Common File Types | Preprocessing | EEG | Sam Kirwan</title>
+  <meta name="description" content="EDF, BDF, BrainVision and EEGLAB files: what each contains and what goes wrong when importing them." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="eeg.css" />
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <h1>Common File Types</h1>
+    </header>
+    <main>
+      <section aria-labelledby="bit">
+        <h2 id="bit">What Is a Bit?</h2>
+        <p>A bit is the smallest unit a computer stores. It has two states, written 0 and 1.</p>
+        <p>Grouping bits gives more possible values: a group of <em>n</em> bits can hold 2<sup><em>n</em></sup> different values.</p>
+        <figure class="bytes">
+          <svg viewBox="0 0 640 200" role="img" aria-label="One bit has 2 possible values, two bits have 4, three bits have 8, and eight bits have 256">
+            <text class="small" x="10" y="29">1 bit</text><rect class="box" x="80" y="6" width="52" height="34" rx="3"/><text x="106" y="28" text-anchor="middle">0</text><rect class="box" x="138" y="6" width="52" height="34" rx="3"/><text x="164" y="28" text-anchor="middle">1</text><text x="600" y="29" text-anchor="end">2</text>
+            <text class="small" x="10" y="75">2 bits</text><rect class="box" x="80" y="52" width="52" height="34" rx="3"/><text x="106" y="74" text-anchor="middle">00</text><rect class="box" x="138" y="52" width="52" height="34" rx="3"/><text x="164" y="74" text-anchor="middle">01</text><rect class="box" x="196" y="52" width="52" height="34" rx="3"/><text x="222" y="74" text-anchor="middle">10</text><rect class="box" x="254" y="52" width="52" height="34" rx="3"/><text x="280" y="74" text-anchor="middle">11</text><text x="600" y="75" text-anchor="end">4</text>
+            <text class="small" x="10" y="121">3 bits</text><rect class="box" x="80" y="98" width="52" height="34" rx="3"/><text x="106" y="120" text-anchor="middle">000</text><rect class="box" x="138" y="98" width="52" height="34" rx="3"/><text x="164" y="120" text-anchor="middle">001</text><rect class="box" x="196" y="98" width="52" height="34" rx="3"/><text x="222" y="120" text-anchor="middle">010</text><rect class="box" x="254" y="98" width="52" height="34" rx="3"/><text x="280" y="120" text-anchor="middle">011</text><rect class="box" x="312" y="98" width="52" height="34" rx="3"/><text x="338" y="120" text-anchor="middle">100</text><rect class="box" x="370" y="98" width="52" height="34" rx="3"/><text x="396" y="120" text-anchor="middle">101</text><rect class="box" x="428" y="98" width="52" height="34" rx="3"/><text x="454" y="120" text-anchor="middle">110</text><rect class="box" x="486" y="98" width="52" height="34" rx="3"/><text x="512" y="120" text-anchor="middle">111</text><text x="600" y="121" text-anchor="end">8</text>
+            <text class="small" x="10" y="173">8 bits</text>
+            <text x="80" y="173">&hellip;</text>
+            <text x="600" y="173" text-anchor="end">256</text>
+          </svg>
+          <figcaption>Each extra bit doubles the number of possible values.</figcaption>
+        </figure>
+      </section>
+
+      <section aria-labelledby="byte">
+        <h2 id="byte">What Is a Byte?</h2>
+        <p>A byte is a group of eight bits, so it can hold 256 different values, from 0 to 255.</p>
+        <p>Bytes are usually written as two hexadecimal digits, from <code>00</code> to <code>FF</code>. Hexadecimal counts in sixteens, using 0&ndash;9 and then A&ndash;F for 10&ndash;15. So <code>3F</code> is 3 &times; 16 + 15 = 63.</p>
+        <figure class="bytes">
+          <svg viewBox="0 0 640 205" role="img" aria-label="The byte 3F opened out into eight bits, 0 0 1 1 1 1 1 1, worth 128 64 32 16 8 4 2 1; the bits that are 1 add up to 63">
+            <rect class="box" x="342" y="6" width="56" height="44" rx="3"/><text x="370" y="33" text-anchor="middle">3F</text>
+            <path class="line" d="M342 50 L180 80 M398 50 L560 80"/>
+            <rect class="box" x="180" y="80" width="44" height="44" rx="3"/><text x="202" y="107" text-anchor="middle">0</text><text class="small" x="202" y="150" text-anchor="middle">128</text><rect class="box" x="228" y="80" width="44" height="44" rx="3"/><text x="250" y="107" text-anchor="middle">0</text><text class="small" x="250" y="150" text-anchor="middle">64</text><rect class="box" x="276" y="80" width="44" height="44" rx="3"/><text x="298" y="107" text-anchor="middle">1</text><text class="small on" x="298" y="150" text-anchor="middle">32</text><rect class="box" x="324" y="80" width="44" height="44" rx="3"/><text x="346" y="107" text-anchor="middle">1</text><text class="small on" x="346" y="150" text-anchor="middle">16</text><rect class="box" x="372" y="80" width="44" height="44" rx="3"/><text x="394" y="107" text-anchor="middle">1</text><text class="small on" x="394" y="150" text-anchor="middle">8</text><rect class="box" x="420" y="80" width="44" height="44" rx="3"/><text x="442" y="107" text-anchor="middle">1</text><text class="small on" x="442" y="150" text-anchor="middle">4</text><rect class="box" x="468" y="80" width="44" height="44" rx="3"/><text x="490" y="107" text-anchor="middle">1</text><text class="small on" x="490" y="150" text-anchor="middle">2</text><rect class="box" x="516" y="80" width="44" height="44" rx="3"/><text x="538" y="107" text-anchor="middle">1</text><text class="small on" x="538" y="150" text-anchor="middle">1</text>
+            <text x="370" y="192" text-anchor="middle">32 + 16 + 8 + 4 + 2 + 1 = 63</text>
+          </svg>
+          <figcaption>One byte is eight bits. Each bit is worth a power of two.</figcaption>
+        </figure>
+      </section>
+
+      <section aria-labelledby="file">
+        <h2 id="file">What Is a File?</h2>
+        <p>A file is a named sequence of bytes stored on a disk.</p>
+        <figure class="bytes">
+          <svg viewBox="0 0 640 150" role="img" aria-label="A file icon named rec.edf, opened out into a row of bytes: 30 20 20 20 20 20 20 20 and more">
+            <path class="doc" d="M20 20 H70 L90 40 V110 H20 Z M70 20 V40 H90"/>
+            <text class="small" x="55" y="135" text-anchor="middle">rec.edf</text>
+            <path class="line" d="M105 65 H148 M140 59 L148 65 L140 71"/>
+            <rect class="box" x="165" y="43" width="48" height="44" rx="3"/><text x="189.0" y="70.0" text-anchor="middle">30</text><rect class="box" x="219" y="43" width="48" height="44" rx="3"/><text x="243.0" y="70.0" text-anchor="middle">20</text><rect class="box" x="273" y="43" width="48" height="44" rx="3"/><text x="297.0" y="70.0" text-anchor="middle">20</text><rect class="box" x="327" y="43" width="48" height="44" rx="3"/><text x="351.0" y="70.0" text-anchor="middle">20</text><rect class="box" x="381" y="43" width="48" height="44" rx="3"/><text x="405.0" y="70.0" text-anchor="middle">20</text><rect class="box" x="435" y="43" width="48" height="44" rx="3"/><text x="459.0" y="70.0" text-anchor="middle">20</text><rect class="box" x="489" y="43" width="48" height="44" rx="3"/><text x="513.0" y="70.0" text-anchor="middle">20</text><rect class="box" x="543" y="43" width="48" height="44" rx="3"/><text x="567.0" y="70.0" text-anchor="middle">20</text>
+            <text x="612" y="70" text-anchor="middle">&hellip;</text>
+          </svg>
+          <figcaption>The first eight bytes of an EDF file.</figcaption>
+        </figure>
+      </section>
+
+      <section aria-labelledby="format">
+        <h2 id="format">Formats and Extensions</h2>
+        <p>A <strong>format</strong> is the set of rules for reading a file&rsquo;s bytes: where the header ends, what each field means, how many bytes make one sample, and what order the samples are in.</p>
+        <p>The <strong>extension</strong> is the end of the filename, after the dot. It tells software which format the file is in, and so which rules to use.</p>
+        <p>The extension is only a label:</p>
+        <figure class="bytes">
+          <svg viewBox="0 0 640 130" role="img" aria-label="rec.edf and rec.txt contain exactly the same bytes">
+            <text x="20" y="47">rec<tspan class="flt">.edf</tspan></text>
+            <rect class="box" x="200" y="20" width="48" height="44" rx="3"/><text x="224.0" y="47.0" text-anchor="middle">30</text><rect class="box" x="254" y="20" width="48" height="44" rx="3"/><text x="278.0" y="47.0" text-anchor="middle">20</text><rect class="box" x="308" y="20" width="48" height="44" rx="3"/><text x="332.0" y="47.0" text-anchor="middle">20</text><rect class="box" x="362" y="20" width="48" height="44" rx="3"/><text x="386.0" y="47.0" text-anchor="middle">20</text><rect class="box" x="416" y="20" width="48" height="44" rx="3"/><text x="440.0" y="47.0" text-anchor="middle">20</text><rect class="box" x="470" y="20" width="48" height="44" rx="3"/><text x="494.0" y="47.0" text-anchor="middle">20</text>
+            <text x="540" y="47" text-anchor="middle">&hellip;</text>
+            <text x="20" y="101">rec<tspan class="flt">.txt</tspan></text>
+            <rect class="box" x="200" y="74" width="48" height="44" rx="3"/><text x="224.0" y="101.0" text-anchor="middle">30</text><rect class="box" x="254" y="74" width="48" height="44" rx="3"/><text x="278.0" y="101.0" text-anchor="middle">20</text><rect class="box" x="308" y="74" width="48" height="44" rx="3"/><text x="332.0" y="101.0" text-anchor="middle">20</text><rect class="box" x="362" y="74" width="48" height="44" rx="3"/><text x="386.0" y="101.0" text-anchor="middle">20</text><rect class="box" x="416" y="74" width="48" height="44" rx="3"/><text x="440.0" y="101.0" text-anchor="middle">20</text><rect class="box" x="470" y="74" width="48" height="44" rx="3"/><text x="494.0" y="101.0" text-anchor="middle">20</text>
+            <text x="540" y="101" text-anchor="middle">&hellip;</text>
+          </svg>
+          <figcaption>Renaming a file changes its extension, not its bytes.</figcaption>
+        </figure>
+        <p>To change format, a file has to be <strong>converted</strong>: read with one set of rules and written with another.</p>
+        <p>Some parts of a file are <strong>text</strong>, which a text editor can read, like a BrainVision header. The samples are almost always <strong>binary</strong>: compact, but unreadable without the format&rsquo;s rules.</p>
+      </section>
+
+      <section aria-labelledby="reading">
+        <h2 id="reading">Reading the Same Bytes Two Ways</h2>
+        <figure class="bytes">
+          <svg viewBox="0 0 640 210" role="img" aria-label="The bytes 00 00 80 3F read as two 16-bit integers give 0 and 16256; read as one 32-bit float they give 1.0">
+            <text class="int" x="146" y="44" text-anchor="middle">0</text>
+            <text class="int" x="322" y="44" text-anchor="middle">16256</text>
+            <path class="int" d="M62 70 V58 H230 V70 M238 70 V58 H406 V70"/>
+            <text class="small" x="430" y="62">two 16-bit integers</text>
+            <rect class="box" x="60" y="80" width="80" height="48" rx="3"/><text x="100.0" y="109.0" text-anchor="middle">00</text><rect class="box" x="148" y="80" width="80" height="48" rx="3"/><text x="188.0" y="109.0" text-anchor="middle">00</text><rect class="box" x="236" y="80" width="80" height="48" rx="3"/><text x="276.0" y="109.0" text-anchor="middle">80</text><rect class="box" x="324" y="80" width="80" height="48" rx="3"/><text x="364.0" y="109.0" text-anchor="middle">3F</text>
+            <path class="flt" d="M62 138 V150 H406 V138"/>
+            <text class="small" x="430" y="154">one 32-bit float</text>
+            <text class="flt" x="234" y="180" text-anchor="middle">1.0</text>
+          </svg>
+          <figcaption>The same four bytes under two formats.</figcaption>
+        </figure>
+        <p>A format that stores 16-bit integers reads these bytes as two samples: <span class="c-freq">0</span> and <span class="c-freq">16256</span>. A format that stores 32-bit floats reads them as one sample: <span class="c-amp">1.0</span>.</p>
+        <p>Both readings take the last byte of each group as the most significant. This <strong>byte order</strong> is also part of the format.</p>
+        <p>Software that applies the wrong rules still produces numbers. They are just wrong.</p>
+      </section>
+
+      <section aria-labelledby="overview">
+        <h2 id="overview">What Every EEG Format Stores</h2>
+        <p>Every EEG format stores the same three things:</p>
+        <ul>
+          <li><strong>Header</strong>: channel names, sampling rate, and how to convert stored values to µV.</li>
+          <li><strong>Data</strong>: the samples.</li>
+          <li><strong>Events</strong>: markers or annotations with their times.</li>
+        </ul>
+        <table class="formats">
+          <thead><tr><th>Format</th><th>Files</th><th>Data stored as</th><th>Events</th></tr></thead>
+          <tbody>
+            <tr><td>EDF / EDF+</td><td>.edf</td><td>16-bit integers</td><td><code>EDF Annotations</code> channel (EDF+ only)</td></tr>
+            <tr><td>BDF</td><td>.bdf</td><td>24-bit integers</td><td><code>Status</code> channel</td></tr>
+            <tr><td>BrainVision</td><td>.vhdr .eeg .vmrk</td><td>16-bit integers or 32-bit floats</td><td>.vmrk file</td></tr>
+            <tr><td>EEGLAB</td><td>.set (.fdt)</td><td>32-bit floats</td><td>Inside the .set</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section aria-labelledby="edf">
+        <h2 id="edf">EDF and EDF+</h2>
+        <ul>
+          <li>One file: a plain-text header, then the data.</li>
+          <li>Values are stored as 16-bit integers. The header gives each channel a physical and a digital minimum and maximum, which convert integers to µV.</li>
+          <li>One integer step is worth (physical range) ÷ (digital range). A ±3,200 µV range gives steps of about 0.1 µV. If the range was set too wide on export, the precision is lost.</li>
+          <li>Each channel can have its own sampling rate. Check they match.</li>
+          <li>EDF+ stores events as an extra channel called <code>EDF Annotations</code>. This channel is a common cause of failed imports. Turning annotations off at import usually fixes it, but the events are then lost.</li>
+          <li><strong>BDF</strong> is BioSemi's 24-bit version of EDF. Triggers are in the <code>Status</code> channel.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="brainvision">
+        <h2 id="brainvision">BrainVision</h2>
+        <ul>
+          <li><code>.vhdr</code>: header (text)</li>
+          <li><code>.eeg</code>: data (binary)</li>
+          <li><code>.vmrk</code>: markers (text)</li>
+        </ul>
+        <p>Header excerpt:</p>
+<pre class="file">[Common Infos]
+DataFile=sub-01_task-rest_eeg.eeg
+MarkerFile=sub-01_task-rest_eeg.vmrk
+DataOrientation=MULTIPLEXED
+NumberOfChannels=64
+SamplingInterval=2000
+
+[Binary Infos]
+BinaryFormat=INT_16
+
+[Channel Infos]
+Ch1=Fp1,,0.1,µV
+<span class="dim">...</span></pre>
+        <ul>
+          <li><code>SamplingInterval</code> is in microseconds: 2000 µs = 500 Hz.</li>
+          <li>Channel lines are <em>name, reference, resolution, unit</em>. A blank reference means the online reference.</li>
+          <li><code>BinaryFormat</code> is <code>INT_16</code> or <code>IEEE_FLOAT_32</code>.</li>
+          <li>Amplifier settings and impedances are often listed at the bottom of the file.</li>
+        </ul>
+        <p>Marker excerpt:</p>
+<pre class="file">Mk1=New Segment,,1,1,0,20251116093012000000
+Mk2=Stimulus,S  1,5000,1,0</pre>
+        <ul>
+          <li>Fields are <em>type, description, position, length, channel</em>.</li>
+          <li>Position is in samples, counting from 1. Channel 0 means all channels.</li>
+        </ul>
+        <p><strong>Don't rename the files directly.</strong> The .vhdr names the .eeg and .vmrk files, and the .vmrk names the .eeg file. Edit those lines as well, or rename with a tool such as MNE-BIDS.</p>
+      </section>
+
+      <section aria-labelledby="eeglab">
+        <h2 id="eeglab">EEGLAB</h2>
+        <ul>
+          <li>The <code>.set</code> is a MATLAB file holding the EEG structure. The data are either inside it or in a separate <code>.fdt</code>.</li>
+          <li>A <code>.set</code> refers to its <code>.fdt</code> by name. Rename with Save As in EEGLAB, not on disk.</li>
+          <li>It stores the processing state: channel locations, events, ICA weights and command history. Use it for intermediate steps, and keep the raw recording in its original format.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="others">
+        <h2 id="others">Other Formats</h2>
+        <table class="formats">
+          <thead><tr><th>Format</th><th>Extension</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Neuroscan</td><td>.cnt</td><td>ANT Neuro uses .cnt for a different format.</td></tr>
+            <tr><td>EGI</td><td>.mff</td><td>A folder, not a single file.</td></tr>
+            <tr><td>FIF</td><td>.fif</td><td>MNE-Python and MEGIN (Elekta) MEG.</td></tr>
+            <tr><td>XDF</td><td>.xdf</td><td>Lab Streaming Layer. Several streams, each with its own timestamps.</td></tr>
+            <tr><td>MATLAB</td><td>.mat</td><td>No standard layout. Sampling rate, channel names and events must be supplied.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section aria-labelledby="bids">
+        <h2 id="bids">BIDS</h2>
+        <p>BIDS is a folder and naming convention, not a file format. For EEG it accepts EDF, BrainVision, EEGLAB and BDF, and recommends EDF or BrainVision.</p>
+      </section>
+
+      <section aria-labelledby="converting">
+        <h2 id="converting">Converting</h2>
+        <ul>
+          <li>Convert a copy. Keep the original.</li>
+          <li>Compare channel count, sampling rate, duration and number of events before and after.</li>
+          <li>Plot a few seconds of one channel from both files and check they match.</li>
+          <li>Converting to EDF can lose precision, because it stores 16-bit integers.</li>
+        </ul>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="eeg-preprocessing.html">← All Preprocessing pages</a>
+        <a href="eeg-bids-folder-structure.html">Next: BIDS Folder Structure →</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>

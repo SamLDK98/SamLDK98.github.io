@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The product of two waves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .widget { --a: #7aa7ff; --b: #7fcf9a; --pos: #6fe0e0; --neg: #9d8cff; --avg: #e8a33d; }
+  .baseline { stroke: var(--dim); stroke-width: 1; }
+  path.line { fill: none; vector-effect: non-scaling-stroke; }
+  .wa { stroke: var(--a); stroke-width: 1.7; } .wb { stroke: var(--b); stroke-width: 1.7; }
+  .prod { stroke: var(--ink); stroke-opacity: 0.6; stroke-width: 1.1; }
+  .fpos { fill: var(--pos); fill-opacity: 0.35; } .fneg { fill: var(--neg); fill-opacity: 0.35; }
+  .avg { stroke: var(--avg); stroke-width: 2; }
+  svg text { font-size: 12px; } svg text.a { fill: var(--a); } svg text.b { fill: var(--b); } svg text.p { fill: var(--ink); }
+  svg text.num { fill: var(--avg); text-anchor: end; }
+  .choices { margin-top: 0.5rem; } .choices button { font-size: 0.95rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 250" role="img" aria-label="Wave A and wave B, and their product, shaded where it is positive and where it is negative, with a line at its average. With different frequencies the average is zero whatever the phase. With the same frequency it depends on the phase.">
+    <text class="a" x="0" y="12">A · 2 Hz</text>
+    <line class="baseline" x1="0" x2="440" y1="40" y2="40" /><path class="line wa" id="wa" />
+    <text class="b" x="0" y="82" id="blab"></text>
+    <line class="baseline" x1="0" x2="440" y1="110" y2="110" /><path class="line wb" id="wb" />
+    <text class="p" x="0" y="156">A × B</text><text class="num" id="num" x="440" y="156"></text>
+    <path class="fpos" id="pos" /><path class="fneg" id="neg" />
+    <line class="baseline" x1="0" x2="440" y1="205" y2="205" /><path class="line prod" id="prod" />
+    <line class="avg" id="avg" x1="0" x2="440" />
+  </svg>
+  <input type="range" id="ph" min="0" max="360" step="5" value="0" aria-label="Phase of wave B" />
+  <div class="choices" role="group" aria-label="Frequency of wave B">
+    <button type="button" data-f="5" aria-pressed="true">B at 5 Hz</button>
+    <button type="button" data-f="2" aria-pressed="false">B at 2 Hz, same as A</button>
+  </div>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  // Both waves have a height of 1 and run for exactly one second. Their product is averaged over the second.
+  const $ = id => document.getElementById(id), N = 1200, W = 440, S = 24, PS = 36, MID = 205;
+  let FB = 5;
+  const line = (fn, mid, s) => { let d = ""; for (let i = 0; i <= W; i++) d += (i ? " L" : "M") + i + "," + (mid - s * fn(i / W)).toFixed(1); return d; };
+  function draw() {
+    const phi = $("ph").valueAsNumber * Math.PI / 180;
+    const a = t => Math.sin(2 * Math.PI * 2 * t), b = t => Math.sin(2 * Math.PI * FB * t + phi), p = t => a(t) * b(t);
+    $("wa").setAttribute("d", line(a, 40, S)); $("wb").setAttribute("d", line(b, 110, S)); $("prod").setAttribute("d", line(p, MID, PS));
+    $("blab").textContent = `B · ${FB} Hz`;
+    let dp = `M0,${MID}`, dn = `M0,${MID}`;
+    for (let i = 0; i <= W; i++) { const v = p(i / W); dp += ` L${i},${(MID - PS * Math.max(0, v)).toFixed(1)}`; dn += ` L${i},${(MID - PS * Math.min(0, v)).toFixed(1)}`; }
+    $("pos").setAttribute("d", dp + ` L${W},${MID} Z`); $("neg").setAttribute("d", dn + ` L${W},${MID} Z`);
+    let m = 0; for (let n = 0; n < N; n++) m += p(n / N); m /= N;
+    $("avg").setAttribute("y1", MID - PS * m); $("avg").setAttribute("y2", MID - PS * m);
+    $("num").textContent = "average " + (Math.abs(m) < 0.005 ? 0 : m).toFixed(2);
+  }
+  $("ph").addEventListener("input", draw);
+  document.querySelectorAll(".choices button").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".choices button").forEach(o => o.setAttribute("aria-pressed", o === btn));
+    FB = +btn.dataset.f; draw();
+  }));
+  draw();
+</script>
+</body>
+</html>

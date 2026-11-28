@@ -71,7 +71,15 @@
     figure.map .link { fill: none; stroke: var(--dim); stroke-width: 1.2; }
     figure.map .wave1 { fill: none; stroke: var(--wave); stroke-width: 1.6; }
     figure.map .wave2 { fill: none; stroke: var(--dim); stroke-width: 1.2; stroke-dasharray: 4 4; }
-    ul.props { margin-top: 0.4rem; }
+    ul.after-colon { margin-top: 1.5rem; }
+    hr { border: 0; border-top: 1px solid var(--faint); margin: 3.6rem 0 2.4rem; }
+    .math.big { font-size: 1.3em; margin: 1.6rem 0 1.8rem; }
+    /* each term of the function, with what it means */
+    ul.terms { list-style: none; margin: 1.4rem 0 1.4rem; }
+    ul.terms li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; align-items: baseline; }
+    ul.terms li + li { margin-top: 0.9rem; }
+    ul.terms .t { color: var(--ink); text-align: right; }
+    @media (max-width: 560px) { ul.terms li { grid-template-columns: 1fr; gap: 0.2rem; } ul.terms .t { text-align: left; } }
     .nw { white-space: nowrap; }
     .pair-ctl { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2.4rem; flex-wrap: wrap; }
     .pair-ctl button { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.06em; padding: 0.45rem 0.9rem; border-radius: 999px; border: 1px solid var(--faint); background: none; color: var(--dim); cursor: pointer; }
@@ -121,18 +129,18 @@
     <p>If we plot its height on the \(y\)-axis and time on the \(x\)-axis, we graph a sinusoidal wave.</p>
     <div class="wv" data-dials="" data-start="1,1,0"></div>
     <p>Three parameters of this circular motion can vary:</p>
-    <ul>
+    <ul class="after-colon">
       <li>The speed at which the point travels around the circle.</li>
       <li>The size of the circle (its radius).</li>
       <li>The position the point starts from.</li>
     </ul>
     <p style="margin-top: 2.2rem">Each one sets a property of the resulting wave:</p>
-    <ul class="props">
+    <ul class="props after-colon">
       <li><strong>Frequency</strong> <span class="c-wave">\((f)\)</span>: the number of complete oscillations (cycles) per second.</li>
       <li><strong>Amplitude</strong> <span class="c-wave">\((A)\)</span>: the greatest height of the peaks, and depth of the troughs, measured from the centre line.</li>
-      <li><strong>Initial phase</strong> <span class="c-wave">\((\phi)\)</span>: where the wave starts, both its height on the \(y\)-axis and the direction it is moving in. Two waves can start at the same height, one rising and the other falling.</li>
+      <li><strong>Initial phase</strong> <span class="c-wave">\((\phi)\)</span>: where the wave starts, both its height on the <span class="nw">\(y\)-axis</span> and the direction it is moving in. Two waves can start at the same height, one rising and the other falling.</li>
     </ul>
-    <div class="wv" data-dials="A w p" data-start="1,1,0"></div>
+    <div class="wv" data-dials="w A p" data-start="1,1,0"></div>
 
     <h2>Measuring the Speed of Rotation</h2>
     <p>We usually measure speed as distance travelled per unit of time, <span class="nw">\(\frac{\text{distance}}{\text{time}}\).</span></p>
@@ -150,7 +158,23 @@
     <p>Both describe the same motion. Frequency is easier to picture; angular frequency is more convenient in formulas, because the angle the point has turned through after \(t\) seconds is simply <span class="nw">\(\omega t\).</span> That is why a sinusoidal wave is usually written as</p>
     <div class="math">\[y = A \sin(\omega t + \phi) = A \sin(2\pi f t + \phi)\]</div>
 
-    <p class="next-down"><a href="sinusoidal-tetris-adding-waves.html" aria-label="Next: Adding Waves" title="Next: Adding Waves">→</a></p>
+    <hr />
+    <div class="math big">\[y(t) = \textcolor{#e8a33d}{A}\,\sin\!\left(2\pi \textcolor{#e8a33d}{f}\, t + \textcolor{#e8a33d}{\phi}\right)\]</div>
+    <p>The function gives the height \(y\) of the point at any time <span class="nw">\(t\).</span> It is easiest to read from the inside out.</p>
+    <ul class="terms">
+      <li><span class="t">\(t\)</span><span class="d">The time, in seconds, since the point set off. This is the input.</span></li>
+      <li><span class="t">\(\textcolor{#e8a33d}{f}\,t\)</span><span class="d">Rotations per second multiplied by seconds gives the number of rotations completed so far. After \(2\) seconds at \(f = 3\), the point has gone round \(6\) times.</span></li>
+      <li><span class="t">\(2\pi \textcolor{#e8a33d}{f}\,t\)</span><span class="d">Each rotation is an angle of \(2\pi\) radians, so this converts rotations into the angle turned through since the start. It is the same as <span class="nw">\(\omega t\).</span></span></li>
+      <li><span class="t">\(+\,\textcolor{#e8a33d}{\phi}\)</span><span class="d">The angle the point started at. Adding it gives the point's angle now, measured from the centre line.</span></li>
+      <li><span class="t">\(\sin(\ldots)\)</span><span class="d">For a circle of radius \(1\), the sine of an angle is the height of the point at that angle. It runs between \(-1\) and <span class="nw">\(1\).</span></span></li>
+      <li><span class="t">\(\textcolor{#e8a33d}{A}\,\sin(\ldots)\)</span><span class="d">Our circle has radius <span class="nw">\(A\),</span> so every height is scaled by <span class="nw">\(A\).</span> The wave now runs between \(-A\) and <span class="nw">\(A\).</span></span></li>
+    </ul>
+    <p>Together: time sets how far round the point has gone, the starting angle sets where it began, the sine turns that angle into a height, and the amplitude scales the height to the size of the circle.</p>
+    <p>For example, take \(A = 2\), \(f = 0.5\) and <span class="nw">\(\phi = 0\).</span> At \(t = 0.5\) seconds the point has made \(0.25\) of a rotation, an angle of <span class="nw">\(\frac{\pi}{2}\).</span> That is the top of the circle, so</p>
+    <div class="math">\[y = 2\sin\!\left(\tfrac{\pi}{2}\right) = 2 \times 1 = 2\]</div>
+    <p>the highest point of the wave.</p>
+
+    <p class="next-down"><a href="sinusoidal-tetris-rate-of-rotation-and-frequency.html" aria-label="Next: Rate of Rotation and Frequency" title="Next: Rate of Rotation and Frequency">→</a></p>
   </div>
 
   <script>

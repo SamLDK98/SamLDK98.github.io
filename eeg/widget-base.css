@@ -35,22 +35,35 @@ svg text.ink  { fill: var(--ink); }
 svg text.base { fill: var(--base); }
 svg text.exp  { fill: var(--exp); }
 
-/* the one control, as a slider: a thin track and a small chalk thumb */
+/* the one control, as a slider: a visible track (filled up to the thumb), a white thumb with a soft halo.
+   Until the reader first touches it, the thumb pulses gently so the slider isn't skimmed past. */
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
-  display: block; width: min(100%, 420px); margin: 0.8rem auto 0;
-  height: 20px; background: transparent; cursor: pointer;
+  --pct: 0%;
+  display: block; width: min(100%, 420px); margin: 0.9rem auto 0;
+  height: 26px; background: transparent; cursor: pointer;
 }
-input[type="range"]::-webkit-slider-runnable-track { height: 1.5px; background: var(--faint); }
-input[type="range"]::-moz-range-track { height: 1.5px; background: var(--faint); }
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px; border-radius: 2px;
+  background: linear-gradient(to right, rgba(244, 246, 255, 0.75) var(--pct), rgba(238, 242, 252, 0.2) var(--pct));
+}
+input[type="range"]::-moz-range-track { height: 3px; border-radius: 2px; background: rgba(238, 242, 252, 0.2); }
+input[type="range"]::-moz-range-progress { height: 3px; border-radius: 2px; background: rgba(244, 246, 255, 0.75); }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 14px; height: 14px; margin-top: -6.25px; border-radius: 50%;
-  background: var(--ink); box-shadow: 0 0 0 4px rgba(244, 246, 255, 0.08);
+  width: 18px; height: 18px; margin-top: -7.5px; border-radius: 50%;
+  background: var(--ink); box-shadow: 0 0 0 5px rgba(244, 246, 255, 0.12);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px; border: 0; border-radius: 50%;
-  background: var(--ink); box-shadow: 0 0 0 4px rgba(244, 246, 255, 0.08);
+  width: 18px; height: 18px; border: 0; border-radius: 50%;
+  background: var(--ink); box-shadow: 0 0 0 5px rgba(244, 246, 255, 0.12);
+}
+input[type="range"].fresh::-webkit-slider-thumb { animation: nudge 1.8s ease-out infinite; }
+input[type="range"].fresh::-moz-range-thumb { animation: nudge 1.8s ease-out infinite; }
+@keyframes nudge {
+  0%   { box-shadow: 0 0 0 4px rgba(244, 246, 255, 0.35); }
+  70%  { box-shadow: 0 0 0 13px rgba(244, 246, 255, 0); }
+  100% { box-shadow: 0 0 0 13px rgba(244, 246, 255, 0); }
 }
 input[type="range"]:focus-visible { outline: 1px solid var(--dim); outline-offset: 4px; }
 
@@ -68,5 +81,6 @@ input[type="range"]:focus-visible { outline: 1px solid var(--dim); outline-offse
 .choices button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
+  input[type="range"].fresh::-webkit-slider-thumb, input[type="range"].fresh::-moz-range-thumb { animation: none !important; }
   * { transition: none !important; animation: none !important; }
 }

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Equal portions of a journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .nav { display: flex; justify-content: center; gap: 2.4rem; margin-top: 0.4rem; }
+  .nav button {
+    font: inherit; font-size: 1.3rem; line-height: 1; width: 2.4rem; height: 2.4rem; border-radius: 50%;
+    background: none; border: 1px solid var(--faint); color: var(--ink); cursor: pointer;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .nav button:hover:not(:disabled) { border-color: var(--dim); }
+  .nav button:disabled { opacity: 0.25; cursor: default; }
+  .nav button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="img"></svg>
+  <div class="nav">
+    <button id="prev" type="button" aria-label="One step back">←</button>
+    <button id="next" type="button" aria-label="One step forward">→</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // A journey to 256 in 8 equal steps, drawn as 8 equal hops: additive (0, +32 each step) or, with
+  // ?journey=mul, multiplicative (1, ×2 each step). A window of two steps (a quarter of the journey)
+  // slides along with the arrows. Additive: wherever it sits, the two steps add 64. Multiplicative:
+  // wherever it sits, they multiply by 4, though the amount they add grows from 3 to 192.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  const INK = "#f4f6ff", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", BASE = "#e8a33d";
+  const MUL = new URLSearchParams(location.search).get("journey") === "mul";
+  const STEPS = 8, RUN = 2;
+  const out = k => MUL ? Math.pow(2, k) : 32 * k;
+  let k = 0;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const serif = e => { e.style.fontFamily = "Spectral, Georgia, serif"; return e; };
+
+  function render() {
+    prev.disabled = k === 0; next.disabled = k === STEPS - RUN;
+    const W = svg.clientWidth || 560, L = 22, R = W - 22, AX = 86, H = 160;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const x = i => L + i * (R - L) / STEPS, hw = (R - L) / STEPS;
+    const from = out(k), to = out(k + RUN);
+
+    // the bracket over the window, with what the two steps do together
+    const a = x(k), b = x(k + RUN);
+    el("path", { d: `M${a + 3} ${AX - 34} V${AX - 40} H${b - 3} V${AX - 34}`, fill: "none", stroke: BASE, "stroke-width": 1.4 });
+    const op = serif(el("text", { x: (a + b) / 2, y: AX - 50, "text-anchor": "middle", "font-size": W < 420 ? 17 : 19 }, MUL ? "×4" : "+64"));
+    op.style.fill = BASE;
+
+    // the line and the hops: the two in the window lit, the rest faint
+    el("line", { x1: x(0), x2: x(STEPS), y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    for (let i = 0; i < STEPS; i++) {
+      const lit = i >= k && i < k + RUN;
+      el("path", { d: `M${x(i)} ${AX} Q${x(i) + hw / 2} ${AX - Math.min(30, hw * 0.6)} ${x(i + 1)} ${AX}`, fill: "none", stroke: EXP, "stroke-opacity": lit ? 0.95 : 0.25, "stroke-width": 1.4 });
+    }
+
+    // the outputs under each step: start green, target red, the window's ends white, the rest dim
+    const fs = W < 420 ? 11 : 13;
+    for (let i = 0; i <= STEPS; i++) {
+      const v = out(i), edge = i === k || i === k + RUN;
+      const col = i === 0 ? VAL : i === STEPS ? RED : INK;
+      const c = el("circle", { cx: x(i), cy: AX, r: i === 0 || i === STEPS ? 3.2 : 2.4 });
+      c.style.fill = col; c.style.fillOpacity = (i === 0 || i === STEPS || edge) ? 1 : 0.45;
+      const t = el("text", { x: x(i), y: AX + 22, "text-anchor": "middle", "font-size": fs }, String(v));
+      t.style.fill = col; t.style.fillOpacity = (i === 0 || i === STEPS || edge) ? 1 : 0.5;
+    }
+
+    // the reading underneath
+    const r = serif(el("text", { x: W / 2, y: H - 14, "text-anchor": "middle", "font-size": W < 420 ? 15 : 17 }));
+    const parts = MUL
+      ? [[`${from} to ${to}:  `, INK, 0.75], ["×4", BASE, 1], [`   (an increase of ${to - from})`, INK, 0.45]]
+      : [[`${from} to ${to}:  `, INK, 0.75], ["+64", BASE, 1]];
+    parts.forEach(([s, col, o]) => { const p = el("tspan", {}, s, r); p.style.fill = col; p.style.fillOpacity = o; });
+    r.style.whiteSpace = "pre";
+
+    svg.setAttribute("aria-label", MUL
+      ? `Steps ${k + 1} and ${k + 2} of 8, from ${from} to ${to}: together they multiply the output by 4, an increase of ${to - from}.`
+      : `Steps ${k + 1} and ${k + 2} of 8, from ${from} to ${to}: together they add 64.`);
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  prev.addEventListener("click", () => { if (k > 0) { k--; render(); } });
+  next.addEventListener("click", () => { if (k < STEPS - RUN) { k++; render(); } });
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

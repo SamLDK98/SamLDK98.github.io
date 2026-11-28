@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotating a point</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root { --text: #ece2d1; --dim: #a89c87; --faint: rgba(236,226,209,0.2); --accent: #d4b888; --cos: #e8a13b; --sin: #6dd3c4; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; color: var(--text); font-family: 'EB Garamond', Georgia, serif; -webkit-font-smoothing: antialiased; }
+  .widget { max-width: 560px; margin: 0 auto; padding: 0.4rem 0 0.6rem; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .stages { display: flex; justify-content: center; gap: 1.4rem; margin-top: 0.9rem; }
+  .stages button { font: inherit; font-size: 1.02rem; color: var(--dim); background: none; border: 0; border-bottom: 1px solid transparent; padding: 0.15rem 0.1rem; cursor: pointer; }
+  .stages button[aria-pressed="true"] { color: var(--text); border-bottom-color: var(--accent); }
+  .stages button:focus-visible { outline: 1px solid var(--dim); outline-offset: 4px; }
+  .slider { display: flex; align-items: center; gap: 0.8rem; margin: 1rem auto 0; max-width: 420px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--dim); transition: opacity 0.25s; }
+  .slider input { flex: 1; accent-color: var(--accent); }
+  .readout { text-align: center; margin-top: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--dim); min-height: 1.4em; line-height: 1.6; }
+  .readout .c { color: var(--cos); } .readout .s { color: var(--sin); } .readout .t { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 330" id="svg" role="img" aria-label="A point on a circle of radius 1 at angle A, reached by a step of length cos A along the horizontal axis and a step of length sin A along the vertical axis. In stage 2 the axes and both steps are rotated by angle B, so the point moves to angle A plus B. In stage 3 the horizontal distance covered by each step is marked on the horizontal axis: cos A cos B for the first step and minus sin A sin B for the second, which add up to cos of A plus B."></svg>
+  <div class="stages" role="group" aria-label="Stage">
+    <button type="button" data-s="1" aria-pressed="true">1 · Coordinates</button>
+    <button type="button" data-s="2" aria-pressed="false">2 · Rotate</button>
+    <button type="button" data-s="3" aria-pressed="false">3 · Project</button>
+  </div>
+  <label class="slider" id="bwrap" style="opacity:0;pointer-events:none"><span>B</span><input type="range" id="b" min="-80" max="80" step="1" value="40" aria-label="Rotation angle B"><span id="bval">40°</span></label>
+  <p class="readout" id="read"></p>
+</div>
+<script>
+  const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("svg");
+  const CX = 170, CY = 200, R = 150, A = 35 * Math.PI / 180;
+  const COS = "#e8a13b", SIN = "#6dd3c4", TXT = "#ece2d1", DIM = "#a89c87", FAINT = "rgba(236,226,209,0.2)";
+  let stage = 1, Bshown = 0, anim = null;
+  const X = x => CX + R * x, Y = y => CY - R * y;
+  const f2 = v => (v < 0 ? "−" : "") + Math.abs(v).toFixed(2);
+  function el(tag, a, txt) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; svg.appendChild(e); return e; }
+  const line = (x1, y1, x2, y2, st, w, dash, op) => el("line", { x1: X(x1), y1: Y(y1), x2: X(x2), y2: Y(y2), stroke: st, "stroke-width": w || 1, "stroke-dasharray": dash || "", opacity: op == null ? 1 : op, "stroke-linecap": "round" });
+  const label = (x, y, t, col, anchor) => el("text", { x, y, fill: col, "text-anchor": anchor || "middle" }, t);
+  function arc(r, a0, a1, col) {
+    if (Math.abs(a1 - a0) < 0.01) return;
+    const p = a => [X(r * Math.cos(a)), Y(r * Math.sin(a))], [x0, y0] = p(a0), [x1, y1] = p(a1);
+    el("path", { d: `M${x0},${y0} A${R * r},${R * r} 0 0 ${a1 > a0 ? 0 : 1} ${x1},${y1}`, fill: "none", stroke: col, "stroke-width": 1 });
+  }
+  function draw() {
+    svg.innerHTML = "";
+    const B = Bshown, rot = stage >= 2;
+    const cA = Math.cos(A), sA = Math.sin(A), cB = Math.cos(B), sB = Math.sin(B);
+    // axes and circle
+    line(-1.12, 0, 1.12, 0, FAINT, 1); line(0, -1.12, 0, 1.12, FAINT, 1);
+    el("circle", { cx: CX, cy: CY, r: R, fill: "none", stroke: FAINT, "stroke-width": 1 });
+    // rotated axes
+    const u = [cB, sB], v = [-sB, cB];
+    if (rot) { line(-1.12 * u[0], -1.12 * u[1], 1.12 * u[0], 1.12 * u[1], DIM, 1, "4 4", 0.7); line(-1.12 * v[0], -1.12 * v[1], 1.12 * v[0], 1.12 * v[1], DIM, 1, "4 4", 0.7); }
+    // ghost of the original steps
+    if (rot) { line(0, 0, cA, 0, COS, 1.5, "", 0.18); line(cA, 0, cA, sA, SIN, 1.5, "", 0.18); }
+    // radius to the point
+    { const ang = A + (rot ? B : 0); line(0, 0, Math.cos(ang), Math.sin(ang), DIM, 1, "", 0.45); }
+    // steps
+    const p1 = [cA * u[0], cA * u[1]], p2 = [p1[0] + sA * v[0], p1[1] + sA * v[1]];
+    line(0, 0, p1[0], p1[1], COS, 2.6); line(p1[0], p1[1], p2[0], p2[1], SIN, 2.6);
+    // angle arcs
+    const a0 = rot ? B : 0;
+    arc(0.3, a0, a0 + A, DIM); label(X(0.38 * Math.cos(a0 + A / 2)), Y(0.38 * Math.sin(a0 + A / 2)) + 4, "A", DIM);
+    if (rot && Math.abs(B) > 0.08) { arc(0.15, 0, B, DIM); label(X(0.22 * Math.cos(B / 2)), Y(0.22 * Math.sin(B / 2)) + 4, "B", DIM); }
+    // step labels
+    const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const m1 = mid([0, 0], p1), m2 = mid(p1, p2);
+    const n1 = [-u[1], u[0]], n2 = [v[1], -v[0]];
+    if (stage < 3) {
+      label(X(m1[0] + 0.09 * n1[0] * -1), Y(m1[1] + 0.09 * n1[1] * -1) + 4, "cos A", COS);
+      label(X(m2[0] + 0.12 * n2[0]), Y(m2[1] + 0.12 * n2[1]) + 4, "sin A", SIN);
+    }
+    // point
+    el("circle", { cx: X(p2[0]), cy: Y(p2[1]), r: 4.5, fill: TXT });
+    label(X(p2[0]) + 10, Y(p2[1]) - 8, rot ? "A + B" : "A", TXT, "start");
+    // projections
+    if (stage === 3) {
+      line(p1[0], p1[1], p1[0], 0, COS, 1, "2 3", 0.8);
+      line(p2[0], p2[1], p2[0], 0, SIN, 1, "2 3", 0.8);
+      const sg = B >= 0 ? -1 : 1, yc = 0, ys = 0.17 * sg;
+      line(0, yc, p1[0], yc, COS, 4);
+      line(p1[0], ys, p2[0], ys, SIN, 4);
+      line(p1[0], 0, p1[0], ys, SIN, 1, "2 3", 0.8);
+      label(X(p1[0] / 2), Y(0) + (sg < 0 ? 15 : -7), "cos A cos B", COS);
+      label(X((p1[0] + p2[0]) / 2), Y(ys) + (sg < 0 ? 17 : -8), "−sin A sin B", SIN);
+      el("circle", { cx: X(p2[0]), cy: Y(0), r: 3, fill: TXT });
+    }
+    // readout
+    const r = document.getElementById("read");
+    if (stage === 1) r.innerHTML = `point = (<span class="c">cos A</span>, <span class="s">sin A</span>) = (<span class="c">${f2(cA)}</span>, <span class="s">${f2(sA)}</span>)`;
+    else if (stage === 2) r.innerHTML = `the point is now at angle A + B = <span class="t">${Math.round((A + B) * 180 / Math.PI)}°</span>`;
+    else r.innerHTML = `<span class="c">cos A cos B</span> − <span class="s">sin A sin B</span> = cos(A + B)<br><span class="c">${f2(cA * cB)}</span> ${sA * sB < 0 ? "+" : "−"} <span class="s">${Math.abs(sA * sB).toFixed(2)}</span> = <span class="t">${f2(Math.cos(A + B))}</span>`;
+  }
+  const target = () => document.getElementById("b").valueAsNumber * Math.PI / 180;
+  function animateTo(to) {
+    cancelAnimationFrame(anim);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { Bshown = to; draw(); return; }
+    const from = Bshown, t0 = performance.now(), D = 900;
+    const step = now => { const k = Math.min(1, (now - t0) / D), e = k * k * (3 - 2 * k); Bshown = from + (to - from) * e; draw(); if (k < 1) anim = requestAnimationFrame(step); };
+    anim = requestAnimationFrame(step);
+  }
+  document.querySelectorAll("[data-s]").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-s]").forEach(o => o.setAttribute("aria-pressed", o === b));
+    const prev = stage; stage = +b.dataset.s;
+    const w = document.getElementById("bwrap"); w.style.opacity = stage >= 2 ? 1 : 0; w.style.pointerEvents = stage >= 2 ? "auto" : "none";
+    if (stage === 1) animateTo(0); else if (prev === 1) animateTo(target()); else draw();
+  }));
+  document.getElementById("b").addEventListener("input", e => { document.getElementById("bval").textContent = e.target.value + "°"; cancelAnimationFrame(anim); Bshown = target(); draw(); });
+  draw();
+</script>
+</body>
+</html>

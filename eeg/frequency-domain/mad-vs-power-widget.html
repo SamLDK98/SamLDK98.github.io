@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAD versus power</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { --mad: #e8a33d; --p: #ff5cb8; }
+  .centre { stroke: var(--dim); stroke-width: 1; }
+  .bx { fill: var(--ink); fill-opacity: 0.85; }
+  .ba { fill: var(--mad); fill-opacity: 0.75; }
+  .bs { fill: var(--p); fill-opacity: 0.75; }
+  svg text.head { fill: var(--ink); font-size: 12px; text-anchor: middle; }
+  svg text.row { text-anchor: end; }
+  svg text.ra { fill: var(--mad); } svg text.rs { fill: var(--p); }
+  svg text.val { font-size: 13px; text-anchor: middle; }
+  .go { display: block; margin: 0.8rem auto 0; font: inherit; font-size: 1.08rem; background: none; border: 0;
+    border-bottom: 1px solid var(--p); color: var(--ink); padding: 0.15rem 0.2rem; cursor: pointer; }
+  .go:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="svg" viewBox="0 0 440 330" role="img" aria-label="Two sets of five displacements: 2, −2, 2, −2, 2 microvolts and 1, −1, 1, −1, 6 microvolts. Below each, their absolute values and their squares. Averaging levels each row to one height: the absolute values of both sets level to 2, but the squares level to 4 for the first set and 8 for the second."></svg>
+  <button type="button" class="go" id="go">Average</button>
+</div>
+<script src="../widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("svg");
+  const sets = [[2, -2, 2, -2, 2], [1, -1, 1, -1, 6]];
+  const COLS = [50, 250], SLOT = 36, BW = 26;
+  const ROWS = [
+    { key: "x",  base: 80,  scale: 8,   f: v => v,     cls: "bx", label: "x",  lc: "",   name: "" },
+    { key: "a",  base: 190, scale: 10,  f: Math.abs,   cls: "ba", label: "|x|", lc: "ra", name: "MAD" },
+    { key: "s",  base: 318, scale: 2.4, f: v => v * v, cls: "bs", label: "x²",  lc: "rs", name: "P" },
+  ];
+  const el = (tag, a, text) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; };
+
+  el("text", { class: "head", x: COLS[0] + 90, y: 14 }, "2, −2, 2, −2, 2");
+  el("text", { class: "head", x: COLS[1] + 90, y: 14 }, "1, −1, 1, −1, 6");
+  const parts = [];
+  ROWS.forEach(r => {
+    el("text", { class: "row " + r.lc, x: 38, y: r.base + 4 }, r.label);
+    COLS.forEach((cx, c) => {
+      el("line", { class: "centre", x1: cx, x2: cx + 180, y1: r.base, y2: r.base });
+      const vals = sets[c].map(r.f), mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+      const rects = vals.map(() => el("rect", { class: r.cls }));
+      const val = r.name ? el("text", { class: "val " + r.lc, x: cx + 90 }, `${r.name} = ${mean}`) : null;
+      parts.push({ r, cx, vals, mean, rects, val });
+    });
+  });
+
+  function draw(t) {
+    parts.forEach(({ r, cx, vals, mean, rects, val }) => {
+      const avg = r.name !== "";               // the displacement row itself is never averaged
+      vals.forEach((v, i) => {
+        const h = (avg ? (1 - t) * v + t * mean : v) * r.scale, w = avg ? BW + t * (SLOT - BW) : BW;
+        const x = cx + i * SLOT + SLOT / 2 - w / 2;
+        rects[i].setAttribute("x", x.toFixed(1)); rects[i].setAttribute("width", w.toFixed(1));
+        rects[i].setAttribute("y", (h >= 0 ? r.base - h : r.base).toFixed(1)); rects[i].setAttribute("height", Math.max(Math.abs(h), 0.5).toFixed(1));
+      });
+      if (val) { val.setAttribute("y", (r.base - mean * r.scale - 7).toFixed(1)); val.setAttribute("opacity", t); }
+    });
+  }
+
+  let t = 0, target = 0, raf = null;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function animate() {
+    if (still) { t = target; draw(t); return; }
+    const from = t, start = performance.now();
+    cancelAnimationFrame(raf);
+    const step = now => {
+      const k = Math.min(1, (now - start) / 900), e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+      t = from + (target - from) * e; draw(t);
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  }
+  document.getElementById("go").addEventListener("click", e => {
+    target = target ? 0 : 1;
+    e.currentTarget.textContent = target ? "Show each point" : "Average";
+    animate();
+  });
+  draw(0);
+</script>
+</body>
+</html>

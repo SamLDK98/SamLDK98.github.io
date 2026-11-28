@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ways of analysing EEG recordings — explanations by Sam Kirwan." />
+  <title>Analyses | EEG | Sam Kirwan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --beige: #e8dcc6;
+      --beige-deep: #ddcfb5;
+      --ink: #1d1a16;
+      --ink-deep: #0b0907;
+      --ink-soft: rgba(29, 26, 22, 0.55);
+      --black: #121110;
+      --cream: #efe6d6;
+      --cream-soft: rgba(239, 230, 214, 0.62);
+      --gold: #d9a441;
+      --gold-deep: #9c6a1e;
+    }
+
+    html, body { height: 100%; }
+    body {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(20rem, 0.9fr) 2fr;
+      font-family: "Alegreya", Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* a fine grain over both halves, so the colours read as paper and matte card rather than flat screen */
+    .half { position: relative; overflow: hidden; }
+    .half::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* left: the title on matte black */
+    .about {
+      background: var(--black);
+      color: var(--cream);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 4.5vw, 4.5rem);
+      box-shadow: inset -18px 0 40px -28px rgba(0, 0, 0, 0.9);
+    }
+    .about::after { opacity: 0.05; mix-blend-mode: screen; }
+    .about > div { position: relative; z-index: 1; }
+    .about h1 { font-weight: 500; font-size: clamp(2.2rem, 3.4vw, 3.2rem); line-height: 1.1; color: var(--cream); text-shadow: 0 0 14px var(--black), 0 0 28px var(--black); }
+    /* the way back up to EEG */
+    .about .kicker {
+      display: inline-block; margin-bottom: 1.2rem;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold);
+      text-decoration: none; transition: color 200ms ease;
+    }
+    .about .kicker:hover, .about .kicker:focus-visible { color: var(--cream); outline: none; }
+
+    /* right: three columns of pages, on beige */
+    .sections {
+      background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 5vw, 5rem);
+    }
+    .sections::after { opacity: 0.16; mix-blend-mode: multiply; }
+
+    .cols {
+      position: relative; z-index: 1; width: 100%;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2.4rem clamp(1.6rem, 3vw, 3rem); align-items: start;
+      animation: rise 320ms ease both;
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    h2 {
+      margin-bottom: 1.1rem;
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.06em; color: var(--gold-deep);
+    }
+
+    /* the pages, numbered quietly */
+    ul { list-style: none; counter-reset: page; }
+    li { counter-increment: page; display: flex; align-items: baseline; gap: 0.8rem; }
+    li::before {
+      content: counter(page, decimal-leading-zero); min-width: 1.4rem;
+      font-family: "Alegreya SC", Georgia, serif; font-size: 0.85rem; color: var(--ink-soft);
+    }
+    li + li { margin-top: 0.55rem; }
+
+    .cols a, li.planned span { font-size: clamp(1.05rem, 1.35vw, 1.25rem); line-height: 1.3; }
+    .cols a {
+      color: rgba(29, 26, 22, 0.82); text-decoration: none;
+      transition: color 350ms ease, font-weight 350ms ease;
+    }
+    /* on hover a title darkens and thickens, easing through the font's weights */
+    .cols a:hover, .cols a:focus-visible { color: var(--ink-deep); font-weight: 700; outline: none; }
+    /* working titles for pages not yet written */
+    li.planned span { color: var(--ink-soft); opacity: 0.75; }
+    li.planned::before { opacity: 0.6; }
+
+    @media (max-width: 1100px) and (min-width: 761px) {
+      .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* phones: keep the split, with smaller type, one column and no cells */
+    @media (max-width: 760px) {
+      body { grid-template-columns: 0.62fr 1fr; }
+      .about { padding: 2rem 0.9rem 2rem 1.1rem; }
+      .sections { padding: 2rem 1rem 2rem 1.1rem; align-items: flex-start; }
+      .about h1 { font-size: 1.45rem; }
+      .about .kicker { font-size: 0.72rem; margin-top: 1.4rem; }
+      .cols { grid-template-columns: 1fr; gap: 1.8rem; }
+      h2 { font-size: 0.75rem; margin-bottom: 0.7rem; }
+      li { gap: 0.55rem; }
+      li::before { font-size: 0.68rem; min-width: 1rem; }
+      li + li { margin-top: 0.4rem; }
+      .cols a, li.planned span { font-size: 0.95rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cols { animation: none; }
+      .cols a, .about .kicker { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="half about" aria-label="Analyses">
+    <div>
+      <h1>Analyses</h1>
+    </div>
+  </aside>
+
+  <main class="half sections" aria-label="Analyses pages">
+    <nav aria-label="Analyses pages" class="cols">
+      <section aria-labelledby="col-frequency">
+        <h2 id="col-frequency">Frequency Domain Analyses</h2>
+        <ul>
+          <li><a href="eeg-frequency-domain-overview.html">An Overview of Frequency Domain Analyses</a></li>
+          <li><a href="eeg-power-spectral-density.html">Power Spectral Density</a></li>
+          <li><a href="eeg-psd-estimation-and-welchs-method.html">PSD Estimation and Welch’s Method</a></li>
+          <li class="planned"><span>Time&ndash;Frequency Analysis</span></li>
+          <li class="planned"><span>Coherence and Connectivity</span></li>
+          <li class="planned"><span>Cross-Frequency Coupling</span></li>
+          <li class="planned"><span>The Aperiodic Component</span></li>
+        </ul>
+      </section>
+    </nav>
+  </main>
+</body>
+</html>

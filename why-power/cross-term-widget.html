@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Why power adds up: the extra term</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .widget { --wa: #7aa7ff; --wb: #7fcf9a; --pos: #6fe0e0; --neg: #9d8cff; --pow: #ff5cb8; --label: #bfc2cc; }
+  .baseline { stroke: var(--faint); stroke-dasharray: 4 4; }
+  path.line { fill: none; vector-effect: non-scaling-stroke; }
+  .pa { stroke: var(--wa); stroke-width: 1.6; } .pb { stroke: var(--wb); stroke-width: 1.6; }
+  .px { stroke: var(--ink); stroke-width: 1.2; stroke-opacity: 0.7; }
+  .fpos { fill: var(--pos); fill-opacity: 0.35; } .fneg { fill: var(--neg); fill-opacity: 0.3; }
+  svg text.la { fill: var(--wa); } svg text.lb { fill: var(--wb); } svg text.lx { fill: var(--ink); }
+  .legend { display: flex; justify-content: center; gap: 1.4rem; margin-top: 0.3rem; font-family: system-ui, sans-serif; font-size: 0.8rem; color: var(--label); }
+  .sw { display: inline-block; width: 0.8rem; height: 0.8rem; vertical-align: -0.1rem; margin-right: 0.35rem; }
+  .sw.pos { background: rgba(111, 224, 224, 0.5); } .sw.neg { background: rgba(157, 140, 255, 0.5); }
+  .controls { width: min(100%, 420px); margin: 1rem auto 0; font-family: system-ui, sans-serif; font-size: 0.85rem; }
+  .controls input { width: 100%; margin: 0.3rem 0 0; }
+  .lbl { display: flex; justify-content: space-between; color: var(--label); }
+  .lbl span { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .choices button { font-size: 0.95rem; }
+  .sub { text-align: center; font-family: system-ui, sans-serif; font-size: 0.8rem; color: var(--label); margin-top: 0.9rem; }
+  .readouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; width: min(100%, 480px); margin: 1.1rem auto 0; text-align: center; }
+  .readouts dt { font-family: system-ui, sans-serif; font-size: 0.75rem; color: var(--label); }
+  .readouts dd { font-family: "IBM Plex Mono", monospace; font-size: 1.15rem; margin-top: 0.3rem; font-variant-numeric: tabular-nums; color: var(--ink); }
+  #sum, #comb { color: var(--pow); }
+  #extra { color: var(--dim); }
+  .note { text-align: center; font-family: system-ui, sans-serif; font-size: 0.8rem; color: var(--dim); margin-top: 0.7rem; min-height: 2.4em; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 290" role="img" aria-label="Wave A, wave B, and the extra term 2AB over one second, shaded where it is positive and where it is negative">
+    <text class="la" x="0" y="11">wave A · 4 µV, 2 Hz</text>
+    <line class="baseline" x1="0" x2="440" y1="42" y2="42" /><path class="line pa" id="a" />
+    <text class="lb" x="0" y="82" id="blab">wave B · 4 µV, 5 Hz</text>
+    <line class="baseline" x1="0" x2="440" y1="113" y2="113" /><path class="line pb" id="b" />
+    <text class="lx" x="0" y="155">extra term 2 × A × B (µV²)</text>
+    <path class="fpos" id="pos" /><path class="fneg" id="neg" />
+    <line class="baseline" x1="0" x2="440" y1="215" y2="215" /><path class="line px" id="x" />
+    <text x="440" y="287" text-anchor="end">1 second</text>
+  </svg>
+  <div class="legend"><span><i class="sw pos"></i>positive terms</span><span><i class="sw neg"></i>negative terms</span></div>
+
+  <div class="controls">
+    <label class="lbl" for="ph">phase of wave B <span id="pho"></span></label>
+    <input type="range" id="ph" min="0" max="360" step="5" value="0" />
+  </div>
+  <p class="sub">frequency of wave B</p>
+  <div class="choices" role="group" aria-label="Frequency of wave B">
+    <button type="button" data-f="5" aria-pressed="true">5 Hz</button>
+    <button type="button" data-f="2" aria-pressed="false">2 Hz, same as A</button>
+  </div>
+
+  <dl class="readouts">
+    <div><dt>sum of individual powers</dt><dd id="sum"></dd></div>
+    <div><dt>power of combined wave</dt><dd id="comb"></dd></div>
+    <div><dt>average extra term</dt><dd id="extra"></dd></div>
+  </dl>
+  <p class="note" id="note"></p>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  // Over exactly one second, both waves hold whole numbers of cycles.
+  // power(A + B) = power(A) + power(B) + average of 2AB; the last term is what the shading shows.
+  const $ = id => document.getElementById(id), N = 2000, AMP = 4, FA = 2;
+  const SA = 6.5, SX = 1.75;      // px per µV for the waves, px per µV² for the extra term
+  let FB = 5;
+  const xpx = i => (i / N * 440).toFixed(1);
+  function draw() {
+    const phi = $("ph").valueAsNumber * Math.PI / 180;
+    let da = "", db = "", dx = "", dp = "M0,215", dn = "M0,215";
+    let pa = 0, pb = 0, pc = 0, ex = 0;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N, a = AMP * Math.sin(2 * Math.PI * FA * t), b = AMP * Math.sin(2 * Math.PI * FB * t + phi), x = 2 * a * b;
+      if (i < N) { pa += a * a; pb += b * b; pc += (a + b) ** 2; ex += x; }
+      if (i % 4 === 0) {
+        const X = xpx(i), sep = i ? " L" : "M";
+        da += sep + X + "," + (42 - SA * a).toFixed(1);
+        db += sep + X + "," + (113 - SA * b).toFixed(1);
+        dx += sep + X + "," + (215 - SX * x).toFixed(1);
+        dp += " L" + X + "," + (215 - SX * Math.max(0, x)).toFixed(1);
+        dn += " L" + X + "," + (215 - SX * Math.min(0, x)).toFixed(1);
+      }
+    }
+    dp += " L440,215 Z"; dn += " L440,215 Z";
+    $("a").setAttribute("d", da); $("b").setAttribute("d", db); $("x").setAttribute("d", dx);
+    $("pos").setAttribute("d", dp); $("neg").setAttribute("d", dn);
+    pa /= N; pb /= N; pc /= N; ex /= N;
+    const fmt = v => (Math.abs(v) < 0.005 ? 0 : v).toFixed(2) + " µV²";
+    $("sum").textContent = fmt(pa + pb); $("comb").textContent = fmt(pc); $("extra").textContent = fmt(ex);
+    $("pho").textContent = $("ph").value + "°";
+    $("blab").textContent = `wave B · 4 µV, ${FB} Hz`;
+    $("note").textContent = FB === FA
+      ? (Math.abs(ex) < 0.005 ? "Same frequency, a quarter cycle apart: the extra term happens to cancel here, but at almost every other phase it does not."
+                              : "Same frequency: the extra term no longer cancels, so the powers no longer add up.")
+      : "Different frequencies: the positive and negative areas always balance, whatever the phase.";
+  }
+  $("ph").addEventListener("input", draw);
+  document.querySelectorAll(".choices button").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".choices button").forEach(o => o.setAttribute("aria-pressed", o === btn));
+    FB = +btn.dataset.f; draw();
+  }));
+  draw();
+</script>
+</body>
+</html>

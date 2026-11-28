@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Changing Voltage Reading</title>
+  <link rel="stylesheet" href="../widget-base.css" />
+  <style>
+    .widget { --label: #bfc2cc; }
+    .caption, .controls, .toolbar { font-family: system-ui, sans-serif; font-size: 0.875rem; }
+    .caption { color: var(--label); margin: 0.6rem 0 0.25rem; }
+    .reading {
+      font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums;
+      font-size: clamp(2.2rem, 9vw, 3rem); text-align: center; color: var(--ink);
+      margin: 0.4rem 0 0.2rem; letter-spacing: 0.02em;
+    }
+    .reading .unit { font-size: 0.5em; color: var(--dim); margin-left: 0.3em; }
+    .baseline { stroke: var(--faint); }
+    .tick { stroke: var(--faint); }
+    .amp-mark { stroke: var(--amp); stroke-width: 1.5; }
+    .amp-guide { stroke: var(--amp); stroke-opacity: 0.45; stroke-dasharray: 3 4; }
+    svg text.amp { fill: var(--amp); }
+    .dot { fill: var(--ink); }
+    .ghost-dot { fill: none; stroke: var(--dim); stroke-width: 1.2; }
+    path { fill: none; vector-effect: non-scaling-stroke; }
+    .trace { stroke: var(--ink); stroke-width: 1.8; }
+    .ghost { stroke: var(--dim); stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .toolbar { display: flex; justify-content: center; gap: 1.4rem; margin-top: 0.6rem; }
+    .toolbar button {
+      font: inherit; background: none; border: 0; padding: 0.15rem 0.1rem; cursor: pointer;
+      color: var(--dim); border-bottom: 1px solid transparent;
+    }
+    .toolbar button:hover { color: var(--ink); }
+    .toolbar button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--amp); }
+    .toolbar button:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+    #record[hidden] { display: none; }
+    .controls { width: min(100%, 420px); margin: 1rem auto 0; display: grid; gap: 0.7rem; }
+    .controls input { margin: 0.35rem 0 0; width: 100%; }
+    .control-label { display: flex; justify-content: space-between; gap: 0.5rem; }
+    .control-label span { font-variant-numeric: tabular-nums; }
+    .c-amp { color: var(--amp); } .c-freq { color: var(--freq); }
+    .note { color: var(--dim); font-family: system-ui, sans-serif; font-size: 0.8rem; text-align: center; margin-top: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <p class="reading" aria-live="off"><span id="value">+0.0</span><span class="unit">µV</span></p>
+
+    <svg id="line" viewBox="0 0 440 56" role="img" aria-label="The current reading as a point on a scale from −10 to +10 microvolts">
+      <line class="baseline" x1="20" x2="420" y1="22" y2="22" />
+      <g id="ticks"></g>
+      <line class="amp-mark" id="amp-hi" y1="10" y2="34" />
+      <line class="amp-mark" id="amp-lo" y1="10" y2="34" />
+      <circle class="ghost-dot" id="ghost-dot" cy="22" r="5" />
+      <circle class="dot" id="dot" cy="22" r="6" />
+    </svg>
+
+    <div class="toolbar">
+      <button type="button" id="play" aria-pressed="false">Pause</button>
+      <button type="button" id="show-record" aria-pressed="false">Show the record over time</button>
+    </div>
+
+    <div id="record" hidden>
+      <p class="caption">The same reading, recorded over the last 6 seconds · newest on the right</p>
+      <svg viewBox="0 0 440 150" role="img" aria-label="The reading plotted against time">
+        <line class="baseline" x1="1" x2="439" y1="75" y2="75" />
+        <line class="amp-guide" id="guide-hi" x1="1" x2="439" />
+        <line class="amp-guide" id="guide-lo" x1="1" x2="439" />
+        <text class="amp" id="guide-hi-label" x="4" text-anchor="start"></text>
+        <text class="amp" id="guide-lo-label" x="4" text-anchor="start"></text>
+        <path class="ghost" id="ghost" />
+        <path class="trace" id="trace" />
+      </svg>
+      <p class="caption" id="ghost-caption">Dashed: the same rhythm at phase 0°</p>
+    </div>
+
+    <div class="controls">
+      <div>
+        <div class="control-label"><label for="amp" class="c-amp">Amplitude</label><span id="amp-out" class="c-amp"></span></div>
+        <input type="range" id="amp" min="1" max="10" step="0.5" value="5" />
+      </div>
+      <div>
+        <div class="control-label"><label for="freq" class="c-freq">Frequency</label><span id="freq-out" class="c-freq"></span></div>
+        <input type="range" id="freq" min="0.1" max="2" step="0.05" value="0.4" />
+      </div>
+      <div>
+        <div class="control-label"><label for="phase">Phase</label><span id="phase-out"></span></div>
+        <input type="range" id="phase" min="0" max="360" step="5" value="0" />
+      </div>
+    </div>
+    <p class="note">Slowed down so you can read it. Real EEG rhythms repeat several to dozens of times a second.</p>
+  </div>
+  <script src="../widget-base.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const amp = $("amp"), freq = $("freq"), phase = $("phase");
+    const X0 = 20, X1 = 420, MAXV = 10;              // number line spans −10 … +10 µV
+    const xOf = v => X0 + (v + MAXV) / (2 * MAXV) * (X1 - X0);
+    const W = 6, RY = 75, RS = 6.5;                  // record: 6 s window, 6.5 px per µV
+    const yOf = v => RY - RS * v;
+
+    const ticks = $("ticks");
+    for (const v of [-10, -5, 0, 5, 10]) {
+      const t = document.createElementNS(ticks.namespaceURI, "line");
+      t.setAttribute("class", "tick"); t.setAttribute("x1", xOf(v)); t.setAttribute("x2", xOf(v));
+      t.setAttribute("y1", 17); t.setAttribute("y2", 27);
+      const l = document.createElementNS(ticks.namespaceURI, "text");
+      l.setAttribute("x", xOf(v)); l.setAttribute("y", 50); l.setAttribute("text-anchor", "middle");
+      l.textContent = v > 0 ? "+" + v : v === 0 ? "0" : "−" + -v;
+      ticks.append(t, l);
+    }
+
+    let theta = 0;          // accumulated cycle angle, so changing frequency never makes the reading jump
+    let last = null, running = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const samples = [];     // { t, theta } over the last W seconds
+    let clock = 0;
+
+    const fmt = v => (v < -0.05 ? "−" : "+") + Math.abs(v).toFixed(1);
+
+    function labels() {
+      const A = amp.valueAsNumber;
+      $("amp-out").textContent = A.toFixed(1) + " µV";
+      $("freq-out").textContent = freq.valueAsNumber.toFixed(2) + " Hz";
+      $("phase-out").textContent = phase.valueAsNumber + "°";
+      for (const [id, s] of [["amp-hi", 1], ["amp-lo", -1]]) {
+        $(id).setAttribute("x1", xOf(s * A)); $(id).setAttribute("x2", xOf(s * A));
+      }
+      for (const [id, s] of [["guide-hi", 1], ["guide-lo", -1]]) {
+        $(id).setAttribute("y1", yOf(s * A)); $(id).setAttribute("y2", yOf(s * A));
+        const lab = $(id + "-label");
+        lab.setAttribute("y", yOf(s * A) + (s > 0 ? -4 : 12));
+        lab.textContent = (s > 0 ? "+" : "−") + A.toFixed(1) + " µV";
+      }
+      const showGhost = phase.valueAsNumber % 360 !== 0;
+      $("ghost").style.display = $("ghost-dot").style.display = showGhost ? "" : "none";
+      $("ghost-caption").style.visibility = showGhost ? "visible" : "hidden";
+    }
+
+    function draw() {
+      const A = amp.valueAsNumber, phi = phase.valueAsNumber * Math.PI / 180;
+      const v = A * Math.sin(theta + phi);
+      $("value").textContent = fmt(v);
+      $("dot").setAttribute("cx", xOf(v));
+      $("ghost-dot").setAttribute("cx", xOf(A * Math.sin(theta)));
+      if ($("record").hidden) return;
+      let d = "", g = "";
+      for (const s of samples) {
+        const x = (1 + 438 * (1 - (clock - s.t) / W)).toFixed(1);
+        d += (d ? " L" : "M") + x + "," + yOf(A * Math.sin(s.theta + phi)).toFixed(1);
+        g += (g ? " L" : "M") + x + "," + yOf(A * Math.sin(s.theta)).toFixed(1);
+      }
+      $("trace").setAttribute("d", d); $("ghost").setAttribute("d", g);
+    }
+
+    function step(now) {
+      if (last !== null && running) {
+        const dt = Math.min((now - last) / 1000, 0.1);
+        clock += dt;
+        theta += 2 * Math.PI * freq.valueAsNumber * dt;
+        samples.push({ t: clock, theta });
+        while (samples.length && clock - samples[0].t > W) samples.shift();
+      }
+      last = now;
+      draw();
+      requestAnimationFrame(step);
+    }
+
+    function setPlay() { $("play").textContent = running ? "Pause" : "Play"; }
+    $("play").addEventListener("click", () => { running = !running; setPlay(); });
+    $("show-record").addEventListener("click", e => {
+      const show = $("record").hidden;
+      $("record").hidden = !show;
+      e.currentTarget.setAttribute("aria-pressed", show);
+      e.currentTarget.textContent = show ? "Hide the record" : "Show the record over time";
+      draw(); window.postWidgetHeight && window.postWidgetHeight();
+    });
+    for (const el of [amp, freq, phase]) el.addEventListener("input", () => { labels(); draw(); });
+
+    labels(); setPlay(); requestAnimationFrame(step);
+  </script>
+</body>
+</html>

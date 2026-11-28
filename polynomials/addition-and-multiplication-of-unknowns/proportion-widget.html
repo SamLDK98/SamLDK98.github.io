@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Where squaring moves a number along its line</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: 600px; margin: 0 auto; }
+  .tag { display: block; text-align: center; min-height: 1.2em; margin-bottom: 0.2rem; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--dim); }
+  .choices { margin-top: 0.6rem; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <span class="tag" id="tag" aria-live="polite"></span>
+  <svg id="line" role="img"></svg>
+  <input id="t" type="range" min="0" max="1" step="0.01" value="0" aria-label="How far through squaring each number" />
+  <div class="choices" role="group" aria-label="Where the line ends">
+    <button type="button" data-end="1" aria-pressed="false">0 to 1</button>
+    <button type="button" data-end="2" aria-pressed="false">0 to 2</button>
+    <button type="button" data-end="4" aria-pressed="true">0 to 4</button>
+    <button type="button" data-end="10" aria-pressed="false">0 to 10</button>
+  </div>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // A stretch of the number line from 0 to some end, drawn at a fixed length on screen, with numbers a quarter,
+  // a half, three-quarters and all of the way along. Squaring sends each number to its square, and the line now
+  // runs from 0 to end². Drawn again at the same length, a number that was a fraction f of the way along
+  // lands f² of the way along — however long the line was.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("line"), slider = document.getElementById("t");
+  const FR = [0.25, 0.5, 0.75, 1];
+  const COL = ["#64c8a0", "#7aa7ff", "#e8a33d", "#f4f6ff"];
+  const NAME = { 0.25: "¼", 0.5: "½", 0.75: "¾", 1: "1", 0.0625: "¹⁄₁₆", 0.5625: "⁹⁄₁₆" };
+  const PAD = 26, H = 150, YA = 40, YB = 118;
+  let END = 4;
+  const fmt = (n) => String(+n.toFixed(2));
+
+  function el(name, attrs, text) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  }
+
+  function render() {
+    const t = +slider.value, ease = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+    const W = svg.clientWidth || 560;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    const sx = (f) => PAD + f * (W - 2 * PAD);
+    document.getElementById("tag").textContent = t === 0 ? "x" : t < 1 ? "squaring…" : "x · x";
+
+    // the two lines: before (0 to end) and after (0 to end²), both drawn the same length
+    [[YA, END, "before"], [YB, END * END, "after"]].forEach(([y, top]) => {
+      el("line", { x1: sx(0), x2: sx(1), y1: y, y2: y, stroke: "rgba(238,242,252,0.22)" });
+      [0, 0.25, 0.5, 0.75, 1].forEach((f) => {
+        el("line", { x1: sx(f), x2: sx(f), y1: y, y2: y + 5, stroke: "rgba(238,242,252,0.2)" });
+        el("text", { x: sx(f), y: y + 18, "text-anchor": "middle" }, fmt(f * top));
+      });
+    });
+
+    FR.forEach((f, i) => {
+      const g = f * f, x = sx(f + (g - f) * ease), y = YA + (YB - YA) * ease;
+      el("line", { x1: sx(f), x2: sx(g), y1: YA, y2: YB, stroke: COL[i], "stroke-opacity": 0.18, "stroke-dasharray": "2 3" });
+      el("circle", { cx: x, cy: y, r: 5, fill: COL[i] });
+      if (t === 0) el("text", { x: sx(f), y: YA - 11, "text-anchor": "middle", style: `fill: ${COL[i]}` }, (f === 1 ? "end" : NAME[f] + " way"));
+      if (t === 1 && f < 1) el("text", { x: sx(g), y: YB - 11, "text-anchor": "middle", style: `fill: ${COL[i]}` }, NAME[g]);
+    });
+    svg.setAttribute("aria-label", `A line from 0 to ${END} with numbers a quarter, a half, three-quarters and all of the way along. After squaring, the line runs from 0 to ${END * END}, and the same numbers sit a sixteenth, a quarter and nine-sixteenths of the way along.`);
+  }
+
+  slider.addEventListener("input", render);
+  document.querySelectorAll(".choices button").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".choices button").forEach((o) => o.setAttribute("aria-pressed", o === b));
+    END = +b.dataset.end; render();
+  }));
+  addEventListener("resize", render);
+  render();
+</script>
+</body>
+</html>

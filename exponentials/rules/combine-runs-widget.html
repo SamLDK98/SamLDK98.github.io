@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Two runs of steps, joined end to end</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../widget-base.css" />
+<style>
+  .widget { max-width: none; }
+  #fig { -webkit-user-select: none; user-select: none; touch-action: none; }
+  #fig .run { cursor: grab; outline: none; }
+  #fig .run:focus-visible .hit { stroke: var(--dim); stroke-dasharray: 2 3; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="fig" role="group" aria-label="Two runs of steps on the journey from 1 to 256 in steps of times 2. Drag each run, or focus it and use the arrow keys."></svg>
+</div>
+
+<script src="../widget-base.js"></script>
+<script>
+  // The journey from 1 to 256 in 8 steps of ×2. Two runs of steps sit above it: ×2³ (3 steps, blue)
+  // and ×2⁵ (5 steps, purple). Drag either along the journey: wherever it sits, it multiplies by the
+  // same factor. Lined up end to end, they cover all 8 steps: eight factors of ×2, ×256 in all.
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("fig");
+  const INK = "#f4f6ff", BASE = "#e8a33d", EXP = "#7aa7ff", VAL = "#7fcf9a", RED = "#e8706a", POW = "#c4a1e8";
+  const STEPS = 8, out = i => Math.pow(2, i);
+  const runs = [
+    { n: 3, s: 0, col: EXP, y: 40, name: "first" },   // both runs start at 1, one above the other
+    { n: 5, s: 0, col: POW, y: 86, name: "second" }
+  ];
+  let geo = null, drag = null;
+
+  function el(name, attrs, text, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const a in attrs) {
+      if (attrs[a] === null || attrs[a] === undefined) continue;
+      if (a === "font-size") e.style.fontSize = attrs[a] + "px"; else e.setAttribute(a, attrs[a]);
+    }
+    if (text !== undefined && text !== null) e.textContent = text;
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  const serif = e => { e.style.fontFamily = "Spectral, Georgia, serif"; return e; };
+
+  function render() {
+    const W = svg.clientWidth || 600, L = 24, R = W - 24, AX = 196, H = AX + 36;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("height", H);
+    svg.textContent = "";
+    // partly to scale, as on the Additive and Multiplicative Growth page: each step a little longer than the last
+    const P = 0.3, span = Math.pow(out(STEPS), P) - 1;
+    const px = i => L + (Math.pow(out(i), P) - 1) / span * (R - L);
+    geo = { px };
+    const fs = W < 460 ? 13 : 15;
+
+    // the journey: faint hops, outputs beneath
+    el("line", { x1: L, x2: R, y1: AX, y2: AX, stroke: INK, "stroke-opacity": 0.16, "stroke-width": 1.2 });
+    for (let i = 0; i < STEPS; i++) {
+      const rise = Math.min(52, (px(i + 1) - px(i)) * 0.42);
+      el("path", { d: `M${px(i)} ${AX} Q${(px(i) + px(i + 1)) / 2} ${AX - rise} ${px(i + 1)} ${AX}`, fill: "none", stroke: INK, "stroke-opacity": 0.28, "stroke-width": 1.2 });
+    }
+    for (let i = 0; i <= STEPS; i++) {
+      const c = el("circle", { cx: px(i), cy: AX, r: 2.4 });
+      c.style.fill = INK; c.style.fillOpacity = 0.5;
+      const t = el("text", { x: px(i), y: AX + 22, "text-anchor": "middle", "font-size": 12 }, out(i));
+      t.style.fill = INK; t.style.fillOpacity = 0.5;
+    }
+
+    // the two runs: a bracket over their steps, guides down to the journey, their factor above
+    runs.forEach((r, k) => {
+      const e = r.s + r.n, a = px(r.s), b = px(e);
+      const g = el("g", { class: "run", tabindex: 0, role: "slider", "aria-label": `The ${r.name} run, times 2 to the ${r.n}`, "aria-valuemin": 0, "aria-valuemax": STEPS - r.n, "aria-valuenow": r.s, "aria-valuetext": `steps ${r.s} to ${e}, from ${out(r.s)} to ${out(e)}` });
+      g.dataset.k = k;
+      el("rect", { class: "hit", x: a - 6, y: r.y - 26, width: b - a + 12, height: 40, fill: "transparent", stroke: "none" }, null, g);
+      [a, b].forEach(x => el("line", { x1: x, x2: x, y1: r.y + 6, y2: AX - 6, stroke: r.col, "stroke-opacity": 0.35, "stroke-dasharray": "3 4" }, null, g));
+      el("path", { d: `M${a} ${r.y + 7} V${r.y} H${b} V${r.y + 7}`, fill: "none", stroke: r.col, "stroke-width": drag && drag.k === k ? 2.4 : 1.8 }, null, g);
+      const t = serif(el("text", { x: (a + b) / 2, y: r.y - 9, "text-anchor": "middle", "font-size": fs }, Array(r.n).fill("×2").join(" "), g));
+      t.style.fill = r.col;
+    });
+
+    if (window.postWidgetHeight) window.postWidgetHeight();
+  }
+
+  // dragging: grab a run by its bracket, snap its start to the nearest step
+  function stepNear(x, r) {
+    let best = 0, bd = Infinity;
+    for (let i = 0; i <= STEPS - r.n; i++) { const d = Math.abs(geo.px(i) - x); if (d < bd) { bd = d; best = i; } }
+    return best;
+  }
+  const xAt = ev => ev.clientX - svg.getBoundingClientRect().left;
+  svg.addEventListener("pointerdown", ev => {
+    const g = ev.target.closest && ev.target.closest(".run"); if (!g) return;
+    const k = +g.dataset.k, r = runs[k];
+    ev.preventDefault(); svg.setPointerCapture(ev.pointerId);
+    drag = { k, offset: xAt(ev) - geo.px(r.s) }; render();
+  });
+  svg.addEventListener("pointermove", ev => {
+    if (!drag) return;
+    const r = runs[drag.k], s = stepNear(xAt(ev) - drag.offset, r);
+    if (s !== r.s) { r.s = s; render(); }
+  });
+  const drop = () => { if (drag) { drag = null; render(); } };
+  svg.addEventListener("pointerup", drop); svg.addEventListener("pointercancel", drop);
+  // keyboard: arrow keys move a focused run one step
+  svg.addEventListener("keydown", ev => {
+    const g = ev.target.closest && ev.target.closest(".run"); if (!g) return;
+    const k = +g.dataset.k, r = runs[k], d = ev.key === "ArrowRight" ? 1 : ev.key === "ArrowLeft" ? -1 : 0;
+    if (!d) return;
+    ev.preventDefault();
+    r.s = Math.max(0, Math.min(STEPS - r.n, r.s + d)); render();
+    const again = svg.querySelector(`.run[data-k="${k}"]`); if (again) again.focus();
+  });
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 60); });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Where points land after squaring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .ruler { stroke: var(--dim); stroke-width: 1.2; }
+  .tickmark { stroke: var(--dim); stroke-width: 1; }
+  .path { stroke: var(--ink); stroke-opacity: 0.1; stroke-width: 1; }
+  .mark { stroke-width: 2.2; stroke-linecap: round; }
+  .avg { stroke-width: 3; stroke-linecap: round; }
+  svg text.a { fill: var(--amp); } svg text.p { fill: var(--pow); }
+  .ends { display: flex; justify-content: space-between; width: min(100%, 420px); margin: 0.2rem auto 0;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 255" role="img" aria-label="Two vertical scales: absolute value from 0 to 4 microvolts, and squared from 0 to 16 square microvolts. Points taken from one hump of the wave at equal steps in time start on the left scale, crowded near the top, with their average about 64 percent of the way up. Sliding carries each point across to its squared value on the right: the point at 2 microvolts, halfway up, lands at 4, a quarter of the way up, and low points slide towards the bottom. On the right, the points crowd equally near the bottom and the top, and their average sits exactly halfway, at 8.">
+    <g id="paths"></g>
+    <line class="ruler" x1="110" x2="110" y1="25" y2="225" />
+    <line class="ruler" x1="330" x2="330" y1="25" y2="225" />
+    <g id="scales"></g>
+    <g id="marks"></g>
+    <line class="avg" id="avg" />
+    <text id="avglab"></text>
+    <circle id="hi" r="4.5" />
+    <text id="hilab"></text>
+  </svg>
+  <input type="range" id="t" min="0" max="1" step="0.005" value="0" aria-label="Square every value" />
+  <div class="ends"><span>absolute value</span><span>squared</span></div>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg", LX = 110, RX = 330, TOP = 25, BOT = 225, H = BOT - TOP, N = 24;
+  const ORANGE = [232, 163, 61], PINK = [255, 92, 184];
+  const mix = (a, b, t) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(",")})`;
+  const mk = (g, tag, a, text) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (text != null) e.textContent = text; document.getElementById(g).appendChild(e); return e; };
+  // scale labels, real values on each side
+  [[0, "0"], [2, "2"], [4, "4 µV"]].forEach(([v, l]) => { const y = BOT - H * v / 4;
+    mk("scales", "line", { class: "tickmark", x1: LX - 5, x2: LX, y1: y, y2: y }); mk("scales", "text", { x: LX - 9, y: y + 4, "text-anchor": "end" }, l); });
+  [[0, "0"], [4, "4"], [8, "8"], [16, "16 µV²"]].forEach(([v, l]) => { const y = BOT - H * v / 16;
+    mk("scales", "line", { class: "tickmark", x1: RX, x2: RX + 5, y1: y, y2: y }); mk("scales", "text", { x: RX + 9, y: y + 4 }, l); });
+  // points from one hump of the wave, at equal steps in time; heights as fractions of each scale
+  const pts = Array.from({ length: N }, (_, i) => { const f = Math.sin(Math.PI * (i + 0.5) / N); return { a: f, s: f * f }; });
+  pts.forEach(p => {
+    mk("paths", "line", { class: "path", x1: LX, x2: RX, y1: BOT - H * p.a, y2: BOT - H * p.s });
+    p.el = mk("marks", "line", { class: "mark" });
+  });
+  const meanA = pts.reduce((m, p) => m + p.a, 0) / N, meanS = pts.reduce((m, p) => m + p.s, 0) / N;
+  const ease = k => k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+  function draw() {
+    const t = ease(document.getElementById("t").valueAsNumber), x = LX + (RX - LX) * t, col = mix(ORANGE, PINK, t);
+    pts.forEach(p => { const y = BOT - H * ((1 - t) * p.a + t * p.s);
+      p.el.setAttribute("x1", x - 9); p.el.setAttribute("x2", x + 9); p.el.setAttribute("y1", y); p.el.setAttribute("y2", y); p.el.setAttribute("stroke", col); });
+    // the average of the points
+    const ya = BOT - H * ((1 - t) * meanA + t * meanS), avg = document.getElementById("avg");
+    avg.setAttribute("x1", x - 20); avg.setAttribute("x2", x + 20); avg.setAttribute("y1", ya); avg.setAttribute("y2", ya); avg.setAttribute("stroke", col);
+    // labels sit on the side away from the scale numbers: right of the marks at first, left of them at the end
+    const right = t < 0.5;
+    const al = document.getElementById("avglab"); al.setAttribute("x", right ? x + 26 : x - 26); al.setAttribute("y", ya + 4);
+    al.setAttribute("text-anchor", right ? "start" : "end"); al.textContent = "average";
+    al.style.fill = col;
+    // the point at 2 µV: halfway up, then a quarter of the way up
+    const hy = BOT - H * ((1 - t) * 0.5 + t * 0.25), hi = document.getElementById("hi");
+    hi.setAttribute("cx", x); hi.setAttribute("cy", hy); hi.setAttribute("fill", col);
+    const hl = document.getElementById("hilab"); hl.setAttribute("x", right ? x + 16 : x - 16); hl.setAttribute("y", hy + 4); hl.setAttribute("text-anchor", right ? "start" : "end");
+    hl.textContent = t < 0.5 ? "2 µV" : "4 µV²"; hl.style.fill = col; hl.setAttribute("opacity", Math.abs(2 * t - 1).toFixed(2));
+  }
+  document.getElementById("t").addEventListener("input", draw);
+  draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIDS Folder Structure | Preprocessing | EEG | Sam Kirwan</title>
+  <meta name="description" content="How to arrange and name EEG files using the Brain Imaging Data Structure (BIDS): the top level, one participant's folder, file names and derivatives." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="eeg.css" />
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <h1>BIDS Folder Structure</h1>
+    </header>
+    <main>
+      <section aria-labelledby="what">
+        <h2 id="what">What BIDS Is</h2>
+        <p>The <strong>Brain Imaging Data Structure</strong> (BIDS) is a standard for naming and arranging neuroimaging files. If a dataset follows it, anyone, and any BIDS-aware tool, can find every file without being told where it is.</p>
+      </section>
+
+      <section aria-labelledby="top">
+        <h2 id="top">The Top Level</h2>
+        <figure class="tree">
+          <svg viewBox="0 0 546 296" role="img" aria-label="The top level of a BIDS dataset: dataset_description.json, README, CHANGES, participants.tsv and .json, and the folders code, sourcedata, one sub folder per participant, and derivatives"><path class="icon dir" d="M20 13 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="40" y="22.5">project/</text><path class="rule" d="M26 26 V44 H39"/><path class="icon" d="M44 37 h6 l4 4 v10 h-10 Z"/><text class="" x="62" y="48.5">dataset_description.json</text><text class="note" x="274" y="48.5">required: name, BIDS version</text><path class="rule" d="M26 26 V70 H39"/><path class="icon" d="M44 63 h6 l4 4 v10 h-10 Z"/><text class="" x="62" y="74.5">README</text><text class="note" x="274" y="74.5">required: describes the dataset</text><path class="rule" d="M26 26 V96 H39"/><path class="icon" d="M44 89 h6 l4 4 v10 h-10 Z"/><text class="" x="62" y="100.5">CHANGES</text><text class="note" x="274" y="100.5">optional: version history</text><path class="rule" d="M26 26 V122 H39"/><path class="icon" d="M44 115 h6 l4 4 v10 h-10 Z"/><text class="" x="62" y="126.5">participants.tsv</text><text class="note" x="274" y="126.5">one row per participant</text><path class="rule" d="M26 26 V148 H39"/><path class="icon" d="M44 141 h6 l4 4 v10 h-10 Z"/><text class="" x="62" y="152.5">participants.json</text><text class="note" x="274" y="152.5">what each column means</text><path class="rule" d="M26 26 V174 H39"/><path class="icon dir" d="M42 169 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="62" y="178.5">code/</text><text class="note" x="274" y="178.5">your scripts</text><path class="rule" d="M26 26 V200 H39"/><path class="icon dir" d="M42 195 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="62" y="204.5">sourcedata/</text><text class="note" x="274" y="204.5">files as recorded, untouched</text><path class="rule" d="M26 26 V226 H39"/><path class="icon dir" d="M42 221 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="62" y="230.5">sub-01/</text><text class="note" x="274" y="230.5">raw data, one folder per participant</text><path class="rule" d="M26 26 V252 H39"/><path class="icon dir" d="M42 247 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="62" y="256.5">sub-02/</text><path class="rule" d="M26 26 V278 H39"/><path class="icon dir" d="M42 273 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="62" y="282.5">derivatives/</text><text class="note" x="274" y="282.5">everything processed</text></svg>
+        </figure>
+        <ul>
+          <li><code>dataset_description.json</code> and <code>README</code> are required.</li>
+          <li>Raw data go in the <code>sub-</code> folders. Processed data go in <code>derivatives/</code>. The two are never mixed.</li>
+          <li><code>sourcedata/</code> holds files before conversion to BIDS, such as the files copied off the recording computer.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="participant">
+        <h2 id="participant">One Participant</h2>
+        <figure class="tree">
+          <svg viewBox="0 0 589 296" role="img" aria-label="One participant folder: sub-01, then ses-01, then eeg, containing the three BrainVision files and the sidecar files eeg.json, channels.tsv, events.tsv, electrodes.tsv and coordsystem.json"><path class="icon dir" d="M20 13 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="40" y="22.5">sub-01/</text><path class="rule" d="M26 26 V44 H39"/><path class="icon dir" d="M42 39 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="62" y="48.5">ses-01/</text><text class="note" x="412" y="48.5">one per visit</text><path class="rule" d="M48 52 V70 H61"/><path class="icon dir" d="M64 65 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="84" y="74.5">eeg/</text><path class="rule" d="M70 78 V96 H83"/><path class="icon" d="M88 89 h6 l4 4 v10 h-10 Z"/><text class="data" x="106" y="100.5">sub-01_ses-01_task-rest_eeg.vhdr</text><text class="note" x="412" y="100.5">header</text><path class="rule" d="M70 78 V122 H83"/><path class="icon" d="M88 115 h6 l4 4 v10 h-10 Z"/><text class="data" x="106" y="126.5">sub-01_ses-01_task-rest_eeg.eeg</text><text class="note" x="412" y="126.5">data</text><path class="rule" d="M70 78 V148 H83"/><path class="icon" d="M88 141 h6 l4 4 v10 h-10 Z"/><text class="data" x="106" y="152.5">sub-01_ses-01_task-rest_eeg.vmrk</text><text class="note" x="412" y="152.5">markers</text><path class="rule" d="M70 78 V174 H83"/><path class="icon" d="M88 167 h6 l4 4 v10 h-10 Z"/><text class="" x="106" y="178.5">sub-01_ses-01_task-rest_eeg.json</text><text class="note" x="412" y="178.5">recording settings</text><path class="rule" d="M70 78 V200 H83"/><path class="icon" d="M88 193 h6 l4 4 v10 h-10 Z"/><text class="" x="106" y="204.5">sub-01_ses-01_task-rest_channels.tsv</text><text class="note" x="412" y="204.5">channel names and types</text><path class="rule" d="M70 78 V226 H83"/><path class="icon" d="M88 219 h6 l4 4 v10 h-10 Z"/><text class="" x="106" y="230.5">sub-01_ses-01_task-rest_events.tsv</text><text class="note" x="412" y="230.5">event times and types</text><path class="rule" d="M70 78 V252 H83"/><path class="icon" d="M88 245 h6 l4 4 v10 h-10 Z"/><text class="" x="106" y="256.5">sub-01_ses-01_electrodes.tsv</text><text class="note" x="412" y="256.5">electrode positions</text><path class="rule" d="M70 78 V278 H83"/><path class="icon" d="M88 271 h6 l4 4 v10 h-10 Z"/><text class="" x="106" y="282.5">sub-01_ses-01_coordsystem.json</text><text class="note" x="412" y="282.5">needed with electrodes</text></svg>
+        </figure>
+        <ul>
+          <li>Leave out <code>ses-</code> folders if each participant was recorded once. If any participant has more than one session, use them for everyone.</li>
+          <li><code>_eeg.json</code> is required. It must give the task name, reference, sampling rate, mains frequency and software filters.</li>
+          <li><code>_channels.tsv</code> is recommended. <code>_electrodes.tsv</code> is optional, but if it is there, <code>_coordsystem.json</code> is required.</li>
+          <li>For EDF or EEGLAB data, the three BrainVision files are replaced by one <code>.edf</code>, or a <code>.set</code> and <code>.fdt</code>.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="names">
+        <h2 id="names">File Names</h2>
+        <figure class="bytes">
+          <svg viewBox="0 0 541 118" role="img" aria-label="The file name sub-01_ses-01_task-rest_run-1_eeg.vhdr split into subject, session, task, run, suffix and extension"><text class="big " x="20.0" y="44" textLength="79.2" lengthAdjust="spacingAndGlyphs">sub-01</text><path class="line" d="M22.0 58 v8 H97.2 v-8"/><text class="small" x="59.6" y="88" text-anchor="middle">subject</text><text class="big sep" x="99.2" y="44" textLength="13.2" lengthAdjust="spacingAndGlyphs">_</text><text class="big " x="112.4" y="44" textLength="79.2" lengthAdjust="spacingAndGlyphs">ses-01</text><path class="line" d="M114.4 58 v8 H189.6 v-8"/><text class="small" x="152.0" y="88" text-anchor="middle">session</text><text class="big sep" x="191.6" y="44" textLength="13.2" lengthAdjust="spacingAndGlyphs">_</text><text class="big " x="204.8" y="44" textLength="118.8" lengthAdjust="spacingAndGlyphs">task-rest</text><path class="line" d="M206.8 58 v8 H321.6 v-8"/><text class="small" x="264.2" y="88" text-anchor="middle">task</text><text class="big sep" x="323.6" y="44" textLength="13.2" lengthAdjust="spacingAndGlyphs">_</text><text class="big " x="336.8" y="44" textLength="66.0" lengthAdjust="spacingAndGlyphs">run-1</text><path class="line" d="M338.8 58 v8 H400.8 v-8"/><text class="small" x="369.8" y="88" text-anchor="middle">run</text><text class="big sep" x="402.8" y="44" textLength="13.2" lengthAdjust="spacingAndGlyphs">_</text><text class="big suf" x="416.0" y="44" textLength="39.6" lengthAdjust="spacingAndGlyphs">eeg</text><path class="flt" d="M418.0 58 v8 H453.6 v-8"/><text class="small" x="435.8" y="88" text-anchor="middle">suffix</text><text class="big ext" x="455.6" y="44" textLength="66.0" lengthAdjust="spacingAndGlyphs">.vhdr</text><path class="int" d="M457.6 58 v8 H519.6 v-8"/><path class="line" d="M488.6 70 V96"/><text class="small" x="488.6" y="110" text-anchor="middle">extension</text></svg>
+        </figure>
+        <ul>
+          <li>A name is a chain of <em>key-value</em> pairs. A hyphen joins each key to its value, and underscores separate the pairs.</li>
+          <li>The order is fixed: <code>sub</code>, <code>ses</code>, <code>task</code>, <code>acq</code>, <code>run</code>. Only <code>sub</code> and <code>task</code> are always needed.</li>
+          <li>Values can only contain letters and numbers. <code>task-rest_EC</code> breaks the name; use <code>task-restEC</code>.</li>
+          <li>Every file from one recording starts the same way. Only the suffix and extension change.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="derivatives">
+        <h2 id="derivatives">Derivatives</h2>
+        <figure class="tree">
+          <svg viewBox="0 0 513 270" role="img" aria-label="The derivatives folder: one folder per pipeline, eeglab-rest, with its own dataset_description.json and the same sub, ses and eeg folders, holding processed files whose names add desc-filtered or desc-clean"><path class="icon dir" d="M20 13 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="40" y="22.5">derivatives/</text><path class="rule" d="M26 26 V44 H39"/><path class="icon dir" d="M42 39 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="62" y="48.5">eeglab-rest/</text><text class="note" x="296" y="48.5">one folder per pipeline</text><path class="rule" d="M48 52 V70 H61"/><path class="icon" d="M66 63 h6 l4 4 v10 h-10 Z"/><text class="" x="84" y="74.5">dataset_description.json</text><text class="note" x="296" y="74.5">must include GeneratedBy</text><path class="rule" d="M48 52 V96 H61"/><path class="icon dir" d="M64 91 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="84" y="100.5">sub-01/</text><path class="rule" d="M70 104 V122 H83"/><path class="icon dir" d="M86 117 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="106" y="126.5">ses-01/</text><path class="rule" d="M92 130 V148 H105"/><path class="icon dir" d="M108 143 h5 l2 2 h7 v9 h-14 Z"/><text class="dir" x="128" y="152.5">eeg/</text><path class="rule" d="M114 156 V174 H127"/><path class="icon" d="M132 167 h6 l4 4 v10 h-10 Z"/><text class="data" x="150" y="178.5">sub-01_ses-01_task-rest_desc-filtered_eeg.set</text><path class="rule" d="M114 156 V200 H127"/><path class="icon" d="M132 193 h6 l4 4 v10 h-10 Z"/><text class="data" x="150" y="204.5">sub-01_ses-01_task-rest_desc-filtered_eeg.fdt</text><path class="rule" d="M114 156 V226 H127"/><path class="icon" d="M132 219 h6 l4 4 v10 h-10 Z"/><text class="data" x="150" y="230.5">sub-01_ses-01_task-rest_desc-clean_eeg.set</text><path class="rule" d="M114 156 V252 H127"/><path class="icon" d="M132 245 h6 l4 4 v10 h-10 Z"/><text class="data" x="150" y="256.5">sub-01_ses-01_task-rest_desc-clean_eeg.fdt</text></svg>
+        </figure>
+        <ul>
+          <li>Each pipeline gets its own folder inside <code>derivatives/</code>, with the same <code>sub-</code>, <code>ses-</code> and <code>eeg/</code> folders below it.</li>
+          <li>Each pipeline folder needs its own <code>dataset_description.json</code>, including a <code>GeneratedBy</code> field naming the software that made it.</li>
+          <li>A processed file keeps the raw file&rsquo;s name and adds a <code>desc-</code> label before the suffix, saying what was done.</li>
+          <li>Raw files are never overwritten.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="checking">
+        <h2 id="checking">Checking a Dataset</h2>
+        <ul>
+          <li>The <a class="inline" href="https://bids-standard.github.io/bids-validator/">BIDS Validator</a> checks a dataset in the browser and lists anything that breaks the rules.</li>
+          <li>MNE-BIDS (Python) and the EEG-BIDS plugin for EEGLAB can write a BIDS dataset, including the sidecar files, from the original recordings.</li>
+        </ul>
+      </section>
+
+      <nav class="foot-nav" aria-label="Page navigation">
+        <a href="eeg-common-file-types.html">← Common File Types</a>
+        <a href="eeg-preprocessing.html">All Preprocessing pages →</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>

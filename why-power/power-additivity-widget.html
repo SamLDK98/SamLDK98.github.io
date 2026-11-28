@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adding two waves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .widget { --w1: #7aa7ff; --w2: #7fcf9a; --mad: #e8a33d; --pow: #ff5cb8;
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) 3.2rem 4.6rem; column-gap: 0.6rem; align-items: center; }
+  .num { text-align: right; } .m { color: var(--mad); } .p { color: var(--pow); }
+  .head { margin-bottom: 0.2rem; } .head .m, .head .p { font-size: 11px; }
+  .lab { display: block; margin-bottom: 0.1rem; }
+  .l1 { color: var(--w1); } .l2 { color: var(--w2); } .lc { color: var(--ink); }
+  .trace svg { display: block; width: 100%; overflow: visible; }
+  .baseline { stroke: var(--dim); stroke-width: 1; }
+  path { fill: none; vector-effect: non-scaling-stroke; }
+  .p1 { stroke: var(--w1); stroke-width: 1.6; } .p2 { stroke: var(--w2); stroke-width: 1.6; } .pc { stroke: var(--ink); stroke-width: 2; }
+  /* each wave's three controls, in a line under its trace: value above, slim slider below */
+  .ctl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 0.2rem 0 0.9rem; }
+  .ctl label { display: block; text-align: center; font-size: 11px; }
+  .ctl input[type="range"] { width: 100%; margin: 0; height: 22px; }
+  .ctl input[type="range"]::-webkit-slider-thumb { width: 13px; height: 13px; margin-top: -5px; box-shadow: 0 0 0 3px rgba(244, 246, 255, 0.12); }
+  .ctl input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; box-shadow: 0 0 0 3px rgba(244, 246, 255, 0.12); }
+  .ctl input[type="range"]::-webkit-slider-runnable-track { height: 2px; }
+  .ctl input[type="range"].fresh::-webkit-slider-thumb, .ctl input[type="range"].fresh::-moz-range-thumb { animation-name: nudge-small; }
+  @keyframes nudge-small { 0% { box-shadow: 0 0 0 3px rgba(244, 246, 255, 0.35); } 70%, 100% { box-shadow: 0 0 0 8px rgba(244, 246, 255, 0); } }
+  .r1 label { color: var(--w1); } .r2 label { color: var(--w2); }
+  .sum .rule { border-top: 1px solid var(--dim); padding-top: 0.25rem; }
+  .sum { margin: 0.1rem 0 0.6rem; } .sum .num { color: var(--ink); opacity: 0.85; } .sum .tag { text-align: right; color: var(--dim); }
+  .rel { font-size: 14px; margin-right: 0.25rem; }
+  .note { text-align: center; font-family: system-ui, sans-serif; font-size: 0.8rem; color: var(--dim); margin-top: 0.5rem; min-height: 1.2em; }
+</style>
+</head>
+<body>
+<div class="widget" role="group" aria-label="Wave 1 and wave 2, each with its MAD and average power beside it and its frequency, amplitude and phase controls beneath it. The two MADs and the two powers are added like a column sum and compared with the combined wave's own MAD and power.">
+  <div class="row head"><span></span><span class="num m">MAD</span><span class="num p">Avg power</span></div>
+
+  <div class="row"><div class="trace"><span class="lab l1">1</span><svg viewBox="0 0 285 60"><line class="baseline" x1="0" x2="285" y1="30" y2="30" /><path class="p1" id="w1" /></svg></div>
+    <span class="num m" id="m1"></span><span class="num p" id="p1"></span></div>
+  <div class="row"><div class="ctl r1">
+      <label><input type="range" id="f1" min="1" max="8" step="1" value="2" aria-label="Wave 1 frequency" /></label>
+      <label><input type="range" id="a1" min="0.5" max="5" step="0.5" value="3" aria-label="Wave 1 amplitude" /></label>
+      <label><input type="range" id="ph1" min="0" max="360" step="5" value="0" aria-label="Wave 1 phase" /></label>
+    </div><span></span><span></span></div>
+
+  <div class="row"><div class="trace"><span class="lab l2">2</span><svg viewBox="0 0 285 60"><line class="baseline" x1="0" x2="285" y1="30" y2="30" /><path class="p2" id="w2" /></svg></div>
+    <span class="num m" id="m2"></span><span class="num p" id="p2"></span></div>
+  <div class="row"><div class="ctl r2">
+      <label><input type="range" id="f2" min="1" max="8" step="1" value="6" aria-label="Wave 2 frequency" /></label>
+      <label><input type="range" id="a2" min="0.5" max="5" step="0.5" value="3" aria-label="Wave 2 amplitude" /></label>
+      <label><input type="range" id="ph" min="0" max="360" step="5" value="0" aria-label="Wave 2 phase" /></label>
+    </div><span></span><span></span></div>
+
+  <div class="row sum"><span class="tag">sum</span><span class="num rule" id="ms"></span><span class="num rule" id="ps"></span></div>
+
+  <div class="row"><div class="trace"><span class="lab lc">1 + 2</span><svg viewBox="0 0 285 116"><line class="baseline" x1="0" x2="285" y1="58" y2="58" /><path class="pc" id="wc" /></svg></div>
+    <span class="num m"><span class="rel" id="mrel"></span><span id="mc"></span></span><span class="num p"><span class="rel" id="prel"></span><span id="pc"></span></span></div>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  // Both waves are measured over exactly one second, so each holds a whole number of cycles.
+  // MAD and average power are computed from 2,000 samples of each wave and of their sum.
+  const $ = id => document.getElementById(id), N = 2000, S = 5.6, W = 285;   // 5.6 px per µV on every row
+  const ins = ["f1", "a1", "ph1", "f2", "a2", "ph"].map($);
+  function trace(vals, mid) {
+    const step = N / W; let d = "";
+    for (let i = 0; i <= W; i++) { const v = vals[Math.min(N - 1, Math.round(i * step))]; d += (i ? " L" : "M") + i + "," + (mid - S * v).toFixed(1); }
+    return d;
+  }
+  const mad = v => v.reduce((s, x) => s + Math.abs(x), 0) / v.length;
+  const pow = v => v.reduce((s, x) => s + x * x, 0) / v.length;
+  function draw() {
+    const [f1, a1, ph1, f2, a2, ph] = ins.map(i => i.valueAsNumber);
+    const phi1 = ph1 * Math.PI / 180, phi2 = ph * Math.PI / 180;
+    const w1 = [], w2 = [], wc = [];
+    for (let n = 0; n < N; n++) {
+      const t = n / N, x1 = a1 * Math.sin(2 * Math.PI * f1 * t + phi1), x2 = a2 * Math.sin(2 * Math.PI * f2 * t + phi2);
+      w1.push(x1); w2.push(x2); wc.push(x1 + x2);
+    }
+    $("w1").setAttribute("d", trace(w1, 30)); $("w2").setAttribute("d", trace(w2, 30)); $("wc").setAttribute("d", trace(wc, 58));
+    const M = [mad(w1), mad(w2), mad(wc)], P = [pow(w1), pow(w2), pow(wc)], fm = x => x.toFixed(2);
+    $("m1").textContent = fm(M[0]); $("m2").textContent = fm(M[1]); $("ms").textContent = fm(M[0] + M[1]); $("mc").textContent = fm(M[2]);
+    $("p1").textContent = fm(P[0]); $("p2").textContent = fm(P[1]); $("ps").textContent = fm(P[0] + P[1]); $("pc").textContent = fm(P[2]);
+    $("mrel").textContent = Math.abs(M[0] + M[1] - M[2]) < 0.005 ? "=" : "≠";
+    $("prel").textContent = Math.abs(P[0] + P[1] - P[2]) < 0.005 ? "=" : "≠";
+  }
+  ins.forEach(i => i.addEventListener("input", draw));
+  draw();
+</script>
+</body>
+</html>

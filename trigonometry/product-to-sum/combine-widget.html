@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The product as two cosine waves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root { --text: #ece2d1; --dim: #a89c87; --faint: rgba(236,226,209,0.22); --accent: #d4b888;
+          --a: #7aa7ff; --b: #7fcf9a; --p: #f2d45c; --d: #9d8cff; --s: #6fe0e0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; color: var(--text); font-family: 'EB Garamond', Georgia, serif; -webkit-font-smoothing: antialiased; }
+  .widget { max-width: 640px; margin: 0 auto; padding: 0.4rem 0 0.6rem; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .base { stroke: var(--faint); stroke-width: 1; }
+  .w { fill: none; stroke-width: 1.7; stroke-linejoin: round; }
+  .sum { fill: none; stroke: var(--text); stroke-width: 1.6; stroke-dasharray: 5 4; transition: opacity 0.3s; }
+  .controls { text-align: center; margin-top: 1.1rem; }
+  button { font: inherit; font-size: 1.05rem; color: var(--accent); background: none; border: 0; border-bottom: 1px solid rgba(212,184,136,0.45); padding: 0.15rem 0.1rem; cursor: pointer; }
+  button:hover { color: var(--text); }
+  button:focus-visible { outline: 1px solid var(--dim); outline-offset: 4px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg viewBox="0 0 440 372" id="svg" role="img" aria-label="A 2 hertz sine wave and a 3 hertz sine wave, each of amplitude 1; their product; and two cosine waves of amplitude one half, at 1 hertz and inverted at 5 hertz. Pressing Combine adds the two cosine waves together on top of the product, where they match it exactly.">
+  </svg>
+  <div class="controls"><button type="button" id="go">Combine</button></div>
+</div>
+<script>
+  const NS = "http://www.w3.org/2000/svg", W = 440, S = 24, svg = document.getElementById("svg");
+  const TAU = 2 * Math.PI;
+  const f1 = t => Math.sin(TAU * 2 * t), f2 = t => Math.sin(TAU * 3 * t), pr = t => f1(t) * f2(t);
+  const c1 = t => 0.5 * Math.cos(TAU * 1 * t), c2 = t => -0.5 * Math.cos(TAU * 5 * t);
+  const el = (tag, a, txt) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt) e.textContent = txt; svg.appendChild(e); return e; };
+  const path = (fn, mid) => { let d = ""; for (let i = 0; i <= W; i++) d += (i ? " L" : "M") + i + "," + (mid - S * fn(i / W)).toFixed(2); return d; };
+  const rows = [
+    { fn: f1, label: "sin, 2 Hz", col: "var(--a)", y: 12, mid: 46 },
+    { fn: f2, label: "sin, 3 Hz", col: "var(--b)", y: 94, mid: 128 },
+    { fn: pr, label: "product", col: "var(--p)", y: 176, mid: 210 },
+    { fn: c1, label: "½ cos, 1 Hz", col: "var(--d)", y: 270, mid: 292 },
+    { fn: c2, label: "−½ cos, 5 Hz", col: "var(--s)", y: 330, mid: 352 },
+  ];
+  rows.forEach(r => {
+    el("text", { x: 0, y: r.y, fill: r.col }, r.label);
+    el("line", { class: "base", x1: 0, x2: W, y1: r.mid, y2: r.mid });
+    el("path", { class: "w", d: path(r.fn, r.mid), stroke: r.col });
+  });
+  const sum = el("path", { class: "sum", style: "opacity:0" });
+  const note = el("text", { x: W, y: 176, "text-anchor": "end", fill: "var(--text)", style: "opacity:0" }, "½ cos, 1 Hz  −  ½ cos, 5 Hz");
+  let on = false, anim = null;
+  function frame(k) { sum.setAttribute("d", path(t => c1(t) + k * c2(t), 210)); }
+  document.getElementById("go").addEventListener("click", () => {
+    on = !on; cancelAnimationFrame(anim);
+    const btn = document.getElementById("go"); btn.textContent = on ? "Separate" : "Combine";
+    if (!on) { sum.style.opacity = 0; note.style.opacity = 0; return; }
+    sum.style.opacity = 1; note.style.opacity = 1;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now(), D = 1100;
+    const step = now => { const k = reduce ? 1 : Math.min(1, (now - t0) / D); frame(k < 1 ? k * k * (3 - 2 * k) : 1); if (k < 1) anim = requestAnimationFrame(step); };
+    frame(0); anim = requestAnimationFrame(step);
+  });
+</script>
+</body>
+</html>

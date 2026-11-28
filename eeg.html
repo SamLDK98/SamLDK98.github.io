@@ -3,156 +3,414 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Interactive explanations of EEG analysis by Sam Kirwan." />
-  <title>EEG</title>
+  <meta name="description" content="EEG: preprocessing recordings and analysing them — explanations by Sam Kirwan." />
+  <title>EEG | Sam Kirwan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #08090b;
-      --text: #f4f5f8;
-      --soft: rgba(244, 245, 248, 0.6);
-      --accent: #7aa7ff;
+      --beige: #e8dcc6;
+      --beige-deep: #ddcfb5;
+      --ink: #1d1a16;
+      --ink-deep: #0b0907;
+      --ink-soft: rgba(29, 26, 22, 0.55);
+      --black: #121110;
+      --cream: #efe6d6;
+      --cream-soft: rgba(239, 230, 214, 0.62);
+      --gold: #d9a441;
+      --gold-deep: #b5852b;
     }
-    html, body { min-height: 100%; }
+
+    html, body { height: 100%; }
     body {
       min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-x: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Space Grotesk", system-ui, sans-serif;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      font-family: "Alegreya", Georgia, serif;
       -webkit-font-smoothing: antialiased;
     }
-    /* a faint EEG trace running behind the page */
-    .trace { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100svh; pointer-events: none; }
-    main {
-      position: relative; z-index: 1;
-      width: min(46rem, calc(100% - 2rem));
-      margin-left: clamp(2rem, 11vw, 10rem);
-      padding: clamp(3rem, 9vh, 5.5rem) 0;
-      text-align: left;
+
+    /* a fine grain over both halves, so the colours read as paper and matte card rather than flat screen */
+    .half { position: relative; overflow: hidden; }
+    .half::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
     }
-    h1 {
-      font-size: clamp(3rem, 7vw, 5.4rem);
-      font-weight: 300;
-      line-height: 0.96;
-      letter-spacing: -0.045em;
+
+    /* right: the sections, on beige */
+    .sections {
+      background: radial-gradient(ellipse 90% 80% at 40% 45%, var(--beige) 0%, var(--beige-deep) 100%);
+      color: var(--ink);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 8vw, 7rem);
     }
-    nav { margin-top: clamp(2.4rem, 6vh, 4rem); }
-    h2 {
-      margin-bottom: 1.1rem;
-      color: var(--accent);
-      opacity: 0.85;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-    nav section + section { margin-top: 2rem; }
-    ul { list-style: none; counter-reset: page; }
-    li { counter-increment: page; display: flex; align-items: baseline; gap: 1.1rem; }
-    li::before {
-      content: counter(page, decimal-leading-zero);
-      min-width: 1.6rem;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--accent);
-      opacity: 0.75;
-    }
-    li + li { margin-top: 0.7rem; }
-    a, li.planned span {
+    .sections::after { opacity: 0.16; mix-blend-mode: multiply; }
+
+    nav { position: relative; z-index: 1; width: 100%; max-width: 26rem; }
+    ul { list-style: none; }
+    .nav-level[hidden] { display: none; }
+    .nav-level:not([hidden]) { animation: rise 320ms ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .nav-level li + li { margin-top: 0.15rem; }
+
+    .nav-item {
       display: inline-block;
-      color: var(--text);
-      font-size: clamp(1rem, 1.65vw, 1.25rem);
-      font-weight: 300;
-      line-height: 1.35;
+      padding: 0.2rem 0;
+      border: 0; background: none; cursor: pointer;
+      color: rgba(29, 26, 22, 0.82);
+      font-family: inherit;
+      font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.2;
+      text-align: left;
       text-decoration: none;
-      transition: color 180ms ease, transform 180ms ease;
     }
-    a:hover,
-    a:focus-visible {
-      color: var(--accent);
-      outline: none;
-      transform: translateX(3px);
+
+    /* on hover a name darkens and thickens, easing through the font's weights */
+    .nav-item { transition: color 350ms ease, font-weight 350ms ease; }
+    .nav-item:focus-visible { color: var(--ink-deep); font-weight: 700; outline: none; }
+    @media (hover: hover) {
+      .nav-item:hover { color: var(--ink-deep); font-weight: 700; outline: none; }
     }
-    /* working titles for pages not yet written */
-    li.planned span { color: var(--soft); opacity: 0.6; }
-    li.planned::before { opacity: 0.4; }
-    @media (max-height: 720px) and (min-width: 600px) {
-      main { padding-block: 2rem; }
-      nav { margin-top: 2rem; }
-      li + li { margin-top: 0.45rem; }
+
+
+    /* the gold hairline along the corner's edge; drawn on phones only */
+    .cut-line { display: none; }
+
+    /* a line drawing for each section, drawn in on hover */
+    .emblem {
+      position: absolute; z-index: 0; pointer-events: none;
+      right: clamp(1rem, 4vw, 4rem); top: 50%; transform: translateY(-50%);
+      width: min(34%, 330px); aspect-ratio: 1; overflow: visible;
     }
-    @media (max-width: 560px) {
-      main {
-        width: min(27rem, calc(100% - 4rem));
-        margin-left: 2rem;
+    .emblem path { fill: none; stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .emblem .faint { opacity: 0.3; }
+    .emblem .accent { fill: var(--gold-deep); stroke: none; }
+    .emblem g { transition: opacity 380ms ease; }
+
+
+    /* left: the overview, on matte black */
+    .about {
+      background: var(--black);
+      color: var(--cream);
+      display: flex; align-items: center;
+      padding: clamp(2.5rem, 8vh, 5rem) clamp(2rem, 6vw, 5.5rem);
+      box-shadow: inset -18px 0 40px -28px rgba(0, 0, 0, 0.9);
+    }
+    .about::after { opacity: 0.05; mix-blend-mode: screen; }
+    .about > div { position: relative; z-index: 1; max-width: 25rem; }
+    .about .kicker {
+      font-family: "Alegreya SC", Georgia, serif; font-weight: 700;
+      font-size: 0.95rem; line-height: 1.4; letter-spacing: 0.06em; color: var(--gold);
+      margin-top: 2.6rem;
+    }
+    .about .kicker .dot { margin: 0 0.45rem; }
+    .about h1 {
+      font-weight: 500; font-size: clamp(1.6rem, 2.6vw, 2.15rem); line-height: 1.22;
+      color: var(--cream); margin-bottom: 1.4rem;
+    }
+    .about p { font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.6; color: var(--cream-soft); }
+    .about p + p { margin-top: 0.9rem; }
+    .about .intro.title { font-size: clamp(2.6rem, 4.6vw, 3.8rem); line-height: 1.1; }
+    .about a.kicker { display: inline-block; text-decoration: none; transition: color 200ms ease; }
+    .about a.kicker:hover, .about a.kicker:focus-visible { color: var(--cream); outline: none; }
+    .about .intro { font-weight: 500; font-size: clamp(1.4rem, 2.2vw, 1.85rem); line-height: 1.3; color: var(--cream); }
+
+    /* phones: the same layout as the homepage. The whole screen in black, with the sections on a beige
+       corner in the bottom right, right-aligned where the thumb rests. */
+    @media (max-width: 760px) {
+      html, body { height: auto; }
+      body { display: block; position: relative; min-height: 100svh; background: var(--black); }
+      .half { position: absolute; inset: 0; min-height: 100svh; }
+      .about { align-items: flex-start; padding: 3rem 1.6rem; box-shadow: none; }
+      .about > div { max-width: 78%; }
+      .about .intro.title { font-size: 2.5rem; }
+      .sections {
+        z-index: 2;
+        align-items: flex-end; justify-content: flex-end;
+        padding: 0 1.5rem max(2.2rem, calc(env(safe-area-inset-bottom) + 1rem));
+        clip-path: polygon(100% 30%, 100% 100%, -30% 100%);
       }
-      h1 { font-size: clamp(2.7rem, 13vw, 4rem); }
-      nav { margin-top: 2.6rem; }
-      li + li { margin-top: 0.8rem; }
+      nav { max-width: none; text-align: right; }
+      .cut-line {
+        display: block; position: absolute; z-index: 3; inset: 0;
+        width: 100%; height: 100%; min-height: 100svh; pointer-events: none;
+      }
+      .cut-line line { stroke: var(--gold-deep); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: 0.7; }
+      .nav-item { font-size: 1.55rem; padding: 0.25rem 0; text-align: right; }
+      .nav-level li + li { margin-top: 0.05rem; }
+      .emblem { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
-      a { transition: none; }
+      .nav-level:not([hidden]) { animation: none; }
+      .nav-item { transition: none; }
+      .emblem g { transition: none; }
     }
   </style>
 </head>
 <body>
-  <canvas class="trace" aria-hidden="true"></canvas>
-  <main>
-    <h1>EEG</h1>
-    <nav aria-label="EEG pages">
-      <section id="basics" aria-labelledby="ch-basics">
-        <h2 id="ch-basics">Basics</h2>
-        <ul>
-          <li><a href="eeg-amplitude-and-power.html">Amplitude and Power</a></li>
-        </ul>
-      </section>
-      <section aria-labelledby="ch-frequency">
-        <h2 id="ch-frequency">Frequency Domain Analyses</h2>
-        <ul>
-          <li><a href="eeg-frequency-domain-overview.html">An Overview of Frequency Domain Analyses</a></li>
-          <li><a href="eeg-power-spectral-density.html">Power Spectral Density</a></li>
-          <li class="planned"><span>Time&ndash;Frequency Analysis</span></li>
-          <li class="planned"><span>Coherence and Connectivity</span></li>
-          <li class="planned"><span>Cross-Frequency Coupling</span></li>
-          <li class="planned"><span>The Aperiodic Component</span></li>
-        </ul>
-      </section>
+  <aside class="half about" aria-label="About this site">
+    <div>
+      <h1 class="intro title">EEG</h1>
+    </div>
+  </aside>
+
+  <svg class="cut-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="100" y1="30" x2="-30" y2="100" /></svg>
+
+  <main class="half sections" aria-label="Sections">
+    <svg class="emblem" viewBox="0 0 300 300" aria-hidden="true"></svg>
+    <nav aria-label="EEG sections" data-level="home">
+      <ul class="nav-level" data-level="home">
+        <li><button class="nav-item" type="button" data-open-level="basics" data-emblem="eeg">Basics</button></li>
+        <li><a class="nav-item" href="eeg-preprocessing.html" data-emblem="preprocessing">Preprocessing</a></li>
+        <li><a class="nav-item" href="eeg-analyses.html" data-emblem="analyses">Analyses</a></li>
+      </ul>
+      <ul class="nav-level" data-level="basics" hidden>
+        <li><a class="nav-item" href="eeg-amplitude-and-power.html" data-emblem="eeg">Amplitude and Power</a></li>
+      </ul>
     </nav>
   </main>
+
+
   <script>
-    // A faint EEG-like trace drifting across the lower part of the page: a few rhythms and some
-    // irregular background, scrolling slowly from right to left. Still for reduced motion.
-    (function () {
-      var c = document.querySelector(".trace"); if (!c || !c.getContext) return;
-      var ctx = c.getContext("2d"), W, H;
-      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      var parts = [];
-      for (var i = 0; i < 24; i++) { var f = 0.4 + Math.random() * 14; parts.push([f, (1 / Math.sqrt(f)) * (0.6 + Math.random()), Math.random() * 6.283]); }
-      parts.push([10, 1.1, 0]);   // alpha
-      var peak = 0; for (var j = 0; j < 4000; j++) { var t = j / 100; var s0 = 0; for (var i2 = 0; i2 < parts.length; i2++) s0 += parts[i2][1] * Math.sin(2 * Math.PI * parts[i2][0] * t + parts[i2][2]); peak = Math.max(peak, Math.abs(s0)); }
-      function size() {
-        var k = window.devicePixelRatio || 1; W = window.innerWidth; H = window.innerHeight;
-        c.width = W * k; c.height = H * k; ctx.setTransform(k, 0, 0, k, 0, 0);
+    const nav = document.querySelector("nav");
+    const levels = [...document.querySelectorAll(".nav-level[data-level]")];
+    const levelNames = { home: "EEG sections", basics: "EEG Basics", math: "Math chapters", physics: "Physics chapters", random: "Random chapters" };
+
+    function showLevel(level) {
+      const nextLevel = levelNames[level] ? level : "home";
+      levels.forEach((list) => { list.hidden = list.dataset.level !== nextLevel; });
+      nav.setAttribute("aria-label", levelNames[nextLevel]);
+      nav.dataset.level = nextLevel;
+    }
+
+    document.querySelectorAll("[data-open-level]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const level = button.dataset.openLevel;
+        showLevel(level);
+        history.pushState({ level }, "", `#${level}`);
+      });
+    });
+
+    addEventListener("popstate", () => showLevel(location.hash.slice(1)));
+    showLevel(location.hash.slice(1));
+
+    /* emblems: a small line drawing for each section */
+    (() => {
+      const svg = document.querySelector(".emblem");
+      const NS = "http://www.w3.org/2000/svg";
+      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const TAU = Math.PI * 2;
+      const f = (n) => n.toFixed(1);
+      const line = (pts) => "M" + pts.map(([x, y]) => `${f(x)} ${f(y)}`).join(" L");
+      const curve = (g, x0, x1, n = 120) => line(Array.from({ length: n + 1 }, (_, i) => { const x = x0 + (x1 - x0) * i / n; return [x, g(x)]; }));
+      const circle = (cx, cy, r) => `M${f(cx + r)} ${f(cy)} A${r} ${r} 0 1 0 ${f(cx - r)} ${f(cy)} A${r} ${r} 0 1 0 ${f(cx + r)} ${f(cy)}`;
+      const rect = (x, y, w, h) => `M${x} ${y} h${w} v${h} h${-w} Z`;
+      const rand = (seed) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      const dot = (x, y, r = 3.4) => ({ dot: [x, y, r] });
+      const faint = (d) => ({ d, faint: true });
+
+      const draw = {
+        eeg() {
+          const out = [], r = rand(7);
+          for (let k = 0; k < 5; k++) {
+            const base = 70 + k * 40, ph = r() * TAU, fr = 0.05 + r() * 0.08, nz = Array.from({ length: 141 }, () => r() - 0.5);
+            out.push(line(nz.map((n, i) => { const x = 20 + i * 1.85; return [x, base + 10 * Math.sin(fr * x + ph) + 5 * Math.sin(fr * 3.1 * x) + 7 * n]; })));
+          }
+          return out;
+        },
+        // a raw trace with a blink and a burst of noise, above the same trace cleaned
+        preprocessing() {
+          const r = rand(11), nz = Array.from({ length: 141 }, () => r() - 0.5);
+          const clean = (x, i) => 8 * Math.sin(x / 9) + 4 * Math.sin(x / 3.3) + 4 * nz[i];
+          const blink = (x) => -55 * Math.exp(-((x - 95) ** 2) / 260);
+          const burst = (x, i) => (x > 190 && x < 235 ? 22 * (r() - 0.5) : 0);
+          const xs = nz.map((_, i) => 20 + i * 1.85);
+          return [line(xs.map((x, i) => [x, 105 + clean(x, i) + blink(x) + burst(x, i)])),
+            faint(line([[150, 140], [150, 172]])), faint(line([[142, 164], [150, 172], [158, 164]])),
+            line(xs.map((x, i) => [x, 210 + clean(x, i)]))];
+        },
+        // a power spectrum: a falling background with an alpha peak
+        analyses() {
+          const g = (x) => 235 - 150 * Math.exp(-(x - 40) / 70) - 70 * Math.exp(-((x - 150) ** 2) / 300);
+          return [faint(line([[35, 250], [280, 250]])), faint(line([[35, 250], [35, 40]])), curve(g, 40, 275, 200)];
+        },
+        math() {
+          const a = 0.85, cx = 80, cy = 150, r = 55;
+          const px = cx + r * Math.cos(a), py = cy - r * Math.sin(a);
+          return [faint(line([[15, cy], [290, cy]])), circle(cx, cy, r), line([[cx, cy], [px, py]]),
+            faint(line([[px, py], [160, py]])), curve((x) => cy - r * Math.sin(a - (x - 160) / 130 * TAU), 160, 290), dot(px, py)];
+        },
+        apps() {
+          const c = 32, x0 = 70, y0 = 70, out = [line([[x0, y0], [x0, y0 + 5 * c], [x0 + 5 * c, y0 + 5 * c], [x0 + 5 * c, y0]])];
+          [[0, 4], [1, 4], [2, 4], [2, 3], [3, 4], [4, 4], [4, 3], [3, 3], [0, 3], [0, 2], [1, 3], [4, 2], [2, 0], [2, 1], [3, 1], [1, 1]]
+            .forEach(([i, j], k) => out.push(k >= 12 ? faint(rect(x0 + i * c, y0 + j * c, c, c)) : rect(x0 + i * c, y0 + j * c, c, c)));
+          out.push(dot(x0 + 2.5 * c, y0 + 0.5 * c));
+          return out;
+        },
+        eeg() {
+          const out = [], r = rand(7);
+          for (let k = 0; k < 5; k++) {
+            const base = 70 + k * 40, ph = r() * TAU, fr = 0.05 + r() * 0.08, nz = Array.from({ length: 141 }, () => r() - 0.5);
+            out.push(line(nz.map((n, i) => { const x = 20 + i * 1.85; return [x, base + 10 * Math.sin(fr * x + ph) + 5 * Math.sin(fr * 3.1 * x) + 7 * n]; })));
+          }
+          out.push(faint(line([[20, 250], [280, 250]])), dot(20, 70));
+          return out;
+        },
+        neurophysiology() {
+          const v = (x) => x < 110 ? 200 - 22 * Math.exp((x - 110) / 18)
+            : x < 130 ? 178 - 128 * Math.sin((x - 110) / 20 * Math.PI / 2)
+            : x < 160 ? 50 + 170 * (1 - Math.cos((x - 130) / 30 * Math.PI)) / 2
+            : 220 - 20 * (1 - Math.exp(-(x - 160) / 30));
+          return [faint(line([[20, 200], [280, 200]])), faint(line([[20, 50], [280, 50]])), curve(v, 20, 280, 260), dot(130, 50)];
+        },
+        physics() {
+          const a = [95, 150], b = [205, 150], out = [circle(...a, 7), circle(...b, 7)];
+          [-150, -95, -50, 50, 95, 150].forEach((h) => out.push(`M${a[0] + 7} ${a[1]} C${a[0] + 30} ${a[1] + h} ${b[0] - 30} ${b[1] + h} ${b[0] - 7} ${b[1]}`));
+          out.push(line([[a[0] + 7, a[1]], [b[0] - 7, b[1]]]));
+          [[-1, 0], [-0.7, 0.7], [-0.7, -0.7]].forEach(([dx, dy]) => out.push(faint(line([[a[0] + 10 * dx, a[1] + 10 * dy], [a[0] + 60 * dx, a[1] + 60 * dy]]))));
+          [[1, 0], [0.7, 0.7], [0.7, -0.7]].forEach(([dx, dy]) => out.push(faint(line([[b[0] + 10 * dx, b[1] + 10 * dy], [b[0] + 60 * dx, b[1] + 60 * dy]]))));
+          out.push(dot(...a, 3));
+          return out;
+        },
+        random() {
+          const r = rand(11); let x = 150, y = 150; const pts = [[x, y]];
+          for (let i = 0; i < 160; i++) { const t = r() * TAU; x = Math.min(275, Math.max(25, x + 19 * Math.cos(t))); y = Math.min(275, Math.max(25, y + 19 * Math.sin(t))); pts.push([x, y]); }
+          return [line(pts), dot(150, 150), dot(x, y, 2.6)];
+        },
+        numbers() {
+          const out = [line([[20, 180], [280, 180]])];
+          for (let i = 0; i <= 10; i++) out.push(line([[30 + i * 24, 174], [30 + i * 24, 186]]));
+          [[1, 4], [4, 7], [7, 10]].forEach(([p, q]) => out.push(`M${30 + p * 24} 170 Q${30 + (p + q) * 12} 110 ${30 + q * 24} 170`));
+          out.push(faint(`M${30 + 24} 196 Q${30 + 5.5 * 24} 250 ${30 + 10 * 24} 196`), dot(30 + 24, 180), dot(30 + 240, 180));
+          return out;
+        },
+        trigonometry() {
+          const cx = 120, cy = 180, r = 110, a = 0.65, px = cx + r * Math.cos(a), py = cy - r * Math.sin(a);
+          return [faint(line([[cx - 10, cy], [cx + r + 30, cy]])), faint(line([[cx, cy + 10], [cx, cy - r - 30]])),
+            `M${cx + r} ${cy} A${r} ${r} 0 0 0 ${cx} ${cy - r}`, line([[cx, cy], [px, py], [px, cy], [cx, cy]]),
+            `M${cx + 28} ${cy} A28 28 0 0 0 ${f(cx + 28 * Math.cos(a))} ${f(cy - 28 * Math.sin(a))}`, line([[px - 10, cy], [px - 10, cy - 10], [px, cy - 10]]), dot(px, py)];
+        },
+        "complex-numbers"() {
+          const cx = 120, cy = 180, a = 0.9, r = 120, px = cx + r * Math.cos(a), py = cy - r * Math.sin(a);
+          return [line([[20, cy], [285, cy]]), line([[cx, 285], [cx, 20]]), faint(circle(cx, cy, r)), line([[cx, cy], [px, py]]),
+            faint(line([[px, py], [px, cy]])), faint(line([[px, py], [cx, py]])), `M${cx + 34} ${cy} A34 34 0 0 0 ${f(cx + 34 * Math.cos(a))} ${f(cy - 34 * Math.sin(a))}`, dot(px, py)];
+        },
+        algebra() {
+          return [faint(line([[20, 200], [280, 200]])), faint(line([[150, 280], [150, 20]])),
+            curve((x) => 200 + 0.016 * (x - 100) * (x - 200), 62, 238), dot(100, 200), dot(200, 200), dot(150, 160, 2.6)];
+        },
+        functions() {
+          const out = ["M95 60 C40 60 40 240 95 240 C150 240 150 60 95 60", "M215 60 C160 60 160 240 215 240 C270 240 270 60 215 60"];
+          [[95, 100, 215, 120], [95, 150, 215, 120], [95, 200, 215, 190]].forEach(([a, b, c, d]) => out.push(`M${a + 6} ${b} Q155 ${(b + d) / 2 - 22} ${c - 6} ${d}`), );
+          [[95, 100], [95, 150], [95, 200], [215, 120], [215, 190]].forEach(([x, y]) => out.push(dot(x, y, 2.8)));
+          out.push(faint(line([[215, 160], [215, 160.1]])));
+          return out;
+        },
+        calculus() {
+          const g = (x) => 220 - 130 * Math.sin((x - 30) / 260 * Math.PI) - 20 * Math.sin((x - 30) / 50);
+          const out = [faint(line([[20, 240], [285, 240]])), curve(g, 30, 280)];
+          for (let x = 110; x <= 200; x += 9) out.push(faint(line([[x, 240], [x, g(x)]])));
+          const x0 = 230, h = 0.5, m = (g(x0 + h) - g(x0 - h)) / (2 * h);
+          out.push(line([[x0 - 55, g(x0) - 55 * m], [x0 + 45, g(x0) + 45 * m]]), dot(x0, g(x0)));
+          return out;
+        },
+        "linear-algebra"() {
+          const M = ([x, y]) => [150 + (x - 150) + 0.45 * (y - 150), 150 + 0.25 * (x - 150) + 0.85 * (y - 150)];
+          const out = [];
+          for (let i = 0; i <= 6; i++) { const t = 60 + i * 30;
+            out.push(faint(line([[t, 60], [t, 240]])), faint(line([[60, t], [240, t]])));
+            out.push(line([M([t, 60]), M([t, 240])]), line([M([60, t]), M([240, t])])); }
+          out.push(dot(...M([180, 150])), dot(...M([150, 120])), dot(150, 150, 2.6));
+          return out;
+        },
+        "field-theories"() {
+          const out = [], r = rand(3);
+          for (let i = 0; i < 9; i++) for (let j = 0; j < 9; j++) {
+            const x = 40 + i * 27.5, y = 40 + j * 27.5, t = Math.atan2(y - 150, x - 150) + Math.PI / 2 + 0.6 * Math.sin(x / 40);
+            const l = 6 + 5 * Math.exp(-((x - 150) ** 2 + (y - 150) ** 2) / 8000);
+            out.push(line([[x - l * Math.cos(t), y - l * Math.sin(t)], [x + l * Math.cos(t), y + l * Math.sin(t)]]));
+          }
+          out.push(dot(150, 150));
+          return out;
+        },
+        "active-inference"() {
+          const cx = 150, cy = 150;
+          return [faint(circle(cx, cy, 118)), circle(cx, cy, 62),
+            `M${cx - 95} ${cy - 20} A100 100 0 0 1 ${cx + 95} ${cy - 20}`, line([[cx + 95, cy - 20], [cx + 84, cy - 30]]), line([[cx + 95, cy - 20], [cx + 99, cy - 34]]),
+            `M${cx + 95} ${cy + 20} A100 100 0 0 1 ${cx - 95} ${cy + 20}`, line([[cx - 95, cy + 20], [cx - 84, cy + 30]]), line([[cx - 95, cy + 20], [cx - 99, cy + 34]]),
+            dot(cx, cy)];
+        },
+        "math-misc"() {
+          const s1 = (x) => 30 * Math.sin((x - 30) / 260 * 2 * Math.PI * 1.5), s2 = (x) => 12 * Math.sin((x - 30) / 260 * 2 * Math.PI * 7 + 1);
+          return [faint(curve((x) => 85 + s1(x), 30, 270, 200)), faint(curve((x) => 150 + s2(x), 30, 270, 240)), curve((x) => 225 + s1(x) + s2(x), 30, 270, 300)];
+        },
+        calendars() {
+          const out = [], s = 30, x0 = 45, y0 = 75;
+          out.push(line([[x0, y0 - 12], [x0 + 7 * s, y0 - 12]]));
+          for (let j = 0; j < 5; j++) for (let i = 0; i < 7; i++) { const k = j * 7 + i; if (k < 2 || k > 32) continue;
+            out.push((k % 7 === 6 || k % 7 === 0) ? faint(rect(x0 + i * s + 3, y0 + j * s + 3, s - 6, s - 6)) : rect(x0 + i * s + 3, y0 + j * s + 3, s - 6, s - 6)); }
+          out.push(dot(x0 + 4.5 * s, y0 + 2.5 * s));
+          return out;
+        },
+      };
+
+      const cache = {};
+      let current = null, timer = null;
+      function build(key) {
+        const g = document.createElementNS(NS, "g");
+        draw[key]().forEach((it, i, all) => {
+          if (it.dot && key !== "math") return;
+          if (it.dot) {
+            const c = document.createElementNS(NS, "circle");
+            c.setAttribute("cx", f(it.dot[0])); c.setAttribute("cy", f(it.dot[1])); c.setAttribute("r", it.dot[2]);
+            c.setAttribute("class", "accent"); g.appendChild(c); return;
+          }
+          const p = document.createElementNS(NS, "path");
+          p.setAttribute("d", it.d || it);
+          if (it.faint) p.setAttribute("class", "faint");
+          g.appendChild(p);
+        });
+        return g;
       }
-      function v(t) { var s = 0; for (var i = 0; i < parts.length; i++) s += parts[i][1] * Math.sin(2 * Math.PI * parts[i][0] * t + parts[i][2]); return s; }
-      function draw(now) {
-        ctx.clearRect(0, 0, W, H);
-        var y0 = H * 0.88, amp = Math.min(40, H * 0.06) / peak, t0 = now / 1000 * 0.35, span = 4;
-        ctx.strokeStyle = "rgba(122, 167, 255, 0.22)"; ctx.lineWidth = 1.2; ctx.beginPath();
-        for (var x = 0; x <= W; x += 2) { var y = y0 - amp * v(t0 + x / W * span); x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
-        ctx.stroke();
-        if (!still) requestAnimationFrame(draw);
+      function show(key) {
+        if (!draw[key] || key === current) return;
+        current = key;
+        svg.querySelectorAll("g").forEach((old) => { old.style.opacity = 0; setTimeout(() => old.remove(), 400); });
+        const g = build(key);
+        svg.appendChild(g);
+        if (still) return;
+        const parts = [...g.children];
+        parts.forEach((el, i) => {
+          const delay = i / parts.length * 450;
+          if (el.tagName === "circle") {
+            el.animate([{ opacity: 0, transform: "scale(0)" }, { opacity: 1, transform: "scale(1)" }],
+              { duration: 300, delay: 650 + delay * 0.3, easing: "cubic-bezier(.3,1.6,.5,1)", fill: "backwards" });
+            el.style.transformBox = "fill-box"; el.style.transformOrigin = "center";
+            return;
+          }
+          const L = el.getTotalLength();
+          el.style.strokeDasharray = L;
+          el.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 900, delay, easing: "cubic-bezier(.45,.05,.25,1)", fill: "backwards" });
+        });
       }
-      size(); window.addEventListener("resize", function () { size(); if (still) draw(0); });
-      still ? draw(0) : requestAnimationFrame(draw);
+      const keyOf = (item) => item.dataset.emblem;
+      const levelKey = () => "eeg";
+
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        const go = () => { clearTimeout(timer); document.querySelectorAll(".nav-item.on").forEach((o) => o.classList.remove("on")); item.classList.add("on"); show(keyOf(item)); };
+        item.addEventListener("pointerenter", go);
+        item.addEventListener("focus", go);
+      });
+      nav.addEventListener("pointerleave", () => { timer = setTimeout(() => { document.querySelectorAll(".nav-item.on").forEach((o) => o.classList.remove("on")); show(levelKey()); }, 900); });
+      addEventListener("popstate", () => show(levelKey()));
+      show(levelKey());
     })();
+
+
   </script>
 </body>
 </html>

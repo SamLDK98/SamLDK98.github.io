@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Circular motion and the sine wave</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Spectral:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../eeg/widget-base.css" />
+<style>
+  .circle { fill: none; stroke: var(--faint); stroke-width: 1.2; }
+  .centre { stroke: var(--dim); stroke-width: 1; }
+  .step { fill: var(--dim); }
+  .proj { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 2 3; }
+  .tick { stroke: var(--amp); stroke-width: 1.6; }
+  .axis { stroke: var(--ink); stroke-opacity: 0.5; stroke-width: 1; }
+  .trace { fill: none; stroke: var(--ink); stroke-width: 2; }
+  .tdot { fill: var(--amp); }
+  .mover { fill: var(--ink); }
+  .arm { stroke: var(--ink); stroke-opacity: 0.6; stroke-width: 1.2; }
+  .link { stroke: var(--ink); stroke-opacity: 0.5; stroke-width: 1; stroke-dasharray: 3 3; }
+  .go { display: block; margin: 0.7rem auto 0; font: inherit; font-size: 1.02rem; background: none; border: 0;
+    border-bottom: 1px solid var(--faint); color: var(--ink); padding: 0.1rem 0.2rem; cursor: pointer; }
+  .go:focus-visible { outline: 1px solid var(--dim); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <svg id="svg" viewBox="0 0 440 220" role="img" aria-label="A point moves at a steady speed around a circle, and its height is traced out as a sinusoidal wave. Its height changes slowly near the top and bottom of the circle and quickly along the sides.">
+    <line class="centre" x1="10" x2="430" y1="110" y2="110" />
+    <circle class="circle" cx="80" cy="110" r="72" />
+    <line class="axis" x1="175" x2="175" y1="34" y2="186" />
+    <path class="trace" id="trace" />
+    <line class="arm" id="arm" x1="80" y1="110" />
+    <line class="link" id="link" x2="175" />
+    <circle class="mover" id="mover" r="5" />
+  </svg>
+  <button type="button" class="go" id="go">Pause</button>
+</div>
+<script src="../eeg/widget-base.js"></script>
+<script>
+  const NS = "http://www.w3.org/2000/svg", CX = 80, CY = 110, R = 72, AX = 175, X1 = 430, STEPS = 24;
+  const PX_PER_RAD = (X1 - AX) / (3 * Math.PI);     // the trace shows the last one and a half turns
+  const mk = (g, tag, a) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); document.getElementById(g).appendChild(e); return e; };
+  let theta = 0.6, last = null, running = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function draw() {
+    const mx = CX + R * Math.cos(theta), my = CY - R * Math.sin(theta);
+    const mover = document.getElementById("mover"); mover.setAttribute("cx", mx); mover.setAttribute("cy", my);
+    const arm = document.getElementById("arm"); arm.setAttribute("x2", mx); arm.setAttribute("y2", my);
+    const link = document.getElementById("link"); link.setAttribute("x1", mx); link.setAttribute("y1", my); link.setAttribute("y2", my);
+    // the trace: height over the recent past, newest at the vertical line
+    let d = "";
+    for (let px = 0; px <= X1 - AX; px += 2) {
+      const a = theta - px / PX_PER_RAD;
+      d += (px ? " L" : "M") + (AX + px) + "," + (CY - R * Math.sin(a)).toFixed(1);
+    }
+    document.getElementById("trace").setAttribute("d", d);
+  }
+  function frame(now) {
+    if (last !== null && running) theta += Math.min((now - last) / 1000, 0.1) * 0.65;
+    last = now; draw(); requestAnimationFrame(frame);
+  }
+  const btn = document.getElementById("go");
+  btn.textContent = running ? "Pause" : "Play";
+  btn.addEventListener("click", () => { running = !running; btn.textContent = running ? "Pause" : "Play"; });
+  requestAnimationFrame(frame);
+</script>
+</body>
+</html>
